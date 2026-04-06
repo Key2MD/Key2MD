@@ -1347,6 +1347,169 @@
       .hero-ctas { flex-direction: column; align-items: center; }
       .cta-banner-btns { flex-direction: column; align-items: center; }
     }
+    /* ═══════════════════════════════
+       GUIDE TEASER
+    ═══════════════════════════════ */
+    .guide-teaser {
+      background: linear-gradient(135deg, #060e1c 0%, #0a1628 50%, #0d2240 100%);
+      padding: 100px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .guide-teaser::before {
+      content: '';
+      position: absolute;
+      bottom: -120px; right: -120px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .guide-teaser-inner {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    /* Book visual */
+    .guide-book-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .guide-book {
+      display: flex;
+      border-radius: 4px 12px 12px 4px;
+      box-shadow: 8px 16px 48px rgba(0,0,0,0.55), 2px 4px 12px rgba(0,0,0,0.4);
+      transform: perspective(600px) rotateY(-10deg);
+      transition: transform 0.4s ease;
+      width: 240px;
+    }
+    .guide-book:hover { transform: perspective(600px) rotateY(-4deg) translateY(-6px); }
+    .guide-book-spine {
+      width: 28px;
+      background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+      border-radius: 4px 0 0 4px;
+      flex-shrink: 0;
+    }
+    .guide-book-cover {
+      flex: 1;
+      background: linear-gradient(160deg, #0d1f3c 0%, #112347 60%, #0a1628 100%);
+      border: 1px solid rgba(14,165,233,0.25);
+      border-left: none;
+      border-radius: 0 10px 10px 0;
+      padding: 28px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 320px;
+    }
+    .guide-book-logo {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--teal2);
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+    .guide-book-logo span { color: var(--gold); }
+    .guide-book-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.3;
+    }
+    .guide-book-sub {
+      font-size: 0.7rem;
+      color: var(--teal2);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+    .guide-book-pages-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 10px 0;
+      flex: 1;
+    }
+    .guide-line {
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+    }
+    .guide-line.short { width: 60%; }
+    .guide-book-badge {
+      display: inline-block;
+      background: rgba(245,158,11,0.2);
+      border: 1px solid rgba(245,158,11,0.4);
+      color: #fbbf24;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 50px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      align-self: flex-start;
+    }
+    .guide-book-shadow {
+      width: 200px;
+      height: 16px;
+      background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%);
+      margin-top: 8px;
+    }
+    /* Content side */
+    .guide-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14,165,233,0.12);
+      border: 1px solid rgba(14,165,233,0.25);
+      color: var(--teal2);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .guide-desc {
+      font-size: 1.02rem;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.75;
+      margin-bottom: 28px;
+      max-width: 520px;
+    }
+    .guide-chapters {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .guide-chapter {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.8);
+    }
+    .guide-ch-num {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--teal);
+      background: rgba(14,165,233,0.12);
+      border: 1px solid rgba(14,165,233,0.22);
+      padding: 3px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      letter-spacing: 0.04em;
+    }
+    @media (max-width: 900px) {
+      .guide-teaser-inner { grid-template-columns: 1fr; gap: 48px; }
+      .guide-book-visual { display: none; }
+    }
+
   </style>
 </head>
 <body>
@@ -1363,6 +1526,7 @@
           <li><a href="about.html">About</a></li>
           <li><a href="testimonials.html">Results</a></li>
           <li><a href="#pricing">Pricing</a></li>
+          <li><a href="guide.html" style="color: rgba(255,255,255,0.8); font-weight: 500;">📖 Free Guide</a></li>
           <li><a href="practice.html" style="color: var(--gold); font-weight: 700;">🎯 Free Practice</a></li>
           <li class="nav-cta"><a href="#book" class="btn btn-primary">Book a Session</a></li>
         </ul>
@@ -1379,6 +1543,7 @@
     <a href="about.html" class="mobile-link">About</a>
     <a href="testimonials.html" class="mobile-link">Results</a>
     <a href="#pricing" class="mobile-link">Pricing</a>
+    <a href="guide.html" class="mobile-link">📖 Free Guide</a>
     <a href="practice.html" class="mobile-link" style="color: var(--gold); font-weight: 700;">🎯 Free Practice Tool</a>
     <a href="#book" class="btn btn-primary">Book a Session →</a>
   </nav>
@@ -1453,12 +1618,12 @@
       <div class="practice-promo-inner">
         <div class="fade-up visible">
           <div class="practice-promo-label">✦ Free Resource</div>
-          <h2>Sharpen your skills with the <span class="gold">Free CASPer Practice Tool</span></h2>
+          <h2>Sharpen your skills with the <span class="gold">Free MMI Practice Tool</span></h2>
           <p>
-            Get unlimited CASPer question practice — completely free. Timed stations, AI-powered feedback, ethics scenarios, role-plays, policy questions, and more. Built by Dan to reflect exactly what Australian medical interviews look like.
+            Get unlimited MMI question practice — completely free. Timed stations, AI-powered feedback, ethics scenarios, role-plays, policy questions, and more. Built by Dan to reflect exactly what Australian medical interviews look like.
           </p>
           <div class="practice-promo-features">
-            <div class="practice-promo-feature">Hundreds of real-style CASPer &amp; MMI-style questions</div>
+            <div class="practice-promo-feature">Hundreds of real-style MMI &amp; CASPer questions</div>
             <div class="practice-promo-feature">Timed practice with configurable reading &amp; response windows</div>
             <div class="practice-promo-feature">Optional AI feedback on your answers</div>
             <div class="practice-promo-feature">Filter by ethics, role-play, policy, personal, and more</div>
@@ -1471,7 +1636,7 @@
             <div class="preview-dot red"></div>
             <div class="preview-dot yellow"></div>
             <div class="preview-dot green"></div>
-            <span>CASPer Practice — Key2MD</span>
+            <span>MMI Practice — Key2MD</span>
           </div>
           <div class="preview-question-label">🎤 Ethics Station · Question 3 of 8</div>
           <div class="preview-question-text">
@@ -1501,9 +1666,36 @@
       <div class="about-grid">
 
         <div class="about-photo-wrap fade-up visible">
-          <div class="about-avatar" style="background: none; border: 4px solid rgba(14,165,233,0.4); overflow: hidden; padding: 0;">
-              <img src="Selfie.jpg" alt="Dan" style="width:100%; height:100%; object-fit:cover; object-position: center top; border-radius: 50%;">
-            </div>
+          <div class="about-avatar" style="background: none; border: none; box-shadow: none; width: 260px; height: 260px; overflow: visible;">
+            <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg" style="width:260px;height:260px;display:block;">
+              <!-- Background circle -->
+              <circle cx="130" cy="130" r="126" fill="#0d1f3c" stroke="rgba(14,165,233,0.35)" stroke-width="3"/>
+              <!-- Subtle grid lines -->
+              <line x1="40" y1="100" x2="220" y2="100" stroke="rgba(14,165,233,0.07)" stroke-width="1"/>
+              <line x1="40" y1="130" x2="220" y2="130" stroke="rgba(14,165,233,0.07)" stroke-width="1"/>
+              <line x1="40" y1="160" x2="220" y2="160" stroke="rgba(14,165,233,0.07)" stroke-width="1"/>
+              <!-- Stethoscope tubing — sweeping S-curve -->
+              <path d="M108 72 C108 72 85 72 78 90 C70 110 70 130 80 148 C92 170 118 178 130 178 C142 178 168 170 180 148 C190 130 190 110 182 90 C175 72 152 72 152 72" fill="none" stroke="#0ea5e9" stroke-width="9" stroke-linecap="round"/>
+              <!-- Earpiece left -->
+              <line x1="108" y1="72" x2="98" y2="54" stroke="#0ea5e9" stroke-width="9" stroke-linecap="round"/>
+              <circle cx="94" cy="48" r="8" fill="#38bdf8"/>
+              <!-- Earpiece right -->
+              <line x1="152" y1="72" x2="162" y2="54" stroke="#0ea5e9" stroke-width="9" stroke-linecap="round"/>
+              <circle cx="166" cy="48" r="8" fill="#38bdf8"/>
+              <!-- Chest piece (diaphragm) -->
+              <circle cx="130" cy="183" r="22" fill="#112347" stroke="#0ea5e9" stroke-width="3"/>
+              <circle cx="130" cy="183" r="14" fill="#0ea5e9" opacity="0.18"/>
+              <circle cx="130" cy="183" r="8" fill="#38bdf8" opacity="0.7"/>
+              <!-- Small cross / pulse line on chest piece -->
+              <path d="M113 200 L118 190 L123 196 L128 182 L133 196 L138 190 L143 200" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+              <!-- Verified badge -->
+              <circle cx="196" cy="74" r="18" fill="#0ea5e9"/>
+              <path d="M187 74 L193 80 L205 68" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <!-- Unimelb / MD label pill -->
+              <rect x="72" y="210" width="116" height="26" rx="13" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.35)" stroke-width="1"/>
+              <text x="130" y="227" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="700" fill="#38bdf8" letter-spacing="0.05em">Unimelb MD · Key2MD</text>
+            </svg>
+          </div>
           <div class="about-badges">
             <span class="badge teal">Unimelb MD Student</span>
             <span class="badge">99.85 ATAR</span>
@@ -1870,6 +2062,49 @@
   </section>
 
   <!-- ══════════════════════════════
+       FREE GUIDE TEASER
+  ══════════════════════════════ -->
+  <section class="guide-teaser" id="guide">
+    <div class="container">
+      <div class="guide-teaser-inner fade-up visible">
+        <div class="guide-book-visual">
+          <div class="guide-book">
+            <div class="guide-book-spine"></div>
+            <div class="guide-book-cover">
+              <div class="guide-book-logo">Key<span>2</span>MD</div>
+              <div class="guide-book-title">The Complete Australian Medical Entrance Guide</div>
+              <div class="guide-book-sub">MMI · CASPer · GAMSAT · Interviews</div>
+              <div class="guide-book-pages-visual">
+                <div class="guide-line"></div><div class="guide-line short"></div>
+                <div class="guide-line"></div><div class="guide-line short"></div>
+                <div class="guide-line"></div>
+              </div>
+              <div class="guide-book-badge">20+ Pages · Free</div>
+            </div>
+          </div>
+          <div class="guide-book-shadow"></div>
+        </div>
+        <div class="guide-teaser-content">
+          <div class="guide-label">✦ Free Resource</div>
+          <h2 class="section-title" style="color:var(--white);">The only guide you need to<br><span style="color:var(--teal2);">get into Australian medicine</span></h2>
+          <p class="guide-desc">
+            A comprehensive 20+ page breakdown of every stage of the Australian medical admissions process — written by Dan from the inside. No fluff, no generic advice. Just the exact frameworks, timelines, and insider knowledge that helped 200+ students get offers.
+          </p>
+          <div class="guide-chapters">
+            <div class="guide-chapter"><span class="guide-ch-num">01</span><span>Understanding the Australian MD landscape</span></div>
+            <div class="guide-chapter"><span class="guide-ch-num">02</span><span>GAMSAT Section II — what markers actually want</span></div>
+            <div class="guide-chapter"><span class="guide-ch-num">03</span><span>The MMI decoded — ethics, role-play & policy stations</span></div>
+            <div class="guide-chapter"><span class="guide-ch-num">04</span><span>CASPer strategy & timing</span></div>
+            <div class="guide-chapter"><span class="guide-ch-num">05</span><span>University-by-university breakdown (Unimelb, Monash, UQ & more)</span></div>
+            <div class="guide-chapter"><span class="guide-ch-num">06</span><span>CSP vs full-fee offers — how to maximise your chances</span></div>
+          </div>
+          <a href="guide.html" class="btn-gold" style="margin-top:8px;">Read the Free Guide →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
        CTA BANNER
   ══════════════════════════════ -->
   <section class="cta-banner" id="book">
@@ -1916,6 +2151,7 @@
             <li><a href="#pricing">Pricing</a></li>
             <li><a href="#faq">FAQ</a></li>
             <li><a href="#book">Book a Session</a></li>
+            <li><a href="guide.html">📖 Free Entrance Guide</a></li>
             <li><a href="practice.html" style="color: #fbbf24; font-weight: 600;">🎯 Free Practice Tool</a></li>
           </ul>
         </div>
