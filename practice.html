@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MMI Practice — Key2MD</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:#0a1628; --navy2:#0d1f3c; --navy3:#112347;
+      --teal:#0ea5e9; --teal2:#38bdf8; --teal3:#0284c7;
+      --white:#ffffff; --gray50:#f8fafc; --gray100:#f1f5f9;
+      --gray200:#e2e8f0; --gray400:#94a3b8; --gray600:#475569; --gray800:#1e293b;
+      --gold:#f59e0b; --red:#ef4444; --green:#22c55e;
+      --radius:16px; --radius-sm:10px; --shadow:0 4px 24px rgba(0,0,0,0.12);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--gray50); color: var(--gray800); line-height: 1.6; min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    header { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(10,22,40,0.92); backdrop-filter:blur(16px); border-bottom:1px solid rgba(255,255,255,0.06); }
+    nav { display:flex; align-items:center; justify-content:space-between; height:68px; max-width:1500px; margin:0 auto; padding:0 24px; }
+    .logo { font-size:1.5rem; font-weight:800; color:var(--white); letter-spacing:-0.5px; }
+    .logo span { color:var(--teal); }
+    .nav-links { display:flex; align-items:center; gap:32px; list-style:none; }
+    .nav-links a { color:rgba(255,255,255,0.75); font-size:0.9rem; font-weight:500; transition:color 0.2s; }
+    .nav-links a:hover { color:var(--teal); }
+    .btn-nav { padding:9px 20px; border-radius:50px; background:var(--teal); color:var(--white); font-size:0.88rem; font-weight:600; transition:all 0.2s; }
+    .btn-nav:hover { background:var(--teal2); transform:translateY(-1px); }
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; background:none; border:none; }
+    .hamburger span { display:block; width:24px; height:2px; background:var(--white); border-radius:2px; transition:all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    .mobile-nav { display:none; position:fixed; top:68px; left:0; right:0; background:var(--navy); border-bottom:1px solid rgba(255,255,255,0.08); padding:20px; z-index:999; flex-direction:column; gap:4px; }
+    .mobile-nav.open { display:flex; }
+    .mobile-nav a { color:rgba(255,255,255,0.85); font-size:1rem; font-weight:500; padding:12px 8px; border-radius:8px; transition:background 0.2s, color 0.2s; }
+    .mobile-nav a:hover { background:rgba(255,255,255,0.06); color:var(--teal); }
+    .mobile-nav .btn-nav { width:100%; text-align:center; margin-top:8px; display:block; padding:13px; }
+
+    .app-wrapper { max-width:1500px; margin:0 auto; padding:88px 24px 40px; display:grid; grid-template-columns:310px 1fr; gap:24px; min-height:100vh; align-items:start; }
+
+    .sidebar { position:sticky; top:88px; display:flex; flex-direction:column; gap:16px; }
+    .sidebar-card { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); padding:20px; }
+    .sidebar-card h3 { font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal3); margin-bottom:14px; }
+    .category-filters { display:flex; flex-direction:column; gap:6px; }
+    .cat-btn { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:8px; border:1px solid var(--gray200); background:var(--gray50); color:var(--gray600); font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s; font-family:inherit; width:100%; text-align:left; }
+    .cat-btn:hover { border-color:var(--teal); color:var(--teal3); background:rgba(14,165,233,0.04); }
+    .cat-btn.active { background:var(--navy); color:var(--white); border-color:var(--navy); }
+    .cat-btn.active .cat-count { background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.8); }
+    .cat-count { font-size:0.72rem; font-weight:600; background:var(--gray200); color:var(--gray600); padding:2px 8px; border-radius:50px; }
+    .timer-settings { display:flex; flex-direction:column; gap:14px; }
+    .setting-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
+    .setting-label { font-size:0.85rem; color:var(--gray600); }
+    .setting-val { font-size:0.85rem; font-weight:700; color:var(--navy); min-width:40px; text-align:right; }
+    input[type="range"] { -webkit-appearance:none; width:100%; height:4px; border-radius:2px; background:var(--gray200); outline:none; cursor:pointer; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--teal); cursor:pointer; transition:transform 0.15s; }
+    input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.2); }
+    .stats-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .stat-mini { background:var(--gray50); border-radius:10px; padding:12px; text-align:center; border:1px solid var(--gray100); }
+    .stat-mini-num { font-size:1.5rem; font-weight:800; color:var(--teal); display:block; }
+    .stat-mini-label { font-size:0.72rem; color:var(--gray400); font-weight:500; }
+    .btn-start { width:100%; padding:16px; border-radius:50px; background:var(--teal); color:var(--white); font-size:1rem; font-weight:700; border:none; cursor:pointer; transition:all 0.25s; font-family:inherit; box-shadow:0 4px 20px rgba(14,165,233,0.35); display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-start:hover { background:var(--teal2); transform:translateY(-2px); }
+    .btn-start.running { background:var(--gray800); box-shadow:none; }
+    .btn-start.running:hover { background:var(--navy); }
+
+    .ai-toggle-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .ai-toggle-label { font-size:0.88rem; font-weight:700; color:var(--gray800); }
+    .toggle-switch { position:relative; width:42px; height:24px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; position:absolute; }
+    .toggle-slider { position:absolute; cursor:pointer; inset:0; background:var(--gray200); border-radius:24px; transition:0.3s; }
+    .toggle-slider::before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:var(--white); border-radius:50%; transition:0.3s; }
+    input:checked + .toggle-slider { background:var(--teal); }
+    input:checked + .toggle-slider::before { transform:translateX(18px); }
+    .api-key-wrap { margin-top:10px; }
+    .api-key-wrap label { font-size:0.78rem; color:var(--gray600); display:block; margin-bottom:6px; }
+    .api-key-input { width:100%; padding:9px 12px; border:1px solid var(--gray200); border-radius:8px; font-size:0.83rem; font-family:inherit; color:var(--gray800); background:var(--gray50); outline:none; transition:border-color 0.2s; }
+    .api-key-input:focus { border-color:var(--teal); background:var(--white); }
+    .api-note { font-size:0.71rem; color:var(--gray400); margin-top:6px; line-height:1.5; }
+    .ai-status { display:flex; align-items:center; gap:6px; font-size:0.78rem; margin-top:10px; padding:8px 10px; border-radius:8px; }
+    .ai-status.ok { background:rgba(34,197,94,0.1); color:#166534; }
+    .ai-status.off { background:var(--gray100); color:var(--gray400); }
+    .ai-status.err { background:rgba(239,68,68,0.1); color:#991b1b; }
+    .sdot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .sdot-green { background:var(--green); }
+    .sdot-gray { background:var(--gray400); }
+    .sdot-red { background:var(--red); }
+
+    .trend-wrap { margin-top:16px; border-top:1px solid var(--gray100); padding-top:14px; }
+    .trend-title { font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--teal3); margin-bottom:10px; }
+    .trend-empty { font-size:0.8rem; color:var(--gray400); text-align:center; padding:16px 0; font-style:italic; }
+    .trend-avg-line { display:flex; align-items:center; justify-content:space-between; margin-top:6px; font-size:0.75rem; color:var(--gray400); }
+    .trend-avg-num { font-weight:700; color:var(--navy); }
+
+    .main-content { display:flex; flex-direction:column; gap:20px; }
+    .station-header { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); padding:20px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+    .station-num { font-size:0.78rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray400); }
+    .category-pill { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:50px; font-size:0.78rem; font-weight:700; }
+    .cat-ethics { background:rgba(245,158,11,0.12); color:#b45309; }
+    .cat-conflict { background:rgba(14,165,233,0.12); color:var(--teal3); }
+    .cat-personal { background:rgba(139,92,246,0.12); color:#7c3aed; }
+    .cat-professional { background:rgba(34,197,94,0.12); color:#16a34a; }
+    .cat-communication { background:rgba(239,68,68,0.12); color:#dc2626; }
+    .header-spacer { flex:1; }
+    .timer-display { display:flex; align-items:center; gap:12px; }
+    .phase-badge { font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:4px 12px; border-radius:50px; }
+    .phase-reading { background:rgba(245,158,11,0.15); color:#92400e; }
+    .phase-writing { background:rgba(14,165,233,0.15); color:var(--teal3); }
+    .phase-idle { background:var(--gray100); color:var(--gray400); }
+    .phase-done { background:rgba(34,197,94,0.15); color:#166534; }
+    .timer-num { font-size:1.4rem; font-weight:800; color:var(--navy); min-width:60px; text-align:right; font-variant-numeric:tabular-nums; transition:color 0.3s; }
+    .timer-num.urgent { color:var(--red); }
+    .progress-outer { height:4px; background:var(--white); border:1px solid var(--gray200); border-top:none; border-radius:0 0 var(--radius) var(--radius); padding-bottom:4px; }
+    .progress-fill { height:4px; border-radius:2px; background:var(--teal); transition:width 1s linear, background 0.3s; width:0%; }
+    .progress-fill.reading { background:var(--gold); }
+    .progress-fill.writing { background:var(--teal); }
+    .progress-fill.urgent { background:var(--red); }
+
+    .scenario-card { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); overflow:hidden; }
+    .scenario-top { padding:28px 32px; border-bottom:1px solid var(--gray100); }
+    .scenario-label { font-size:0.72rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--teal3); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .scenario-label::before { content:''; display:block; width:20px; height:2px; background:var(--teal); border-radius:1px; }
+    .scenario-text { font-size:1.05rem; color:var(--gray800); line-height:1.8; }
+    .idle-hero { padding:52px 32px; text-align:center; }
+    .idle-icon { font-size:3.5rem; margin-bottom:20px; opacity:0.3; }
+    .idle-title { font-size:1.4rem; font-weight:700; color:var(--gray800); margin-bottom:8px; }
+    .idle-sub { font-size:0.95rem; color:var(--gray400); }
+    .prompts-area { padding:20px 32px; display:flex; flex-direction:column; gap:14px; }
+    .prompts-locked { display:flex; align-items:center; gap:12px; color:var(--gray400); font-size:0.9rem; font-style:italic; }
+    .lock-icon { width:32px; height:32px; background:var(--gray100); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
+    .prompt-item { background:var(--gray50); border:1px solid var(--gray200); border-radius:12px; padding:16px 18px; display:flex; gap:14px; align-items:flex-start; animation:fadeSlideIn 0.4s ease; }
+    @keyframes fadeSlideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .prompt-num { width:28px; height:28px; background:var(--navy); color:var(--white); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:700; flex-shrink:0; }
+    .prompt-text { font-size:0.97rem; color:var(--gray800); line-height:1.65; padding-top:3px; }
+
+    .answer-section { border-top:1px solid var(--gray100); padding:22px 32px; display:flex; flex-direction:column; gap:10px; }
+    .answer-label { font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray400); display:flex; align-items:center; justify-content:space-between; }
+    .word-count { font-size:0.75rem; color:var(--gray400); font-weight:400; letter-spacing:0; text-transform:none; }
+    .answer-textarea { width:100%; min-height:160px; padding:16px; border:1px solid var(--gray200); border-radius:12px; font-family:inherit; font-size:0.95rem; color:var(--gray800); line-height:1.7; resize:vertical; outline:none; transition:border-color 0.2s; background:var(--gray50); }
+    .answer-textarea:focus { border-color:var(--teal); background:var(--white); }
+    .answer-textarea::placeholder { color:var(--gray400); }
+
+    .ai-feedback { border:1px solid rgba(14,165,233,0.25); border-radius:12px; background:rgba(14,165,233,0.04); overflow:hidden; animation:fadeSlideIn 0.5s ease; }
+    .ai-feedback-header { padding:12px 18px; border-bottom:1px solid rgba(14,165,233,0.15); display:flex; align-items:center; gap:10px; }
+    .ai-feedback-title { font-size:0.8rem; font-weight:700; color:var(--teal3); }
+    .ai-score-badge { margin-left:auto; font-size:0.82rem; font-weight:800; padding:3px 12px; border-radius:50px; }
+    .score-high { background:rgba(34,197,94,0.15); color:#166534; }
+    .score-mid { background:rgba(245,158,11,0.15); color:#92400e; }
+    .score-low { background:rgba(239,68,68,0.15); color:#991b1b; }
+    .ai-feedback-body { padding:14px 18px; font-size:0.9rem; color:var(--gray600); line-height:1.75; }
+    .ai-feedback-body strong { color:var(--navy); font-weight:600; }
+    .ai-loading { padding:18px; display:flex; align-items:center; gap:10px; color:var(--teal3); font-size:0.88rem; }
+    .spinner { width:16px; height:16px; border:2px solid rgba(14,165,233,0.3); border-top-color:var(--teal); border-radius:50%; animation:spin 0.8s linear infinite; flex-shrink:0; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .nav-controls { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); padding:16px 24px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .btn-ctrl { display:flex; align-items:center; gap:8px; padding:10px 20px; border-radius:50px; border:1px solid var(--gray200); background:var(--white); color:var(--gray600); font-size:0.88rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:inherit; }
+    .btn-ctrl:hover:not(:disabled) { border-color:var(--navy); color:var(--navy); background:var(--gray50); }
+    .btn-ctrl:disabled { opacity:0.35; cursor:not-allowed; }
+    .btn-ctrl-primary { background:var(--navy); color:var(--white); border-color:var(--navy); }
+    .btn-ctrl-primary:hover:not(:disabled) { background:var(--navy2); border-color:var(--navy2); color:var(--white); }
+    .btn-ctrl-skip { border-color:var(--gold); color:#92400e; }
+    .btn-ctrl-skip:hover:not(:disabled) { background:rgba(245,158,11,0.08); }
+    .ctrl-spacer { flex:1; }
+    .kbd-hints { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+    .kbd-hint { display:flex; align-items:center; gap:6px; font-size:0.78rem; color:var(--gray400); }
+    kbd { background:var(--gray100); border:1px solid var(--gray200); border-radius:5px; padding:2px 7px; font-size:0.72rem; font-family:inherit; color:var(--gray600); }
+
+    .review-panel { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); overflow:hidden; display:none; }
+    .review-panel.show { display:block; }
+    .review-header { background:var(--navy); padding:28px 32px; }
+    .review-header h2 { font-size:1.8rem; font-weight:800; color:var(--white); margin-bottom:4px; }
+    .review-header p { color:rgba(255,255,255,0.6); font-size:0.95rem; }
+    .review-stat-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; padding:24px 32px; border-bottom:1px solid var(--gray100); }
+    .review-stat { text-align:center; }
+    .review-stat-num { font-size:2rem; font-weight:800; color:var(--teal); display:block; }
+    .review-stat-label { font-size:0.78rem; color:var(--gray400); }
+    .review-trend { padding:24px 32px; border-bottom:1px solid var(--gray100); }
+    .review-trend h3 { font-size:0.78rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal3); margin-bottom:16px; }
+    .chart-container { position:relative; height:140px; width:100%; }
+    .review-list { padding:24px 32px; display:flex; flex-direction:column; gap:14px; }
+    .review-list h3 { font-size:0.78rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal3); }
+    .review-filter-row { display:flex; gap:8px; flex-wrap:wrap; }
+    .review-filter-btn { padding:6px 16px; border-radius:50px; border:1px solid var(--gray200); background:var(--white); color:var(--gray600); font-size:0.8rem; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+    .review-filter-btn.active { background:var(--navy); color:var(--white); border-color:var(--navy); }
+    .station-review-card { border:1px solid var(--gray200); border-radius:12px; overflow:hidden; transition:box-shadow 0.2s; }
+    .station-review-card:hover { box-shadow:var(--shadow); }
+    .src-header { padding:14px 18px; display:flex; align-items:flex-start; gap:12px; background:var(--gray50); border-bottom:1px solid var(--gray100); cursor:pointer; user-select:none; }
+    .src-num { font-size:0.72rem; font-weight:700; color:var(--gray400); min-width:20px; padding-top:2px; }
+    .src-scenario { font-size:0.88rem; color:var(--gray700); line-height:1.5; flex:1; }
+    .src-score-badge { flex-shrink:0; font-size:0.78rem; font-weight:800; padding:3px 12px; border-radius:50px; }
+    .src-body { padding:16px 18px; display:none; }
+    .src-body.open { display:block; }
+    .src-section-label { font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray400); margin-bottom:6px; margin-top:14px; }
+    .src-section-label:first-child { margin-top:0; }
+    .src-answer-text { font-size:0.88rem; color:var(--gray600); line-height:1.7; background:var(--gray50); border-radius:8px; padding:12px 14px; white-space:pre-wrap; }
+    .src-feedback-text { font-size:0.88rem; color:var(--gray700); line-height:1.75; }
+    .src-feedback-text strong { color:var(--navy); }
+    .below-avg-tag { display:inline-flex; align-items:center; gap:4px; background:rgba(239,68,68,0.1); color:#dc2626; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:50px; margin-left:6px; }
+    .review-footer { padding:24px 32px; border-top:1px solid var(--gray100); display:flex; gap:12px; flex-wrap:wrap; }
+    .btn-restart { display:inline-flex; align-items:center; gap:8px; padding:13px 28px; border-radius:50px; background:var(--teal); color:var(--white); font-size:0.9rem; font-weight:700; border:none; cursor:pointer; font-family:inherit; transition:all 0.2s; box-shadow:0 4px 16px rgba(14,165,233,0.3); }
+    .btn-restart:hover { background:var(--teal2); transform:translateY(-2px); }
+    .btn-restart-outline { background:var(--white); color:var(--navy); border:1px solid var(--gray200); box-shadow:none; }
+    .btn-restart-outline:hover { background:var(--gray50); border-color:var(--navy); }
+
+    footer { background:#060e1c; padding:32px 0; color:rgba(255,255,255,0.4); margin-top:40px; }
+    .footer-inner { max-width:1500px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .footer-logo { font-size:1.1rem; font-weight:800; color:var(--white); }
+    .footer-logo span { color:var(--teal); }
+    .footer-copy { font-size:0.8rem; }
+    .footer-link { color:var(--teal2); font-size:0.8rem; }
+    .footer-link:hover { text-decoration:underline; }
+
+    @media (max-width:1024px) { .app-wrapper { grid-template-columns:1fr; } .sidebar { position:static; } .nav-links { display:none; } .hamburger { display:flex; } }
+    @media (max-width:600px) { .app-wrapper { padding:80px 16px 32px; } .scenario-top,.prompts-area,.answer-section,.review-list,.review-trend,.review-footer { padding:20px; } .review-stat-row { grid-template-columns:repeat(2,1fr); } .review-header { padding:24px 20px; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html" class="logo">
+      <img src="Logo.png" alt="Key2MD" style="height:44px;width:auto;display:block;" onerror="this.outerHTML='Key<span style=&quot;color:var(--teal)&quot;>2</span>MD'">
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#services">Services</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="testimonials.html">Results</a></li>
+      <li><a href="index.html#pricing">Pricing</a></li>
+      <li><a href="index.html#book" class="btn-nav">Book a Session</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+<nav class="mobile-nav" id="mobileNav">
+  <a href="index.html#services">Services</a>
+  <a href="about.html">About</a>
+  <a href="testimonials.html">Results</a>
+  <a href="index.html#pricing">Pricing</a>
+  <a href="index.html#book" class="btn-nav">Book a Session</a>
+</nav>
+
+<div class="app-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <h3>Category</h3>
+      <div class="category-filters" id="categoryFilters">
+        <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="cnt-all">52</span></button>
+        <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="cnt-ethics">0</span></button>
+        <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="cnt-conflict">0</span></button>
+        <button class="cat-btn" data-cat="Personal">Personal <span class="cat-count" id="cnt-personal">0</span></button>
+        <button class="cat-btn" data-cat="Professionalism">Professionalism <span class="cat-count" id="cnt-professionalism">0</span></button>
+        <button class="cat-btn" data-cat="Communication">Communication <span class="cat-count" id="cnt-communication">0</span></button>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>Timer Settings</h3>
+      <div class="timer-settings">
+        <div>
+          <div class="setting-row"><span class="setting-label">Reading time</span><span class="setting-val" id="readingVal">60s</span></div>
+          <input type="range" id="readingSlider" min="15" max="120" step="5" value="60">
+        </div>
+        <div>
+          <div class="setting-row"><span class="setting-label">Writing time</span><span class="setting-val" id="writingVal">3:30</span></div>
+          <input type="range" id="writingSlider" min="60" max="600" step="15" value="210">
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="ai-toggle-row">
+        <span class="ai-toggle-label">✦ AI Marking</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="aiToggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div id="aiKeyWrap" style="display:none;">
+        <div class="api-key-wrap">
+          <label for="apiKeyInput">Anthropic API key</label>
+          <input type="password" id="apiKeyInput" class="api-key-input" placeholder="sk-ant-...">
+          <p class="api-note">Stays in your browser only — sent directly to Anthropic, never via Key2MD servers.</p>
+        </div>
+      </div>
+      <div id="aiStatusEl" class="ai-status off"><span class="sdot sdot-gray"></span>AI marking off</div>
+      <div class="trend-wrap" id="trendWrap" style="display:none;">
+        <div class="trend-title">Score Trend</div>
+        <div id="trendChartArea">
+          <div class="trend-empty" id="trendEmpty">Complete stations to see your trend</div>
+          <canvas id="trendCanvas" style="display:none;"></canvas>
+        </div>
+        <div class="trend-avg-line" id="trendAvgLine" style="display:none;">
+          <span>Session avg</span><span class="trend-avg-num" id="trendAvgNum">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>Session Stats</h3>
+      <div class="stats-row">
+        <div class="stat-mini"><span class="stat-mini-num" id="statCompleted">0</span><span class="stat-mini-label">Completed</span></div>
+        <div class="stat-mini"><span class="stat-mini-num" id="statAvg" style="color:var(--gray400)">—</span><span class="stat-mini-label">Avg Score</span></div>
+      </div>
+    </div>
+
+    <button class="btn-start" id="startBtn"><span id="startBtnIcon">▶</span><span id="startBtnText">Start Session</span></button>
+  </aside>
+
+  <div class="main-content">
+    <div class="station-header">
+      <span class="station-num" id="stationNum">Station —</span>
+      <span class="category-pill phase-idle" id="categoryPill">Select a category &amp; press Start</span>
+      <div class="header-spacer"></div>
+      <div class="timer-display">
+        <span class="phase-badge phase-idle" id="phaseBadge">Idle</span>
+        <span class="timer-num" id="timerNum">—:——</span>
+      </div>
+    </div>
+    <div class="progress-outer"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+    <div class="scenario-card" id="scenarioCard">
+      <div class="scenario-top">
+        <div class="scenario-label">Scenario</div>
+        <div id="scenarioIdle" class="idle-hero">
+          <div class="idle-icon">🎤</div>
+          <div class="idle-title">Ready to practise?</div>
+          <div class="idle-sub">Choose a category and press Start Session to begin your MMI simulation.</div>
+        </div>
+        <p class="scenario-text" id="scenarioText" style="display:none;"></p>
+      </div>
+      <div class="prompts-area" id="promptsArea">
+        <div class="prompts-locked" id="promptsLocked">
+          <div class="lock-icon">🔒</div>Prompts revealed after reading time
+        </div>
+        <div id="prompt1Wrap" style="display:none;">
+          <div class="prompt-item"><div class="prompt-num">1</div><div class="prompt-text" id="prompt1Text"></div></div>
+        </div>
+        <div id="prompt2Wrap" style="display:none;">
+          <div class="prompt-item"><div class="prompt-num">2</div><div class="prompt-text" id="prompt2Text"></div></div>
+        </div>
+      </div>
+      <div class="answer-section" id="answerSection" style="display:none;">
+        <div class="answer-label">Your response <span class="word-count" id="wordCount">0 words</span></div>
+        <textarea class="answer-textarea" id="answerTextarea" placeholder="Start typing your answer here… Speak as you would in the actual interview — empathy, structure, and authenticity matter."></textarea>
+        <div id="aiFeedbackWrap"></div>
+      </div>
+    </div>
+
+    <div class="review-panel" id="reviewPanel">
+      <div class="review-header">
+        <h2>Session Complete</h2>
+        <p id="reviewSubtitle">Here's how you did.</p>
+      </div>
+      <div class="review-stat-row">
+        <div class="review-stat"><span class="review-stat-num" id="rCompleted">0</span><span class="review-stat-label">Stations done</span></div>
+        <div class="review-stat"><span class="review-stat-num" id="rCategory">All</span><span class="review-stat-label">Category</span></div>
+        <div class="review-stat"><span class="review-stat-num" id="rAvg" style="color:var(--gray400)">—</span><span class="review-stat-label">Avg AI score</span></div>
+        <div class="review-stat"><span class="review-stat-num" id="rTrend" style="color:var(--gray400)">—</span><span class="review-stat-label">Trend</span></div>
+      </div>
+      <div class="review-trend" id="reviewTrendSection" style="display:none;">
+        <h3>Score Over Time</h3>
+        <div class="chart-container"><canvas id="reviewCanvas"></canvas></div>
+      </div>
+      <div class="review-list">
+        <h3>Station Review</h3>
+        <div class="review-filter-row">
+          <button class="review-filter-btn active" data-filter="all">All</button>
+          <button class="review-filter-btn" data-filter="below">Below Average</button>
+          <button class="review-filter-btn" data-filter="answered">With Answers</button>
+        </div>
+        <div id="stationReviewList"></div>
+      </div>
+      <div class="review-footer">
+        <button class="btn-restart" id="restartBtn">↺ New Session</button>
+        <button class="btn-restart btn-restart-outline" id="reviewAgainBtn">Redo Same Stations</button>
+      </div>
+    </div>
+
+    <div class="nav-controls">
+      <div class="kbd-hints">
+        <div class="kbd-hint"><kbd>←</kbd> Prev</div>
+        <div class="kbd-hint"><kbd>→</kbd> Next</div>
+        <div class="kbd-hint"><kbd>Space</kbd> Skip reading</div>
+      </div>
+      <div class="ctrl-spacer"></div>
+      <button class="btn-ctrl" id="prevBtn" disabled>← Previous</button>
+      <button class="btn-ctrl btn-ctrl-skip" id="skipReadingBtn" disabled>Skip Reading</button>
+      <button class="btn-ctrl btn-ctrl-primary" id="nextBtn" disabled>Next Station →</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Key<span>2</span>MD</div>
+    <span class="footer-copy">© 2025 Key2MD. Free practice tool.</span>
+    <a href="index.html#book" class="footer-link">Book a real session with Dan →</a>
+  </div>
+</footer>
+
+<script>
+const STATIONS=[
+{category:"Conflict Resolution",scenario:"You are a housemate. Stan, your university housemate, has recently decided to adopt a vegan diet. He has become passionate about being vegan, and loves talking about his reduced carbon footprint and contribution to animal welfare. At your latest dinner, Stan stated that he doesn't feel right about living in a house where animal products are regularly bought and used. He feels so strongly about this that he offers to do all the grocery shopping and cooking for everyone if you will all agree to no longer bring animal products into the house. Otherwise, he feels he will have to move out.",prompt1:"What would you say to Stan and your other housemates?",prompt2:"What is your approach to working with someone whose beliefs are vastly different from your own?"},
+{category:"Ethics",scenario:"You are an employee paired with Ryan at a financial consulting firm. Your boss asks you both to complete a major industry report by Monday morning. After she leaves, Ryan says: \"I'm totally wiped. I was going to get my guy to drop off some Adderall to get us through the weekend. It really helps me get things done faster. Do you want a couple?\"",prompt1:"How would you respond to Ryan's question?",prompt2:"Do you think universities should be more proactive in preventing widespread Adderall misuse among their students?"},
+{category:"Ethics",scenario:"You are in a study group. A friend obtained last year's exam from a teaching assistant and forwarded it to everyone. Immediately after, Marcine — another member — emails you privately to say she will report the breach to the professor with everyone's names, and asks you not to warn the others so they can't 'hide the evidence.'",prompt1:"Do you think Marcine's approach is fair? Why or why not?",prompt2:"What would you do?"},
+{category:"Conflict Resolution",scenario:"In your study group, John is upset that Marshal's workload was redistributed after Marshal was hospitalised. A photo has since appeared on Marshal's Facebook showing him at a pool party. The group's work, if submitted, would give Marshal the same grade despite not contributing. Steve turns to you and asks how to proceed.",prompt1:"What do you recommend to your group members?",prompt2:"Do you think it is okay to report a concern to a supervisor based on a suspicion? Why or why not?"},
+{category:"Personal",scenario:"You are captain of your high school basketball team preparing for regional championships next week. Your mother calls in distress — her sister has died unexpectedly. Your aunt was not close to the family and you barely know her. The funeral is the same day as your championships, four hours away by car, and you don't have a driver's licence.",prompt1:"Do you attend the funeral or the game? Why?",prompt2:"Describe a time when you had to make a similarly challenging decision."},
+{category:"Ethics",scenario:"Your best friend asked you to co-found a test preparation company, saying you should model what other successful companies do. As you get involved, you realise he is copying material from competitors almost verbatim and claiming it as his own.",prompt1:"How would you approach your friend about this?",prompt2:"Would you report a close friend or family member to superiors if you became aware of them acting unethically or illegally? Why or why not?"},
+{category:"Ethics",scenario:"During a final exam, you briefly raise your head and see a classmate on their phone. Exam grades are not weighed against class performance, so a high grade for your classmate would not affect yours.",prompt1:"What should you do in this situation?",prompt2:"Describe a time when you witnessed unethical behaviour. What did you do?"},
+{category:"Ethics",scenario:"Your close friend Anna works in HR and is well loved by the company. While reviewing expense reports at work, you notice dubious spending on the company account — groceries, clothing, and luxury items. Anna is the only person with access to company funds. Reporting it will almost certainly result in her losing her job.",prompt1:"What is going through your mind?",prompt2:"Describe a time when you made an ethical decision that was not popular with others."},
+{category:"Ethics",scenario:"You and a friend have a biology lab report due tomorrow. Reading his draft in a cafe, you notice he has plagiarised heavily from online sources. There is clearly not enough time to rewrite it.",prompt1:"What would you tell your friend?",prompt2:"Do you believe plagiarism is ever justified?"},
+{category:"Ethics",scenario:"A convenience store near a high school has experienced repeated student thefts during lunch. The owners implement a policy prohibiting high school-age students from entering during school hours.",prompt1:"Is this discrimination?",prompt2:"Besides this policy, what are some other ways the owners could reduce thefts?"},
+{category:"Personal",scenario:"Think of a time when you felt too uncomfortable to speak up.",prompt1:"Describe the situation.",prompt2:"What factors do you think were preventing you from speaking up?"},
+{category:"Professionalism",scenario:"A draft brochure claims a program doubles participant acceptance rates, based on a small pilot with no control group. Leadership likes the bold claim. You consider it overstated. Printing deposits are due.",prompt1:"How should evidence quality shape promotional language?",prompt2:"What would you do if your boss asked you to set aside your concerns and do what is best for the company?"},
+{category:"Professionalism",scenario:"After spending days developing an innovative idea, you're ready to share it with colleagues. Before you can, team member Lucas stands up and deliberately repeats your idea, claiming it as his own and accepting all the praise.",prompt1:"Do you speak up, or do you keep quiet?",prompt2:"Imagine it was your boss who took credit for your hard work. Would this change your reaction?"},
+{category:"Professionalism",scenario:"You are organising a group trip with the university Chess club and are in charge as a senior exec. One night, a junior player sneaks alcohol into the hotel room. You catch him.",prompt1:"Do you remove the player from the trip?",prompt2:"How can you prevent such an incident from happening again?"},
+{category:"Personal",scenario:"After your company's annual awards ceremony, you realise you forgot to give an award to Amy in HR. You have a lukewarm relationship with Amy and your conversations have not gone well in the past.",prompt1:"What is the best way to give an apology? How would you approach Amy?",prompt2:"Describe a time in your life where you've had to admit you were wrong — what happened?"},
+{category:"Professionalism",scenario:"You receive contradictory guidance from two senior mentors on presentation style. Implementing both is impossible. Choosing one may alienate the other. Rehearsal deadline is tomorrow.",prompt1:"How would you handle this situation?",prompt2:"Describe a time you've faced a similar dilemma. How did you handle it?"},
+{category:"Personal",scenario:"Tom has been raised in a privileged home and gained admission to the best universities. He decides he wants independence and wants to become a social media influencer instead. His parents urge him to accept a university offer.",prompt1:"What are your thoughts on this situation?",prompt2:"\"Education is the key to success.\" What are your thoughts on this statement?"},
+{category:"Ethics",scenario:"Your close friend Savanna — someone you've known for over ten years and consider family — has been using your credit card to make personal purchases without your knowledge. You discover this reviewing your transaction history.",prompt1:"What will you do?",prompt2:"\"Clear communication is key to the success of any relationship.\" What are your thoughts on this?"},
+{category:"Personal",scenario:"A friend you haven't spoken to in over a year texts you. After several warm messages, you realise he's reaching out to ask for a favour.",prompt1:"What factors would you consider when deciding whether or not to help him?",prompt2:"Would your decision change if he revealed he's recently been through a difficult time and lost many friends?"},
+{category:"Conflict Resolution",scenario:"You are on a university student council. Two committee heads do not get along, causing confusion and incomplete tasks. You receive conflicting instructions from each.",prompt1:"How would you handle the conflicting instructions?",prompt2:"What steps would you take to ensure the council functions effectively?"},
+{category:"Ethics",scenario:"You are shopping at a pharmacy and see a young mother with her baby steal formula and walk out. She appears well dressed and healthy.",prompt1:"What do you do?",prompt2:"Would your answer change if this was the only time she did this?"},
+{category:"Communication",scenario:"A woman at a bus stop with several children appears stressed. She suddenly grabs one of the boys, slaps him, and yells at him while the other children cry.",prompt1:"What do you do?",prompt2:"Would your view change if the woman was not the child's mother?"},
+{category:"Ethics",scenario:"You are a supervisor at a nursing home. A tenant refuses to be cared for by a staff member based on their race. The staff member is visibly upset.",prompt1:"How would you deal with this situation?",prompt2:"How would you support the employee?"},
+{category:"Ethics",scenario:"You are 17 and see your neighbour — currently receiving compensation for a back injury — lifting heavy concrete bags and doing physically demanding yard work. He notices you watching and makes the 'shhh' gesture.",prompt1:"What do you do?",prompt2:"Would your response change if your parents told you not to say anything?"},
+{category:"Ethics",scenario:"You are a medical student and notice a colleague documenting an examination they did not actually perform.",prompt1:"What would you do in this situation?",prompt2:"What ethical principles are involved?"},
+{category:"Conflict Resolution",scenario:"A senior team member speaks sharply and disrespectfully to a nurse during a busy ward round.",prompt1:"How would you approach this situation?",prompt2:"What factors would influence your response?"},
+{category:"Communication",scenario:"You are a nursing student in the Emergency Department. A father whose son has been waiting over 3 hours is becoming increasingly hostile. A senior nurse asks you to go 'sort him out.'",prompt1:"How would you respond?",prompt2:"Why do you think the father acted like this?"},
+{category:"Professionalism",scenario:"A classmate asks to copy your reflective assignment because they are overwhelmed and just need help this once.",prompt1:"What would you do?",prompt2:"How would you balance compassion with professionalism?"},
+{category:"Ethics",scenario:"A patient refuses a recommended treatment because of strongly held personal beliefs.",prompt1:"How would you respond?",prompt2:"How would you balance respecting autonomy with promoting patient wellbeing?"},
+{category:"Conflict Resolution",scenario:"Two members of your student group are in disagreement, and the conflict is affecting the quality of the team's work.",prompt1:"What would you do?",prompt2:"How would you try to resolve the conflict fairly?"},
+{category:"Communication",scenario:"A parent is demanding immediate antibiotics for their child, but the clinician believes the illness is viral and antibiotics will not help — and may cause harm.",prompt1:"How would you communicate in this situation?",prompt2:"How would you maintain trust while disagreeing?"},
+{category:"Professionalism",scenario:"You see a fellow student posting about a clinical placement experience on social media in a way that may risk patient confidentiality.",prompt1:"What would you do?",prompt2:"Why is this an issue professionally?"},
+{category:"Ethics",scenario:"On rural placement, you shadow a widely respected GP. You notice patients with chronic pain are routinely given early opioid repeats without documented review. A patient privately tells you they've started taking higher doses but are afraid to mention it because this doctor 'has done so much' for their family.",prompt1:"How would you approach this situation?",prompt2:"What do you think the major barriers are when speaking up to a superior?"},
+{category:"Personal",scenario:"A close friend who recently went through a difficult breakup asks you to co-sign a large loan. They've been spending impulsively and say that being denied this loan would 'prove everyone has abandoned them.'",prompt1:"How would you respond to your friend?",prompt2:"How would you balance empathy with your own boundaries?"},
+{category:"Professionalism",scenario:"A colleague with spina bifida has been missing in-person meetings due to worsening mobility issues. Some team members begin making comments like 'If they really cared, they'd find a way to show up like the rest of us.'",prompt1:"How would you respond to these comments?",prompt2:"What actions would you take to support the situation?"},
+{category:"Conflict Resolution",scenario:"In a volunteer organisation, a team member who recently lost a parent has become withdrawn and occasionally snaps at others. Some members avoid working with them; others feel the group should be more understanding.",prompt1:"How would you approach this situation?",prompt2:"What do you think are the most important elements when supporting someone who is grieving?"},
+{category:"Professionalism",scenario:"You come across a fellow student's private social media account where they describe a 'frustrating patient encounter,' including details about the patient's condition, timing, and location that could make the individual identifiable.",prompt1:"What would you do?",prompt2:"If this was escalated to the dean — what punishment do you think would be equitable?"},
+{category:"Personal",scenario:"Your sibling, who has struggled academically for years, asks you to share answers for an upcoming exam. They've already failed once and say your refusal would 'basically guarantee they never get into the career they've worked toward.'",prompt1:"How would you respond?",prompt2:"Describe a time you've been asked to betray your own values — what did you do?"},
+{category:"Conflict Resolution",scenario:"Two team members approach you separately. One feels micromanaged and says their ideas are constantly overridden; the other insists deadlines are tight and past mistakes caused real problems.",prompt1:"How would you handle this situation?",prompt2:"Describe a time you've been in the middle of two people with contrasting views — what happened?"},
+{category:"Ethics",scenario:"A pharmaceutical representative offers to fully cover your travel and accommodation for a conference, saying it would be a great opportunity. All they ask is that while there, you wear their branded shirt with your doctor name badge displayed on top.",prompt1:"How would you respond?",prompt2:"What considerations are most important in making your decision?"},
+{category:"Professionalism",scenario:"During ward rounds, a senior doctor makes a lighthearted remark about a patient's cultural health beliefs, prompting laughs from some team members but visible discomfort from others.",prompt1:"How would you respond in the moment?",prompt2:"What would you do afterward?"},
+{category:"Personal",scenario:"You are feeling burned out during a demanding rotation when a co-worker asks you to take over several of their shifts, explaining they are overwhelmed preparing for an important family event and 'wouldn't ask if it wasn't serious.'",prompt1:"How would you respond?",prompt2:"How would you manage your own wellbeing in this situation?"},
+{category:"Conflict Resolution",scenario:"A patient's family insists on continuing aggressive treatment despite clinicians expressing concerns about limited benefit. Family members become emotional and accuse the team of 'giving up.'",prompt1:"How would you approach this situation?",prompt2:"What role does communication play here?"},
+{category:"Professionalism",scenario:"A fellow student frequently arrives late and appears disengaged during teaching sessions. You later learn they are caring for a parent undergoing chemotherapy and travelling long distances. They often appear tired and have a flat affect.",prompt1:"How would you respond to this situation?",prompt2:"What role do you think the university can play? Describe both best case and worst case levels of support."},
+{category:"Personal",scenario:"You are a junior lawyer offered a prestigious interstate training opportunity. It requires 5 days a week away for 6 months to 2 years. Your partner struggles with depression and asks you to postpone and reapply in a couple of years — you're unsure the opportunity will exist then.",prompt1:"How would you approach this decision?",prompt2:"What considerations are most important?"},
+{category:"Professionalism",scenario:"You've been working at a consulting firm for a few months. A senior executive who has influence over promotions has taken a noticeable interest in your work. On a Friday evening, they approach you: 'You've been doing really well lately — why don't you join me for a drink nearby?'",prompt1:"What would be going through your mind?",prompt2:"What would you say to this executive?"},
+{category:"Conflict Resolution",scenario:"Priya, a junior team member, regularly contributes creative ideas in meetings, but they're quickly brushed aside by senior members who call them unrealistic. Priya tells you privately she feels discouraged and believes she isn't being taken seriously because of her junior status.",prompt1:"What would you say to Priya?",prompt2:"If you were head of this team, how would you ensure equity among members?"},
+{category:"Ethics",scenario:"A patient calls you as you pass her room: 'No one is listening to me. I've asked several times to have my crystals in the room — they give me energy to get through this.' You know the crystals pose no medical risk, but the team is simply too busy in an overcrowded public hospital.",prompt1:"How would you respond to the patient?",prompt2:"To what lengths do you think hospitals should go to cater to patients' ancillary concerns?"},
+{category:"Professionalism",scenario:"Observing a pre-operative assessment, you notice a surgeon skipping several standard questions. She notices your confusion and assures you she's only skipping questions about patient concerns — not medical ones — since the patient 'would prefer to just have the surgery,' and gives a wry smile.",prompt1:"What would you do?",prompt2:"Describe a time you've cut corners — how did you justify it, and would you change anything now?"},
+{category:"Personal",scenario:"A close friend confides they've been secretly taking their younger brother's prescribed ADHD medication to help study. Their performance has improved significantly and they feel unable to succeed without it. The brother is now running out of medication faster than it can be dispensed.",prompt1:"What are your major concerns in this situation?",prompt2:"What would you say to your friend?"},
+{category:"Conflict Resolution",scenario:"You are leading a volunteer community project to clean up a river. Numbers have dropped significantly. Some members blame poor leadership and unclear direction; others say meetings are held in locations that are difficult to access.",prompt1:"How would you approach this situation?",prompt2:"Do you think it is fair to ask volunteers to commit a minimum number of hours upon signup? Why or why not?"}
+// ── BATCH 1: 20 stations from previous session ──
+,{category:"Ethics",scenario:"You are a close friend. Your friend Daniel has been battling severe depression for the past year and has been isolating himself from most people. He has recently confided in you — and only you — that he has been secretly researching assisted dying options, not because he has a terminal illness, but because he feels his quality of life is unbearable. He hasn't said he is going to act on anything, and he was very clear that he only told you because he trusted you completely and does not want you to involve anyone else. You are genuinely worried.",prompt1:"What is going through your mind, and what do you say to Daniel in this moment?",prompt2:"Daniel asks you directly: 'You're not going to tell anyone, are you?' How do you respond?"}
+,{category:"Conflict Resolution",scenario:"You are a third-year university student and the president of your faculty's student society. Two of your most capable committee members — Sophie and Marcus — have had a serious falling out after a disagreement at a social event last month. They are now refusing to work together, which is causing real problems as they co-lead your biggest event of the year. Other committee members are starting to take sides. The event is six weeks away and cannot be delayed.",prompt1:"How would you approach Sophie and Marcus individually, and what would you say?",prompt2:"Some committee members are suggesting you simply remove one of them from the event to resolve the tension quickly. What are your thoughts on this approach?"}
+,{category:"Personal",scenario:"You are a university student in your final semester. Your father, who immigrated to this country and worked two jobs for twenty years specifically so you could get a degree, has been diagnosed with an aggressive form of cancer. He has been given 6–12 months. He tells you not to worry about him and insists you focus on finishing your degree. Your mother, however, calls you crying every second night, saying she cannot manage alone and needs you to come home. Your home is a 5-hour drive away.",prompt1:"What is going through your mind, and what do you do?",prompt2:"Your father finds out your mother has been calling you and apologises, saying: 'She shouldn't have done that — this is not your burden.' How does this change, if at all, how you think about the situation?"}
+,{category:"Ethics",scenario:"You are a retail employee. You are working a shift at a large pharmacy chain when you notice an elderly man in his 70s — visibly confused and distressed — pocketing a packet of blood pressure medication without paying. He is muttering quietly to himself and seems unaware of where he is. The medication is worth $14. Store policy requires you to report all theft to the duty manager, who has a reputation for calling police immediately regardless of circumstances.",prompt1:"What do you do in this moment?",prompt2:"How do you think the duty manager's approach to shoplifting policy reflects the broader question of how institutions should handle vulnerable people who break rules?"}
+,{category:"Communication",scenario:"You are a volunteer at a community support centre. A 42-year-old woman named Rosa approaches you. She is from a non-English speaking background and uses a mix of broken English and gestures to communicate. Rosa is visibly distressed and is trying to tell you something about her children, but you cannot fully understand her. The centre's interpreter isn't available until tomorrow morning, and Rosa seems increasingly frantic as she realises you aren't understanding her.",prompt1:"How do you handle this situation right now, in this moment?",prompt2:"How do you think Rosa is feeling, and what do you think the experience of not being understood in a moment of distress is like for someone in her position?"}
+,{category:"Professionalism",scenario:"You are a junior employee at a law firm. You are working late when a senior partner — someone known for being difficult but who has been a strong advocate for your career — asks you to backdate a document. He frames it casually, saying it is 'just a formality' and that 'everyone does it.' He adds that your performance review is next week and that he has been very impressed by you. The document in question could affect the outcome of a client dispute.",prompt1:"What do you do?",prompt2:"If you refused and the partner retaliated by giving you a poor performance review, what recourse do you think you would have, and would you pursue it?"}
+,{category:"Ethics",scenario:"You are a housemate. You share a house with four others, one of whom — Priya — has been visibly losing weight over the past two months. She eats very little at shared meals, exercises for hours each day, and becomes defensive if anyone comments on her appearance. You've noticed she often goes to the bathroom immediately after eating. You are not close friends with Priya but you share a kitchen and see her daily. None of your other housemates have mentioned it.",prompt1:"Do you say something to Priya, and if so, how do you approach it?",prompt2:"What would change, if anything, if you found out Priya had previously been treated for an eating disorder?"}
+,{category:"Conflict Resolution",scenario:"You are a team leader on a group university assignment worth 40% of your final grade. Your group of five has been working together for six weeks. One member, James, has consistently produced poor quality work and missed two of four deadlines. The rest of the group wants to report James to the course coordinator and have his contribution formally assessed separately, which would likely result in him failing the assignment. James confides in you that he has been dealing with a family crisis he hasn't told anyone else about, and begs you not to say anything.",prompt1:"How do you navigate your responsibility to the group and your responsibility to James?",prompt2:"James asks you: 'Do you think I deserve to fail this assignment?' What do you say?"}
+,{category:"Personal",scenario:"You are a first-year university student. You have been offered a place in a very selective academic mentoring program — only 12 students are accepted annually. The day you receive your acceptance email, your best friend from high school calls to tell you that she also applied and did not get in. She is devastated and says this was her 'one real chance' at getting the support she needed to succeed at university. She doesn't yet know you were accepted.",prompt1:"What is going through your mind, and how do you tell your friend?",prompt2:"Your friend reacts with anger and accuses you of always 'getting everything.' How do you respond in that moment?"}
+,{category:"Ethics",scenario:"You are an employee. During a routine lunch break, a colleague you don't know well — Greg — confides in you that he has been falsifying his timesheets for the past three months, claiming overtime hours he didn't work. He says he did it because his wife is seriously ill and the family is drowning financially. He seems genuinely remorseful and tells you he has already stopped doing it. He is sharing this because he feels guilty and needs to tell someone. He is not asking for your advice.",prompt1:"How do you respond to Greg in this conversation?",prompt2:"Do you have any obligation to report what Greg told you, even though he has already stopped and did not ask for your input?"}
+,{category:"Communication",scenario:"You are a university student working part-time as a tutor for high school students. One of your students, a 16-year-old named Lily, has been progressively disengaging. Today she arrives looking exhausted and tearful. When you ask if she's okay, she says: 'I'm fine, I just haven't been sleeping.' As the session progresses, she says quietly: 'Sometimes I just think everyone would be better off without me.' She immediately follows this with: 'Forget I said that — can we just do the work?'",prompt1:"What do you do and say in this moment?",prompt2:"How do you think Lily is feeling right now, and why might someone minimise a statement like the one she just made?"}
+,{category:"Professionalism",scenario:"You are a new graduate working at a small accounting firm. You discover that your supervisor has been advising a particular client in a way that clearly benefits that client's competitor, which is another client of the firm — a clear conflict of interest. When you quietly raise it with him, he says: 'This is how the firm has always operated. If you're not comfortable, you might want to ask yourself if this is really the right place for you.' You are two months into your first job.",prompt1:"What do you do after this conversation?",prompt2:"What do you think makes it so difficult for junior employees to speak up about ethical concerns, even when they clearly see wrongdoing?"}
+,{category:"Ethics",scenario:"You are a friend. Your close friend Mia has been in a relationship with Ben for three years. Over the past year, you have noticed Ben becoming increasingly controlling — he monitors her phone, decides who she can see, and makes dismissive comments about her in front of others. Mia has never described this as a problem and seems happy. When you've tried to gently raise your concerns in the past, she has become defensive and told you that you 'don't understand their relationship.' Ben is a mutual friend.",prompt1:"What do you do now?",prompt2:"How do you think Mia might be experiencing this relationship, and why might someone in her position not recognise or acknowledge what others see?"}
+,{category:"Conflict Resolution",scenario:"You are a resident advisor at a university college. Two students in adjacent rooms — Hamish and Oliver — have a serious ongoing conflict. Hamish is a very light sleeper with diagnosed anxiety and insomnia; he has submitted a formal noise complaint about Oliver's late-night guitar playing. Oliver insists he stops before 10pm and has already compromised significantly. Oliver tells you the complaints feel like an 'attack on who I am' and that music is how he manages his own mental health. Both are distressed.",prompt1:"How do you approach a resolution when both students have genuine and competing needs?",prompt2:"Hamish tells you privately that if Oliver doesn't stop entirely, he is going to move out of college. What do you do with this information?"}
+,{category:"Personal",scenario:"You are a university student. Your parents, who are traditional and conservative, have always assumed you will enter a specific career path they have spent years encouraging you toward — your father even rearranged his work schedule for years to take you to relevant activities. You have recently come to realise, with significant conviction, that this career is wrong for you and that you want to pursue something completely different that they will almost certainly not support. You have not told them yet.",prompt1:"How do you approach this conversation with your parents?",prompt2:"Your father's immediate response is silence, followed by: 'I don't understand you.' How do you sit with that?"}
+,{category:"Ethics",scenario:"You are a final-year student on a clinical placement. You observe a senior clinician perform a procedure more quickly than protocol requires, skipping several documented safety checks. The patient is fine. Afterward, the clinician tells the student group: 'Real-world medicine isn't a textbook — you'll learn that.' No adverse outcome occurred, and the patient was never at risk in any obvious way. Your fellow students say nothing.",prompt1:"Do you raise what you saw, and if so, with whom and how?",prompt2:"What do you think the clinician's comment reveals about a broader tension in medical education, and how should that tension be navigated?"}
+,{category:"Communication",scenario:"You are a volunteer visitor at a residential aged care facility. You regularly visit an 84-year-old resident named Arthur, who has no family and few visitors. During today's visit, Arthur becomes emotional and tells you that he overheard two staff members last week laughing about how he 'probably won't last the winter.' He is not visibly unwell. He says he hasn't slept since hearing it and asks you: 'Do you think they're right?'",prompt1:"What do you say to Arthur in this moment?",prompt2:"How do you think Arthur has been experiencing the time since he overheard those comments, and what does that tell you about the impact of careless words in care settings?"}
+,{category:"Professionalism",scenario:"You are a second-year student on a group project. Your group's final presentation is tomorrow. Tonight, reviewing the shared document, you discover that your group's highest-achieving member — who everyone relies on and who volunteered to compile the final version — has inserted three paragraphs that were clearly taken directly from an online source, unreferenced and unacknowledged. The rest of your contributions are entirely original. If submitted as-is, the entire group will have a plagiarism violation on their record.",prompt1:"What do you do tonight?",prompt2:"If your group member insists the paragraphs were 'just a placeholder that they forgot to rewrite,' how do you assess that explanation, and does it change anything?"}
+,{category:"Ethics",scenario:"You are a long-time employee at a small family-run business. The owner — a woman in her 60s who built the company from nothing and whom you genuinely respect — has been making decisions lately that seem increasingly erratic. She has double-booked major clients, forgotten conversations that happened recently, and become uncharacteristically emotional. You suspect she may be experiencing early cognitive decline. She has no family involved in the business, and you are her most trusted employee.",prompt1:"What is your responsibility here, if any, and what do you do?",prompt2:"How do you think your employer would feel if she knew you were having these concerns about her — and how does that shape your approach?"}
+,{category:"Personal",scenario:"You are a postgraduate student. A close friend and fellow student, someone you have known for five years, is applying for the same highly competitive scholarship as you. You both need this scholarship — it would fund two years of your research. The committee has informally told you that you are the front-runner. Your friend asks if you would be willing to review his application and give honest feedback, the way you always have for each other. His application, as it stands, is weak in two specific ways that you can clearly see.",prompt1:"What do you do?",prompt2:"If you help him and he ends up getting the scholarship instead of you, how do you think you would feel — and what does that tell you about what kind of person you want to be?"}
+// ── BATCH 2: 50 new stations ──
+,{category:"Ethics",scenario:"You are a university student working in a campus café. A regular customer — a postgraduate student named Niamh — comes in looking severely distressed. While making her order, she mentions that her supervisor has told her if she doesn't submit her thesis by Friday she will be expelled from the program. She says she hasn't slept in four days and has been relying on energy drinks. As she pays, you notice her hands are trembling badly and she mentions offhand that she's been having heart palpitations but 'can't afford to stop now.'",prompt1:"What do you do?",prompt2:"Niamh says: 'Please don't make this a bigger deal than it is — I just need my coffee.' How do you respond to this?"}
+,{category:"Conflict Resolution",scenario:"You are a resident in a shared apartment block. Your downstairs neighbour — a single mother of two young children — has knocked on your door asking if you could please stop using your treadmill before 7am, as the noise wakes her babies. You have been using the treadmill at 6am because it is the only time you have before work. She looks exhausted and apologises for bothering you. You have a medical condition that makes evening exercise difficult.",prompt1:"How would you respond to her in this moment?",prompt2:"What is a fair way to resolve a conflict where both parties have genuine and reasonable needs?"}
+,{category:"Personal",scenario:"You are a final-year student who has just received a job offer from a prestigious company — the role you have worked toward for three years. The same week, your closest friend is diagnosed with a serious illness that will require a year of treatment. He doesn't ask you to change your plans, but you can see he is frightened and that his support network is thin. The job starts in three weeks.",prompt1:"What is going through your mind?",prompt2:"Describe how you would think through a decision where being a good friend and pursuing your own goals seem to pull in opposite directions."}
+,{category:"Ethics",scenario:"You are a medical student on a ward. A patient — a 68-year-old man recovering from surgery — asks you to look at a letter he has received from the hospital. You realise it contains another patient's private medical information, sent to him by administrative error. The other patient's diagnosis is a sensitive one. The man asks: 'Should I be worried about what this says?'",prompt1:"What do you say to the patient and what do you do next?",prompt2:"What does this situation reveal about the consequences of administrative errors in healthcare, and who bears responsibility?"}
+,{category:"Communication",scenario:"You are a team leader at a community youth centre. During a group activity session with teenagers, one of the young people — a 15-year-old who rarely speaks — suddenly starts crying without explanation and gets up to leave the room. The other teenagers go quiet and look to you. You know this young person has a difficult home situation but they have never opened up to you directly.",prompt1:"What do you do in this moment — with the group and with the young person?",prompt2:"Why might a young person cry in a group setting without explanation, and what does this ask of those around them?"}
+,{category:"Professionalism",scenario:"You are a junior doctor. A patient's family has requested a meeting to discuss their mother's deteriorating condition. The consultant responsible for her care has been unavailable and has asked you to run the meeting. You do not feel fully briefed on all the details of her prognosis, and the family has already been given inconsistent information by different staff members. They arrive visibly upset and immediately ask: 'What exactly is going to happen to our mother?'",prompt1:"How do you handle this meeting?",prompt2:"What should hospitals do better to manage communication with families during serious illness?"}
+,{category:"Ethics",scenario:"You are a student living at home. You discover that your younger teenage sibling has been secretly vaping and selling vaping products to other students at their school. When you confront them, they beg you not to tell your parents, saying: 'Mum is already so stressed with work, this would destroy her.' They are clearly aware that what they are doing is wrong and promise to stop.",prompt1:"What do you do?",prompt2:"How do you weigh loyalty to a sibling against your responsibility to their wellbeing and your parents' right to know?"}
+,{category:"Conflict Resolution",scenario:"You are a senior student mentor at a medical school. A first-year student, Aditi, comes to you privately and says she is being excluded from study group activities by her peers. She suspects it is because she is the only student from a non-English speaking background in the group. She is not sure whether to raise a formal complaint and asks for your honest advice. She is visibly upset and says she doesn't want to make trouble.",prompt1:"What would you say to Aditi?",prompt2:"What responsibility do educational institutions have to address informal exclusion that is difficult to prove?"}
+,{category:"Personal",scenario:"You are a volunteer coordinator for a charity that provides meals to homeless individuals. One of your most dedicated volunteers, a retired man named George who has been coming every Saturday for three years, has recently been making comments that some of the recipients find patronising and occasionally offensive. Two recipients have separately mentioned it to you. George is unaware and clearly means no harm.",prompt1:"How do you approach this with George?",prompt2:"How do you think George would feel if he knew his words had this effect, and how should that shape how you talk to him?"}
+,{category:"Ethics",scenario:"You are a university student. Your housemate asks you to be the designated driver for a group night out. Late in the evening, you discover your housemate — who organised the whole night — has been secretly drinking despite telling everyone he was also staying sober so 'the numbers worked.' He is now asking you to drive a group of seven people home in a car that seats five, saying: 'No one will notice and it's just around the corner.'",prompt1:"What do you do?",prompt2:"How does the fact that your housemate deceived you about staying sober affect how you approach this situation?"}
+,{category:"Communication",scenario:"You are a first-year medical student on a hospital visit. An elderly female patient in a two-bed ward calls you over while her roommate is sleeping. She whispers that her roommate has been crying every night and she is worried about her, but the roommate refuses to talk to staff and has told her: 'They don't have time for this.' She asks: 'Can you please just check on her?'",prompt1:"What do you do?",prompt2:"What does the roommate's comment — 'they don't have time for this' — tell you about how patients perceive the healthcare system, and how should this shape care delivery?"}
+,{category:"Professionalism",scenario:"You are a student representative on your university's academic integrity committee. A case is brought before the committee involving a student caught submitting an AI-generated essay. The student is a single parent who explains that she had a family emergency the week the essay was due, didn't ask for an extension because she 'didn't want to seem like she was making excuses,' and used AI in desperation. This is her first academic integrity violation.",prompt1:"How should the committee approach this case?",prompt2:"Do you think universities have kept pace with the ethical questions raised by AI-generated work? What policies would you recommend?"}
+,{category:"Ethics",scenario:"You are a registered nurse working a night shift. A patient in your care — a 45-year-old man admitted for observation after a cardiac event — tells you in confidence that he has not told his cardiologist that he has been driving long distances for work despite being told not to. He asks you not to document it. He says: 'I'll lose my job if I can't drive, and my family needs me working. My heart is fine — I feel great.'",prompt1:"What do you say to this patient?",prompt2:"What competing obligations are you navigating here, and how do you prioritise them?"}
+,{category:"Conflict Resolution",scenario:"You are a shift supervisor at a retail store. Two of your employees — both of whom you consider good workers — have had a falling out over a scheduling dispute. One of them, Maya, has started leaving tasks incomplete that she knows the other, Sean, will have to finish. Sean has come to you saying he feels targeted and the situation is affecting his mental health. Maya denies it is intentional.",prompt1:"How do you handle this situation?",prompt2:"What does fairness look like when one party denies behaviour that the other person experiences as clearly intentional?"}
+,{category:"Personal",scenario:"You are a second-year university student. A professor whose class you are enrolled in has given you a grade that you believe is unfair and that could significantly affect your academic record. When you politely request a meeting to discuss it, she responds curtly that 'the grade stands and reflects the quality of your work.' You believe the feedback she provided does not match the marking criteria.",prompt1:"How do you proceed from here?",prompt2:"Describe a time when you were treated unfairly by someone in a position of authority. How did you respond?"}
+,{category:"Ethics",scenario:"You are a friend. You are attending a party with a close friend, Alex, who you drove to the event. As the night progresses, you notice Alex becoming increasingly intoxicated. At the end of the night, Alex insists on driving home despite having clearly had too much to drink. They become angry and accuse you of 'being a buzzkill' when you object. Several other friends in the group shrug and say Alex 'always drives home fine.'",prompt1:"What do you do?",prompt2:"How does peer pressure influence decision-making in situations with clear safety risks, and how do you resist it?"}
+,{category:"Communication",scenario:"You are a student nurse on a placement. An Indigenous patient in his 50s has been admitted following a fall. He is quiet during ward rounds and gives monosyllabic answers to the medical team. Afterward, you sit with him alone and he opens up — telling you the doctors speak too fast, use terms he doesn't understand, and that he feels like 'they've already decided what's wrong with me.' He says he didn't want to 'make a fuss' in front of them.",prompt1:"How do you respond to him, and what do you do next?",prompt2:"What does this patient's experience tell you about barriers to communication in healthcare, and whose responsibility is it to address them?"}
+,{category:"Professionalism",scenario:"You are a junior employee at a healthcare company. You discover that a dataset used in a recently published internal report — one that influenced an important resourcing decision — contains significant errors that were present before the report was finalised. The report has not been made public, but decisions have already been made based on it. Your direct supervisor was responsible for reviewing the data before publication.",prompt1:"What do you do?",prompt2:"If your supervisor asks you to 'leave it alone — the decision is made and reopening it will cause more problems than it solves,' how do you respond?"}
+,{category:"Ethics",scenario:"You are a university student. Your study partner, who you have known for two years and trust, tells you he has been anonymously submitting false complaints about another student — one he personally dislikes — to the university's academic misconduct office. No formal action has been taken yet, but an investigation has begun. He tells you this casually and doesn't seem to think it's a serious issue.",prompt1:"How do you respond in this conversation?",prompt2:"What obligations do you have now that you are aware of this — even though you had no involvement?"}
+,{category:"Conflict Resolution",scenario:"You are a volunteer at a disability support organisation. You have been paired for six months with a client, Tom — a young man with an intellectual disability — and you have built a strong rapport. A new coordinator has recently changed your roster without warning, reassigning you to a different client and giving Tom a new volunteer. Tom is visibly upset at the change, and his mother has contacted you directly saying Tom has been asking for you and has become withdrawn.",prompt1:"How do you handle Tom's mother's message and the situation overall?",prompt2:"How do you think Tom is experiencing this change, and what does that tell you about the importance of consistency in support relationships?"}
+,{category:"Personal",scenario:"You are a student who has just returned from a long-awaited overseas trip, funded by months of part-time work. While you were away, a close friend's parent passed away suddenly. You did not know at the time and could not have known. When you return and find out, your friend tells you — without obvious anger — that she 'needed you and you weren't there.' She has been leaning on other friends in the weeks since.",prompt1:"How do you respond to your friend?",prompt2:"How do you carry the weight of not having been present for someone you love, even when it was not your fault?"}
+,{category:"Ethics",scenario:"You are a resident doctor. A patient — a 28-year-old woman with a history of chronic pain — is requesting a repeat opioid prescription. She is well-spoken, articulate, and describes her pain clearly. Your supervising consultant has noted in her file: 'drug-seeking — exercise caution.' You have no reason from your own assessment to reach the same conclusion, and the patient is visibly distressed at having to justify herself again.",prompt1:"How do you approach this consultation?",prompt2:"What is the risk of allowing a previous clinician's assumptions to shape your own clinical assessment, and how do you guard against it?"}
+,{category:"Communication",scenario:"You are a social work student on placement at a family services centre. A father comes in — visibly embarrassed — saying his 9-year-old daughter has been referred to the centre after a teacher flagged concerns about her emotional wellbeing. He is defensive and says the school 'has it in for him' and has been looking for excuses to interfere. He hasn't directly asked for help but came in anyway.",prompt1:"How do you approach this first conversation with him?",prompt2:"Why might a parent respond defensively to concerns about their child, and how should that shape a practitioner's approach?"}
+,{category:"Professionalism",scenario:"You are a medical student presenting a case to your clinical team. In the middle of your presentation, the consultant interrupts you and corrects something you said in a way that is factually wrong — it is you who has the correct information, which you confirmed with a specialist earlier. The rest of the team are looking at you. The consultant moves on before you can respond.",prompt1:"What do you do in this moment and afterward?",prompt2:"What are the risks of a culture where trainees feel unable to respectfully disagree with senior clinicians?"}
+,{category:"Ethics",scenario:"You are a friend. Your close friend Tara comes to you upset, saying her elderly neighbour — a 79-year-old woman who lives alone — has been asking her for money on a weekly basis, small amounts at a time. Tara has been giving it to her out of kindness but it has now escalated to larger requests. Tara isn't sure if the woman genuinely needs help or is being manipulated herself by someone else, and feels too guilty to stop.",prompt1:"What do you say to Tara?",prompt2:"What is the difference between compassion and enabling, and how do you help someone recognise that line without making them feel judged?"}
+,{category:"Conflict Resolution",scenario:"You are a student at a university college. Your college has a tradition of a 'welcome week' for new students that includes activities some students consider hazing — the activities are not physically dangerous, but are intentionally embarrassing. Older students defend it as 'harmless fun' and a bonding ritual. A new student comes to you privately and says she found it humiliating and feels unable to raise it officially without being ostracised.",prompt1:"What do you say to her, and what if anything do you do?",prompt2:"How should institutions balance tradition and culture against the wellbeing of individuals who experience that culture differently?"}
+,{category:"Personal",scenario:"You are a university student who has been shortlisted for a prestigious national award. As part of the process, you are asked to submit a written statement about your community contributions. Looking back at your application, you realise that in describing a volunteer role, you inadvertently inflated the number of hours you contributed — not intentionally, but the error is meaningful. The submission deadline has passed.",prompt1:"What do you do?",prompt2:"How do you weigh the discomfort of admitting a mistake against the principle of honesty, especially when no one else knows?"}
+,{category:"Ethics",scenario:"You are a GP. A mother brings in her 8-year-old son for a routine appointment. During the visit, the boy — who seems bright and engaged — says, unprompted: 'My tummy always hurts when Dad comes home.' The mother immediately redirects the conversation, saying: 'He's always a bit dramatic.' The boy goes quiet.",prompt1:"How do you proceed during this appointment?",prompt2:"What makes this situation particularly delicate, and what would guide your next steps?"}
+,{category:"Communication",scenario:"You are a first-year intern at a company. On your first day, you witness a team meeting where a long-standing employee's idea is dismissed with what feels like condescension by the manager. The employee — a woman in her 50s who has worked there for 15 years — says nothing and looks down. After the meeting, you pass her in the corridor and she seems visibly deflated.",prompt1:"What, if anything, do you say to her?",prompt2:"What does it mean to acknowledge someone's experience without overstepping your role or making assumptions?"}
+,{category:"Professionalism",scenario:"You are a pharmacy student on placement. A customer comes in to collect a prescription for antidepressants. While you are processing it, she says: 'I don't even know why I bother, I feel like nothing is ever going to get better.' She says it in a resigned, matter-of-fact tone — not dramatically. The pharmacy is busy and there is a queue.",prompt1:"What do you do?",prompt2:"What does this moment require of you professionally and humanly, and how do you navigate the tension between efficiency and genuine care?"}
+,{category:"Ethics",scenario:"You are a close friend. Your friend Leo has just told you he has been lying to his long-term partner about attending therapy. He has been telling her he goes every two weeks, and she has been relieved and encouraged by his apparent progress. In reality, he stopped going after three sessions and has spent the money on sports bets. He is not asking for your advice. He seems almost proud of how well it has worked.",prompt1:"What do you say to Leo?",prompt2:"How do you maintain a friendship with someone who is actively deceiving a person you also care about?"}
+,{category:"Conflict Resolution",scenario:"You are the captain of a university sports team. Your team's most talented player, Jamie, has been behaving poorly at training — making dismissive comments to less experienced players and undermining the coach's instructions when he disagrees. The coach has asked you, as captain, to speak with Jamie. You know Jamie is going through a difficult personal period, but he has not told the coach.",prompt1:"How do you approach this conversation with Jamie?",prompt2:"How do you lead someone effectively when you have context about their personal situation that the authority figure above you does not?"}
+,{category:"Personal",scenario:"You are a second-year university student from a low-income background. You have been offered a paid summer internship at a competitive company — an opportunity that could define your career trajectory. The same week, your mother tells you she has been diagnosed with a chronic illness and will need significant support over the coming months, including help getting to appointments. You are her primary support person. Your siblings live interstate.",prompt1:"What is going through your mind?",prompt2:"How do you think about sacrifice and opportunity when the tension is between your own future and someone who has sacrificed for you?"}
+,{category:"Ethics",scenario:"You are a student nurse on a ward. An 82-year-old patient — cognitively intact and legally competent — tells you she has decided she does not want to continue with her prescribed chemotherapy. She has made this decision calmly and says she has had 'a long and good life.' Her adult children, who arrive shortly after, are distraught and demand the medical team 'talk her out of it.' They ask you to support their position when speaking with their mother.",prompt1:"How do you respond to the family?",prompt2:"How do you think the patient is feeling in this moment — and what does she most need from those around her?"}
+,{category:"Communication",scenario:"You are a tutoring coordinator at a university. A student — a mature-aged man returning to study after 20 years in the workforce — emails you in obvious frustration, saying that the online learning platform 'makes no sense,' that he feels 'too old for this' and is considering dropping out. He ends the email with: 'You probably get emails like this all the time. Sorry for wasting your time.'",prompt1:"What do you write back?",prompt2:"What does his apology at the end of the email tell you about how he is feeling, and how does that shape your response?"}
+,{category:"Professionalism",scenario:"You are a junior doctor on a ward round. The team is discussing a patient's management plan in the corridor outside her room. The door is open and you can see the patient is awake and listening. The registrar is speaking freely about her prognosis in technical language without appearing to notice. The patient's face has become very still.",prompt1:"What do you do?",prompt2:"Whose responsibility is it to set and maintain standards for how clinical conversations happen in hospital environments?"}
+,{category:"Ethics",scenario:"You are a university student and part of an online student forum. You come across a post in which a fellow student — using a username you recognise — is sharing intimate details of their breakup with another student, naming them and sharing private messages. The post is getting significant engagement. You know both students personally.",prompt1:"What do you do?",prompt2:"What are the limits of 'venting' publicly, and at what point does processing your own pain become harm to someone else?"}
+,{category:"Conflict Resolution",scenario:"You are a senior student helping to run orientation for new students. One of the new students — a quiet 19-year-old named Sam — tells you privately that a returning student who is also part of the orientation team made a joke at Sam's expense in front of the group earlier that day. Sam laughed along in the moment but tells you it actually really hurt. Sam asks you not to 'make it into a thing.'",prompt1:"How do you respond to Sam, and what if anything do you do?",prompt2:"Why might someone ask that a hurtful experience not be 'made into a thing,' and what does respecting that request actually look like?"}
+,{category:"Personal",scenario:"You are a student who has been accepted to study medicine — your lifelong goal. The same week, your best friend tells you that her application was unsuccessful, and that she has decided to give up entirely on the dream she has had since childhood. She says quietly: 'Some people are just meant for it and some aren't.' You can see she is devastated.",prompt1:"What do you say to her?",prompt2:"How do you hold your own joy and someone else's grief at the same time — and is there a right way to do that?"}
+,{category:"Ethics",scenario:"You are a resident medical officer. You have been called to see a 35-year-old male patient who was brought in by police after a public disturbance. He is agitated and aggressive. A police officer accompanying him tells you: 'He was being difficult — just sedate him.' The patient has not been assessed. He is shouting but coherent, and you can see he is frightened.",prompt1:"How do you approach this situation?",prompt2:"What are the risks when external authority figures influence clinical decision-making in emergency settings?"}
+,{category:"Communication",scenario:"You are a physiotherapy student on clinical placement. Your patient today is a 55-year-old woman recovering from a stroke. She has some aphasia — she understands you but struggles to find words. During the session, she becomes visibly frustrated and starts to cry, saying haltingly: 'I used... to be... different.' She looks embarrassed.",prompt1:"What do you say and do in this moment?",prompt2:"What do you imagine it feels like to be unable to express yourself in the way you once could — and how does that shape how you sit with her?"}
+,{category:"Professionalism",scenario:"You are an intern at a research institute. Your supervisor — a respected academic — asks you to exclude a particular set of data points from an analysis before submission, saying they are 'outliers that complicate the story.' You look at the data and believe these points are legitimate and that their exclusion would meaningfully change the conclusions of the paper.",prompt1:"What do you do?",prompt2:"What is the cumulative effect on science and public trust when data is selectively reported — even when each individual decision seems minor?"}
+,{category:"Ethics",scenario:"You are a close friend. Your friend Chris has confided that he has been diagnosed with a sexually transmitted infection and has not told his current partner. He insists the relationship is 'basically over' and that he will tell her 'when the time is right.' It has been three weeks since his diagnosis. You are also acquainted with his partner.",prompt1:"What do you say to Chris?",prompt2:"What obligation, if any, do you have toward his partner — someone you know but are not close to?"}
+,{category:"Conflict Resolution",scenario:"You are a team member at a graduate program. Your cohort has been told that one spot is available for a fully funded international conference. The program director has asked the group to decide amongst themselves who should go. No formal criteria have been given. The discussion quickly becomes tense, with some members making strong arguments for themselves and one member — who arguably has the most relevant work — staying silent.",prompt1:"How do you navigate this group decision?",prompt2:"What does the silent member's silence tell you, and what responsibility do you have toward them in this process?"}
+,{category:"Personal",scenario:"You are a high school student who witnesses a classmate — someone who has bullied you in the past — being publicly humiliated on social media by a group of other students. The posts are cruel and the classmate, from what you can see on their own profile, appears genuinely distressed. Others are laughing and sharing the posts.",prompt1:"What do you do?",prompt2:"How do you extend compassion to someone who has hurt you in the past, and what does doing so say about who you are?"}
+,{category:"Ethics",scenario:"You are a junior employee. You discover that your company has been disposing of chemical waste in a way that is technically legal but that local environmental groups have flagged as harmful to a nearby waterway. When you raise it with your manager, he says: 'We're compliant with regulations. What else do you want from us?' Several of your colleagues have raised similar concerns internally over the past year with no result.",prompt1:"What do you do now?",prompt2:"When legal compliance and ethical responsibility diverge, how should individuals within organisations respond?"}
+,{category:"Communication",scenario:"You are a welfare officer at a university. A student — a 22-year-old international student named Wei — comes to your office. He is quiet and says he is 'fine' but his academic supervisor has flagged concerns. As you talk, it becomes clear Wei has been struggling significantly with isolation, cultural adjustment and financial stress, but he is minimising everything and apologising repeatedly for 'bothering you.'",prompt1:"How do you conduct this conversation?",prompt2:"Why might Wei minimise his own distress and apologise for seeking help — and what does this tell you about what kind of support he needs?"}
+,{category:"Professionalism",scenario:"You are a medical student on a rural placement. The local GP — who is the only doctor within 80km — asks you to stay back to assist with an after-hours procedure that falls slightly outside what you've been trained to do. He says: 'You're the best I've got tonight. I'll guide you through it.' The procedure is not emergency-critical but should be done tonight.",prompt1:"What do you do?",prompt2:"What are the tensions that arise when resource limitations in rural healthcare push against standard scope-of-practice guidelines — and how should they be navigated?"}
+,{category:"Ethics",scenario:"You are a student. Your close friend has been in a serious relationship for two years. You find out — from a mutual acquaintance — that your friend's partner cheated on them six months ago, resolved it privately with the person they cheated with, and has never told your friend. Your friend has no idea and seems happy in the relationship. The mutual acquaintance asks you to keep it between you.",prompt1:"What do you do with this information?",prompt2:"How do you think about the difference between information that belongs to you to act on, and information that is not yours to share?"}
+,{category:"Conflict Resolution",scenario:"You are a PhD student. Your research supervisor has been taking credit for your work in public presentations — not explicitly claiming it as his own, but presenting your findings as part of 'our lab's work' without acknowledgement. Other students in the lab have noticed and mentioned it to you privately. Your supervisor controls your funding and your graduation timeline.",prompt1:"What do you do?",prompt2:"What makes power imbalances particularly difficult to navigate in academic settings, and what systems should exist to protect students?"}
+,{category:"Personal",scenario:"You are a junior employee who has just been promoted over two colleagues who applied for the same role. Both are older and more experienced than you, and one of them has made it clear — without saying anything directly — that they are not happy about it. You will now be managing both of them.",prompt1:"How do you approach your first weeks in this new role?",prompt2:"How do you lead someone with more experience than you who may resent your position — and what does it require of you personally?"}
+,{category:"Ethics",scenario:"You are a student. A classmate with whom you have a minor disagreement has been putting their hand up in seminars to ask questions you strongly suspect they have already looked up — essentially performing confusion to seem more engaged. They are well-liked by the professor. You know this is harming no one directly, but it irritates you.",prompt1:"What is going through your mind, and what do you do?",prompt2:"What does your reaction to this situation reveal about you — and is it something worth examining?"}
+,{category:"Communication",scenario:"You are a dental student on clinical placement. Your patient today is a 12-year-old boy whose mother is present. The boy has significant tooth decay that will require several uncomfortable procedures. When you explain the plan, his mother says cheerfully: 'He's fine, he's tough.' The boy has gone very quiet and is gripping the armrest. He hasn't said a word.",prompt1:"How do you proceed with this appointment?",prompt2:"What is this boy communicating through his silence and body language — and what does he need from you that he isn't able to ask for?"}
+];
+
+// State
+let pool=[],currentIdx=0,completed=0,sessionPool=[];
+let timerInterval=null,phase='idle',sessionActive=false;
+let selectedCategory='All',readingTime=60,writingTime=210;
+let aiEnabled=false,apiKey='';
+let sessionHistory=[];
+
+// DOM
+const $ = id => document.getElementById(id);
+const startBtn=$('startBtn'),prevBtn=$('prevBtn'),nextBtn=$('nextBtn'),skipBtn=$('skipReadingBtn');
+const timerNum=$('timerNum'),phaseBadge=$('phaseBadge'),progressFill=$('progressFill');
+const scenarioIdle=$('scenarioIdle'),scenarioText=$('scenarioText');
+const prompt1Wrap=$('prompt1Wrap'),prompt2Wrap=$('prompt2Wrap');
+const prompt1Text=$('prompt1Text'),prompt2Text=$('prompt2Text');
+const promptsLocked=$('promptsLocked'),categoryPill=$('categoryPill'),stationNum=$('stationNum');
+const statCompleted=$('statCompleted'),statAvg=$('statAvg');
+const answerSection=$('answerSection'),answerTextarea=$('answerTextarea'),wordCountEl=$('wordCount');
+const aiFeedbackWrap=$('aiFeedbackWrap'),scenarioCard=$('scenarioCard'),reviewPanel=$('reviewPanel');
+const aiToggle=$('aiToggle'),aiKeyWrap=$('aiKeyWrap'),apiKeyInput=$('apiKeyInput'),aiStatusEl=$('aiStatusEl');
+const trendWrap=$('trendWrap'),trendEmpty=$('trendEmpty'),trendCanvas=$('trendCanvas'),trendAvgLine=$('trendAvgLine'),trendAvgNum=$('trendAvgNum');
+
+// Category counts
+function updateCounts(){
+  const c={Ethics:0,'Conflict Resolution':0,Personal:0,Professionalism:0,Communication:0};
+  STATIONS.forEach(s=>{if(c[s.category]!==undefined)c[s.category]++;});
+  $('cnt-all').textContent=STATIONS.length;
+  $('cnt-ethics').textContent=c.Ethics;
+  $('cnt-conflict').textContent=c['Conflict Resolution'];
+  $('cnt-personal').textContent=c.Personal;
+  $('cnt-professionalism').textContent=c.Professionalism;
+  $('cnt-communication').textContent=c.Communication;
+}
+updateCounts();
+
+// Sliders
+$('readingSlider').addEventListener('input',function(){readingTime=+this.value;$('readingVal').textContent=readingTime+'s';});
+$('writingSlider').addEventListener('input',function(){writingTime=+this.value;const m=Math.floor(writingTime/60),s=writingTime%60;$('writingVal').textContent=m+':'+(s<10?'0':'')+s;});
+
+// Category filter
+$('categoryFilters').addEventListener('click',e=>{
+  const btn=e.target.closest('.cat-btn');if(!btn)return;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');selectedCategory=btn.dataset.cat;
+});
+
+// AI toggle
+aiToggle.addEventListener('change',()=>{
+  aiEnabled=aiToggle.checked;
+  aiKeyWrap.style.display=aiEnabled?'block':'none';
+  trendWrap.style.display=aiEnabled?'block':'none';
+  updateAiStatus();
+});
+apiKeyInput.addEventListener('input',()=>{apiKey=apiKeyInput.value.trim();sessionStorage.setItem('k2md_key',apiKey);updateAiStatus();});
+const sk=sessionStorage.getItem('k2md_key');if(sk){apiKeyInput.value=sk;apiKey=sk;}
+
+function updateAiStatus(){
+  if(!aiEnabled){aiStatusEl.className='ai-status off';aiStatusEl.innerHTML='<span class="sdot sdot-gray"></span>AI marking off';}
+  else if(!apiKey){aiStatusEl.className='ai-status err';aiStatusEl.innerHTML='<span class="sdot sdot-red"></span>Enter API key to enable';}
+  else{aiStatusEl.className='ai-status ok';aiStatusEl.innerHTML='<span class="sdot sdot-green"></span>AI marking ready';}
+}
+
+// Utils
+function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
+function fmt(s){const m=Math.floor(s/60);return m+':'+(s%60<10?'0':'')+(s%60);}
+function catClass(cat){return{Ethics:'cat-ethics','Conflict Resolution':'cat-conflict',Personal:'cat-personal',Professionalism:'cat-professional',Communication:'cat-communication'}[cat]||'cat-ethics';}
+function clearTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+function wc(t){return t.trim()===''?0:t.trim().split(/\s+/).length;}
+function scoreCls(s){return s>=7?'score-high':s>=5?'score-mid':'score-low';}
+function avgScores(){const sc=sessionHistory.filter(h=>h&&h.score!=null).map(h=>h.score);return sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length*10)/10:null;}
+
+// Timer
+function runTimer(secs,done){
+  clearTimer();let left=secs;
+  timerNum.textContent=fmt(left);timerNum.classList.remove('urgent');progressFill.style.width='100%';
+  timerInterval=setInterval(()=>{
+    left--;
+    if(left<0){clearTimer();done&&done();return;}
+    timerNum.textContent=fmt(left);
+    progressFill.style.width=Math.max(0,left/secs*100)+'%';
+    const urg=left<=5;
+    timerNum.classList.toggle('urgent',urg);progressFill.classList.toggle('urgent',urg);
+    if(left>0&&left<=5)beep(0.25,false);
+    if(left===0){clearTimer();flashTimeUp(()=>{done&&done();});}
+  },1000);
+}
+function flashTimeUp(cb){
+  beep(0.5,true);let f=0;
+  const iv=setInterval(()=>{timerNum.textContent=f%2===0?'TIME UP':'——:——';timerNum.classList.toggle('urgent',f%2===0);f++;if(f>=6){clearInterval(iv);timerNum.textContent='TIME UP';setTimeout(cb,400);}},300);
+}
+function beep(vol,long){try{const a=new Audio(long?'https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg':'https://actions.google.com/sounds/v1/alarms/beep_short.ogg');a.volume=vol;a.play();}catch(e){}}
+function setPhaseUI(p){
+  phase=p;phaseBadge.className='phase-badge';progressFill.className='progress-fill';
+  if(p==='reading'){phaseBadge.classList.add('phase-reading');phaseBadge.textContent='📖 Reading';progressFill.classList.add('reading');}
+  else if(p==='writing'){phaseBadge.classList.add('phase-writing');phaseBadge.textContent='✍️ Writing';progressFill.classList.add('writing');}
+  else if(p==='done'){phaseBadge.classList.add('phase-done');phaseBadge.textContent='✓ Done';}
+  else{phaseBadge.classList.add('phase-idle');phaseBadge.textContent='Idle';}
+  updateBtns();
+}
+function updateBtns(){prevBtn.disabled=!sessionActive||currentIdx===0;nextBtn.disabled=!sessionActive;skipBtn.disabled=!sessionActive||phase!=='reading';}
+
+// Answer word count
+answerTextarea.addEventListener('input',()=>{
+  const n=wc(answerTextarea.value);wordCountEl.textContent=n+' word'+(n!==1?'s':'');
+  if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;
+});
+
+// Session
+function startSession(){
+  clearTimer();
+  pool=shuffle(selectedCategory==='All'?STATIONS:STATIONS.filter(s=>s.category===selectedCategory));
+  sessionPool=[...pool];currentIdx=0;completed=0;sessionHistory=[];
+  sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
+  $('startBtn').classList.add('running');$('startBtnText').textContent='Restart';$('startBtnIcon').textContent='↺';
+  statAvg.textContent='—';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
+  loadStation();
+}
+
+function loadStation(){
+  clearTimer();
+  if(currentIdx>=pool.length){endSession();return;}
+  if(currentIdx<0)currentIdx=0;
+  const s=pool[currentIdx];
+  if(!sessionHistory[currentIdx])sessionHistory[currentIdx]={station:s,answer:'',score:null,feedback:null};
+  stationNum.textContent=`Station ${currentIdx+1}`;statCompleted.textContent=completed;
+  categoryPill.className='category-pill '+catClass(s.category);categoryPill.textContent=s.category;
+  scenarioIdle.style.display='none';scenarioText.style.display='';scenarioText.textContent=s.scenario;
+  promptsLocked.style.display='flex';prompt1Wrap.style.display='none';prompt2Wrap.style.display='none';
+  answerSection.style.display='none';answerTextarea.value=sessionHistory[currentIdx].answer||'';
+  wordCountEl.textContent=wc(answerTextarea.value)+' words';aiFeedbackWrap.innerHTML='';
+  if(sessionHistory[currentIdx].feedback)restoreFeedback(currentIdx);
+  setPhaseUI('reading');runTimer(readingTime,()=>startWriting());
+}
+
+function startWriting(){
+  const s=pool[currentIdx];
+  promptsLocked.style.display='none';prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
+  prompt1Wrap.style.display='block';prompt2Wrap.style.display='block';
+  answerSection.style.display='block';answerTextarea.focus();
+  setPhaseUI('writing');runTimer(writingTime,()=>finishStation());
+}
+
+async function finishStation(){
+  saveAnswer();
+  if(aiEnabled&&apiKey&&sessionHistory[currentIdx]?.answer?.trim().length>20)await runAI(currentIdx);
+  completed++;statCompleted.textContent=completed;currentIdx++;loadStation();
+}
+
+function saveAnswer(){if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;}
+
+// AI marking
+async function runAI(idx){
+  const h=sessionHistory[idx];if(!h||!h.answer.trim())return;
+  showAiLoading();
+  const s=h.station;
+  const p=`You are an expert MMI (Multiple Mini Interview) assessor for Australian medical school admissions. Evaluate this student response.
+
+SCENARIO: ${s.scenario}
+PROMPT 1: ${s.prompt1}
+PROMPT 2: ${s.prompt2}
+STUDENT RESPONSE: ${h.answer}
+
+Respond ONLY with a raw JSON object (no markdown, no backticks):
+{"score":<integer 1-10>,"strengths":"<1-2 sentences>","improvements":"<1-2 sentences>","empathy":"<one sentence>","missed":"<key missed point or None>"}
+
+Score guide: 8-10=excellent, 6-7=good, 4-5=developing, 1-3=needs significant work. Be honest and specific.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:p}]})});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const txt=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    const fb=JSON.parse(txt);
+    h.score=fb.score;h.feedback=fb;
+    showFeedback(fb.score,fb);updateTrend();updateAvgStat();
+  }catch(err){
+    aiFeedbackWrap.innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">AI marking failed — check your API key. (${err.message})</div>`;
+  }
+}
+
+function showAiLoading(){aiFeedbackWrap.innerHTML=`<div class="ai-loading"><div class="spinner"></div>AI reviewing your response…</div>`;}
+function showFeedback(score,fb){
+  if(!fb)return;
+  aiFeedbackWrap.innerHTML=`<div class="ai-feedback"><div class="ai-feedback-header"><span class="ai-feedback-title">✦ AI Feedback</span><span class="ai-score-badge ${scoreCls(score)}">${score}/10</span></div><div class="ai-feedback-body"><strong>Strengths:</strong> ${fb.strengths}<br><br><strong>Improve:</strong> ${fb.improvements}<br><br><strong>Empathy:</strong> ${fb.empathy}${fb.missed&&fb.missed!=='None'?`<br><br><strong>Missed:</strong> ${fb.missed}`:''}</div></div>`;
+}
+function restoreFeedback(idx){const h=sessionHistory[idx];if(h&&h.feedback){answerSection.style.display='block';showFeedback(h.score,h.feedback);}}
+
+// Trend chart
+function clearTrend(){trendEmpty.style.display='block';trendCanvas.style.display='none';trendAvgLine.style.display='none';}
+function updateTrend(){
+  const sc=sessionHistory.filter(h=>h&&h.score!=null).map(h=>h.score);
+  if(!sc.length){clearTrend();return;}
+  trendEmpty.style.display='none';trendCanvas.style.display='block';
+  drawChart(trendCanvas,sc,64);
+  const avg=sc.reduce((a,b)=>a+b,0)/sc.length;
+  trendAvgLine.style.display='flex';trendAvgNum.textContent=(Math.round(avg*10)/10)+'/10';
+}
+function updateAvgStat(){const avg=avgScores();if(avg!==null){statAvg.textContent=avg+'/10';statAvg.style.color=avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';}}
+
+function drawChart(canvas,scores,h){
+  const W=canvas.parentElement.offsetWidth||220;canvas.width=W;canvas.height=h;
+  const ctx=canvas.getContext('2d');ctx.clearRect(0,0,W,h);
+  const pad=8,uw=(W-pad*2)/Math.max(scores.length-1,1);
+  const pts=scores.map((s,i)=>({x:pad+i*uw,y:h-pad-((s-1)/9)*(h-pad*2)}));
+  const avg=scores.reduce((a,b)=>a+b,0)/scores.length;
+  const ay=h-pad-((avg-1)/9)*(h-pad*2);
+  ctx.strokeStyle='rgba(148,163,184,0.3)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(0,ay);ctx.lineTo(W,ay);ctx.stroke();ctx.setLineDash([]);
+  const grad=ctx.createLinearGradient(0,0,0,h);grad.addColorStop(0,'rgba(14,165,233,0.18)');grad.addColorStop(1,'rgba(14,165,233,0)');
+  ctx.fillStyle=grad;ctx.beginPath();ctx.moveTo(pts[0].x,h-pad);pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(pts[pts.length-1].x,h-pad);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#0ea5e9';ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
+  pts.forEach((p,i)=>{ctx.fillStyle=scores[i]>=7?'#22c55e':scores[i]>=5?'#f59e0b':'#ef4444';ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();});
+}
+
+// End session + review
+function endSession(){
+  clearTimer();sessionActive=false;phase='done';scenarioCard.style.display='none';
+  buildReview();reviewPanel.classList.add('show');
+  timerNum.textContent='——:——';timerNum.classList.remove('urgent');progressFill.style.width='0%';
+  setPhaseUI('done');updateBtns();
+}
+
+function buildReview(){
+  const sc=sessionHistory.filter(h=>h&&h.score!=null).map(h=>h.score);
+  const avg=sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length*10)/10:null;
+  let trend='—';
+  if(sc.length>=4){
+    const h1=sc.slice(0,Math.floor(sc.length/2)),h2=sc.slice(Math.ceil(sc.length/2));
+    const d=h2.reduce((a,b)=>a+b,0)/h2.length-h1.reduce((a,b)=>a+b,0)/h1.length;
+    trend=d>0.3?'↑ Improving':d<-0.3?'↓ Declining':'→ Steady';
+  }
+  $('rCompleted').textContent=completed;$('rCategory').textContent=selectedCategory;
+  $('rAvg').textContent=avg!==null?avg+'/10':'—';$('rAvg').style.color=avg===null?'var(--gray400)':avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';
+  $('rTrend').textContent=trend;$('rTrend').style.color=trend.includes('↑')?'var(--green)':trend.includes('↓')?'var(--red)':'var(--gray400)';
+  $('reviewSubtitle').textContent=avg!==null?`Session average: ${avg}/10 across ${sc.length} AI-marked station${sc.length!==1?'s':''}.`:`${completed} station${completed!==1?'s':''} completed.`;
+  const rts=$('reviewTrendSection');
+  if(sc.length>=2){rts.style.display='block';setTimeout(()=>drawChart($('reviewCanvas'),sc,140),50);}else rts.style.display='none';
+  renderList('all');
+  document.querySelectorAll('.review-filter-btn').forEach(btn=>{
+    btn.onclick=()=>{document.querySelectorAll('.review-filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderList(btn.dataset.filter);};
+  });
+}
+
+function renderList(filter){
+  const con=$('stationReviewList');
+  const avg=avgScores();
+  const items=sessionHistory.filter(h=>h&&h.station);
+  let list=items;
+  if(filter==='below')list=items.filter(h=>h.score!=null&&(avg===null||h.score<avg));
+  if(filter==='answered')list=items.filter(h=>h.answer&&h.answer.trim().length>0);
+  if(!list.length){con.innerHTML='<p style="color:var(--gray400);font-size:0.88rem;padding:8px 0;">No stations match this filter.</p>';return;}
+  con.innerHTML=list.map((h,li)=>{
+    const ba=avg!==null&&h.score!=null&&h.score<avg;
+    const sb=h.score!=null?`<span class="src-score-badge ${scoreCls(h.score)}">${h.score}/10${ba?'<span class="below-avg-tag">↓ below avg</span>':''}</span>`:`<span class="src-score-badge" style="background:var(--gray100);color:var(--gray400)">No score</span>`;
+    const fb=h.feedback?`<div class="src-section-label">AI Feedback</div><div class="src-feedback-text"><strong>Strengths:</strong> ${h.feedback.strengths}<br><strong>Improve:</strong> ${h.feedback.improvements}<br><strong>Empathy:</strong> ${h.feedback.empathy}${h.feedback.missed&&h.feedback.missed!=='None'?`<br><strong>Missed:</strong> ${h.feedback.missed}`:''}</div>`:'';
+    const ans=h.answer&&h.answer.trim()?`<div class="src-section-label">Your Response</div><div class="src-answer-text">${h.answer.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`:`<div class="src-section-label" style="color:var(--gray400)">No response recorded</div>`;
+    const n=items.indexOf(h)+1;
+    return`<div class="station-review-card"><div class="src-header" onclick="this.nextElementSibling.classList.toggle('open')"><span class="src-num">${n}</span><span class="src-scenario">${h.station.scenario.substring(0,110)}…</span>${sb}</div><div class="src-body"><div class="src-section-label">Prompts</div><div class="src-feedback-text">1. ${h.station.prompt1}<br>2. ${h.station.prompt2}</div>${ans}${fb}</div></div>`;
+  }).join('');
+}
+
+// Button handlers
+$('startBtn').addEventListener('click',startSession);
+$('restartBtn').addEventListener('click',startSession);
+$('reviewAgainBtn').addEventListener('click',()=>{
+  pool=[...sessionPool];currentIdx=0;completed=0;sessionHistory=[];sessionActive=true;
+  reviewPanel.classList.remove('show');scenarioCard.style.display='';
+  statAvg.textContent='—';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
+  loadStation();
+});
+
+prevBtn.addEventListener('click',()=>{
+  if(!sessionActive||currentIdx===0)return;
+  clearTimer();saveAnswer();currentIdx--;loadStation();
+});
+
+nextBtn.addEventListener('click',async()=>{
+  if(!sessionActive)return;clearTimer();saveAnswer();
+  if(phase==='writing'){
+    if(aiEnabled&&apiKey&&sessionHistory[currentIdx]?.answer?.trim().length>20){
+      nextBtn.disabled=true;nextBtn.textContent='Marking…';
+      await runAI(currentIdx);nextBtn.textContent='Next Station →';
+    }
+    completed++;statCompleted.textContent=completed;
+  }
+  currentIdx++;loadStation();
+});
+
+skipBtn.addEventListener('click',()=>{if(!sessionActive||phase!=='reading')return;clearTimer();startWriting();});
+
+// Keyboard shortcuts
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key==='ArrowRight'&&!nextBtn.disabled)nextBtn.click();
+  if(e.key==='ArrowLeft'&&!prevBtn.disabled)prevBtn.click();
+  if(e.key===' '&&!skipBtn.disabled){e.preventDefault();skipBtn.click();}
+});
+
+// Hamburger
+$('hamburger').addEventListener('click',function(){this.classList.toggle('open');$('mobileNav').classList.toggle('open');});
+$('mobileNav').querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{$('hamburger').classList.remove('open');$('mobileNav').classList.remove('open');}));
+</script>
+</body>
+</html>
