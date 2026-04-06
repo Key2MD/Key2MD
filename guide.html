@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Complete Australian Medical Entrance Guide — Key2MD</title>
+  <meta name="description" content="A free 20+ page guide to getting into medicine in Australia. GAMSAT, GPA, CASPer, MMI, university breakdowns, the Combo formula, and insider strategy — written by Dan, a Unimelb MD student who has coached 200+ students.">
+  <meta name="keywords" content="how to get into medicine australia, australian medical entrance guide, GAMSAT preparation, CASPer guide australia, MMI preparation, GEMSAS GPA, combo score medicine, unimelb medicine, wollongong medicine, notre dame medicine, CSP offer medicine, GAMSAT section 2 books">
+  <link rel="canonical" href="https://key2md.com.au/guide.html">
+  <meta property="og:title" content="The Complete Australian Medical Entrance Guide — Key2MD">
+  <meta property="og:description" content="Free 20+ page guide to Australian medical admissions. GAMSAT, GPA, CASPer, MMI, university exceptions and Combo formula — by Dan, Unimelb MD student.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://key2md.com.au/guide.html">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0a1628; --navy2: #0d1f3c; --navy3: #112347;
+      --teal: #0ea5e9; --teal2: #38bdf8; --teal3: #0284c7;
+      --white: #ffffff; --gray50: #f8fafc; --gray100: #f1f5f9;
+      --gray200: #e2e8f0; --gray400: #94a3b8; --gray600: #475569; --gray800: #1e293b;
+      --gold: #f59e0b; --radius: 16px; --radius-sm: 10px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--white); color: var(--gray800); line-height: 1.75; overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(10,22,40,0.95); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    nav { display: flex; align-items: center; justify-content: space-between; height: 68px; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .nav-links { display: flex; align-items: center; gap: 24px; list-style: none; }
+    .nav-links a { color: rgba(255,255,255,0.75); font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--teal); }
+    .nav-links a.active { color: var(--white); font-weight: 600; }
+    .btn-nav { padding: 9px 20px; border-radius: 50px; background: var(--teal); color: var(--white) !important; font-size: 0.88rem; font-weight: 600 !important; transition: all 0.2s; }
+    .btn-nav:hover { background: var(--teal2); transform: translateY(-1px); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; background: none; border: none; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--white); border-radius: 2px; transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-nav { display: none; position: fixed; top: 68px; left: 0; right: 0; background: var(--navy); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 20px; z-index: 999; flex-direction: column; gap: 4px; }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { color: rgba(255,255,255,0.85); font-size: 1rem; font-weight: 500; padding: 12px 8px; border-radius: 8px; transition: background 0.2s, color 0.2s; display: block; }
+    .mobile-nav a:hover { background: rgba(255,255,255,0.06); color: var(--teal); }
+    .mobile-nav .btn-nav { width: 100%; text-align: center; margin-top: 8px; display: block; padding: 13px; }
+
+    .page-wrapper { max-width: 1200px; margin: 0 auto; padding: 100px 24px 80px; display: grid; grid-template-columns: 264px 1fr; gap: 52px; align-items: start; }
+
+    .toc-sidebar { position: sticky; top: 88px; }
+    .toc-card { background: var(--gray50); border: 1px solid var(--gray200); border-radius: var(--radius); padding: 22px; }
+    .toc-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal3); margin-bottom: 14px; }
+    .toc-list { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+    .toc-list a { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 7px; font-size: 0.8rem; color: var(--gray600); font-weight: 500; transition: all 0.2s; line-height: 1.3; }
+    .toc-list a:hover { background: rgba(14,165,233,0.07); color: var(--teal3); }
+    .toc-list a.active { background: rgba(14,165,233,0.11); color: var(--teal3); font-weight: 600; }
+    .toc-num { font-size: 0.65rem; font-weight: 700; color: var(--teal); background: rgba(14,165,233,0.12); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+    .toc-divider { height: 1px; background: var(--gray200); margin: 12px 0; }
+    .toc-cta-text { font-size: 0.76rem; color: var(--gray600); line-height: 1.5; margin-bottom: 10px; }
+    .btn-cta-sm { display: block; text-align: center; padding: 11px 16px; border-radius: 50px; background: var(--teal); color: var(--white); font-size: 0.82rem; font-weight: 700; transition: all 0.2s; }
+    .btn-cta-sm:hover { background: var(--teal2); }
+    .btn-cta-sm-outline { display: block; text-align: center; padding: 9px 16px; border-radius: 50px; background: transparent; color: var(--teal3); font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(14,165,233,0.35); transition: all 0.2s; margin-top: 8px; }
+    .btn-cta-sm-outline:hover { background: rgba(14,165,233,0.06); }
+
+    .guide-hero { background: linear-gradient(135deg, var(--navy) 0%, #0d2a52 60%, #0a1f3d 100%); padding: 80px 0 64px; text-align: center; position: relative; overflow: hidden; }
+    .guide-hero::before { content: ''; position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 700px; height: 400px; background: radial-gradient(ellipse, rgba(14,165,233,0.12) 0%, transparent 70%); pointer-events: none; }
+    .guide-hero-inner { position: relative; z-index: 1; max-width: 740px; margin: 0 auto; padding: 0 24px; }
+    .guide-hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.3); color: var(--teal2); font-size: 0.78rem; font-weight: 700; padding: 6px 16px; border-radius: 50px; margin-bottom: 24px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .guide-hero h1 { font-size: clamp(1.9rem, 4vw, 3rem); font-weight: 800; color: var(--white); line-height: 1.2; margin-bottom: 18px; letter-spacing: -0.5px; }
+    .guide-hero h1 span { background: linear-gradient(135deg, var(--teal), var(--teal2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .guide-hero-meta { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; font-size: 0.83rem; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
+    .guide-hero-meta strong { color: rgba(255,255,255,0.9); }
+    .guide-hero-meta .sep { width: 3px; height: 3px; background: rgba(255,255,255,0.3); border-radius: 50%; }
+    .guide-hero-desc { font-size: 1rem; color: rgba(255,255,255,0.68); line-height: 1.75; margin-bottom: 32px; }
+    .guide-cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 13px 28px; border-radius: 50px; background: var(--teal); color: var(--white); font-weight: 600; font-size: 0.92rem; transition: all 0.25s; }
+    .btn-primary:hover { background: var(--teal2); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(14,165,233,0.4); }
+    .btn-outline { display: inline-flex; align-items: center; gap: 8px; padding: 13px 28px; border-radius: 50px; background: transparent; color: var(--white); font-weight: 600; font-size: 0.92rem; border: 2px solid rgba(255,255,255,0.3); transition: all 0.25s; }
+    .btn-outline:hover { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.07); transform: translateY(-2px); }
+
+    .guide-content { min-width: 0; }
+    .chapter { padding: 52px 0; border-bottom: 1px solid var(--gray200); }
+    .chapter:last-child { border-bottom: none; padding-bottom: 0; }
+    .chapter-label { display: inline-flex; align-items: center; gap: 10px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal3); margin-bottom: 10px; }
+    .chapter-label::before { content: ''; display: inline-block; width: 20px; height: 2px; background: var(--teal); border-radius: 2px; }
+    .chapter h2 { font-size: clamp(1.45rem, 2.5vw, 2rem); font-weight: 800; color: var(--navy); margin-bottom: 22px; letter-spacing: -0.4px; line-height: 1.25; }
+    .chapter h3 { font-size: 1.1rem; font-weight: 700; color: var(--navy); margin: 36px 0 12px; }
+    .chapter h4 { font-size: 0.97rem; font-weight: 700; color: var(--navy2); margin: 22px 0 8px; }
+    .chapter p { font-size: 0.97rem; color: var(--gray600); margin-bottom: 16px; max-width: 700px; line-height: 1.8; }
+    .chapter p strong { color: var(--navy); font-weight: 600; }
+    .chapter p:last-child { margin-bottom: 0; }
+    .ext-link { color: var(--teal3); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+    .callout { border-radius: var(--radius-sm); padding: 18px 22px; margin: 24px 0; border-left: 4px solid; max-width: 700px; }
+    .callout-teal { background: rgba(14,165,233,0.07); border-color: var(--teal); }
+    .callout-gold { background: rgba(245,158,11,0.08); border-color: var(--gold); }
+    .callout-navy { background: var(--gray50); border-color: var(--navy3); }
+    .callout-red { background: rgba(239,68,68,0.07); border-color: #ef4444; }
+    .callout-title { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .callout-teal .callout-title { color: var(--teal3); }
+    .callout-gold .callout-title { color: #92400e; }
+    .callout-navy .callout-title { color: var(--navy); }
+    .callout-red .callout-title { color: #991b1b; }
+    .callout p { margin-bottom: 0; font-size: 0.92rem; max-width: none; }
+
+    .pull-quote { border-left: 4px solid var(--teal); padding: 16px 24px; margin: 28px 0; background: var(--gray50); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 1rem; font-style: italic; color: var(--navy); font-weight: 500; max-width: 700px; line-height: 1.7; }
+
+    .step-list { list-style: none; display: flex; flex-direction: column; gap: 14px; margin: 20px 0; max-width: 700px; }
+    .step-list li { display: flex; gap: 14px; align-items: flex-start; }
+    .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: var(--white); font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 3px; }
+    .step-text { font-size: 0.95rem; color: var(--gray600); line-height: 1.7; }
+    .step-text strong { color: var(--navy); }
+
+    .checklist { list-style: none; display: flex; flex-direction: column; gap: 9px; margin: 16px 0; max-width: 700px; }
+    .checklist li { display: flex; gap: 12px; align-items: flex-start; font-size: 0.93rem; color: var(--gray600); line-height: 1.65; }
+    .checklist li::before { content: '✓'; color: var(--teal3); font-weight: 700; flex-shrink: 0; width: 16px; margin-top: 2px; }
+
+    .book-list { display: flex; flex-direction: column; gap: 14px; margin: 20px 0; max-width: 700px; }
+    .book-item { background: var(--gray50); border: 1px solid var(--gray200); border-radius: var(--radius-sm); padding: 16px 20px; }
+    .book-title { font-size: 0.95rem; font-weight: 700; color: var(--navy); margin-bottom: 2px; }
+    .book-author { font-size: 0.8rem; color: var(--teal3); font-weight: 600; margin-bottom: 8px; }
+    .book-themes { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .book-theme { font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 50px; background: rgba(14,165,233,0.1); color: var(--teal3); }
+    .book-note { font-size: 0.85rem; color: var(--gray600); line-height: 1.65; }
+    .book-note.dan { font-style: italic; color: var(--navy2); }
+
+    .mentions-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; max-width: 700px; }
+    .mention-tag { font-size: 0.8rem; background: var(--gray100); color: var(--gray600); padding: 5px 12px; border-radius: 50px; border: 1px solid var(--gray200); font-weight: 500; }
+
+    .formula-box { background: var(--navy); border-radius: var(--radius); padding: 32px 36px; margin: 28px 0; max-width: 560px; text-align: center; }
+    .formula-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal2); margin-bottom: 16px; }
+    .formula-eq { font-size: 1.5rem; font-weight: 700; color: var(--white); font-family: Georgia, serif; letter-spacing: 0.02em; line-height: 1.6; margin-bottom: 14px; }
+    .formula-eq em { color: var(--teal2); font-style: normal; }
+    .formula-note { font-size: 0.84rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+    .formula-note strong { color: var(--teal2); }
+
+    .student-card { background: var(--gray50); border: 1px solid var(--gray200); border-radius: var(--radius-sm); padding: 18px 22px; margin: 12px 0; max-width: 580px; }
+    .student-card h5 { font-size: 0.82rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .student-card .calc { font-size: 0.88rem; color: var(--gray600); font-family: 'Courier New', monospace; line-height: 1.6; }
+    .student-card .result { font-size: 0.97rem; font-weight: 700; margin-top: 8px; }
+    .result-pass { color: #166534; }
+    .result-fail { color: #991b1b; }
+
+    .quartile-grid { display: flex; flex-direction: column; gap: 16px; margin: 24px 0; max-width: 700px; }
+    .quartile-card { border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--gray200); }
+    .quartile-header { display: flex; align-items: center; gap: 12px; padding: 11px 18px; }
+    .q1 .quartile-header { background: rgba(239,68,68,0.07); }
+    .q2 .quartile-header { background: rgba(245,158,11,0.07); }
+    .q3 .quartile-header { background: rgba(14,165,233,0.07); }
+    .q4 .quartile-header { background: rgba(34,197,94,0.07); }
+    .quartile-badge { font-size: 0.7rem; font-weight: 800; padding: 3px 10px; border-radius: 50px; letter-spacing: 0.05em; flex-shrink: 0; }
+    .q1 .quartile-badge { background: rgba(239,68,68,0.15); color: #991b1b; }
+    .q2 .quartile-badge { background: rgba(245,158,11,0.15); color: #92400e; }
+    .q3 .quartile-badge { background: rgba(14,165,233,0.15); color: var(--teal3); }
+    .q4 .quartile-badge { background: rgba(34,197,94,0.15); color: #166534; }
+    .quartile-desc { font-size: 0.8rem; color: var(--gray400); font-style: italic; }
+    .quartile-body { padding: 16px 18px; }
+    .quartile-body p { font-size: 0.9rem; color: var(--gray600); margin: 0; max-width: none; line-height: 1.75; }
+
+    .uni-table-wrap { overflow-x: auto; margin: 24px 0; max-width: 700px; }
+    .uni-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--gray200); }
+    .uni-table th { background: var(--navy); color: var(--white); font-weight: 600; padding: 11px 14px; text-align: left; font-size: 0.78rem; letter-spacing: 0.03em; }
+    .uni-table td { padding: 11px 14px; border-bottom: 1px solid var(--gray100); color: var(--gray600); vertical-align: top; line-height: 1.6; }
+    .uni-table tr:last-child td { border-bottom: none; }
+    .uni-table tr:hover td { background: var(--gray50); }
+    .uni-table td strong { color: var(--navy); font-weight: 600; }
+    .tag-exc { display: inline-block; font-size: 0.66rem; font-weight: 700; background: rgba(245,158,11,0.15); color: #92400e; padding: 2px 7px; border-radius: 50px; margin-left: 5px; vertical-align: middle; }
+
+    .fact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 24px 0; max-width: 680px; }
+    .fact-card { background: var(--gray50); border: 1px solid var(--gray200); border-radius: var(--radius-sm); padding: 16px 18px; }
+    .fact-num { font-size: 1.5rem; font-weight: 800; color: var(--teal); display: block; margin-bottom: 4px; }
+    .fact-label { font-size: 0.78rem; color: var(--gray600); font-weight: 500; line-height: 1.4; }
+
+    .disclaimer { background: var(--gray50); border: 1px solid var(--gray200); border-radius: var(--radius-sm); padding: 16px 22px; margin-bottom: 40px; font-size: 0.85rem; color: var(--gray400); line-height: 1.65; max-width: 700px; }
+    .disclaimer strong { color: var(--gray600); }
+
+    .guide-bottom-cta { background: linear-gradient(135deg, var(--navy) 0%, #0d2a52 100%); border-radius: var(--radius); padding: 52px 48px; margin-top: 64px; text-align: center; }
+    .guide-bottom-cta h2 { font-size: 1.8rem; font-weight: 800; color: var(--white); margin-bottom: 14px; }
+    .guide-bottom-cta p { font-size: 1rem; color: rgba(255,255,255,0.68); margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+    .guide-bottom-cta .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    footer { background: #060e1c; padding: 40px 0 28px; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-logo { font-size: 1.2rem; font-weight: 800; color: var(--white); }
+    .footer-logo span { color: var(--teal); }
+    .footer-links-row { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links-row a { font-size: 0.82rem; color: rgba(255,255,255,0.45); transition: color 0.2s; }
+    .footer-links-row a:hover { color: var(--teal2); }
+    .footer-copy { font-size: 0.75rem; color: rgba(255,255,255,0.22); width: 100%; padding-top: 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 20px; }
+
+    /* ── CONTENTS SECTION ── */
+    .contents-section {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray200);
+      padding: 64px 0 72px;
+    }
+    .contents-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .contents-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .contents-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal3);
+      margin-bottom: 12px;
+    }
+    .contents-eyebrow::before, .contents-eyebrow::after {
+      content: '';
+      display: inline-block;
+      width: 28px;
+      height: 1.5px;
+      background: var(--teal);
+      border-radius: 2px;
+    }
+    .contents-header h2 {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.4px;
+      margin-bottom: 10px;
+    }
+    .contents-header p {
+      font-size: 0.95rem;
+      color: var(--gray400);
+    }
+    .contents-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .contents-card {
+      display: block;
+      background: var(--gray50);
+      border: 1px solid var(--gray200);
+      border-radius: var(--radius);
+      padding: 24px 22px;
+      transition: all 0.22s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .contents-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--teal), var(--teal2));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.25s ease;
+    }
+    .contents-card:hover {
+      border-color: rgba(14,165,233,0.3);
+      background: var(--white);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(14,165,233,0.1);
+    }
+    .contents-card:hover::before { transform: scaleX(1); }
+    .contents-card-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .contents-num {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--teal);
+      background: rgba(14,165,233,0.1);
+      border: 1px solid rgba(14,165,233,0.2);
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+    }
+    .contents-icon {
+      font-size: 1.3rem;
+      line-height: 1;
+      margin-left: auto;
+    }
+    .contents-title {
+      font-size: 0.97rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .contents-desc {
+      font-size: 0.8rem;
+      color: var(--gray400);
+      line-height: 1.55;
+    }
+    .contents-arrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--teal3);
+      margin-top: 14px;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: all 0.2s ease;
+    }
+    .contents-card:hover .contents-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    /* highlight cards for the big 3 topics */
+    .contents-card.featured {
+      background: var(--navy);
+      border-color: rgba(14,165,233,0.25);
+    }
+    .contents-card.featured::before {
+      background: linear-gradient(90deg, var(--teal2), #7dd3fc);
+    }
+    .contents-card.featured .contents-num {
+      background: rgba(14,165,233,0.2);
+      border-color: rgba(14,165,233,0.35);
+      color: var(--teal2);
+    }
+    .contents-card.featured .contents-title { color: var(--white); }
+    .contents-card.featured .contents-desc { color: rgba(255,255,255,0.5); }
+    .contents-card.featured .contents-arrow { color: var(--teal2); }
+    .contents-card.featured:hover {
+      background: #0d2240;
+      border-color: rgba(14,165,233,0.5);
+      box-shadow: 0 8px 32px rgba(14,165,233,0.18);
+    }
+
+    @media (max-width: 960px) {
+      .page-wrapper { grid-template-columns: 1fr; padding-top: 88px; }
+      .toc-sidebar { display: none; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .fact-grid { grid-template-columns: repeat(2, 1fr); }
+      .guide-bottom-cta { padding: 36px 28px; }
+      .contents-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .guide-hero { padding: 60px 0 48px; }
+      .guide-hero h1 { font-size: 1.65rem; }
+      .chapter h2 { font-size: 1.3rem; }
+      .formula-eq { font-size: 1.1rem; }
+      .fact-grid { grid-template-columns: 1fr 1fr; }
+      .contents-grid { grid-template-columns: 1fr; }
+      .contents-section { padding: 48px 0 56px; }
+    }
+  </style>
+</head>
+<body>
+
+<header id="header">
+  <nav>
+    <a href="index.html">
+      <img src="Logo.png" alt="Key2MD" style="height:44px;width:auto;display:block;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\'font-size:1.4rem;font-weight:800;color:#fff;\'>Key<span style=\'color:#0ea5e9\'>2</span>MD</span>')">
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#services">Services</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="testimonials.html">Results</a></li>
+      <li><a href="index.html#pricing">Pricing</a></li>
+      <li><a href="guide.html" class="active">📖 Free Guide</a></li>
+      <li><a href="practice.html" style="color:#fbbf24;font-weight:700;">🎯 Free Practice</a></li>
+      <li><a href="index.html#book" class="btn-nav">Book a Session</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+<nav class="mobile-nav" id="mobileNav">
+  <a href="index.html">Home</a>
+  <a href="index.html#services">Services</a>
+  <a href="about.html">About</a>
+  <a href="testimonials.html">Results</a>
+  <a href="index.html#pricing">Pricing</a>
+  <a href="guide.html" style="color:var(--teal2);font-weight:600;">📖 Free Guide</a>
+  <a href="practice.html" style="color:#fbbf24;font-weight:700;">🎯 Free Practice Tool</a>
+  <a href="index.html#book" class="btn-nav">Book a Session</a>
+</nav>
+
+<section class="guide-hero">
+  <div class="guide-hero-inner">
+    <div class="guide-hero-badge">✦ Is There a Doctor on Board? · Free Guide</div>
+    <h1>Your Guide to Becoming a<br><span>Doctor in Australia</span></h1>
+    <div class="guide-hero-meta">
+      <span>By <strong>Dan</strong> · Unimelb MD Student</span>
+      <span class="sep"></span>
+      <span><strong>200+</strong> students coached</span>
+      <span class="sep"></span>
+      <span><strong>93%+</strong> CSP offer rate</span>
+    </div>
+    <p class="guide-hero-desc">Most of the confusion around medical admissions comes from a complicated system where the blind leads the blind. This is here to fix that — cliff-notes only, no fluff, based on navigating this personally and with over 200 students.</p>
+    <div class="guide-cta-row">
+      <a href="#chapter-1" class="btn-primary">Start Reading →</a>
+      <a href="index.html#book" class="btn-outline">Book a Free Intro Call</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ VISUAL CONTENTS ══ -->
+<section class="contents-section">
+  <div class="contents-inner">
+    <div class="contents-header">
+      <div class="contents-eyebrow">What's Inside</div>
+      <h2>Jump to What You Need</h2>
+      <p>Click any chapter to skip straight there — no need to read from the top.</p>
+    </div>
+    <div class="contents-grid">
+
+      <a href="#chapter-1" class="contents-card">
+        <div class="contents-card-top"><span class="contents-num">01</span><span class="contents-icon">🗺️</span></div>
+        <div class="contents-title">Overview &amp; Pathways</div>
+        <div class="contents-desc">School-leaver vs postgraduate. How the two routes work and who qualifies for each.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+      <a href="#chapter-2" class="contents-card">
+        <div class="contents-card-top"><span class="contents-num">02</span><span class="contents-icon">🎓</span></div>
+        <div class="contents-title">School-leaver Entry</div>
+        <div class="contents-desc">ATAR cutoffs, UCAT ANZ, and how the interview fits into the final offer calculation.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+      <a href="#chapter-3" class="contents-card featured">
+        <div class="contents-card-top"><span class="contents-num">03</span><span class="contents-icon">⚡</span></div>
+        <div class="contents-title">GAMSAT — The Gatekeeper</div>
+        <div class="contents-desc">How the three sections work, the weighted scoring formula, and how improvable each section actually is.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+      <a href="#chapter-4" class="contents-card">
+        <div class="contents-card-top"><span class="contents-num">04</span><span class="contents-icon">📚</span></div>
+        <div class="contents-title">Studying Each Section</div>
+        <div class="contents-desc">Section 1 question bank method, Section 2 philosophy, and Jesse Osborne for Section 3.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+      <a href="#chapter-5" class="contents-card">
+        <div class="contents-card-top"><span class="contents-num">05</span><span class="contents-icon">📖</span></div>
+        <div class="contents-title">Section 2 Reading List</div>
+        <div class="contents-desc">Dan's curated book list with themes, order of importance, and honest notes on each one.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+      <a href="#chapter-6" class="contents-card">
+        <div class="contents-card-top"><span class="contents-num">06</span><span class="contents-icon">🧮</span></div>
+        <div class="contents-title">GPA — Must Read</div>
+        <div class="contents-desc">Why your university GPA and your GEMSAS GPA are often completely different numbers.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+      <a href="#chapter-7" class="contents-card featured">
+        <div class="contents-card-top"><span class="contents-num">07</span><span class="contents-icon">📐</span></div>
+        <div class="contents-title">The Combo Score</div>
+        <div class="contents-desc">The exact formula, worked examples, and the 1.68 benchmark that decides most interview offers.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+      <a href="#chapter-8" class="contents-card">
+        <div class="contents-card-top"><span class="contents-num">08</span><span class="contents-icon">🏛️</span></div>
+        <div class="contents-title">University Exceptions</div>
+        <div class="contents-desc">UoW, Notre Dame, USYD and UoM — the universities that break the standard combo rules.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+      <a href="#chapter-9" class="contents-card featured">
+        <div class="contents-card-top"><span class="contents-num">09</span><span class="contents-icon">💬</span></div>
+        <div class="contents-title">CASPer — Full Guide</div>
+        <div class="contents-desc">2025 format, the 9 tenets, WPM strategy, and the full Q1–Q4 response examples with breakdown.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+      <a href="#chapter-10" class="contents-card">
+        <div class="contents-card-top"><span class="contents-num">10</span><span class="contents-icon">🎤</span></div>
+        <div class="contents-title">MMI — Decoded</div>
+        <div class="contents-desc">Station types, what examiners look for, and why warmth matters more than frameworks.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+      <a href="#chapter-11" class="contents-card">
+        <div class="contents-card-top"><span class="contents-num">11</span><span class="contents-icon">🤔</span></div>
+        <div class="contents-title">Can You Even Prepare?</div>
+        <div class="contents-desc">The research, the paradox, and why genuine skill development works when frameworks don't.</div>
+        <div class="contents-arrow">Read chapter →</div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+  <aside class="toc-sidebar">
+    <div class="toc-card">
+      <div class="toc-title">Table of Contents</div>
+      <ul class="toc-list">
+        <li><a href="#chapter-1"><span class="toc-num">01</span>Overview &amp; Pathways</a></li>
+        <li><a href="#chapter-2"><span class="toc-num">02</span>School-leaver Entry</a></li>
+        <li><a href="#chapter-3"><span class="toc-num">03</span>GAMSAT — The Gatekeeper</a></li>
+        <li><a href="#chapter-4"><span class="toc-num">04</span>Studying Each Section</a></li>
+        <li><a href="#chapter-5"><span class="toc-num">05</span>Section 2 Reading List</a></li>
+        <li><a href="#chapter-6"><span class="toc-num">06</span>GPA — Must Read</a></li>
+        <li><a href="#chapter-7"><span class="toc-num">07</span>The Combo Score</a></li>
+        <li><a href="#chapter-8"><span class="toc-num">08</span>University Exceptions</a></li>
+        <li><a href="#chapter-9"><span class="toc-num">09</span>CASPer — Full Guide</a></li>
+        <li><a href="#chapter-10"><span class="toc-num">10</span>MMI — Decoded</a></li>
+        <li><a href="#chapter-11"><span class="toc-num">11</span>Can You Even Prepare?</a></li>
+      </ul>
+      <div class="toc-divider"></div>
+      <p class="toc-cta-text">Want Dan to walk you through this personally?</p>
+      <a href="index.html#book" class="btn-cta-sm">Book a Free Intro Call →</a>
+      <a href="practice.html" class="btn-cta-sm-outline">🎯 Free Practice Tool</a>
+    </div>
+  </aside>
+
+  <main class="guide-content">
+
+    <div class="disclaimer"><strong>A note from Dan:</strong> This is not an exhaustive guide, and I don't proclaim to know any secrets — this is based on my own experience navigating this process, and two hundred students. Where things get complicated, go to the universities or GEMSAS directly. Don't simply trust a comment on Reddit. The amount of misinformed people accidentally spreading misinformation is genuinely alarming.</div>
+
+    <!-- ══ CH 1 ══ -->
+    <article class="chapter" id="chapter-1">
+      <div class="chapter-label">Chapter 01</div>
+      <h2>Overview of Medicine in Australia</h2>
+      <p>Studying medicine in Australia happens across two major pathways — as a <strong>school-leaver</strong> (a student currently completing Year 12), also known as undergraduate entry, or as a <strong>postgraduate</strong>. To be clear: you are only a school-leaver in Year 12. Once you graduate high school and enter university, you are no longer eligible for school-leaver positions.</p>
+      <p>The medical school spots are roughly a <strong>40/60 split</strong> between school-leaver and postgraduate positions. Some undergraduate courses do accept students beyond the school-leaver point — for example, James Cook University (a 6-year undergraduate course) takes in 180–200 students per year, of which approximately 15 spots go to non-school leavers. This is extremely competitive, since you get to skip 3+ years of a bachelor's degree and avoid the GAMSAT.</p>
+      <p>This guide predominantly focuses on <strong>postgraduate entry</strong>, as this is where almost all of the confusion lives.</p>
+      <div class="fact-grid">
+        <div class="fact-card"><span class="fact-num">40/60</span><span class="fact-label">Undergrad vs postgrad spot split nationally</span></div>
+        <div class="fact-card"><span class="fact-num">4 yrs</span><span class="fact-label">Length of an Australian MD program</span></div>
+        <div class="fact-card"><span class="fact-num">9+</span><span class="fact-label">MD programs via GEMSAS</span></div>
+      </div>
+      <h3>The Postgraduate Pathway</h3>
+      <ol class="step-list">
+        <li><span class="step-num">1</span><span class="step-text">Complete an undergraduate degree (3–4 years). Any discipline qualifies.</span></li>
+        <li><span class="step-num">2</span><span class="step-text">Sit the <strong>GAMSAT</strong> in March or September. Most universities accept both.</span></li>
+        <li><span class="step-num">3</span><span class="step-text">Apply through <strong>GEMSAS</strong> — the centralised portal for most Australian MD programs.</span></li>
+        <li><span class="step-num">4</span><span class="step-text">Your <strong>GEMSAS GPA</strong> is calculated — almost certainly different from your university GPA (see Ch. 6).</span></li>
+        <li><span class="step-num">5</span><span class="step-text">If your <strong>Combo score</strong> clears the threshold, you're invited to interview — MMI, panel, or CASPer depending on the university.</span></li>
+        <li><span class="step-num">6</span><span class="step-text">Receive an offer — ideally a <strong>CSP (Commonwealth Supported Place)</strong>, which dramatically reduces fees vs full-fee.</span></li>
+      </ol>
+    </article>
+
+    <!-- ══ CH 2 ══ -->
+    <article class="chapter" id="chapter-2">
+      <div class="chapter-label">Chapter 02</div>
+      <h2>School-leaver Entry Requirements</h2>
+      <p>Most Australian medical schools select school-leavers based on three things: ATAR, UCAT ANZ, and an interview.</p>
+      <h3>1. ATAR</h3>
+      <p>Usually very high — typically <strong>95+ minimum</strong>, with the lower end usually requiring bonuses or special pathways. To be competitive for an interview invite, you generally need <strong>98–99+</strong>.</p>
+      <h3>2. UCAT ANZ</h3>
+      <p>A mandatory aptitude test for most undergraduate medicine courses. Tests reasoning, decision-making, and problem-solving — not school content. Competitive applicants generally need the <strong>90th percentile or above</strong>. Used to decide who gets an interview, and sometimes as part of the final ranking.</p>
+      <h3>3. Interview (usually MMI)</h3>
+      <p>If your ATAR + UCAT qualify you, you'll be invited to an interview — most commonly an MMI — assessing communication, ethics, empathy, and motivation for medicine.</p>
+      <div class="callout callout-teal">
+        <div class="callout-title">💡 The Interview is the Decider</div>
+        <p>Final offers typically weight around <strong>50% interview + 50% ATAR/UCAT</strong>. Once you're at interview stage, obsessing over your combo calculation is pointless. Anyone can receive an offer if they interview well. The lower your combo, the better your interview needs to be.</p>
+      </div>
+    </article>
+
+    <!-- ══ CH 3 ══ -->
+    <article class="chapter" id="chapter-3">
+      <div class="chapter-label">Chapter 03</div>
+      <h2>GAMSAT — The Gatekeeper</h2>
+      <p>The Graduate Medical School Admissions Test (GAMSAT) is a standardised computer-based exam by ACER, assessing capacity for graduate-entry medical study. Three sections, three very different skills:</p>
+      <ul class="checklist">
+        <li><strong>Section 1 — Reasoning in Humanities &amp; Social Sciences (62 MCQs, 100 min):</strong> Interpretation and comprehension of written passages, poetry, cartoons, and diagrams.</li>
+        <li><strong>Section 2 — Written Communication (2 essays, 65 min):</strong> Organise and express thoughts on social, cultural, and personal themes.</li>
+        <li><strong>Section 3 — Reasoning in Biological &amp; Physical Sciences (75 MCQs, 150 min):</strong> ~40% Biology, 40% Chemistry, 20% Physics. First-year university level (physics is more Year 12 in practice).</li>
+      </ul>
+      <h3>How the Score is Calculated</h3>
+      <p>Most universities use a weighted scoring system where <strong>Section 3 counts double</strong>:</p>
+      <div class="formula-box" style="text-align:left;padding:24px 28px;max-width:460px;">
+        <div class="formula-label">Weighted GAMSAT</div>
+        <div class="formula-eq" style="font-size:1.15rem;">(S1 + S2 + 2×S3) ÷ 4</div>
+        <div class="formula-note">Example: (50 + 55 + 2×60) ÷ 4 = <strong>56.25</strong></div>
+      </div>
+      <div class="callout callout-red">
+        <div class="callout-title">⚠️ The Margin is Brutal</div>
+        <p>For a student with a 7.0 GPA, a GAMSAT of 72 is great — but 67 makes them ineligible at almost every medical school in Australia. A score that separates just 6% of students is the difference between an interview offer and total rejection. Never lose hope, but understand the stakes.</p>
+      </div>
+      <h3>How Improvable is Each Section?</h3>
+      <ul class="checklist">
+        <li><strong>Section 1:</strong> The most refractory to practice. Rarely improves more than 5 points over 6 months. If you haven't been an active reader, start now — there are no shortcuts.</li>
+        <li><strong>Section 2:</strong> By far the most coachable. Students have moved from ~50 to 75+ in 6 months of targeted preparation. Highest-yield investment.</li>
+        <li><strong>Section 3:</strong> Rewards slow, steady grinding. Consistent pattern: 50 → 55 → 60 → 65 across sittings as fundamental skills develop.</li>
+      </ul>
+    </article>
+
+    <!-- ══ CH 4 ══ -->
+    <article class="chapter" id="chapter-4">
+      <div class="chapter-label">Chapter 04</div>
+      <h2>How to Study Each Section</h2>
+      <h3>Section 1</h3>
+      <p>Section 1 is honestly a bit refractory to practice, and I want to be upfront about that. The method that works best: work through question banks <strong>one station at a time</strong>, allocating 1.5 minutes per question. When you finish, review every wrong answer with no time limit — argue with yourself about why you chose the wrong option and why the correct answer is actually better. That review phase is where improvement happens.</p>
+      <div class="callout callout-teal">
+        <div class="callout-title">💡 Practice With Others</div>
+        <p>I practiced Section 1 with an engineering friend — watching them reason through questions, even when wrong, was invaluable. In disproving their ideas I solidified my own; when they were right, they showed me a whole new angle. If I could go back, I'd have joined a study group. I'd recommend that to you now.</p>
+      </div>
+      <h3>Section 2</h3>
+      <p>Section 2 is not a test of writing ability per se. It's a test of your capacity to engage with ideas, take a position, and develop a nuanced argument under pressure. Markers want originality of thought and genuine engagement with the stimulus — not technically correct essays that say nothing. Markers read thousands of responses. The ones that score in the 70s say something real.</p>
+      <p>Write under timed conditions from day one. Get your work reviewed by someone who can give substantive feedback on whether your argument actually holds up. See Chapter 5 for the reading list.</p>
+      <h3>Section 3</h3>
+      <p>For all things Section 3, I recommend <strong>Jesse Osborne</strong> — <a href="https://www.youtube.com/@jesseosbourne/videos" target="_blank" class="ext-link">youtube.com/@jesseosbourne</a>. He scored 100 in Section 3, created a large library of free videos, and his questions are the most realistic I've encountered outside of official ACER materials. Watch on repeat and buy him a coffee if you see him around UoM.</p>
+      <p>Section 3 doesn't require memorising formulas (ACER provides them) or extensive prior knowledge — but familiarity with core Biology, Chemistry, and Physics reduces the risk of fatal errors under time pressure.</p>
+    </article>
+
+    <!-- ══ CH 5 ══ -->
+    <article class="chapter" id="chapter-5">
+      <div class="chapter-label">Chapter 05</div>
+      <h2>Section 2 Reading List</h2>
+      <p>Listed in approximate order of importance. For each: read it, digest it, read summaries, confirm you understood it correctly, then move on.</p>
+      <div class="book-list">
+        <div class="book-item">
+          <div class="book-title">1984</div>
+          <div class="book-author">George Orwell</div>
+          <div class="book-themes"><span class="book-theme">Surveillance</span><span class="book-theme">Freedom</span><span class="book-theme">Truth vs Manipulation</span><span class="book-theme">Power</span><span class="book-theme">Control</span></div>
+          <p class="book-note">No list makes sense without starting here. Covers so many common Section 2 Task A themes.</p>
+        </div>
+        <div class="book-item">
+          <div class="book-title">Sapiens: A Brief History of Humankind</div>
+          <div class="book-author">Yuval Noah Harari</div>
+          <div class="book-themes"><span class="book-theme">Human Cooperation</span><span class="book-theme">Belief Systems</span><span class="book-theme">Culture vs Biology</span><span class="book-theme">Societal Evolution</span></div>
+          <p class="book-note dan">Probably the most influential book for me personally — I drew on it constantly. It gave me far more conviction in my own opinions and made me much more informed. Even now when I'm marking Section 2 essays, I'm always referencing this book. Strongly, strongly recommend — even if you never pursue GAMSAT.</p>
+        </div>
+        <div class="book-item">
+          <div class="book-title">Brave New World</div>
+          <div class="book-author">Aldous Huxley</div>
+          <div class="book-themes"><span class="book-theme">Comfort vs Truth</span><span class="book-theme">Hedonism</span><span class="book-theme">Technological Control</span><span class="book-theme">Individuality</span></div>
+          <p class="book-note">Very useful for essays on modern society, consumerism, social media, and AI — all extremely assessable. A genuinely interesting read.</p>
+        </div>
+        <div class="book-item">
+          <div class="book-title">To Kill a Mockingbird</div>
+          <div class="book-author">Harper Lee</div>
+          <div class="book-themes"><span class="book-theme">Moral Courage</span><span class="book-theme">Justice vs Bias</span><span class="book-theme">Empathy</span></div>
+          <p class="book-note">Fitting for essays on fairness, racism, and ethics. I read this out of FOMO and am better for it.</p>
+        </div>
+        <div class="book-item">
+          <div class="book-title">The Kite Runner</div>
+          <div class="book-author">Khaled Hosseini</div>
+          <div class="book-themes"><span class="book-theme">Guilt and Redemption</span><span class="book-theme">Loyalty and Betrayal</span><span class="book-theme">Social Inequality</span></div>
+          <p class="book-note">Essays on personal growth, morality, and forgiveness will be well informed by this. Simple but deeply affecting — big on emotional depth.</p>
+        </div>
+        <div class="book-item">
+          <div class="book-title">When Breath Becomes Air</div>
+          <div class="book-author">Paul Kalanithi</div>
+          <div class="book-themes"><span class="book-theme">Meaning of Life and Death</span><span class="book-theme">Identity</span><span class="book-theme">Doctor vs Patient</span></div>
+          <p class="book-note dan">Cliché in medicine circles — everyone's read it, med students especially. It covers a lot of assessable themes so you may as well join the herd. Very touching and deep, but also honestly a bit heavy. Read at your own risk.</p>
+        </div>
+        <div class="book-item">
+          <div class="book-title">Why I Write (incl. "Shooting an Elephant")</div>
+          <div class="book-author">George Orwell</div>
+          <div class="book-themes"><span class="book-theme">Truth vs Propaganda</span><span class="book-theme">Moral Compromise</span><span class="book-theme">Social Pressure</span><span class="book-theme">Responsibility</span></div>
+          <p class="book-note dan">Shoutout to Jesse Osborne for this one. Very high yield — I used themes from it multiple times. 'Shooting an Elephant' made me rethink a lot and influenced many of my Task B responses.</p>
+        </div>
+      </div>
+      <h3>Honourable Mentions</h3>
+      <p>If you've worked through the list above and want more:</p>
+      <div class="mentions-grid">
+        <span class="mention-tag">The Man Who Mistook His Wife for a Hat — Oliver Sacks</span>
+        <span class="mention-tag">Man's Search for Meaning — Viktor Frankl</span>
+        <span class="mention-tag">Thinking, Fast and Slow — Kahneman</span>
+        <span class="mention-tag">Beyond Good and Evil — Nietzsche</span>
+        <span class="mention-tag">Factfulness — Hans Rosling</span>
+        <span class="mention-tag">Being Mortal — Atul Gawande</span>
+        <span class="mention-tag">Politics — Socrates (if you can stomach philosophy)</span>
+      </div>
+      <p style="margin-top:14px;">Fun reads that are still thematically relevant:</p>
+      <div class="mentions-grid">
+        <span class="mention-tag">The Road — Cormac McCarthy</span>
+        <span class="mention-tag">Lord of the Flies — William Golding</span>
+        <span class="mention-tag">Never Let Me Go — Kazuo Ishiguro</span>
+      </div>
+    </article>
+
+    <!-- ══ CH 6 ══ -->
+    <article class="chapter" id="chapter-6">
+      <div class="chapter-label">Chapter 06</div>
+      <h2>GPA — Must Read</h2>
+      <p>This seems obvious but it's actually the most misunderstood part of the process. The first question to any "is my GPA good enough?" is always: <strong>is that your university GPA or your GEMSAS GPA?</strong> These numbers are often very different.</p>
+      <p>A GPA of 6 at UQ can be harder to achieve than at another university — at some institutions a 7 requires 85%+, at others only 80%+. This creates significant inequity, which is why the GEMSAS consortium applies institution-specific weightings. The GPA they award you is likely very different from your university transcript.</p>
+      <div class="callout callout-gold">
+        <div class="callout-title">📊 Real Example</div>
+        <p>A student who completed a Bachelor of Biomedical Science at UQ and scored a 6 (Distinction) in every single course across 3 years will have a university GPA of 6. GEMSAS would award them a GEMSAS GPA of <strong>6.75</strong> — an astounding difference that changes their entire application profile.</p>
+      </div>
+      <p>Calculate your actual GEMSAS GPA here: <a href="https://applygemsas.edu.au/gemsas/#/gpa-calc" target="_blank" class="ext-link">applygemsas.edu.au → GPA Calculator</a></p>
+    </article>
+
+    <!-- ══ CH 7 ══ -->
+    <article class="chapter" id="chapter-7">
+      <div class="chapter-label">Chapter 07</div>
+      <h2>The Combo Score</h2>
+      <p>The "Combo" combines your GEMSAS GPA (as a fraction of 7) and your GAMSAT score (as a fraction of 100):</p>
+      <div class="formula-box">
+        <div class="formula-label">The Combo Formula</div>
+        <div class="formula-eq">(<em>GEMSAS GPA</em> ÷ 7) + (<em>GAMSAT</em> ÷ 100)</div>
+        <div class="formula-note">Maximum theoretical score = 1.0 + 1.0 = <strong>2.0</strong></div>
+      </div>
+      <div class="student-card">
+        <h5>Student A — Strong Profile</h5>
+        <p class="calc">GEMSAS GPA: 6.95 &nbsp;|&nbsp; GAMSAT: 75</p>
+        <p class="calc">(6.95 ÷ 7) + (75 ÷ 100) = 0.9929 + 0.75</p>
+        <p class="result result-pass">Combo: 1.7429 — All but guaranteed an interview ✓</p>
+      </div>
+      <div class="student-card">
+        <h5>Student B — Below Threshold</h5>
+        <p class="calc">GEMSAS GPA: 6.75 &nbsp;|&nbsp; GAMSAT: 66</p>
+        <p class="calc">(6.75 ÷ 7) + (66 ÷ 100) = 0.9643 + 0.66</p>
+        <p class="result result-fail">Combo: 1.6243 — Unlikely to receive an interview at most schools ✗</p>
+      </div>
+      <div class="callout callout-navy">
+        <div class="callout-title">📌 The Benchmark</div>
+        <p>The average minimum combo for Australian postgraduate medical schools as of 2026 is around <strong>1.68</strong>. Student A is competitive. Student B is not — at most universities. There are important exceptions covered in the next chapter.</p>
+      </div>
+    </article>
+
+    <!-- ══ CH 8 ══ -->
+    <article class="chapter" id="chapter-8">
+      <div class="chapter-label">Chapter 08</div>
+      <h2>University Exceptions to the Standard Combo</h2>
+      <p>Not every university uses the standard 1.68 combo threshold. These exceptions matter — they can represent real opportunities for applicants who don't fit the standard profile.</p>
+      <div class="uni-table-wrap">
+        <table class="uni-table">
+          <thead><tr><th>University</th><th>Format</th><th>Exception / Key Notes</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>University of Wollongong</strong><span class="tag-exc">Major Exception</span></td>
+              <td>CASPer + Bonuses</td>
+              <td>Minimum GPA 5.5 + minimum GAMSAT 50 used as hurdles only — not combined into a Combo. CASPer replaces the combo ranking. A <strong>Quartile 4 CASPer essentially required</strong>. Bonus points for rural ties (e.g. living in Wollongong, UoW graduate, AHPRA registration — changes annually, check yearly). Average for interview = 3 bonuses, but students with just 1 bonus have received offers on the strength of their CASPer alone.</td>
+            </tr>
+            <tr>
+              <td><strong>Notre Dame</strong> (Sydney &amp; Fremantle)<span class="tag-exc">Exception</span></td>
+              <td>CASPer + Panel Interview</td>
+              <td>Significantly lower combo threshold. Recent years (2024–2025) saw combos as low as <strong>1.56</strong> receive interviews — well below the usual 1.68. CASPer added as a supplementary lens. Strong interpersonal performance compensates for a lower academic profile.</td>
+            </tr>
+            <tr>
+              <td><strong>University of Sydney</strong><span class="tag-exc">No MMI</span></td>
+              <td>GAMSAT score only</td>
+              <td>USYD dropped MMIs and uses only GAMSAT — but with unusual weighting that strongly prioritises Sections 1 &amp; 2. Based on aggregated student data, a rough guide: <strong>1×S1 + 1×S2 + 0.1×S3</strong>. Scores above ~152.5 typically get offers. Example: GAMSAT 75/82/63 → USYD score = 163.3. Changes year on year.</td>
+            </tr>
+            <tr>
+              <td><strong>University of Melbourne</strong></td>
+              <td>MMI</td>
+              <td>Uses GPA + GAMSAT combo but re-ranks via an unknown GPA distribution. The 1.68 benchmark generally applies — the re-ranking only meaningfully impacts the bottom 1–3% of applicants.</td>
+            </tr>
+            <tr>
+              <td><strong>University of Queensland</strong></td>
+              <td>CASPer + Panel</td>
+              <td>GPA 50% + GAMSAT 50%. CASPer used as a screening filter before interview shortlisting. Panel interview format rather than MMI.</td>
+            </tr>
+            <tr>
+              <td><strong>Monash, ANU, Flinders, UNSW, UWA</strong></td>
+              <td>MMI or Panel</td>
+              <td>Standard Combo applies. Check each university's published cutoffs annually — they shift with cohort competitiveness each year.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- ══ CH 9 ══ -->
+    <article class="chapter" id="chapter-9">
+      <div class="chapter-label">Chapter 09</div>
+      <h2>CASPer — Full Guide</h2>
+      <p>The CASPer Test (Computer-Based Assessment for Sampling Personal Characteristics) is a situational judgment test evaluating non-cognitive traits including empathy, ethics, collaboration, and problem-solving. It presents video- or text-based scenarios with open-ended questions under tight time pressure.</p>
+      <h3>Format as of 2025</h3>
+      <ul class="checklist">
+        <li>Duration: <strong>65–85 minutes</strong> (reduced from 90–110)</li>
+        <li>Scenarios: <strong>11 total</strong> — 4 video-response, 7 typed-response (down from 14)</li>
+        <li>Each scenario: <strong>2 questions</strong> (typed previously had 3)</li>
+        <li>Typed responses scored <strong>individually</strong>, not per scenario</li>
+        <li>Response time per typed scenario: <strong>3.5 minutes</strong> (down from 5)</li>
+      </ul>
+      <h3>The 9 Core Tenets</h3>
+      <p>CASPer is structured around nine tenets that form the scoring foundation. Keep these in mind — not as a checklist, but as genuine considerations when framing your responses:</p>
+      <div class="mentions-grid">
+        <span class="mention-tag">Collaboration</span><span class="mention-tag">Communication</span><span class="mention-tag">Empathy</span><span class="mention-tag">Fairness</span><span class="mention-tag">Ethics</span><span class="mention-tag">Motivation</span><span class="mention-tag">Problem Solving</span><span class="mention-tag">Resilience</span><span class="mention-tag">Self-Awareness</span>
+      </div>
+      <h3>Step 1: Know Your WPM</h3>
+      <p>The first thing I ask every student to do is find out their words-per-minute. Go to <a href="https://10fastfingers.com" target="_blank" class="ext-link">10fastfingers.com</a> right now. Your WPM shapes your entire CASPer strategy:</p>
+      <ul class="checklist">
+        <li><strong>Under 55 WPM:</strong> Avoid filler sentences. Every line must hit a tenet or evidence critical thinking. Use dot-points if needed.</li>
+        <li><strong>55–80 WPM:</strong> Focus on structure and quality of reasoning. You have enough throughput to write in paragraphs.</li>
+        <li><strong>80+ WPM:</strong> You have the luxury of extra thinking time or more expansive answers. My own WPM is over 150 — I had spare thinking time after every scenario.</li>
+      </ul>
+      <p>Want to improve? Practice at <a href="https://typeracer.com" target="_blank" class="ext-link">typeracer.com</a> against real people online.</p>
+
+      <h3>The Q1 to Q4 Spectrum</h3>
+      <p>The best way to understand CASPer is to see the full spectrum of responses to the same scenario. Try answering this yourself first:</p>
+      <div class="callout callout-navy">
+        <div class="callout-title">📋 Scenario</div>
+        <p>You are a law student sitting your final university exam and see your friend cheating. They've previously been a good student and you're quite close. <em>Q1: What do you do?</em></p>
+      </div>
+      <div class="quartile-grid">
+        <div class="quartile-card q1">
+          <div class="quartile-header"><span class="quartile-badge">Q1 — Bottom 25%</span><span class="quartile-desc">Correct, but hollow and robotic</span></div>
+          <div class="quartile-body"><p>This question underpins the fundamental ethical principle of integrity which is essential to the legal field. I would speak to him in a private non-confrontational non-judgemental manner and kindly ask him to report himself, and if he did, I would do nothing else — if he didn't, I would report him.</p></div>
+        </div>
+        <div class="quartile-card q2">
+          <div class="quartile-header"><span class="quartile-badge">Q2</span><span class="quartile-desc">More detail, minimal critical thinking</span></div>
+          <div class="quartile-body"><p>I would speak to my friend in a non-judgemental and non-confrontational way and ask to speak privately. I'd tell them I saw what they were doing, give them the chance to own up, and allow them to confess to the professor in hopes of leniency — possibly allowing them to sit an alternate exam. As they've been a good student, I think they'd confess. If they didn't, I would sadly have to report them myself.</p></div>
+        </div>
+        <div class="quartile-card q3">
+          <div class="quartile-header"><span class="quartile-badge">Q3</span><span class="quartile-desc">Empathy present, but still formulaic</span></div>
+          <div class="quartile-body"><p>This sounds like such a tough situation, and my friend is likely feeling really anxious and guilty. I'd want to approach carefully, as this could be delicate. I'd advise them I saw what they were doing and ask them to report themselves, despite how scary it is. I'd emphasise the greater good and offer to be there with them — ultimately if they refused, I'd have to report them to ensure fairness.</p></div>
+        </div>
+        <div class="quartile-card q4">
+          <div class="quartile-header"><span class="quartile-badge">Q4 — Top 25%</span><span class="quartile-desc">Genuine, human, proactive, specific</span></div>
+          <div class="quartile-body"><p>I can only imagine how desperate my friend is feeling, knowing how good of a student they've been in the past — they're likely quite vulnerable now. I'd approach carefully and mention how tough the exam was, to normalise the difficulty and set the scene for openness. I'd mention what I thought I saw and ask if they're okay — that is my priority. I'd encourage them to own up and speak to the professor to maintain equity for all, and offer to go with them for moral support so they know they aren't alone. Then I'd workshop ways to prepare going forwards, like sharing study notes that worked for me.</p></div>
+        </div>
+      </div>
+
+      <h3>What Actually Separates the Quartiles</h3>
+      <p>Each answer builds in analysis, views the situation with a wider lens, and acts more empathetically. The Q1 answer rushed to solving the problem with little regard for the person — ironically unethical despite "correct" action. Explicitly saying you'll act "non-confrontationally" and "non-judgementally" signals you've watched YouTube and are outputting a stock response without demonstrating the actual skills.</p>
+      <p>Q4 recognises past goodness and doesn't begin with negativity. The priority is the friend's wellbeing first — the confession is secondary. They stand by the person, are proactive, and offer long-term support. The answer takes the reader on a genuine human journey.</p>
+
+      <div class="callout callout-teal">
+        <div class="callout-title">💡 If Your WPM is Low</div>
+        <p>CASPer isn't designed to penalise low typing speed. Focus on dot-points over paragraphs. In the final 30–40 seconds if you freeze, simply bullet your major remaining thoughts — CASPer explicitly states they want to see your thinking, not your grammar. Throw your considerations out there and maximise what the marker can see.</p>
+      </div>
+      <h3>One Final Principle</h3>
+      <p>Remember your role. You are not being assessed on how well you act like a doctor — they want to see you're a good human who can act with decency. Don't force health advice into scenarios. CASPer assesses what you <em>would</em> do, not what you think you <em>should</em> do — taking the moral high ground isn't always ideal or realistic.</p>
+    </article>
+
+    <!-- ══ CH 10 ══ -->
+    <article class="chapter" id="chapter-10">
+      <div class="chapter-label">Chapter 10</div>
+      <h2>MMI — Decoded</h2>
+      <p>The MMI (Multiple Mini Interview) is where you're finally confronted with showing who you are as a person, not just as an academic. Stations assess whether you possess the traits required for medicine: empathy, understanding, equity, ethics, teamwork, and communication.</p>
+      <p>The first and likely biggest struggle: can you maintain composure and speak eloquently being recorded? Do you genuinely understand others' perspectives? Life has likely not prepared you for being assessed as a <em>person</em> rather than as an academic.</p>
+      <h3>What Universities Look For</h3>
+      <p>Some universities are explicit. Deakin assesses: communication skills, commitment to rural practice, evidence-based practice, self-directed learning, teamwork, motivation for medicine, social justice, professionalism, effective use of resources, and health promotion. UoW adds: empathetic and ethical approach, reflective manner, decision-making in clinical and community contexts, and Aboriginal and Torres Strait Islander health.</p>
+      <h3>Station Types</h3>
+      <ul class="checklist">
+        <li><strong>Ethics:</strong> Identify stakeholders, name competing values explicitly, work toward a balanced position that acknowledges trade-offs. Don't rush to a conclusion.</li>
+        <li><strong>Role-play:</strong> Open with genuine acknowledgement of the other person's emotional state. Ask open questions. Don't problem-solve immediately.</li>
+        <li><strong>Personal reflection:</strong> The reflection — what you <em>learned</em> — is what differentiates strong from mediocre responses.</li>
+        <li><strong>Policy:</strong> You're not expected to have the "right" answer. Demonstrate sophisticated thinking about systemic trade-offs — equity, access, individual rights, cost, evidence.</li>
+      </ul>
+      <div class="callout callout-teal">
+        <div class="callout-title">💡 The Examiner's Perspective</div>
+        <p>MMI examiners are often clinicians, academics, or community members. They're not looking for a future debater — they're looking for someone they'd trust in a room with a distressed patient in three years. Human warmth, genuine curiosity, and the ability to sit with uncertainty matter enormously.</p>
+      </div>
+    </article>
+
+    <!-- ══ CH 11 ══ -->
+    <article class="chapter" id="chapter-11">
+      <div class="chapter-label">Chapter 11</div>
+      <h2>Can You Even Prepare for CASPer and MMI?</h2>
+      <p>CASPer proudly states on their website that you cannot prepare for it. Most universities ardently say you should not prepare for their MMI, and that tutoring doesn't help. There is even peer-reviewed research that agrees:</p>
+      <div class="callout callout-navy">
+        <div class="callout-title">📄 The Research</div>
+        <p>Wong, C. X., &amp; Roberts-Thomson, R. L. (2009). <em>Does practice make perfect? The effect of coaching and retesting on selection tests used for admission to an Australian medical school.</em> Medical Journal of Australia, 190(2), 101–102.</p>
+      </div>
+      <p><strong>So are they lying?</strong></p>
+      <p>Paradoxically — they're actually entirely correct. When you find that the average "MMI tutor" is a medical school applicant working for a prep company with no training in MMI or psychometrics, it makes immediate sense that their coaching offers little value. Many people with GAMSATs in the 80s and perfect GPAs sell advice — when realistically their combo alone got them in regardless of how they interviewed. <em>Of course</em> tutoring didn't help them. They didn't need it.</p>
+      <p>But what the research actually shows is that <strong>drilling frameworks doesn't work</strong>. It doesn't show that genuine development of the underlying human skills doesn't work.</p>
+      <div class="pull-quote">"Whenever I think about this, I think about a student in 2024 — she had likely the lowest combo of her applying cohort to UoM for 2025 (1.678). No GAMSAT luck, no rural bonuses. Up against the odds. But she was one of the nicest, bubbliest, most genuine people I'd met. If she'd gone to YouTube, she would have learned the STAR framework, quoted the four ethical pillars, and focused on stakeholder acronyms — and shown nothing of herself at all. She came to me instead. I simply helped her show herself. As of 2026, she is an MD2 at UoM, and someone I'd still call a friend today."</div>
+      <p>Think logically about what the interview is actually assessing. Your GPA proves conscientiousness and sustained academic performance. Your GAMSAT proves intelligence and ability to process complex information under time pressure. So what's left to assess? The human stuff — the things that can't be measured by marks. Does it then make sense to answer MMI questions with ethical principle frameworks and STAR formats when you're trying to show who you are as a person?</p>
+      <p>What they want to see is the person who will be in the room with a patient. Not the student who memorised a framework.</p>
+      <div class="callout callout-gold">
+        <div class="callout-title">⚠️ What Actually Helps</div>
+        <p>Practice out loud under timed, realistic conditions. Do real mock circuits. Get feedback from someone who genuinely understands what interviewers look for — not someone who just reassures you. Read broadly. Build genuine healthcare knowledge. And above all: work on showing who you actually are, not a performed version of who you think they want.</p>
+      </div>
+
+      <div class="guide-bottom-cta">
+        <h2>Ready to turn this into results?</h2>
+        <p>Dan works with a small number of students each intake — real mock circuits, genuine feedback, and strategy that actually moves the needle.</p>
+        <div class="cta-row">
+          <a href="index.html#book" class="btn-primary">Book a Free Intro Call →</a>
+          <a href="practice.html" class="btn-outline">Try the Free Practice Tool</a>
+        </div>
+      </div>
+    </article>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Key<span>2</span>MD</div>
+    <div class="footer-links-row">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Dan</a>
+      <a href="testimonials.html">Results</a>
+      <a href="practice.html">Free Practice Tool</a>
+      <a href="index.html#book">Book a Session</a>
+    </div>
+    <div class="footer-copy">© 2025 Key2MD. All rights reserved. · StudentVIP verified tutor · r/GAMSAT community endorsed</div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('hamburger').addEventListener('click', function() {
+    this.classList.toggle('open');
+    document.getElementById('mobileNav').classList.toggle('open');
+  });
+  document.querySelectorAll('#mobileNav a').forEach(a => a.addEventListener('click', () => {
+    document.getElementById('hamburger').classList.remove('open');
+    document.getElementById('mobileNav').classList.remove('open');
+  }));
+  const chapters = document.querySelectorAll('.chapter');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.toc-list a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-80px 0px -40% 0px' });
+  chapters.forEach(ch => io.observe(ch));
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      const t = document.querySelector(this.getAttribute('href'));
+      if (t) { e.preventDefault(); window.scrollTo({ top: t.getBoundingClientRect().top + window.pageYOffset - 88, behavior: 'smooth' }); }
+    });
+  });
+</script>
+</body>
+</html>
