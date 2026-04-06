@@ -1537,7 +1537,7 @@
           <li><a href="#pricing">Pricing</a></li>
           <li><a href="guide.html" style="color: rgba(255,255,255,0.8); font-weight: 500;">📖 Free Guide</a></li>
           <li><a href="practice.html" style="color: var(--gold); font-weight: 700;" onclick="gtag('event', 'practice_click', { 'event_category': 'engagement', 'event_label': 'nav_free_practice' });">🎯 Free Practice</a></li>
-          <li class="nav-cta"><a href="#book" class="btn btn-primary" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'nav_book_session' });">Book a Session</a></li>
+          <li class="nav-cta"><a href="#" class="btn btn-primary" onclick="openBookModal(event);gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'nav_book_session' });">Book a Session</a></li>
         </ul>
         <button class="hamburger" id="hamburger" aria-label="Toggle menu">
           <span></span><span></span><span></span>
@@ -1554,8 +1554,33 @@
     <a href="#pricing" class="mobile-link">Pricing</a>
     <a href="guide.html" class="mobile-link">📖 Free Guide</a>
     <a href="practice.html" class="mobile-link" style="color: var(--gold); font-weight: 700;" onclick="gtag('event', 'practice_click', { 'event_category': 'engagement', 'event_label': 'mobile_free_practice' });">🎯 Free Practice Tool</a>
-    <a href="#book" class="btn btn-primary" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'mobile_book_session' });">Book a Session →</a>
+    <a href="#" class="btn btn-primary" onclick="openBookModal(event);gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'mobile_book_session' });">Book a Session →</a>
   </nav>
+
+  <!-- Book Modal -->
+  <div id="bookModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+    <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:40px 36px;max-width:480px;width:90%;position:relative;">
+      <button onclick="closeBookModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
+      <h3 style="color:#fff;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Book with Dan</h3>
+      <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin-bottom:28px;">Choose the session type that suits you:</p>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <a href="https://calendly.com/brittainmbbs/30min" target="_blank" style="display:block;background:rgba(14,165,233,0.15);border:1.5px solid rgba(14,165,233,0.4);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(14,165,233,0.25)'" onmouseout="this.style.background='rgba(14,165,233,0.15)'">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <span style="background:#0ea5e9;color:#fff;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">FREE</span>
+            <span style="color:#fff;font-weight:700;font-size:1rem;">Intro Call — 30 Minutes</span>
+          </div>
+          <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">No commitment. We discuss your goals, timeline, and whether we're a good fit.</p>
+        </a>
+        <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <span style="background:#f59e0b;color:#0a1628;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$300</span>
+            <span style="color:#fff;font-weight:700;font-size:1rem;">1:1 Tutoring Session — 1 Hour</span>
+          </div>
+          <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Full personalised session — MMI, CASPer, or GAMSAT S2 prep with Dan.</p>
+        </a>
+      </div>
+    </div>
+  </div>
 
   <!-- ══════════════════════════════
        HERO
@@ -1579,7 +1604,7 @@
             StudentVIP verified
           </div>
           <div class="hero-ctas fade-up delay-4 visible">
-            <a href="#book" class="btn btn-primary" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'hero_free_intro_call' });">Book a Free Intro Call →</a>
+            <a href="https://calendly.com/brittainmbbs/30min" target="_blank" class="btn btn-primary" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'hero_free_intro_call' });">Book a Free Intro Call →</a>
             <a href="practice.html" class="btn btn-outline" style="border-color: rgba(245,158,11,0.6); color: #fbbf24;" onclick="gtag('event', 'practice_click', { 'event_category': 'engagement', 'event_label': 'hero_free_practice_tool' });">🎯 Free Practice Tool</a>
           </div>
         </div>
@@ -1627,12 +1652,12 @@
       <div class="practice-promo-inner">
         <div class="fade-up visible">
           <div class="practice-promo-label">✦ Free Resource</div>
-          <h2>Sharpen your skills with the <span class="gold">Free MMI Practice Tool</span></h2>
+          <h2>Sharpen your skills with the <span class="gold">Free CASPer Prep Tool</span></h2>
           <p>
-            Get unlimited MMI question practice — completely free. Timed stations, AI-powered feedback, ethics scenarios, role-plays, policy questions, and more. Built by Dan to reflect exactly what Australian medical interviews look like.
+            Get unlimited CASPer-style question practice — completely free. Timed stations, AI-powered feedback, ethics scenarios, conflict resolution, professionalism, communication questions, and more. Built by Dan to reflect exactly what Australian medical school CASPer looks like.
           </p>
           <div class="practice-promo-features">
-            <div class="practice-promo-feature">Hundreds of real-style MMI &amp; CASPer questions</div>
+            <div class="practice-promo-feature">Hundreds of real-style CASPer scenarios</div>
             <div class="practice-promo-feature">Timed practice with configurable reading &amp; response windows</div>
             <div class="practice-promo-feature">Optional AI feedback on your answers</div>
             <div class="practice-promo-feature">Filter by ethics, role-play, policy, personal, and more</div>
@@ -1645,7 +1670,7 @@
             <div class="preview-dot red"></div>
             <div class="preview-dot yellow"></div>
             <div class="preview-dot green"></div>
-            <span>MMI Practice — Key2MD</span>
+            <span>CASPer Practice — Key2MD</span>
           </div>
           <div class="preview-question-label">🎤 Ethics Station · Question 3 of 8</div>
           <div class="preview-question-text">
@@ -1784,7 +1809,7 @@
             <li>Personalised feedback &amp; body language tips</li>
             <li>Unimelb, Monash, UQ interview intel</li>
           </ul>
-          <a href="#book" class="btn btn-dark" style="margin-top: auto; justify-content: center;" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'mmi_card_book_now' });">Book Now →</a>
+          <a href="#" class="btn btn-dark" style="margin-top: auto; justify-content: center;" onclick="openBookModal(event);gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'mmi_card_book_now' });">Book Now →</a>
         </div>
 
         <div class="service-card fade-up delay-1 visible">
@@ -1800,7 +1825,7 @@
             <li>Group sessions available (Fridays 6pm)</li>
             <li>Professionalism &amp; ethical reasoning drills</li>
           </ul>
-          <a href="#book" class="btn btn-dark" style="margin-top: auto; justify-content: center;" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'casper_card_book_now' });">Book Now →</a>
+          <a href="#" class="btn btn-dark" style="margin-top: auto; justify-content: center;" onclick="openBookModal(event);gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'casper_card_book_now' });">Book Now →</a>
         </div>
 
         <div class="service-card fade-up delay-2 visible">
@@ -1816,7 +1841,7 @@
             <li>Theme analysis &amp; stimulus interpretation</li>
             <li>Band 60+ strategies</li>
           </ul>
-          <a href="#book" class="btn btn-dark" style="margin-top: auto; justify-content: center;" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'gamsat_card_book_now' });">Book Now →</a>
+          <a href="#" class="btn btn-dark" style="margin-top: auto; justify-content: center;" onclick="openBookModal(event);gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'gamsat_card_book_now' });">Book Now →</a>
         </div>
 
       </div>
@@ -1950,7 +1975,7 @@
             <li class="pricing-feature">Flexible scheduling</li>
             <li class="pricing-feature">Online via Zoom</li>
           </ul>
-          <a href="#book" class="btn btn-dark" style="width:100%; justify-content: center;" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'pricing_book_1to1' });">Book 1:1 →</a>
+          <a href="#" class="btn btn-dark" style="width:100%; justify-content: center;" onclick="openBookModal(event);gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'pricing_book_1to1' });">Book 1:1 →</a>
         </div>
 
         <div class="pricing-card featured fade-up delay-1 visible">
@@ -1966,7 +1991,7 @@
             <li class="pricing-feature">Peer benchmark context</li>
             <li class="pricing-feature">Online via Zoom</li>
           </ul>
-          <a href="#book" class="btn btn-primary" style="width:100%; justify-content: center;" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'pricing_join_group' });">Join Group →</a>
+          <a href="https://calendly.com/brittainmbbs/30min" target="_blank" class="btn btn-primary" style="width:100%; justify-content: center;" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'pricing_join_group' });">Join Group →</a>
         </div>
 
       </div>
@@ -2125,7 +2150,7 @@
           Start with a free 15-minute intro call. No commitment, no pressure — just clarity on your path forward.
         </p>
         <div class="cta-banner-btns">
-          <a href="#book" class="btn btn-primary" style="font-size: 1rem; padding: 16px 36px;" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'cta_banner_free_intro_call' });">Book Your Free Intro Call →</a>
+          <a href="https://calendly.com/brittainmbbs/30min" target="_blank" class="btn btn-primary" style="font-size: 1rem; padding: 16px 36px;" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'cta_banner_free_intro_call' });">Book Your Free Intro Call →</a>
           <a href="#services" class="btn btn-outline" style="font-size: 1rem; padding: 16px 36px;">Explore Services</a>
         </div>
       </div>
@@ -2159,7 +2184,7 @@
             <li><a href="testimonials.html">Results</a></li>
             <li><a href="#pricing">Pricing</a></li>
             <li><a href="#faq">FAQ</a></li>
-            <li><a href="#book" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'footer_book_session' });">Book a Session</a></li>
+            <li><a href="#" onclick="openBookModal(event);gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'footer_book_session' });">Book a Session</a></li>
             <li><a href="guide.html">📖 Free Entrance Guide</a></li>
             <li><a href="practice.html" style="color: #fbbf24; font-weight: 600;" onclick="gtag('event', 'practice_click', { 'event_category': 'engagement', 'event_label': 'footer_free_practice_tool' });">🎯 Free Practice Tool</a></li>
           </ul>
@@ -2173,12 +2198,16 @@
   </footer>
 
   <!-- Mobile sticky CTA -->
-  <a href="#book" class="btn btn-primary mobile-book-btn" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'mobile_sticky_book_session' });">📅 Book a Session</a>
+  <a href="#" class="btn btn-primary mobile-book-btn" onclick="openBookModal(event);gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'mobile_sticky_book_session' });">📅 Book a Session</a>
 
   <!-- ══════════════════════════════
        JAVASCRIPT
   ══════════════════════════════ -->
   <script>
+    function openBookModal(e){if(e)e.preventDefault();const m=document.getElementById('bookModal');m.style.display='flex';}
+    function closeBookModal(){document.getElementById('bookModal').style.display='none';}
+    document.getElementById('bookModal').addEventListener('click',function(e){if(e.target===this)closeBookModal();});
+
     function trackPracticeEngagement(label) {
       gtag('event', 'practice_click', {
         event_category: 'engagement',

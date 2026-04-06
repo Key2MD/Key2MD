@@ -707,8 +707,9 @@
           <li><a href="about.html" class="active">About</a></li>
           <li><a href="testimonials.html">Results</a></li>
           <li><a href="index.html#pricing">Pricing</a></li>
+          <li><a href="guide.html" style="color:rgba(255,255,255,0.8);font-weight:500;">📖 Free Guide</a></li>
           <li><a href="practice.html" style="color:#fbbf24; font-weight:700;">🎯 Free Practice</a></li>
-          <li class="nav-cta"><a href="index.html#book" class="btn btn-primary">Book a Session</a></li>
+          <li class="nav-cta"><a href="#" class="btn btn-primary" onclick="openBookModal(event)">Book a Session</a></li>
         </ul>
         <button class="hamburger" id="hamburger" aria-label="Toggle menu">
           <span></span><span></span><span></span>
@@ -722,9 +723,35 @@
     <a href="about.html" class="mobile-link">About</a>
     <a href="testimonials.html" class="mobile-link">Results</a>
     <a href="index.html#pricing" class="mobile-link">Pricing</a>
+    <a href="guide.html" class="mobile-link">📖 Free Guide</a>
     <a href="practice.html" class="mobile-link" style="color:#fbbf24; font-weight:700;">🎯 Free Practice Tool</a>
-    <a href="index.html#book" class="btn btn-primary">Book a Session →</a>
+    <a href="#" class="btn btn-primary" onclick="openBookModal(event)">Book a Session →</a>
   </nav>
+
+  <!-- Book Modal -->
+  <div id="bookModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+    <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:40px 36px;max-width:480px;width:90%;position:relative;">
+      <button onclick="closeBookModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
+      <h3 style="color:#fff;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Book with Dan</h3>
+      <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin-bottom:28px;">Choose the session type that suits you:</p>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <a href="https://calendly.com/brittainmbbs/30min" target="_blank" style="display:block;background:rgba(14,165,233,0.15);border:1.5px solid rgba(14,165,233,0.4);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(14,165,233,0.25)'" onmouseout="this.style.background='rgba(14,165,233,0.15)'">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <span style="background:#0ea5e9;color:#fff;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">FREE</span>
+            <span style="color:#fff;font-weight:700;font-size:1rem;">Intro Call — 30 Minutes</span>
+          </div>
+          <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">No commitment. We discuss your goals, timeline, and whether we're a good fit.</p>
+        </a>
+        <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <span style="background:#f59e0b;color:#0a1628;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$300</span>
+            <span style="color:#fff;font-weight:700;font-size:1rem;">1:1 Tutoring Session — 1 Hour</span>
+          </div>
+          <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Full personalised session — MMI, CASPer, or GAMSAT S2 prep with Dan.</p>
+        </a>
+      </div>
+    </div>
+  </div>
 
   <!-- PAGE HERO -->
   <section class="page-hero">
@@ -940,7 +967,7 @@
           Start with a free 15-minute intro call. No commitment, no pressure — just clarity on your path forward.
         </p>
         <div class="cta-banner-btns">
-          <a href="index.html#book" class="btn btn-primary" style="font-size: 1rem; padding: 16px 36px;">Book Your Free Intro Call →</a>
+          <a href="https://calendly.com/brittainmbbs/30min" target="_blank" class="btn btn-primary" style="font-size: 1rem; padding: 16px 36px;">Book Your Free Intro Call →</a>
           <a href="testimonials.html" class="btn btn-outline" style="font-size: 1rem; padding: 16px 36px;">Read Student Results</a>
         </div>
       </div>
@@ -972,7 +999,7 @@
             <li><a href="testimonials.html">Results</a></li>
             <li><a href="index.html#pricing">Pricing</a></li>
             <li><a href="index.html#faq">FAQ</a></li>
-            <li><a href="index.html#book">Book a Session</a></li>
+            <li><a href="#" onclick="openBookModal(event)">Book a Session</a></li>
             <li><a href="practice.html" style="color:#fbbf24; font-weight:600;">🎯 Free Practice Tool</a></li>
           </ul>
         </div>
@@ -984,13 +1011,17 @@
     </div>
   </footer>
 
-  <a href="index.html#book" class="btn btn-primary mobile-book-btn">📅 Book a Session</a>
+  <a href="#" class="btn btn-primary mobile-book-btn" onclick="openBookModal(event)">📅 Book a Session</a>
 
   <script>
     const header = document.getElementById('header');
     window.addEventListener('scroll', () => {
       header.classList.toggle('scrolled', window.scrollY > 40);
     }, { passive: true });
+
+    function openBookModal(e){if(e)e.preventDefault();const m=document.getElementById('bookModal');m.style.display='flex';}
+    function closeBookModal(){document.getElementById('bookModal').style.display='none';}
+    document.getElementById('bookModal').addEventListener('click',function(e){if(e.target===this)closeBookModal();});
 
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
