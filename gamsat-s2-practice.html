@@ -1,0 +1,2528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free GAMSAT Section II Practice Tool | Key2MD</title>
+<meta name="description" content="Australia's most comprehensive free GAMSAT Section II essay practice tool. 50 real-style stimuli for Task A and Task B, 30-minute timer, AI feedback, and expert human marking by a University of Melbourne MD student.">
+<meta name="keywords" content="GAMSAT Section 2 practice, GAMSAT essay practice, GAMSAT Section II free, GAMSAT Task A Task B, GAMSAT writing practice Australia">
+<link rel="canonical" href="https://www.key2md.com/gamsat-s2-practice.html">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Free GAMSAT Section II Practice Tool | Key2MD">
+<meta property="og:description" content="50 real-style GAMSAT stimuli, 30-minute timer, AI feedback and optional expert human marking. Built by a Unimelb MD student.">
+<meta property="og:url" content="https://www.key2md.com/gamsat-s2-practice.html">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════
+   CSS VARIABLES — matches Key2MD theme
+═══════════════════════════════════════════════ */
+:root {
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --cream: #faf8f4;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --accent-dark: #1d4ed8;
+  --gold: #c9a84c;
+  --gold-light: #fdf6e3;
+  --text: #1a1a1a;
+  --text-muted: #6b7280;
+  --text-light: #9ca3af;
+  --border: #e5e7eb;
+  --border-dark: #d1d5db;
+  --surface: #ffffff;
+  --surface-alt: #f9fafb;
+  --task-a: #2563eb;
+  --task-b: #7c3aed;
+  --task-a-light: #eff6ff;
+  --task-b-light: #f5f3ff;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warning: #d97706;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+}
+
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════
+   NAV — mirrors Key2MD
+═══════════════════════════════════════════════ */
+nav {
+  background: var(--black);
+  padding: 0 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.nav-logo img { height: 36px; }
+.nav-logo span {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.02em;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+.nav-links a {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-links .nav-cta {
+  background: var(--accent);
+  color: var(--white) !important;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s !important;
+}
+.nav-links .nav-cta:hover { background: var(--accent-dark) !important; }
+
+/* ═══════════════════════════════════════════════
+   HERO SECTION
+═══════════════════════════════════════════════ */
+.hero {
+  background: var(--black);
+  color: var(--white);
+  padding: 72px 5% 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(37,99,235,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(201,168,76,0.15);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 24px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--gold);
+}
+.hero-sub {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.65);
+  max-width: 600px;
+  margin: 0 auto 32px;
+  line-height: 1.7;
+}
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.hero-stat {
+  text-align: center;
+}
+.hero-stat strong {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--white);
+}
+.hero-stat span {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ═══════════════════════════════════════════════
+   HOW IT WORKS STRIP
+═══════════════════════════════════════════════ */
+.how-it-works {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 28px 5%;
+}
+.how-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.how-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+}
+.how-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.how-step-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.how-step-text span { color: var(--text-muted); font-weight: 400; }
+.how-arrow {
+  color: var(--border-dark);
+  font-size: 1.2rem;
+  padding: 0 4px;
+}
+
+/* ═══════════════════════════════════════════════
+   API KEY NOTICE
+═══════════════════════════════════════════════ */
+.api-notice {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin: 32px auto 0;
+  max-width: 860px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.875rem;
+}
+.api-notice-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.api-notice strong { display: block; margin-bottom: 4px; color: #92400e; }
+.api-notice p { color: #78350f; line-height: 1.55; }
+.api-notice a { color: var(--accent); font-weight: 600; }
+
+/* ═══════════════════════════════════════════════
+   MAIN TOOL LAYOUT
+═══════════════════════════════════════════════ */
+.tool-wrapper {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 5%;
+}
+
+/* ═══════════════════════════════════════════════
+   PAID MARKING CARD — always visible, non-intrusive
+═══════════════════════════════════════════════ */
+.marking-card {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.marking-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(201,168,76,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.marking-card-left { flex: 1; }
+.marking-card-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.marking-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.marking-card p {
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.55;
+  max-width: 480px;
+}
+.marking-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.marking-price {
+  text-align: center;
+}
+.marking-price strong {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+.marking-price span {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.45);
+}
+.btn-marking {
+  background: var(--gold);
+  color: var(--black);
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-marking:hover { background: #b8923c; transform: translateY(-1px); }
+
+/* ═══════════════════════════════════════════════
+   TASK SELECTOR
+═══════════════════════════════════════════════ */
+.task-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.task-card {
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.task-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--task-a);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+.task-card.task-b-card::before { background: var(--task-b); }
+.task-card:hover { border-color: var(--task-a); box-shadow: var(--shadow-md); }
+.task-card.task-b-card:hover { border-color: var(--task-b); }
+.task-card.active { border-color: var(--task-a); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+.task-card.active::before { transform: scaleX(1); }
+.task-card.task-b-card.active { border-color: var(--task-b); box-shadow: 0 0 0 3px rgba(124,58,237,0.12); }
+.task-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 100px;
+  margin-bottom: 10px;
+}
+.tag-a { background: var(--task-a-light); color: var(--task-a); }
+.tag-b { background: var(--task-b-light); color: var(--task-b); }
+.task-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.task-card p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ═══════════════════════════════════════════════
+   CONTROLS BAR
+═══════════════════════════════════════════════ */
+.controls-bar {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.controls-bar label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.station-select {
+  flex: 1;
+  min-width: 200px;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  color: var(--text);
+  background: var(--surface-alt);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+.station-select:focus { border-color: var(--accent); }
+.btn { 
+  padding: 9px 18px; 
+  border-radius: var(--radius-sm); 
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem; 
+  font-weight: 600; 
+  cursor: pointer; 
+  border: none;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--accent); color: var(--white); }
+.btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
+.btn-secondary { background: var(--surface-alt); color: var(--text); border: 1.5px solid var(--border-dark); }
+.btn-secondary:hover { background: var(--border); }
+.btn-random { background: var(--black); color: var(--white); }
+.btn-random:hover { background: #333; }
+
+/* ═══════════════════════════════════════════════
+   STATION DISPLAY
+═══════════════════════════════════════════════ */
+.station-display {
+  display: none;
+}
+.station-display.active {
+  display: block;
+  animation: fadeUp 0.3s ease;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.station-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.station-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.station-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.station-theme-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+}
+.badge-a { background: var(--task-a-light); color: var(--task-a); }
+.badge-b { background: var(--task-b-light); color: var(--task-b); }
+
+/* Timer */
+.timer-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.timer-clock {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.05em;
+  min-width: 90px;
+  text-align: right;
+}
+.timer-clock.warning { color: var(--warning); }
+.timer-clock.danger { color: var(--danger); animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.timer-btn {
+  background: none;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.timer-btn:hover { border-color: var(--accent); color: var(--accent); }
+.timer-btn.running { border-color: var(--success); color: var(--success); }
+
+/* Stimulus Card */
+.stimulus-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px 40px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+.stimulus-instruction {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.6;
+}
+.stimulus-instruction strong { color: var(--text); }
+.quotes-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.quote-item {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.quote-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--accent);
+  padding-top: 4px;
+}
+.quote-content { }
+.quote-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.65;
+  font-style: italic;
+  margin-bottom: 4px;
+}
+.quote-attr {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Prompt box */
+.task-prompt-box {
+  background: var(--surface-alt);
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin-top: 24px;
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+.task-prompt-box.task-b-prompt { border-left-color: var(--task-b); }
+.task-prompt-box strong { color: var(--accent); }
+.task-prompt-box.task-b-prompt strong { color: var(--task-b); }
+
+/* Essay Area */
+.essay-section { margin-bottom: 24px; }
+.essay-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.essay-section-header h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.word-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.word-count.good { color: var(--success); }
+.essay-textarea {
+  width: 100%;
+  min-height: 340px;
+  padding: 20px;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  background: var(--white);
+}
+.essay-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+.essay-textarea::placeholder { color: var(--text-light); }
+
+/* Essay action buttons */
+.essay-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.btn-save { background: var(--surface-alt); color: var(--text); border: 1.5px solid var(--border-dark); }
+.btn-save:hover { background: var(--border); }
+.btn-ai-feedback { background: var(--accent); color: var(--white); }
+.btn-ai-feedback:hover { background: var(--accent-dark); }
+.btn-ai-feedback:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ═══════════════════════════════════════════════
+   HUMAN MARKING INLINE CTA
+═══════════════════════════════════════════════ */
+.inline-marking-cta {
+  background: var(--gold-light);
+  border: 1.5px solid rgba(201,168,76,0.35);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.inline-marking-cta-left { flex: 1; }
+.inline-marking-cta h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.inline-marking-cta p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.btn-submit-marking {
+  background: var(--black);
+  color: var(--white);
+  padding: 10px 22px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-submit-marking:hover { background: #333; transform: translateY(-1px); }
+
+/* ═══════════════════════════════════════════════
+   API KEY SETUP
+═══════════════════════════════════════════════ */
+.api-setup-section {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-top: 12px;
+}
+.api-setup-section h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.api-setup-section p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  line-height: 1.55;
+}
+.api-setup-section a { color: var(--accent); font-weight: 600; }
+.api-key-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.api-key-input {
+  flex: 1;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.api-key-input:focus { border-color: var(--accent); }
+.btn-save-key {
+  padding: 9px 16px;
+  background: var(--accent);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.2s;
+}
+.btn-save-key:hover { background: var(--accent-dark); }
+.api-key-status {
+  font-size: 0.78rem;
+  margin-top: 6px;
+  display: none;
+}
+.api-key-status.set { color: var(--success); display: block; }
+
+/* ═══════════════════════════════════════════════
+   AI FEEDBACK PANEL
+═══════════════════════════════════════════════ */
+.feedback-panel {
+  display: none;
+  margin-top: 24px;
+}
+.feedback-panel.active { display: block; animation: fadeUp 0.4s ease; }
+.feedback-panel-header {
+  background: var(--black);
+  color: var(--white);
+  padding: 20px 28px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.feedback-panel-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.feedback-panel-header p { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.band-score-badge {
+  background: var(--gold);
+  color: var(--black);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.feedback-body {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 28px;
+}
+
+/* Score breakdown */
+.score-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.score-criterion {
+  background: var(--surface-alt);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.score-criterion-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.score-bar-wrap {
+  background: var(--border);
+  border-radius: 100px;
+  height: 6px;
+  margin-bottom: 4px;
+}
+.score-bar {
+  height: 6px;
+  border-radius: 100px;
+  background: var(--accent);
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.score-bar.good { background: var(--success); }
+.score-bar.mid { background: var(--warning); }
+.score-bar.low { background: var(--danger); }
+.score-criterion-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* Examiner's Lens */
+.examiners-lens {
+  margin-bottom: 28px;
+}
+.examiners-lens h4 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.examiners-lens h4::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.lens-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.lens-key {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.lens-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.dot-strength { background: rgba(22,163,74,0.25); border: 1px solid rgba(22,163,74,0.5); }
+.dot-weak { background: rgba(220,38,38,0.15); border: 1px solid rgba(220,38,38,0.4); }
+.dot-stimulus { background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.4); }
+.dot-neutral { background: transparent; }
+.essay-annotated {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.essay-annotated .hl-strength {
+  background: rgba(22,163,74,0.18);
+  border-radius: 3px;
+  padding: 1px 2px;
+}
+.essay-annotated .hl-weak {
+  background: rgba(220,38,38,0.12);
+  border-radius: 3px;
+  padding: 1px 2px;
+  text-decoration: underline;
+  text-decoration-color: rgba(220,38,38,0.4);
+  text-decoration-style: wavy;
+}
+.essay-annotated .hl-stimulus {
+  background: rgba(37,99,235,0.12);
+  border-radius: 3px;
+  padding: 1px 2px;
+}
+
+/* Feedback sections */
+.feedback-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+.feedback-section h4 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.feedback-section p, .feedback-section ul {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+.feedback-section ul { padding-left: 18px; }
+.feedback-section ul li { margin-bottom: 4px; }
+
+/* Band 70 hint */
+.band70-box {
+  background: linear-gradient(135deg, #fdf6e3 0%, #fef9ed 100%);
+  border: 1.5px solid rgba(201,168,76,0.4);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+}
+.band70-box h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #78350f;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.band70-box ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.band70-box ul li {
+  font-size: 0.875rem;
+  color: #78350f;
+  line-height: 1.55;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.band70-box ul li::before {
+  content: '→';
+  color: var(--gold);
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+/* Loading state */
+.feedback-loading {
+  display: none;
+  padding: 40px 28px;
+  text-align: center;
+}
+.feedback-loading.active { display: block; }
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.feedback-loading p { color: var(--text-muted); font-size: 0.875rem; }
+
+/* ═══════════════════════════════════════════════
+   SUBMIT FOR MARKING MODAL
+═══════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  animation: fadeUp 0.25s ease;
+}
+.modal h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.modal .modal-sub {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  line-height: 1.55;
+}
+.modal-field {
+  margin-bottom: 16px;
+}
+.modal-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.modal-field input, .modal-field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.modal-field input:focus, .modal-field textarea:focus { border-color: var(--accent); }
+.modal-price-note {
+  background: var(--gold-light);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 0.82rem;
+  color: #78350f;
+  margin-bottom: 20px;
+  line-height: 1.55;
+}
+.modal-price-note strong { display: block; font-size: 1rem; color: #92400e; margin-bottom: 2px; }
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.btn-modal-cancel {
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+.btn-modal-cancel:hover { background: var(--border); }
+.btn-modal-submit {
+  padding: 10px 24px;
+  border-radius: var(--radius-sm);
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+.btn-modal-submit:hover { background: #333; }
+
+/* ═══════════════════════════════════════════════
+   SEO CONTENT SECTION
+═══════════════════════════════════════════════ */
+.seo-section {
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 60px 5%;
+  margin-top: 60px;
+}
+.seo-inner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+.seo-inner h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.seo-inner h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 28px 0 10px;
+  color: var(--text);
+}
+.seo-inner p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+  margin-bottom: 12px;
+}
+.seo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 24px 0;
+}
+.seo-card {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.seo-card h4 {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+.seo-card p { font-size: 0.85rem; margin-bottom: 0; }
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+footer {
+  background: var(--black);
+  color: rgba(255,255,255,0.5);
+  padding: 40px 5%;
+  text-align: center;
+  font-size: 0.82rem;
+}
+footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+footer a:hover { color: var(--white); }
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--white);
+  display: block;
+  margin-bottom: 12px;
+}
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media (max-width: 700px) {
+  .task-selector { grid-template-columns: 1fr; }
+  .marking-card { flex-direction: column; }
+  .marking-card-right { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; }
+  .stimulus-card { padding: 24px 20px; }
+  .seo-grid { grid-template-columns: 1fr; }
+  .score-breakdown { grid-template-columns: 1fr 1fr; }
+  .nav-links { display: none; }
+  .hero h1 { font-size: 1.8rem; }
+  .hero-stats { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://www.key2md.com" class="nav-logo">
+    <img src="https://www.key2md.com/Logo.png" alt="Key2MD">
+  </a>
+  <ul class="nav-links">
+    <li><a href="https://www.key2md.com/#services">Services</a></li>
+    <li><a href="https://www.key2md.com/about.html">About</a></li>
+    <li><a href="https://www.key2md.com/testimonials.html">Results</a></li>
+    <li><a href="https://www.key2md.com/practice.html">CASPer Tool</a></li>
+    <li><a href="https://www.key2md.com/guide.html">📖 Free Guide</a></li>
+    <li><a href="https://calendly.com/brittainmbbs/30min" class="nav-cta">Book Free Call →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">✦ Free Resource — Key2MD</div>
+  <h1>GAMSAT Section II<br><em>Practice Tool</em></h1>
+  <p class="hero-sub">50 real-style stimuli across Task A and Task B. 30-minute timer, examiner-lens AI feedback, and optional expert human marking by Dan — Unimelb MD student.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>50</strong><span>Unique Stimuli</span></div>
+    <div class="hero-stat"><strong>25+25</strong><span>Task A & Task B</span></div>
+    <div class="hero-stat"><strong>30 min</strong><span>Timed Practice</span></div>
+    <div class="hero-stat"><strong>Free</strong><span>No Account Needed</span></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-it-works">
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="how-step-num">1</div>
+      <div class="how-step-text">Choose Task A or B <span>→ select a station</span></div>
+    </div>
+    <div class="how-arrow">›</div>
+    <div class="how-step">
+      <div class="how-step-num">2</div>
+      <div class="how-step-text">Read the stimulus <span>→ start your 30-min timer</span></div>
+    </div>
+    <div class="how-arrow">›</div>
+    <div class="how-step">
+      <div class="how-step-num">3</div>
+      <div class="how-step-text">Write your essay <span>→ get AI feedback</span></div>
+    </div>
+    <div class="how-arrow">›</div>
+    <div class="how-step">
+      <div class="how-step-num">4</div>
+      <div class="how-step-text">Optional: submit <span>→ Dan marks it</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN TOOL -->
+<div class="tool-wrapper">
+
+  <!-- API NOTICE -->
+  <div class="api-notice">
+    <div class="api-notice-icon">ℹ️</div>
+    <div>
+      <strong>About the AI Feedback feature</strong>
+      <p>Key2MD is a tutoring service — we don't sell AI access. The AI feedback feature uses your own Anthropic API key, entered below. This is entirely optional. <a href="https://console.anthropic.com" target="_blank" rel="noopener">Get a free API key at console.anthropic.com →</a> Alternatively, submit your essay to Dan for expert human marking ($50).</p>
+    </div>
+  </div>
+
+  <!-- PAID MARKING CARD -->
+  <div class="marking-card" style="margin-top:32px;">
+    <div class="marking-card-left">
+      <div class="marking-card-label">Expert Human Marking</div>
+      <h3>Get Dan to mark your essay personally</h3>
+      <p>A University of Melbourne MD student and Australia's most trusted GAMSAT Section II tutor marks your essay with full written feedback, a band score, and prioritised recommendations. Turnaround within 48 hours.</p>
+    </div>
+    <div class="marking-card-right">
+      <div class="marking-price">
+        <strong>$50</strong>
+        <span>per essay</span>
+      </div>
+      <button class="btn-marking" onclick="openMarkingModal()">Submit for Marking →</button>
+    </div>
+  </div>
+
+  <!-- TASK SELECTOR -->
+  <div class="task-selector" style="margin-top:32px;">
+    <div class="task-card active" onclick="selectTask('A')">
+      <div class="task-tag tag-a">✍️ Task A</div>
+      <h3>Socio-cultural Essay</h3>
+      <p>Write an expository essay responding to a social, cultural, ethical or philosophical theme. State a clear viewpoint and argue with evidence. Assessed on argument quality, structure, and insight.</p>
+    </div>
+    <div class="task-card task-b-card" onclick="selectTask('B')">
+      <div class="task-tag tag-b">💭 Task B</div>
+      <h3>Personal Reflection</h3>
+      <p>Write a personal, discursive or reflective piece. You may draw on imagination, personal experience, or narrative. Assessed on depth of personal voice, emotional authenticity, and thematic insight.</p>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls-bar">
+    <label>Station:</label>
+    <select class="station-select" id="stationSelect" onchange="loadStation()">
+      <option value="">— Select a station —</option>
+    </select>
+    <button class="btn btn-random" onclick="loadRandom()">🎲 Random</button>
+    <button class="btn btn-secondary" onclick="clearEssay()">Clear Essay</button>
+  </div>
+
+  <!-- STATION DISPLAY -->
+  <div class="station-display" id="stationDisplay">
+
+    <!-- Station header -->
+    <div class="station-header">
+      <div class="station-meta">
+        <span class="station-num" id="stationNumLabel"></span>
+        <span class="station-theme-badge badge-a" id="stationBadge"></span>
+      </div>
+      <div class="timer-display">
+        <div class="timer-clock" id="timerDisplay">30:00</div>
+        <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">Start</button>
+        <button class="timer-btn" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Stimulus -->
+    <div class="stimulus-card">
+      <div class="stimulus-instruction">
+        <strong>For each Writing Test, follow these directions:</strong><br>
+        Consider the following comments and develop a piece of writing in response to one or more of them.<br>
+        Your writing will be judged on the quality of what you have to say in response to the theme, how well you organise and present your point of view, and how effectively you express yourself.<br>
+        <em>You will not be judged on the views or attitudes you express.</em>
+      </div>
+      <ol class="quotes-list" id="quotesList"></ol>
+      <div class="task-prompt-box" id="taskPromptBox"></div>
+    </div>
+
+    <!-- Essay -->
+    <div class="essay-section">
+      <div class="essay-section-header">
+        <h3>Your Essay</h3>
+        <span class="word-count" id="wordCount">0 words</span>
+      </div>
+      <textarea 
+        class="essay-textarea" 
+        id="essayTextarea" 
+        placeholder="Begin writing your essay here. Aim for approximately 600 words — roughly 2 pages of handwritten A4 in exam conditions..."
+        oninput="updateWordCount()"
+      ></textarea>
+      <div class="essay-actions">
+        <button class="btn btn-save" onclick="saveEssay()">💾 Save / Download</button>
+        <button class="btn btn-ai-feedback" id="aiFeedbackBtn" onclick="requestAIFeedback()">🔍 Get AI Feedback</button>
+      </div>
+    </div>
+
+    <!-- Human marking inline CTA -->
+    <div class="inline-marking-cta">
+      <div class="inline-marking-cta-left">
+        <h4>Want expert human feedback instead?</h4>
+        <p>Dan provides detailed written marking, a band estimate, and tailored recommendations — just as a real GAMSAT examiner would. $50 · 48hr turnaround.</p>
+      </div>
+      <button class="btn-submit-marking" onclick="openMarkingModal()">Submit for Dan's Marking →</button>
+    </div>
+
+    <!-- API Key setup -->
+    <div class="api-setup-section" id="apiSetupSection">
+      <h4>🔑 AI Feedback — Enter Your Anthropic API Key</h4>
+      <p>Key2MD doesn't provide AI access — this uses your own key. It's free to get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>. Your key is stored locally in your browser only and never sent to Key2MD's servers.</p>
+      <div class="api-key-row">
+        <input type="password" class="api-key-input" id="apiKeyInput" placeholder="sk-ant-api03-...">
+        <button class="btn-save-key" onclick="saveApiKey()">Save Key</button>
+      </div>
+      <div class="api-key-status" id="apiKeyStatus">✓ API key saved for this session</div>
+    </div>
+
+    <!-- AI Feedback loading -->
+    <div class="feedback-loading" id="feedbackLoading">
+      <div class="loading-spinner"></div>
+      <p>Analysing your essay through the examiner's lens…</p>
+    </div>
+
+    <!-- AI Feedback Panel -->
+    <div class="feedback-panel" id="feedbackPanel">
+      <div class="feedback-panel-header">
+        <div>
+          <h3>Examiner's Lens — AI Feedback</h3>
+          <p>Based on GAMSAT Section II marking criteria · Des O'Neill framework</p>
+        </div>
+        <div class="band-score-badge" id="bandScoreBadge">—</div>
+      </div>
+      <div class="feedback-body">
+        <!-- Score breakdown -->
+        <div class="score-breakdown" id="scoreBreakdown"></div>
+        <!-- Examiner's lens -->
+        <div class="examiners-lens" id="examinersLens">
+          <h4>Examiner's Lens — Annotated Essay</h4>
+          <div class="lens-legend">
+            <div class="lens-key"><div class="lens-dot dot-strength"></div>Strong argument / insight</div>
+            <div class="lens-key"><div class="lens-dot dot-weak"></div>Needs development</div>
+            <div class="lens-key"><div class="lens-dot dot-stimulus"></div>Engages with stimulus</div>
+          </div>
+          <div class="essay-annotated" id="annotatedEssay"></div>
+        </div>
+        <!-- Feedback sections -->
+        <div class="feedback-sections" id="feedbackSections"></div>
+        <!-- Band 70 box -->
+        <div class="band70-box" id="band70Box">
+          <h4>🎯 What a Band 70 response would address</h4>
+          <ul id="band70List"></ul>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end station-display -->
+
+</div><!-- end tool-wrapper -->
+
+<!-- SUBMIT FOR MARKING MODAL -->
+<div class="modal-overlay" id="markingModal">
+  <div class="modal">
+    <h3>Submit for Expert Marking</h3>
+    <p class="modal-sub">Dan will personally mark your essay with full written feedback, a band score, and prioritised recommendations within 48 hours.</p>
+    <div class="modal-price-note">
+      <strong>$50 per essay</strong>
+      Payment details will be sent to your email once Dan confirms receipt. You'll hear back within 48 hours.
+    </div>
+    <div class="modal-field">
+      <label>Your Name</label>
+      <input type="text" id="markingName" placeholder="e.g. Sarah Chen">
+    </div>
+    <div class="modal-field">
+      <label>Your Email (Dan will reply here)</label>
+      <input type="email" id="markingEmail" placeholder="e.g. sarah@email.com">
+    </div>
+    <div class="modal-field">
+      <label>Anything else Dan should know? (optional)</label>
+      <textarea id="markingNotes" rows="2" placeholder="e.g. GAMSAT March 2025, this is my third practice essay..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeMarkingModal()">Cancel</button>
+      <button class="btn-modal-submit" onclick="submitForMarking()">Send to Dan →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SEO CONTENT SECTION -->
+<section class="seo-section">
+  <div class="seo-inner">
+    <h2>About GAMSAT Section II</h2>
+    <p>GAMSAT Section II (Writing) requires candidates to write two essays — Task A and Task B — in 60 minutes. It accounts for one quarter of your overall GAMSAT score and is consistently the most underestimated section by Australian medical school applicants.</p>
+    <p>Each task presents five stimulus comments grouped around a central theme. Candidates must identify the theme, select one or more comments to respond to, and produce a coherent, insightful piece of writing. You are not judged on the views you hold, but on the quality of your thinking and expression.</p>
+
+    <div class="seo-grid">
+      <div class="seo-card">
+        <h4>Task A — Expository/Argumentative</h4>
+        <p>Typically socio-cultural in nature. Requires a clear thesis, logical argument, and evidence. Think: structured, persuasive essay with an analytical edge.</p>
+      </div>
+      <div class="seo-card">
+        <h4>Task B — Reflective/Discursive</h4>
+        <p>Personal and social themes. Can be narrative, reflective, or discursive. More latitude for voice and creativity — but still requires thematic depth.</p>
+      </div>
+    </div>
+
+    <h3>How to use this GAMSAT Section II practice tool</h3>
+    <p>Select Task A or Task B, then choose a stimulus from the dropdown or hit Random. Start the 30-minute timer when you're ready to write — this mirrors actual exam conditions. Aim for approximately 600 words (two pages of handwritten A4). When finished, use the AI feedback feature to get an examiner-lens analysis, band score estimate, and Band 70 thematic hints.</p>
+    <p>For genuine improvement, submit your essay to Dan for expert human marking. Unlike AI, Dan will give you the specific, personalised feedback that actually moves your band score.</p>
+
+    <h3>What examiners look for in GAMSAT Section II</h3>
+    <p>ACER assesses two criteria: <strong>Thought and Content</strong> (the quality and insightfulness of what you say) and <strong>Organisation and Expression</strong> (structure and language effectiveness). The major emphasis is on Thought and Content — which is why generic essay frameworks without genuine insight will plateau your score.</p>
+    <p>High-scoring essays don't just summarise the stimulus quotes — they use them as a launching point for original, nuanced thinking. A Band 70+ response will often take an unexpected angle that still remains faithful to the theme, demonstrating independent thought rather than rote application of a framework.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">Key2MD</span>
+  <div class="footer-links">
+    <a href="https://www.key2md.com">Home</a>
+    <a href="https://www.key2md.com/about.html">About Dan</a>
+    <a href="https://www.key2md.com/testimonials.html">Results</a>
+    <a href="https://www.key2md.com/practice.html">CASPer Tool</a>
+    <a href="https://www.key2md.com/guide.html">Free Guide</a>
+    <a href="https://calendly.com/brittainmbbs/30min">Book a Session</a>
+  </div>
+  <p>© 2025 Key2MD. All rights reserved. · StudentVIP Verified Tutor · r/GAMSAT Community Endorsed</p>
+  <p style="margin-top:8px; font-size:0.75rem; opacity:0.6;">The AI feedback feature uses the student's own Anthropic API key. Key2MD does not provide or sell AI access.</p>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════
+   STATION DATA — 50 stations (25 Task A, 25 Task B)
+═══════════════════════════════════════════════ */
+const stations = {
+  A: [
+    {
+      theme: "The Nature of Freedom",
+      quotes: [
+        { text: "Freedom is never given; it is won.", attr: "A. Philip Randolph" },
+        { text: "The most courageous act is still to think for yourself. Aloud.", attr: "Coco Chanel" },
+        { text: "Liberty, when it begins to take root, is a plant of rapid growth.", attr: "George Washington" },
+        { text: "The price of freedom is eternal vigilance.", attr: "Thomas Jefferson" },
+        { text: "Man is born free, and everywhere he is in chains.", attr: "Jean-Jacques Rousseau" }
+      ]
+    },
+    {
+      theme: "Truth and Deception",
+      quotes: [
+        { text: "The truth is rarely pure and never simple.", attr: "Oscar Wilde" },
+        { text: "A lie gets halfway around the world before the truth has a chance to get its pants on.", attr: "Winston Churchill" },
+        { text: "There are no facts, only interpretations.", attr: "Friedrich Nietzsche" },
+        { text: "The cruelest lies are often told in silence.", attr: "Robert Louis Stevenson" },
+        { text: "When you stretch the truth, watch out for the snapback.", attr: "Bill Copeland" }
+      ]
+    },
+    {
+      theme: "Justice and Punishment",
+      quotes: [
+        { text: "The measure of a civilization is how it treats its weakest and most helpless citizens.", attr: "Pearl S. Buck" },
+        { text: "Punishment is not for revenge, but to lessen crime and reform the criminal.", attr: "Elizabeth Fry" },
+        { text: "Justice delayed is justice denied.", attr: "William Gladstone" },
+        { text: "The law is reason, free from passion.", attr: "Aristotle" },
+        { text: "An eye for an eye makes the whole world blind.", attr: "Mahatma Gandhi" }
+      ]
+    },
+    {
+      theme: "Progress and Tradition",
+      quotes: [
+        { text: "The least questioned assumptions are often the most questionable.", attr: "Paul Broca" },
+        { text: "Tradition is the illusion of permanence.", attr: "Woody Allen" },
+        { text: "Every generation imagines itself to be more intelligent than the one that went before it.", attr: "George Orwell" },
+        { text: "The art of progress is to preserve order amid change and to preserve change amid order.", attr: "Alfred North Whitehead" },
+        { text: "Those who cannot remember the past are condemned to repeat it.", attr: "George Santayana" }
+      ]
+    },
+    {
+      theme: "Wealth and Inequality",
+      quotes: [
+        { text: "The test of our progress is not whether we add more to the abundance of those who have much; it is whether we provide enough for those who have too little.", attr: "Franklin D. Roosevelt" },
+        { text: "Wealth is the ability to fully experience life.", attr: "Henry David Thoreau" },
+        { text: "The rich rob the poor, and the poor rob one another.", attr: "Sojourner Truth" },
+        { text: "It is not the creation of wealth that is wrong, but the love of money for its own sake.", attr: "Margaret Thatcher" },
+        { text: "Poverty is the worst form of violence.", attr: "Mahatma Gandhi" }
+      ]
+    },
+    {
+      theme: "Education and Wisdom",
+      quotes: [
+        { text: "Education is not the filling of a pail, but the lighting of a fire.", attr: "W.B. Yeats" },
+        { text: "The more I learn, the more I realise how much I don't know.", attr: "Albert Einstein" },
+        { text: "An investment in knowledge pays the best interest.", attr: "Benjamin Franklin" },
+        { text: "The function of education is to teach one to think intensively and to think critically.", attr: "Martin Luther King Jr." },
+        { text: "It is a miracle that curiosity survives formal education.", attr: "Albert Einstein" }
+      ]
+    },
+    {
+      theme: "Power and Corruption",
+      quotes: [
+        { text: "Power tends to corrupt, and absolute power corrupts absolutely.", attr: "Lord Acton" },
+        { text: "The most common way people give up their power is by thinking they don't have any.", attr: "Alice Walker" },
+        { text: "Nearly all men can stand adversity, but if you want to test a man's character, give him power.", attr: "Abraham Lincoln" },
+        { text: "Power is not revealed by striking hard or often, but by striking true.", attr: "Honoré de Balzac" },
+        { text: "He who controls others may be powerful, but he who has mastered himself is mightier still.", attr: "Lao Tzu" }
+      ]
+    },
+    {
+      theme: "Courage and Fear",
+      quotes: [
+        { text: "Courage is not the absence of fear, but the triumph over it.", attr: "Nelson Mandela" },
+        { text: "Fear is the mind-killer.", attr: "Frank Herbert" },
+        { text: "It takes courage to grow up and become who you really are.", attr: "E.E. Cummings" },
+        { text: "Scared is what you're feeling. Brave is what you're doing.", attr: "Emma Donoghue" },
+        { text: "Cowardice asks the question: is it safe? Expediency asks the question: is it politic? Vanity asks the question: is it popular? But conscience asks the question: is it right?", attr: "Martin Luther King Jr." }
+      ]
+    },
+    {
+      theme: "Science and Ethics",
+      quotes: [
+        { text: "Science without conscience is but the ruin of the soul.", attr: "François Rabelais" },
+        { text: "The saddest aspect of life right now is that science gathers knowledge faster than society gathers wisdom.", attr: "Isaac Asimov" },
+        { text: "To know what is right and not to do it is the worst cowardice.", attr: "Confucius" },
+        { text: "Ethics is knowing the difference between what you have a right to do and what is right to do.", attr: "Potter Stewart" },
+        { text: "The great question of our time is not what technology can do, but what we should do with it.", attr: "Bill Moyers" }
+      ]
+    },
+    {
+      theme: "War and Peace",
+      quotes: [
+        { text: "War does not determine who is right — only who is left.", attr: "Bertrand Russell" },
+        { text: "Peace cannot be kept by force; it can only be achieved by understanding.", attr: "Albert Einstein" },
+        { text: "The purpose of all war is ultimately peace.", attr: "Saint Augustine" },
+        { text: "In war, truth is the first casualty.", attr: "Aeschylus" },
+        { text: "An eye for an eye, and soon the whole world is blind.", attr: "Mahatma Gandhi" }
+      ]
+    },
+    {
+      theme: "Identity and Belonging",
+      quotes: [
+        { text: "The greatest thing in the world is to know how to belong to oneself.", attr: "Michel de Montaigne" },
+        { text: "We are all immigrants to the future; none of us is a native there.", attr: "Margaret Mead" },
+        { text: "No man is an island, entire of itself.", attr: "John Donne" },
+        { text: "The privilege of a lifetime is to become who you truly are.", attr: "Carl Jung" },
+        { text: "If you don't know where you've come from, you don't know where you're going.", attr: "James Baldwin" }
+      ]
+    },
+    {
+      theme: "Technology and Humanity",
+      quotes: [
+        { text: "Technology is a useful servant but a dangerous master.", attr: "Christian Lous Lange" },
+        { text: "The human spirit must prevail over technology.", attr: "Albert Einstein" },
+        { text: "We shape our tools, and thereafter our tools shape us.", attr: "Marshall McLuhan" },
+        { text: "The real danger is not that computers will begin to think like men, but that men will begin to think like computers.", attr: "Sydney J. Harris" },
+        { text: "Any sufficiently advanced technology is indistinguishable from magic.", attr: "Arthur C. Clarke" }
+      ]
+    },
+    {
+      theme: "Democracy and Governance",
+      quotes: [
+        { text: "Democracy is the worst form of government, except for all the others.", attr: "Winston Churchill" },
+        { text: "The ballot is stronger than the bullet.", attr: "Abraham Lincoln" },
+        { text: "Bad officials are elected by good citizens who do not vote.", attr: "George Jean Nathan" },
+        { text: "In a democracy, the individual enjoys not only the ultimate power but carries the ultimate responsibility.", attr: "Norman Cousins" },
+        { text: "The price of apathy towards public affairs is to be ruled by evil men.", attr: "Plato" }
+      ]
+    },
+    {
+      theme: "Compassion and Indifference",
+      quotes: [
+        { text: "The opposite of love is not hate, it's indifference.", attr: "Elie Wiesel" },
+        { text: "Compassion is not a relationship between the healer and the wounded. It's a relationship between equals.", attr: "Pema Chödrön" },
+        { text: "If you want others to be happy, practice compassion. If you want to be happy, practice compassion.", attr: "Dalai Lama" },
+        { text: "The price of indifference to public affairs is to be ruled by evil men.", attr: "Plato" },
+        { text: "No act of kindness, no matter how small, is ever wasted.", attr: "Aesop" }
+      ]
+    },
+    {
+      theme: "Environment and Responsibility",
+      quotes: [
+        { text: "We do not inherit the earth from our ancestors; we borrow it from our children.", attr: "Native American Proverb" },
+        { text: "The Earth does not belong to us; we belong to the Earth.", attr: "Chief Seattle" },
+        { text: "What we are doing to the forests of the world is but a mirror reflection of what we are doing to ourselves.", attr: "Mahatma Gandhi" },
+        { text: "The greatest threat to our planet is the belief that someone else will save it.", attr: "Robert Swan" },
+        { text: "We are the first generation to feel the impact of climate change and the last generation that can do something about it.", attr: "Barack Obama" }
+      ]
+    },
+    {
+      theme: "Individualism and Collectivism",
+      quotes: [
+        { text: "The smallest minority on earth is the individual. Those who deny individual rights cannot claim to be defenders of minorities.", attr: "Ayn Rand" },
+        { text: "It takes a village to raise a child.", attr: "African Proverb" },
+        { text: "Ask not what your country can do for you — ask what you can do for your country.", attr: "John F. Kennedy" },
+        { text: "The nail that sticks up gets hammered down.", attr: "Japanese Proverb" },
+        { text: "A society that puts equality before freedom will get neither. A society that puts freedom before equality will get a high degree of both.", attr: "Milton Friedman" }
+      ]
+    },
+    {
+      theme: "Art and Its Purpose",
+      quotes: [
+        { text: "Art is not what you see, but what you make others see.", attr: "Edgar Degas" },
+        { text: "The purpose of art is washing the dust of daily life off our souls.", attr: "Pablo Picasso" },
+        { text: "Art enables us to find ourselves and lose ourselves at the same time.", attr: "Thomas Merton" },
+        { text: "Without art, the crudeness of reality would make the world unbearable.", attr: "George Bernard Shaw" },
+        { text: "Art is the lie that enables us to realise the truth.", attr: "Pablo Picasso" }
+      ]
+    },
+    {
+      theme: "Ambition and Contentment",
+      quotes: [
+        { text: "Ambition is the path to success. Persistence is the vehicle you arrive in.", attr: "Bill Bradley" },
+        { text: "Contentment is natural wealth, luxury is artificial poverty.", attr: "Socrates" },
+        { text: "The trouble with the rat race is that even if you win, you're still a rat.", attr: "Lily Tomlin" },
+        { text: "It is not in the pursuit of happiness that we find fulfilment, but in the happiness of pursuit.", attr: "Denis Waitley" },
+        { text: "Great ambition is the passion of a great character. Those endowed with it may perform very good or very bad acts.", attr: "Napoleon Bonaparte" }
+      ]
+    },
+    {
+      theme: "Leadership and Responsibility",
+      quotes: [
+        { text: "The price of greatness is responsibility.", attr: "Winston Churchill" },
+        { text: "A leader is best when people barely know he exists. When his work is done, his aim fulfilled, they will all say: we did it ourselves.", attr: "Lao Tzu" },
+        { text: "Leadership is not about being in charge. It is about taking care of those in your charge.", attr: "Simon Sinek" },
+        { text: "The function of leadership is to produce more leaders, not more followers.", attr: "Ralph Nader" },
+        { text: "In matters of conscience, the law of the majority has no place.", attr: "Mahatma Gandhi" }
+      ]
+    },
+    {
+      theme: "Suffering and Resilience",
+      quotes: [
+        { text: "That which does not kill us makes us stronger.", attr: "Friedrich Nietzsche" },
+        { text: "Out of suffering have emerged the strongest souls; the most massive characters are seared with scars.", attr: "Kahlil Gibran" },
+        { text: "The world breaks everyone, and afterward, many are strong at the broken places.", attr: "Ernest Hemingway" },
+        { text: "Pain is inevitable. Suffering is optional.", attr: "Haruki Murakami" },
+        { text: "The most beautiful people we have known are those who have known defeat, known suffering, known struggle, known loss.", attr: "Elisabeth Kübler-Ross" }
+      ]
+    },
+    {
+      theme: "Media and Influence",
+      quotes: [
+        { text: "The media's the most powerful entity on earth. They have the power to make the innocent guilty and the guilty innocent.", attr: "Malcolm X" },
+        { text: "All the news that's fit to print.", attr: "New York Times masthead" },
+        { text: "If you don't read the newspaper, you're uninformed. If you read the newspaper, you're misinformed.", attr: "Mark Twain" },
+        { text: "In an age of universal deceit, telling the truth is a revolutionary act.", attr: "George Orwell" },
+        { text: "We are drowning in information but starved for knowledge.", attr: "Rutherford Rogers" }
+      ]
+    },
+    {
+      theme: "Ageing and Time",
+      quotes: [
+        { text: "Do not regret growing older. It is a privilege denied to many.", attr: "Unknown" },
+        { text: "The afternoon of life is just as full of meaning as the morning; only, its meaning and purpose are different.", attr: "Carl Jung" },
+        { text: "Youth is wasted on the young.", attr: "George Bernard Shaw" },
+        { text: "Time is the most valuable thing a man can spend.", attr: "Theophrastus" },
+        { text: "Old age is not a disease — it is strength and survivorship, triumph over all kinds of vicissitudes and disappointments.", attr: "Maggie Kuhn" }
+      ]
+    },
+    {
+      theme: "Religion and Society",
+      quotes: [
+        { text: "Science without religion is lame, religion without science is blind.", attr: "Albert Einstein" },
+        { text: "Religion is what keeps the poor from murdering the rich.", attr: "Napoleon Bonaparte" },
+        { text: "The truest form of love is how you behave toward someone, not how you feel about them.", attr: "Steve Hall" },
+        { text: "God has no religion.", attr: "Mahatma Gandhi" },
+        { text: "Faith is taking the first step even when you don't see the whole staircase.", attr: "Martin Luther King Jr." }
+      ]
+    },
+    {
+      theme: "Globalisation and Culture",
+      quotes: [
+        { text: "When we lose the right to be different, we lose the privilege to be free.", attr: "Charles Evans Hughes" },
+        { text: "A people without the knowledge of their past history, origin and culture is like a tree without roots.", attr: "Marcus Garvey" },
+        { text: "Globalisation has produced a new of level of interdependence among us.", attr: "Mike Moore" },
+        { text: "The world is a book, and those who do not travel read only one page.", attr: "Saint Augustine" },
+        { text: "No culture can live if it attempts to be exclusive.", attr: "Mahatma Gandhi" }
+      ]
+    },
+    {
+      theme: "Human Nature and Morality",
+      quotes: [
+        { text: "Man is the only animal that blushes. Or needs to.", attr: "Mark Twain" },
+        { text: "The only good is knowledge and the only evil is ignorance.", attr: "Socrates" },
+        { text: "Morality is not the doctrine of how we may make ourselves happy, but how we may make ourselves worthy of happiness.", attr: "Immanuel Kant" },
+        { text: "Inside every cynical person, there is a disappointed idealist.", attr: "George Carlin" },
+        { text: "We are not human beings having a spiritual experience. We are spiritual beings having a human experience.", attr: "Pierre Teilhard de Chardin" }
+      ]
+    }
+  ],
+  B: [
+    {
+      theme: "Solitude and Connection",
+      quotes: [
+        { text: "I exist as I am, that is enough.", attr: "Walt Whitman" },
+        { text: "The soul that sees beauty may sometimes walk alone.", attr: "Johann Wolfgang von Goethe" },
+        { text: "We are all so much together, but we are all dying of loneliness.", attr: "Albert Schweitzer" },
+        { text: "In solitude the mind gains strength and learns to lean upon itself.", attr: "Laurence Sterne" },
+        { text: "What a commentary on our civilisation, when being alone is considered suspect; when one has to apologise for it, make excuses, hide the fact that one practices it.", attr: "Anne Morrow Lindbergh" }
+      ]
+    },
+    {
+      theme: "Home and Belonging",
+      quotes: [
+        { text: "Home is not a place — it's a feeling.", attr: "Cecelia Ahern" },
+        { text: "You can't go home again.", attr: "Thomas Wolfe" },
+        { text: "The ache for home lives in all of us. The safe place where we can go as we are and not be questioned.", attr: "Maya Angelou" },
+        { text: "Where we love is home — home that our feet may leave, but not our hearts.", attr: "Oliver Wendell Holmes Sr." },
+        { text: "I long, as does every human being, to be at home wherever I find myself.", attr: "Maya Angelou" }
+      ]
+    },
+    {
+      theme: "Childhood and Innocence",
+      quotes: [
+        { text: "In every real man a child is hidden that wants to play.", attr: "Friedrich Nietzsche" },
+        { text: "The reluctance to put away childish things may be a requirement of genius.", attr: "Rebecca Pepper Sinkler" },
+        { text: "Grown-ups never understand anything by themselves, and it is tiresome for children to be always and forever explaining things to them.", attr: "Antoine de Saint-Exupéry" },
+        { text: "We carry within us the wonders we seek without us.", attr: "Sir Thomas Browne" },
+        { text: "It is never too late to have a happy childhood.", attr: "Tom Robbins" }
+      ]
+    },
+    {
+      theme: "Grief and Loss",
+      quotes: [
+        { text: "Grief is the price we pay for love.", attr: "Queen Elizabeth II" },
+        { text: "You don't get over it. You get used to it.", attr: "Unknown" },
+        { text: "The risk of love is loss, and the price of loss is grief — but the pain of grief is only a shadow when compared with the pain of never risking love.", attr: "Hilary Stanton Zunin" },
+        { text: "To live in hearts we leave behind is not to die.", attr: "Thomas Campbell" },
+        { text: "What we have once enjoyed we can never lose; all that we love deeply becomes a part of us.", attr: "Helen Keller" }
+      ]
+    },
+    {
+      theme: "Failure and Growth",
+      quotes: [
+        { text: "Success is stumbling from failure to failure with no loss of enthusiasm.", attr: "Winston Churchill" },
+        { text: "I have not failed. I've just found 10,000 ways that won't work.", attr: "Thomas A. Edison" },
+        { text: "It is impossible to live without failing at something, unless you live so cautiously that you might as well not have lived at all.", attr: "J.K. Rowling" },
+        { text: "The master has failed more times than the beginner has even tried.", attr: "Stephen McCranie" },
+        { text: "Failure is simply the opportunity to begin again, this time more intelligently.", attr: "Henry Ford" }
+      ]
+    },
+    {
+      theme: "Love and Vulnerability",
+      quotes: [
+        { text: "To love at all is to be vulnerable.", attr: "C.S. Lewis" },
+        { text: "We accept the love we think we deserve.", attr: "Stephen Chbosky" },
+        { text: "The giving of love is an education in itself.", attr: "Eleanor Roosevelt" },
+        { text: "Love does not consist of gazing at each other, but in looking outward together in the same direction.", attr: "Antoine de Saint-Exupéry" },
+        { text: "Love is not love which alters when it alteration finds.", attr: "William Shakespeare" }
+      ]
+    },
+    {
+      theme: "Regret and Second Chances",
+      quotes: [
+        { text: "Of all the words of mice and men, the saddest are, 'It might have been.'", attr: "Kurt Vonnegut" },
+        { text: "Never regret. If it's good, it's wonderful. If it's bad, it's experience.", attr: "Victoria Holt" },
+        { text: "We are all the heroes of our own stories, with the capacity to rewrite the chapters that failed us.", attr: "Unknown" },
+        { text: "Make the most of your regrets; never smother your sorrow, but tend and cherish it till it comes to have a separate and integral interest.", attr: "Henry David Thoreau" },
+        { text: "In the end, we only regret the chances we didn't take.", attr: "Lewis Carroll" }
+      ]
+    },
+    {
+      theme: "Silence and Words",
+      quotes: [
+        { text: "Speak only if it improves upon the silence.", attr: "Mahatma Gandhi" },
+        { text: "The cruelest thing a man can do to a woman is to portray her as perfection.", attr: "D.H. Lawrence" },
+        { text: "Words are, of course, the most powerful drug used by mankind.", attr: "Rudyard Kipling" },
+        { text: "The right word may be effective, but no word was ever as effective as a rightly timed pause.", attr: "Mark Twain" },
+        { text: "Handle them carefully, for words have more power than atom bombs.", attr: "Pearl Strachan Hurd" }
+      ]
+    },
+    {
+      theme: "Dreams and Reality",
+      quotes: [
+        { text: "All our dreams can come true, if we have the courage to pursue them.", attr: "Walt Disney" },
+        { text: "Reality is wrong. Dreams are for real.", attr: "Tupac Shakur" },
+        { text: "The future belongs to those who believe in the beauty of their dreams.", attr: "Eleanor Roosevelt" },
+        { text: "We are such stuff as dreams are made on, and our little life is rounded with a sleep.", attr: "William Shakespeare" },
+        { text: "A dream you dream alone is only a dream. A dream you dream together is reality.", attr: "John Lennon" }
+      ]
+    },
+    {
+      theme: "Forgiveness and Anger",
+      quotes: [
+        { text: "To forgive is to set a prisoner free and discover that the prisoner was you.", attr: "Lewis B. Smedes" },
+        { text: "Anger is like drinking poison and expecting the other person to die.", attr: "Unknown" },
+        { text: "The weak can never forgive. Forgiveness is the attribute of the strong.", attr: "Mahatma Gandhi" },
+        { text: "Holding on to anger is like grasping a hot coal with the intent of throwing it at someone else; you are the one who gets burned.", attr: "The Buddha" },
+        { text: "Forgiveness is not an occasional act; it is a constant attitude.", attr: "Martin Luther King Jr." }
+      ]
+    },
+    {
+      theme: "Memory and Identity",
+      quotes: [
+        { text: "We are the sum of all the moments of our lives — all that is ours is in them.", attr: "Thomas Wolfe" },
+        { text: "Memory is the diary we all carry about with us.", attr: "Oscar Wilde" },
+        { text: "The past is never where you think you left it.", attr: "Katherine Anne Porter" },
+        { text: "I am not what happened to me, I am what I choose to become.", attr: "Carl Jung" },
+        { text: "Memory is not what the heart desires. That is only a mirror.", attr: "J.R.R. Tolkien" }
+      ]
+    },
+    {
+      theme: "Nature and the Human Soul",
+      quotes: [
+        { text: "In every walk with nature, one receives far more than he seeks.", attr: "John Muir" },
+        { text: "The poetry of earth is never dead.", attr: "John Keats" },
+        { text: "Nature does not hurry, yet everything is accomplished.", attr: "Lao Tzu" },
+        { text: "Look deep into nature, and then you will understand everything better.", attr: "Albert Einstein" },
+        { text: "Forget not that the earth delights to feel your bare feet and the winds long to play with your hair.", attr: "Kahlil Gibran" }
+      ]
+    },
+    {
+      theme: "The Body and Self-Image",
+      quotes: [
+        { text: "Your body is not an apology. It is a home.", attr: "Sonya Renee Taylor" },
+        { text: "To lose confidence in one's body is to lose confidence in oneself.", attr: "Simone de Beauvoir" },
+        { text: "The body is a sacred garment.", attr: "Martha Graham" },
+        { text: "You are imperfect, permanently and inevitably flawed. And you are beautiful.", attr: "Amy Bloom" },
+        { text: "Health is not just about what you're eating. It's also about what you're thinking and saying.", attr: "Unknown" }
+      ]
+    },
+    {
+      theme: "Friendship and Trust",
+      quotes: [
+        { text: "A friend is one who knows you and loves you just the same.", attr: "Elbert Hubbard" },
+        { text: "It is not the lack of love, but a lack of friendship that makes unhappy marriages.", attr: "Friedrich Nietzsche" },
+        { text: "The most I can do for my friend is simply be his friend.", attr: "Henry David Thoreau" },
+        { text: "Wishing to be friends is quick work, but friendship is a slow-ripening fruit.", attr: "Aristotle" },
+        { text: "A real friend is one who walks in when the rest of the world walks out.", attr: "Walter Winchell" }
+      ]
+    },
+    {
+      theme: "Fear of the Unknown",
+      quotes: [
+        { text: "The oldest and strongest emotion of mankind is fear, and the oldest and strongest kind of fear is fear of the unknown.", attr: "H.P. Lovecraft" },
+        { text: "Life is either a daring adventure or nothing at all.", attr: "Helen Keller" },
+        { text: "Everything you've ever wanted is on the other side of fear.", attr: "George Addair" },
+        { text: "We suffer more in imagination than in reality.", attr: "Seneca" },
+        { text: "Do one thing every day that scares you.", attr: "Eleanor Roosevelt" }
+      ]
+    },
+    {
+      theme: "Parenthood and Legacy",
+      quotes: [
+        { text: "Children are the living messages we send to a time we will not see.", attr: "Neil Postman" },
+        { text: "A parent's love is whole no matter how many times divided.", attr: "Robert Brault" },
+        { text: "The thing about parenting rules is there aren't any. That's what makes it so difficult.", attr: "Ewan McGregor" },
+        { text: "We may not be able to prepare the future for our children, but we can at least prepare our children for the future.", attr: "Franklin D. Roosevelt" },
+        { text: "The greatest legacy one can pass on to one's children is not money or other material things, but rather a legacy of character and faith.", attr: "Billy Graham" }
+      ]
+    },
+    {
+      theme: "Happiness and Meaning",
+      quotes: [
+        { text: "Happiness is not something ready-made. It comes from your own actions.", attr: "Dalai Lama" },
+        { text: "The purpose of life is not to be happy. It is to be useful, to be honourable, to be compassionate.", attr: "Ralph Waldo Emerson" },
+        { text: "Happiness is when what you think, what you say, and what you do are in harmony.", attr: "Mahatma Gandhi" },
+        { text: "He who has a why to live can bear almost any how.", attr: "Friedrich Nietzsche" },
+        { text: "The happiness of your life depends upon the quality of your thoughts.", attr: "Marcus Aurelius" }
+      ]
+    },
+    {
+      theme: "Growing Up and Coming of Age",
+      quotes: [
+        { text: "Growing up means letting go of the dearest things, and knowing they'll always be there.", attr: "Unknown" },
+        { text: "We are always the same age inside.", attr: "Gertrude Stein" },
+        { text: "The first forty years of life give us the text; the next thirty supply the commentary.", attr: "Arthur Schopenhauer" },
+        { text: "Maturity is the ability to think, speak and act your feelings within the bounds of dignity.", attr: "Samuel Ullman" },
+        { text: "The mark of the immature man is that he wants to die nobly for a cause, while the mark of the mature man is that he wants to live humbly for one.", attr: "J.D. Salinger" }
+      ]
+    },
+    {
+      theme: "Work and Purpose",
+      quotes: [
+        { text: "The secret of your future is hidden in your daily routine.", attr: "Mike Murdock" },
+        { text: "Far and away the best prize that life has to offer is the chance to work hard at work worth doing.", attr: "Theodore Roosevelt" },
+        { text: "Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work.", attr: "Steve Jobs" },
+        { text: "The only way to do great work is to love what you do.", attr: "Steve Jobs" },
+        { text: "Choose a job you love, and you will never have to work a day in your life.", attr: "Confucius" }
+      ]
+    },
+    {
+      theme: "Curiosity and Wonder",
+      quotes: [
+        { text: "The world is full of magical things patiently waiting for our wits to grow sharper.", attr: "Bertrand Russell" },
+        { text: "Curiosity is the lust of the mind.", attr: "Thomas Hobbes" },
+        { text: "The important thing is not to stop questioning. Curiosity has its own reason for existence.", attr: "Albert Einstein" },
+        { text: "Wonder is the beginning of wisdom.", attr: "Socrates" },
+        { text: "It is a miracle that curiosity survives formal education.", attr: "Albert Einstein" }
+      ]
+    },
+    {
+      theme: "Privilege and Gratitude",
+      quotes: [
+        { text: "Privilege is invisible to those who have it.", attr: "Michael Kimmel" },
+        { text: "Gratitude turns what we have into enough.", attr: "Unknown" },
+        { text: "Not what we say about our blessings, but how we use them, is the true measure of our thanksgiving.", attr: "W.T. Purkiser" },
+        { text: "We tend to forget that happiness doesn't come as a result of getting something we don't have, but rather of recognising and appreciating what we do have.", attr: "Friedrich Koenig" },
+        { text: "When I started counting my blessings, my whole life turned around.", attr: "Willie Nelson" }
+      ]
+    },
+    {
+      theme: "Conscience and Conformity",
+      quotes: [
+        { text: "The one who follows the crowd will usually get no further than the crowd.", attr: "Albert Einstein" },
+        { text: "To thine own self be true.", attr: "William Shakespeare" },
+        { text: "The human race is a monotonous affair. Most people spend the greatest part of their time working in order to live, and what little freedom remains so fills them with fear that they seek out any and every means to be rid of it.", attr: "Johann Wolfgang von Goethe" },
+        { text: "Disobedience is the true foundation of liberty.", attr: "Henry David Thoreau" },
+        { text: "It is not the strongest of the species that survives, nor the most intelligent; it is the one most adaptable to change.", attr: "Charles Darwin" }
+      ]
+    },
+    {
+      theme: "Migration and Displacement",
+      quotes: [
+        { text: "I am not an Athenian or a Greek, but a citizen of the world.", attr: "Socrates" },
+        { text: "Once you have tasted flight, you will forever walk the earth with your eyes turned skyward.", attr: "Leonardo da Vinci" },
+        { text: "Not all those who wander are lost.", attr: "J.R.R. Tolkien" },
+        { text: "You have to leave the city of your comfort and go into the wilderness of your intuition.", attr: "Alan Alda" },
+        { text: "Migration is the story of humanity — and the story of hope.", attr: "António Guterres" }
+      ]
+    },
+    {
+      theme: "Music and Emotion",
+      quotes: [
+        { text: "Music gives a soul to the universe, wings to the mind, flight to the imagination, and life to everything.", attr: "Plato" },
+        { text: "Without music, life would be a mistake.", attr: "Friedrich Nietzsche" },
+        { text: "Music can change the world because it can change people.", attr: "Bono" },
+        { text: "One good thing about music — when it hits you, you feel no pain.", attr: "Bob Marley" },
+        { text: "Music is the shorthand of emotion.", attr: "Leo Tolstoy" }
+      ]
+    },
+    {
+      theme: "Kindness and Small Acts",
+      quotes: [
+        { text: "No act of kindness, no matter how small, is ever wasted.", attr: "Aesop" },
+        { text: "Carry out a random act of kindness, with no expectation of reward, safe in the knowledge that one day someone might do the same for you.", attr: "Princess Diana" },
+        { text: "The smallest act of kindness is worth more than the grandest intention.", attr: "Oscar Wilde" },
+        { text: "Do things for people not because of who they are or what they do in return, but because of who you are.", attr: "Harold S. Kushner" },
+        { text: "A single act of kindness throws out roots in all directions, and the roots spring up and make new trees.", attr: "Amelia Earhart" }
+      ]
+    }
+  ]
+};
+
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+let currentTask = 'A';
+let currentStation = null;
+let timerInterval = null;
+let timerSeconds = 30 * 60;
+let timerRunning = false;
+let userApiKey = '';
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  populateDropdown();
+  // Check for saved API key
+  const saved = sessionStorage.getItem('key2md_api_key');
+  if (saved) {
+    userApiKey = saved;
+    document.getElementById('apiKeyInput').value = saved;
+    document.getElementById('apiKeyStatus').classList.add('set');
+  }
+});
+
+function populateDropdown() {
+  const select = document.getElementById('stationSelect');
+  // Clear existing options except placeholder
+  while (select.options.length > 1) select.remove(1);
+  const list = stations[currentTask];
+  list.forEach((s, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Station ${i + 1} — ${s.theme}`;
+    select.appendChild(opt);
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   TASK SELECTION
+═══════════════════════════════════════════════ */
+function selectTask(task) {
+  currentTask = task;
+  currentStation = null;
+  // Update UI
+  document.querySelectorAll('.task-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.task-card')[task === 'A' ? 0 : 1].classList.add('active');
+  // Reset
+  populateDropdown();
+  document.getElementById('stationSelect').value = '';
+  document.getElementById('stationDisplay').classList.remove('active');
+  resetTimer();
+  hideFeedback();
+}
+
+/* ═══════════════════════════════════════════════
+   LOAD STATION
+═══════════════════════════════════════════════ */
+function loadStation() {
+  const idx = document.getElementById('stationSelect').value;
+  if (idx === '') return;
+  currentStation = parseInt(idx);
+  renderStation(stations[currentTask][currentStation], currentStation);
+}
+
+function loadRandom() {
+  const list = stations[currentTask];
+  const idx = Math.floor(Math.random() * list.length);
+  currentStation = idx;
+  document.getElementById('stationSelect').value = idx;
+  renderStation(list[idx], idx);
+}
+
+function renderStation(station, idx) {
+  // Labels
+  document.getElementById('stationNumLabel').textContent = 
+    `${currentTask === 'A' ? 'Task A' : 'Task B'} · Station ${idx + 1} of 25`;
+  
+  const badge = document.getElementById('stationBadge');
+  badge.textContent = station.theme;
+  badge.className = `station-theme-badge ${currentTask === 'A' ? 'badge-a' : 'badge-b'}`;
+
+  // Quotes
+  const list = document.getElementById('quotesList');
+  list.innerHTML = '';
+  station.quotes.forEach((q, i) => {
+    const li = document.createElement('li');
+    li.className = 'quote-item';
+    li.innerHTML = `
+      <span class="quote-num">${i + 1}</span>
+      <div class="quote-content">
+        <div class="quote-text">${q.text}</div>
+        <div class="quote-attr">${q.attr}</div>
+      </div>`;
+    list.appendChild(li);
+  });
+
+  // Task prompt
+  const prompt = document.getElementById('taskPromptBox');
+  if (currentTask === 'A') {
+    prompt.className = 'task-prompt-box';
+    prompt.innerHTML = `<strong>Task A — Expository Essay:</strong> Develop a clear viewpoint on the theme of <em>${station.theme}</em>. Set forth your position early and support it through logical argument and evidence. Your essay should be insightful, structured, and persuasive. Aim for approximately 600 words.`;
+  } else {
+    prompt.className = 'task-prompt-box task-b-prompt';
+    prompt.innerHTML = `<strong>Task B — Reflective/Personal Essay:</strong> Respond to the theme of <em>${station.theme}</em> through a personal, reflective, or discursive piece. You may use narrative, personal experience, or imagination. Depth of insight and authenticity of voice are paramount. Aim for approximately 600 words.`;
+  }
+
+  // Show station
+  document.getElementById('stationDisplay').classList.add('active');
+  resetTimer();
+  hideFeedback();
+  document.getElementById('essayTextarea').value = '';
+  updateWordCount();
+}
+
+/* ═══════════════════════════════════════════════
+   TIMER
+═══════════════════════════════════════════════ */
+function toggleTimer() {
+  if (timerRunning) {
+    pauseTimer();
+  } else {
+    startTimer();
+  }
+}
+
+function startTimer() {
+  timerRunning = true;
+  document.getElementById('timerBtn').textContent = 'Pause';
+  document.getElementById('timerBtn').classList.add('running');
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    // Show as countdown from 30 min: display 30:00 - elapsed
+    const remaining = Math.max(0, 30 * 60 - timerSeconds + 1);
+    // Actually track elapsed and show remaining
+    updateTimerDisplay();
+  }, 1000);
+}
+
+// Fix: track elapsed separately
+let elapsedSeconds = 0;
+function startTimer() {
+  timerRunning = true;
+  document.getElementById('timerBtn').textContent = 'Pause';
+  document.getElementById('timerBtn').classList.add('running');
+  timerInterval = setInterval(() => {
+    elapsedSeconds++;
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function pauseTimer() {
+  timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('timerBtn').textContent = 'Resume';
+  document.getElementById('timerBtn').classList.remove('running');
+}
+
+function resetTimer() {
+  timerRunning = false;
+  elapsedSeconds = 0;
+  clearInterval(timerInterval);
+  const btn = document.getElementById('timerBtn');
+  btn.textContent = 'Start';
+  btn.classList.remove('running');
+  const display = document.getElementById('timerDisplay');
+  display.textContent = '30:00';
+  display.className = 'timer-clock';
+}
+
+function updateTimerDisplay() {
+  const remaining = Math.max(0, 30 * 60 - elapsedSeconds);
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  const display = document.getElementById('timerDisplay');
+  display.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if (remaining === 0) {
+    display.className = 'timer-clock danger';
+    pauseTimer();
+    document.getElementById('timerBtn').textContent = 'Time Up';
+  } else if (remaining <= 5 * 60) {
+    display.className = 'timer-clock warning';
+  } else {
+    display.className = 'timer-clock';
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   WORD COUNT
+═══════════════════════════════════════════════ */
+function updateWordCount() {
+  const text = document.getElementById('essayTextarea').value.trim();
+  const words = text ? text.split(/\s+/).length : 0;
+  const el = document.getElementById('wordCount');
+  el.textContent = `${words} words`;
+  el.className = words >= 450 && words <= 750 ? 'word-count good' : 'word-count';
+}
+
+/* ═══════════════════════════════════════════════
+   SAVE ESSAY
+═══════════════════════════════════════════════ */
+function clearEssay() {
+  if (confirm('Clear your essay? This cannot be undone.')) {
+    document.getElementById('essayTextarea').value = '';
+    updateWordCount();
+  }
+}
+
+function saveEssay() {
+  const essay = document.getElementById('essayTextarea').value;
+  if (!essay.trim()) { alert('Nothing to save yet.'); return; }
+  const station = currentStation !== null ? stations[currentTask][currentStation] : null;
+  const header = station 
+    ? `GAMSAT Section II Practice — Key2MD\nTask ${currentTask}: ${station.theme}\nDate: ${new Date().toLocaleDateString('en-AU')}\n${'─'.repeat(60)}\n\n`
+    : '';
+  const blob = new Blob([header + essay], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `GAMSAT_S2_Task${currentTask}_${station ? station.theme.replace(/\s+/g,'_') : 'Essay'}.txt`;
+  a.click();
+}
+
+/* ═══════════════════════════════════════════════
+   API KEY
+═══════════════════════════════════════════════ */
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key.startsWith('sk-ant')) {
+    alert('Please enter a valid Anthropic API key (starts with sk-ant...)');
+    return;
+  }
+  userApiKey = key;
+  sessionStorage.setItem('key2md_api_key', key);
+  document.getElementById('apiKeyStatus').classList.add('set');
+}
+
+/* ═══════════════════════════════════════════════
+   AI FEEDBACK
+═══════════════════════════════════════════════ */
+async function requestAIFeedback() {
+  const essay = document.getElementById('essayTextarea').value.trim();
+  if (!essay) { alert('Please write your essay first.'); return; }
+  if (essay.split(/\s+/).length < 50) { alert('Your essay is too short for meaningful feedback. Aim for at least 300 words.'); return; }
+  if (!userApiKey) {
+    alert('Please enter your Anthropic API key in the field below to use AI feedback.');
+    document.getElementById('apiKeyInput').focus();
+    return;
+  }
+  if (currentStation === null) { alert('Please load a station first.'); return; }
+
+  const station = stations[currentTask][currentStation];
+  
+  // Show loading
+  document.getElementById('feedbackLoading').classList.add('active');
+  document.getElementById('feedbackPanel').classList.remove('active');
+  document.getElementById('aiFeedbackBtn').disabled = true;
+
+  const taskDesc = currentTask === 'A' 
+    ? 'Task A (Expository/Argumentative socio-cultural essay)'
+    : 'Task B (Personal, reflective, or discursive essay)';
+
+  const quotesText = station.quotes.map((q,i) => `${i+1}. "${q.text}" — ${q.attr}`).join('\n');
+
+  const systemPrompt = `You are an expert GAMSAT Section II examiner and writing coach, deeply familiar with Des O'Neill's GAMSAT preparation framework. Your role is to provide detailed, honest, and pedagogically useful feedback on student essays.
+
+You must respond ONLY with a valid JSON object. No preamble, no markdown fences, no explanation outside the JSON.
+
+ACER assesses two criteria:
+1. Thought and Content (major emphasis): quality and insightfulness of ideas, engagement with theme, development of argument
+2. Organisation and Expression: structure, language effectiveness, coherence
+
+For Task A (expository): assess argument clarity, thesis statement quality, use of stimulus quotes as launching points (not just repetition), counter-argument acknowledgement, conclusion strength, and originality of insight.
+For Task B (reflective/personal): assess depth of personal voice, narrative/discursive structure, emotional authenticity, thematic insight, use of concrete detail, and the quality of reflection.
+
+Des O'Neill's key principles:
+- The student must write TO the THEME, not just ABOUT the quotes
+- Taking on board the IDEAS of comments, not paraphrasing them
+- Quality of thought and feeling is paramount
+- The essay should demonstrate the author's viewpoint clearly from early on
+- Expository essays need a logical point of view argued through evidence
+- Band 70+ essays take unexpected, insightful angles that remain thematically faithful
+
+Respond with this exact JSON structure:
+{
+  "bandScore": "55-60",
+  "bandJustification": "brief justification of band score",
+  "scores": {
+    "thoughtContent": { "score": 7, "max": 10, "comment": "..." },
+    "organisation": { "score": 6, "max": 10, "comment": "..." },
+    "themeEngagement": { "score": 7, "max": 10, "comment": "..." },
+    "languageExpression": { "score": 6, "max": 10, "comment": "..." }
+  },
+  "strengths": ["strength 1", "strength 2", "strength 3"],
+  "improvements": ["improvement 1", "improvement 2", "improvement 3"],
+  "annotations": [
+    { "phrase": "exact phrase from essay (10-20 words)", "type": "strength|weak|stimulus", "comment": "brief examiner comment" }
+  ],
+  "overallFeedback": "3-4 sentences of overall feedback in examiner voice",
+  "band70Hints": [
+    "thematic angle a band 70 response would explore",
+    "thematic angle a band 70 response would explore",
+    "thematic angle a band 70 response would explore",
+    "thematic angle a band 70 response would explore"
+  ]
+}
+
+For bandScore use format like "50-55", "55-60", "60-65", "65-70", "70-75", "75+"
+Scores out of 10. Be honest — do not inflate scores. Most student essays score 5-7/10.
+Annotations: pick 4-6 actual phrases from the essay. Type: strength=green, weak=red, stimulus=blue.
+Band70Hints: specific thematic or argumentative angles, not generic advice.`;
+
+  const userMessage = `GAMSAT Section II ${taskDesc}
+Theme: ${station.theme}
+
+STIMULUS QUOTES:
+${quotesText}
+
+STUDENT ESSAY:
+${essay}
+
+Please analyse this essay and provide feedback in the specified JSON format.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': userApiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'API error');
+    }
+
+    const data = await response.json();
+    const raw = data.content[0].text;
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const feedback = JSON.parse(clean);
+    renderFeedback(feedback, essay);
+
+  } catch (err) {
+    document.getElementById('feedbackLoading').classList.remove('active');
+    document.getElementById('aiFeedbackBtn').disabled = false;
+    if (err.message.includes('401') || err.message.includes('authentication')) {
+      alert('Invalid API key. Please check your Anthropic API key and try again.');
+    } else {
+      alert('An error occurred: ' + err.message + '\n\nCheck your API key has credits and try again.');
+    }
+  }
+}
+
+function renderFeedback(f, essayText) {
+  document.getElementById('feedbackLoading').classList.remove('active');
+  document.getElementById('aiFeedbackBtn').disabled = false;
+
+  // Band score
+  document.getElementById('bandScoreBadge').textContent = f.bandScore;
+
+  // Score breakdown
+  const scoreBreakdown = document.getElementById('scoreBreakdown');
+  const criteriaMap = {
+    thoughtContent: 'Thought & Content',
+    organisation: 'Organisation',
+    themeEngagement: 'Theme Engagement',
+    languageExpression: 'Language'
+  };
+  scoreBreakdown.innerHTML = '';
+  for (const [key, label] of Object.entries(criteriaMap)) {
+    const s = f.scores[key];
+    if (!s) continue;
+    const pct = (s.score / s.max) * 100;
+    const barClass = pct >= 70 ? 'good' : pct >= 50 ? 'mid' : 'low';
+    scoreBreakdown.innerHTML += `
+      <div class="score-criterion">
+        <div class="score-criterion-name">${label}</div>
+        <div class="score-bar-wrap"><div class="score-bar ${barClass}" style="width:${pct}%"></div></div>
+        <div class="score-criterion-val">${s.score}/${s.max} — ${s.comment}</div>
+      </div>`;
+  }
+
+  // Annotated essay (Examiner's Lens)
+  let annotated = escapeHtml(essayText);
+  if (f.annotations && f.annotations.length) {
+    f.annotations.forEach(ann => {
+      if (!ann.phrase) return;
+      const escaped = escapeHtml(ann.phrase);
+      const cssClass = ann.type === 'strength' ? 'hl-strength' : ann.type === 'weak' ? 'hl-weak' : 'hl-stimulus';
+      const title = escapeHtml(ann.comment || '');
+      annotated = annotated.replace(escaped, `<span class="${cssClass}" title="${title}">${escaped}</span>`);
+    });
+  }
+  document.getElementById('annotatedEssay').innerHTML = annotated;
+
+  // Feedback sections
+  const sections = document.getElementById('feedbackSections');
+  sections.innerHTML = `
+    <div class="feedback-section">
+      <h4>Overall Assessment</h4>
+      <p>${escapeHtml(f.overallFeedback || '')}</p>
+      ${f.bandJustification ? `<p style="margin-top:8px; color:var(--text-muted); font-size:0.85rem;"><em>Band ${f.bandScore}: ${escapeHtml(f.bandJustification)}</em></p>` : ''}
+    </div>
+    <div class="feedback-section">
+      <h4>✓ Strengths</h4>
+      <ul>${(f.strengths||[]).map(s=>`<li>${escapeHtml(s)}</li>`).join('')}</ul>
+    </div>
+    <div class="feedback-section">
+      <h4>→ Priority Improvements</h4>
+      <ul>${(f.improvements||[]).map(i=>`<li>${escapeHtml(i)}</li>`).join('')}</ul>
+    </div>`;
+
+  // Band 70 hints
+  const band70List = document.getElementById('band70List');
+  band70List.innerHTML = (f.band70Hints||[]).map(h=>`<li>${escapeHtml(h)}</li>`).join('');
+
+  document.getElementById('feedbackPanel').classList.add('active');
+  document.getElementById('feedbackPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function hideFeedback() {
+  document.getElementById('feedbackPanel').classList.remove('active');
+  document.getElementById('feedbackLoading').classList.remove('active');
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ═══════════════════════════════════════════════
+   MARKING MODAL
+═══════════════════════════════════════════════ */
+function openMarkingModal() {
+  const essay = document.getElementById('essayTextarea').value.trim();
+  if (!essay) {
+    alert('Please write your essay before submitting for marking.');
+    return;
+  }
+  document.getElementById('markingModal').classList.add('active');
+}
+
+function closeMarkingModal() {
+  document.getElementById('markingModal').classList.remove('active');
+}
+
+function submitForMarking() {
+  const name = document.getElementById('markingName').value.trim();
+  const email = document.getElementById('markingEmail').value.trim();
+  const notes = document.getElementById('markingNotes').value.trim();
+  const essay = document.getElementById('essayTextarea').value.trim();
+  const station = currentStation !== null ? stations[currentTask][currentStation] : null;
+
+  if (!name) { alert('Please enter your name.'); return; }
+  if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
+
+  const subject = encodeURIComponent(`GAMSAT S2 Marking Request — ${name} — Task ${currentTask}${station ? ': ' + station.theme : ''}`);
+  
+  const quotesText = station 
+    ? station.quotes.map((q,i)=>`${i+1}. "${q.text}" — ${q.attr}`).join('\n')
+    : 'No station selected';
+
+  const body = encodeURIComponent(
+`GAMSAT Section II Marking Request
+════════════════════════════════════
+
+Student Name: ${name}
+Student Email: ${email}
+Task: ${currentTask} — ${station ? station.theme : 'Unknown'}
+Date: ${new Date().toLocaleDateString('en-AU')}
+
+Notes: ${notes || 'None'}
+
+STIMULUS:
+${quotesText}
+
+════════════════════════════════════
+ESSAY:
+════════════════════════════════════
+
+${essay}
+
+════════════════════════════════════
+[Please reply to ${email} with feedback and payment link]`
+  );
+
+  window.location.href = `mailto:brittainmbbs@gmail.com?subject=${subject}&body=${body}`;
+  closeMarkingModal();
+  
+  // Show confirmation
+  setTimeout(() => {
+    alert(`Your essay has been prepared for Dan!\n\nYour email app should have opened with your essay pre-filled. Once Dan receives it, he'll send payment details and feedback within 48 hours.\n\nIf your email didn't open, you can manually email brittainmbbs@gmail.com with your essay.`);
+  }, 500);
+}
+
+// Close modal on overlay click
+document.getElementById('markingModal').addEventListener('click', function(e) {
+  if (e.target === this) closeMarkingModal();
+});
+</script>
+</body>
+</html>
