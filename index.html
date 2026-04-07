@@ -173,7 +173,8 @@
     .nav-links a {
       color: rgba(255,255,255,0.8);
       font-size: 0.9rem;
-      font-weight: 500;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       transition: color 0.2s;
     }
     .nav-links a:hover { color: var(--teal); }
@@ -206,23 +207,25 @@
       display: none;
       position: fixed;
       top: 68px; left: 0; right: 0;
-      background: var(--navy);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      padding: 20px;
-      z-index: 999;
+      background: #060f1e;
+      border-bottom: 2px solid rgba(14,165,233,0.2);
+      padding: 16px 20px 20px;
+      z-index: 9998;
       flex-direction: column;
-      gap: 4px;
+      gap: 2px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
     }
     .mobile-nav.open { display: flex; }
     .mobile-nav a {
-      color: rgba(255,255,255,0.85);
+      color: rgba(255,255,255,0.92);
       font-size: 1rem;
       font-weight: 500;
-      padding: 12px 8px;
-      border-radius: 8px;
+      padding: 13px 14px;
+      border-radius: 10px;
       transition: background 0.2s, color 0.2s;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
-    .mobile-nav a:hover { background: rgba(255,255,255,0.06); color: var(--teal); }
+    .mobile-nav a:hover { background: rgba(255,255,255,0.08); color: var(--teal); }
     .mobile-nav .btn { width: 100%; justify-content: center; margin-top: 8px; }
 
     /* ═══════════════════════════════
@@ -624,7 +627,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      color: rgba(255,255,255,0.85);
+      color: rgba(255,255,255,0.95);
       font-size: 0.92rem;
     }
     .practice-promo-feature::before {
@@ -867,7 +870,7 @@
 
     .testimonial-quote {
       font-size: 0.97rem;
-      color: rgba(255,255,255,0.85);
+      color: rgba(255,255,255,0.95);
       line-height: 1.75;
       font-style: italic;
       flex: 1;
@@ -1322,6 +1325,7 @@
 
     @media (max-width: 768px) {
       section { padding: 64px 0; }
+      .masterclass-grid { grid-template-columns: 1fr !important; max-width: 480px !important; }
       .nav-links { display: none; }
       .hamburger { display: flex; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
@@ -1567,9 +1571,9 @@
         <a href="https://calendly.com/brittainmbbs/30min" target="_blank" style="display:block;background:rgba(14,165,233,0.15);border:1.5px solid rgba(14,165,233,0.4);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(14,165,233,0.25)'" onmouseout="this.style.background='rgba(14,165,233,0.15)'">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
             <span style="background:#0ea5e9;color:#fff;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">FREE</span>
-            <span style="color:#fff;font-weight:700;font-size:1rem;">Intro Call — 30 Minutes</span>
+            <span style="color:#fff;font-weight:700;font-size:1rem;">Intro Call — 15 Minutes</span>
           </div>
-          <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">No commitment. We discuss your goals, timeline, and whether we're a good fit.</p>
+          <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Free, no commitment. 15 minutes to discuss your goals, timeline, and fit.</p>
         </a>
         <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
@@ -1618,7 +1622,7 @@
     </div>
   </section>
 
-  <!-- ══════════════════════════════
+    <!-- ══════════════════════════════
        STATS BAR
   ══════════════════════════════ -->
   <section class="stats-bar" id="stats">
@@ -1693,6 +1697,104 @@
   </section>
 
   <!-- ══════════════════════════════
+       MASTERCLASSES
+  ══════════════════════════════ -->
+  <section style="background:var(--gray50);padding:80px 0;">
+    <div class="container">
+      <div class="fade-up visible" style="text-align:center;margin-bottom:48px;">
+        <p class="section-label">Group Events</p>
+        <h2 class="section-title">Upcoming Masterclasses</h2>
+        <p class="section-sub" style="margin:0 auto;">Intensive group sessions built around exactly what you'll face on exam day. Small cohorts, real scenarios, live feedback.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:900px;margin:0 auto 48px;" class="fade-up visible masterclass-grid">
+
+        <!-- CASPer Masterclass -->
+        <div style="background:var(--white);border:1px solid var(--gray200);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:all 0.3s ease;box-shadow:none;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 40px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="background:linear-gradient(135deg,#0a1628,#0d2a52);padding:28px 28px 22px;">
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(14,165,233,0.2);border:1px solid rgba(14,165,233,0.4);border-radius:50px;padding:5px 14px;font-size:0.72rem;font-weight:700;color:var(--teal2);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px;">💬 CASPer Masterclass</div>
+            <h3 style="font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.2;">CASPer Intensive<br>Seminar</h3>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+              <div style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
+                <div style="font-size:1.1rem;font-weight:800;color:var(--teal2);">Early June</div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">2025</div>
+              </div>
+              <div style="font-size:0.8rem;color:rgba(255,255,255,0.55);line-height:1.4;">Full-day intensive<br>group session</div>
+            </div>
+          </div>
+          <div style="padding:22px 28px;flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.87rem;color:var(--gray600);">
+                <span style="color:var(--teal3);font-weight:700;flex-shrink:0;">✓</span>Live timed CASPer scenarios with real-time feedback
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.87rem;color:var(--gray600);">
+                <span style="color:var(--teal3);font-weight:700;flex-shrink:0;">✓</span>Dan's proven response structure &amp; scoring logic breakdown
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.87rem;color:var(--gray600);">
+                <span style="color:var(--teal3);font-weight:700;flex-shrink:0;">✓</span>Ethics, professionalism &amp; conflict resolution drills
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.87rem;color:var(--gray600);">
+                <span style="color:var(--teal3);font-weight:700;flex-shrink:0;">✓</span>Small cohort — genuine individual attention
+              </div>
+            </div>
+            <div style="margin-top:auto;padding-top:8px;">
+              <a href="mailto:dan@key2md.com.au?subject=CASPer Masterclass EOI" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.9rem;font-weight:700;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='var(--navy2)'" onmouseout="this.style.background='var(--navy)'">Register Interest →</a>
+              <p style="text-align:center;font-size:0.73rem;color:var(--gray400);margin-top:8px;">EOI open now · Spots limited</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- MMI Masterclass -->
+        <div style="background:var(--white);border:1px solid var(--gray200);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:all 0.3s ease;box-shadow:none;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 40px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="background:linear-gradient(135deg,#1a0a3c,#2d1060);padding:28px 28px 22px;">
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);border-radius:50px;padding:5px 14px;font-size:0.72rem;font-weight:700;color:#c4b5fd;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px;">🎤 MMI Masterclass</div>
+            <h3 style="font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.2;">MMI Interview<br>Masterclass</h3>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+              <div style="background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
+                <div style="font-size:1.1rem;font-weight:800;color:#c4b5fd;">Early Sept</div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">2025</div>
+              </div>
+              <div style="font-size:0.8rem;color:rgba(255,255,255,0.55);line-height:1.4;">Full mock MMI<br>circuit day</div>
+            </div>
+          </div>
+          <div style="padding:22px 28px;flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.87rem;color:var(--gray600);">
+                <span style="color:#7c3aed;font-weight:700;flex-shrink:0;">✓</span>Full mock MMI circuit with real-time examiner feedback
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.87rem;color:var(--gray600);">
+                <span style="color:#7c3aed;font-weight:700;flex-shrink:0;">✓</span>Ethics, role-play, policy &amp; personal stations covered
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.87rem;color:var(--gray600);">
+                <span style="color:#7c3aed;font-weight:700;flex-shrink:0;">✓</span>Unimelb, Monash, ANU &amp; more — university-specific intel
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.87rem;color:var(--gray600);">
+                <span style="color:#7c3aed;font-weight:700;flex-shrink:0;">✓</span>Body language, pacing &amp; pressure management
+              </div>
+            </div>
+            <div style="margin-top:auto;padding-top:8px;">
+              <a href="mailto:dan@key2md.com.au?subject=MMI Masterclass EOI" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:50px;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;font-size:0.9rem;font-weight:700;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Register Interest →</a>
+              <p style="text-align:center;font-size:0.73rem;color:var(--gray400);margin-top:8px;">EOI open now · Spots limited</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- EOI callout -->
+      <div class="fade-up visible" style="max-width:620px;margin:0 auto;background:var(--white);border:1px solid var(--gray200);border-radius:var(--radius-sm);padding:22px 28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <div style="font-size:1.6rem;">📩</div>
+        <div style="flex:1;min-width:200px;">
+          <p style="font-size:0.92rem;font-weight:700;color:var(--navy);margin-bottom:3px;">Expressions of interest open year-round</p>
+          <p style="font-size:0.83rem;color:var(--gray600);">Email Dan any time to reserve a spot before they open — masterclasses fill fast.</p>
+        </div>
+        <a href="mailto:dan@key2md.com.au?subject=Masterclass EOI" style="display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.87rem;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;">Send EOI →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
        ABOUT
   ══════════════════════════════ -->
   <section class="about" id="about">
@@ -1700,35 +1802,56 @@
       <div class="about-grid">
 
         <div class="about-photo-wrap fade-up visible">
-          <div class="about-avatar" style="background: none; border: none; box-shadow: none; width: 260px; height: 260px; overflow: visible;">
-            <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg" style="width:260px;height:260px;display:block;">
-              <!-- Background circle -->
-              <circle cx="130" cy="130" r="126" fill="#0d1f3c" stroke="rgba(14,165,233,0.35)" stroke-width="3"/>
-              <!-- Subtle grid lines -->
-              <line x1="40" y1="100" x2="220" y2="100" stroke="rgba(14,165,233,0.07)" stroke-width="1"/>
-              <line x1="40" y1="130" x2="220" y2="130" stroke="rgba(14,165,233,0.07)" stroke-width="1"/>
-              <line x1="40" y1="160" x2="220" y2="160" stroke="rgba(14,165,233,0.07)" stroke-width="1"/>
-              <!-- Stethoscope tubing — sweeping S-curve -->
-              <path d="M108 72 C108 72 85 72 78 90 C70 110 70 130 80 148 C92 170 118 178 130 178 C142 178 168 170 180 148 C190 130 190 110 182 90 C175 72 152 72 152 72" fill="none" stroke="#0ea5e9" stroke-width="9" stroke-linecap="round"/>
-              <!-- Earpiece left -->
-              <line x1="108" y1="72" x2="98" y2="54" stroke="#0ea5e9" stroke-width="9" stroke-linecap="round"/>
-              <circle cx="94" cy="48" r="8" fill="#38bdf8"/>
-              <!-- Earpiece right -->
-              <line x1="152" y1="72" x2="162" y2="54" stroke="#0ea5e9" stroke-width="9" stroke-linecap="round"/>
-              <circle cx="166" cy="48" r="8" fill="#38bdf8"/>
-              <!-- Chest piece (diaphragm) -->
-              <circle cx="130" cy="183" r="22" fill="#112347" stroke="#0ea5e9" stroke-width="3"/>
-              <circle cx="130" cy="183" r="14" fill="#0ea5e9" opacity="0.18"/>
-              <circle cx="130" cy="183" r="8" fill="#38bdf8" opacity="0.7"/>
-              <!-- Small cross / pulse line on chest piece -->
-              <path d="M113 200 L118 190 L123 196 L128 182 L133 196 L138 190 L143 200" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
-              <!-- Verified badge -->
-              <circle cx="196" cy="74" r="18" fill="#0ea5e9"/>
-              <path d="M187 74 L193 80 L205 68" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-              <!-- Unimelb / MD label pill -->
-              <rect x="72" y="210" width="116" height="26" rx="13" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.35)" stroke-width="1"/>
-              <text x="130" y="227" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="700" fill="#38bdf8" letter-spacing="0.05em">Unimelb MD · Key2MD</text>
-            </svg>
+          <div style="background:linear-gradient(135deg,#0d1f3c 0%,#112347 100%);border:1px solid rgba(14,165,233,0.25);border-radius:20px;padding:32px 28px;width:100%;max-width:300px;display:flex;flex-direction:column;gap:20px;box-shadow:0 12px 48px rgba(0,0,0,0.3);">
+            <!-- Top identity row -->
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;color:#fff;flex-shrink:0;">D</div>
+              <div>
+                <div style="font-size:1rem;font-weight:800;color:#fff;">Dan</div>
+                <div style="font-size:0.78rem;color:var(--teal2);font-weight:600;">Unimelb MD Student</div>
+              </div>
+              <div style="margin-left:auto;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);border-radius:50px;padding:4px 10px;font-size:0.68rem;font-weight:700;color:#22c55e;">✓ Verified</div>
+            </div>
+            <!-- Divider -->
+            <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+            <!-- Credential rows -->
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">🎓</div>
+                <div>
+                  <div style="font-size:0.82rem;font-weight:700;color:#fff;">99.85 ATAR</div>
+                  <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Top 0.15% nationally</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">🏆</div>
+                <div>
+                  <div style="font-size:0.82rem;font-weight:700;color:#fff;">r/GAMSAT Admin Trusted</div>
+                  <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Community endorsed tutor</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">⭐</div>
+                <div>
+                  <div style="font-size:0.82rem;font-weight:700;color:#fff;">StudentVIP Verified</div>
+                  <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Background checked &amp; reviewed</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">👥</div>
+                <div>
+                  <div style="font-size:0.82rem;font-weight:700;color:#fff;">200+ Students Coached</div>
+                  <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">93%+ CSP offer rate</div>
+                </div>
+              </div>
+            </div>
+            <!-- Divider -->
+            <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+            <!-- Years badge -->
+            <div style="text-align:center;">
+              <span style="font-size:1.8rem;font-weight:800;color:var(--teal);">6+</span>
+              <span style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-left:6px;">years tutoring</span>
+            </div>
           </div>
           <div class="about-badges">
             <span class="badge teal">Unimelb MD Student</span>
