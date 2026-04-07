@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CASPer Practice — Key2MD</title>
+  <title id="pageTitle">CASPer Practice — Key2MD</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -214,6 +214,66 @@
     .footer-link:hover { text-decoration:underline; }
 
     @media (max-width:1024px) { .app-wrapper { grid-template-columns:1fr; } .sidebar { position:static; } .nav-links { display:none; } .hamburger { display:flex; } }
+    
+    /* ── Mode Toggle ── */
+    .mode-toggle-wrap { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); padding:16px 20px; display:flex; flex-direction:column; gap:10px; }
+    .mode-toggle-label { font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal3); margin-bottom:4px; }
+    .mode-pill-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    .mode-pill { padding:10px 6px; border-radius:10px; border:2px solid var(--gray200); background:var(--gray50); color:var(--gray600); font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:inherit; text-align:center; }
+    .mode-pill:hover { border-color:var(--teal); color:var(--teal3); }
+    .mode-pill.active-casper { background:var(--navy); color:var(--white); border-color:var(--navy); }
+    .mode-pill.active-mmi { background:linear-gradient(135deg,#6d28d9,#7c3aed); color:var(--white); border-color:#7c3aed; }
+
+    /* ── MMI sidebar options ── */
+    .mmi-options { display:flex; flex-direction:column; gap:8px; }
+    .mmi-opt-row { display:flex; align-items:center; justify-content:space-between; font-size:0.83rem; color:var(--gray600); }
+    .mmi-opt-label { font-size:0.83rem; color:var(--gray600); }
+
+    /* ── Download button ── */
+    .btn-download { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:50px; border:1.5px solid var(--teal3); background:rgba(14,165,233,0.06); color:var(--teal3); font-size:0.83rem; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:inherit; white-space:nowrap; }
+    .btn-download:hover { background:rgba(14,165,233,0.12); }
+
+    /* ── Textarea locked state ── */
+    .answer-textarea.locked { background:var(--gray50); color:var(--gray600); cursor:default; border-color:var(--gray200); resize:none; }
+    .time-up-banner { display:none; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); border-radius:10px; padding:10px 14px; font-size:0.83rem; color:#166534; font-weight:600; align-items:center; gap:8px; }
+    .time-up-banner.show { display:flex; }
+
+    /* ── Webcam panel ── */
+    /* ── Webcam: compact floating panel ── */
+    .webcam-panel { display:none; }
+    .webcam-panel.show { display:flex; justify-content:center; margin-bottom:4px; }
+    .webcam-float { width:420px; margin:0 auto; background:var(--navy); border-radius:14px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.35); border:2px solid rgba(14,165,233,0.25); }
+    .webcam-header { background:var(--navy); padding:7px 12px; display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .webcam-header-title { color:rgba(255,255,255,0.75); font-weight:600; font-size:0.72rem; flex:1; letter-spacing:0.02em; }
+    .rec-dot { width:7px; height:7px; border-radius:50%; background:var(--red); animation:recpulse 1.2s ease-in-out infinite; flex-shrink:0; }
+    @keyframes recpulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .rec-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.6); letter-spacing:0.06em; text-transform:uppercase; }
+    .webcam-video-wrap { position:relative; background:#000; width:100%; aspect-ratio:16/9; overflow:hidden; }
+    #webcamLive { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; display:block; background:#000; transform:scaleX(-1); }
+    #webcamPlayback { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; display:none; background:#000; }
+    .webcam-overlay { position:absolute; top:0; left:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; background:rgba(10,22,40,0.82); }
+    .webcam-overlay.hidden { display:none; }
+    .webcam-permission-text { color:rgba(255,255,255,0.75); font-size:0.72rem; text-align:center; padding:0 12px; line-height:1.4; }
+    .btn-webcam-start { padding:7px 14px; border-radius:50px; background:var(--teal); color:var(--white); border:none; font-size:0.75rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .webcam-controls { padding:7px 10px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; background:rgba(255,255,255,0.04); border-top:1px solid rgba(255,255,255,0.06); }
+    .webcam-timer-display { font-size:0.82rem; font-weight:800; color:var(--teal2); font-variant-numeric:tabular-nums; margin-right:auto; }
+    .btn-webcam-dl { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border-radius:50px; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.8); border:1px solid rgba(255,255,255,0.12); font-size:0.7rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s; white-space:nowrap; }
+    .btn-webcam-dl:hover { background:rgba(255,255,255,0.15); }
+    .btn-webcam-dl:disabled { opacity:0.3; cursor:not-allowed; }
+    .btn-webcam-restart { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border-radius:50px; background:rgba(239,68,68,0.12); color:#fca5a5; border:1px solid rgba(239,68,68,0.25); font-size:0.7rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s; white-space:nowrap; }
+    .btn-webcam-restart:hover { background:rgba(239,68,68,0.22); }
+    .btn-webcam-restart:disabled { opacity:0.3; cursor:not-allowed; }
+    @media (max-width:768px) { .webcam-float { width:100%; max-width:420px; } }
+
+    /* ── MMI speaking mode - no textarea, show speaking prompt ── */
+    .mmi-speaking-area { border-top:1px solid var(--gray100); padding:22px 32px; display:none; flex-direction:column; gap:14px; }
+    .mmi-speaking-area.show { display:flex; }
+    .speaking-instruction { background:rgba(14,165,233,0.06); border:1px solid rgba(14,165,233,0.2); border-radius:12px; padding:16px 18px; font-size:0.93rem; color:var(--navy); line-height:1.6; }
+    .speaking-instruction strong { color:var(--teal3); }
+
+    /* ── Category badge for MMI ── */
+    .cat-mmi { background:rgba(139,92,246,0.12); color:#7c3aed; }
+
     @media (max-width:600px) { .app-wrapper { padding:80px 16px 32px; } .scenario-top,.prompts-area,.answer-section,.review-list,.review-trend,.review-footer { padding:20px; } .review-stat-row { grid-template-columns:repeat(2,1fr); } .review-header { padding:24px 20px; } }
   </style>
 </head>
@@ -273,9 +333,19 @@
 
 <div class="app-wrapper">
   <aside class="sidebar">
+    <!-- Mode Toggle -->
+    <div class="mode-toggle-wrap">
+      <div class="mode-toggle-label">Practice Mode</div>
+      <div class="mode-pill-row">
+        <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper')">💬 CASPer</button>
+        <button class="mode-pill" id="modeMMI" onclick="setMode('mmi')">🎤 MMI</button>
+      </div>
+    </div>
+
     <button class="btn-start" id="startBtn"><span id="startBtnIcon">▶</span><span id="startBtnText">Start Session</span></button>
 
-    <div class="sidebar-card">
+    <!-- CASPer category filters -->
+    <div class="sidebar-card" id="casperCategoryCard">
       <h3>Category</h3>
       <div class="category-filters" id="categoryFilters">
         <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="cnt-all">52</span></button>
@@ -287,7 +357,35 @@
       </div>
     </div>
 
-    <div class="sidebar-card">
+    <!-- MMI category filters -->
+    <div class="sidebar-card" id="mmiCategoryCard" style="display:none;">
+      <h3>MMI Station Type</h3>
+      <div class="category-filters" id="mmiCategoryFilters">
+        <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="mmi-cnt-all">10</span></button>
+        <button class="cat-btn" data-cat="Motivation">Motivation <span class="cat-count" id="mmi-cnt-motivation">0</span></button>
+        <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="mmi-cnt-ethics">0</span></button>
+        <button class="cat-btn" data-cat="Role-Play">Role-Play <span class="cat-count" id="mmi-cnt-roleplay">0</span></button>
+        <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="mmi-cnt-conflict">0</span></button>
+        <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">0</span></button>
+      </div>
+    </div>
+
+    <!-- MMI options -->
+    <div class="sidebar-card" id="mmiOptionsCard" style="display:none;">
+      <h3>MMI Options</h3>
+      <div class="mmi-options">
+        <div class="mmi-opt-row">
+          <span class="mmi-opt-label">Hide prompts during reading</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="mmiHidePrompts">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div style="font-size:0.72rem;color:var(--gray400);line-height:1.5;margin-top:2px;">Off by default. Enable to simulate universities that hide questions until answering begins.</div>
+      </div>
+    </div>
+
+    <div class="sidebar-card" id="timerSettingsCard">
       <h3>Timer Settings</h3>
       <div class="timer-settings">
         <div>
@@ -351,13 +449,36 @@
     </div>
     <div class="progress-outer"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
 
+    <div class="webcam-panel" id="webcamPanel">
+      <div class="webcam-float">
+        <div class="webcam-header">
+          <div class="rec-dot" id="recDot" style="display:none;"></div>
+          <span class="rec-label" id="recLabel" style="display:none;">REC</span>
+          <span class="webcam-header-title" id="webcamTitle">📷 Camera</span>
+        </div>
+        <div class="webcam-video-wrap">
+          <video id="webcamLive" autoplay muted playsinline></video>
+          <video id="webcamPlayback" controls></video>
+          <div class="webcam-overlay" id="webcamOverlay">
+            <div class="webcam-permission-text">Enable camera to record your answer</div>
+            <button class="btn-webcam-start" id="btnStartWebcam">Enable Camera</button>
+          </div>
+        </div>
+        <div class="webcam-controls">
+          <span class="webcam-timer-display" id="webcamTimerDisp">—:——</span>
+          <button class="btn-webcam-restart" id="btnRestartRecording" disabled title="Restart this station">↺</button>
+          <button class="btn-webcam-dl" id="btnDownloadVideo" disabled>⬇</button>
+        </div>
+      </div>
+    </div>
+
     <div class="scenario-card" id="scenarioCard">
       <div class="scenario-top">
         <div class="scenario-label">Scenario</div>
         <div id="scenarioIdle" class="idle-hero">
           <div class="idle-icon">🎤</div>
           <div class="idle-title">Ready to practise?</div>
-          <div class="idle-sub">Choose a category and press Start Session to begin your CASPer practice simulation.</div>
+          <div class="idle-sub" id="idle-sub-text">Choose a category and press Start Session to begin your CASPer practice simulation.</div>
         </div>
         <p class="scenario-text" id="scenarioText" style="display:none;"></p>
       </div>
@@ -373,9 +494,18 @@
         </div>
       </div>
       <div class="answer-section" id="answerSection" style="display:none;">
-        <div class="answer-label">Your response <span class="word-count" id="wordCount">0 words</span></div>
+        <div class="answer-label">Your response <span class="word-count" id="wordCount">0 words</span>
+          <button class="btn-download" id="btnDownloadResponse" title="Download your response">⬇ Save Response</button>
+        </div>
+        <div class="time-up-banner" id="timeUpBanner">✓ Time up — your response is saved. You can still select and copy it below.</div>
         <textarea class="answer-textarea" id="answerTextarea" placeholder="Start typing your answer here… Speak as you would in the actual interview — empathy, structure, and authenticity matter."></textarea>
         <div id="aiFeedbackWrap"></div>
+      </div>
+      <div class="mmi-speaking-area" id="mmiSpeakingArea">
+        <div class="speaking-instruction" id="speakingInstruction">
+          <strong>🎤 Speak your answer aloud</strong> — this is a spoken station. Use the camera above to record and review your response. Focus on structure, empathy, and authentic delivery.
+        </div>
+        <div id="aiFeedbackWrapMMI"></div>
       </div>
     </div>
 
@@ -616,12 +746,35 @@ const STATIONS=[
 
 ];
 
-// State
+// ══ MMI STATIONS ══
+const MMI_STATIONS=[
+{category:"Motivation",scenario:"You are sitting in an MMI at a leading Australian medical school. The examiner looks up from their notes and says: 'Tell me why you want to study medicine. And please — avoid the clichés.'",prompt1:"Why do you want to study medicine?",prompt2:"What has your path to this interview taught you about yourself?"},
+{category:"Ethics",scenario:"You are a medical student on placement. You observe your supervising consultant dismiss a patient's concerns about a proposed treatment with visible impatience, saying 'Trust me, I've done this a thousand times.' The patient looks uncertain but says nothing more. The treatment plan proceeds.",prompt1:"What are your thoughts on what just happened?",prompt2:"What, if anything, would you do — and how do you weigh speaking up against the risk of undermining a senior colleague?"},
+{category:"Role-Play",scenario:"You are a medical student. The examiner will play the role of a close friend, Jamie, who has called you clearly upset. Jamie says: 'I don't know what to do — I've been feeling completely hopeless lately and I haven't told anyone. I needed to tell someone I trust.'",prompt1:"[Role-play] Respond to Jamie as you would in this real conversation.",prompt2:"[Reflect] What made this conversation difficult, and what do you think Jamie needed most from you?"},
+{category:"Conflict Resolution",scenario:"You are a third-year medical student on a clinical team. A nurse pulls you aside and tells you that she believes the registrar made an error in a patient's medication order. She is hesitant to raise it herself and asks you to 'look into it.' The registrar is known for being dismissive when challenged.",prompt1:"What do you do?",prompt2:"What does this situation reveal about the role of hierarchy in patient safety, and how should healthcare teams manage it?"},
+{category:"Policy",scenario:"The examiner presents you with the following scenario: A government body is considering a policy that would require all medical students to complete a mandatory rural placement of at least 12 months before graduating, in response to the critical shortage of doctors in regional Australia.",prompt1:"What do you see as the strongest arguments for and against this policy?",prompt2:"How do you think medical schools should balance producing specialists for cities versus generalists for rural communities?"},
+{category:"Motivation",scenario:"The examiner says: 'You've listed significant volunteer work in your application. I want to understand it more deeply. What did you actually learn from it — not what you were supposed to learn, but what genuinely surprised you or changed the way you think?'",prompt1:"What did your volunteer experience genuinely teach you?",prompt2:"How has it shaped what kind of doctor you want to be?"},
+{category:"Ethics",scenario:"A patient in her mid-30s is admitted following a suicide attempt. She is medically stable and coherent. She tells you clearly that she does not want her family notified, and she does not want any psychiatric intervention. 'I know my own mind,' she says. 'I just want to go home.'",prompt1:"What are the ethical tensions in this situation?",prompt2:"How do you balance a patient's right to autonomy with a duty of care — and is there ever a point where that balance tips decisively one way?"},
+{category:"Role-Play",scenario:"The examiner will play a patient, Mr. Chen, a 72-year-old man who has been told by his oncologist that his cancer is no longer responding to treatment. He has come to speak with you — a junior doctor — because his oncologist was busy and he has questions. He says: 'I just want someone to be straight with me. How long do I have?'",prompt1:"[Role-play] Respond to Mr. Chen.",prompt2:"[Reflect] What made this conversation particularly challenging, and how do you think about the difference between honesty and hope in end-of-life care?"},
+{category:"Conflict Resolution",scenario:"You are a member of a student research group. Over several months, you notice that one member — a high achiever who is well-liked by the supervisor — consistently takes more credit than is due in group presentations and written reports, while another quieter member whose contributions are substantial is consistently uncredited. Neither has raised it.",prompt1:"What do you do?",prompt2:"Why do you think the uncredited member hasn't raised it themselves — and what does that tell you about the dynamics at play?"},
+{category:"Policy",scenario:"The examiner asks: 'There is an ongoing debate about whether medical school interviews — including the MMI format — are effective at selecting the best future doctors. Some researchers argue they favour candidates who are coached, articulate, and socioculturally advantaged. What do you think?'",prompt1:"What is your view on whether the MMI is an effective selection tool?",prompt2:"If you were designing a fairer admissions process, what would it look like?"}
+];
+
+// ══ STATE ══
+const MODE_CASPER = 'casper';
+const MODE_MMI = 'mmi';
+let currentMode = MODE_CASPER;
 let pool=[],currentIdx=0,completed=0,sessionPool=[];
 let timerInterval=null,phase='idle',sessionActive=false;
 let selectedCategory='All',readingTime=60,writingTime=210;
+let mmiReadingTime=120,mmiAnswerTime=300;
 let aiEnabled=false,apiKey='';
 let sessionHistory=[];
+let mmiHidePrompts=false;
+
+// Webcam/recording state
+let webcamStream=null,mediaRecorder=null,recordedChunks=[],recordingBlob=null;
+let webcamReady=false,webcamActive=false;
 
 // DOM
 const $ = id => document.getElementById(id);
@@ -648,18 +801,42 @@ function updateCounts(){
   $('cnt-professionalism').textContent=c.Professionalism;
   $('cnt-communication').textContent=c.Communication;
 }
+function updateMMICounts(){
+  const c={Motivation:0,Ethics:0,'Role-Play':0,'Conflict Resolution':0,Policy:0};
+  MMI_STATIONS.forEach(s=>{if(c[s.category]!==undefined)c[s.category]++;});
+  $('mmi-cnt-all').textContent=MMI_STATIONS.length;
+  $('mmi-cnt-motivation').textContent=c.Motivation;
+  $('mmi-cnt-ethics').textContent=c.Ethics;
+  $('mmi-cnt-roleplay').textContent=c['Role-Play'];
+  $('mmi-cnt-conflict').textContent=c['Conflict Resolution'];
+  $('mmi-cnt-policy').textContent=c.Policy;
+}
 updateCounts();
+updateMMICounts();
 
 // Sliders
-$('readingSlider').addEventListener('input',function(){readingTime=+this.value;$('readingVal').textContent=readingTime+'s';});
-$('writingSlider').addEventListener('input',function(){writingTime=+this.value;const m=Math.floor(writingTime/60),s=writingTime%60;$('writingVal').textContent=m+':'+(s<10?'0':'')+s;});
+$('readingSlider').addEventListener('input',function(){
+  if(currentMode===MODE_CASPER){readingTime=+this.value;$('readingVal').textContent=readingTime+'s';}
+  else{mmiReadingTime=+this.value;$('readingVal').textContent=Math.floor(+this.value/60)+':'+(+this.value%60<10?'0':'')+( +this.value%60);}
+});
+$('writingSlider').addEventListener('input',function(){
+  const m=Math.floor(+this.value/60),s=+this.value%60;
+  $('writingVal').textContent=m+':'+(s<10?'0':'')+s;
+  if(currentMode===MODE_CASPER)writingTime=+this.value;else mmiAnswerTime=+this.value;
+});
 
 // Category filter
 $('categoryFilters').addEventListener('click',e=>{
   const btn=e.target.closest('.cat-btn');if(!btn)return;
-  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#categoryFilters .cat-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');selectedCategory=btn.dataset.cat;
 });
+$('mmiCategoryFilters').addEventListener('click',e=>{
+  const btn=e.target.closest('.cat-btn');if(!btn)return;
+  document.querySelectorAll('#mmiCategoryFilters .cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');selectedCategory=btn.dataset.cat;
+});
+$('mmiHidePrompts').addEventListener('change',()=>{mmiHidePrompts=$('mmiHidePrompts').checked;});
 
 // AI toggle
 aiToggle.addEventListener('change',()=>{
@@ -680,7 +857,7 @@ function updateAiStatus(){
 // Utils
 function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
 function fmt(s){const m=Math.floor(s/60);return m+':'+(s%60<10?'0':'')+(s%60);}
-function catClass(cat){return{Ethics:'cat-ethics','Conflict Resolution':'cat-conflict',Personal:'cat-personal',Professionalism:'cat-professional',Communication:'cat-communication'}[cat]||'cat-ethics';}
+function catClass(cat){return{Ethics:'cat-ethics','Conflict Resolution':'cat-conflict',Personal:'cat-personal',Professionalism:'cat-professional',Communication:'cat-communication',Motivation:'cat-personal','Role-Play':'cat-communication',Policy:'cat-ethics',MMI:'cat-mmi'}[cat]||'cat-ethics';}
 function clearTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
 function wc(t){return t.trim()===''?0:t.trim().split(/\s+/).length;}
 function scoreCls(s){return s>=7?'score-high':s>=5?'score-mid':'score-low';}
@@ -694,6 +871,7 @@ function runTimer(secs,done){
     left--;
     if(left<0){clearTimer();done&&done();return;}
     timerNum.textContent=fmt(left);
+    const wcd=$('webcamTimerDisp');if(wcd&&phase==='writing')wcd.textContent=fmt(left);
     progressFill.style.width=Math.max(0,left/secs*100)+'%';
     const urg=left<=5;
     timerNum.classList.toggle('urgent',urg);progressFill.classList.toggle('urgent',urg);
@@ -714,7 +892,15 @@ function setPhaseUI(p){
   else{phaseBadge.classList.add('phase-idle');phaseBadge.textContent='Idle';}
   updateBtns();
 }
-function updateBtns(){prevBtn.disabled=!sessionActive||currentIdx===0;nextBtn.disabled=!sessionActive;skipBtn.disabled=!sessionActive||phase!=='reading';}
+function updateBtns(){
+  prevBtn.disabled=!sessionActive||currentIdx===0;
+  nextBtn.disabled=!sessionActive;
+  skipBtn.disabled=!sessionActive||phase!=='reading';
+  // Update Next button label based on state
+  if(phase==='done')nextBtn.textContent='Next Station →';
+  else if(phase==='writing'&&currentMode===MODE_MMI)nextBtn.textContent='Stop & Review →';
+  else nextBtn.textContent='Next Station →';
+}
 
 // Answer word count
 answerTextarea.addEventListener('input',()=>{
@@ -722,14 +908,148 @@ answerTextarea.addEventListener('input',()=>{
   if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;
 });
 
-// Session
+// ══ MODE SWITCHING ══
+function setMode(mode){
+  currentMode=mode;
+  const isCasper=mode===MODE_CASPER;
+  $('modeCasper').className='mode-pill'+(isCasper?' active-casper':'');
+  $('modeMMI').className='mode-pill'+(isCasper?'':' active-mmi');
+  $('casperCategoryCard').style.display=isCasper?'':' none';
+  $('mmiCategoryCard').style.display=isCasper?'none':'';
+  $('mmiOptionsCard').style.display=isCasper?'none':'';
+  $('webcamPanel').className='webcam-panel'+(isCasper?'':' show');
+  // Update title
+  document.getElementById('pageTitle').textContent=(isCasper?'CASPer':'MMI')+' Practice — Key2MD';
+  // Update idle text
+  $('idle-sub-text').textContent=isCasper
+    ?'Choose a category and press Start Session to begin your CASPer practice simulation.'
+    :'Choose a station type and press Start Session to begin your MMI simulation.';
+  // Update timer defaults
+  if(!isCasper){
+    $('readingSlider').min=30;$('readingSlider').max=180;$('readingSlider').value=120;
+    $('writingSlider').min=60;$('writingSlider').max=600;$('writingSlider').value=300;
+    $('readingVal').textContent='2:00';$('writingVal').textContent='5:00';
+    mmiReadingTime=120;mmiAnswerTime=300;
+    // Reset category selection
+    document.querySelectorAll('#mmiCategoryFilters .cat-btn').forEach(b=>b.classList.remove('active'));
+    $('mmiCategoryFilters').querySelector('.cat-btn').classList.add('active');
+    selectedCategory='All';
+  } else {
+    $('readingSlider').min=15;$('readingSlider').max=120;$('readingSlider').value=60;
+    $('writingSlider').min=60;$('writingSlider').max=600;$('writingSlider').value=210;
+    $('readingVal').textContent='60s';$('writingVal').textContent='3:30';
+    readingTime=60;writingTime=210;
+    document.querySelectorAll('#categoryFilters .cat-btn').forEach(b=>b.classList.remove('active'));
+    $('categoryFilters').querySelector('.cat-btn').classList.add('active');
+    selectedCategory='All';
+  }
+  // Reset session
+  clearTimer();sessionActive=false;phase='idle';
+  scenarioIdle.style.display='';scenarioText.style.display='none';
+  prompt1Wrap.style.display='none';prompt2Wrap.style.display='none';
+  promptsLocked.style.display='flex';answerSection.style.display='none';
+  $('mmiSpeakingArea').classList.remove('show');
+  setPhaseUI('idle');
+  $('startBtn').classList.remove('running');$('startBtnText').textContent='Start Session';$('startBtnIcon').textContent='▶';
+  reviewPanel.classList.remove('show');scenarioCard.style.display='';
+}
+
+// ══ WEBCAM ══
+async function initWebcam(){
+  if(webcamReady)return true;
+  try{
+    webcamStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},aspectRatio:{ideal:1.777}},audio:true});
+    const lv=$('webcamLive');lv.srcObject=webcamStream;
+    $('webcamOverlay').classList.add('hidden');
+    webcamReady=true;return true;
+  }catch(e){
+    $('webcamPermissionText').textContent='Camera access denied. Check your browser settings.';
+    return false;
+  }
+}
+function startRecording(){
+  if(!webcamReady||!webcamStream)return;
+  recordedChunks=[];recordingBlob=null;
+  $('btnDownloadVideo').disabled=true;
+  $('webcamPlayback').style.display='none';
+  $('webcamLive').style.display='block';
+  const opts=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
+              MediaRecorder.isTypeSupported('video/webm')?{mimeType:'video/webm'}:{};
+  mediaRecorder=new MediaRecorder(webcamStream,opts);
+  mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
+  mediaRecorder.onstop=()=>{
+    recordingBlob=new Blob(recordedChunks,{type:mediaRecorder.mimeType||'video/webm'});
+    const url=URL.createObjectURL(recordingBlob);
+    const pv=$('webcamPlayback');pv.src=url;pv.style.display='block';
+    $('webcamLive').style.display='none';
+    $('btnDownloadVideo').disabled=false;
+    $('btnRestartRecording').disabled=false;
+    $('recDot').style.display='none';$('recLabel').style.display='none';
+    $('webcamTitle').textContent='📹 Review your response — or restart below';
+  };
+  mediaRecorder.start(1000);
+  webcamActive=true;
+  $('btnRestartRecording').disabled=false;
+  $('recDot').style.display='block';$('recLabel').style.display='block';
+  $('webcamTitle').textContent='🔴 Recording';
+}
+function stopRecording(){
+  if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
+  webcamActive=false;
+}
+$('btnStartWebcam').addEventListener('click',async()=>{await initWebcam();});
+$('btnDownloadVideo').addEventListener('click',()=>{
+  if(!recordingBlob)return;
+  const a=document.createElement('a');a.href=URL.createObjectURL(recordingBlob);
+  a.download='MMI-response-Key2MD-'+Date.now()+'.webm';a.click();
+});
+
+$('btnRestartRecording').addEventListener('click',()=>{
+  if(!sessionActive||currentMode!==MODE_MMI)return;
+  // Stop any active recording cleanly
+  stopRecording();
+  // Reset playback, re-show live feed
+  const pv=$('webcamPlayback');pv.src='';pv.style.display='none';
+  $('webcamLive').style.display='block';
+  $('btnDownloadVideo').disabled=true;
+  $('btnRestartRecording').disabled=true;
+  recordedChunks=[];recordingBlob=null;
+  // Reload the station from scratch - resets timers and phase
+  clearTimer();
+  loadStation();
+});
+
+// ══ DOWNLOAD RESPONSE ══
+$('btnDownloadResponse').addEventListener('click',()=>{
+  if(!pool[currentIdx])return;
+  const s=pool[currentIdx];
+  const answer=answerTextarea.value.trim();
+  const content=
+    'Key2MD — CASPer Practice\n'+
+    '═══════════════════════════════════════\n\n'+
+    'SCENARIO\n'+'-'.repeat(40)+'\n'+s.scenario+'\n\n'+
+    'PROMPT 1\n'+'-'.repeat(40)+'\n'+s.prompt1+'\n\n'+
+    'PROMPT 2\n'+'-'.repeat(40)+'\n'+s.prompt2+'\n\n'+
+    'YOUR RESPONSE\n'+'-'.repeat(40)+'\n'+(answer||'(no response recorded)')+'\n\n'+
+    '═══════════════════════════════════════\n'+
+    'Downloaded from Key2MD Free Practice Tool\n'+
+    new Date().toLocaleString('en-AU');
+  const blob=new Blob([content],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='CASPer-response-'+Date.now()+'.txt';a.click();
+});
+
+// ══ SESSION ══
 function startSession(){
   clearTimer();
-  pool=shuffle(selectedCategory==='All'?STATIONS:STATIONS.filter(s=>s.category===selectedCategory));
+  const stations=currentMode===MODE_CASPER?STATIONS:MMI_STATIONS;
+  pool=shuffle(selectedCategory==='All'?stations:stations.filter(s=>s.category===selectedCategory));
   sessionPool=[...pool];currentIdx=0;completed=0;sessionHistory=[];
   sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
   $('startBtn').classList.add('running');$('startBtnText').textContent='Restart';$('startBtnIcon').textContent='↺';
   statAvg.textContent='—';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
+  // Init webcam for MMI
+  if(currentMode===MODE_MMI&&!webcamReady)initWebcam();
   loadStation();
 }
 
@@ -742,25 +1062,75 @@ function loadStation(){
   stationNum.textContent=`Station ${currentIdx+1}`;statCompleted.textContent=completed;
   categoryPill.className='category-pill '+catClass(s.category);categoryPill.textContent=s.category;
   scenarioIdle.style.display='none';scenarioText.style.display='';scenarioText.textContent=s.scenario;
-  promptsLocked.style.display='flex';prompt1Wrap.style.display='none';prompt2Wrap.style.display='none';
-  answerSection.style.display='none';answerTextarea.value=sessionHistory[currentIdx].answer||'';
-  wordCountEl.textContent=wc(answerTextarea.value)+' words';aiFeedbackWrap.innerHTML='';
+
+  // Reset answer area
+  answerSection.style.display='none';
+  $('mmiSpeakingArea').classList.remove('show');
+  $('timeUpBanner').classList.remove('show');
+  answerTextarea.classList.remove('locked');
+  answerTextarea.readOnly=false;
+  answerTextarea.value=sessionHistory[currentIdx].answer||'';
+  wordCountEl.textContent=wc(answerTextarea.value)+' words';
+  aiFeedbackWrap.innerHTML='';
+  $('aiFeedbackWrapMMI').innerHTML='';
+
+  // MMI mode: show all prompts from start (unless hide option enabled)
+  const isMmi=currentMode===MODE_MMI;
+  if(isMmi&&!mmiHidePrompts){
+    promptsLocked.style.display='none';
+    prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
+    prompt1Wrap.style.display='block';prompt2Wrap.style.display='block';
+  } else {
+    promptsLocked.style.display='flex';
+    prompt1Wrap.style.display='none';prompt2Wrap.style.display='none';
+  }
+
   if(sessionHistory[currentIdx].feedback)restoreFeedback(currentIdx);
-  setPhaseUI('reading');runTimer(readingTime,()=>startWriting());
+
+  const rt=isMmi?mmiReadingTime:readingTime;
+  setPhaseUI('reading');runTimer(rt,()=>startWriting());
 }
 
 function startWriting(){
   const s=pool[currentIdx];
-  promptsLocked.style.display='none';prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
+  const isMmi=currentMode===MODE_MMI;
+  // Always reveal prompts at writing phase
+  promptsLocked.style.display='none';
+  prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
   prompt1Wrap.style.display='block';prompt2Wrap.style.display='block';
-  answerSection.style.display='block';answerTextarea.focus();
-  setPhaseUI('writing');runTimer(writingTime,()=>finishStation());
+
+  if(isMmi){
+    // MMI: show speaking area, start recording
+    $('mmiSpeakingArea').classList.add('show');
+    answerSection.style.display='none';
+    if(webcamReady)startRecording();
+    const wt=mmiAnswerTime;
+    setPhaseUI('writing');
+    runTimer(wt,()=>finishStation());
+  } else {
+    // CASPer: show text area as before
+    answerSection.style.display='block';
+    answerTextarea.focus();
+    setPhaseUI('writing');
+    runTimer(writingTime,()=>finishStation());
+  }
 }
 
 async function finishStation(){
-  saveAnswer();
-  if(aiEnabled&&apiKey&&sessionHistory[currentIdx]?.answer?.trim().length>20)await runAI(currentIdx);
-  completed++;statCompleted.textContent=completed;currentIdx++;loadStation();
+  const isMmi=currentMode===MODE_MMI;
+  if(isMmi){
+    stopRecording();
+    // Show answer section for potential notes, lock it
+  } else {
+    // CASPer: lock textarea, show time-up banner
+    answerTextarea.readOnly=true;
+    answerTextarea.classList.add('locked');
+    $('timeUpBanner').classList.add('show');
+    saveAnswer();
+    if(aiEnabled&&apiKey&&sessionHistory[currentIdx]?.answer?.trim().length>20)await runAI(currentIdx);
+  }
+  setPhaseUI('done');updateBtns();
+  // Don't auto-advance — wait for user to click Next
 }
 
 function saveAnswer(){if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;}
@@ -770,7 +1140,8 @@ async function runAI(idx){
   const h=sessionHistory[idx];if(!h||!h.answer.trim())return;
   showAiLoading();
   const s=h.station;
-  const p=`You are an expert CASPer assessor for Australian medical school admissions. Evaluate this student response.
+  const isMmi=currentMode===MODE_MMI;
+  const p=`You are an expert ${isMmi?'MMI (Multiple Mini Interview)':'CASPer'} assessor for Australian medical school admissions. Evaluate this student response.
 
 SCENARIO: ${s.scenario}
 PROMPT 1: ${s.prompt1}
@@ -794,12 +1165,20 @@ Score guide: 8-10=excellent, 6-7=good, 4-5=developing, 1-3=needs significant wor
   }
 }
 
-function showAiLoading(){aiFeedbackWrap.innerHTML=`<div class="ai-loading"><div class="spinner"></div>AI reviewing your response…</div>`;}
+function getAiFbEl(){return currentMode===MODE_MMI?$('aiFeedbackWrapMMI'):aiFeedbackWrap;}
+function showAiLoading(){getAiFbEl().innerHTML=`<div class="ai-loading"><div class="spinner"></div>AI reviewing your response…</div>`;}
 function showFeedback(score,fb){
   if(!fb)return;
-  aiFeedbackWrap.innerHTML=`<div class="ai-feedback"><div class="ai-feedback-header"><span class="ai-feedback-title">✦ AI Feedback</span><span class="ai-score-badge ${scoreCls(score)}">${score}/10</span></div><div class="ai-feedback-body"><strong>Strengths:</strong> ${fb.strengths}<br><br><strong>Improve:</strong> ${fb.improvements}<br><br><strong>Empathy:</strong> ${fb.empathy}${fb.missed&&fb.missed!=='None'?`<br><br><strong>Missed:</strong> ${fb.missed}`:''}</div></div>`;
+  getAiFbEl().innerHTML=`<div class="ai-feedback"><div class="ai-feedback-header"><span class="ai-feedback-title">✦ AI Feedback</span><span class="ai-score-badge ${scoreCls(score)}">${score}/10</span></div><div class="ai-feedback-body"><strong>Strengths:</strong> ${fb.strengths}<br><br><strong>Improve:</strong> ${fb.improvements}<br><br><strong>Empathy:</strong> ${fb.empathy}${fb.missed&&fb.missed!=='None'?`<br><br><strong>Missed:</strong> ${fb.missed}`:''}</div></div>`;
 }
-function restoreFeedback(idx){const h=sessionHistory[idx];if(h&&h.feedback){answerSection.style.display='block';showFeedback(h.score,h.feedback);}}
+function restoreFeedback(idx){
+  const h=sessionHistory[idx];
+  if(h&&h.feedback){
+    if(currentMode===MODE_CASPER)answerSection.style.display='block';
+    else $('mmiSpeakingArea').classList.add('show');
+    showFeedback(h.score,h.feedback);
+  }
+}
 
 // Trend chart
 function clearTrend(){trendEmpty.style.display='block';trendCanvas.style.display='none';trendAvgLine.style.display='none';}
@@ -882,27 +1261,48 @@ $('reviewAgainBtn').addEventListener('click',()=>{
   pool=[...sessionPool];currentIdx=0;completed=0;sessionHistory=[];sessionActive=true;
   reviewPanel.classList.remove('show');scenarioCard.style.display='';
   statAvg.textContent='—';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
+  answerTextarea.readOnly=false;answerTextarea.classList.remove('locked');
+  $('timeUpBanner').classList.remove('show');
   loadStation();
 });
 
 prevBtn.addEventListener('click',()=>{
   if(!sessionActive||currentIdx===0)return;
-  clearTimer();saveAnswer();currentIdx--;loadStation();
+  clearTimer();
+  if(currentMode===MODE_MMI)stopRecording();
+  else saveAnswer();
+  answerTextarea.readOnly=false;answerTextarea.classList.remove('locked');
+  $('timeUpBanner').classList.remove('show');
+  currentIdx--;loadStation();
 });
 
 nextBtn.addEventListener('click',async()=>{
-  if(!sessionActive)return;clearTimer();saveAnswer();
-  if(phase==='writing'){
+  if(!sessionActive)return;
+  // If still in writing phase (user clicked Next early in CASPer), run AI first
+  if(phase==='writing'&&currentMode===MODE_CASPER){
+    clearTimer();saveAnswer();
     if(aiEnabled&&apiKey&&sessionHistory[currentIdx]?.answer?.trim().length>20){
       nextBtn.disabled=true;nextBtn.textContent='Marking…';
       await runAI(currentIdx);nextBtn.textContent='Next Station →';
     }
-    completed++;statCompleted.textContent=completed;
   }
-  currentIdx++;loadStation();
+  if(phase==='writing'&&currentMode===MODE_MMI){
+    clearTimer();stopRecording();setPhaseUI('done');updateBtns();return;
+  }
+  // Advance to next
+  if(phase==='done'||phase==='reading'||currentMode===MODE_MMI){
+    // Unlock textarea for next station
+    answerTextarea.readOnly=false;answerTextarea.classList.remove('locked');
+    $('timeUpBanner').classList.remove('show');
+    completed++;statCompleted.textContent=completed;
+    currentIdx++;loadStation();
+  }
 });
 
-skipBtn.addEventListener('click',()=>{if(!sessionActive||phase!=='reading')return;clearTimer();startWriting();});
+skipBtn.addEventListener('click',()=>{
+  if(!sessionActive||phase!=='reading')return;
+  clearTimer();startWriting();
+});
 
 // Keyboard shortcuts
 document.addEventListener('keydown',e=>{
