@@ -541,6 +541,10 @@
       <div class="answer-section" id="answerSection" style="display:none;">
         <div class="answer-label">Your response <span class="word-count" id="wordCount">0 words</span>
           <button class="btn-download" id="btnDownloadResponse" title="Download your response">⬇ Save Response</button>
+            <span id="btnGetAIWrap" style="display:none;align-items:center;gap:8px;">
+              <button class="btn-download" id="btnGetAI" onclick="manualRunAI()" title="Get AI feedback on your response" style="background:rgba(14,165,233,0.12);">✦ Get AI Feedback</button>
+              <span id="btnAIRemaining" style="font-size:0.75rem;color:var(--teal3);font-weight:700;white-space:nowrap;"></span>
+            </span>
         </div>
         <div class="time-up-banner" id="timeUpBanner">✓ Time up — your response is saved. You can still select and copy it below.</div>
         <textarea class="answer-textarea" id="answerTextarea" placeholder="Start typing your answer here… Speak as you would in the actual interview — empathy, structure, and authenticity matter."></textarea>
@@ -1019,6 +1023,16 @@ function updateBtns(){
 // Answer word count
 answerTextarea.addEventListener('input',()=>{
   const n=wc(answerTextarea.value);wordCountEl.textContent=n+' word'+(n!==1?'s':'');
+  const aiwrap=$('btnGetAIWrap');
+  if(aiwrap){
+    const show=(n>20&&phase==='writing');
+    aiwrap.style.display=show?'inline-flex':'none';
+    const rem=Math.max(0,AI_LIMIT_MAX-_getUsed());
+    const remEl=$('btnAIRemaining');
+    if(remEl)remEl.textContent=rem>0?rem+' free left today':'No reviews left today';
+    const aibtn=$('btnGetAI');
+    if(aibtn){aibtn.disabled=rem===0;aibtn.style.opacity=rem===0?'0.5':'1';}
+  }
   if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;
 });
 
@@ -1187,6 +1201,7 @@ function loadStation(){
   wordCountEl.textContent=wc(answerTextarea.value)+' words';
   aiFeedbackWrap.innerHTML='';
   $('aiFeedbackWrapMMI').innerHTML='';
+  const _aw=$('btnGetAIWrap');if(_aw)_aw.style.display='none';
 
   // MMI mode: show all prompts from start (unless hide option enabled)
   const isMmi=currentMode===MODE_MMI;
@@ -1241,7 +1256,6 @@ async function finishStation(){
     answerTextarea.classList.add('locked');
     $('timeUpBanner').classList.add('show');
     saveAnswer();
-    if(!_limitReached()&&sessionHistory[currentIdx]?.answer?.trim().length>20)await runAI(currentIdx);
   }
   setPhaseUI('done');updateBtns();
   // Don't auto-advance — wait for user to click Next
@@ -1250,6 +1264,22 @@ async function finishStation(){
 function saveAnswer(){if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;}
 
 // AI marking
+async function manualRunAI(){
+  saveAnswer();
+  const btn=$('btnGetAI'),wrap=$('btnGetAIWrap'),remEl=$('btnAIRemaining');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Marking…';}
+  await runAI(currentIdx);
+  if(btn){btn.textContent='✦ Get AI Feedback';}
+  // After marking, update count or hide if exhausted
+  const rem=Math.max(0,AI_LIMIT_MAX-_getUsed());
+  if(rem===0){
+    if(wrap)wrap.style.display='none';
+  } else {
+    if(remEl)remEl.textContent=rem+' free left today';
+    if(btn){btn.disabled=false;btn.style.opacity='1';}
+  }
+}
+
 async function runAI(idx){
   const h=sessionHistory[idx];if(!h||!h.answer.trim())return;
   // ── Daily limit check ──
@@ -1403,13 +1433,8 @@ prevBtn.addEventListener('click',()=>{
 
 nextBtn.addEventListener('click',async()=>{
   if(!sessionActive)return;
-  // If still in writing phase (user clicked Next early in CASPer), run AI first
   if(phase==='writing'&&currentMode===MODE_CASPER){
     clearTimer();saveAnswer();
-    if(!_limitReached()&&sessionHistory[currentIdx]?.answer?.trim().length>20){
-      nextBtn.disabled=true;nextBtn.textContent='Marking…';
-      await runAI(currentIdx);nextBtn.textContent='Next Station →';
-    }
   }
   if(phase==='writing'&&currentMode===MODE_MMI){
     clearTimer();stopRecording();setPhaseUI('done');updateBtns();return;
