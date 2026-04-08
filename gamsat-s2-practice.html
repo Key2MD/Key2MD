@@ -1218,6 +1218,14 @@ footer a:hover { color: var(--white); }
   .hero h1 { font-size: 1.8rem; }
   .hero-stats { gap: 24px; }
 }
+
+/* -- DAILY LIMIT UI -- */
+.daily-limit-note { font-size: 0.78rem; color: var(--text-muted); margin-left: 8px; }
+.daily-limit-note.used { color: var(--warning); font-weight: 600; }
+.limit-banner { display: none; background: #fffbeb; border: 1.5px solid #fcd34d; border-radius: var(--radius); padding: 20px 24px; margin-top: 12px; }
+.limit-banner.active { display: block; }
+.limit-banner h4 { font-size: 0.95rem; font-weight: 700; color: #92400e; margin-bottom: 6px; }
+.limit-banner p { font-size: 0.875rem; color: #78350f; line-height: 1.6; margin-bottom: 14px; }
 </style>
 </head>
 <body>
@@ -1228,13 +1236,15 @@ footer a:hover { color: var(--white); }
     <img src="https://www.key2md.com/Logo.png" alt="Key2MD">
   </a>
   <ul class="nav-links">
-    <li><a href="https://www.key2md.com/#services">Services</a></li>
-    <li><a href="https://www.key2md.com/about.html">About</a></li>
-    <li><a href="https://www.key2md.com/testimonials.html">Results</a></li>
-    <li><a href="https://www.key2md.com/practice.html">CASPer Tool</a></li>
-    <li><a href="https://www.key2md.com/guide.html">📖 Free Guide</a></li>
-    <li><a href="https://calendly.com/brittainmbbs/30min" class="nav-cta">Book Free Call →</a></li>
-  </ul>
+      <li><a href="index.html#services">Services</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="testimonials.html">Results</a></li>
+      <li><a href="index.html#pricing">Pricing</a></li>
+      <li><a href="guide.html">&#x1F4D6; Free Guide</a></li>
+      <li><a href="practice.html" style="color:var(--gold);font-weight:700;">&#x1F3AF; CASPer Practice</a></li>
+      <li><a href="gamsat-s2-practice.html" class="active" style="color:#a78bfa;font-weight:700;">&#x270D;&#xFE0F; GAMSAT S2 Practice</a></li>
+      <li><a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session</a></li>
+    </ul>
 </nav>
 
 <!-- HERO -->
@@ -1277,14 +1287,6 @@ footer a:hover { color: var(--white); }
 
 <!-- MAIN TOOL -->
 <div class="tool-wrapper">
-
-  <!-- API NOTICE -->
-  <div class="api-notice">
-    <div class="api-notice-icon">ℹ️</div>
-    <div>
-      <strong>About the AI Feedback feature</strong>
-      <p>Key2MD is a tutoring service — we don't sell AI access. The AI feedback feature uses your own Anthropic API key, entered below. This is entirely optional. <a href="https://console.anthropic.com" target="_blank" rel="noopener">Get a free API key at console.anthropic.com →</a> Alternatively, submit your essay to Dan for expert human marking ($50).</p>
-    </div>
   </div>
 
   <!-- PAID MARKING CARD -->
@@ -1369,11 +1371,19 @@ footer a:hover { color: var(--white); }
       ></textarea>
       <div class="essay-actions">
         <button class="btn btn-save" onclick="saveEssay()">💾 Save / Download</button>
-        <button class="btn btn-ai-feedback" id="aiFeedbackBtn" onclick="requestAIFeedback()">🔍 Get AI Feedback</button>
+        <button class="btn btn-ai-feedback" id="aiFeedbackBtn" onclick="requestAIFeedback()">Get Free AI Feedback</button>
+        <span class="daily-limit-note" id="limitNote">1 free AI review per day</span>
       </div>
     </div>
 
-    <!-- Human marking inline CTA -->
+    
+    <!-- Limit banner -->
+    <div class="limit-banner" id="limitBanner">
+      <h4>You have used your free AI review for today</h4>
+      <p>Your daily limit resets at midnight. Come back tomorrow, or submit your essay to Dan for expert human feedback and a precise band score within 48 hours.</p>
+      <button class="btn-marking" onclick="openMarkingModal()">Submit to Dan - $50</button>
+    </div>
+<!-- Human marking inline CTA -->
     <div class="inline-marking-cta">
       <div class="inline-marking-cta-left">
         <h4>Want expert human feedback instead?</h4>
@@ -1381,15 +1391,6 @@ footer a:hover { color: var(--white); }
       </div>
       <button class="btn-submit-marking" onclick="openMarkingModal()">Submit for Dan's Marking →</button>
     </div>
-
-    <!-- API Key setup -->
-    <div class="api-setup-section" id="apiSetupSection">
-      <h4>🔑 AI Feedback — Enter Your Anthropic API Key</h4>
-      <p>Key2MD doesn't provide AI access — this uses your own key. It's free to get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>. Your key is stored locally in your browser only and never sent to Key2MD's servers.</p>
-      <div class="api-key-row">
-        <input type="password" class="api-key-input" id="apiKeyInput" placeholder="sk-ant-api03-...">
-        <button class="btn-save-key" onclick="saveApiKey()">Save Key</button>
-      </div>
       <div class="api-key-status" id="apiKeyStatus">✓ API key saved for this session</div>
     </div>
 
@@ -1503,7 +1504,6 @@ footer a:hover { color: var(--white); }
     <a href="https://calendly.com/brittainmbbs/30min">Book a Session</a>
   </div>
   <p>© 2025 Key2MD. All rights reserved. · StudentVIP Verified Tutor · r/GAMSAT Community Endorsed</p>
-  <p style="margin-top:8px; font-size:0.75rem; opacity:0.6;">The AI feedback feature uses the student's own Anthropic API key. Key2MD does not provide or sell AI access.</p>
 </footer>
 
 <script>
@@ -2025,21 +2025,35 @@ let currentStation = null;
 let timerInterval = null;
 let timerSeconds = 30 * 60;
 let timerRunning = false;
-let userApiKey = '';
+// Embedded key
+const _K = atob('c2stYW50LWFwaTAzLXo0YTBjdlJyNU5NSXVIeHhBay1jTG9VOURkN1oyMFpIQkoxR0JRaDcydWNVT0x0YnV5YXRuTjVsZk9PcjA5ZGVvOS1MTk5McHZxdUp3VEo5MDNuTUEtX0ExWm5nQUE=');
+// 1/day limit
+const _LD='k2md_s2_date',_LU='k2md_s2_used';
+function _todayStr(){return new Date().toISOString().slice(0,10);}
+function _getUsed(){return localStorage.getItem(_LD)===_todayStr()?parseInt(localStorage.getItem(_LU)||'0'):0;}
+function _incUsed(){localStorage.setItem(_LD,_todayStr());localStorage.setItem(_LU,String(_getUsed()+1));}
+function _limitReached(){return _getUsed()>=1;}
+let userApiKey = _K;
 
 /* ═══════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded', () => {
   populateDropdown();
-  // Check for saved API key
-  const saved = sessionStorage.getItem('key2md_api_key');
-  if (saved) {
-    userApiKey = saved;
-    document.getElementById('apiKeyInput').value = saved;
-    document.getElementById('apiKeyStatus').classList.add('set');
-  }
+  updateLimitUI();
 });
+
+function updateLimitUI() {
+  const btn = document.getElementById('aiFeedbackBtn');
+  const note = document.getElementById('limitNote');
+  if (_limitReached()) {
+    if (btn) { btn.disabled = true; btn.textContent = 'AI Review Used Today'; }
+    if (note) { note.textContent = 'Resets at midnight. Submit to Dan for expert marking.'; note.className = 'daily-limit-note used'; }
+  } else {
+    if (btn) { btn.disabled = false; btn.textContent = 'Get Free AI Feedback'; }
+    if (note) { note.textContent = '1 free AI review per day'; note.className = 'daily-limit-note'; }
+  }
+}
 
 function populateDropdown() {
   const select = document.getElementById('stationSelect');
@@ -2241,12 +2255,6 @@ function saveEssay() {
 /* ═══════════════════════════════════════════════
    API KEY
 ═══════════════════════════════════════════════ */
-function saveApiKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key.startsWith('sk-ant')) {
-    alert('Please enter a valid Anthropic API key (starts with sk-ant...)');
-    return;
-  }
   userApiKey = key;
   sessionStorage.setItem('key2md_api_key', key);
   document.getElementById('apiKeyStatus').classList.add('set');
@@ -2259,9 +2267,10 @@ async function requestAIFeedback() {
   const essay = document.getElementById('essayTextarea').value.trim();
   if (!essay) { alert('Please write your essay first.'); return; }
   if (essay.split(/\s+/).length < 50) { alert('Your essay is too short for meaningful feedback. Aim for at least 300 words.'); return; }
-  if (!userApiKey) {
-    alert('Please enter your Anthropic API key in the field below to use AI feedback.');
-    document.getElementById('apiKeyInput').focus();
+  if (_limitReached()) {
+    document.getElementById('limitBanner').classList.add('active');
+    document.getElementById('limitBanner').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    updateLimitUI();
     return;
   }
   if (currentStation === null) { alert('Please load a station first.'); return; }
@@ -2343,7 +2352,7 @@ Please analyse this essay and provide feedback in the specified JSON format.`;
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': userApiKey,
+        'x-api-key': _K,
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
@@ -2364,6 +2373,7 @@ Please analyse this essay and provide feedback in the specified JSON format.`;
     const raw = data.content[0].text;
     const clean = raw.replace(/```json|```/g, '').trim();
     const feedback = JSON.parse(clean);
+    _incUsed(); updateLimitUI();
     renderFeedback(feedback, essay);
 
   } catch (err) {

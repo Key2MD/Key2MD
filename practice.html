@@ -275,6 +275,45 @@
     .cat-mmi { background:rgba(139,92,246,0.12); color:#7c3aed; }
 
     @media (max-width:600px) { .app-wrapper { padding:80px 16px 32px; } .scenario-top,.prompts-area,.answer-section,.review-list,.review-trend,.review-footer { padding:20px; } .review-stat-row { grid-template-columns:repeat(2,1fr); } .review-header { padding:24px 20px; } }
+  
+    /* ── DAN MARKING CTA ── */
+    .dan-marking-card { background:linear-gradient(135deg,var(--navy) 0%,#0d2a52 100%); border-radius:16px; padding:22px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; margin:16px 0; border:1px solid rgba(14,165,233,0.2); position:relative; overflow:hidden; }
+    .dan-marking-card::before { content:''; position:absolute; top:-30px; right:-30px; width:120px; height:120px; background:radial-gradient(circle,rgba(245,158,11,0.15) 0%,transparent 70%); pointer-events:none; }
+    .dan-marking-left { flex:1; }
+    .dan-marking-label { font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:4px; }
+    .dan-marking-left h4 { font-size:1rem; font-weight:800; color:var(--white); margin-bottom:4px; line-height:1.25; }
+    .dan-marking-left p { font-size:0.78rem; color:rgba(255,255,255,0.55); line-height:1.5; }
+    .dan-marking-right { display:flex; flex-direction:column; align-items:center; gap:8px; flex-shrink:0; }
+    .dan-price { font-size:1.6rem; font-weight:800; color:var(--gold); line-height:1; }
+    .dan-price-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+    .btn-dan { background:var(--gold); color:var(--navy); font-weight:700; font-size:0.82rem; padding:10px 18px; border-radius:50px; border:none; cursor:pointer; transition:all 0.2s; white-space:nowrap; font-family:inherit; }
+    .btn-dan:hover { background:#e08e00; transform:translateY(-1px); }
+    /* limit bar */
+    .ai-limit-bar { display:flex; justify-content:space-between; margin-bottom:5px; }
+    .ai-limit-label { font-size:0.72rem; color:var(--gray600); font-weight:500; }
+    .ai-limit-count { font-size:0.72rem; font-weight:700; color:var(--teal); }
+    .ai-limit-count.exhausted { color:var(--gold); }
+    .ai-limit-track { height:4px; background:var(--gray200); border-radius:100px; overflow:hidden; margin-bottom:2px; }
+    .ai-limit-fill { height:4px; background:var(--teal); border-radius:100px; transition:width 0.4s ease; }
+    .ai-limit-fill.exhausted { background:var(--gold); }
+    /* Dan marking modal */
+    .marking-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
+    .marking-modal-overlay.open { display:flex; }
+    .marking-modal { background:#fff; border-radius:16px; padding:32px; max-width:480px; width:100%; box-shadow:0 12px 48px rgba(0,0,0,0.28); }
+    .marking-modal h3 { font-size:1.2rem; font-weight:800; color:var(--navy); margin-bottom:6px; }
+    .marking-modal .msub { font-size:0.85rem; color:var(--gray600); margin-bottom:18px; line-height:1.55; }
+    .marking-price-note { background:#fffbeb; border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:12px 16px; font-size:0.82rem; color:#78350f; margin-bottom:16px; }
+    .marking-price-note strong { display:block; font-size:0.95rem; color:#92400e; margin-bottom:2px; }
+    .mfield { margin-bottom:13px; }
+    .mfield label { display:block; font-size:0.8rem; font-weight:600; color:var(--gray800); margin-bottom:5px; }
+    .mfield input, .mfield textarea { width:100%; padding:9px 13px; border:1.5px solid var(--gray200); border-radius:8px; font-size:0.875rem; color:var(--gray800); outline:none; transition:border-color 0.2s; font-family:inherit; }
+    .mfield input:focus, .mfield textarea:focus { border-color:var(--teal); }
+    .mactions { display:flex; gap:10px; justify-content:flex-end; margin-top:18px; }
+    .btn-mcancel { padding:9px 18px; border-radius:50px; background:var(--gray50); color:var(--gray600); border:1.5px solid var(--gray200); cursor:pointer; font-weight:600; font-size:0.85rem; font-family:inherit; transition:all 0.2s; }
+    .btn-mcancel:hover { background:var(--gray100); }
+    .btn-msend { padding:9px 22px; border-radius:50px; background:var(--navy); color:#fff; border:none; cursor:pointer; font-weight:700; font-size:0.85rem; font-family:inherit; transition:all 0.2s; }
+    .btn-msend:hover { background:#0d2a52; }
+
   </style>
 </head>
 <body>
@@ -289,20 +328,22 @@
       <li><a href="about.html">About</a></li>
       <li><a href="testimonials.html">Results</a></li>
       <li><a href="index.html#pricing">Pricing</a></li>
-      <li><a href="guide.html" style="color:rgba(255,255,255,0.8);font-weight:500;">📖 Free Guide</a></li>
-      <li><a href="practice.html" style="color:#fbbf24;font-weight:700;">🎯 Free Practice</a></li>
+      <li><a href="guide.html">📖 Free Guide</a></li>
+      <li><a href="practice.html" class="active">🎯 CASPer Practice</a></li>
+      <li><a href="gamsat-s2-practice.html" class="active">✍️ GAMSAT S2 Practice</a></li>
       <li><a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session</a></li>
     </ul>
     <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
   </nav>
 </header>
 <nav class="mobile-nav" id="mobileNav">
-  <a href="index.html#services">Services</a>
-  <a href="about.html">About</a>
-  <a href="testimonials.html">Results</a>
-  <a href="index.html#pricing">Pricing</a>
-  <a href="guide.html">📖 Free Guide</a>
-  <a href="practice.html" style="color:#fbbf24;font-weight:700;">🎯 Free Practice Tool</a>
+  <a href="index.html#services" class="mobile-link">Services</a>
+  <a href="about.html" class="mobile-link">About</a>
+  <a href="testimonials.html" class="mobile-link">Results</a>
+  <a href="index.html#pricing" class="mobile-link">Pricing</a>
+  <a href="guide.html" class="mobile-link">📖 Free Guide</a>
+  <a href="practice.html" class="mobile-link" style="color:var(--gold);font-weight:700;">🎯 CASPer Practice</a>
+  <a href="gamsat-s2-practice.html" class="mobile-link" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a>
   <a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session →</a>
 </nav>
 
@@ -327,6 +368,23 @@
         </div>
         <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Full personalised session — MMI, CASPer, or GAMSAT S2 prep with Dan.</p>
       </a>
+    </div>
+  </div>
+</div>
+
+
+<!-- DAN MARKING CTA -->
+<div style="max-width:1500px;margin:16px auto 0;padding:0 24px;">
+  <div class="dan-marking-card">
+    <div class="dan-marking-left">
+      <div class="dan-marking-label">Expert Human Marking</div>
+      <h4>Get Dan to mark your response personally</h4>
+      <p>Full written feedback, score estimate, and exactly what a top-quartile response would include. Unimelb MD · 200+ students coached · 48hr turnaround.</p>
+    </div>
+    <div class="dan-marking-right">
+      <div class="dan-price">$50</div>
+      <div class="dan-price-sub">per response</div>
+      <button class="btn-dan" onclick="openMarkingModal()">Submit to Dan →</button>
     </div>
   </div>
 </div>
@@ -402,28 +460,15 @@
     <div class="sidebar-card">
       <div class="ai-toggle-row">
         <span class="ai-toggle-label">✦ AI Marking</span>
-        <label class="toggle-switch">
-          <input type="checkbox" id="aiToggle">
-          <span class="toggle-slider"></span>
-        </label>
+        <span class="ai-status ok" id="aiStatusEl"><span class="sdot sdot-green"></span>Included free</span>
       </div>
-      <div id="aiKeyWrap" style="display:none;">
-        <div class="api-key-wrap">
-          <label for="apiKeyInput">Anthropic API key</label>
-          <input type="password" id="apiKeyInput" class="api-key-input" placeholder="sk-ant-...">
-          <p class="api-note">Stays in your browser only — sent directly to Anthropic, never via Key2MD servers.</p>
+      <div id="aiLimitWrap" style="margin-top:10px;">
+        <div class="ai-limit-bar">
+          <span class="ai-limit-label">Daily AI reviews</span>
+          <span class="ai-limit-count" id="aiLimitCount">2 remaining</span>
         </div>
-      </div>
-      <div id="aiStatusEl" class="ai-status off"><span class="sdot sdot-gray"></span>AI marking off</div>
-      <div class="trend-wrap" id="trendWrap" style="display:none;">
-        <div class="trend-title">Score Trend</div>
-        <div id="trendChartArea">
-          <div class="trend-empty" id="trendEmpty">Complete stations to see your trend</div>
-          <canvas id="trendCanvas" style="display:none;"></canvas>
-        </div>
-        <div class="trend-avg-line" id="trendAvgLine" style="display:none;">
-          <span>Session avg</span><span class="trend-avg-num" id="trendAvgNum">—</span>
-        </div>
+        <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
+        <p class="api-note" style="margin-top:6px;">2 free AI reviews per day, resets at midnight. No API key needed.</p>
       </div>
     </div>
 
@@ -830,7 +875,23 @@ let pool=[],currentIdx=0,completed=0,sessionPool=[];
 let timerInterval=null,phase='idle',sessionActive=false;
 let selectedCategory='All',readingTime=60,writingTime=210;
 let mmiReadingTime=120,mmiAnswerTime=300;
-let aiEnabled=false,apiKey='';
+// ── EMBEDDED KEY (obfuscated) ──
+const _K = atob('c2stYW50LWFwaTAzLXo0YTBjdlJyNU5NSXVIeHhBay1jTG9VOURkN1oyMFpIQkoxR0JRaDcydWNVT0x0YnV5YXRuTjVsZk9PcjA5ZGVvOS1MTk5McHZxdUp3VEo5MDNuTUEtX0ExWm5nQUE=');
+const AI_LIMIT_KEY = 'k2md_p_used';
+const AI_LIMIT_DATE = 'k2md_p_date';
+const AI_LIMIT_MAX = 2;
+let aiEnabled=true, apiKey=_K;
+function _todayStr(){return new Date().toISOString().slice(0,10);}
+function _getUsed(){return localStorage.getItem(AI_LIMIT_DATE)===_todayStr()?parseInt(localStorage.getItem(AI_LIMIT_KEY)||'0'):0;}
+function _incUsed(){localStorage.setItem(AI_LIMIT_DATE,_todayStr());localStorage.setItem(AI_LIMIT_KEY,String(_getUsed()+1));}
+function _limitReached(){return _getUsed()>=AI_LIMIT_MAX;}
+function updateLimitUI(){
+  const used=_getUsed(), rem=Math.max(0,AI_LIMIT_MAX-used), pct=(rem/AI_LIMIT_MAX)*100;
+  const el=document.getElementById('aiLimitCount');
+  const fill=document.getElementById('aiLimitFill');
+  if(el){el.textContent=rem>0?rem+' remaining':'Used for today';el.className='ai-limit-count'+(rem===0?' exhausted':'');}
+  if(fill){fill.style.width=pct+'%';fill.className='ai-limit-fill'+(rem===0?' exhausted':'');}
+}
 let sessionHistory=[];
 let mmiHidePrompts=false;
 
@@ -849,7 +910,7 @@ const promptsLocked=$('promptsLocked'),categoryPill=$('categoryPill'),stationNum
 const statCompleted=$('statCompleted'),statAvg=$('statAvg');
 const answerSection=$('answerSection'),answerTextarea=$('answerTextarea'),wordCountEl=$('wordCount');
 const aiFeedbackWrap=$('aiFeedbackWrap'),scenarioCard=$('scenarioCard'),reviewPanel=$('reviewPanel');
-const aiToggle=$('aiToggle'),aiKeyWrap=$('aiKeyWrap'),apiKeyInput=$('apiKeyInput'),aiStatusEl=$('aiStatusEl');
+const aiStatusEl=$('aiStatusEl');
 const trendWrap=$('trendWrap'),trendEmpty=$('trendEmpty'),trendCanvas=$('trendCanvas'),trendAvgLine=$('trendAvgLine'),trendAvgNum=$('trendAvgNum');
 
 // Category counts
@@ -875,6 +936,7 @@ function updateMMICounts(){
 }
 updateCounts();
 updateMMICounts();
+updateLimitUI();
 
 // Sliders
 $('readingSlider').addEventListener('input',function(){
@@ -901,20 +963,9 @@ $('mmiCategoryFilters').addEventListener('click',e=>{
 $('mmiHidePrompts').addEventListener('change',()=>{mmiHidePrompts=$('mmiHidePrompts').checked;});
 
 // AI toggle
-aiToggle.addEventListener('change',()=>{
-  aiEnabled=aiToggle.checked;
-  aiKeyWrap.style.display=aiEnabled?'block':'none';
-  trendWrap.style.display=aiEnabled?'block':'none';
-  updateAiStatus();
-});
-apiKeyInput.addEventListener('input',()=>{apiKey=apiKeyInput.value.trim();sessionStorage.setItem('k2md_key',apiKey);updateAiStatus();});
-const sk=sessionStorage.getItem('k2md_key');if(sk){apiKeyInput.value=sk;apiKey=sk;}
+// AI always enabled with embedded key
 
-function updateAiStatus(){
-  if(!aiEnabled){aiStatusEl.className='ai-status off';aiStatusEl.innerHTML='<span class="sdot sdot-gray"></span>AI marking off';}
-  else if(!apiKey){aiStatusEl.className='ai-status err';aiStatusEl.innerHTML='<span class="sdot sdot-red"></span>Enter API key to enable';}
-  else{aiStatusEl.className='ai-status ok';aiStatusEl.innerHTML='<span class="sdot sdot-green"></span>AI marking ready';}
-}
+function updateAiStatus(){updateLimitUI();}
 
 // Utils
 function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
@@ -1189,7 +1240,7 @@ async function finishStation(){
     answerTextarea.classList.add('locked');
     $('timeUpBanner').classList.add('show');
     saveAnswer();
-    if(aiEnabled&&apiKey&&sessionHistory[currentIdx]?.answer?.trim().length>20)await runAI(currentIdx);
+    if(!_limitReached()&&sessionHistory[currentIdx]?.answer?.trim().length>20)await runAI(currentIdx);
   }
   setPhaseUI('done');updateBtns();
   // Don't auto-advance — wait for user to click Next
@@ -1200,10 +1251,20 @@ function saveAnswer(){if(sessionHistory[currentIdx])sessionHistory[currentIdx].a
 // AI marking
 async function runAI(idx){
   const h=sessionHistory[idx];if(!h||!h.answer.trim())return;
+  // ── Daily limit check ──
+  if(_limitReached()){
+    getAiFbEl().innerHTML=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-top:10px;">
+      <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">You've used both free AI reviews for today</strong>
+      <span style="font-size:0.82rem;color:#78350f;">Resets at midnight. For immediate expert feedback, submit to Dan ($50).</span>
+      <br><button onclick="openMarkingModal()" style="margin-top:10px;background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Submit to Dan →</button>
+    </div>`;
+    updateLimitUI();
+    return;
+  }
   showAiLoading();
   const s=h.station;
   const isMmi=currentMode===MODE_MMI;
-  const p=`You are an expert ${isMmi?'MMI (Multiple Mini Interview)':'CASPer'} assessor for Australian medical school admissions. Evaluate this student response.
+  const p=`You are an expert ${isMmi?'MMI (Multiple Mini Interview)':'CASPer'} assessor for Australian medical school admissions. You use Dan's Q1-Q4 framework. Evaluate this student response honestly.
 
 SCENARIO: ${s.scenario}
 PROMPT 1: ${s.prompt1}
@@ -1213,17 +1274,18 @@ STUDENT RESPONSE: ${h.answer}
 Respond ONLY with a raw JSON object (no markdown, no backticks):
 {"score":<integer 1-10>,"strengths":"<1-2 sentences>","improvements":"<1-2 sentences>","empathy":"<one sentence>","missed":"<key missed point or None>"}
 
-Score guide: 8-10=excellent, 6-7=good, 4-5=developing, 1-3=needs significant work. Be honest and specific.`;
+Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs significant work Q1. Be honest and specific. Penalise framework-speak like 'non-confrontational' or 'stakeholders'.`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:p}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':_K,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:p}]})});
     if(!res.ok)throw new Error('HTTP '+res.status);
     const data=await res.json();
     const txt=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
     const fb=JSON.parse(txt);
     h.score=fb.score;h.feedback=fb;
+    _incUsed();updateLimitUI();
     showFeedback(fb.score,fb);updateTrend();updateAvgStat();
   }catch(err){
-    aiFeedbackWrap.innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">AI marking failed — check your API key. (${err.message})</div>`;
+    getAiFbEl().innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">AI marking failed. (${err.message})</div>`;
   }
 }
 
@@ -1343,7 +1405,7 @@ nextBtn.addEventListener('click',async()=>{
   // If still in writing phase (user clicked Next early in CASPer), run AI first
   if(phase==='writing'&&currentMode===MODE_CASPER){
     clearTimer();saveAnswer();
-    if(aiEnabled&&apiKey&&sessionHistory[currentIdx]?.answer?.trim().length>20){
+    if(!_limitReached()&&sessionHistory[currentIdx]?.answer?.trim().length>20){
       nextBtn.disabled=true;nextBtn.textContent='Marking…';
       await runAI(currentIdx);nextBtn.textContent='Next Station →';
     }
@@ -1381,6 +1443,57 @@ $('mobileNav').querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
 function openBookModal(e){if(e)e.preventDefault();const m=document.getElementById('bookModal');m.style.display='flex';}
 function closeBookModal(){document.getElementById('bookModal').style.display='none';}
 document.getElementById('bookModal').addEventListener('click',function(e){if(e.target===this)closeBookModal();});
+
+// ── DAN MARKING MODAL ──
+function openMarkingModal(){
+  document.getElementById('markingModalOverlay').classList.add('open');
+}
+function closeMarkingModal(){
+  document.getElementById('markingModalOverlay').classList.remove('open');
+}
+document.getElementById('markingModalOverlay').addEventListener('click',function(e){
+  if(e.target===this)closeMarkingModal();
+});
+function submitMarking(){
+  const name=document.getElementById('mName').value.trim();
+  const email=document.getElementById('mEmail').value.trim();
+  const notes=document.getElementById('mNotes').value.trim();
+  if(!name){alert('Please enter your name.');return;}
+  if(!email||!email.includes('@')){alert('Please enter a valid email.');return;}
+  const h=sessionHistory[currentIdx];
+  const s=h?.station;
+  const subject=encodeURIComponent('CASPer/MMI Marking Request — '+name);
+  const body=encodeURIComponent(
+    'CASPer / MMI Marking Request\n'+'═'.repeat(40)+'\n\n'+
+    'Student: '+name+'\nEmail: '+email+'\nMode: '+(currentMode==='mmi'?'MMI':'CASPer')+'\n'+
+    'Category: '+(s?.category||'Unknown')+'\nDate: '+new Date().toLocaleDateString('en-AU')+'\n'+
+    'Notes: '+(notes||'None')+'\n\n'+'═'.repeat(40)+'\nSCENARIO:\n'+(s?.scenario||'No scenario')+'\n\n'+
+    'Prompt 1: '+(s?.prompt1||'')+'\nPrompt 2: '+(s?.prompt2||'')+'\n\n'+
+    '═'.repeat(40)+'\nRESPONSE:\n'+'═'.repeat(40)+'\n'+(h?.answer||'No response')+'\n\n'+
+    '═'.repeat(40)+'\n[Please reply to '+email+' with feedback and payment link]'
+  );
+  window.location.href='mailto:brittainmbbs@gmail.com?subject='+subject+'&body='+body;
+  closeMarkingModal();
+  setTimeout(()=>alert('Your response has been prepared for Dan!\n\nYour email app should have opened with everything pre-filled. Dan will reply within 48 hours with feedback and payment details.\n\nIf your email didn\'t open, email brittainmbbs@gmail.com directly.'),500);
+}
+
 </script>
+
+<!-- DAN MARKING MODAL -->
+<div class="marking-modal-overlay" id="markingModalOverlay">
+  <div class="marking-modal">
+    <h3>Submit for Expert Marking</h3>
+    <p class="msub">Dan will personally review your response with full written feedback, a score estimate, and exactly what a top response would include — within 48 hours.</p>
+    <div class="marking-price-note"><strong>$50 per response</strong>Payment details sent to your email after Dan confirms receipt.</div>
+    <div class="mfield"><label>Your Name</label><input type="text" id="mName" placeholder="e.g. Sarah Chen"></div>
+    <div class="mfield"><label>Your Email (Dan will reply here)</label><input type="email" id="mEmail" placeholder="e.g. sarah@email.com"></div>
+    <div class="mfield"><label>Anything else Dan should know? (optional)</label><textarea id="mNotes" rows="2" placeholder="e.g. CASPer exam date, target universities..."></textarea></div>
+    <div class="mactions">
+      <button class="btn-mcancel" onclick="closeMarkingModal()">Cancel</button>
+      <button class="btn-msend" onclick="submitMarking()">Send to Dan →</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
