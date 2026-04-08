@@ -347,6 +347,7 @@
   }
   </script>
   <meta name="robots" content="index, follow">
+  <script src="auth.js"></script>
 </head>
 <body>
 
@@ -487,6 +488,11 @@
       </div>
     </div>
 
+    <!-- Auth / Account -->
+    <div class="sidebar-card">
+      <div id="k2mdAuthBar"></div>
+    </div>
+
     <div class="sidebar-card">
       <div class="ai-toggle-row">
         <span class="ai-toggle-label">✦ AI Marking</span>
@@ -498,7 +504,7 @@
           <span class="ai-limit-count" id="aiLimitCount">2 remaining</span>
         </div>
         <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
-        <p class="api-note" style="margin-top:6px;">2 free AI reviews per day, resets at midnight. No API key needed.</p>
+        <p class="api-note" style="margin-top:6px;">Create a free account to unlock AI reviews.</p>
       </div>
     </div>
 
@@ -909,21 +915,23 @@ let pool=[],currentIdx=0,completed=0,sessionPool=[];
 let timerInterval=null,phase='idle',sessionActive=false;
 let selectedCategory='All',readingTime=60,writingTime=210;
 let mmiReadingTime=120,mmiAnswerTime=300;
-// ── PROXY ENDPOINT (API key is kept safe on the server) ──
-const PROXY_URL = 'https://billowing-dream-4b05.brittainmbbs.workers.dev';
-const AI_LIMIT_KEY = 'k2md_p_used';
-const AI_LIMIT_DATE = 'k2md_p_date';
+// ── API ENDPOINT (handled by Key2MDAuth module) ──
+// IMPORTANT: Update this to your deployed worker URL or domain route
+const API_BASE = 'https://www.key2md.com'; // Change if using workers.dev URL
 const AI_LIMIT_MAX = 2;
 let aiEnabled=true;
-function _todayStr(){return new Date().toISOString().slice(0,10);}
-function _getUsed(){return localStorage.getItem(AI_LIMIT_DATE)===_todayStr()?parseInt(localStorage.getItem(AI_LIMIT_KEY)||'0'):0;}
-function _incUsed(){localStorage.setItem(AI_LIMIT_DATE,_todayStr());localStorage.setItem(AI_LIMIT_KEY,String(_getUsed()+1));}
-function _limitReached(){return _getUsed()>=AI_LIMIT_MAX;}
 function updateLimitUI(){
-  const used=_getUsed(), rem=Math.max(0,AI_LIMIT_MAX-used), pct=(rem/AI_LIMIT_MAX)*100;
-  const el=document.getElementById('aiLimitCount');
-  const fill=document.getElementById('aiLimitFill');
-  if(el){el.textContent=rem>0?rem+' remaining':'Used for today';el.className='ai-limit-count'+(rem===0?' exhausted':'');}
+  // Delegated to auth module — it auto-updates #aiLimitCount and #aiLimitFill
+  // But we can also manually refresh:
+  const limits = Key2MDAuth.getLimits();
+  if(!limits) return;
+  const tool = limits.casper;
+  if(!tool) return;
+  const rem = tool.unlimited ? 99 : Math.max(0, tool.limit - tool.used);
+  const pct = tool.unlimited ? 100 : (rem / tool.limit * 100);
+  const el = document.getElementById('aiLimitCount');
+  const fill = document.getElementById('aiLimitFill');
+  if(el){el.textContent = tool.unlimited ? '∞ Unlimited (Pro)' : (rem > 0 ? rem + ' remaining' : 'Used for today'); el.className='ai-limit-count'+(rem===0?' exhausted':'');}
   if(fill){fill.style.width=pct+'%';fill.className='ai-limit-fill'+(rem===0?' exhausted':'');}
 }
 let sessionHistory=[];
@@ -1057,11 +1065,13 @@ answerTextarea.addEventListener('input',()=>{
   if(aiwrap){
     const show=(n>20&&phase==='writing');
     aiwrap.style.display=show?'inline-flex':'none';
-    const rem=Math.max(0,AI_LIMIT_MAX-_getUsed());
+    const limits = Key2MDAuth.getLimits();
+    const toolLimits = limits?.casper;
+    const rem = !Key2MDAuth.isLoggedIn() ? AI_LIMIT_MAX : (Key2MDAuth.isPro() ? 99 : (toolLimits ? Math.max(0, toolLimits.limit - toolLimits.used) : AI_LIMIT_MAX));
     const remEl=$('btnAIRemaining');
-    if(remEl)remEl.textContent=rem>0?rem+' free left today':'No reviews left today';
+    if(remEl)remEl.textContent=!Key2MDAuth.isLoggedIn()?'Sign up to unlock':(Key2MDAuth.isPro()?'∞ unlimited':(rem>0?rem+' free left today':'No reviews left today'));
     const aibtn=$('btnGetAI');
-    if(aibtn){aibtn.disabled=rem===0;aibtn.style.opacity=rem===0?'0.5':'1';}
+    if(aibtn){aibtn.disabled=(rem===0 && Key2MDAuth.isLoggedIn() && !Key2MDAuth.isPro());aibtn.style.opacity=(rem===0 && Key2MDAuth.isLoggedIn() && !Key2MDAuth.isPro())?'0.5':'1';}
   }
   if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;
 });
@@ -1300,27 +1310,42 @@ async function manualRunAI(){
   if(btn){btn.disabled=true;btn.textContent='⏳ Marking…';}
   await runAI(currentIdx);
   if(btn){btn.textContent='✦ Get AI Feedback';}
-  // After marking, update count or hide if exhausted
-  const rem=Math.max(0,AI_LIMIT_MAX-_getUsed());
-  if(rem===0){
+  // After marking, update based on server limits
+  const limits = Key2MDAuth.getLimits();
+  const rem = limits?.casper ? Math.max(0, limits.casper.limit - limits.casper.used) : 0;
+  if(!Key2MDAuth.isLoggedIn()){
+    // Not logged in — button stays, clicking will prompt signup
+    if(btn){btn.disabled=false;btn.style.opacity='1';}
+  } else if(rem===0 && !Key2MDAuth.isPro()){
     if(wrap)wrap.style.display='none';
   } else {
-    if(remEl)remEl.textContent=rem+' free left today';
+    if(remEl)remEl.textContent=Key2MDAuth.isPro() ? '∞ unlimited' : rem+' free left today';
     if(btn){btn.disabled=false;btn.style.opacity='1';}
   }
 }
 
 async function runAI(idx){
   const h=sessionHistory[idx];if(!h||!h.answer.trim())return;
-  // ── Daily limit check ──
-  if(_limitReached()){
-    getAiFbEl().innerHTML=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-top:10px;">
-      <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">You've used both free AI reviews for today</strong>
-      <span style="font-size:0.82rem;color:#78350f;">Resets at midnight. For immediate expert feedback, submit to Dan ($50).</span>
-      <br><button onclick="openMarkingModal()" style="margin-top:10px;background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Submit to Dan →</button>
-    </div>`;
-    updateLimitUI();
-    return;
+  // ── Auth + server-side limit check ──
+  const check = Key2MDAuth.canReview();
+  if(!check.allowed){
+    if(check.reason === 'auth_required'){
+      getAiFbEl().innerHTML=`<div style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:10px;padding:14px 16px;margin-top:10px;">
+        <strong style="color:#0284c7;font-size:0.88rem;display:block;margin-bottom:4px;">Create a free account to unlock AI feedback</strong>
+        <span style="font-size:0.82rem;color:#475569;">Sign up in 10 seconds — no credit card needed.</span>
+        <br><button onclick="Key2MDAuth.showAuthModal('signup')" style="margin-top:10px;background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Create Free Account →</button>
+      </div>`;
+      return;
+    }
+    if(check.reason === 'limit_reached'){
+      getAiFbEl().innerHTML=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-top:10px;">
+        <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">You've used both free AI reviews for today</strong>
+        <span style="font-size:0.82rem;color:#78350f;">Resets at midnight AEST. For immediate expert feedback, submit to Dan ($50).</span>
+        <br><button onclick="openMarkingModal()" style="margin-top:10px;background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Submit to Dan →</button>
+      </div>`;
+      updateLimitUI();
+      return;
+    }
   }
   showAiLoading();
   const s=h.station;
@@ -1337,13 +1362,18 @@ Respond ONLY with a raw JSON object (no markdown, no backticks):
 
 Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs significant work Q1. Be honest and specific. Penalise framework-speak like 'non-confrontational' or 'stakeholders'.`;
   try{
-    const res=await fetch(PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:p}]})});
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    const data=await res.json();
+    const data = await Key2MDAuth.requestReview(
+      [{role:'user',content:p}],
+      {question: s.scenario, response: h.answer}
+    );
+    if(data.error){
+      if(data.error === 'auth_required' || data.error === 'limit_reached') return;
+      throw new Error(data.error);
+    }
     const txt=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
     const fb=JSON.parse(txt);
     h.score=fb.score;h.feedback=fb;
-    _incUsed();updateLimitUI();
+    updateLimitUI();
     showFeedback(fb.score,fb);updateTrend();updateAvgStat();
   }catch(err){
     getAiFbEl().innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">AI marking failed. (${err.message})</div>`;
@@ -1510,6 +1540,27 @@ function closeMarkingModal(){
 window.addEventListener('DOMContentLoaded',function(){
   var overlay=document.getElementById('markingModalOverlay');
   if(overlay)overlay.addEventListener('click',function(e){if(e.target===this)closeMarkingModal();});
+
+  // ── Initialize Auth ──
+  Key2MDAuth.init({
+    tool: 'casper',
+    apiBase: API_BASE,
+    onAuthChange: function(user) {
+      updateLimitUI();
+      // Update AI status indicator
+      var statusEl = document.getElementById('aiStatusEl');
+      if(statusEl){
+        if(user){
+          statusEl.innerHTML = '<span class="sdot sdot-green"></span>' + (user.tier === 'pro' ? 'Pro — Unlimited' : 'Free — 2/day');
+        } else {
+          statusEl.innerHTML = '<span class="sdot sdot-green"></span>Sign up to unlock';
+        }
+      }
+    },
+    onLimitsLoaded: function(limits) {
+      updateLimitUI();
+    },
+  });
 });
 function submitMarking(){
   const name=document.getElementById('mName').value.trim();

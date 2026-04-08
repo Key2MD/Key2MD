@@ -1257,6 +1257,7 @@ footer a:hover { color: var(--white); }
 .limit-banner p { font-size: 0.875rem; color: #78350f; line-height: 1.6; margin-bottom: 14px; }
 </style>
   <meta name="robots" content="index, follow">
+  <script src="auth.js"></script>
 </head>
 <body>
 
@@ -1369,6 +1370,9 @@ footer a:hover { color: var(--white); }
       <p>Write a personal, discursive or reflective piece. You may draw on imagination, personal experience, or narrative. Assessed on depth of personal voice, emotional authenticity, and thematic insight.</p>
     </div>
   </div>
+
+  <!-- Auth / Account -->
+  <div id="k2mdAuthBar" style="margin-bottom:20px;"></div>
 
   <!-- CONTROLS -->
   <div class="controls-bar">
@@ -2075,31 +2079,56 @@ let currentStation = null;
 let timerInterval = null;
 let timerSeconds = 30 * 60;
 let timerRunning = false;
-const PROXY_URL = 'https://billowing-dream-4b05.brittainmbbs.workers.dev';
-const _LD='k2md_s2_date',_LU='k2md_s2_used';
-function _todayStr(){return new Date().toISOString().slice(0,10);}
-function _getUsed(){return localStorage.getItem(_LD)===_todayStr()?parseInt(localStorage.getItem(_LU)||'0'):0;}
-function _incUsed(){localStorage.setItem(_LD,_todayStr());localStorage.setItem(_LU,String(_getUsed()+1));}
-function _limitReached(){return _getUsed()>=1;}
-// API key is now handled by the proxy server
+// ── API handled by Key2MDAuth module ──
+const API_BASE = 'https://www.key2md.com'; // Change if using workers.dev URL
 
 /* ═══════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded', () => {
   populateDropdown();
-  updateLimitUI();
+
+  // ── Initialize Auth ──
+  Key2MDAuth.init({
+    tool: 'gamsat',
+    apiBase: API_BASE,
+    onAuthChange: function(user) {
+      updateLimitUI();
+    },
+    onLimitsLoaded: function(limits) {
+      updateLimitUI();
+    },
+  });
 });
 
 function updateLimitUI() {
   const btn = document.getElementById('aiFeedbackBtn');
   const note = document.getElementById('limitNote');
-  if (_limitReached()) {
+  const user = Key2MDAuth.getUser();
+  const limits = Key2MDAuth.getLimits();
+
+  if (!user) {
+    // Not logged in
+    if (btn) { btn.disabled = false; btn.textContent = '🔍 Get Free AI Feedback'; }
+    if (note) { note.textContent = 'Create a free account to unlock AI reviews'; note.className = 'daily-limit-note'; }
+    return;
+  }
+
+  if (Key2MDAuth.isPro()) {
+    if (btn) { btn.disabled = false; btn.textContent = '🔍 Get AI Feedback'; }
+    if (note) { note.textContent = '∞ Unlimited (Pro)'; note.className = 'daily-limit-note'; }
+    return;
+  }
+
+  const gamsat = limits?.gamsat;
+  const remaining = gamsat ? Math.max(0, gamsat.limit - gamsat.used) : 1;
+
+  if (remaining <= 0) {
     if (btn) { btn.disabled = true; btn.textContent = 'AI Review Used Today'; }
-    if (note) { note.textContent = 'Resets at midnight. Submit to Dan for expert marking.'; note.className = 'daily-limit-note used'; }
+    if (note) { note.textContent = 'Resets at midnight AEST. Submit to Dan for expert marking.'; note.className = 'daily-limit-note used'; }
   } else {
-    if (btn) { btn.disabled = false; btn.textContent = 'Get Free AI Feedback'; }
-    if (note) { note.textContent = '1 free AI review per day'; note.className = 'daily-limit-note'; }
+    if (btn) { btn.disabled = false; btn.textContent = '🔍 Get Free AI Feedback'; }
+    if (note) { note.textContent = remaining + ' free AI review per day'; note.className = 'daily-limit-note'; }
   }
 }
 
@@ -2311,12 +2340,22 @@ async function requestAIFeedback() {
   const essay = document.getElementById('essayTextarea').value.trim();
   if (!essay) { alert('Please write your essay first.'); return; }
   if (essay.split(/\s+/).length < 50) { alert('Your essay is too short for meaningful feedback. Aim for at least 300 words.'); return; }
-  if (_limitReached()) {
-    document.getElementById('limitBanner').classList.add('active');
-    document.getElementById('limitBanner').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    updateLimitUI();
-    return;
+
+  // ── Auth + server-side limit check ──
+  const check = Key2MDAuth.canReview();
+  if (!check.allowed) {
+    if (check.reason === 'auth_required') {
+      Key2MDAuth.showAuthModal('signup');
+      return;
+    }
+    if (check.reason === 'limit_reached') {
+      document.getElementById('limitBanner').classList.add('active');
+      document.getElementById('limitBanner').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      updateLimitUI();
+      return;
+    }
   }
+
   if (currentStation === null) { alert('Please load a station first.'); return; }
 
   const station = stations[currentTask][currentStation];
@@ -2392,39 +2431,42 @@ ${essay}
 Please analyse this essay and provide feedback in the specified JSON format.`;
 
   try {
-    const response = await fetch(PROXY_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
+    const data = await Key2MDAuth.requestReview(
+      [{ role: 'user', content: userMessage }],
+      {
         system: systemPrompt,
-        messages: [{ role: 'user', content: userMessage }]
-      })
-    });
+        max_tokens: 2000,
+        question: station.theme,
+        response: essay,
+      }
+    );
 
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error?.message || 'API error');
+    if (data.error) {
+      document.getElementById('feedbackLoading').classList.remove('active');
+      document.getElementById('aiFeedbackBtn').disabled = false;
+      if (data.error === 'auth_required') {
+        Key2MDAuth.showAuthModal('signup');
+        return;
+      }
+      if (data.error === 'limit_reached') {
+        document.getElementById('limitBanner').classList.add('active');
+        document.getElementById('limitBanner').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        updateLimitUI();
+        return;
+      }
+      throw new Error(data.error);
     }
 
-    const data = await response.json();
     const raw = data.content[0].text;
     const clean = raw.replace(/```json|```/g, '').trim();
     const feedback = JSON.parse(clean);
-    _incUsed(); updateLimitUI();
+    updateLimitUI();
     renderFeedback(feedback, essay);
 
   } catch (err) {
     document.getElementById('feedbackLoading').classList.remove('active');
     document.getElementById('aiFeedbackBtn').disabled = false;
-    if (err.message.includes('401') || err.message.includes('authentication')) {
-      alert('AI feedback failed. Please try again or contact Dan.');
-    } else {
-      alert('Something went wrong: ' + err.message + '\n\nPlease try again or contact Dan.');
-    }
+    alert('Something went wrong: ' + err.message + '\n\nPlease try again or contact Dan.');
   }
 }
 
