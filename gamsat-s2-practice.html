@@ -2023,13 +2023,13 @@ let currentStation = null;
 let timerInterval = null;
 let timerSeconds = 30 * 60;
 let timerRunning = false;
-const _K = atob('c2stYW50LWFwaTAzLVEyMGswN3ZPVzdSNC1RemJuMFBURWEtYkVaSVQwRWIzOVJIcmRrdzhDN2pFc0phOG45UkJ2aGdjdnFBemxpc3drZlpNeDhNckN0UzI5Tmxkc2lnNUZnLXZTeEhOUUFB');
+const PROXY_URL = 'https://billowing-dream-4b05.brittainmbbs.workers.dev';
 const _LD='k2md_s2_date',_LU='k2md_s2_used';
 function _todayStr(){return new Date().toISOString().slice(0,10);}
 function _getUsed(){return localStorage.getItem(_LD)===_todayStr()?parseInt(localStorage.getItem(_LU)||'0'):0;}
 function _incUsed(){localStorage.setItem(_LD,_todayStr());localStorage.setItem(_LU,String(_getUsed()+1));}
 function _limitReached(){return _getUsed()>=1;}
-let userApiKey = _K;
+// API key is now handled by the proxy server
 
 /* ═══════════════════════════════════════════════
    INIT
@@ -2340,13 +2340,10 @@ ${essay}
 Please analyse this essay and provide feedback in the specified JSON format.`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(PROXY_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': _K,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',

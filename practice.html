@@ -879,12 +879,12 @@ let pool=[],currentIdx=0,completed=0,sessionPool=[];
 let timerInterval=null,phase='idle',sessionActive=false;
 let selectedCategory='All',readingTime=60,writingTime=210;
 let mmiReadingTime=120,mmiAnswerTime=300;
-// ── EMBEDDED KEY (obfuscated) ──
-const _K = atob('c2stYW50LWFwaTAzLVEyMGswN3ZPVzdSNC1RemJuMFBURWEtYkVaSVQwRWIzOVJIcmRrdzhDN2pFc0phOG45UkJ2aGdjdnFBemxpc3drZlpNeDhNckN0UzI5Tmxkc2lnNUZnLXZTeEhOUUFB');
+// ── PROXY ENDPOINT (API key is kept safe on the server) ──
+const PROXY_URL = 'https://billowing-dream-4b05.brittainmbbs.workers.dev';
 const AI_LIMIT_KEY = 'k2md_p_used';
 const AI_LIMIT_DATE = 'k2md_p_date';
 const AI_LIMIT_MAX = 2;
-let aiEnabled=true, apiKey=_K;
+let aiEnabled=true;
 function _todayStr(){return new Date().toISOString().slice(0,10);}
 function _getUsed(){return localStorage.getItem(AI_LIMIT_DATE)===_todayStr()?parseInt(localStorage.getItem(AI_LIMIT_KEY)||'0'):0;}
 function _incUsed(){localStorage.setItem(AI_LIMIT_DATE,_todayStr());localStorage.setItem(AI_LIMIT_KEY,String(_getUsed()+1));}
@@ -1307,7 +1307,7 @@ Respond ONLY with a raw JSON object (no markdown, no backticks):
 
 Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs significant work Q1. Be honest and specific. Penalise framework-speak like 'non-confrontational' or 'stakeholders'.`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':_K,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:p}]})});
+    const res=await fetch(PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:p}]})});
     if(!res.ok)throw new Error('HTTP '+res.status);
     const data=await res.json();
     const txt=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
