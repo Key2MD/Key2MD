@@ -1647,6 +1647,152 @@
       .email-form { flex-direction: column; }
       .email-form button { width: 100%; }
     }
+
+    /* ── ENQUIRY MODAL ── */
+    #enquiryModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+    }
+    #enquiryModal.open { display: flex; }
+    .enquiry-card {
+      background: #0d1f3c;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 36px 32px;
+      max-width: 460px;
+      width: 92%;
+      position: relative;
+    }
+    .enquiry-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: #fff;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .enquiry-title {
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .enquiry-sub {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.85rem;
+      margin-bottom: 22px;
+    }
+    .enquiry-type-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+      letter-spacing: 0.04em;
+    }
+    .eq-field {
+      margin-bottom: 14px;
+    }
+    .eq-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 6px;
+    }
+    .eq-field input, .eq-field textarea, .eq-field select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      color: #fff;
+      background: rgba(255,255,255,0.06);
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .eq-field input:focus, .eq-field textarea:focus, .eq-field select:focus {
+      border-color: #0ea5e9;
+      background: rgba(14,165,233,0.06);
+    }
+    .eq-field input::placeholder, .eq-field textarea::placeholder {
+      color: rgba(255,255,255,0.3);
+    }
+    .eq-field select option { background: #0d1f3c; color: #fff; }
+    .eq-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .eq-btn-cancel {
+      flex: 0 0 auto;
+      padding: 12px 20px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.88rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .eq-btn-submit {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 50px;
+      border: none;
+      background: #0ea5e9;
+      color: #fff;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .eq-btn-submit:hover { background: #38bdf8; }
+    .eq-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .eq-error {
+      display: none;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #fca5a5;
+      font-size: 0.82rem;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .eq-success {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .eq-success-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+    .eq-success-title {
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .eq-success-sub {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.85rem;
+    }
 </style>
   <script type="application/ld+json">
   {
@@ -1776,6 +1922,64 @@
           </div>
           <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Full personalised session — MMI, CASPer, or GAMSAT S2 prep with Dan.</p>
         </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enquiry Modal -->
+  <div id="enquiryModal">
+    <div class="enquiry-card">
+      <button class="enquiry-close" onclick="closeEnquiry()">✕</button>
+
+      <!-- Form view -->
+      <div id="eqForm">
+        <div class="enquiry-type-badge" id="eqBadge" style="background:rgba(14,165,233,0.15);color:#38bdf8;border:1px solid rgba(14,165,233,0.3);">Session Enquiry</div>
+        <div class="enquiry-title" id="eqTitle">Register Your Interest</div>
+        <div class="enquiry-sub" id="eqSub">Dan will get back to you within 24 hours.</div>
+        <div class="eq-error" id="eqError"></div>
+        <div class="eq-field">
+          <label>Your Name *</label>
+          <input type="text" id="eqName" placeholder="e.g. Sarah Chen" autocomplete="name">
+        </div>
+        <div class="eq-field">
+          <label>Your Email *</label>
+          <input type="email" id="eqEmail" placeholder="e.g. sarah@email.com" autocomplete="email">
+        </div>
+        <div class="eq-field">
+          <label>What are you interested in?</label>
+          <select id="eqType">
+            <option value="CASPer Group Session">Friday CASPer Group Session ($120)</option>
+            <option value="CASPer Masterclass">CASPer Masterclass — Early June ($300)</option>
+            <option value="MMI Masterclass">MMI Masterclass — Early Sept ($400)</option>
+            <option value="General Enquiry">General Enquiry</option>
+          </select>
+        </div>
+        <div class="eq-field">
+          <label>Target Universities</label>
+          <input type="text" id="eqUnis" placeholder="e.g. UniMelb, Monash, UQ">
+        </div>
+        <div class="eq-field">
+          <label>Exam/Interview Date (if known)</label>
+          <input type="text" id="eqDate" placeholder="e.g. July 2025, Not sure yet">
+        </div>
+        <div class="eq-field">
+          <label>Anything else? (optional)</label>
+          <textarea id="eqNotes" rows="2" placeholder="Questions, concerns, context..."></textarea>
+        </div>
+        <div class="eq-actions">
+          <button class="eq-btn-cancel" onclick="closeEnquiry()">Cancel</button>
+          <button class="eq-btn-submit" id="eqSubmitBtn" onclick="submitEnquiry()">Send to Dan →</button>
+        </div>
+      </div>
+
+      <!-- Success view -->
+      <div id="eqSuccess" style="display:none;">
+        <div class="eq-success">
+          <div class="eq-success-icon">✅</div>
+          <div class="eq-success-title">Enquiry sent!</div>
+          <div class="eq-success-sub">Dan will reply to your email within 24 hours. Keep an eye on your inbox.</div>
+          <button class="eq-btn-submit" onclick="closeEnquiry()" style="margin-top:20px;width:100%;">Got it →</button>
+        </div>
       </div>
     </div>
   </div>
@@ -2209,7 +2413,7 @@
             <li class="pricing-feature">Peer benchmark context</li>
             <li class="pricing-feature">Online via Zoom</li>
           </ul>
-          <a href="https://mail.google.com/mail/?view=cm&to=brittainmbbs@gmail.com&su=Friday%20CASPer%20Group%20Session%20Enquiry&body=Hi%20Dan%2C%0A%0AI%27d%20love%20to%20join%20the%20weekly%20Friday%20CASPer%20group%20session.%0A%0AMy%20name%3A%0AMy%20CASPer%20exam%20date%20(if%20known)%3A%0AMy%20target%20universities%3A%0AAnything%20else%3A%0A%0AThanks!" target="_blank" class="btn btn-primary" style="width:100%; justify-content: center;" onclick="gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'pricing_join_group' });">Join Group →</a>
+          <a href="#" class="btn btn-primary" style="width:100%; justify-content: center;" onclick="event.preventDefault();openEnquiry('CASPer Group Session');gtag('event', 'book_click', { 'event_category': 'conversion', 'event_label': 'pricing_join_group' });">Join Group →</a>
         </div>
 
       </div>
@@ -2259,7 +2463,7 @@
               <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">7.</span>Open Q&amp;A — no topic off limits</div>
             </div>
             <div style="margin-top:auto;padding-top:12px;">
-              <a href="https://mail.google.com/mail/?view=cm&amp;to=brittainmbbs@gmail.com&amp;su=CASPer+Masterclass+EOI&amp;body=Hi+Dan,%0A%0AI%27d+love+to+register+my+interest+in+the+CASPer+Masterclass+(Early+June).%0A%0AMy+name%3A%0AMy+target+universities%3A%0AMy+CASPer+exam+date+(if+known)%3A%0AAnything+else%3A%0A%0AThanks!" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.9rem;font-weight:700;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='var(--navy2)'" onmouseout="this.style.background='var(--navy)'">Register Interest →</a>
+              <a href="#" onclick="event.preventDefault();openEnquiry('CASPer Masterclass');" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.9rem;font-weight:700;text-decoration:none;transition:all 0.2s;cursor:pointer;">Register Interest →</a>
               <p style="text-align:center;font-size:0.73rem;color:var(--gray400);margin-top:8px;">EOI open now · Spots strictly limited</p>
             </div>
           </div>
@@ -2294,7 +2498,7 @@
               <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">7.</span>Your questions answered — nothing is off the table</div>
             </div>
             <div style="margin-top:auto;padding-top:12px;">
-              <a href="https://mail.google.com/mail/?view=cm&amp;to=brittainmbbs@gmail.com&amp;su=MMI+Masterclass+EOI&amp;body=Hi+Dan,%0A%0AI%27d+love+to+register+my+interest+in+the+MMI+Masterclass+(Early+September).%0A%0AMy+name%3A%0AMy+target+universities%3A%0AMy+interview+date+(if+known)%3A%0AAnything+else%3A%0A%0AThanks!" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:50px;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;font-size:0.9rem;font-weight:700;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Register Interest →</a>
+              <a href="#" onclick="event.preventDefault();openEnquiry('MMI Masterclass');" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:50px;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;font-size:0.9rem;font-weight:700;text-decoration:none;transition:all 0.2s;cursor:pointer;">Register Interest →</a>
               <p style="text-align:center;font-size:0.73rem;color:var(--gray400);margin-top:8px;">EOI open now · Spots strictly limited</p>
             </div>
           </div>
@@ -2309,7 +2513,7 @@
           <p style="font-size:0.92rem;font-weight:700;color:var(--navy);margin-bottom:3px;">Expressions of interest open year-round</p>
           <p style="font-size:0.83rem;color:var(--gray600);">Email Dan any time to secure your spot before they open publicly — masterclasses fill fast.</p>
         </div>
-        <a href="https://mail.google.com/mail/?view=cm&amp;to=brittainmbbs@gmail.com&amp;su=Masterclass+EOI&amp;body=Hi+Dan,%0A%0AI%27d+like+to+register+my+interest+in+an+upcoming+masterclass.%0A%0AWhich+class%3A+CASPer+%2F+MMI+(please+circle)%0AMy+name%3A%0AMy+target+universities%3A%0AAnything+else%3A%0A%0AThanks!" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.87rem;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;">Send EOI →</a>
+        <a href="#" onclick="event.preventDefault();openEnquiry('General Enquiry');" style="display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.87rem;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;cursor:pointer;">Send EOI →</a>
       </div>
 
     </div>
@@ -2606,6 +2810,122 @@
         }
       });
     }, 100);
+
+    // ── Enquiry Modal ──
+    function openEnquiry(type) {
+      var modal = document.getElementById('enquiryModal');
+      var select = document.getElementById('eqType');
+      var badge = document.getElementById('eqBadge');
+      var title = document.getElementById('eqTitle');
+      
+      // Reset to form view
+      document.getElementById('eqForm').style.display = 'block';
+      document.getElementById('eqSuccess').style.display = 'none';
+      document.getElementById('eqError').style.display = 'none';
+      document.getElementById('eqSubmitBtn').disabled = false;
+      document.getElementById('eqSubmitBtn').textContent = 'Send to Dan →';
+
+      // Pre-select the type
+      if (type) {
+        for (var i = 0; i < select.options.length; i++) {
+          if (select.options[i].value === type) {
+            select.selectedIndex = i;
+            break;
+          }
+        }
+      }
+
+      // Update badge styling based on type
+      if (type === 'MMI Masterclass') {
+        badge.textContent = '🎤 MMI Masterclass';
+        badge.style.background = 'rgba(139,92,246,0.15)';
+        badge.style.color = '#c4b5fd';
+        badge.style.borderColor = 'rgba(139,92,246,0.3)';
+        title.textContent = 'Register for MMI Masterclass';
+      } else if (type === 'CASPer Masterclass') {
+        badge.textContent = '💬 CASPer Masterclass';
+        badge.style.background = 'rgba(14,165,233,0.15)';
+        badge.style.color = '#38bdf8';
+        badge.style.borderColor = 'rgba(14,165,233,0.3)';
+        title.textContent = 'Register for CASPer Masterclass';
+      } else if (type === 'CASPer Group Session') {
+        badge.textContent = '👥 Group Session';
+        badge.style.background = 'rgba(14,165,233,0.15)';
+        badge.style.color = '#38bdf8';
+        badge.style.borderColor = 'rgba(14,165,233,0.3)';
+        title.textContent = 'Join Friday CASPer Group';
+      } else {
+        badge.textContent = '📩 Enquiry';
+        badge.style.background = 'rgba(14,165,233,0.15)';
+        badge.style.color = '#38bdf8';
+        badge.style.borderColor = 'rgba(14,165,233,0.3)';
+        title.textContent = 'Register Your Interest';
+      }
+
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      setTimeout(function(){ document.getElementById('eqName').focus(); }, 100);
+    }
+    window.openEnquiry = openEnquiry;
+
+    function closeEnquiry() {
+      var modal = document.getElementById('enquiryModal');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    window.closeEnquiry = closeEnquiry;
+
+    // Close on backdrop click
+    document.getElementById('enquiryModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEnquiry();
+    });
+
+    function submitEnquiry() {
+      var name = document.getElementById('eqName').value.trim();
+      var email = document.getElementById('eqEmail').value.trim();
+      var type = document.getElementById('eqType').value;
+      var unis = document.getElementById('eqUnis').value.trim();
+      var date = document.getElementById('eqDate').value.trim();
+      var notes = document.getElementById('eqNotes').value.trim();
+      var errEl = document.getElementById('eqError');
+      var btn = document.getElementById('eqSubmitBtn');
+
+      if (!name) { errEl.textContent = 'Please enter your name.'; errEl.style.display = 'block'; return; }
+      if (!email || !email.includes('@')) { errEl.textContent = 'Please enter a valid email.'; errEl.style.display = 'block'; return; }
+
+      errEl.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      // Send to worker
+      fetch('https://key2md-api.brittainmbbs.workers.dev/api/enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, email: email, type: type, universities: unis, exam_date: date, notes: notes })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        document.getElementById('eqForm').style.display = 'none';
+        document.getElementById('eqSuccess').style.display = 'block';
+        gtag('event', 'enquiry_submit', { event_category: 'conversion', event_label: type });
+      })
+      .catch(function() {
+        // Fallback to mailto
+        var subject = encodeURIComponent(type + ' Enquiry — ' + name);
+        var body = encodeURIComponent(
+          type + ' Enquiry\n' + '═'.repeat(40) + '\n\n' +
+          'Name: ' + name + '\nEmail: ' + email + '\nType: ' + type + '\n' +
+          'Target Unis: ' + (unis || 'Not specified') + '\n' +
+          'Exam Date: ' + (date || 'Not specified') + '\n' +
+          'Notes: ' + (notes || 'None') + '\n\n' +
+          '[Please reply to ' + email + ']'
+        );
+        window.location.href = 'mailto:brittainmbbs@gmail.com?subject=' + subject + '&body=' + body;
+        document.getElementById('eqForm').style.display = 'none';
+        document.getElementById('eqSuccess').style.display = 'block';
+      });
+    }
+    window.submitEnquiry = submitEnquiry;
 
     // ── Email Capture ──
     function submitEmail() {
