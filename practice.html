@@ -37,7 +37,7 @@
     .nav-links { display:flex; align-items:center; gap:32px; list-style:none; }
     .nav-links a { color:rgba(255,255,255,0.75); font-size:0.9rem; font-weight:500; transition:color 0.2s; }
     .nav-links a:hover { color:var(--teal); }
-    .btn-nav { padding:9px 20px; border-radius:50px; background:var(--teal); color:var(--white); font-size:0.88rem; font-weight:600; transition:all 0.2s; }
+    .btn-nav { padding:9px 20px; border-radius:50px; background:var(--teal); color:var(--white); font-size:0.88rem; font-weight:600; transition:all 0.2s;  white-space:nowrap; }
     .btn-nav:hover { background:var(--teal2); transform:translateY(-1px); }
     .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; background:none; border:none; }
     .hamburger span { display:block; width:24px; height:2px; background:var(--white); border-radius:2px; transition:all 0.3s; }
@@ -48,7 +48,7 @@
     .mobile-nav.open { display:flex; }
     .mobile-nav a { color:rgba(255,255,255,0.95); font-size:1rem; font-weight:600; padding:13px 14px; border-radius:10px; transition:background 0.2s, color 0.2s; border-bottom:1px solid rgba(255,255,255,0.06); }
     .mobile-nav a:hover { background:rgba(255,255,255,0.08); color:var(--teal); }
-    .mobile-nav .btn-nav { width:100%; text-align:center; margin-top:8px; display:block; padding:13px; }
+    .mobile-nav .btn-nav { width:100%; text-align:center; margin-top:8px; display:block; padding:13px;  white-space:nowrap; }
 
     .app-wrapper { max-width:1500px; margin:0 auto; padding:88px 24px 40px; display:grid; grid-template-columns:310px 1fr; gap:24px; min-height:100vh; align-items:start; }
 
@@ -344,17 +344,14 @@
 
 <header>
   <nav>
-    <a href="index.html" class="logo">
-      <img src="Logo.png" alt="Key2MD — Free CASPer and MMI Practice Tool" style="height:44px;width:auto;display:block;" onerror="this.outerHTML='Key<span style=&quot;color:var(--teal)&quot;>2</span>MD'">
-    </a>
+    <a href="index.html" class="logo">Key2<span>MD</span></a>
     <ul class="nav-links">
-      <li><a href="index.html#services">Services</a></li>
+      <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="testimonials.html">Results</a></li>
-      <li><a href="index.html#pricing">Pricing</a></li>
       <li><a href="guide.html">📖 Free Guide</a></li>
-      <li><a href="practice.html" class="active">🎯 CASPer Practice</a></li>
-      <li><a href="gamsat-s2-practice.html" class="active">✍️ GAMSAT S2 Practice</a></li>
+      <li><a href="practice.html" style="color:var(--gold);font-weight:700;" class="active">🎯 CASPer Practice</a></li>
+      <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a></li>
       <li><a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session</a></li>
     </ul>
     <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
@@ -413,6 +410,7 @@
   </div>
 </div>
 
+<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Free CASPer & MMI Practice Tool — Australian Medical Applicants</h1>
 <div class="app-wrapper">
   <aside class="sidebar">
     <!-- Mode Toggle -->
