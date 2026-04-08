@@ -82,6 +82,7 @@ const Key2MDAuth = (() => {
         model: extraContext.model || 'claude-sonnet-4-20250514',
         max_tokens: extraContext.max_tokens || 500,
         system: extraContext.system || undefined,
+        use_credit: extraContext.use_credit || false,
         messages,
         question_context: extraContext.question || '',
         user_response: extraContext.response || '',
