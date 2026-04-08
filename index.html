@@ -1863,7 +1863,47 @@
   function openBookModal(e){if(e)e.preventDefault();var m=document.getElementById('bookModal');if(m){m.style.display='flex';document.body.style.overflow='hidden';}}
   function closeBookModal(){var m=document.getElementById('bookModal');if(m){m.style.display='none';document.body.style.overflow='';}}
   document.addEventListener('DOMContentLoaded',function(){var m=document.getElementById('bookModal');if(m){m.addEventListener('click',function(e){if(e.target===this)closeBookModal();})}});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeBookModal();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookModal();closeEnquiry();}});
+
+  // Enquiry modal functions (must be global before HTML parses)
+  function openEnquiry(type){
+    var modal=document.getElementById('enquiryModal');
+    var select=document.getElementById('eqType');
+    var badge=document.getElementById('eqBadge');
+    var title=document.getElementById('eqTitle');
+    if(!modal)return;
+    document.getElementById('eqForm').style.display='block';
+    document.getElementById('eqSuccess').style.display='none';
+    document.getElementById('eqError').style.display='none';
+    document.getElementById('eqSubmitBtn').disabled=false;
+    document.getElementById('eqSubmitBtn').textContent='Send to Dan →';
+    if(type&&select){for(var i=0;i<select.options.length;i++){if(select.options[i].value===type){select.selectedIndex=i;break;}}}
+    if(type==='MMI Masterclass'){badge.textContent='🎤 MMI Masterclass';badge.style.background='rgba(139,92,246,0.15)';badge.style.color='#c4b5fd';badge.style.borderColor='rgba(139,92,246,0.3)';title.textContent='Register for MMI Masterclass';}
+    else if(type==='CASPer Masterclass'){badge.textContent='💬 CASPer Masterclass';badge.style.background='rgba(14,165,233,0.15)';badge.style.color='#38bdf8';badge.style.borderColor='rgba(14,165,233,0.3)';title.textContent='Register for CASPer Masterclass';}
+    else if(type==='CASPer Group Session'){badge.textContent='👥 Group Session';badge.style.background='rgba(14,165,233,0.15)';badge.style.color='#38bdf8';badge.style.borderColor='rgba(14,165,233,0.3)';title.textContent='Join Friday CASPer Group';}
+    else{badge.textContent='📩 Enquiry';badge.style.background='rgba(14,165,233,0.15)';badge.style.color='#38bdf8';badge.style.borderColor='rgba(14,165,233,0.3)';title.textContent='Register Your Interest';}
+    modal.classList.add('open');document.body.style.overflow='hidden';
+    setTimeout(function(){document.getElementById('eqName').focus();},100);
+  }
+  function closeEnquiry(){var modal=document.getElementById('enquiryModal');if(modal){modal.classList.remove('open');document.body.style.overflow='';}}
+  function submitEnquiry(){
+    var name=document.getElementById('eqName').value.trim();
+    var email=document.getElementById('eqEmail').value.trim();
+    var type=document.getElementById('eqType').value;
+    var unis=document.getElementById('eqUnis').value.trim();
+    var date=document.getElementById('eqDate').value.trim();
+    var notes=document.getElementById('eqNotes').value.trim();
+    var errEl=document.getElementById('eqError');
+    var btn=document.getElementById('eqSubmitBtn');
+    if(!name){errEl.textContent='Please enter your name.';errEl.style.display='block';return;}
+    if(!email||!email.includes('@')){errEl.textContent='Please enter a valid email.';errEl.style.display='block';return;}
+    errEl.style.display='none';btn.disabled=true;btn.textContent='Sending...';
+    fetch('https://key2md-api.brittainmbbs.workers.dev/api/enquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,email:email,type:type,universities:unis,exam_date:date,notes:notes})})
+    .then(function(res){return res.json();})
+    .then(function(){document.getElementById('eqForm').style.display='none';document.getElementById('eqSuccess').style.display='block';if(typeof gtag==='function')gtag('event','enquiry_submit',{event_category:'conversion',event_label:type});})
+    .catch(function(){var subject=encodeURIComponent(type+' Enquiry — '+name);var body=encodeURIComponent(type+' Enquiry\n\nName: '+name+'\nEmail: '+email+'\nType: '+type+'\nTarget Unis: '+(unis||'N/A')+'\nExam Date: '+(date||'N/A')+'\nNotes: '+(notes||'None'));window.location.href='mailto:brittainmbbs@gmail.com?subject='+subject+'&body='+body;document.getElementById('eqForm').style.display='none';document.getElementById('eqSuccess').style.display='block';});
+  }
+  document.addEventListener('DOMContentLoaded',function(){var eq=document.getElementById('enquiryModal');if(eq)eq.addEventListener('click',function(e){if(e.target===this)closeEnquiry();});});
 </script>
 
   <!-- ══════════════════════════════
@@ -2810,122 +2850,6 @@
         }
       });
     }, 100);
-
-    // ── Enquiry Modal ──
-    function openEnquiry(type) {
-      var modal = document.getElementById('enquiryModal');
-      var select = document.getElementById('eqType');
-      var badge = document.getElementById('eqBadge');
-      var title = document.getElementById('eqTitle');
-      
-      // Reset to form view
-      document.getElementById('eqForm').style.display = 'block';
-      document.getElementById('eqSuccess').style.display = 'none';
-      document.getElementById('eqError').style.display = 'none';
-      document.getElementById('eqSubmitBtn').disabled = false;
-      document.getElementById('eqSubmitBtn').textContent = 'Send to Dan →';
-
-      // Pre-select the type
-      if (type) {
-        for (var i = 0; i < select.options.length; i++) {
-          if (select.options[i].value === type) {
-            select.selectedIndex = i;
-            break;
-          }
-        }
-      }
-
-      // Update badge styling based on type
-      if (type === 'MMI Masterclass') {
-        badge.textContent = '🎤 MMI Masterclass';
-        badge.style.background = 'rgba(139,92,246,0.15)';
-        badge.style.color = '#c4b5fd';
-        badge.style.borderColor = 'rgba(139,92,246,0.3)';
-        title.textContent = 'Register for MMI Masterclass';
-      } else if (type === 'CASPer Masterclass') {
-        badge.textContent = '💬 CASPer Masterclass';
-        badge.style.background = 'rgba(14,165,233,0.15)';
-        badge.style.color = '#38bdf8';
-        badge.style.borderColor = 'rgba(14,165,233,0.3)';
-        title.textContent = 'Register for CASPer Masterclass';
-      } else if (type === 'CASPer Group Session') {
-        badge.textContent = '👥 Group Session';
-        badge.style.background = 'rgba(14,165,233,0.15)';
-        badge.style.color = '#38bdf8';
-        badge.style.borderColor = 'rgba(14,165,233,0.3)';
-        title.textContent = 'Join Friday CASPer Group';
-      } else {
-        badge.textContent = '📩 Enquiry';
-        badge.style.background = 'rgba(14,165,233,0.15)';
-        badge.style.color = '#38bdf8';
-        badge.style.borderColor = 'rgba(14,165,233,0.3)';
-        title.textContent = 'Register Your Interest';
-      }
-
-      modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-      setTimeout(function(){ document.getElementById('eqName').focus(); }, 100);
-    }
-    window.openEnquiry = openEnquiry;
-
-    function closeEnquiry() {
-      var modal = document.getElementById('enquiryModal');
-      modal.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    window.closeEnquiry = closeEnquiry;
-
-    // Close on backdrop click
-    document.getElementById('enquiryModal').addEventListener('click', function(e) {
-      if (e.target === this) closeEnquiry();
-    });
-
-    function submitEnquiry() {
-      var name = document.getElementById('eqName').value.trim();
-      var email = document.getElementById('eqEmail').value.trim();
-      var type = document.getElementById('eqType').value;
-      var unis = document.getElementById('eqUnis').value.trim();
-      var date = document.getElementById('eqDate').value.trim();
-      var notes = document.getElementById('eqNotes').value.trim();
-      var errEl = document.getElementById('eqError');
-      var btn = document.getElementById('eqSubmitBtn');
-
-      if (!name) { errEl.textContent = 'Please enter your name.'; errEl.style.display = 'block'; return; }
-      if (!email || !email.includes('@')) { errEl.textContent = 'Please enter a valid email.'; errEl.style.display = 'block'; return; }
-
-      errEl.style.display = 'none';
-      btn.disabled = true;
-      btn.textContent = 'Sending...';
-
-      // Send to worker
-      fetch('https://key2md-api.brittainmbbs.workers.dev/api/enquiry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, email: email, type: type, universities: unis, exam_date: date, notes: notes })
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        document.getElementById('eqForm').style.display = 'none';
-        document.getElementById('eqSuccess').style.display = 'block';
-        gtag('event', 'enquiry_submit', { event_category: 'conversion', event_label: type });
-      })
-      .catch(function() {
-        // Fallback to mailto
-        var subject = encodeURIComponent(type + ' Enquiry — ' + name);
-        var body = encodeURIComponent(
-          type + ' Enquiry\n' + '═'.repeat(40) + '\n\n' +
-          'Name: ' + name + '\nEmail: ' + email + '\nType: ' + type + '\n' +
-          'Target Unis: ' + (unis || 'Not specified') + '\n' +
-          'Exam Date: ' + (date || 'Not specified') + '\n' +
-          'Notes: ' + (notes || 'None') + '\n\n' +
-          '[Please reply to ' + email + ']'
-        );
-        window.location.href = 'mailto:brittainmbbs@gmail.com?subject=' + subject + '&body=' + body;
-        document.getElementById('eqForm').style.display = 'none';
-        document.getElementById('eqSuccess').style.display = 'block';
-      });
-    }
-    window.submitEnquiry = submitEnquiry;
 
     // ── Email Capture ──
     function submitEmail() {

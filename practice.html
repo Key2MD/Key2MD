@@ -607,6 +607,18 @@
       <div style="font-size:0.68rem;color:var(--gray400);margin-top:10px;text-align:center;" id="lbParticipants">— students practising today</div>
     </div>
 
+    <!-- Mailing list -->
+    <div class="sidebar-card">
+      <h3>📬 Weekly Tips</h3>
+      <p style="font-size:0.78rem;color:var(--gray600);line-height:1.5;margin-bottom:10px;">Get Dan's weekly CASPer, MMI &amp; GAMSAT tips — scenario breakdowns, common mistakes, and what examiners look for.</p>
+      <div id="practiceEmailForm">
+        <input type="email" id="practiceEmailInput" placeholder="Your email" style="width:100%;padding:9px 12px;border:1px solid var(--gray200);border-radius:8px;font-size:0.82rem;font-family:inherit;color:var(--gray800);background:var(--gray50);outline:none;margin-bottom:8px;box-sizing:border-box;">
+        <button onclick="subscribePractice()" style="width:100%;padding:9px;border-radius:8px;border:none;background:var(--teal,#0ea5e9);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Subscribe Free →</button>
+      </div>
+      <div id="practiceEmailDone" style="display:none;font-size:0.82rem;color:#16a34a;font-weight:600;padding:8px 0;">✓ You're in! Check your inbox.</div>
+      <p style="font-size:0.68rem;color:var(--gray400);margin-top:6px;">No spam. Unsubscribe anytime.</p>
+    </div>
+
   </aside>
 
   <div class="main-content">
@@ -2072,6 +2084,18 @@ function purchaseCredits(){
   });
 }
 window.purchaseCredits = purchaseCredits;
+
+// ══ MAILING LIST (sidebar) ══
+function subscribePractice(){
+  var input=document.getElementById('practiceEmailInput');
+  var email=input.value.trim();
+  if(!email||!email.includes('@')||!email.includes('.')){input.style.borderColor='#ef4444';input.focus();return;}
+  input.style.borderColor='';
+  fetch('https://key2md-api.brittainmbbs.workers.dev/api/email/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})})
+  .then(function(){document.getElementById('practiceEmailForm').style.display='none';document.getElementById('practiceEmailDone').style.display='block';})
+  .catch(function(){document.getElementById('practiceEmailForm').style.display='none';document.getElementById('practiceEmailDone').style.display='block';});
+}
+window.subscribePractice=subscribePractice;
 
 </script>
 
