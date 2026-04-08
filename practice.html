@@ -913,6 +913,7 @@ const aiFeedbackWrap=$('aiFeedbackWrap'),scenarioCard=$('scenarioCard'),reviewPa
 const aiStatusEl=$('aiStatusEl');
 const trendWrap=$('trendWrap'),trendEmpty=$('trendEmpty'),trendCanvas=$('trendCanvas'),trendAvgLine=$('trendAvgLine'),trendAvgNum=$('trendAvgNum');
 
+
 // Category counts
 function updateCounts(){
   const c={Ethics:0,'Conflict Resolution':0,Personal:0,Professionalism:0,Communication:0};
@@ -1305,14 +1306,14 @@ function restoreFeedback(idx){
 }
 
 // Trend chart
-function clearTrend(){trendEmpty.style.display='block';trendCanvas.style.display='none';trendAvgLine.style.display='none';}
+function clearTrend(){if(trendEmpty)trendEmpty.style.display='block';if(trendCanvas)trendCanvas.style.display='none';if(trendAvgLine)trendAvgLine.style.display='none';}
 function updateTrend(){
   const sc=sessionHistory.filter(h=>h&&h.score!=null).map(h=>h.score);
   if(!sc.length){clearTrend();return;}
-  trendEmpty.style.display='none';trendCanvas.style.display='block';
-  drawChart(trendCanvas,sc,64);
+  if(trendEmpty)trendEmpty.style.display='none';if(trendCanvas)trendCanvas.style.display='block';
+  if(trendCanvas)drawChart(trendCanvas,sc,64);
   const avg=sc.reduce((a,b)=>a+b,0)/sc.length;
-  trendAvgLine.style.display='flex';trendAvgNum.textContent=(Math.round(avg*10)/10)+'/10';
+  if(trendAvgLine)trendAvgLine.style.display='flex';if(trendAvgNum)trendAvgNum.textContent=(Math.round(avg*10)/10)+'/10';
 }
 function updateAvgStat(){const avg=avgScores();if(avg!==null){statAvg.textContent=avg+'/10';statAvg.style.color=avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';}}
 
@@ -1451,8 +1452,9 @@ function openMarkingModal(){
 function closeMarkingModal(){
   document.getElementById('markingModalOverlay').classList.remove('open');
 }
-document.getElementById('markingModalOverlay').addEventListener('click',function(e){
-  if(e.target===this)closeMarkingModal();
+window.addEventListener('DOMContentLoaded',function(){
+  var overlay=document.getElementById('markingModalOverlay');
+  if(overlay)overlay.addEventListener('click',function(e){if(e.target===this)closeMarkingModal();});
 });
 function submitMarking(){
   const name=document.getElementById('mName').value.trim();
