@@ -1255,6 +1255,236 @@ footer a:hover { color: var(--white); }
 .limit-banner.active { display: block; }
 .limit-banner h4 { font-size: 0.95rem; font-weight: 700; color: #92400e; margin-bottom: 6px; }
 .limit-banner p { font-size: 0.875rem; color: #78350f; line-height: 1.6; margin-bottom: 14px; }
+
+/* ═══════════════════════════════════════════════
+   AI MARKING PANEL (sidebar-style inline card)
+═══════════════════════════════════════════════ */
+.ai-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.ai-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.ai-panel-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.ai-status-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: rgba(22,163,74,0.1);
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ai-status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+}
+.ai-status-badge.exhausted {
+  background: rgba(217,119,6,0.1);
+  color: var(--warning);
+}
+.ai-status-badge.exhausted::before { background: var(--warning); }
+
+/* AI Explainer */
+.ai-explainer-toggle {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  padding: 0;
+  text-align: left;
+}
+.ai-explainer-toggle:hover { color: var(--accent-dark); }
+.ai-explainer-content {
+  display: none;
+  margin-top: 10px;
+  padding: 14px;
+  background: var(--accent-light);
+  border: 1px solid rgba(37,99,235,0.15);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+.ai-explainer-content strong { color: var(--text); display: block; margin-bottom: 4px; }
+
+/* Limit bar */
+.ai-limit-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.ai-limit-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.ai-limit-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.ai-limit-count.exhausted { color: var(--warning); }
+.ai-limit-track {
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.ai-limit-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 100px;
+  transition: width 0.5s ease;
+}
+.ai-limit-fill.exhausted { background: var(--warning); }
+
+/* Credit balance */
+.credit-balance-wrap {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.credit-balance-label { font-size: 0.75rem; color: var(--text-muted); }
+.credit-balance-num { font-size: 0.82rem; font-weight: 700; color: var(--gold); }
+.ai-limit-note {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* Buy credits button */
+.buy-credits-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(37,99,235,0.3);
+  background: rgba(37,99,235,0.06);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+.buy-credits-btn:hover { background: rgba(37,99,235,0.12); }
+
+/* ═══════════════════════════════════════════════
+   MAILING LIST PANEL
+═══════════════════════════════════════════════ */
+.mailing-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.mailing-panel h3 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.mailing-panel p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.mailing-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+.mailing-input:focus { border-color: var(--accent); }
+.mailing-submit {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--accent);
+  color: var(--white);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.mailing-submit:hover { background: var(--accent-dark); }
+.mailing-done {
+  display: none;
+  font-size: 0.85rem;
+  color: var(--success);
+  font-weight: 600;
+  padding: 8px 0;
+}
+.mailing-fine-print {
+  font-size: 0.7rem;
+  color: var(--text-light);
+  margin-top: 6px;
+}
+
+/* ═══════════════════════════════════════════════
+   TWO-COLUMN LAYOUT for panels
+═══════════════════════════════════════════════ */
+.panels-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+@media (max-width: 700px) {
+  .panels-row { grid-template-columns: 1fr; }
+}
+
+/* Credit shop pack button (reused from CASPer) */
+.credit-pack-btn { display:flex; align-items:center; justify-content:space-between; width:100%; padding:14px 16px; border-radius:10px; border:1.5px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#fff; font-size:0.88rem; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; text-align:left; }
+.credit-pack-btn:hover { border-color:rgba(37,99,235,0.4); background:rgba(37,99,235,0.08); }
+.credit-pack-btn.selected { border-color:var(--accent); background:rgba(37,99,235,0.12); box-shadow:0 0 0 1px var(--accent); }
+.credit-pack-btn.recommended { border-color:rgba(201,168,76,0.4); }
+.credit-pack-btn.recommended.selected { border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); }
+.credit-pack-btn strong { color:#fff; font-weight:700; }
+.pack-price { margin-left:8px; color:rgba(255,255,255,0.6); font-weight:400; }
+.pack-save { margin-left:8px; font-size:0.72rem; font-weight:700; color:#22c55e; background:rgba(34,197,94,0.15); padding:2px 8px; border-radius:50px; }
+.pack-rec { font-size:0.68rem; font-weight:700; color:#fbbf24; background:rgba(245,158,11,0.15); padding:3px 10px; border-radius:50px; white-space:nowrap; }
 </style>
   <meta name="robots" content="index, follow">
   <script src="auth.js"></script>
@@ -1309,7 +1539,7 @@ footer a:hover { color: var(--white); }
     <div class="hero-stat"><strong>50</strong><span>Unique Stimuli</span></div>
     <div class="hero-stat"><strong>25+25</strong><span>Task A & Task B</span></div>
     <div class="hero-stat"><strong>30 min</strong><span>Timed Practice</span></div>
-    <div class="hero-stat"><strong>Free</strong><span>No Account Needed</span></div>
+    <div class="hero-stat"><strong>1 Free/Day</strong><span>AI Essay Review</span></div>
   </div>
 </section>
 
@@ -1374,6 +1604,68 @@ footer a:hover { color: var(--white); }
   <!-- Auth / Account -->
   <div id="k2mdAuthBar" style="margin-bottom:20px;"></div>
 
+  <!-- AI MARKING + MAILING LIST PANELS -->
+  <div class="panels-row">
+
+    <!-- AI Marking Panel -->
+    <div class="ai-panel">
+      <div class="ai-panel-header">
+        <span class="ai-panel-title">✦ AI Essay Marking</span>
+        <span class="ai-status-badge" id="gamsatAiStatus">1 free/day</span>
+      </div>
+
+      <!-- Why our AI is different -->
+      <div style="margin-top:4px;">
+        <button class="ai-explainer-toggle" id="aiExplainerBtn" onclick="toggleAiExplainer()">Why is this different from ChatGPT? ▸</button>
+        <div class="ai-explainer-content" id="aiExplainer">
+          <strong>This isn't generic AI feedback.</strong>
+          Dan has spent 300+ hours developing the marking criteria, prompt architecture, and scoring rubrics that power this tool — drawing directly from his experience coaching students through GAMSAT Section II and using Des O'Neill's framework.
+          <br><br>
+          Every essay is assessed using <strong>Dan's GAMSAT-specific rubric</strong>, the same criteria he uses in paid 1:1 sessions. The AI is specifically calibrated to penalise the exact mistakes Dan sees students make — shallow engagement with stimulus quotes, generic framework responses, weak thesis statements, and surface-level reflections that would score below Band 60.
+          <br><br>
+          <strong>Dan is sceptical of AI feedback.</strong> Most AI marking tools give vague, encouraging responses that don't actually move your band score. This one was built with the opposite philosophy: honest, specific, sometimes uncomfortable feedback — because that's what separates a Band 55 from a Band 70.
+          <br><br>
+          <span style="color:var(--accent);font-weight:600;">Try it yourself — paste the same essay into ChatGPT and compare. You'll see the difference immediately.</span>
+        </div>
+      </div>
+
+      <!-- Limits + Credits -->
+      <div id="aiLimitWrap" style="margin-top:14px;">
+        <div class="ai-limit-bar">
+          <span class="ai-limit-label">Free daily review</span>
+          <span class="ai-limit-count" id="aiLimitCount">1 remaining</span>
+        </div>
+        <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
+
+        <!-- Credit balance -->
+        <div class="credit-balance-wrap" id="creditBalanceWrap" style="display:none;">
+          <span class="credit-balance-label">Purchased credits</span>
+          <span class="credit-balance-num" id="creditCount">0</span>
+        </div>
+
+        <p class="ai-limit-note" id="aiLimitNote">Create a free account to unlock AI reviews.</p>
+      </div>
+
+      <!-- Buy credits button -->
+      <div id="buyCreditsBtnWrap" style="display:none;">
+        <button class="buy-credits-btn" onclick="openCreditShop()">Buy More AI Reviews →</button>
+      </div>
+    </div>
+
+    <!-- Mailing List Panel -->
+    <div class="mailing-panel">
+      <h3>📬 Weekly GAMSAT Tips</h3>
+      <p>Get Dan's weekly GAMSAT Section II tips — essay breakdowns, common mistakes, what examiners actually look for, and Band 70 strategies.</p>
+      <div id="gamsatEmailForm">
+        <input type="email" id="gamsatEmailInput" class="mailing-input" placeholder="Your email">
+        <button class="mailing-submit" onclick="subscribeGamsat()">Subscribe Free →</button>
+      </div>
+      <div class="mailing-done" id="gamsatEmailDone">✓ You're in! Check your inbox.</div>
+      <p class="mailing-fine-print">No spam. Unsubscribe anytime.</p>
+    </div>
+
+  </div>
+
   <!-- CONTROLS -->
   <div class="controls-bar">
     <label>Station:</label>
@@ -1435,8 +1727,11 @@ footer a:hover { color: var(--white); }
     <!-- Limit banner -->
     <div class="limit-banner" id="limitBanner">
       <h4>You’ve used your free AI review for today</h4>
-      <p>Your daily limit resets at midnight. Come back tomorrow — or submit your essay to Dan for expert human marking and a precise band score within 48 hours.</p>
-      <button class="btn-marking" onclick="openMarkingModal()">Submit to Dan — $50 →</button>
+      <p>Your daily limit resets at midnight AEST. Buy credits for instant access, or submit your essay to Dan for expert human marking and a precise band score within 48 hours.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="buy-credits-btn" style="width:auto;margin:0;padding:10px 20px;" onclick="openCreditShop()">Buy AI Credits →</button>
+        <button class="btn-marking" onclick="openMarkingModal()">Submit to Dan — $50 →</button>
+      </div>
     </div>
 
     <!-- Human marking inline CTA -->
@@ -1557,7 +1852,7 @@ footer a:hover { color: var(--white); }
     <a href="https://www.key2md.com/guide.html">Free Guide</a>
     <a href="https://calendly.com/brittainmbbs/30min">Book a Session</a>
   </div>
-  <p>© 2025 Key2MD. All rights reserved. · StudentVIP Verified Tutor · r/GAMSAT Community Endorsed</p>
+  <p>© 2025–2026 Key2MD. All rights reserved. · StudentVIP Verified Tutor · r/GAMSAT Community Endorsed</p>
 </footer>
 
 <script>
@@ -2103,32 +2398,113 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function updateLimitUI() {
   const btn = document.getElementById('aiFeedbackBtn');
-  const note = document.getElementById('limitNote');
+  const inlineNote = document.getElementById('limitNote');
   const user = Key2MDAuth.getUser();
   const limits = Key2MDAuth.getLimits();
+  const loggedIn = Key2MDAuth.isLoggedIn();
 
-  if (!user) {
+  // Panel elements
+  const statusBadge = document.getElementById('gamsatAiStatus');
+  const countEl = document.getElementById('aiLimitCount');
+  const fillEl = document.getElementById('aiLimitFill');
+  const noteEl = document.getElementById('aiLimitNote');
+  const creditWrap = document.getElementById('creditBalanceWrap');
+  const creditCountEl = document.getElementById('creditCount');
+  const buyBtn = document.getElementById('buyCreditsBtnWrap');
+
+  if (!loggedIn) {
     // Not logged in
     if (btn) { btn.disabled = false; btn.textContent = '🔍 Get Free AI Feedback'; }
-    if (note) { note.textContent = 'Create a free account to unlock AI reviews'; note.className = 'daily-limit-note'; }
+    if (inlineNote) { inlineNote.textContent = 'Create a free account to unlock AI reviews'; inlineNote.className = 'daily-limit-note'; }
+    if (statusBadge) { statusBadge.textContent = '1 free/day'; statusBadge.className = 'ai-status-badge'; }
+    if (countEl) { countEl.textContent = '1 free/day'; countEl.className = 'ai-limit-count'; }
+    if (fillEl) { fillEl.style.width = '100%'; fillEl.className = 'ai-limit-fill'; }
+    if (noteEl) noteEl.textContent = 'Create a free account to unlock AI reviews.';
+    if (creditWrap) creditWrap.style.display = 'none';
+    if (buyBtn) buyBtn.style.display = 'none';
     return;
   }
 
   if (Key2MDAuth.isPro()) {
     if (btn) { btn.disabled = false; btn.textContent = '🔍 Get AI Feedback'; }
-    if (note) { note.textContent = '∞ Unlimited (Pro)'; note.className = 'daily-limit-note'; }
+    if (inlineNote) { inlineNote.textContent = '∞ Unlimited (Pro)'; inlineNote.className = 'daily-limit-note'; }
+    if (statusBadge) { statusBadge.textContent = '∞ Unlimited'; statusBadge.className = 'ai-status-badge'; }
+    if (countEl) { countEl.textContent = '∞ Unlimited (Pro)'; countEl.className = 'ai-limit-count'; }
+    if (fillEl) { fillEl.style.width = '100%'; fillEl.className = 'ai-limit-fill'; }
+    if (noteEl) noteEl.textContent = 'Unlimited AI reviews with Pro.';
+    if (creditWrap) creditWrap.style.display = 'none';
+    if (buyBtn) buyBtn.style.display = 'none';
     return;
   }
 
-  const gamsat = limits?.gamsat;
-  const remaining = gamsat ? Math.max(0, gamsat.limit - gamsat.used) : 1;
+  if (!limits) return;
+  const tool = limits.gamsat;
+  if (!tool) return;
 
-  if (remaining <= 0) {
-    if (btn) { btn.disabled = true; btn.textContent = 'AI Review Used Today'; }
-    if (note) { note.textContent = 'Resets at midnight AEST. Submit to Dan for expert marking.'; note.className = 'daily-limit-note used'; }
+  const rem = tool.unlimited ? 99 : Math.max(0, tool.limit - tool.used);
+  const pct = tool.unlimited ? 100 : (rem / tool.limit * 100);
+  const credits = tool.credits || 0;
+
+  // Update panel limit count
+  if (countEl) {
+    if (tool.unlimited) {
+      countEl.textContent = '∞ Unlimited (Pro)';
+    } else if (rem > 0) {
+      countEl.textContent = rem + ' free remaining';
+    } else if (credits > 0) {
+      countEl.textContent = 'Free used · ' + credits + ' credits left';
+    } else {
+      countEl.textContent = 'Used for today';
+    }
+    countEl.className = 'ai-limit-count' + ((rem === 0 && credits === 0) ? ' exhausted' : '');
+  }
+  if (fillEl) { fillEl.style.width = pct + '%'; fillEl.className = 'ai-limit-fill' + ((rem === 0 && credits === 0) ? ' exhausted' : ''); }
+
+  // Status badge
+  if (statusBadge) {
+    if (rem > 0) {
+      statusBadge.textContent = rem + ' free remaining';
+      statusBadge.className = 'ai-status-badge';
+    } else if (credits > 0) {
+      statusBadge.textContent = credits + ' credits';
+      statusBadge.className = 'ai-status-badge';
+    } else {
+      statusBadge.textContent = 'Used today';
+      statusBadge.className = 'ai-status-badge exhausted';
+    }
+  }
+
+  // Credit balance
+  if (creditWrap && creditCountEl) {
+    if (credits > 0) {
+      creditWrap.style.display = 'flex';
+      creditCountEl.textContent = credits;
+    } else {
+      creditWrap.style.display = 'none';
+    }
+  }
+
+  // Buy button (show if logged in)
+  if (buyBtn) buyBtn.style.display = loggedIn ? 'block' : 'none';
+
+  // Panel note
+  if (noteEl) {
+    if (rem > 0) {
+      noteEl.textContent = '1 free AI review per day. Buy credits for more.';
+    } else if (credits > 0) {
+      noteEl.textContent = 'Using purchased credits. Buy more anytime.';
+    } else {
+      noteEl.textContent = 'Free review used. Buy credits or wait until midnight AEST.';
+    }
+  }
+
+  // Main feedback button
+  if (rem > 0 || credits > 0) {
+    if (btn) { btn.disabled = false; btn.textContent = credits > 0 && rem <= 0 ? '🔍 Get AI Feedback (1 credit)' : '🔍 Get Free AI Feedback'; }
+    if (inlineNote) { inlineNote.textContent = rem > 0 ? rem + ' free AI review per day' : credits + ' credits remaining'; inlineNote.className = 'daily-limit-note'; }
   } else {
-    if (btn) { btn.disabled = false; btn.textContent = '🔍 Get Free AI Feedback'; }
-    if (note) { note.textContent = remaining + ' free AI review per day'; note.className = 'daily-limit-note'; }
+    if (btn) { btn.disabled = true; btn.textContent = 'AI Review Used Today'; }
+    if (inlineNote) { inlineNote.textContent = 'Buy credits or wait until midnight AEST.'; inlineNote.className = 'daily-limit-note used'; }
   }
 }
 
@@ -2341,14 +2717,25 @@ async function requestAIFeedback() {
   if (!essay) { alert('Please write your essay first.'); return; }
   if (essay.split(/\s+/).length < 50) { alert('Your essay is too short for meaningful feedback. Aim for at least 300 words.'); return; }
 
-  // ── Auth + server-side limit check ──
-  const check = Key2MDAuth.canReview();
-  if (!check.allowed) {
-    if (check.reason === 'auth_required') {
-      Key2MDAuth.showAuthModal('signup');
-      return;
-    }
-    if (check.reason === 'limit_reached') {
+  // ── Auth check ──
+  if (!Key2MDAuth.isLoggedIn()) {
+    Key2MDAuth.showAuthModal('signup');
+    return;
+  }
+
+  // ── Check limits + credits ──
+  const limits = Key2MDAuth.getLimits();
+  const toolLimits = limits?.gamsat;
+  const remaining = toolLimits ? Math.max(0, toolLimits.limit - toolLimits.used) : 1;
+  const credits = toolLimits?.credits || 0;
+  let useCredit = false;
+
+  if (!Key2MDAuth.isPro() && remaining <= 0) {
+    if (credits > 0) {
+      // Auto-use a purchased credit
+      useCredit = true;
+    } else {
+      // No free reviews, no credits
       document.getElementById('limitBanner').classList.add('active');
       document.getElementById('limitBanner').scrollIntoView({ behavior: 'smooth', block: 'center' });
       updateLimitUI();
@@ -2438,6 +2825,7 @@ Please analyse this essay and provide feedback in the specified JSON format.`;
         max_tokens: 2000,
         question: station.theme,
         response: essay,
+        use_credit: useCredit,
       }
     );
 
@@ -2448,7 +2836,7 @@ Please analyse this essay and provide feedback in the specified JSON format.`;
         Key2MDAuth.showAuthModal('signup');
         return;
       }
-      if (data.error === 'limit_reached') {
+      if (data.error === 'limit_reached' || data.error === 'no_credits') {
         document.getElementById('limitBanner').classList.add('active');
         document.getElementById('limitBanner').scrollIntoView({ behavior: 'smooth', block: 'center' });
         updateLimitUI();
@@ -2620,8 +3008,187 @@ document.getElementById('markingModal').addEventListener('click', function(e) {
 function openBookModal(e){if(e)e.preventDefault();const m=document.getElementById('bookModal');m.style.display='flex';}
 function closeBookModal(){document.getElementById('bookModal').style.display='none';}
 document.getElementById('bookModal').addEventListener('click',function(e){if(e.target===this)closeBookModal();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeBookModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookModal();closeCreditShop();}});
 </script>
+
+<!-- CREDIT SHOP MODAL -->
+<div id="creditShopOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);z-index:2001;display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:32px 28px;max-width:440px;width:92%;position:relative;max-height:90vh;overflow-y:auto;">
+    <button onclick="closeCreditShop()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
+
+    <div id="creditShopMain">
+      <div style="font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:4px;">Buy AI Review Credits</div>
+      <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:20px;">Credits never expire. Use them anytime.</div>
+
+      <!-- GAMSAT packs -->
+      <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">✍️ GAMSAT Essay Reviews</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+        <button class="credit-pack-btn" onclick="selectPack('gamsat_1')" data-pack="gamsat_1">
+          <div><strong>1 essay review</strong><span class="pack-price">$5.00</span></div>
+        </button>
+        <button class="credit-pack-btn" onclick="selectPack('gamsat_5')" data-pack="gamsat_5">
+          <div><strong>5 essay reviews</strong><span class="pack-price">$20.00</span><span class="pack-save">Save 20%</span></div>
+        </button>
+        <button class="credit-pack-btn recommended" onclick="selectPack('gamsat_10')" data-pack="gamsat_10">
+          <div><strong>10 essay reviews</strong><span class="pack-price">$35.00</span><span class="pack-save">Save 30%</span></div>
+          <span class="pack-rec">Best Value</span>
+        </button>
+      </div>
+
+      <!-- CASPer packs -->
+      <div style="font-size:0.72rem;font-weight:700;color:var(--accent,#2563eb);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">💬 CASPer Station Reviews</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+        <button class="credit-pack-btn" onclick="selectPack('casper_1')" data-pack="casper_1">
+          <div><strong>1 review</strong><span class="pack-price">$1.50</span></div>
+        </button>
+        <button class="credit-pack-btn" onclick="selectPack('casper_10')" data-pack="casper_10">
+          <div><strong>10 reviews</strong><span class="pack-price">$12.00</span><span class="pack-save">Save 20%</span></div>
+        </button>
+        <button class="credit-pack-btn recommended" onclick="selectPack('casper_20')" data-pack="casper_20">
+          <div><strong>20 reviews</strong><span class="pack-price">$20.00</span><span class="pack-save">Save 33%</span></div>
+          <span class="pack-rec">Best Value</span>
+        </button>
+      </div>
+
+      <!-- Purchase button -->
+      <button id="creditBuyBtn" onclick="purchaseCredits()" disabled style="width:100%;padding:14px;border-radius:50px;border:none;background:var(--accent,#2563eb);color:#fff;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;opacity:0.5;">Select a pack to continue</button>
+
+      <!-- No refunds -->
+      <div style="font-size:0.68rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:12px;line-height:1.5;">
+        By purchasing, you agree that all credit purchases are final and non-refundable.<br>Credits are tied to your account and cannot be transferred. Unused credits do not expire.
+      </div>
+    </div>
+
+    <!-- Purchase success -->
+    <div id="creditShopSuccess" style="display:none;text-align:center;padding:20px 0;">
+      <div style="font-size:2.5rem;margin-bottom:12px;">✅</div>
+      <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:6px;">Credits added!</div>
+      <div style="font-size:0.85rem;color:rgba(255,255,255,0.5);" id="creditSuccessMsg">Your credits are ready to use.</div>
+      <button onclick="closeCreditShop()" style="margin-top:20px;width:100%;padding:12px;border-radius:50px;border:none;background:var(--accent,#2563eb);color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Continue Practising →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ CREDIT SHOP ══
+let selectedPackId = null;
+
+function openCreditShop(){
+  const overlay = document.getElementById('creditShopOverlay');
+  if(!overlay) return;
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  document.getElementById('creditShopMain').style.display = 'block';
+  document.getElementById('creditShopSuccess').style.display = 'none';
+  selectedPackId = null;
+  document.querySelectorAll('.credit-pack-btn').forEach(b=>b.classList.remove('selected'));
+  const btn = document.getElementById('creditBuyBtn');
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  btn.textContent = 'Select a pack to continue';
+}
+window.openCreditShop = openCreditShop;
+
+function closeCreditShop(){
+  const overlay = document.getElementById('creditShopOverlay');
+  if(overlay) overlay.style.display = 'none';
+  document.body.style.overflow = '';
+  updateLimitUI();
+}
+window.closeCreditShop = closeCreditShop;
+
+document.addEventListener('DOMContentLoaded',function(){
+  var cs = document.getElementById('creditShopOverlay');
+  if(cs) cs.addEventListener('click',function(e){if(e.target===this)closeCreditShop();});
+});
+
+function selectPack(packId){
+  selectedPackId = packId;
+  document.querySelectorAll('.credit-pack-btn').forEach(b=>{
+    b.classList.toggle('selected', b.getAttribute('data-pack')===packId);
+  });
+  const btn = document.getElementById('creditBuyBtn');
+  const packs = {
+    casper_1:'Purchase 1 CASPer Review — $1.50',
+    casper_10:'Purchase 10 CASPer Reviews — $12.00',
+    casper_20:'Purchase 20 CASPer Reviews — $20.00',
+    gamsat_1:'Purchase 1 GAMSAT Review — $5.00',
+    gamsat_5:'Purchase 5 GAMSAT Reviews — $20.00',
+    gamsat_10:'Purchase 10 GAMSAT Reviews — $35.00'
+  };
+  btn.textContent = packs[packId] || 'Purchase';
+  btn.disabled = false;
+  btn.style.opacity = '1';
+}
+window.selectPack = selectPack;
+
+function purchaseCredits(){
+  if(!selectedPackId) return;
+  const btn = document.getElementById('creditBuyBtn');
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+
+  // TODO: Replace with Stripe Checkout redirect when Stripe is set up
+  const token = Key2MDAuth.getToken();
+  fetch(API_BASE + '/api/credits/purchase', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+    },
+    body: JSON.stringify({
+      pack_id: selectedPackId,
+      stripe_payment_id: 'pending_stripe_setup'
+    })
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.ok){
+      document.getElementById('creditShopMain').style.display = 'none';
+      document.getElementById('creditShopSuccess').style.display = 'block';
+      document.getElementById('creditSuccessMsg').textContent = 'You now have ' + data.credits + ' credits ready to use.';
+      Key2MDAuth.checkSession();
+    } else {
+      btn.textContent = 'Error — try again';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
+  })
+  .catch(()=>{
+    btn.textContent = 'Error — try again';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  });
+}
+window.purchaseCredits = purchaseCredits;
+
+// ══ AI EXPLAINER TOGGLE ══
+function toggleAiExplainer(){
+  const el = document.getElementById('aiExplainer');
+  const btn = document.getElementById('aiExplainerBtn');
+  if(el.style.display === 'block'){
+    el.style.display = 'none';
+    btn.textContent = 'Why is this different from ChatGPT? ▸';
+  } else {
+    el.style.display = 'block';
+    btn.textContent = 'Why is this different from ChatGPT? ▾';
+  }
+}
+window.toggleAiExplainer = toggleAiExplainer;
+
+// ══ MAILING LIST (GAMSAT) ══
+function subscribeGamsat(){
+  var input=document.getElementById('gamsatEmailInput');
+  var email=input.value.trim();
+  if(!email||!email.includes('@')||!email.includes('.')){input.style.borderColor='var(--danger)';input.focus();return;}
+  input.style.borderColor='';
+  fetch('https://key2md-api.brittainmbbs.workers.dev/api/email/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,source:'gamsat_practice'})})
+  .then(function(){document.getElementById('gamsatEmailForm').style.display='none';document.getElementById('gamsatEmailDone').style.display='block';})
+  .catch(function(){document.getElementById('gamsatEmailForm').style.display='none';document.getElementById('gamsatEmailDone').style.display='block';});
+}
+window.subscribeGamsat=subscribeGamsat;
+</script>
+
   <div style="display:none;" aria-hidden="true">
     <a href="https://www.key2md.com/">GAMSAT Section II Coaching Australia</a>
     <a href="https://www.key2md.com/practice.html">Free CASPer and MMI Practice Tool</a>
