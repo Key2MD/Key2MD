@@ -137,6 +137,8 @@ nav {
   transition: background 0.2s !important;
 }
 .nav-links .nav-cta:hover { background: var(--accent-dark) !important; }
+.btn-nav { padding:9px 20px; border-radius:50px; background:#0ea5e9; color:#fff !important; font-size:0.88rem; font-weight:600; transition:all 0.2s; }
+.btn-nav:hover { background:#38bdf8 !important; transform:translateY(-1px); color:#fff !important; }
 
 /* ═══════════════════════════════════════════════
    HERO SECTION
@@ -1267,6 +1269,31 @@ footer a:hover { color: var(--white); }
     </ul>
 </nav>
 
+<!-- Book Modal -->
+<div id="bookModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:40px 36px;max-width:480px;width:90%;position:relative;">
+    <button onclick="closeBookModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
+    <h3 style="color:#fff;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Book with Dan</h3>
+    <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin-bottom:28px;">Choose the session type that suits you:</p>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <a href="https://calendly.com/brittainmbbs/30min" target="_blank" style="display:block;background:rgba(14,165,233,0.15);border:1.5px solid rgba(14,165,233,0.4);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(14,165,233,0.25)'" onmouseout="this.style.background='rgba(14,165,233,0.15)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <span style="background:#0ea5e9;color:#fff;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">FREE</span>
+          <span style="color:#fff;font-weight:700;font-size:1rem;">Intro Call — 15 Minutes</span>
+        </div>
+        <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Free, no commitment. 15 minutes to discuss your goals, timeline, and fit.</p>
+      </a>
+      <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <span style="background:#f59e0b;color:#0a1628;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$300</span>
+          <span style="color:#fff;font-weight:700;font-size:1rem;">1:1 Tutoring Session — 1 Hour</span>
+        </div>
+        <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Full personalised session — MMI, CASPer, or GAMSAT S2 prep with Dan.</p>
+      </a>
+    </div>
+  </div>
+</div>
+
 <!-- HERO -->
 <section class="hero">
   <div class="hero-badge">✦ Free Resource — Key2MD</div>
@@ -1519,7 +1546,7 @@ footer a:hover { color: var(--white); }
     <a href="https://www.key2md.com/testimonials.html">Results</a>
     <a href="https://www.key2md.com/practice.html">CASPer Tool</a>
     <a href="https://www.key2md.com/guide.html">Free Guide</a>
-    <a href="https://calendly.com/brittainmbbs/30min">Book a Session</a>
+    <a href="#" onclick="openBookModal(event)">Book a Session</a>
   </div>
   <p>© 2025 Key2MD. All rights reserved. · StudentVIP Verified Tutor · r/GAMSAT Community Endorsed</p>
 </footer>
@@ -2542,6 +2569,12 @@ ${essay}
 document.getElementById('markingModal').addEventListener('click', function(e) {
   if (e.target === this) closeMarkingModal();
 });
+
+// Book modal
+function openBookModal(e){if(e)e.preventDefault();const m=document.getElementById('bookModal');m.style.display='flex';}
+function closeBookModal(){document.getElementById('bookModal').style.display='none';}
+document.getElementById('bookModal').addEventListener('click',function(e){if(e.target===this)closeBookModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeBookModal();});
 </script>
   <div style="display:none;" aria-hidden="true">
     <a href="https://www.key2md.com/">GAMSAT Section II Coaching Australia</a>
