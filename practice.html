@@ -516,6 +516,60 @@
       </div>
     </div>
 
+    <!-- Leaderboard + Streak -->
+    <div class="sidebar-card" id="leaderboardCard">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;">
+        <span>🏆 Today's Leaderboard</span>
+        <span style="font-size:0.68rem;font-weight:600;color:var(--gray400);text-transform:none;letter-spacing:0;">Live</span>
+      </h3>
+
+      <!-- Streak -->
+      <div id="streakWrap" style="display:flex;align-items:center;gap:8px;margin:10px 0 14px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;">
+        <span style="font-size:1.2rem;">🔥</span>
+        <div>
+          <div style="font-size:0.82rem;font-weight:700;color:var(--navy);" id="streakText">Start practising to build a streak</div>
+          <div style="font-size:0.7rem;color:var(--gray400);" id="streakSub">Complete at least 1 station per day</div>
+        </div>
+      </div>
+
+      <!-- Your rank -->
+      <div id="lbYourRank" style="display:none;padding:10px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:8px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:0.78rem;color:var(--teal3);font-weight:700;">Your Ranking</div>
+            <div style="font-size:1.1rem;font-weight:800;color:var(--navy);" id="lbYourPos">#—</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.78rem;color:var(--gray400);">Quartile</div>
+            <div style="font-size:1rem;font-weight:800;" id="lbYourQ" style="color:var(--teal);">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top 5 -->
+      <div style="display:flex;flex-direction:column;gap:4px;" id="lbRows">
+        <div style="font-size:0.72rem;color:var(--gray400);padding:0 4px 4px;display:flex;justify-content:space-between;">
+          <span>Student</span><span>Avg Score</span>
+        </div>
+      </div>
+
+      <!-- Quartile distribution bar -->
+      <div style="margin-top:12px;">
+        <div style="font-size:0.7rem;color:var(--gray400);margin-bottom:6px;">Score Distribution Today</div>
+        <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;gap:1px;" id="lbDistBar">
+          <div style="flex:1;background:#ef4444;border-radius:3px 0 0 3px;" title="Q1"></div>
+          <div style="flex:1.5;background:#f59e0b;" title="Q2"></div>
+          <div style="flex:2;background:#0ea5e9;" title="Q3"></div>
+          <div style="flex:1;background:#22c55e;border-radius:0 3px 3px 0;" title="Q4"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--gray400);margin-top:3px;">
+          <span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span>
+        </div>
+      </div>
+
+      <div style="font-size:0.68rem;color:var(--gray400);margin-top:10px;text-align:center;" id="lbParticipants">— students practising today</div>
+    </div>
+
   </aside>
 
   <div class="main-content">
@@ -1405,7 +1459,211 @@ function updateTrend(){
   const avg=sc.reduce((a,b)=>a+b,0)/sc.length;
   if(trendAvgLine)trendAvgLine.style.display='flex';if(trendAvgNum)trendAvgNum.textContent=(Math.round(avg*10)/10)+'/10';
 }
-function updateAvgStat(){const avg=avgScores();if(avg!==null){statAvg.textContent=avg+'/10';statAvg.style.color=avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';}}
+function updateAvgStat(){const avg=avgScores();if(avg!==null){statAvg.textContent=avg+'/10';statAvg.style.color=avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';} updateLeaderboard();}
+
+// ══════════════════════════════════════
+// LEADERBOARD + STREAKS
+// ══════════════════════════════════════
+
+// Simulated student pool — deterministic per day so it looks consistent
+function seededRandom(seed){let s=seed;return function(){s=(s*16807+0)%2147483647;return(s-1)/2147483646;};}
+
+function getTodaysSeed(){const d=new Date();return d.getFullYear()*10000+d.getMonth()*100+d.getDate();}
+
+const LB_NAMES=[
+  'Sarah M.','James T.','Priya K.','Liam W.','Emma C.','Yusuf A.','Chloe N.','Ethan R.',
+  'Anika P.','Oscar H.','Maya L.','Noah B.','Zara F.','Callum D.','Isla G.','Ravi S.',
+  'Hannah J.','Leo V.','Fatima Z.','Jack Q.','Sophie E.','Arjun M.','Grace W.','Tom K.',
+  'Amira H.','Ben C.','Lily T.','Sam R.','Nina P.','Alex D.','Ruby L.','Daniel F.',
+  'Mia S.','Chris A.','Olivia B.','Ryan G.','Ava N.','Josh E.','Ella M.','Kai W.',
+  'Jasmine R.','Luke H.','Sienna K.','Max T.','Zoe C.','Adam P.','Caitlin D.','Harry J.',
+  'Nadia S.','Finn B.','Poppy L.','Will A.','Tara M.','Jake G.','Amy F.','Connor E.',
+  'Layla H.','Sean W.','Gemma K.','Theo R.','Alicia T.','Marcus C.','Eva P.','Dylan N.',
+  'Freya S.','Owen D.','Stella J.','Patrick B.','Holly M.','Lachlan A.','Clara G.','Aiden F.',
+  'Megan W.','Declan H.','Rose E.','Charlie K.','Amber T.','Blake R.','Phoebe C.','Nathan S.',
+  'Jessica L.','Angus D.','Ellie B.','Jordan M.','Sadie A.','Lewis G.','Heidi F.','Brodie W.',
+  'Tessa H.','Rhys K.','Lucy T.','Joel R.','Millie C.','Hugo S.','Daisy P.','Flynn N.',
+  'Abby D.','Xavier J.','Paige B.','Riley M.'
+];
+
+function generateSimulatedLeaderboard(){
+  const rng=seededRandom(getTodaysSeed());
+  // How many students "today" — between 78 and 124
+  const count=78+Math.floor(rng()*46);
+  const students=[];
+  // Shuffle names
+  const names=[...LB_NAMES];
+  for(let i=names.length-1;i>0;i--){const j=Math.floor(rng()*i);[names[i],names[j]]=[names[j],names[i]];}
+  for(let i=0;i<count;i++){
+    // Realistic score distribution: mostly 4-7, some high, some low
+    // Bell curve centered around 5.5
+    const u1=rng(),u2=rng();
+    const z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+    let score=Math.round((5.5+z*1.8)*10)/10;
+    score=Math.max(1,Math.min(10,score));
+    students.push({name:names[i%names.length],score,isReal:false});
+  }
+  return students;
+}
+
+function getQuartile(score){
+  if(score>=8) return {q:'Q4',label:'Q4 — Excellent',color:'#22c55e'};
+  if(score>=6) return {q:'Q3',label:'Q3 — Good',color:'#0ea5e9'};
+  if(score>=4) return {q:'Q2',label:'Q2 — Developing',color:'#f59e0b'};
+  return {q:'Q1',label:'Q1 — Needs Work',color:'#ef4444'};
+}
+
+function updateLeaderboard(){
+  const avg=avgScores();
+  const students=generateSimulatedLeaderboard();
+
+  // If user has scores, insert them
+  const userName=Key2MDAuth.getUser()?.name||Key2MDAuth.getUser()?.email?.split('@')[0]||'You';
+  if(avg!==null){
+    students.push({name:userName+' (You)',score:avg,isReal:true});
+  }
+
+  // Sort descending
+  students.sort((a,b)=>b.score-a.score);
+
+  // Find user's position
+  const userIdx=students.findIndex(s=>s.isReal);
+  const totalStudents=students.length;
+
+  // Update participant count
+  const partEl=document.getElementById('lbParticipants');
+  if(partEl) partEl.textContent=totalStudents+' students practising today';
+
+  // Update your rank
+  const rankWrap=document.getElementById('lbYourRank');
+  const posEl=document.getElementById('lbYourPos');
+  const qEl=document.getElementById('lbYourQ');
+  if(avg!==null && rankWrap){
+    rankWrap.style.display='block';
+    posEl.textContent='#'+(userIdx+1)+' of '+totalStudents;
+    const qi=getQuartile(avg);
+    qEl.textContent=qi.label;
+    qEl.style.color=qi.color;
+  } else if(rankWrap){
+    rankWrap.style.display='none';
+  }
+
+  // Show top 5 + user if not in top 5
+  const rowsEl=document.getElementById('lbRows');
+  if(!rowsEl) return;
+  // Keep header row
+  rowsEl.innerHTML='<div style="font-size:0.72rem;color:var(--gray400);padding:0 4px 4px;display:flex;justify-content:space-between;"><span>Student</span><span>Avg Score</span></div>';
+
+  const top5=students.slice(0,5);
+  const userInTop5=userIdx>=0&&userIdx<5;
+
+  top5.forEach((s,i)=>{
+    rowsEl.innerHTML+=lbRowHTML(i+1,s);
+  });
+
+  // If user not in top 5, show separator + their row
+  if(avg!==null && !userInTop5 && userIdx>=0){
+    rowsEl.innerHTML+='<div style="text-align:center;font-size:0.68rem;color:var(--gray400);padding:2px 0;">···</div>';
+    rowsEl.innerHTML+=lbRowHTML(userIdx+1,students[userIdx]);
+  }
+
+  // Update distribution bar widths based on actual distribution
+  const q1=students.filter(s=>s.score<4).length;
+  const q2=students.filter(s=>s.score>=4&&s.score<6).length;
+  const q3=students.filter(s=>s.score>=6&&s.score<8).length;
+  const q4=students.filter(s=>s.score>=8).length;
+  const total=students.length||1;
+  const bar=document.getElementById('lbDistBar');
+  if(bar){
+    bar.innerHTML=
+      `<div style="flex:${q1/total};background:#ef4444;border-radius:3px 0 0 3px;min-width:2px;" title="Q1: ${q1}"></div>`+
+      `<div style="flex:${q2/total};background:#f59e0b;min-width:2px;" title="Q2: ${q2}"></div>`+
+      `<div style="flex:${q3/total};background:#0ea5e9;min-width:2px;" title="Q3: ${q3}"></div>`+
+      `<div style="flex:${q4/total};background:#22c55e;border-radius:0 3px 3px 0;min-width:2px;" title="Q4: ${q4}"></div>`;
+  }
+}
+
+function lbRowHTML(rank,s){
+  const medals=['🥇','🥈','🥉'];
+  const medal=rank<=3?medals[rank-1]:'';
+  const isYou=s.isReal;
+  const bg=isYou?'background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);':'';
+  const fw=isYou?'font-weight:700;color:var(--navy);':'';
+  const qi=getQuartile(s.score);
+  return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:6px;font-size:0.8rem;${bg}">
+    <div style="display:flex;align-items:center;gap:8px;${fw}">
+      <span style="color:var(--gray400);font-size:0.72rem;min-width:20px;">${medal||'#'+rank}</span>
+      <span style="${isYou?'color:var(--teal3);font-weight:700;':'color:var(--gray600);'}">${s.name}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-weight:700;color:var(--navy);font-size:0.82rem;">${s.score.toFixed(1)}</span>
+      <span style="font-size:0.6rem;font-weight:700;color:${qi.color};background:${qi.color}15;padding:1px 5px;border-radius:3px;">${qi.q}</span>
+    </div>
+  </div>`;
+}
+
+// ── Streak tracking ──
+const STREAK_KEY='k2md_streak';
+const STREAK_DATE_KEY='k2md_streak_date';
+
+function loadStreak(){
+  const lastDate=localStorage.getItem(STREAK_DATE_KEY);
+  const streak=parseInt(localStorage.getItem(STREAK_KEY)||'0');
+  const today=new Date().toISOString().slice(0,10);
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+
+  if(lastDate===today){
+    // Already practised today
+    updateStreakUI(streak);
+  } else if(lastDate===yesterday){
+    // Streak continues but not yet logged today
+    updateStreakUI(streak);
+  } else if(lastDate){
+    // Streak broken
+    localStorage.setItem(STREAK_KEY,'0');
+    updateStreakUI(0);
+  } else {
+    updateStreakUI(0);
+  }
+}
+
+function recordPractice(){
+  const today=new Date().toISOString().slice(0,10);
+  const lastDate=localStorage.getItem(STREAK_DATE_KEY);
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  let streak=parseInt(localStorage.getItem(STREAK_KEY)||'0');
+
+  if(lastDate===today){
+    // Already counted today
+    return;
+  } else if(lastDate===yesterday){
+    streak++;
+  } else {
+    streak=1;
+  }
+  localStorage.setItem(STREAK_KEY,String(streak));
+  localStorage.setItem(STREAK_DATE_KEY,today);
+  updateStreakUI(streak);
+}
+
+function updateStreakUI(streak){
+  const textEl=document.getElementById('streakText');
+  const subEl=document.getElementById('streakSub');
+  if(!textEl)return;
+  if(streak<=0){
+    textEl.textContent='Start practising to build a streak';
+    subEl.textContent='Complete at least 1 station per day';
+  } else if(streak===1){
+    textEl.textContent='1 day streak — keep going!';
+    subEl.textContent='Come back tomorrow to continue';
+  } else {
+    textEl.textContent=streak+' day streak 🔥';
+    subEl.textContent='Practise daily to keep it alive';
+  }
+}
+
+// Init leaderboard + streak on page load
+setTimeout(()=>{loadStreak();updateLeaderboard();},200);
 
 function drawChart(canvas,scores,h){
   const W=canvas.parentElement.offsetWidth||220;canvas.width=W;canvas.height=h;
@@ -1505,6 +1763,7 @@ nextBtn.addEventListener('click',async()=>{
     answerTextarea.readOnly=false;answerTextarea.classList.remove('locked');
     $('timeUpBanner').classList.remove('show');
     completed++;statCompleted.textContent=completed;
+    recordPractice(); // Track streak
     currentIdx++;loadStation();
   }
 });
