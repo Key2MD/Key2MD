@@ -414,7 +414,7 @@
       <p>Full written feedback, score estimate, and exactly what a top-quartile response would include. Unimelb MD · 200+ students coached · 48hr turnaround.</p>
     </div>
     <div class="dan-marking-right">
-      <div class="dan-price">$50</div>
+      <div class="dan-price">$35</div>
       <div class="dan-price-sub">per response</div>
       <button class="btn-dan" onclick="openMarkingModal()">Submit to Dan →</button>
     </div>
@@ -1526,7 +1526,7 @@ async function runAI(idx){
         <span style="font-size:0.82rem;color:#78350f;">Buy credits for more AI reviews, or wait until midnight AEST.</span>
         <br><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
           <button onclick="openCreditShop()" style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Buy AI Credits →</button>
-          <button onclick="openMarkingModal()" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Submit to Dan ($50) →</button>
+          <button onclick="openMarkingModal()" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Submit to Dan ($35) →</button>
         </div>
       </div>`;
       updateLimitUI();
@@ -1936,10 +1936,45 @@ function closeBookModal(){document.getElementById('bookModal').style.display='no
 document.getElementById('bookModal').addEventListener('click',function(e){if(e.target===this)closeBookModal();});
 
 // ── DAN MARKING MODAL ──
-function openMarkingModal(){
+let markingSource = 'current';
+
+function setMarkingSource(src) {
+  markingSource = src;
+  const btnCurrent = document.getElementById('markSrcCurrent');
+  const btnPaste = document.getElementById('markSrcPaste');
+  const previewWrap = document.getElementById('markCurrentPreview');
+  const pasteWrap = document.getElementById('markPasteWrap');
+  if (src === 'current') {
+    btnCurrent.style.background = 'var(--navy)'; btnCurrent.style.color = '#fff';
+    btnPaste.style.background = 'var(--gray50)'; btnPaste.style.color = 'var(--gray600)';
+    previewWrap.style.display = 'block'; pasteWrap.style.display = 'none';
+  } else {
+    btnPaste.style.background = 'var(--navy)'; btnPaste.style.color = '#fff';
+    btnCurrent.style.background = 'var(--gray50)'; btnCurrent.style.color = 'var(--gray600)';
+    previewWrap.style.display = 'none'; pasteWrap.style.display = 'block';
+  }
+}
+
+function openMarkingModal() {
+  // Populate current station preview
+  const h = sessionHistory[currentIdx];
+  const s = h?.station;
+  const preview = document.getElementById('markCurrentContent');
+  if (s && h?.answer) {
+    preview.textContent = 'Scenario: ' + (s.scenario || '') + '\n\nPrompt 1: ' + (s.prompt1 || '') + '\nPrompt 2: ' + (s.prompt2 || '') + '\n\n--- Your Response ---\n' + (h.answer || '');
+  } else {
+    preview.textContent = 'No station loaded yet. Start a station first, or switch to "Paste Your Own".';
+  }
+  // Pre-fill email if logged in
+  const user = Key2MDAuth.getUser();
+  if (user && user.email) {
+    document.getElementById('mEmail').value = user.email;
+  }
+  setMarkingSource('current');
   document.getElementById('markingModalOverlay').classList.add('open');
 }
-function closeMarkingModal(){
+
+function closeMarkingModal() {
   document.getElementById('markingModalOverlay').classList.remove('open');
 }
 window.addEventListener('DOMContentLoaded',function(){
@@ -1967,28 +2002,68 @@ window.addEventListener('DOMContentLoaded',function(){
     },
   });
 });
-function submitMarking(){
-  const name=document.getElementById('mName').value.trim();
-  const email=document.getElementById('mEmail').value.trim();
-  const notes=document.getElementById('mNotes').value.trim();
-  if(!name){alert('Please enter your name.');return;}
-  if(!email||!email.includes('@')){alert('Please enter a valid email.');return;}
-  const h=sessionHistory[currentIdx];
-  const s=h?.station;
-  const subject=encodeURIComponent('CASPer/MMI Marking Request — '+name);
-  const body=encodeURIComponent(
-    'CASPer / MMI Marking Request\n'+'═'.repeat(40)+'\n\n'+
-    'Student: '+name+'\nEmail: '+email+'\nMode: '+(currentMode==='mmi'?'MMI':'CASPer')+'\n'+
-    'Category: '+(s?.category||'Unknown')+'\nDate: '+new Date().toLocaleDateString('en-AU')+'\n'+
-    'Notes: '+(notes||'None')+'\n\n'+'═'.repeat(40)+'\nSCENARIO:\n'+(s?.scenario||'No scenario')+'\n\n'+
-    'Prompt 1: '+(s?.prompt1||'')+'\nPrompt 2: '+(s?.prompt2||'')+'\n\n'+
-    '═'.repeat(40)+'\nRESPONSE:\n'+'═'.repeat(40)+'\n'+(h?.answer||'No response')+'\n\n'+
-    '═'.repeat(40)+'\n[Please reply to '+email+' with feedback and payment link]'
-  );
-  window.location.href='mailto:brittainmbbs@gmail.com?subject='+subject+'&body='+body;
-  closeMarkingModal();
-  setTimeout(()=>alert('Your response has been prepared for Dan!\n\nYour email app should have opened with everything pre-filled. Dan will reply within 48 hours with feedback and payment details.\n\nIf your email didn\'t open, email brittainmbbs@gmail.com directly.'),500);
+function submitMarkingPayment() {
+  const email = document.getElementById('mEmail').value.trim();
+  const notes = document.getElementById('mNotes').value.trim();
+  if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+
+  let scenario = '', response = '';
+  if (markingSource === 'current') {
+    const h = sessionHistory[currentIdx];
+    const s = h?.station;
+    if (!s || !h?.answer) { alert('No station loaded. Switch to "Paste Your Own" or complete a station first.'); return; }
+    scenario = 'Mode: ' + (currentMode === 'mmi' ? 'MMI' : 'CASPer') + '\nCategory: ' + (s.category || '') + '\nScenario: ' + (s.scenario || '') + '\nPrompt 1: ' + (s.prompt1 || '') + '\nPrompt 2: ' + (s.prompt2 || '');
+    response = h.answer;
+  } else {
+    scenario = (document.getElementById('mPasteScenario').value || '').trim();
+    response = (document.getElementById('mPasteResponse').value || '').trim();
+    if (!scenario || !response) { alert('Please paste both the scenario and your response.'); return; }
+  }
+
+  const btn = document.getElementById('markPayBtn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to Stripe...';
+
+  fetch(API_BASE + '/api/marking/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      tool: 'casper',
+      email: email,
+      notes: notes,
+      scenario: scenario,
+      response: response,
+      success_url: window.location.origin + window.location.pathname + '?marking=success',
+      cancel_url: window.location.origin + window.location.pathname + '?marking=cancelled',
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      btn.textContent = data.error || 'Error \u2014 try again';
+      btn.disabled = false;
+    }
+  })
+  .catch(() => {
+    btn.textContent = 'Error \u2014 try again';
+    btn.disabled = false;
+  });
 }
+
+// Handle marking payment return
+(function handleMarkingReturn(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('marking') === 'success'){
+    window.history.replaceState({}, '', window.location.pathname);
+    setTimeout(function(){
+      alert('Payment received! Dan will review your submission and reply to your email within 48 hours.');
+    }, 500);
+  } else if(params.get('marking') === 'cancelled'){
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
 
 // ══ CREDIT SHOP ══
 let selectedPackId = null;
@@ -2125,14 +2200,38 @@ window.subscribePractice=subscribePractice;
 <div class="marking-modal-overlay" id="markingModalOverlay">
   <div class="marking-modal">
     <h3>Submit for Expert Marking</h3>
-    <p class="msub">Dan will personally review your response with full written feedback, a score estimate, and exactly what a top response would include — within 48 hours.</p>
-    <div class="marking-price-note"><strong>$50 per response</strong>Payment details sent to your email after Dan confirms receipt.</div>
-    <div class="mfield"><label>Your Name</label><input type="text" id="mName" placeholder="e.g. Sarah Chen"></div>
+    <p class="msub">Dan will personally review your response with full written feedback, a quartile estimate, and exactly what a top response would include — within 48 hours.</p>
+    <div class="marking-price-note"><strong>$35 per CASPer station</strong>Paid securely via Stripe. Dan replies to your email within 48 hours.</div>
+
+    <!-- Source toggle -->
+    <div style="display:flex;gap:0;margin-bottom:16px;border:1.5px solid var(--gray200);border-radius:50px;overflow:hidden;">
+      <button id="markSrcCurrent" onclick="setMarkingSource('current')" style="flex:1;padding:10px;border:none;background:var(--navy);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;">Current Station</button>
+      <button id="markSrcPaste" onclick="setMarkingSource('paste')" style="flex:1;padding:10px;border:none;background:var(--gray50);color:var(--gray600);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">Paste Your Own</button>
+    </div>
+
+    <!-- Current station preview -->
+    <div id="markCurrentPreview" style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px 16px;margin-bottom:14px;max-height:180px;overflow-y:auto;">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Attached from current station</div>
+      <div id="markCurrentContent" style="font-size:0.82rem;color:var(--gray600);line-height:1.6;white-space:pre-wrap;">No station loaded yet. Start a station first, or switch to "Paste Your Own".</div>
+    </div>
+
+    <!-- Paste your own (hidden by default) -->
+    <div id="markPasteWrap" style="display:none;">
+      <div class="mfield">
+        <label>Scenario / Question</label>
+        <textarea id="mPasteScenario" rows="3" placeholder="Paste the CASPer scenario or MMI prompt here..." style="width:100%;padding:9px 13px;border:1.5px solid var(--gray200);border-radius:8px;font-size:0.875rem;color:var(--gray800);outline:none;transition:border-color 0.2s;font-family:inherit;resize:vertical;"></textarea>
+      </div>
+      <div class="mfield">
+        <label>Your Response</label>
+        <textarea id="mPasteResponse" rows="4" placeholder="Paste your typed response here..." style="width:100%;padding:9px 13px;border:1.5px solid var(--gray200);border-radius:8px;font-size:0.875rem;color:var(--gray800);outline:none;transition:border-color 0.2s;font-family:inherit;resize:vertical;"></textarea>
+      </div>
+    </div>
+
     <div class="mfield"><label>Your Email (Dan will reply here)</label><input type="email" id="mEmail" placeholder="e.g. sarah@email.com"></div>
     <div class="mfield"><label>Anything else Dan should know? (optional)</label><textarea id="mNotes" rows="2" placeholder="e.g. CASPer exam date, target universities..."></textarea></div>
     <div class="mactions">
       <button class="btn-mcancel" onclick="closeMarkingModal()">Cancel</button>
-      <button class="btn-msend" onclick="submitMarking()">Send to Dan →</button>
+      <button class="btn-msend" id="markPayBtn" onclick="submitMarkingPayment()">Pay $35 & Submit →</button>
     </div>
   </div>
 </div>

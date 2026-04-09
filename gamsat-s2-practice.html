@@ -1793,12 +1793,33 @@ footer a:hover { color: var(--white); }
     <p class="modal-sub">Dan will personally mark your essay with full written feedback, a band score, and prioritised recommendations within 48 hours.</p>
     <div class="modal-price-note">
       <strong>$50 per essay</strong>
-      Payment details will be sent to your email once Dan confirms receipt. You'll hear back within 48 hours.
+      Paid securely via Stripe. Dan replies to your email within 48 hours.
     </div>
-    <div class="modal-field">
-      <label>Your Name</label>
-      <input type="text" id="markingName" placeholder="e.g. Sarah Chen">
+
+    <!-- Source toggle -->
+    <div style="display:flex;gap:0;margin-bottom:16px;border:1.5px solid var(--border-dark);border-radius:100px;overflow:hidden;">
+      <button id="markSrcCurrent" onclick="setMarkingSource('current')" style="flex:1;padding:10px;border:none;background:var(--black);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;">Current Essay</button>
+      <button id="markSrcPaste" onclick="setMarkingSource('paste')" style="flex:1;padding:10px;border:none;background:var(--surface-alt);color:var(--text-muted);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;">Paste Your Own</button>
     </div>
+
+    <!-- Current essay preview -->
+    <div id="markCurrentPreview" style="background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:14px;max-height:180px;overflow-y:auto;">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Attached from current station</div>
+      <div id="markCurrentContent" style="font-size:0.82rem;color:var(--text-muted);line-height:1.6;white-space:pre-wrap;">No essay written yet. Write your essay first, or switch to "Paste Your Own".</div>
+    </div>
+
+    <!-- Paste your own (hidden by default) -->
+    <div id="markPasteWrap" style="display:none;">
+      <div class="modal-field">
+        <label>Stimulus / Theme</label>
+        <textarea id="mPasteScenario" rows="3" placeholder="Paste the stimulus quotes or theme here..."></textarea>
+      </div>
+      <div class="modal-field">
+        <label>Your Essay</label>
+        <textarea id="mPasteResponse" rows="5" placeholder="Paste your essay here..."></textarea>
+      </div>
+    </div>
+
     <div class="modal-field">
       <label>Your Email (Dan will reply here)</label>
       <input type="email" id="markingEmail" placeholder="e.g. sarah@email.com">
@@ -1809,7 +1830,7 @@ footer a:hover { color: var(--white); }
     </div>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeMarkingModal()">Cancel</button>
-      <button class="btn-modal-submit" onclick="submitForMarking()">Send to Dan →</button>
+      <button class="btn-modal-submit" id="markPayBtn" onclick="submitMarkingPayment()">Pay $50 & Submit →</button>
     </div>
   </div>
 </div>
@@ -2940,12 +2961,42 @@ function escapeHtml(str) {
 /* ═══════════════════════════════════════════════
    MARKING MODAL
 ═══════════════════════════════════════════════ */
-function openMarkingModal() {
-  const essay = document.getElementById('essayTextarea').value.trim();
-  if (!essay) {
-    alert('Please write your essay before submitting for marking.');
-    return;
+let markingSource = 'current';
+
+function setMarkingSource(src) {
+  markingSource = src;
+  const btnCurrent = document.getElementById('markSrcCurrent');
+  const btnPaste = document.getElementById('markSrcPaste');
+  const previewWrap = document.getElementById('markCurrentPreview');
+  const pasteWrap = document.getElementById('markPasteWrap');
+  if (src === 'current') {
+    btnCurrent.style.background = 'var(--black)'; btnCurrent.style.color = '#fff';
+    btnPaste.style.background = 'var(--surface-alt)'; btnPaste.style.color = 'var(--text-muted)';
+    previewWrap.style.display = 'block'; pasteWrap.style.display = 'none';
+  } else {
+    btnPaste.style.background = 'var(--black)'; btnPaste.style.color = '#fff';
+    btnCurrent.style.background = 'var(--surface-alt)'; btnCurrent.style.color = 'var(--text-muted)';
+    previewWrap.style.display = 'none'; pasteWrap.style.display = 'block';
   }
+}
+
+function openMarkingModal() {
+  // Populate preview with current essay
+  const essay = document.getElementById('essayTextarea').value.trim();
+  const station = currentStation !== null ? stations[currentTask][currentStation] : null;
+  const preview = document.getElementById('markCurrentContent');
+  if (station && essay) {
+    const quotesText = station.quotes.map((q,i) => (i+1) + '. "' + q.text + '" — ' + q.attr).join('\n');
+    preview.textContent = 'Task ' + currentTask + ': ' + station.theme + '\n\nStimulus:\n' + quotesText + '\n\n--- Your Essay ---\n' + essay;
+  } else {
+    preview.textContent = 'No essay written yet. Write your essay first, or switch to "Paste Your Own".';
+  }
+  // Pre-fill email
+  const user = Key2MDAuth.getUser();
+  if (user && user.email) {
+    document.getElementById('markingEmail').value = user.email;
+  }
+  setMarkingSource('current');
   document.getElementById('markingModal').classList.add('active');
 }
 
@@ -2953,54 +3004,69 @@ function closeMarkingModal() {
   document.getElementById('markingModal').classList.remove('active');
 }
 
-function submitForMarking() {
-  const name = document.getElementById('markingName').value.trim();
+function submitMarkingPayment() {
   const email = document.getElementById('markingEmail').value.trim();
   const notes = document.getElementById('markingNotes').value.trim();
-  const essay = document.getElementById('essayTextarea').value.trim();
-  const station = currentStation !== null ? stations[currentTask][currentStation] : null;
+  if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
 
-  if (!name) { alert('Please enter your name.'); return; }
-  if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
+  let scenario = '', response = '';
+  if (markingSource === 'current') {
+    const essay = document.getElementById('essayTextarea').value.trim();
+    const station = currentStation !== null ? stations[currentTask][currentStation] : null;
+    if (!station || !essay) { alert('No essay written. Switch to "Paste Your Own" or write your essay first.'); return; }
+    const quotesText = station.quotes.map((q,i) => (i+1) + '. "' + q.text + '" \u2014 ' + q.attr).join('\n');
+    scenario = 'Task ' + currentTask + ': ' + station.theme + '\nStimulus:\n' + quotesText;
+    response = essay;
+  } else {
+    scenario = (document.getElementById('mPasteScenario').value || '').trim();
+    response = (document.getElementById('mPasteResponse').value || '').trim();
+    if (!scenario || !response) { alert('Please paste both the stimulus and your essay.'); return; }
+  }
 
-  const subject = encodeURIComponent(`GAMSAT S2 Marking Request — ${name} — Task ${currentTask}${station ? ': ' + station.theme : ''}`);
-  
-  const quotesText = station 
-    ? station.quotes.map((q,i)=>`${i+1}. "${q.text}" — ${q.attr}`).join('\n')
-    : 'No station selected';
+  const btn = document.getElementById('markPayBtn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to Stripe...';
 
-  const body = encodeURIComponent(
-`GAMSAT Section II Marking Request
-════════════════════════════════════
-
-Student Name: ${name}
-Student Email: ${email}
-Task: ${currentTask} — ${station ? station.theme : 'Unknown'}
-Date: ${new Date().toLocaleDateString('en-AU')}
-
-Notes: ${notes || 'None'}
-
-STIMULUS:
-${quotesText}
-
-════════════════════════════════════
-ESSAY:
-════════════════════════════════════
-
-${essay}
-
-════════════════════════════════════
-[Please reply to ${email} with feedback and payment link]`
-  );
-
-  window.location.href = `mailto:brittainmbbs@gmail.com?subject=${subject}&body=${body}`;
-  closeMarkingModal();
-  
-  // Show confirmation
-  setTimeout(() => {
-    alert(`Your essay has been prepared for Dan!\n\nYour email app should have opened with your essay pre-filled. Once Dan receives it, he'll send payment details and feedback within 48 hours.\n\nIf your email didn't open, you can manually email brittainmbbs@gmail.com with your essay.`);
-  }, 500);
+  fetch(API_BASE + '/api/marking/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      tool: 'gamsat',
+      email: email,
+      notes: notes,
+      scenario: scenario,
+      response: response,
+      success_url: window.location.origin + window.location.pathname + '?marking=success',
+      cancel_url: window.location.origin + window.location.pathname + '?marking=cancelled',
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      btn.textContent = data.error || 'Error \u2014 try again';
+      btn.disabled = false;
+    }
+  })
+  .catch(() => {
+    btn.textContent = 'Error \u2014 try again';
+    btn.disabled = false;
+  });
 }
+
+// Handle marking payment return
+(function handleMarkingReturn(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('marking') === 'success'){
+    window.history.replaceState({}, '', window.location.pathname);
+    setTimeout(function(){
+      alert('Payment received! Dan will review your essay and reply to your email within 48 hours.');
+    }, 500);
+  } else if(params.get('marking') === 'cancelled'){
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
 
 // Close modal on overlay click
 document.getElementById('markingModal').addEventListener('click', function(e) {
