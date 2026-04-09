@@ -1532,150 +1532,55 @@ footer a:hover { color: var(--white); }
 </div>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="hero-badge">✦ Free Resource — Key2MD</div>
-  <h1>Free GAMSAT Section II<br><em>Essay Practice Tool</em></h1>
-  <p class="hero-sub">50 real-style stimuli across Task A and Task B. 30-minute timer, examiner-lens AI feedback, and optional expert human marking by Dan — Unimelb MD student.</p>
-  <div class="hero-stats">
-    <div class="hero-stat"><strong>50</strong><span>Unique Stimuli</span></div>
-    <div class="hero-stat"><strong>25+25</strong><span>Task A & Task B</span></div>
-    <div class="hero-stat"><strong>30 min</strong><span>Timed Practice</span></div>
-    <div class="hero-stat"><strong>1 Free/Day</strong><span>AI Essay Review</span></div>
+<section class="hero" style="padding:56px 5% 40px;">
+  <div class="hero-badge">✦ Free Practice Tool — Key2MD</div>
+  <h1 style="margin-bottom:10px;">GAMSAT Section II<br><em>Essay Practice</em></h1>
+  <p class="hero-sub" style="margin-bottom:20px;">50 real-style stimuli. Timed writing. AI examiner feedback. Expert marking by Dan.</p>
+  <div class="hero-stats" style="gap:28px;">
+    <div class="hero-stat"><strong>25</strong><span>Task A Stimuli</span></div>
+    <div class="hero-stat"><strong>25</strong><span>Task B Stimuli</span></div>
+    <div class="hero-stat"><strong>30 min</strong><span>Timed Sessions</span></div>
+    <div class="hero-stat"><strong>Free</strong><span>AI Review Daily</span></div>
   </div>
+  <a href="#practice-area" style="display:inline-block;margin-top:24px;padding:14px 32px;background:var(--accent);color:#fff;font-weight:700;font-size:0.95rem;border-radius:100px;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 20px rgba(37,99,235,0.3);" onmouseover="this.style.background='var(--accent-dark)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='var(--accent)';this.style.transform='none'">Start Writing ↓</a>
 </section>
 
-<!-- HOW IT WORKS -->
-<div class="how-it-works">
-  <div class="how-steps">
-    <div class="how-step">
-      <div class="how-step-num">1</div>
-      <div class="how-step-text">Choose Task A or B <span>→ select a station</span></div>
-    </div>
-    <div class="how-arrow">›</div>
-    <div class="how-step">
-      <div class="how-step-num">2</div>
-      <div class="how-step-text">Read the stimulus <span>→ start your 30-min timer</span></div>
-    </div>
-    <div class="how-arrow">›</div>
-    <div class="how-step">
-      <div class="how-step-num">3</div>
-      <div class="how-step-text">Write your essay <span>→ get AI feedback</span></div>
-    </div>
-    <div class="how-arrow">›</div>
-    <div class="how-step">
-      <div class="how-step-num">4</div>
-      <div class="how-step-text">Optional: submit <span>→ Dan marks it</span></div>
-    </div>
-  </div>
-</div>
-
 <!-- MAIN TOOL -->
-<div class="tool-wrapper">
-
-  <!-- PAID MARKING CARD -->
-  <div class="marking-card" style="margin-top:32px;">
-    <div class="marking-card-left">
-      <div class="marking-card-label">Expert Human Marking</div>
-      <h3>Get Dan to mark your essay personally</h3>
-      <p>A University of Melbourne MD student and Australia's most trusted GAMSAT Section II tutor marks your essay with full written feedback, a band score, and prioritised recommendations. Turnaround within 48 hours.</p>
-    </div>
-    <div class="marking-card-right">
-      <div class="marking-price">
-        <strong>$50</strong>
-        <span>per essay</span>
-      </div>
-      <button class="btn-marking" onclick="openMarkingModal()">Submit for Marking →</button>
-    </div>
-  </div>
-
-  <!-- TASK SELECTOR -->
-  <div class="task-selector" style="margin-top:32px;">
-    <div class="task-card active" onclick="selectTask('A')">
-      <div class="task-tag tag-a">✍️ Task A</div>
-      <h3>Socio-cultural Essay</h3>
-      <p>Write an expository essay responding to a social, cultural, ethical or philosophical theme. State a clear viewpoint and argue with evidence. Assessed on argument quality, structure, and insight.</p>
-    </div>
-    <div class="task-card task-b-card" onclick="selectTask('B')">
-      <div class="task-tag tag-b">💭 Task B</div>
-      <h3>Personal Reflection</h3>
-      <p>Write a personal, discursive or reflective piece. You may draw on imagination, personal experience, or narrative. Assessed on depth of personal voice, emotional authenticity, and thematic insight.</p>
-    </div>
-  </div>
+<div class="tool-wrapper" id="practice-area">
 
   <!-- Auth / Account -->
-  <div id="k2mdAuthBar" style="margin-bottom:20px;"></div>
+  <div id="k2mdAuthBar" style="margin-bottom:16px;"></div>
 
-  <!-- AI MARKING + MAILING LIST PANELS -->
-  <div class="panels-row">
+  <!-- QUICK START: Task + Station selector -->
+  <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px 32px;margin-bottom:24px;box-shadow:var(--shadow-sm);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--text);margin:0;">Choose your essay</h2>
+      <button class="btn btn-random" onclick="loadRandom()" style="font-size:0.82rem;padding:8px 16px;">🎲 Random Station</button>
+    </div>
 
-    <!-- AI Marking Panel -->
-    <div class="ai-panel">
-      <div class="ai-panel-header">
-        <span class="ai-panel-title">✦ AI Essay Marking</span>
-        <span class="ai-status-badge" id="gamsatAiStatus">1 free/day</span>
+    <!-- Task toggle -->
+    <div class="task-selector" style="margin-bottom:16px;">
+      <div class="task-card active" onclick="selectTask('A')" style="padding:16px 20px;">
+        <div class="task-tag tag-a">✍️ Task A</div>
+        <h3 style="font-size:1rem;margin-bottom:4px;">Socio-cultural Essay</h3>
+        <p style="font-size:0.78rem;">Expository / argumentative. Clear thesis, logical argument, evidence.</p>
       </div>
-
-      <!-- Why our AI is different -->
-      <div style="margin-top:4px;">
-        <button class="ai-explainer-toggle" id="aiExplainerBtn" onclick="toggleAiExplainer()">Why is this different from ChatGPT? ▸</button>
-        <div class="ai-explainer-content" id="aiExplainer">
-          <strong>This isn't generic AI feedback.</strong>
-          Dan has spent 300+ hours developing the marking criteria, prompt architecture, and scoring rubrics that power this tool — drawing directly from his experience coaching students through GAMSAT Section II and using Des O'Neill's framework.
-          <br><br>
-          Every essay is assessed using <strong>Dan's GAMSAT-specific rubric</strong>, the same criteria he uses in paid 1:1 sessions. The AI is specifically calibrated to penalise the exact mistakes Dan sees students make — shallow engagement with stimulus quotes, generic framework responses, weak thesis statements, and surface-level reflections that would score below Band 60.
-          <br><br>
-          <strong>Dan is sceptical of AI feedback.</strong> Most AI marking tools give vague, encouraging responses that don't actually move your band score. This one was built with the opposite philosophy: honest, specific, sometimes uncomfortable feedback — because that's what separates a Band 55 from a Band 70.
-          <br><br>
-          <span style="color:var(--accent);font-weight:600;">Try it yourself — paste the same essay into ChatGPT and compare. You'll see the difference immediately.</span>
-        </div>
-      </div>
-
-      <!-- Limits + Credits -->
-      <div id="aiLimitWrap" style="margin-top:14px;">
-        <div class="ai-limit-bar">
-          <span class="ai-limit-label">Free daily review</span>
-          <span class="ai-limit-count" id="aiLimitCount">1 remaining</span>
-        </div>
-        <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
-
-        <!-- Credit balance -->
-        <div class="credit-balance-wrap" id="creditBalanceWrap" style="display:none;">
-          <span class="credit-balance-label">Purchased credits</span>
-          <span class="credit-balance-num" id="creditCount">0</span>
-        </div>
-
-        <p class="ai-limit-note" id="aiLimitNote">Create a free account to unlock AI reviews.</p>
-      </div>
-
-      <!-- Buy credits button -->
-      <div id="buyCreditsBtnWrap" style="display:none;">
-        <button class="buy-credits-btn" onclick="openCreditShop()">Buy More AI Reviews →</button>
+      <div class="task-card task-b-card" onclick="selectTask('B')" style="padding:16px 20px;">
+        <div class="task-tag tag-b">💭 Task B</div>
+        <h3 style="font-size:1rem;margin-bottom:4px;">Personal Reflection</h3>
+        <p style="font-size:0.78rem;">Reflective / discursive. Personal voice, emotional depth, narrative.</p>
       </div>
     </div>
 
-    <!-- Mailing List Panel -->
-    <div class="mailing-panel">
-      <h3>📬 Weekly GAMSAT Tips</h3>
-      <p>Get Dan's weekly GAMSAT Section II tips — essay breakdowns, common mistakes, what examiners actually look for, and Band 70 strategies.</p>
-      <div id="gamsatEmailForm">
-        <input type="email" id="gamsatEmailInput" class="mailing-input" placeholder="Your email">
-        <button class="mailing-submit" onclick="subscribeGamsat()">Subscribe Free →</button>
-      </div>
-      <div class="mailing-done" id="gamsatEmailDone">✓ You're in! Check your inbox.</div>
-      <p class="mailing-fine-print">No spam. Unsubscribe anytime.</p>
+    <!-- Station dropdown -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <select class="station-select" id="stationSelect" onchange="loadStation()" style="flex:1;">
+        <option value="">— Select a station —</option>
+      </select>
+      <button class="btn btn-secondary" onclick="clearEssay()" style="font-size:0.82rem;padding:8px 14px;">Clear</button>
     </div>
-
   </div>
 
-  <!-- CONTROLS -->
-  <div class="controls-bar">
-    <label>Station:</label>
-    <select class="station-select" id="stationSelect" onchange="loadStation()">
-      <option value="">— Select a station —</option>
-    </select>
-    <button class="btn btn-random" onclick="loadRandom()">🎲 Random</button>
-    <button class="btn btn-secondary" onclick="clearEssay()">Clear Essay</button>
-  </div>
 
   <!-- STATION DISPLAY -->
   <div class="station-display" id="stationDisplay">
@@ -1736,12 +1641,16 @@ footer a:hover { color: var(--white); }
     </div>
 
     <!-- Human marking inline CTA -->
-    <div class="inline-marking-cta">
-      <div class="inline-marking-cta-left">
-        <h4>Want expert human feedback instead?</h4>
-        <p>Dan provides detailed written marking, a band estimate, and tailored recommendations — just as a real GAMSAT examiner would. $50 · 48hr turnaround.</p>
+    <div style="background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);border-radius:var(--radius-lg);padding:24px 28px;margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:220px;">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Expert Human Marking</div>
+        <h4 style="color:#fff;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:4px;">Want Dan to mark this essay?</h4>
+        <p style="color:rgba(255,255,255,0.55);font-size:0.82rem;line-height:1.5;margin:0;">Full written feedback, band score estimate, and what a Band 70 response would include. 48hr turnaround.</p>
       </div>
-      <button class="btn-submit-marking" onclick="openMarkingModal()">Submit for Dan's Marking →</button>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;">
+        <div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--gold);">$50</div>
+        <button class="btn-marking" onclick="openMarkingModal()" style="white-space:nowrap;">Submit to Dan →</button>
+      </div>
     </div>
 
     <!-- AI Feedback loading -->
@@ -1834,6 +1743,70 @@ footer a:hover { color: var(--white); }
     </div>
   </div>
 </div>
+
+<!-- AI MARKING + MAILING LIST PANELS -->
+  <div class="panels-row">
+
+    <!-- AI Marking Panel -->
+    <div class="ai-panel">
+      <div class="ai-panel-header">
+        <span class="ai-panel-title">✦ AI Essay Marking</span>
+        <span class="ai-status-badge" id="gamsatAiStatus">1 free/day</span>
+      </div>
+
+      <!-- Why our AI is different -->
+      <div style="margin-top:4px;">
+        <button class="ai-explainer-toggle" id="aiExplainerBtn" onclick="toggleAiExplainer()">Why is this different from ChatGPT? ▸</button>
+        <div class="ai-explainer-content" id="aiExplainer">
+          <strong>This isn't generic AI feedback.</strong>
+          Dan has spent 300+ hours developing the marking criteria, prompt architecture, and scoring rubrics that power this tool — drawing directly from his experience coaching students through GAMSAT Section II and using Des O'Neill's framework.
+          <br><br>
+          Every essay is assessed using <strong>Dan's GAMSAT-specific rubric</strong>, the same criteria he uses in paid 1:1 sessions. The AI is specifically calibrated to penalise the exact mistakes Dan sees students make — shallow engagement with stimulus quotes, generic framework responses, weak thesis statements, and surface-level reflections that would score below Band 60.
+          <br><br>
+          <strong>Dan is sceptical of AI feedback.</strong> Most AI marking tools give vague, encouraging responses that don't actually move your band score. This one was built with the opposite philosophy: honest, specific, sometimes uncomfortable feedback — because that's what separates a Band 55 from a Band 70.
+          <br><br>
+          <span style="color:var(--accent);font-weight:600;">Try it yourself — paste the same essay into ChatGPT and compare. You'll see the difference immediately.</span>
+        </div>
+      </div>
+
+      <!-- Limits + Credits -->
+      <div id="aiLimitWrap" style="margin-top:14px;">
+        <div class="ai-limit-bar">
+          <span class="ai-limit-label">Free daily review</span>
+          <span class="ai-limit-count" id="aiLimitCount">1 remaining</span>
+        </div>
+        <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
+
+        <!-- Credit balance -->
+        <div class="credit-balance-wrap" id="creditBalanceWrap" style="display:none;">
+          <span class="credit-balance-label">Purchased credits</span>
+          <span class="credit-balance-num" id="creditCount">0</span>
+        </div>
+
+        <p class="ai-limit-note" id="aiLimitNote">Create a free account to unlock AI reviews.</p>
+      </div>
+
+      <!-- Buy credits button -->
+      <div id="buyCreditsBtnWrap" style="display:none;">
+        <button class="buy-credits-btn" onclick="openCreditShop()">Buy More AI Reviews →</button>
+      </div>
+    </div>
+
+    <!-- Mailing List Panel -->
+    <div class="mailing-panel">
+      <h3>📬 Weekly GAMSAT Tips</h3>
+      <p>Get Dan's weekly GAMSAT Section II tips — essay breakdowns, common mistakes, what examiners actually look for, and Band 70 strategies.</p>
+      <div id="gamsatEmailForm">
+        <input type="email" id="gamsatEmailInput" class="mailing-input" placeholder="Your email">
+        <button class="mailing-submit" onclick="subscribeGamsat()">Subscribe Free →</button>
+      </div>
+      <div class="mailing-done" id="gamsatEmailDone">✓ You're in! Check your inbox.</div>
+      <p class="mailing-fine-print">No spam. Unsubscribe anytime.</p>
+    </div>
+
+  </div>
+
+  
 
 <!-- SEO CONTENT SECTION -->
 <section class="seo-section">
