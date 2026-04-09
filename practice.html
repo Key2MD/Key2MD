@@ -2029,12 +2029,12 @@ function selectPack(packId){
   });
   const btn = document.getElementById('creditBuyBtn');
   const packs = {
-    casper_1:'Purchase 1 CASPer Review — $1.50',
-    casper_10:'Purchase 10 CASPer Reviews — $12.00',
-    casper_20:'Purchase 20 CASPer Reviews — $20.00',
-    gamsat_1:'Purchase 1 GAMSAT Review — $5.00',
-    gamsat_5:'Purchase 5 GAMSAT Reviews — $20.00',
-    gamsat_10:'Purchase 10 GAMSAT Reviews — $35.00'
+    casper_1:'Purchase 1 Station Review — $7.00',
+    casper_5:'Purchase 5 Station Reviews — $31.50',
+    casper_10:'Purchase 10 Station Reviews — $56.00',
+    gamsat_1:'Purchase 1 Essay Review — $12.00',
+    gamsat_5:'Purchase 5 Essay Reviews — $54.00',
+    gamsat_10:'Purchase 10 Essay Reviews — $96.00'
   };
   btn.textContent = packs[packId] || 'Purchase';
   btn.disabled = false;
@@ -2150,13 +2150,13 @@ window.subscribePractice=subscribePractice;
       <div style="font-size:0.72rem;font-weight:700;color:#38bdf8;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">💬 CASPer Station Reviews</div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
         <button class="credit-pack-btn" onclick="selectPack('casper_1')" data-pack="casper_1">
-          <div><strong>1 review</strong><span class="pack-price">$1.50</span></div>
+          <div><strong>1 station review</strong><span class="pack-price">$7.00</span></div>
         </button>
-        <button class="credit-pack-btn" onclick="selectPack('casper_10')" data-pack="casper_10">
-          <div><strong>10 reviews</strong><span class="pack-price">$12.00</span><span class="pack-save">Save 20%</span></div>
+        <button class="credit-pack-btn" onclick="selectPack('casper_5')" data-pack="casper_5">
+          <div><strong>5 station reviews</strong><span class="pack-price">$31.50</span><span class="pack-save">Save 10%</span></div>
         </button>
-        <button class="credit-pack-btn recommended" onclick="selectPack('casper_20')" data-pack="casper_20">
-          <div><strong>20 reviews</strong><span class="pack-price">$20.00</span><span class="pack-save">Save 33%</span></div>
+        <button class="credit-pack-btn recommended" onclick="selectPack('casper_10')" data-pack="casper_10">
+          <div><strong>10 station reviews</strong><span class="pack-price">$56.00</span><span class="pack-save">Save 20%</span></div>
           <span class="pack-rec">Best Value</span>
         </button>
       </div>
@@ -2165,13 +2165,13 @@ window.subscribePractice=subscribePractice;
       <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">✍️ GAMSAT Essay Reviews</div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
         <button class="credit-pack-btn" onclick="selectPack('gamsat_1')" data-pack="gamsat_1">
-          <div><strong>1 essay review</strong><span class="pack-price">$5.00</span></div>
+          <div><strong>1 essay review</strong><span class="pack-price">$12.00</span></div>
         </button>
         <button class="credit-pack-btn" onclick="selectPack('gamsat_5')" data-pack="gamsat_5">
-          <div><strong>5 essay reviews</strong><span class="pack-price">$20.00</span><span class="pack-save">Save 20%</span></div>
+          <div><strong>5 essay reviews</strong><span class="pack-price">$54.00</span><span class="pack-save">Save 10%</span></div>
         </button>
         <button class="credit-pack-btn recommended" onclick="selectPack('gamsat_10')" data-pack="gamsat_10">
-          <div><strong>10 essay reviews</strong><span class="pack-price">$35.00</span><span class="pack-save">Save 30%</span></div>
+          <div><strong>10 essay reviews</strong><span class="pack-price">$96.00</span><span class="pack-save">Save 20%</span></div>
           <span class="pack-rec">Best Value</span>
         </button>
       </div>
