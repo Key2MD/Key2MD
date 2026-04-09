@@ -361,6 +361,7 @@
       <li><a href="guide.html">📖 Free Guide</a></li>
       <li><a href="practice.html" style="color:var(--gold);font-weight:700;" class="active">🎯 CASPer Practice</a></li>
       <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a></li>
+      <li><a href="blog.html">Blog</a></li>
       <li><a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session</a></li>
     </ul>
     <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
@@ -374,6 +375,7 @@
   <a href="guide.html" class="mobile-link">📖 Free Guide</a>
   <a href="practice.html" class="mobile-link" style="color:var(--gold);font-weight:700;">🎯 CASPer Practice</a>
   <a href="gamsat-s2-practice.html" class="mobile-link" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a>
+  <a href="blog.html" class="mobile-link">Blog</a>
   <a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session →</a>
 </nav>
 
@@ -2042,17 +2044,16 @@ window.selectPack = selectPack;
 
 function purchaseCredits(){
   if(!selectedPackId) return;
+  if(!Key2MDAuth.isLoggedIn()){
+    Key2MDAuth.showAuthModal('signup');
+    return;
+  }
   const btn = document.getElementById('creditBuyBtn');
   btn.disabled = true;
-  btn.textContent = 'Processing...';
+  btn.textContent = 'Redirecting to Stripe...';
 
-  // TODO: Replace with Stripe Checkout redirect when Stripe is set up
-  // For now, record the purchase intent and show success
-  // When Stripe is live, this will redirect to Stripe Checkout and
-  // the webhook will call /api/credits/purchase with the payment ID
-  
   const token = Key2MDAuth.getToken();
-  fetch(API_BASE + '/api/credits/purchase', {
+  fetch(API_BASE + '/api/checkout/create', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -2060,30 +2061,51 @@ function purchaseCredits(){
     },
     body: JSON.stringify({
       pack_id: selectedPackId,
-      stripe_payment_id: 'pending_stripe_setup' // placeholder
+      success_url: window.location.origin + window.location.pathname + '?payment=success',
+      cancel_url: window.location.origin + window.location.pathname + '?payment=cancelled',
     })
   })
-  .then(r=>r.json())
-  .then(data=>{
-    if(data.ok){
-      document.getElementById('creditShopMain').style.display = 'none';
-      document.getElementById('creditShopSuccess').style.display = 'block';
-      document.getElementById('creditSuccessMsg').textContent = 'You now have ' + data.credits + ' credits ready to use.';
-      // Refresh limits
-      Key2MDAuth.checkSession();
+  .then(r => r.json())
+  .then(data => {
+    if(data.checkout_url){
+      // Redirect to Stripe Checkout
+      window.location.href = data.checkout_url;
     } else {
-      btn.textContent = 'Error — try again';
+      btn.textContent = data.error || 'Error \u2014 try again';
       btn.disabled = false;
       btn.style.opacity = '1';
     }
   })
-  .catch(()=>{
-    btn.textContent = 'Error — try again';
+  .catch(() => {
+    btn.textContent = 'Error \u2014 try again';
     btn.disabled = false;
     btn.style.opacity = '1';
   });
 }
 window.purchaseCredits = purchaseCredits;
+
+// \u2550\u2550 HANDLE STRIPE RETURN \u2550\u2550
+(function handlePaymentReturn(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('payment') === 'success'){
+    // Clean URL
+    window.history.replaceState({}, '', window.location.pathname);
+    // Wait for auth to init, then show success
+    setTimeout(function(){
+      Key2MDAuth.checkSession();
+      // Show credit shop success state
+      const overlay = document.getElementById('creditShopOverlay');
+      if(overlay){
+        overlay.style.display = 'flex';
+        document.getElementById('creditShopMain').style.display = 'none';
+        document.getElementById('creditShopSuccess').style.display = 'block';
+        document.getElementById('creditSuccessMsg').textContent = 'Payment successful! Your credits have been added.';
+      }
+    }, 1500);
+  } else if(params.get('payment') === 'cancelled'){
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
 
 // ══ MAILING LIST (sidebar) ══
 function subscribePractice(){
