@@ -4,71 +4,805 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow,noarchive,nosnippet" />
-  <title>Admin Sign In</title>
+  <title>Key2MD Admin</title>
   <style>
-    body {
+    :root {
+      --bg: #0b1220;
+      --bg-soft: rgba(255,255,255,0.04);
+      --panel: rgba(255,255,255,0.06);
+      --panel-strong: rgba(255,255,255,0.09);
+      --border: rgba(255,255,255,0.12);
+      --text: #f4f7fb;
+      --muted: #a9b4c6;
+      --accent: #7dd3fc;
+      --success: #86efac;
+      --danger: #fca5a5;
+      --shadow: 0 16px 40px rgba(0,0,0,0.24);
+      --radius: 18px;
+      --maxw: 1320px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
       margin: 0;
-      min-height: 100vh;
+      padding: 0;
+      background:
+        radial-gradient(circle at top left, rgba(125,211,252,0.14), transparent 28%),
+        radial-gradient(circle at top right, rgba(147,197,253,0.12), transparent 24%),
+        linear-gradient(180deg, #07111f 0%, #0b1220 100%);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100%;
+    }
+
+    .shell {
+      width: min(var(--maxw), calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 64px;
+    }
+
+    .hidden { display: none !important; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      backdrop-filter: blur(14px);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .brand h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.4rem, 2vw, 2rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      color: var(--muted);
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .loginWrap {
       display: grid;
       place-items: center;
-      background: linear-gradient(180deg, #07111f 0%, #0b1220 100%);
-      color: #f4f7fb;
-      font-family: Inter, system-ui, sans-serif;
+      min-height: 70vh;
     }
-    .box {
-      width: min(460px, calc(100vw - 24px));
-      padding: 24px;
+
+    .loginBox {
+      width: min(460px, 100%);
+      padding: 28px;
       border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.06);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.24);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
     }
-    h1 { margin-top: 0; }
-    input, button {
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .loginBox h2 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .loginBox p {
+      margin: 0 0 20px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 8px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    input, select, button {
       width: 100%;
-      min-height: 48px;
+      min-height: 50px;
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid var(--border);
       background: rgba(255,255,255,0.06);
-      color: #fff;
+      color: var(--text);
       padding: 12px 14px;
-      margin-bottom: 12px;
-      box-sizing: border-box;
+      font-size: 1rem;
+      outline: none;
+      font: inherit;
     }
-    button { cursor: pointer; font-weight: 700; }
-    .error { color: #fecaca; min-height: 1.2rem; }
+
+    input:focus, select:focus {
+      border-color: rgba(125,211,252,0.55);
+      background: rgba(255,255,255,0.08);
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(180deg, rgba(125,211,252,0.24), rgba(125,211,252,0.14));
+      transition: transform .18s ease, border-color .18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(125,211,252,0.45);
+    }
+
+    .button.secondary {
+      background: rgba(255,255,255,0.06);
+      font-weight: 600;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.045));
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .card .label {
+      color: var(--muted);
+      font-size: 0.83rem;
+      margin-bottom: 8px;
+    }
+
+    .card .value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .tableWrap {
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.035));
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .tableScroller {
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1080px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      vertical-align: top;
+      font-size: 0.95rem;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: rgba(8,16,30,0.94);
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      z-index: 1;
+    }
+
+    tr.data-row {
+      cursor: pointer;
+      transition: background .16s ease;
+    }
+
+    tr.data-row:hover {
+      background: rgba(255,255,255,0.045);
+    }
+
+    .muted { color: var(--muted); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .badge.free { color: var(--accent); }
+    .badge.paid, .badge.premium, .badge.pro { color: var(--success); }
+
+    .truncate {
+      max-width: 460px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .detail-row { display: none; }
+    .detail-row.open { display: table-row; }
+
+    .detail-panel {
+      padding: 18px;
+      background: rgba(255,255,255,0.035);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .detail-box {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      padding: 14px;
+      min-height: 160px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .detail-box h4 {
+      margin: 0 0 12px;
+      font-size: 0.95rem;
+    }
+
+    .error {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(252,165,165,0.25);
+      background: rgba(252,165,165,0.08);
+      color: #ffe3e3;
+      display: none;
+    }
+
+    .empty {
+      padding: 36px 18px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .rowActions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    @media (max-width: 1100px) {
+      .controls { grid-template-columns: 1fr 1fr; }
+      .summary { grid-template-columns: 1fr 1fr; }
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(calc(100vw - 20px), var(--maxw)); padding-top: 18px; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .controls { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: 1fr; }
+      th, td { padding: 12px; }
+      .truncate { max-width: 240px; }
+      .toolbar { flex-direction: column; align-items: flex-start; }
+    }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>Admin Sign In</h1>
-    <p>Private internal access only.</p>
-    <form id="loginForm">
-      <input id="email" type="email" autocomplete="username" placeholder="Email" required />
-      <input id="password" type="password" autocomplete="current-password" placeholder="Password" required />
-      <button type="submit">Sign in</button>
-      <div class="error" id="error"></div>
-    </form>
+  <div class="shell">
+
+    <section id="loginSection" class="loginWrap">
+      <div class="loginBox">
+        <div class="eyebrow">Private admin</div>
+        <h2>Sign in</h2>
+        <p>Internal access only. Session is memory-only and will disappear on refresh or tab close.</p>
+
+        <form id="loginForm">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" placeholder="Email" required />
+
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="Password" required />
+
+          <button id="submitBtn" type="submit">Sign in</button>
+          <div class="error" id="loginError"></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="dashboardSection" class="hidden">
+      <div class="topbar">
+        <div class="brand">
+          <h1>Admin Reviews</h1>
+          <p>Private internal view for submissions, student identities, and feedback history.</p>
+        </div>
+        <div class="pill" id="adminBadge">Not signed in</div>
+      </div>
+
+      <div class="controls">
+        <input id="searchInput" type="text" placeholder="Search email, name, question, or response" />
+        <select id="toolFilter">
+          <option value="">All tools</option>
+          <option value="casper">CASPer</option>
+          <option value="mmi">MMI</option>
+          <option value="gamsat">GAMSAT</option>
+        </select>
+        <select id="tierFilter">
+          <option value="">All tiers</option>
+          <option value="free">Free</option>
+          <option value="paid">Paid</option>
+          <option value="premium">Premium</option>
+          <option value="pro">Pro</option>
+        </select>
+        <select id="limitFilter">
+          <option value="25">25 rows</option>
+          <option value="50" selected>50 rows</option>
+          <option value="100">100 rows</option>
+          <option value="250">250 rows</option>
+        </select>
+        <button id="refreshBtn">Refresh</button>
+      </div>
+
+      <div class="summary">
+        <div class="card"><div class="label">Total loaded</div><div class="value" id="totalLoaded">0</div></div>
+        <div class="card"><div class="label">Free users</div><div class="value" id="freeCount">0</div></div>
+        <div class="card"><div class="label">Paid / premium / pro</div><div class="value" id="paidCount">0</div></div>
+        <div class="card"><div class="label">Unique emails</div><div class="value" id="uniqueEmails">0</div></div>
+      </div>
+
+      <div class="tableWrap">
+        <div class="toolbar">
+          <div class="status" id="statusText">Loading…</div>
+          <div class="rowActions">
+            <button id="exportBtn" class="button secondary">Export CSV</button>
+            <button id="logoutBtn" class="button secondary">Log out</button>
+          </div>
+        </div>
+
+        <div class="tableScroller">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Student</th>
+                <th>Tool</th>
+                <th>Tier</th>
+                <th>Question</th>
+                <th>Response</th>
+              </tr>
+            </thead>
+            <tbody id="reviewsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="empty" id="emptyState" style="display:none;">No reviews matched your current filters.</div>
+      </div>
+
+      <div class="error" id="dashboardError"></div>
+    </section>
   </div>
+
   <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const error = document.getElementById('error');
-      error.textContent = '';
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password })
-      });
-      if (!res.ok) {
-        error.textContent = 'Sign in failed.';
+    const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+
+    const state = {
+      token: null,
+      adminEmail: null,
+      rows: [],
+    };
+
+    const els = {
+      loginSection: document.getElementById('loginSection'),
+      dashboardSection: document.getElementById('dashboardSection'),
+      loginForm: document.getElementById('loginForm'),
+      email: document.getElementById('email'),
+      password: document.getElementById('password'),
+      submitBtn: document.getElementById('submitBtn'),
+      loginError: document.getElementById('loginError'),
+
+      adminBadge: document.getElementById('adminBadge'),
+      searchInput: document.getElementById('searchInput'),
+      toolFilter: document.getElementById('toolFilter'),
+      tierFilter: document.getElementById('tierFilter'),
+      limitFilter: document.getElementById('limitFilter'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      exportBtn: document.getElementById('exportBtn'),
+      logoutBtn: document.getElementById('logoutBtn'),
+      reviewsBody: document.getElementById('reviewsBody'),
+      statusText: document.getElementById('statusText'),
+      dashboardError: document.getElementById('dashboardError'),
+      emptyState: document.getElementById('emptyState'),
+      totalLoaded: document.getElementById('totalLoaded'),
+      freeCount: document.getElementById('freeCount'),
+      paidCount: document.getElementById('paidCount'),
+      uniqueEmails: document.getElementById('uniqueEmails'),
+    };
+
+    function showLogin() {
+      els.loginSection.classList.remove('hidden');
+      els.dashboardSection.classList.add('hidden');
+    }
+
+    function showDashboard() {
+      els.loginSection.classList.add('hidden');
+      els.dashboardSection.classList.remove('hidden');
+    }
+
+    function setLoginError(message) {
+      if (!message) {
+        els.loginError.style.display = 'none';
+        els.loginError.textContent = '';
         return;
       }
-      location.href = '/admin/reviews.html';
-    });
+      els.loginError.textContent = message;
+      els.loginError.style.display = 'block';
+    }
+
+    function setDashboardError(message) {
+      if (!message) {
+        els.dashboardError.style.display = 'none';
+        els.dashboardError.textContent = '';
+        return;
+      }
+      els.dashboardError.textContent = message;
+      els.dashboardError.style.display = 'block';
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return iso;
+      return d.toLocaleString('en-AU', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+    }
+
+    function getTierClass(tier) {
+      return String(tier || '').toLowerCase();
+    }
+
+    function parseFeedback(feedback) {
+      if (!feedback) return '—';
+      if (typeof feedback === 'object') return JSON.stringify(feedback, null, 2);
+      try {
+        return JSON.stringify(JSON.parse(feedback), null, 2);
+      } catch {
+        return String(feedback);
+      }
+    }
+
+    async function apiFetch(path, options = {}) {
+      const headers = new Headers(options.headers || {});
+      if (state.token) {
+        headers.set('Authorization', `Bearer ${state.token}`);
+      }
+      return fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers,
+      });
+    }
+
+    async function login(email, password) {
+      const res = await apiFetch('/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      let data = null;
+      try { data = await res.json(); } catch {}
+
+      if (!res.ok) {
+        throw new Error(data?.error || 'Sign in failed.');
+      }
+
+      if (!data?.token) {
+        throw new Error('No token returned.');
+      }
+
+      state.token = data.token;
+      state.adminEmail = data.email || email;
+      els.adminBadge.textContent = `Signed in as ${state.adminEmail}`;
+    }
+
+    function applyClientFilters(rows) {
+      const q = els.searchInput.value.trim().toLowerCase();
+      const tool = els.toolFilter.value.trim().toLowerCase();
+      const tier = els.tierFilter.value.trim().toLowerCase();
+
+      return rows.filter((row) => {
+        const matchesSearch = !q || [
+          row.email,
+          row.name,
+          row.tool,
+          row.question_text,
+          row.response_text,
+        ].some(v => String(v || '').toLowerCase().includes(q));
+
+        const matchesTool = !tool || String(row.tool || '').toLowerCase() === tool;
+        const matchesTier = !tier || String(row.tier || '').toLowerCase() === tier;
+
+        return matchesSearch && matchesTool && matchesTier;
+      });
+    }
+
+    function renderSummary(rows) {
+      const freeCount = rows.filter(r => String(r.tier || '').toLowerCase() === 'free').length;
+      const paidCount = rows.length - freeCount;
+      const uniqueEmails = new Set(rows.map(r => String(r.email || '').toLowerCase()).filter(Boolean)).size;
+
+      els.totalLoaded.textContent = String(rows.length);
+      els.freeCount.textContent = String(freeCount);
+      els.paidCount.textContent = String(paidCount);
+      els.uniqueEmails.textContent = String(uniqueEmails);
+    }
+
+    function renderTable() {
+      const rows = applyClientFilters(state.rows);
+      renderSummary(rows);
+      els.reviewsBody.innerHTML = '';
+      els.emptyState.style.display = rows.length ? 'none' : 'block';
+      els.statusText.textContent = `${rows.length} review${rows.length === 1 ? '' : 's'} shown`;
+
+      for (const row of rows) {
+        const detailId = `detail-${row.id}`;
+        const tr = document.createElement('tr');
+        tr.className = 'data-row';
+        tr.innerHTML = `
+          <td>${escapeHtml(formatDate(row.created_at))}</td>
+          <td>
+            <div><strong>${escapeHtml(row.email || 'Unknown')}</strong></div>
+            <div class="muted">${escapeHtml(row.name || 'No name')}</div>
+          </td>
+          <td><span class="badge">${escapeHtml(row.tool || '—')}</span></td>
+          <td><span class="badge ${getTierClass(row.tier)}">${escapeHtml(row.tier || '—')}</span></td>
+          <td><div class="truncate">${escapeHtml(row.question_text || '')}</div></td>
+          <td><div class="truncate">${escapeHtml(row.response_text || '')}</div></td>
+        `;
+
+        const detailTr = document.createElement('tr');
+        detailTr.className = 'detail-row';
+        detailTr.id = detailId;
+        detailTr.innerHTML = `
+          <td colspan="6" class="detail-panel">
+            <div class="detail-grid">
+              <div class="detail-box">
+                <h4>Question</h4>
+                ${escapeHtml(row.question_text || '—')}
+              </div>
+              <div class="detail-box">
+                <h4>Response</h4>
+                ${escapeHtml(row.response_text || '—')}
+              </div>
+              <div class="detail-box">
+                <h4>AI feedback</h4>
+                ${escapeHtml(parseFeedback(row.ai_feedback))}
+              </div>
+            </div>
+          </td>
+        `;
+
+        tr.addEventListener('click', () => {
+          detailTr.classList.toggle('open');
+        });
+
+        els.reviewsBody.appendChild(tr);
+        els.reviewsBody.appendChild(detailTr);
+      }
+    }
+
+    async function loadReviews() {
+      setDashboardError('');
+      els.statusText.textContent = 'Loading reviews…';
+
+      const params = new URLSearchParams({
+        limit: els.limitFilter.value || '50',
+      });
+
+      const res = await apiFetch(`/admin/reviews?${params.toString()}`);
+      let data = null;
+      try { data = await res.json(); } catch {}
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('Session expired. Please sign in again.');
+        }
+        throw new Error(data?.error || 'Failed to load reviews.');
+      }
+
+      state.rows = Array.isArray(data?.rows) ? data.rows : [];
+      renderTable();
+    }
+
+    async function exportCsv() {
+      const params = new URLSearchParams({
+        limit: els.limitFilter.value || '50',
+      });
+
+      const res = await apiFetch(`/admin/reviews.csv?${params.toString()}`);
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('Session expired. Please sign in again.');
+        }
+        throw new Error('CSV export failed.');
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `key2md-admin-reviews-${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function logout() {
+      try {
+        if (state.token) {
+          await apiFetch('/admin/logout', { method: 'POST' });
+        }
+      } catch {}
+      state.token = null;
+      state.adminEmail = null;
+      state.rows = [];
+      els.reviewsBody.innerHTML = '';
+      setDashboardError('');
+      setLoginError('');
+      els.adminBadge.textContent = 'Not signed in';
+      showLogin();
+    }
+
+    function bindEvents() {
+      els.loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setLoginError('');
+        els.submitBtn.disabled = true;
+        els.submitBtn.textContent = 'Signing in...';
+
+        try {
+          await login(els.email.value.trim(), els.password.value);
+          showDashboard();
+          await loadReviews();
+        } catch (err) {
+          setLoginError(err.message || 'Sign in failed.');
+        } finally {
+          els.submitBtn.disabled = false;
+          els.submitBtn.textContent = 'Sign in';
+        }
+      });
+
+      [els.searchInput, els.toolFilter, els.tierFilter].forEach(el => {
+        el.addEventListener('input', renderTable);
+        el.addEventListener('change', renderTable);
+      });
+
+      els.limitFilter.addEventListener('change', async () => {
+        try {
+          await loadReviews();
+        } catch (err) {
+          if ((err.message || '').includes('Session expired')) {
+            await logout();
+            setLoginError('Session expired. Please sign in again.');
+          } else {
+            setDashboardError(err.message);
+          }
+        }
+      });
+
+      els.refreshBtn.addEventListener('click', async () => {
+        try {
+          await loadReviews();
+        } catch (err) {
+          if ((err.message || '').includes('Session expired')) {
+            await logout();
+            setLoginError('Session expired. Please sign in again.');
+          } else {
+            setDashboardError(err.message);
+          }
+        }
+      });
+
+      els.exportBtn.addEventListener('click', async () => {
+        try {
+          await exportCsv();
+        } catch (err) {
+          if ((err.message || '').includes('Session expired')) {
+            await logout();
+            setLoginError('Session expired. Please sign in again.');
+          } else {
+            setDashboardError(err.message);
+          }
+        }
+      });
+
+      els.logoutBtn.addEventListener('click', async () => {
+        await logout();
+      });
+    }
+
+    bindEvents();
+    showLogin();
   </script>
 </body>
 </html>
