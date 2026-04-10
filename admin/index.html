@@ -880,18 +880,38 @@
     }
 
     // Parse "SCENARIO: ... PROMPT 1: ... PROMPT 2: ..." format
-    function parseQuestionText(text) {
-      if (!text) return null;
-      const scenarioMatch = text.match(/SCENARIO:\s*([\s\S]*?)(?=PROMPT 1:|$)/i);
-      const p1Match = text.match(/PROMPT 1:\s*([\s\S]*?)(?=PROMPT 2:|$)/i);
-      const p2Match = text.match(/PROMPT 2:\s*([\s\S]*?)$/i);
-      if (!scenarioMatch && !p1Match) return null;
-      return {
-        scenario: scenarioMatch ? scenarioMatch[1].trim() : '',
-        prompt1: p1Match ? p1Match[1].trim() : '',
-        prompt2: p2Match ? p2Match[1].trim() : '',
-      };
-    }
+function parseQuestionText(text) {
+  if (!text) return null;
+
+  const raw = String(text).trim();
+
+  // Format A: SCENARIO / PROMPT 1 / PROMPT 2
+  const scenarioMatchA = raw.match(/SCENARIO:\s*([\s\S]*?)(?=PROMPT\s*1:|$)/i);
+  const p1MatchA = raw.match(/PROMPT\s*1:\s*([\s\S]*?)(?=PROMPT\s*2:|$)/i);
+  const p2MatchA = raw.match(/PROMPT\s*2:\s*([\s\S]*?)$/i);
+
+  if (scenarioMatchA || p1MatchA || p2MatchA) {
+    return {
+      scenario: scenarioMatchA ? scenarioMatchA[1].trim() : '',
+      prompt1: p1MatchA ? p1MatchA[1].trim() : '',
+      prompt2: p2MatchA ? p2MatchA[1].trim() : '',
+    };
+  }
+
+  // Format B: scenario followed by numbered prompts on new lines
+  // e.g. "...paragraph...\n\n1\nWhat do you do?\n2\nWhy..."
+  const matchB = raw.match(/^([\s\S]*?)(?:\n\s*1\s*\n|\n\s*1[.)]\s*|\n\s*Question\s*1[:.)]?\s*)([\s\S]*?)(?:\n\s*2\s*\n|\n\s*2[.)]\s*|\n\s*Question\s*2[:.)]?\s*)([\s\S]*)$/i);
+
+  if (matchB) {
+    return {
+      scenario: matchB[1].trim(),
+      prompt1: matchB[2].trim(),
+      prompt2: matchB[3].trim(),
+    };
+  }
+
+  return null;
+}
 
     function renderQuestionBox(questionText) {
       const parsed = parseQuestionText(questionText);
