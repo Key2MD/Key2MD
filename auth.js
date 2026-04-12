@@ -55,7 +55,7 @@ const Key2MDAuth = (() => {
     if (_user.tier === 'pro') return { allowed: true };
     if (!_limits) return { allowed: true }; // optimistic if limits not loaded yet
     const toolLimits = _limits[_config.tool];
-    if (toolLimits && toolLimits.remaining <= 0) return { allowed: false, reason: 'limit_reached' };
+if (toolLimits && toolLimits.remaining <= 0 && !toolLimits.credits) return { allowed: false, reason: 'limit_reached' };
     return { allowed: true };
   }
 
