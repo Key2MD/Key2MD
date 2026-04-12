@@ -919,34 +919,39 @@
 
     async function loadReviews() {
       setError('');
-      els.statusText.textContent = 'Loading reviews…';
       const params = new URLSearchParams({ limit: els.limitFilter.value || '50' });
+
       const res = await apiFetch(`/admin/reviews?${params}`);
       const data = await res.json().catch(() => ({}));
+
       if (!res.ok) {
         if (res.status === 401) throw new Error('Session expired. Please sign in again.');
         throw new Error(data?.error || 'Failed to load reviews.');
       }
+
       state.reviews = Array.isArray(data?.rows) ? data.rows : [];
-      renderCurrentView();
+      renderReviewsTable();
     }
 
     async function loadUsers() {
       setError('');
-      els.statusText.textContent = 'Loading users…';
       const params = new URLSearchParams({ limit: els.limitFilter.value || '50' });
       const q = els.searchInput.value.trim();
       const tier = els.tierFilter.value.trim();
+
       if (q) params.set('q', q);
       if (tier) params.set('tier', tier);
+
       const res = await apiFetch(`/admin/users?${params}`);
       const data = await res.json().catch(() => ({}));
+
       if (!res.ok) {
         if (res.status === 401) throw new Error('Session expired. Please sign in again.');
         throw new Error(data?.error || 'Failed to load users.');
       }
+
       state.users = Array.isArray(data?.rows) ? data.rows : [];
-      renderCurrentView();
+      renderUsersTable();
     }
 
     async function loadUserDetail(userId) {
@@ -973,12 +978,10 @@
     function getFilteredUsers() {
       const q = els.searchInput.value.trim().toLowerCase();
       const tier = els.tierFilter.value.toLowerCase();
-      const tool = els.toolFilter.value.toLowerCase();
       return state.users.filter(u => {
         const search = !q || [u.email, u.name].some(v => String(v || '').toLowerCase().includes(q));
         const matchTier = !tier || String(u.tier || '').toLowerCase() === tier;
-        const matchTool = !tool || (tool === 'casper' ? Number(u.casper_balance || 0) >= 0 : tool === 'gamsat' ? Number(u.gamsat_balance || 0) >= 0 : true);
-        return search && matchTier && matchTool;
+        return search && matchTier;
       });
     }
 
@@ -1169,24 +1172,20 @@
       });
     }
 
-    function renderCurrentView() {
+    async function refreshCurrentView() {
       if (state.currentView === 'reviews') {
         els.viewTitle.textContent = 'Student Reviews';
-        els.reviewsTable.classList.remove('hidden');
         els.usersTable.classList.add('hidden');
-        els.toolFilter.disabled = false;
-        renderReviewsTable();
+        els.reviewsTable.classList.remove('hidden');
+        els.statusText.textContent = 'Loading reviews…';
+        await loadReviews();
       } else {
         els.viewTitle.textContent = 'User Accounts';
         els.reviewsTable.classList.add('hidden');
         els.usersTable.classList.remove('hidden');
-        renderUsersTable();
+        els.statusText.textContent = 'Loading users…';
+        await loadUsers();
       }
-    }
-
-    async function refreshCurrentView() {
-      if (state.currentView === 'reviews') await loadReviews();
-      else await loadUsers();
     }
 
     async function exportCurrentView() {
@@ -1228,6 +1227,15 @@
         await login(els.email.value.trim(), els.password.value);
         els.loginSection.classList.add('hidden');
         els.dashboardSection.classList.remove('hidden');
+
+        state.currentView = 'reviews';
+        els.reviewsTabBtn.classList.add('active');
+        els.usersTabBtn.classList.remove('active');
+        els.viewTitle.textContent = 'Student Reviews';
+        els.usersTable.classList.add('hidden');
+        els.reviewsTable.classList.remove('hidden');
+        els.statusText.textContent = 'Loading reviews…';
+
         await loadReviews();
       } catch (err) {
         setLoginError(err.message);
@@ -1238,17 +1246,51 @@
     });
 
     els.reviewsTabBtn.addEventListener('click', async () => {
-      state.currentView = 'reviews';
-      els.reviewsTabBtn.classList.add('active');
-      els.usersTabBtn.classList.remove('active');
-      await loadReviews();
+      try {
+        state.currentView = 'reviews';
+
+        els.reviewsTabBtn.classList.add('active');
+        els.usersTabBtn.classList.remove('active');
+
+        els.viewTitle.textContent = 'Student Reviews';
+        els.usersTable.classList.add('hidden');
+        els.reviewsTable.classList.remove('hidden');
+        els.emptyState.classList.add('hidden');
+        els.statusText.textContent = 'Loading reviews…';
+
+        await loadReviews();
+      } catch (err) {
+        if ((err.message || '').includes('Session expired')) {
+          await logout();
+          setLoginError(err.message);
+        } else {
+          setError(err.message);
+        }
+      }
     });
 
     els.usersTabBtn.addEventListener('click', async () => {
-      state.currentView = 'users';
-      els.usersTabBtn.classList.add('active');
-      els.reviewsTabBtn.classList.remove('active');
-      await loadUsers();
+      try {
+        state.currentView = 'users';
+
+        els.usersTabBtn.classList.add('active');
+        els.reviewsTabBtn.classList.remove('active');
+
+        els.viewTitle.textContent = 'User Accounts';
+        els.reviewsTable.classList.add('hidden');
+        els.usersTable.classList.remove('hidden');
+        els.emptyState.classList.add('hidden');
+        els.statusText.textContent = 'Loading users…';
+
+        await loadUsers();
+      } catch (err) {
+        if ((err.message || '').includes('Session expired')) {
+          await logout();
+          setLoginError(err.message);
+        } else {
+          setError(err.message);
+        }
+      }
     });
 
     [els.searchInput, els.toolFilter, els.tierFilter].forEach(el => {
@@ -1256,9 +1298,22 @@
         if (state.currentView === 'reviews') renderReviewsTable();
         else renderUsersTable();
       });
+
       el.addEventListener('change', async () => {
-        if (state.currentView === 'reviews') renderReviewsTable();
-        else await loadUsers();
+        try {
+          if (state.currentView === 'reviews') {
+            renderReviewsTable();
+          } else {
+            await loadUsers();
+          }
+        } catch (err) {
+          if ((err.message || '').includes('Session expired')) {
+            await logout();
+            setLoginError(err.message);
+          } else {
+            setError(err.message);
+          }
+        }
       });
     });
 
