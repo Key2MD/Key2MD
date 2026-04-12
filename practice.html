@@ -1482,7 +1482,9 @@ async function manualRunAI(){
   saveAnswer();
   const btn=$('btnGetAI'),wrap=$('btnGetAIWrap'),remEl=$('btnAIRemaining');
   if(btn){btn.disabled=true;btn.textContent='⏳ Marking…';}
+  nextBtn.disabled=true;prevBtn.disabled=true;
   await runAI(currentIdx);
+  updateBtns();
   if(btn){btn.textContent='✦ Get AI Feedback';}
   // After marking, update based on server limits
   const limits = Key2MDAuth.getLimits();
