@@ -32,7 +32,6 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { font-size: 15px; }
 
     body {
@@ -47,7 +46,6 @@
 
     .hidden { display: none !important; }
 
-    /* ── Login ── */
     .login-wrap {
       min-height: 100vh;
       display: grid;
@@ -158,14 +156,12 @@
       display: none;
     }
 
-    /* ── Shell ── */
     .shell {
-      max-width: 1400px;
+      max-width: 1440px;
       margin: 0 auto;
       padding: 24px 20px 64px;
     }
 
-    /* ── Topbar ── */
     .topbar {
       display: flex;
       align-items: center;
@@ -249,7 +245,34 @@
 
     .btn-sm:hover { color: var(--text); border-color: var(--border2); background: rgba(255,255,255,0.1); }
 
-    /* ── Stats ── */
+    .tabs {
+      display: inline-flex;
+      gap: 8px;
+      padding: 6px;
+      margin-bottom: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .tab-btn {
+      padding: 9px 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--blue-dim);
+      color: var(--blue);
+      border-color: rgba(56,189,248,0.2);
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -280,7 +303,6 @@
       color: var(--text);
     }
 
-    /* ── Controls ── */
     .controls {
       display: grid;
       grid-template-columns: 1fr auto auto auto auto;
@@ -299,7 +321,6 @@
       font-size: 0.85rem;
       outline: none;
       transition: border-color 0.2s;
-      min-height: unset;
       width: 100%;
     }
 
@@ -323,7 +344,6 @@
 
     .btn-refresh:hover { background: rgba(56,189,248,0.2); }
 
-    /* ── Table wrap ── */
     .table-wrap {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -355,7 +375,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 900px;
+      min-width: 980px;
     }
 
     thead tr {
@@ -389,8 +409,6 @@
     tr.data-row:hover { background: rgba(255,255,255,0.03); }
     tr.data-row.expanded { background: rgba(56,189,248,0.04); }
 
-    tr.data-row:last-child td { border-bottom: none; }
-
     .truncate-cell {
       max-width: 320px;
       white-space: nowrap;
@@ -400,7 +418,6 @@
       font-size: 0.82rem;
     }
 
-    /* ── Badges ── */
     .badge {
       display: inline-flex;
       align-items: center;
@@ -421,8 +438,9 @@
     .badge-free { background: var(--surface2); color: var(--muted); border-color: var(--border); }
     .badge-pro { background: var(--green-dim); color: var(--green); border-color: rgba(74,222,128,0.2); }
     .badge-paid, .badge-premium { background: var(--amber-dim); color: var(--amber); border-color: rgba(251,191,36,0.2); }
+    .badge-yes { background: var(--green-dim); color: var(--green); border-color: rgba(74,222,128,0.2); }
+    .badge-no { background: var(--surface2); color: var(--muted); border-color: var(--border); }
 
-    /* ── Score badge ── */
     .score-badge {
       display: inline-flex;
       align-items: center;
@@ -438,7 +456,6 @@
     .score-mid { background: var(--amber-dim); color: var(--amber); }
     .score-low { background: var(--red-dim); color: var(--red); }
 
-    /* ── Expand indicator ── */
     .expand-icon {
       display: inline-flex;
       align-items: center;
@@ -459,7 +476,6 @@
       color: var(--blue);
     }
 
-    /* ── Detail panel ── */
     .detail-row { display: none; }
     .detail-row.open { display: table-row; }
 
@@ -476,28 +492,14 @@
       gap: 14px;
     }
 
-    /* Question box */
     .detail-box {
       border-radius: 12px;
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-    }
-
-    .detail-box-question {
       background: rgba(255,255,255,0.03);
       border: 1px solid var(--border);
-    }
-
-    .detail-box-response {
-      background: rgba(56,189,248,0.04);
-      border: 1px solid rgba(56,189,248,0.12);
-    }
-
-    .detail-box-feedback {
-      background: rgba(74,222,128,0.03);
-      border: 1px solid rgba(74,222,128,0.12);
     }
 
     .detail-box-header {
@@ -516,11 +518,8 @@
       justify-content: center;
       font-size: 0.75rem;
       flex-shrink: 0;
+      background: rgba(255,255,255,0.08);
     }
-
-    .icon-q { background: rgba(255,255,255,0.08); }
-    .icon-r { background: var(--blue-dim); }
-    .icon-f { background: var(--green-dim); }
 
     .detail-box-title {
       font-size: 0.7rem;
@@ -538,93 +537,18 @@
       overflow-wrap: anywhere;
     }
 
-    /* Parsed scenario sections */
-    .scenario-section { margin-bottom: 12px; }
-    .scenario-section:last-child { margin-bottom: 0; }
-
-    .scenario-tag {
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted2);
-      margin-bottom: 4px;
+    .subtable {
+      width: 100%;
+      min-width: 100%;
     }
 
-    .scenario-content {
-      font-size: 0.83rem;
-      line-height: 1.65;
-      color: var(--text);
+    .subtable th, .subtable td {
+      padding: 8px 10px;
+      font-size: 0.78rem;
     }
 
-    /* AI Feedback rendered */
-    .feedback-score-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(74,222,128,0.15);
-    }
+    .subtable th { color: var(--muted2); }
 
-    .feedback-score-num {
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-
-    .feedback-score-label {
-      font-size: 0.72rem;
-      color: var(--muted);
-      line-height: 1.3;
-    }
-
-    .feedback-score-quartile {
-      margin-left: auto;
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 50px;
-    }
-
-    .q4 { background: var(--green-dim); color: var(--green); }
-    .q3 { background: var(--blue-dim); color: var(--blue); }
-    .q2 { background: var(--amber-dim); color: var(--amber); }
-    .q1 { background: var(--red-dim); color: var(--red); }
-
-    .feedback-field {
-      margin-bottom: 10px;
-    }
-
-    .feedback-field:last-child { margin-bottom: 0; }
-
-    .feedback-field-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted2);
-      margin-bottom: 4px;
-    }
-
-    .feedback-field-val {
-      font-size: 0.82rem;
-      line-height: 1.65;
-      color: var(--text);
-    }
-
-    .feedback-missed {
-      margin-top: 10px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      background: var(--red-dim);
-      border: 1px solid rgba(248,113,113,0.15);
-    }
-
-    .feedback-missed .feedback-field-label { color: var(--red); }
-    .feedback-missed .feedback-field-val { color: #fca5a5; }
-
-    /* ── Empty / error ── */
     .empty-state {
       padding: 48px;
       text-align: center;
@@ -643,7 +567,6 @@
       display: none;
     }
 
-    /* ── Student cell ── */
     .student-name {
       font-weight: 600;
       color: var(--text);
@@ -656,7 +579,6 @@
       margin-top: 2px;
     }
 
-    /* ── Time cell ── */
     .time-main {
       font-size: 0.82rem;
       color: var(--text);
@@ -683,8 +605,6 @@
   </style>
 </head>
 <body>
-
-  <!-- ── LOGIN ── -->
   <section id="loginSection" class="login-wrap">
     <div class="login-card">
       <div class="login-logo">Key2<span>MD</span></div>
@@ -706,15 +626,13 @@
     </div>
   </section>
 
-  <!-- ── DASHBOARD ── -->
   <section id="dashboardSection" class="hidden">
     <div class="shell">
-
       <div class="topbar">
         <div class="topbar-brand">
           <div class="topbar-logo">Key2<span>MD</span></div>
           <div class="topbar-divider"></div>
-          <div class="topbar-title">Student Reviews</div>
+          <div class="topbar-title" id="viewTitle">Student Reviews</div>
         </div>
         <div class="topbar-right">
           <div class="admin-badge" id="adminBadge">Not signed in</div>
@@ -722,27 +640,32 @@
         </div>
       </div>
 
+      <div class="tabs">
+        <button class="tab-btn active" id="reviewsTabBtn" data-view="reviews">Reviews</button>
+        <button class="tab-btn" id="usersTabBtn" data-view="users">Users</button>
+      </div>
+
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label">Total reviews</div>
-          <div class="stat-value" id="totalLoaded">0</div>
+          <div class="stat-label" id="stat1Label">Total reviews</div>
+          <div class="stat-value" id="stat1Value">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Free tier</div>
-          <div class="stat-value" id="freeCount">0</div>
+          <div class="stat-label" id="stat2Label">Free tier</div>
+          <div class="stat-value" id="stat2Value">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Paid / Pro</div>
-          <div class="stat-value" id="paidCount">0</div>
+          <div class="stat-label" id="stat3Label">Paid / Pro</div>
+          <div class="stat-value" id="stat3Value">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Unique students</div>
-          <div class="stat-value" id="uniqueEmails">0</div>
+          <div class="stat-label" id="stat4Label">Unique students</div>
+          <div class="stat-value" id="stat4Value">0</div>
         </div>
       </div>
 
       <div class="controls">
-        <input class="ctrl-input" id="searchInput" type="text" placeholder="🔍  Search student, scenario, or response…" />
+        <input class="ctrl-input" id="searchInput" type="text" placeholder="🔍 Search email, name, scenario, or response…" />
         <select class="ctrl-select" id="toolFilter">
           <option value="">All tools</option>
           <option value="casper">CASPer</option>
@@ -774,7 +697,7 @@
         </div>
 
         <div class="table-scroller">
-          <table>
+          <table id="reviewsTable">
             <thead>
               <tr>
                 <th style="width:40px;"></th>
@@ -789,20 +712,44 @@
             </thead>
             <tbody id="reviewsBody"></tbody>
           </table>
+
+          <table id="usersTable" class="hidden">
+            <thead>
+              <tr>
+                <th style="width:40px;"></th>
+                <th>User</th>
+                <th>Tier</th>
+                <th>CASPer credits</th>
+                <th>GAMSAT credits</th>
+                <th>Reviews</th>
+                <th>Payments</th>
+                <th>Total spend</th>
+                <th>Free today</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
         </div>
 
-        <div class="empty-state hidden" id="emptyState">No reviews match your current filters.</div>
+        <div class="empty-state hidden" id="emptyState">No records match your current filters.</div>
       </div>
 
       <div class="error-banner" id="dashboardError"></div>
-
     </div>
   </section>
 
   <script>
     const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
 
-    const state = { token: null, adminEmail: null, rows: [] };
+    const state = {
+      token: null,
+      adminEmail: null,
+      currentView: 'reviews',
+      reviews: [],
+      users: [],
+      userDetailCache: new Map(),
+    };
 
     const els = {
       loginSection: document.getElementById('loginSection'),
@@ -813,6 +760,9 @@
       submitBtn: document.getElementById('submitBtn'),
       loginError: document.getElementById('loginError'),
       adminBadge: document.getElementById('adminBadge'),
+      viewTitle: document.getElementById('viewTitle'),
+      reviewsTabBtn: document.getElementById('reviewsTabBtn'),
+      usersTabBtn: document.getElementById('usersTabBtn'),
       searchInput: document.getElementById('searchInput'),
       toolFilter: document.getElementById('toolFilter'),
       tierFilter: document.getElementById('tierFilter'),
@@ -820,17 +770,22 @@
       refreshBtn: document.getElementById('refreshBtn'),
       exportBtn: document.getElementById('exportBtn'),
       logoutBtn: document.getElementById('logoutBtn'),
+      reviewsTable: document.getElementById('reviewsTable'),
+      usersTable: document.getElementById('usersTable'),
       reviewsBody: document.getElementById('reviewsBody'),
+      usersBody: document.getElementById('usersBody'),
       statusText: document.getElementById('statusText'),
       dashboardError: document.getElementById('dashboardError'),
       emptyState: document.getElementById('emptyState'),
-      totalLoaded: document.getElementById('totalLoaded'),
-      freeCount: document.getElementById('freeCount'),
-      paidCount: document.getElementById('paidCount'),
-      uniqueEmails: document.getElementById('uniqueEmails'),
+      stat1Label: document.getElementById('stat1Label'),
+      stat2Label: document.getElementById('stat2Label'),
+      stat3Label: document.getElementById('stat3Label'),
+      stat4Label: document.getElementById('stat4Label'),
+      stat1Value: document.getElementById('stat1Value'),
+      stat2Value: document.getElementById('stat2Value'),
+      stat3Value: document.getElementById('stat3Value'),
+      stat4Value: document.getElementById('stat4Value'),
     };
-
-    // ── Helpers ──
 
     function escapeHtml(v) {
       return String(v ?? '')
@@ -839,12 +794,17 @@
     }
 
     function formatDate(iso) {
-      if (!iso) return '—';
+      if (!iso) return null;
       const d = new Date(iso);
-      if (isNaN(d)) return iso;
-      const date = d.toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' });
-      const time = d.toLocaleTimeString('en-AU', { hour:'numeric', minute:'2-digit' });
-      return { date, time };
+      if (isNaN(d)) return { date: iso, time: '' };
+      return {
+        date: d.toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' }),
+        time: d.toLocaleTimeString('en-AU', { hour:'numeric', minute:'2-digit' }),
+      };
+    }
+
+    function formatMoney(aud) {
+      return `$${Number(aud || 0).toFixed(2)}`;
     }
 
     function toolBadge(tool) {
@@ -859,6 +819,10 @@
       return `<span class="badge ${cls}">${escapeHtml(tier || 'free')}</span>`;
     }
 
+    function yesNoBadge(val) {
+      return `<span class="badge ${val ? 'badge-yes' : 'badge-no'}">${val ? 'Yes' : 'No'}</span>`;
+    }
+
     function parseFeedbackJson(raw) {
       if (!raw) return null;
       if (typeof raw === 'object') return raw;
@@ -867,222 +831,76 @@
 
     function scoreClass(score) {
       if (!score) return '';
-      const n = parseInt(score);
+      const n = parseInt(score, 10);
       return n >= 7 ? 'score-high' : n >= 5 ? 'score-mid' : 'score-low';
     }
 
     function quartileLabel(score) {
-      const n = parseInt(score);
+      const n = parseInt(score, 10);
       if (n >= 8) return { label: 'Q4 — Excellent', cls: 'q4' };
       if (n >= 6) return { label: 'Q3 — Good', cls: 'q3' };
       if (n >= 4) return { label: 'Q2 — Developing', cls: 'q2' };
       return { label: 'Q1 — Needs Work', cls: 'q1' };
     }
 
-    // Parse "SCENARIO: ... PROMPT 1: ... PROMPT 2: ..." format
-function parseQuestionText(text) {
-  if (!text) return null;
-
-  const raw = String(text).trim();
-
-  // Format A: SCENARIO / PROMPT 1 / PROMPT 2
-  const scenarioMatchA = raw.match(/SCENARIO:\s*([\s\S]*?)(?=PROMPT\s*1:|$)/i);
-  const p1MatchA = raw.match(/PROMPT\s*1:\s*([\s\S]*?)(?=PROMPT\s*2:|$)/i);
-  const p2MatchA = raw.match(/PROMPT\s*2:\s*([\s\S]*?)$/i);
-
-  if (scenarioMatchA || p1MatchA || p2MatchA) {
-    return {
-      scenario: scenarioMatchA ? scenarioMatchA[1].trim() : '',
-      prompt1: p1MatchA ? p1MatchA[1].trim() : '',
-      prompt2: p2MatchA ? p2MatchA[1].trim() : '',
-    };
-  }
-
-  // Format B: scenario followed by numbered prompts on new lines
-  // e.g. "...paragraph...\n\n1\nWhat do you do?\n2\nWhy..."
-  const matchB = raw.match(/^([\s\S]*?)(?:\n\s*1\s*\n|\n\s*1[.)]\s*|\n\s*Question\s*1[:.)]?\s*)([\s\S]*?)(?:\n\s*2\s*\n|\n\s*2[.)]\s*|\n\s*Question\s*2[:.)]?\s*)([\s\S]*)$/i);
-
-  if (matchB) {
-    return {
-      scenario: matchB[1].trim(),
-      prompt1: matchB[2].trim(),
-      prompt2: matchB[3].trim(),
-    };
-  }
-
-  return null;
-}
+    function parseQuestionText(text) {
+      if (!text) return null;
+      const raw = String(text).trim();
+      const scenarioMatchA = raw.match(/SCENARIO:\s*([\s\S]*?)(?=PROMPT\s*1:|$)/i);
+      const p1MatchA = raw.match(/PROMPT\s*1:\s*([\s\S]*?)(?=PROMPT\s*2:|$)/i);
+      const p2MatchA = raw.match(/PROMPT\s*2:\s*([\s\S]*?)$/i);
+      if (scenarioMatchA || p1MatchA || p2MatchA) {
+        return {
+          scenario: scenarioMatchA ? scenarioMatchA[1].trim() : '',
+          prompt1: p1MatchA ? p1MatchA[1].trim() : '',
+          prompt2: p2MatchA ? p2MatchA[1].trim() : '',
+        };
+      }
+      return null;
+    }
 
     function renderQuestionBox(questionText) {
       const parsed = parseQuestionText(questionText);
-      if (!parsed) {
-        return `<div class="detail-box-body">${escapeHtml(questionText || '—')}</div>`;
-      }
+      if (!parsed) return `<div class="detail-box-body">${escapeHtml(questionText || '—')}</div>`;
       return `
-        ${parsed.scenario ? `
-          <div class="scenario-section">
-            <div class="scenario-tag">Scenario</div>
-            <div class="scenario-content">${escapeHtml(parsed.scenario)}</div>
-          </div>` : ''}
-        ${parsed.prompt1 ? `
-          <div class="scenario-section">
-            <div class="scenario-tag">Prompt 1</div>
-            <div class="scenario-content">${escapeHtml(parsed.prompt1)}</div>
-          </div>` : ''}
-        ${parsed.prompt2 ? `
-          <div class="scenario-section">
-            <div class="scenario-tag">Prompt 2</div>
-            <div class="scenario-content">${escapeHtml(parsed.prompt2)}</div>
-          </div>` : ''}
+        ${parsed.scenario ? `<div><div class="detail-box-title">Scenario</div><div class="detail-box-body">${escapeHtml(parsed.scenario)}</div></div>` : ''}
+        ${parsed.prompt1 ? `<div><div class="detail-box-title">Prompt 1</div><div class="detail-box-body">${escapeHtml(parsed.prompt1)}</div></div>` : ''}
+        ${parsed.prompt2 ? `<div><div class="detail-box-title">Prompt 2</div><div class="detail-box-body">${escapeHtml(parsed.prompt2)}</div></div>` : ''}
       `;
     }
 
     function renderFeedbackBox(raw) {
       const fb = parseFeedbackJson(raw);
-      if (!fb) {
-        return `<div class="detail-box-body">${escapeHtml(String(raw || '—'))}</div>`;
-      }
+      if (!fb) return `<div class="detail-box-body">${escapeHtml(String(raw || '—'))}</div>`;
       const score = fb.score;
       const q = score ? quartileLabel(score) : null;
       return `
         ${score ? `
-          <div class="feedback-score-row">
-            <div>
-              <div class="feedback-score-num ${scoreClass(score)}" style="color:inherit">${score}<span style="font-size:1rem;font-weight:500;color:var(--muted)">/10</span></div>
-              <div class="feedback-score-label">AI Score</div>
-            </div>
-            ${q ? `<span class="feedback-score-quartile ${q.cls}">${q.label}</span>` : ''}
+          <div class="detail-box-body" style="margin-bottom:10px;">
+            <strong>${escapeHtml(score)}/10</strong>
+            ${q ? `<span class="badge ${q.cls}">${q.label}</span>` : ''}
           </div>` : ''}
-        ${fb.strengths ? `
-          <div class="feedback-field">
-            <div class="feedback-field-label">✓ Strengths</div>
-            <div class="feedback-field-val">${escapeHtml(fb.strengths)}</div>
-          </div>` : ''}
-        ${fb.improvements ? `
-          <div class="feedback-field">
-            <div class="feedback-field-label">↑ Improve</div>
-            <div class="feedback-field-val">${escapeHtml(fb.improvements)}</div>
-          </div>` : ''}
-        ${fb.empathy ? `
-          <div class="feedback-field">
-            <div class="feedback-field-label">♡ Empathy</div>
-            <div class="feedback-field-val">${escapeHtml(fb.empathy)}</div>
-          </div>` : ''}
-        ${fb.missed && fb.missed !== 'None' ? `
-          <div class="feedback-field feedback-missed">
-            <div class="feedback-field-label">⚠ Missed</div>
-            <div class="feedback-field-val">${escapeHtml(fb.missed)}</div>
-          </div>` : ''}
+        ${fb.strengths ? `<div><div class="detail-box-title">Strengths</div><div class="detail-box-body">${escapeHtml(fb.strengths)}</div></div>` : ''}
+        ${fb.improvements ? `<div><div class="detail-box-title">Improvements</div><div class="detail-box-body">${escapeHtml(fb.improvements)}</div></div>` : ''}
+        ${fb.empathy ? `<div><div class="detail-box-title">Empathy</div><div class="detail-box-body">${escapeHtml(fb.empathy)}</div></div>` : ''}
+        ${fb.missed ? `<div><div class="detail-box-title">Missed</div><div class="detail-box-body">${escapeHtml(fb.missed)}</div></div>` : ''}
       `;
     }
-
-    // ── Render ──
-
-    function renderSummary(rows) {
-      const free = rows.filter(r => String(r.tier||'').toLowerCase() === 'free').length;
-      const paid = rows.length - free;
-      const unique = new Set(rows.map(r => String(r.email||'').toLowerCase()).filter(Boolean)).size;
-      els.totalLoaded.textContent = rows.length;
-      els.freeCount.textContent = free;
-      els.paidCount.textContent = paid;
-      els.uniqueEmails.textContent = unique;
-    }
-
-    function applyFilters(rows) {
-      const q = els.searchInput.value.trim().toLowerCase();
-      const tool = els.toolFilter.value.toLowerCase();
-      const tier = els.tierFilter.value.toLowerCase();
-      return rows.filter(r => {
-        const search = !q || [r.email,r.name,r.tool,r.question_text,r.response_text]
-          .some(v => String(v||'').toLowerCase().includes(q));
-        const matchTool = !tool || String(r.tool||'').toLowerCase() === tool;
-        const matchTier = !tier || String(r.tier||'').toLowerCase() === tier;
-        return search && matchTool && matchTier;
-      });
-    }
-
-    function renderTable() {
-      const rows = applyFilters(state.rows);
-      renderSummary(rows);
-      els.reviewsBody.innerHTML = '';
-      els.emptyState.classList.toggle('hidden', rows.length > 0);
-      els.statusText.textContent = `${rows.length} review${rows.length === 1 ? '' : 's'} shown`;
-
-      rows.forEach((row, i) => {
-        const fb = parseFeedbackJson(row.ai_feedback);
-        const score = fb?.score;
-        const dt = formatDate(row.created_at);
-
-        // Scenario preview — extract just scenario text if structured
-        const parsed = parseQuestionText(row.question_text);
-        const scenarioPreview = parsed?.scenario || row.question_text || '';
-
-        const dataRow = document.createElement('tr');
-        dataRow.className = 'data-row';
-        dataRow.innerHTML = `
-          <td><div class="expand-icon">▼</div></td>
-          <td>
-            <div class="time-main">${dt ? dt.date : '—'}</div>
-            <div class="time-sub">${dt ? dt.time : ''}</div>
-          </td>
-          <td>
-            <div class="student-name">${escapeHtml(row.email || 'Unknown')}</div>
-            <div class="student-sub">${escapeHtml(row.name || 'No name')}</div>
-          </td>
-          <td>${toolBadge(row.tool)}</td>
-          <td>${tierBadge(row.tier)}</td>
-          <td>${score ? `<div class="score-badge ${scoreClass(score)}">${score}</div>` : '<span style="color:var(--muted2);font-size:0.78rem;">—</span>'}</td>
-          <td><div class="truncate-cell">${escapeHtml(scenarioPreview.substring(0, 120))}${scenarioPreview.length > 120 ? '…' : ''}</div></td>
-          <td><div class="truncate-cell">${escapeHtml((row.response_text||'').substring(0, 120))}${(row.response_text||'').length > 120 ? '…' : ''}</div></td>
-        `;
-
-        const detailRow = document.createElement('tr');
-        detailRow.className = 'detail-row';
-        detailRow.innerHTML = `
-          <td colspan="8" class="detail-panel">
-            <div class="detail-inner">
-              <div class="detail-box detail-box-question">
-                <div class="detail-box-header">
-                  <div class="detail-box-icon icon-q">📋</div>
-                  <div class="detail-box-title">Scenario & Prompts</div>
-                </div>
-                ${renderQuestionBox(row.question_text)}
-              </div>
-              <div class="detail-box detail-box-response">
-                <div class="detail-box-header">
-                  <div class="detail-box-icon icon-r">✍️</div>
-                  <div class="detail-box-title">Student Response</div>
-                </div>
-                <div class="detail-box-body">${escapeHtml(row.response_text || '—')}</div>
-              </div>
-              <div class="detail-box detail-box-feedback">
-                <div class="detail-box-header">
-                  <div class="detail-box-icon icon-f">✦</div>
-                  <div class="detail-box-title">AI Feedback</div>
-                </div>
-                ${renderFeedbackBox(row.ai_feedback)}
-              </div>
-            </div>
-          </td>
-        `;
-
-        dataRow.addEventListener('click', () => {
-          const isOpen = detailRow.classList.contains('open');
-          detailRow.classList.toggle('open', !isOpen);
-          dataRow.classList.toggle('expanded', !isOpen);
-        });
-
-        els.reviewsBody.appendChild(dataRow);
-        els.reviewsBody.appendChild(detailRow);
-      });
-    }
-
-    // ── API ──
 
     async function apiFetch(path, opts = {}) {
       const headers = new Headers(opts.headers || {});
       if (state.token) headers.set('Authorization', `Bearer ${state.token}`);
       return fetch(`${API_BASE}${path}`, { ...opts, headers });
+    }
+
+    function setLoginError(msg) {
+      els.loginError.textContent = msg || '';
+      els.loginError.style.display = msg ? 'block' : 'none';
+    }
+
+    function setError(msg) {
+      els.dashboardError.textContent = msg || '';
+      els.dashboardError.style.display = msg ? 'block' : 'none';
     }
 
     async function login(email, password) {
@@ -1101,7 +919,7 @@ function parseQuestionText(text) {
 
     async function loadReviews() {
       setError('');
-      els.statusText.textContent = 'Loading…';
+      els.statusText.textContent = 'Loading reviews…';
       const params = new URLSearchParams({ limit: els.limitFilter.value || '50' });
       const res = await apiFetch(`/admin/reviews?${params}`);
       const data = await res.json().catch(() => ({}));
@@ -1109,44 +927,297 @@ function parseQuestionText(text) {
         if (res.status === 401) throw new Error('Session expired. Please sign in again.');
         throw new Error(data?.error || 'Failed to load reviews.');
       }
-      state.rows = Array.isArray(data?.rows) ? data.rows : [];
-      renderTable();
+      state.reviews = Array.isArray(data?.rows) ? data.rows : [];
+      renderCurrentView();
     }
 
-    async function exportCsv() {
+    async function loadUsers() {
+      setError('');
+      els.statusText.textContent = 'Loading users…';
       const params = new URLSearchParams({ limit: els.limitFilter.value || '50' });
-      const res = await apiFetch(`/admin/reviews.csv?${params}`);
+      const q = els.searchInput.value.trim();
+      const tier = els.tierFilter.value.trim();
+      if (q) params.set('q', q);
+      if (tier) params.set('tier', tier);
+      const res = await apiFetch(`/admin/users?${params}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (res.status === 401) throw new Error('Session expired. Please sign in again.');
+        throw new Error(data?.error || 'Failed to load users.');
+      }
+      state.users = Array.isArray(data?.rows) ? data.rows : [];
+      renderCurrentView();
+    }
+
+    async function loadUserDetail(userId) {
+      if (state.userDetailCache.has(userId)) return state.userDetailCache.get(userId);
+      const res = await apiFetch(`/admin/users/${encodeURIComponent(userId)}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || 'Failed to load user detail.');
+      state.userDetailCache.set(userId, data);
+      return data;
+    }
+
+    function getFilteredReviews() {
+      const q = els.searchInput.value.trim().toLowerCase();
+      const tool = els.toolFilter.value.toLowerCase();
+      const tier = els.tierFilter.value.toLowerCase();
+      return state.reviews.filter(r => {
+        const search = !q || [r.email, r.name, r.tool, r.question_text, r.response_text].some(v => String(v || '').toLowerCase().includes(q));
+        const matchTool = !tool || String(r.tool || '').toLowerCase() === tool;
+        const matchTier = !tier || String(r.tier || '').toLowerCase() === tier;
+        return search && matchTool && matchTier;
+      });
+    }
+
+    function getFilteredUsers() {
+      const q = els.searchInput.value.trim().toLowerCase();
+      const tier = els.tierFilter.value.toLowerCase();
+      const tool = els.toolFilter.value.toLowerCase();
+      return state.users.filter(u => {
+        const search = !q || [u.email, u.name].some(v => String(v || '').toLowerCase().includes(q));
+        const matchTier = !tier || String(u.tier || '').toLowerCase() === tier;
+        const matchTool = !tool || (tool === 'casper' ? Number(u.casper_balance || 0) >= 0 : tool === 'gamsat' ? Number(u.gamsat_balance || 0) >= 0 : true);
+        return search && matchTier && matchTool;
+      });
+    }
+
+    function renderReviewSummary(rows) {
+      const free = rows.filter(r => String(r.tier || '').toLowerCase() === 'free').length;
+      const paid = rows.length - free;
+      const unique = new Set(rows.map(r => String(r.email || '').toLowerCase()).filter(Boolean)).size;
+      els.stat1Label.textContent = 'Total reviews';
+      els.stat2Label.textContent = 'Free tier';
+      els.stat3Label.textContent = 'Paid / Pro';
+      els.stat4Label.textContent = 'Unique students';
+      els.stat1Value.textContent = rows.length;
+      els.stat2Value.textContent = free;
+      els.stat3Value.textContent = paid;
+      els.stat4Value.textContent = unique;
+    }
+
+    function renderUserSummary(rows) {
+      const free = rows.filter(r => String(r.tier || '').toLowerCase() === 'free').length;
+      const totalSpend = rows.reduce((sum, r) => sum + Number(r.total_spend_aud || 0), 0);
+      const totalCredits = rows.reduce((sum, r) => sum + Number(r.casper_balance || 0) + Number(r.gamsat_balance || 0), 0);
+      els.stat1Label.textContent = 'Total accounts';
+      els.stat2Label.textContent = 'Free tier';
+      els.stat3Label.textContent = 'Total spend';
+      els.stat4Label.textContent = 'Credits held';
+      els.stat1Value.textContent = rows.length;
+      els.stat2Value.textContent = free;
+      els.stat3Value.textContent = formatMoney(totalSpend);
+      els.stat4Value.textContent = `${totalCredits}`;
+    }
+
+    function renderReviewsTable() {
+      const rows = getFilteredReviews();
+      renderReviewSummary(rows);
+      els.reviewsBody.innerHTML = '';
+      els.emptyState.classList.toggle('hidden', rows.length > 0);
+      els.statusText.textContent = `${rows.length} review${rows.length === 1 ? '' : 's'} shown`;
+
+      rows.forEach(row => {
+        const fb = parseFeedbackJson(row.ai_feedback);
+        const score = fb?.score;
+        const dt = formatDate(row.created_at);
+        const parsed = parseQuestionText(row.question_text);
+        const scenarioPreview = parsed?.scenario || row.question_text || '';
+
+        const dataRow = document.createElement('tr');
+        dataRow.className = 'data-row';
+        dataRow.innerHTML = `
+          <td><div class="expand-icon">▼</div></td>
+          <td><div class="time-main">${dt ? dt.date : '—'}</div><div class="time-sub">${dt ? dt.time : ''}</div></td>
+          <td><div class="student-name">${escapeHtml(row.email || 'Unknown')}</div><div class="student-sub">${escapeHtml(row.name || 'No name')}</div></td>
+          <td>${toolBadge(row.tool)}</td>
+          <td>${tierBadge(row.tier)}</td>
+          <td>${score ? `<div class="score-badge ${scoreClass(score)}">${score}</div>` : '<span style="color:var(--muted2);font-size:0.78rem;">—</span>'}</td>
+          <td><div class="truncate-cell">${escapeHtml(scenarioPreview.substring(0, 120))}${scenarioPreview.length > 120 ? '…' : ''}</div></td>
+          <td><div class="truncate-cell">${escapeHtml((row.response_text || '').substring(0, 120))}${(row.response_text || '').length > 120 ? '…' : ''}</div></td>
+        `;
+
+        const detailRow = document.createElement('tr');
+        detailRow.className = 'detail-row';
+        detailRow.innerHTML = `
+          <td colspan="8" class="detail-panel">
+            <div class="detail-inner">
+              <div class="detail-box"><div class="detail-box-header"><div class="detail-box-icon">📋</div><div class="detail-box-title">Scenario & Prompts</div></div>${renderQuestionBox(row.question_text)}</div>
+              <div class="detail-box"><div class="detail-box-header"><div class="detail-box-icon">✍️</div><div class="detail-box-title">Student Response</div></div><div class="detail-box-body">${escapeHtml(row.response_text || '—')}</div></div>
+              <div class="detail-box"><div class="detail-box-header"><div class="detail-box-icon">✦</div><div class="detail-box-title">AI Feedback</div></div>${renderFeedbackBox(row.ai_feedback)}</div>
+            </div>
+          </td>
+        `;
+
+        dataRow.addEventListener('click', () => {
+          const isOpen = detailRow.classList.contains('open');
+          detailRow.classList.toggle('open', !isOpen);
+          dataRow.classList.toggle('expanded', !isOpen);
+        });
+
+        els.reviewsBody.appendChild(dataRow);
+        els.reviewsBody.appendChild(detailRow);
+      });
+    }
+
+    function renderUserDetailHtml(detail) {
+      const user = detail.user;
+      const credits = detail.credits || [];
+      const payments = detail.payments || [];
+      const reviews = detail.reviews || [];
+
+      return `
+        <div class="detail-inner">
+          <div class="detail-box">
+            <div class="detail-box-header"><div class="detail-box-icon">👤</div><div class="detail-box-title">Account</div></div>
+            <div class="detail-box-body"><strong>${escapeHtml(user.email || '—')}</strong></div>
+            <div class="detail-box-body">Name: ${escapeHtml(user.name || '—')}</div>
+            <div class="detail-box-body">Tier: ${escapeHtml(user.tier || '—')}</div>
+            <div class="detail-box-body">Stripe customer: ${escapeHtml(user.stripe_customer_id || '—')}</div>
+            <div class="detail-box-body">Created: ${escapeHtml(user.created_at || '—')}</div>
+            <div class="detail-box-body">Updated: ${escapeHtml(user.updated_at || '—')}</div>
+            <div class="detail-box-body">CASPer free used today: ${user.usage_today?.casper?.used_free_today ? 'Yes' : 'No'} (${user.usage_today?.casper?.used || 0}/${user.usage_today?.casper?.limit || 0})</div>
+            <div class="detail-box-body">GAMSAT free used today: ${user.usage_today?.gamsat?.used_free_today ? 'Yes' : 'No'} (${user.usage_today?.gamsat?.used || 0}/${user.usage_today?.gamsat?.limit || 0})</div>
+          </div>
+
+          <div class="detail-box">
+            <div class="detail-box-header"><div class="detail-box-icon">💳</div><div class="detail-box-title">Credits & Payments</div></div>
+            <div class="detail-box-body">
+              <table class="subtable">
+                <thead><tr><th>Tool</th><th>Balance</th><th>Updated</th></tr></thead>
+                <tbody>
+                  ${credits.length ? credits.map(c => `<tr><td>${escapeHtml(c.tool)}</td><td>${escapeHtml(c.balance)}</td><td>${escapeHtml(c.updated_at || '—')}</td></tr>`).join('') : '<tr><td colspan="3">No credits</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+            <div class="detail-box-body" style="margin-top:8px;">
+              <table class="subtable">
+                <thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Time</th></tr></thead>
+                <tbody>
+                  ${payments.length ? payments.map(p => `<tr><td>${escapeHtml(p.type)}</td><td>${escapeHtml(formatMoney(p.amount_aud))}</td><td>${escapeHtml(p.status)}</td><td>${escapeHtml(p.created_at || '—')}</td></tr>`).join('') : '<tr><td colspan="4">No payments</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="detail-box">
+            <div class="detail-box-header"><div class="detail-box-icon">📝</div><div class="detail-box-title">Recent Reviews</div></div>
+            <div class="detail-box-body">
+              <table class="subtable">
+                <thead><tr><th>Tool</th><th>Time</th><th>Preview</th></tr></thead>
+                <tbody>
+                  ${reviews.length ? reviews.map(r => `<tr><td>${escapeHtml(r.tool)}</td><td>${escapeHtml(r.created_at || '—')}</td><td>${escapeHtml((r.response_text || '').slice(0, 90))}${(r.response_text || '').length > 90 ? '…' : ''}</td></tr>`).join('') : '<tr><td colspan="3">No reviews</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderUsersTable() {
+      const rows = getFilteredUsers();
+      renderUserSummary(rows);
+      els.usersBody.innerHTML = '';
+      els.emptyState.classList.toggle('hidden', rows.length > 0);
+      els.statusText.textContent = `${rows.length} user${rows.length === 1 ? '' : 's'} shown`;
+
+      rows.forEach(row => {
+        const dt = formatDate(row.created_at);
+        const freeToday = Boolean(row.usage_today?.casper?.used_free_today || row.usage_today?.gamsat?.used_free_today);
+
+        const dataRow = document.createElement('tr');
+        dataRow.className = 'data-row';
+        dataRow.innerHTML = `
+          <td><div class="expand-icon">▼</div></td>
+          <td><div class="student-name">${escapeHtml(row.email || 'Unknown')}</div><div class="student-sub">${escapeHtml(row.name || 'No name')}</div></td>
+          <td>${tierBadge(row.tier)}</td>
+          <td>${escapeHtml(row.casper_balance)}</td>
+          <td>${escapeHtml(row.gamsat_balance)}</td>
+          <td>${escapeHtml(row.review_count)}</td>
+          <td>${escapeHtml(row.payment_count)}</td>
+          <td>${escapeHtml(formatMoney(row.total_spend_aud))}</td>
+          <td>${yesNoBadge(freeToday)}</td>
+          <td><div class="time-main">${dt ? dt.date : '—'}</div><div class="time-sub">${dt ? dt.time : ''}</div></td>
+        `;
+
+        const detailRow = document.createElement('tr');
+        detailRow.className = 'detail-row';
+        detailRow.innerHTML = `<td colspan="10" class="detail-panel"><div class="detail-inner"><div class="detail-box"><div class="detail-box-body">Loading…</div></div></div></td>`;
+
+        dataRow.addEventListener('click', async () => {
+          const isOpen = detailRow.classList.contains('open');
+          if (isOpen) {
+            detailRow.classList.remove('open');
+            dataRow.classList.remove('expanded');
+            return;
+          }
+          try {
+            const detail = await loadUserDetail(row.id);
+            detailRow.innerHTML = `<td colspan="10" class="detail-panel">${renderUserDetailHtml(detail)}</td>`;
+            detailRow.classList.add('open');
+            dataRow.classList.add('expanded');
+          } catch (err) {
+            detailRow.innerHTML = `<td colspan="10" class="detail-panel"><div class="detail-inner"><div class="detail-box"><div class="detail-box-body">${escapeHtml(err.message || 'Failed to load user detail.')}</div></div></div></td>`;
+            detailRow.classList.add('open');
+            dataRow.classList.add('expanded');
+          }
+        });
+
+        els.usersBody.appendChild(dataRow);
+        els.usersBody.appendChild(detailRow);
+      });
+    }
+
+    function renderCurrentView() {
+      if (state.currentView === 'reviews') {
+        els.viewTitle.textContent = 'Student Reviews';
+        els.reviewsTable.classList.remove('hidden');
+        els.usersTable.classList.add('hidden');
+        els.toolFilter.disabled = false;
+        renderReviewsTable();
+      } else {
+        els.viewTitle.textContent = 'User Accounts';
+        els.reviewsTable.classList.add('hidden');
+        els.usersTable.classList.remove('hidden');
+        renderUsersTable();
+      }
+    }
+
+    async function refreshCurrentView() {
+      if (state.currentView === 'reviews') await loadReviews();
+      else await loadUsers();
+    }
+
+    async function exportCurrentView() {
+      const base = state.currentView === 'reviews' ? '/admin/reviews.csv' : '/admin/users.csv';
+      const params = new URLSearchParams({ limit: els.limitFilter.value || '50' });
+      const res = await apiFetch(`${base}?${params}`);
       if (!res.ok) throw new Error('Export failed.');
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `key2md-reviews-${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `${state.currentView}-${new Date().toISOString().slice(0,10)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     }
 
     async function logout() {
       try { if (state.token) await apiFetch('/admin/logout', { method: 'POST' }); } catch {}
-      state.token = null; state.adminEmail = null; state.rows = [];
+      state.token = null;
+      state.adminEmail = null;
+      state.reviews = [];
+      state.users = [];
+      state.userDetailCache.clear();
       els.reviewsBody.innerHTML = '';
-      setError(''); setLoginError('');
+      els.usersBody.innerHTML = '';
+      setError('');
+      setLoginError('');
       els.adminBadge.textContent = 'Not signed in';
       els.loginSection.classList.remove('hidden');
       els.dashboardSection.classList.add('hidden');
     }
-
-    function setLoginError(msg) {
-      els.loginError.textContent = msg || '';
-      els.loginError.style.display = msg ? 'block' : 'none';
-    }
-
-    function setError(msg) {
-      els.dashboardError.textContent = msg || '';
-      els.dashboardError.style.display = msg ? 'block' : 'none';
-    }
-
-    // ── Events ──
 
     els.loginForm.addEventListener('submit', async e => {
       e.preventDefault();
@@ -1166,31 +1237,66 @@ function parseQuestionText(text) {
       }
     });
 
+    els.reviewsTabBtn.addEventListener('click', async () => {
+      state.currentView = 'reviews';
+      els.reviewsTabBtn.classList.add('active');
+      els.usersTabBtn.classList.remove('active');
+      await loadReviews();
+    });
+
+    els.usersTabBtn.addEventListener('click', async () => {
+      state.currentView = 'users';
+      els.usersTabBtn.classList.add('active');
+      els.reviewsTabBtn.classList.remove('active');
+      await loadUsers();
+    });
+
     [els.searchInput, els.toolFilter, els.tierFilter].forEach(el => {
-      el.addEventListener('input', renderTable);
-      el.addEventListener('change', renderTable);
+      el.addEventListener('input', () => {
+        if (state.currentView === 'reviews') renderReviewsTable();
+        else renderUsersTable();
+      });
+      el.addEventListener('change', async () => {
+        if (state.currentView === 'reviews') renderReviewsTable();
+        else await loadUsers();
+      });
     });
 
     els.limitFilter.addEventListener('change', async () => {
-      try { await loadReviews(); } catch (err) {
-        if (err.message.includes('Session expired')) { await logout(); setLoginError(err.message); }
-        else setError(err.message);
+      try {
+        await refreshCurrentView();
+      } catch (err) {
+        if ((err.message || '').includes('Session expired')) {
+          await logout();
+          setLoginError(err.message);
+        } else {
+          setError(err.message);
+        }
       }
     });
 
     els.refreshBtn.addEventListener('click', async () => {
-      try { await loadReviews(); } catch (err) {
-        if (err.message.includes('Session expired')) { await logout(); setLoginError(err.message); }
-        else setError(err.message);
+      try {
+        await refreshCurrentView();
+      } catch (err) {
+        if ((err.message || '').includes('Session expired')) {
+          await logout();
+          setLoginError(err.message);
+        } else {
+          setError(err.message);
+        }
       }
     });
 
     els.exportBtn.addEventListener('click', async () => {
-      try { await exportCsv(); } catch (err) { setError(err.message); }
+      try {
+        await exportCurrentView();
+      } catch (err) {
+        setError(err.message);
+      }
     });
 
     els.logoutBtn.addEventListener('click', logout);
-
   </script>
 </body>
 </html>
