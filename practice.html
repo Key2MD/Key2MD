@@ -1580,9 +1580,9 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
 }
     );
     if(data.error){
-      if(data.error === 'auth_required' || data.error === 'limit_reached' || data.error === 'no_credits') return;
-      throw new Error(data.error);
-    }
+  getAiFbEl().innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">Error: ${data.error}${data.message ? ' — ' + data.message : ''}</div>`;
+  return;
+}
     const txt=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
     const fb=JSON.parse(txt);
     h.score=fb.score;h.feedback=fb;
