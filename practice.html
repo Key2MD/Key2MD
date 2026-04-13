@@ -1280,11 +1280,13 @@ $('categoryFilters').addEventListener('click',e=>{
   const btn=e.target.closest('.cat-btn');if(!btn)return;
   document.querySelectorAll('#categoryFilters .cat-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');selectedCategory=btn.dataset.cat;
+  if(sessionActive){clearTimer();startSession();}
 });
 $('mmiCategoryFilters').addEventListener('click',e=>{
   const btn=e.target.closest('.cat-btn');if(!btn)return;
   document.querySelectorAll('#mmiCategoryFilters .cat-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');selectedCategory=btn.dataset.cat;
+  if(sessionActive){clearTimer();startSession();}
 });
 $('mmiHidePrompts').addEventListener('change',()=>{mmiHidePrompts=$('mmiHidePrompts').checked;});
 
