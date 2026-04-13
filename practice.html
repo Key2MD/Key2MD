@@ -1965,8 +1965,8 @@ prevBtn.addEventListener('click',()=>{
 
 nextBtn.addEventListener('click',async()=>{
   if(!sessionActive)return;
-  if(phase==='writing'&&currentMode===MODE_CASPER){
-    clearTimer();saveAnswer();
+if(phase==='writing'&&currentMode===MODE_CASPER){
+    clearTimer();saveAnswer();setPhaseUI('done');
   }
   if(phase==='writing'&&currentMode===MODE_MMI){
     clearTimer();stopRecording();setPhaseUI('done');updateBtns();return;
