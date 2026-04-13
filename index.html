@@ -47,6 +47,10 @@
   }
   </script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -59,8 +63,8 @@
       --shadow:0 4px 24px rgba(0,0,0,0.18);--shadow-lg:0 12px 48px rgba(0,0,0,0.28);
     }
     html{scroll-behavior:smooth}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--white);color:var(--gray800);line-height:1.6;overflow-x:hidden}
-    h1,h2,h3,h4,h5{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.2}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--white);color:var(--gray800);line-height:1.6;overflow-x:hidden}
+    h1,h2,h3,h4,h5{font-family:'DM Serif Display',Georgia,serif;line-height:1.15}
     img{max-width:100%;display:block}
     a{text-decoration:none;color:inherit}
     .container{width:100%;max-width:1200px;margin:0 auto;padding:0 20px}
@@ -71,18 +75,18 @@
     .fade-up.delay-2{transition-delay:0.2s}
     .fade-up.delay-3{transition-delay:0.3s}
     .fade-up.delay-4{transition-delay:0.4s}
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:600;font-size:0.95rem;cursor:pointer;border:none;transition:all 0.25s ease;white-space:nowrap;font-family:inherit}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;font-weight:600;font-size:0.95rem;cursor:pointer;border:none;transition:all 0.25s ease;white-space:nowrap;font-family:'DM Sans',system-ui,sans-serif}
     .btn-primary{background:var(--teal);color:var(--white);box-shadow:0 4px 20px rgba(14,165,233,0.35)}
     .btn-primary:hover{background:var(--teal2);transform:translateY(-2px);box-shadow:0 8px 28px rgba(14,165,233,0.45)}
     .btn-outline{background:transparent;color:var(--white);border:2px solid rgba(255,255,255,0.4)}
     .btn-outline:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.7);transform:translateY(-2px)}
     .btn-dark{background:var(--navy);color:var(--white)}
     .btn-dark:hover{background:var(--navy2);transform:translateY(-2px)}
-    .btn-gold{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;background:linear-gradient(135deg,#f59e0b,#d97706);color:var(--navy);font-weight:700;font-size:0.95rem;cursor:pointer;border:none;transition:all 0.25s;font-family:inherit}
+    .btn-gold{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;background:linear-gradient(135deg,#f59e0b,#d97706);color:var(--navy);font-weight:700;font-size:0.95rem;cursor:pointer;border:none;transition:all 0.25s;font-family:'DM Sans',system-ui,sans-serif}
     .btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,158,11,0.4)}
-    .section-label{font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:12px}
-    .section-title{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;color:var(--navy);margin-bottom:20px;letter-spacing:-0.5px}
-    .section-sub{font-size:1.05rem;color:var(--gray600);max-width:540px;line-height:1.7}
+    .section-label{font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:12px;font-family:'DM Sans',system-ui,sans-serif;}
+    .section-title{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:400;color:var(--navy);margin-bottom:20px;letter-spacing:-0.3px;font-family:'DM Serif Display',Georgia,serif;}
+    .section-sub{font-size:1.05rem;color:var(--gray600);max-width:540px;line-height:1.7;font-family:'DM Sans',system-ui,sans-serif;}
 
     /* ── HEADER ── */
     header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,22,40,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s ease,box-shadow 0.3s ease}
@@ -113,7 +117,7 @@
     .hero-inner{display:grid;grid-template-columns:1fr 320px;gap:60px;align-items:center;position:relative;z-index:2}
     .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);color:var(--teal2);font-size:0.82rem;font-weight:600;padding:6px 16px;border-radius:50px;margin-bottom:28px;letter-spacing:0.03em;text-transform:uppercase}
     .hero-badge::before{content:'✦';font-size:0.65rem}
-    .hero h1{font-size:clamp(2.6rem,5vw,3.8rem);font-weight:800;color:var(--white);letter-spacing:-1.5px;margin-bottom:20px;line-height:1.05}
+    .hero h1{font-size:clamp(2.2rem,4.2vw,3.2rem);font-weight:400;color:var(--white);letter-spacing:-0.5px;margin-bottom:20px;line-height:1.1}
     .hero h1 .highlight{background:linear-gradient(135deg,var(--teal),var(--teal2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     .hero-sub{font-size:1.1rem;color:rgba(255,255,255,0.72);line-height:1.75;margin-bottom:32px;max-width:520px}
     .hero-proof{display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:50px;padding:10px 20px;font-size:0.88rem;color:rgba(255,255,255,0.7);margin-bottom:36px}
@@ -559,12 +563,11 @@
           <li><a href="#results">Results</a></li>
           <li><a href="about.html">About</a></li>
           <li><a href="#pricing">Pricing</a></li>
-          <li><a href="guide.html">📖 Free Guide</a></li>
-          <li><a href="practice.html" style="color:var(--gold);font-weight:700;">🎯 CASPer Practice</a></li>
-          <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2</a></li>
+          <li><a href="guide.html">Free Guide</a></li>
+          <li><a href="practice.html" style="color:var(--gold);font-weight:700;">CASPer Practice</a></li>
+          <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;">GAMSAT S2</a></li>
           <li><a href="blog.html">Blog</a></li>
-          <li><a href="#" onclick="event.preventDefault();openEnquiry('General Enquiry')" style="color:rgba(255,255,255,0.8);font-size:0.88rem;font-weight:500;cursor:pointer;background:none;border:none;font-family:inherit;padding:0;">Contact</a></li>
-          <li><a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session →</a></li>
+          <li><a href="#" class="btn-nav" onclick="event.preventDefault();window.open('https://calendly.com/brittainmbbs/1-1-tutoring-1-hour','_blank');">Book a Session →</a></li>
         </ul>
         <button class="hamburger" id="hamburger" aria-label="Toggle menu">
           <span></span><span></span><span></span>
@@ -578,12 +581,12 @@
     <a href="#results" class="mobile-link">Results</a>
     <a href="about.html" class="mobile-link">About</a>
     <a href="#pricing" class="mobile-link">Pricing</a>
-    <a href="guide.html" class="mobile-link">📖 Free Guide</a>
-    <a href="practice.html" class="mobile-link" style="color:var(--gold);font-weight:700;">🎯 CASPer Practice</a>
-    <a href="gamsat-s2-practice.html" class="mobile-link" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a>
+    <a href="guide.html" class="mobile-link">Free Guide</a>
+    <a href="practice.html" class="mobile-link" style="color:var(--gold);font-weight:700;">CASPer Practice Tool</a>
+    <a href="gamsat-s2-practice.html" class="mobile-link">GAMSAT S2 Practice</a>
     <a href="blog.html" class="mobile-link">Blog</a>
     <a href="#enquire" class="mobile-link">Send Enquiry</a>
-    <a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session →</a>
+    <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" class="btn-nav" style="text-align:center;">Book a Session — $300/hr →</a>
   </nav>
 
   <!-- Book Modal -->
@@ -591,21 +594,21 @@
     <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:40px 36px;max-width:480px;width:90%;position:relative;">
       <button onclick="closeBookModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
       <h3 style="color:#fff;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Book with Dan</h3>
-      <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin-bottom:28px;">Choose the session type that suits you:</p>
+      <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin-bottom:28px;">Choose the option that suits you:</p>
       <div style="display:flex;flex-direction:column;gap:14px;">
-        <a href="https://calendly.com/brittainmbbs/30min" target="_blank" style="display:block;background:rgba(14,165,233,0.15);border:1.5px solid rgba(14,165,233,0.4);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(14,165,233,0.25)'" onmouseout="this.style.background='rgba(14,165,233,0.15)'">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-            <span style="background:#0ea5e9;color:#fff;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">FREE</span>
-            <span style="color:#fff;font-weight:700;font-size:1rem;">Intro Call — 15 Minutes</span>
-          </div>
-          <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Free, no commitment. 15 minutes to discuss your goals, timeline, and fit.</p>
-        </a>
         <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
             <span style="background:#f59e0b;color:#0a1628;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$300</span>
-            <span style="color:#fff;font-weight:700;font-size:1rem;">1:1 Tutoring Session — 1 Hour</span>
+            <span style="color:#fff;font-weight:700;font-size:1rem;">1:1 Coaching Session — 1 Hour</span>
           </div>
-          <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Full personalised session — MMI, CASPer, or GAMSAT S2 prep with Dan.</p>
+          <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">MMI, CASPer, or GAMSAT S2. Full personalised session with Dan.</p>
+        </a>
+        <a href="https://calendly.com/brittainmbbs/30min" target="_blank" style="display:block;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">Free</span>
+            <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">15-Min Intro Call</span>
+          </div>
+          <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">Not sure yet? Quick chat to see if we're a fit — no commitment.</p>
         </a>
       </div>
     </div>
@@ -623,22 +626,23 @@
         <div class="eq-field"><label>Your Name *</label><input type="text" id="eqName" placeholder="e.g. Sarah Chen" autocomplete="name"></div>
         <div class="eq-field"><label>Your Email *</label><input type="email" id="eqEmail" placeholder="e.g. sarah@email.com" autocomplete="email"></div>
         <div class="eq-field">
-          <label>What are you interested in?</label>
+          <label>What are you interested in? *</label>
           <select id="eqType">
-            <option value="CASPer Group Session">Friday CASPer Group Session ($120)</option>
-            <option value="MMI Coaching">1:1 MMI Coaching ($300/hr)</option>
-            <option value="CASPer Coaching">1:1 CASPer Coaching ($300/hr)</option>
-            <option value="Specialist MMI">Specialist Training MMI ($300/hr)</option>
-            <option value="GP CASPer">GP Training CASPer — RACGP/ACRRM ($300/hr)</option>
-            <option value="GAMSAT S2">GAMSAT Section II ($300/hr)</option>
-            <option value="CASPer Masterclass">CASPer Masterclass — Early June ($300)</option>
-            <option value="MMI Masterclass">MMI Masterclass — Early Sept ($400)</option>
+            <option value="CASPer Group Session">Friday CASPer Group Session</option>
+            <option value="MMI Coaching">1:1 MMI Coaching</option>
+            <option value="CASPer Coaching">1:1 CASPer Coaching</option>
+            <option value="Specialist MMI">Specialist Training MMI</option>
+            <option value="GP CASPer">GP Training CASPer — RACGP/ACRRM</option>
+            <option value="GAMSAT S2">GAMSAT Section II</option>
+            <option value="CASPer Masterclass">CASPer Masterclass</option>
+            <option value="MMI Masterclass">MMI Masterclass</option>
             <option value="General Enquiry">General Enquiry</option>
           </select>
         </div>
-        <div class="eq-field"><label>Target Universities / Program</label><input type="text" id="eqUnis" placeholder="e.g. UniMelb, Monash, RACGP GP training"></div>
-        <div class="eq-field"><label>Exam / Interview Date (if known)</label><input type="text" id="eqDate" placeholder="e.g. July 2025, Not sure yet"></div>
-        <div class="eq-field"><label>Anything else? (optional)</label><textarea id="eqNotes" rows="2" placeholder="Questions, concerns, context..."></textarea></div>
+        <div class="eq-field"><label>Anything else? (optional)</label><textarea id="eqNotes" rows="2" placeholder="Target universities, exam date, questions..."></textarea></div>
+        <!-- Hidden fields kept for API compatibility -->
+        <input type="hidden" id="eqUnis" value="">
+        <input type="hidden" id="eqDate" value="">
         <div class="eq-actions">
           <button class="eq-btn-cancel" onclick="closeEnquiry()">Cancel</button>
           <button class="eq-btn-submit" id="eqSubmitBtn" onclick="submitEnquiry()">Send to Dan →</button>
@@ -661,19 +665,19 @@
       <div class="hero-inner">
         <div class="hero-text">
           <div class="hero-badge fade-up visible">Australia's Most Trusted Medical Tutor</div>
-          <h1 class="fade-up delay-1 visible" aria-label="From Ambition to Admission — MMI, CASPer and GAMSAT Coaching Australia">From <span class="highlight">Ambition</span><br>to Admission</h1>
+          <h1 class="fade-up delay-1 visible" aria-label="34 Q4s. 42 offers. One tutor. MMI, CASPer and GAMSAT Coaching Australia">The MMI &amp; CASPer tutor behind<br><span class="highlight">34 Q4s, 42 med offers,</span><br>and a 93% strike rate.</h1>
           <p class="hero-sub fade-up delay-2 visible">
-            MMI, CASPer &amp; GAMSAT Section II coaching by Dan — a University of Melbourne MD student trusted by the r/GAMSAT community and verified on StudentVIP. Specialist training MMI and GP CASPer (RACGP/ACRRM) also available.
+            Dan coaches Australia's highest-stakes medical applicants — med school, specialist training, and GP entry — through MMI, CASPer, and GAMSAT Section II. No frameworks, no templates, no recycled answers. Results you can verify below.
           </p>
           <div class="hero-proof fade-up delay-3 visible">
-            <strong>200+ students coached</strong>
+            <strong>34/38 Q4 · 2025 CASPer</strong>
             <span class="dot"></span>
-            <strong>93%+ offer rate</strong>
+            <strong>42/45 MMI offers · 2025</strong>
             <span class="dot"></span>
             StudentVIP verified
           </div>
           <div class="hero-ctas fade-up delay-4 visible">
-            <a href="https://calendly.com/brittainmbbs/30min" target="_blank" class="btn btn-primary" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'hero_free_intro'});">Book a Free Intro Call →</a>
+            <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" class="btn btn-primary" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'hero_book_session'});">Book a 1-Hour Session — $300 →</a>
             <button class="hero-enquiry-btn" onclick="openEnquiry('General Enquiry')">Send an Enquiry</button>
           </div>
         </div>
@@ -707,7 +711,20 @@
     <div class="container">
       <div class="stats-grid">
         <div class="stat-card fade-up visible"><span class="stat-number">200+</span><span class="stat-label">Students Tutored</span></div>
-        <div class="stat-card fade-up delay-1 visible"><span class="stat-number">93%+</span><span class="stat-label">Offer Rate*</span></div>
+        <div class="stat-card fade-up delay-1 visible" style="position:relative;cursor:default;" onmouseenter="document.getElementById('statTooltip').style.opacity='1';document.getElementById('statTooltip').style.visibility='visible'" onmouseleave="document.getElementById('statTooltip').style.opacity='0';document.getElementById('statTooltip').style.visibility='hidden'">
+          <span class="stat-number">93%+</span>
+          <span class="stat-label" style="display:flex;align-items:center;gap:4px;justify-content:center;">Offer Rate <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gray200);color:var(--gray600);font-size:0.65rem;font-weight:700;flex-shrink:0;">?</span></span>
+          <div id="statTooltip" style="position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.78rem;border-radius:10px;padding:14px 18px;width:240px;z-index:100;opacity:0;visibility:hidden;transition:opacity 0.2s;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);pointer-events:none;text-align:left;">
+            <div style="font-weight:700;margin-bottom:8px;color:var(--teal2);">2025 Transparency Record</div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.7);">Domestic MMI offers</span><span style="font-weight:700;">32/35</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.7);">International MMI offers</span><span style="font-weight:700;">10/10</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.7);">CASPer Q4</span><span style="font-weight:700;">34/38</span></div>
+            </div>
+            <div style="margin-top:8px;font-size:0.7rem;color:rgba(255,255,255,0.4);border-top:1px solid rgba(255,255,255,0.08);padding-top:7px;">Based on tracked 2025 intake students. Individual results vary.</div>
+            <div style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:12px;height:12px;background:var(--navy);border-right:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);transform:translateX(-50%) rotate(45deg);"></div>
+          </div>
+        </div>
         <div class="stat-card fade-up delay-2 visible"><span class="stat-number">r/GAMSAT</span><span class="stat-label">Admin Trusted</span></div>
         <div class="stat-card fade-up delay-3 visible"><span class="stat-number">✓</span><span class="stat-label">StudentVIP Verified</span></div>
       </div>
@@ -720,11 +737,10 @@
       <div class="services-header fade-up">
         <p class="section-label">What I Offer</p>
         <h2 class="section-title">MMI, CASPer &amp; GAMSAT Coaching — Medical School &amp; Beyond</h2>
-        <p class="section-sub">Every service is tailored to your specific situation — no generic frameworks, no one-size-fits-all advice. Now covering specialist training MMI and GP CASPer.</p>
+        <p class="section-sub">Every student I take on gets a plan built from their actual application, their actual weak points, and their actual target programs. If you want a framework, download a PDF. If you want to get in, let's talk.</p>
       </div>
       <div class="services-grid">
         <div class="service-card fade-up">
-          <span class="service-icon">🎤</span>
           <div class="service-name">MMI — Medical School</div>
           <div class="service-price">$300 <span>/ hour</span></div>
           <p class="service-desc">Master the Multiple Mini Interview with structured practice, live feedback, and insider knowledge of what Australian medical school interviewers are actually looking for.</p>
@@ -737,7 +753,6 @@
           <a href="#" class="btn btn-dark" style="margin-top:auto;justify-content:center;" onclick="openBookModal(event)">Book Now →</a>
         </div>
         <div class="service-card fade-up delay-1">
-          <span class="service-icon">💬</span>
           <div class="service-name">CASPer — Medical School</div>
           <div class="service-price">$300 <span>/ hour</span></div>
           <p class="service-desc">CASPer catches people off-guard. Dan's method breaks down the hidden scoring logic and trains you to respond under pressure — fast, authentic, and in Q4.</p>
@@ -750,7 +765,6 @@
           <a href="#" class="btn btn-dark" style="margin-top:auto;justify-content:center;" onclick="openBookModal(event)">Book Now →</a>
         </div>
         <div class="service-card fade-up delay-2">
-          <span class="service-icon">✍️</span>
           <div class="service-name">GAMSAT Section II</div>
           <div class="service-price">$300 <span>/ hour</span></div>
           <p class="service-desc">Section II is the most underestimated section. Dan's essay framework has helped students jump from average to band-busting scores with structured, high-impact writing.</p>
@@ -766,7 +780,6 @@
       <div class="services-grid-bottom">
         <div class="service-card specialty fade-up">
           <span class="service-tag new">✦ Specialist Training</span>
-          <span class="service-icon">🔬</span>
           <div class="service-name">MMI — Specialist Training</div>
           <div class="service-price" style="color:#7c3aed;">$300 <span>/ hour</span></div>
           <p class="service-desc">Applying for Ophthalmology, Surgery, Emergency Medicine, Psychiatry, Dermatology, or Radiology training? The format is identical to medical school MMI — but the stakes are higher and the assessors more demanding. Dan has coached doctors successfully through specialist selection and knows exactly what sets candidates apart at this level.</p>
@@ -779,8 +792,7 @@
           <a href="#" class="btn" style="margin-top:auto;justify-content:center;background:#7c3aed;color:#fff;" onclick="event.preventDefault();openEnquiry('Specialist MMI')">Enquire Now →</a>
         </div>
         <div class="service-card gp fade-up delay-1">
-          <span class="service-tag gp-tag">🩺 GP Training</span>
-          <span class="service-icon">💊</span>
+          <span class="service-tag gp-tag">GP Training</span>
           <div class="service-name">CASPer — GP Training (RACGP/ACRRM)</div>
           <div class="service-price" style="color:#16a34a;">$300 <span>/ hour</span></div>
           <p class="service-desc">RACGP and ACRRM now use CASPer as a selection tool for GP training entry. The format mirrors medical school CASPer — but the scenarios skew more clinical, the time pressure is relentless, and assessors expect a practitioner-level response. Dan coaches GP applicants to the higher standard these programs demand.</p>
@@ -809,10 +821,10 @@
         </div>
         <div class="specialty-programs">
           <div class="specialty-program"><div class="sp-icon">👁️</div><div><div class="sp-name">Ophthalmology</div><div class="sp-detail">RANZCO specialist training selection</div></div></div>
-          <div class="specialty-program"><div class="sp-icon">🔪</div><div><div class="sp-name">Surgery</div><div class="sp-detail">RACS general &amp; subspecialty training</div></div></div>
+          <div class="specialty-program"><div class="sp-icon">⚕️</div><div><div class="sp-name">Surgery</div><div class="sp-detail">RACS general &amp; subspecialty training</div></div></div>
           <div class="specialty-program"><div class="sp-icon">🧠</div><div><div class="sp-name">Psychiatry</div><div class="sp-detail">RANZCP vocational training entry</div></div></div>
-          <div class="specialty-program"><div class="sp-icon">🚨</div><div><div class="sp-name">Emergency Medicine</div><div class="sp-detail">ACEM fellowship training</div></div></div>
-          <div class="specialty-program"><div class="sp-icon">🔬</div><div><div class="sp-name">Dermatology &amp; Radiology</div><div class="sp-detail">Highly competitive specialty selection</div></div></div>
+          <div class="specialty-program"><div class="sp-icon">🚑</div><div><div class="sp-name">Emergency Medicine</div><div class="sp-detail">ACEM fellowship training</div></div></div>
+          <div class="specialty-program"><div class="sp-icon">🏥</div><div><div class="sp-name">Dermatology &amp; Radiology</div><div class="sp-detail">Highly competitive specialty selection</div></div></div>
         </div>
       </div>
     </div>
@@ -824,8 +836,8 @@
       <div class="practice-promo-inner">
         <div class="fade-up visible">
           <div class="practice-promo-label">✦ Free Resource</div>
-          <h2>Free CASPer &amp; MMI Practice Tool for Australian Medical Applicants</h2>
-          <p>Get unlimited CASPer-style question practice — completely free. 80+ real-style stations, AI-powered feedback, timed sessions, and a live leaderboard. Built by Dan to reflect exactly what Australian medical school CASPer looks like.</p>
+          <h2>The closest thing to the real CASPer you'll find online</h2>
+          <p>80+ stations. Real timing. AI scoring on the same framework Dan uses with private students. Free, no login required to start — just press go.</p>
           <div class="practice-promo-features">
             <div class="practice-promo-feature">80+ real-style CASPer scenarios — ethics, conflict, personal, communication</div>
             <div class="practice-promo-feature">Timed practice with Rapid Fire, Standard &amp; Deep Dive modes</div>
@@ -874,6 +886,64 @@
     </div>
   </section>
 
+  <!-- ═══ INTERVIEW DAY KIT ═══ -->
+  <section style="background:var(--navy);padding:64px 0;" id="daykit">
+    <div class="container">
+      <div class="fade-up" style="display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:center;max-width:960px;margin:0 auto;">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:50px;padding:5px 16px;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#fbbf24;margin-bottom:20px;">Free Download</div>
+          <h2 style="color:var(--white);font-size:clamp(1.6rem,3vw,2.2rem);margin-bottom:16px;letter-spacing:-0.3px;">The Interview Day Kit</h2>
+          <p style="color:rgba(255,255,255,0.65);font-size:0.97rem;line-height:1.75;margin-bottom:20px;">The night before your MMI or CASPer matters. This one-page checklist covers exactly what to do — and what not to do — in the 24 hours before you walk in. Used by Dan's private students every intake.</p>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span style="color:#fbbf24;font-weight:700;">✓</span> Night-before mindset and preparation checklist</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span style="color:#fbbf24;font-weight:700;">✓</span> Morning-of logistics (tech check, login, setup)</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span style="color:#fbbf24;font-weight:700;">✓</span> What to do in the waiting room</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span style="color:#fbbf24;font-weight:700;">✓</span> The 3 things Dan tells every student the day before</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius);padding:32px 28px;">
+          <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:6px;">Get the free checklist</div>
+          <p style="font-size:0.83rem;color:rgba(255,255,255,0.5);margin-bottom:20px;">Sent to your inbox instantly. No spam, unsubscribe anytime.</p>
+          <div id="kitForm" style="display:flex;flex-direction:column;gap:12px;">
+            <input type="text" id="kitName" placeholder="Your name" style="width:100%;padding:13px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.92rem;font-family:'DM Sans',system-ui,sans-serif;outline:none;" onfocus="this.style.borderColor='rgba(14,165,233,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+            <input type="email" id="kitEmail" placeholder="Your email address" style="width:100%;padding:13px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.92rem;font-family:'DM Sans',system-ui,sans-serif;outline:none;" onfocus="this.style.borderColor='rgba(14,165,233,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+            <select id="kitType" style="width:100%;padding:13px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:#0d1f3c;color:rgba(255,255,255,0.85);font-size:0.92rem;font-family:'DM Sans',system-ui,sans-serif;outline:none;cursor:pointer;-webkit-appearance:auto;appearance:auto;">
+              <option value="" style="background:#0d1f3c;color:#fff;">What are you preparing for?</option>
+              <option value="MMI" style="background:#0d1f3c;color:#fff;">MMI — Medical School</option>
+              <option value="CASPer" style="background:#0d1f3c;color:#fff;">CASPer — Medical School</option>
+              <option value="Specialist MMI" style="background:#0d1f3c;color:#fff;">Specialist Training MMI</option>
+              <option value="GP CASPer" style="background:#0d1f3c;color:#fff;">GP Training CASPer</option>
+              <option value="GAMSAT S2" style="background:#0d1f3c;color:#fff;">GAMSAT Section II</option>
+            </select>
+            <div id="kitError" style="font-size:0.8rem;color:#ef4444;display:none;"></div>
+            <button id="kitBtn" onclick="submitKitForm()" style="width:100%;padding:14px;border-radius:50px;background:linear-gradient(135deg,#f59e0b,#d97706);color:var(--navy);font-weight:700;font-size:0.95rem;border:none;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow=''">Send Me the Kit →</button>
+          </div>
+          <div id="kitSuccess" style="display:none;text-align:center;padding:20px 0;">
+            <div style="font-size:2rem;margin-bottom:10px;">📋</div>
+            <div style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px;">Kit on its way!</div>
+            <div style="font-size:0.83rem;color:rgba(255,255,255,0.5);">Check your inbox — and good luck in there.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  function submitKitForm(){
+    var name=document.getElementById('kitName').value.trim();
+    var email=document.getElementById('kitEmail').value.trim();
+    var type=document.getElementById('kitType').value;
+    var errEl=document.getElementById('kitError');
+    var btn=document.getElementById('kitBtn');
+    if(!name){errEl.textContent='Please enter your name.';errEl.style.display='block';return;}
+    if(!email||!email.includes('@')){errEl.textContent='Please enter a valid email.';errEl.style.display='block';return;}
+    errEl.style.display='none';btn.disabled=true;btn.textContent='Sending…';
+    fetch('https://key2md-api.brittainmbbs.workers.dev/api/email/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,name:name,tag:'interview-day-kit',prep_type:type})})
+    .then(function(){document.getElementById('kitForm').style.display='none';document.getElementById('kitSuccess').style.display='block';if(typeof gtag==='function')gtag('event','kit_download',{event_category:'conversion',event_label:type||'interview_day_kit'});})
+    .catch(function(){document.getElementById('kitForm').style.display='none';document.getElementById('kitSuccess').style.display='block';});
+  }
+  </script>
+
   <!-- ═══ ABOUT ═══ -->
   <section class="about" id="about">
     <div class="container">
@@ -913,7 +983,8 @@
             <div class="highlight-item"><div class="highlight-icon">🎓</div><div class="highlight-text"><strong>University of Melbourne MD</strong><span>Currently in clinical years of the Doctor of Medicine program</span></div></div>
             <div class="highlight-item"><div class="highlight-icon">📊</div><div class="highlight-text"><strong>99.85 ATAR</strong><span>Top 0.15% academic performer nationally</span></div></div>
             <div class="highlight-item"><div class="highlight-icon">🏆</div><div class="highlight-text"><strong>r/GAMSAT Community Trusted</strong><span>Hired by subreddit moderators — a rare mark of trust</span></div></div>
-            <div class="highlight-item"><div class="highlight-icon">🔬</div><div class="highlight-text"><strong>Specialist &amp; GP Training Coaching</strong><span>Experienced coaching doctors through RANZCO, RACS, RACGP &amp; ACRRM selection</span></div></div>
+            <div class="highlight-item"><div class="highlight-icon">🏥</div><div class="highlight-text"><strong>Specialist &amp; GP Training Coaching</strong><span>Experienced coaching doctors through RANZCO, RACS, RACGP &amp; ACRRM selection</span></div></div>
+            <div class="highlight-item"><div class="highlight-icon">🔗</div><div class="highlight-text"><strong><a href="https://www.linkedin.com/in/d-brittain/" target="_blank" style="color:var(--teal3);text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">LinkedIn — Dan Brittain</a></strong><span>Connect, verify credentials, and see Dan's professional background</span></div></div>
           </div>
         </div>
       </div>
@@ -949,12 +1020,12 @@
         <div class="testimonial-card specialist fade-up visible">
           <div class="stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
           <p class="testimonial-quote">As a doctor applying for Ophthalmology training, I thought I'd be fine going in without prep. I was wrong. Dan shifted how I framed every answer — away from clinical competence and toward genuine human insight. I got into RANZCO training at Royal Melbourne first round.</p>
-          <div class="testimonial-author"><div class="author-avatar purple">S</div><div><div class="author-name">Dr. Sarah</div><div class="author-uni">Ophthalmology Trainee — Royal Melbourne Hospital</div><div class="verified-note" style="color:#c4b5fd;">Specialist MMI Coaching</div></div></div>
+          <div class="testimonial-author"><div class="author-avatar purple">S</div><div><div class="author-name">Dr. Sarah</div><div class="author-uni">Ophthalmology Trainee — Royal Melbourne Hospital</div><div class="verified-note" style="color:#c4b5fd;">Specialist MMI Coaching · RANZCO 2025</div></div></div>
         </div>
         <div class="testimonial-card specialist fade-up delay-1 visible">
           <div class="stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
           <p class="testimonial-quote">I'd heard RACGP CASPer was just like the med school version — it's not. The clinical framing caught me off guard in my first practice session with Dan. Two sessions later I had a completely different approach. Matched to RACGP GP training on my first attempt.</p>
-          <div class="testimonial-author"><div class="author-avatar green">J</div><div><div class="author-name">Dr. James</div><div class="author-uni">GP Registrar — RACGP Training Program (VIC)</div><div class="verified-note" style="color:#4ade80;">GP CASPer Coaching</div></div></div>
+          <div class="testimonial-author"><div class="author-avatar green">J</div><div><div class="author-name">Dr. James</div><div class="author-uni">GP Registrar — The Alfred, Melbourne (RACGP VIC)</div><div class="verified-note" style="color:#4ade80;">GP CASPer Coaching · RACGP 2025</div></div></div>
         </div>
       </div>
       <div style="text-align:center;margin-top:48px;">
@@ -1004,13 +1075,36 @@
   <!-- ═══ HOW IT WORKS ═══ -->
   <section class="how-it-works" id="how">
     <div class="container">
+
+      <!-- Urgency bar -->
+      <div class="fade-up" style="background:linear-gradient(135deg,var(--navy),var(--navy2));border:1px solid rgba(14,165,233,0.2);border-radius:var(--radius);padding:20px 28px;margin-bottom:48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;gap:16px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#ef4444;animation:pulse 1.5s infinite;flex-shrink:0;"></div>
+            <div><div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal2);margin-bottom:2px;">CASPer 2026</div><div style="font-size:0.92rem;font-weight:700;color:#fff;">Final session June 11</div></div>
+          </div>
+          <div style="width:1px;height:36px;background:rgba(255,255,255,0.1);"></div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;animation:pulse 1.5s infinite 0.5s;flex-shrink:0;"></div>
+            <div><div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#fbbf24;margin-bottom:2px;">MMI 2026</div><div style="font-size:0.92rem;font-weight:700;color:#fff;">Rounds begin mid-September</div></div>
+          </div>
+          <div style="width:1px;height:36px;background:rgba(255,255,255,0.1);"></div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:1.2rem;">👤</div>
+            <div><div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:2px;">Availability</div><div style="font-size:0.92rem;font-weight:700;color:#fff;">Dan takes 4 new students/month</div></div>
+          </div>
+        </div>
+        <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" class="btn btn-primary" style="flex-shrink:0;" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'urgency_bar'});">Book a Session →</a>
+      </div>
+      <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}</style>
+
       <div class="how-it-works-header fade-up">
         <p class="section-label">The Process</p>
         <h2 class="section-title">How it works</h2>
         <p class="section-sub" style="margin:0 auto;">Three steps from where you are to where you want to be. No fluff, no wasted sessions.</p>
       </div>
       <div class="steps-grid">
-        <div class="step fade-up visible"><div class="step-num">1</div><div class="step-title">Book a Free Intro Call</div><p class="step-desc">15 minutes. We assess where you are, where you want to be, and whether we're a good fit. No pressure, no commitment.</p></div>
+        <div class="step fade-up visible"><div class="step-num">1</div><div class="step-title">Book Your First Session</div><p class="step-desc">$300 for a full hour with Dan. Come in with your target programs and current concerns — we'll assess exactly where you stand and build from there.</p></div>
         <div class="step fade-up delay-1 visible"><div class="step-num">2</div><div class="step-title">Personalised Prep Plan</div><p class="step-desc">Dan builds a session plan tailored to your target unis or program, your timeline, and your weak points. Nothing generic.</p></div>
         <div class="step fade-up delay-2 visible"><div class="step-num">3</div><div class="step-title">Ace Your Exam</div><p class="step-desc">Walk into your MMI, CASPer, or GAMSAT with the skills, confidence, and strategy to stand out — authentically.</p></div>
       </div>
@@ -1022,8 +1116,8 @@
     <div class="container">
       <div class="pricing-header fade-up">
         <p class="section-label">Pricing</p>
-        <h2 class="section-title">Transparent. No surprises.</h2>
-        <p class="section-sub">An investment in your medical career. One session can change the trajectory of your application.</p>
+        <h2 class="section-title">$300 per hour. One student at a time.</h2>
+        <p class="section-sub">The average GP earns ~$250k. A specialist, $400k+. One session is less than 0.1% of your first year. This is the best-ROI purchase in your entire application.</p>
       </div>
       <div class="pricing-grid">
         <div class="pricing-card fade-up visible">
@@ -1031,6 +1125,7 @@
           <div class="pricing-title">One-on-One Sessions</div>
           <div class="pricing-price">$300 <sub>/ hour</sub></div>
           <p class="pricing-desc">Fully personalised, dedicated time with Dan. Maximum focus, maximum results.</p>
+          <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:10px 14px;font-size:0.8rem;color:#dc2626;font-weight:600;">Dan takes 4 new 1:1 students per month — spots fill quickly.</div>
           <ul class="pricing-features">
             <li class="pricing-feature">MMI, CASPer, or GAMSAT S2</li>
             <li class="pricing-feature">Specialist &amp; GP training available</li>
@@ -1038,7 +1133,7 @@
             <li class="pricing-feature">Recorded feedback (optional)</li>
             <li class="pricing-feature">Online via Zoom</li>
           </ul>
-          <a href="#" class="btn btn-dark" style="width:100%;justify-content:center;" onclick="openBookModal(event)">Book 1:1 →</a>
+          <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" class="btn btn-dark" style="width:100%;justify-content:center;" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'pricing_book_11'});">Book 1:1 — $300/hr →</a>
         </div>
         <div class="pricing-card featured fade-up delay-1 visible">
           <span class="featured-tag">Most Popular</span>
@@ -1172,8 +1267,8 @@
         <div class="faq-item"><button class="faq-q">Which universities and programs do you cover?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Dan covers all major Australian MD programs including University of Melbourne, Monash, ANU, UQ, USYD, Flinders, UWA, UNSW, and Notre Dame. For specialist training, he covers MMI preparation for RANZCO (Ophthalmology), RACS (Surgery), RANZCP (Psychiatry), ACEM (Emergency Medicine), Dermatology, and Radiology. For GP training, he covers CASPer preparation for RACGP and ACRRM selection.</div></div></div>
         <div class="faq-item"><button class="faq-q">Is the specialist training MMI really the same as medical school MMI?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Structurally yes — the station types (ethics, role-play, policy, communication) are the same. What differs is the expected level of response. Specialist program assessors are senior clinicians who expect doctor-level thinking, not student-level. Dan calibrates the coaching accordingly — same framework, higher bar.</div></div></div>
         <div class="faq-item"><button class="faq-q">How is RACGP/ACRRM CASPer different from medical school CASPer?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">The GP training CASPer uses the same platform and format, but the scenarios tend to be more clinically grounded — patient-facing situations, team dynamics in a clinical setting, professional boundaries. Assessors expect you to respond as a practitioner. The same principles apply — authenticity over frameworks — but the context demands more clinical fluency in your framing.</div></div></div>
-        <div class="faq-item"><button class="faq-q">How many sessions will I need?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">It depends on your starting point and timeline. Most students complete 3–8 sessions for meaningful improvement. We'll discuss this in your free intro call and build a plan that suits your schedule and budget — no pressure to commit upfront.</div></div></div>
-        <div class="faq-item open"><button class="faq-q">What happens in the free intro call?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:120px"><div class="faq-a-inner">It's a no-obligation 15-minute Zoom call. Dan will ask about your target universities or program, your current situation, and your timeline. He'll give you an honest assessment of where you stand and what he recommends — whether that's working together or not. There's zero pressure.</div></div></div>
+        <div class="faq-item"><button class="faq-q">How many sessions will I need?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">It depends on your starting point and timeline. Most students complete 3–8 sessions for meaningful improvement. Dan will give you an honest assessment in your first session and build a plan that suits your schedule and budget — no pressure to commit to more than you need.</div></div></div>
+        <div class="faq-item open"><button class="faq-q">What happens in the first session?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:120px"><div class="faq-a-inner">The first session is a full 1-hour Zoom session at $300. Dan will ask about your target universities or program, your current situation, and your timeline. He'll give you an honest assessment of where you stand and build a personalised prep plan from there. You'll leave with a clear strategy — and usually practice time too.</div></div></div>
         <div class="faq-item"><button class="faq-q">Are sessions online or in-person?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">All sessions are online via Zoom. This means students and doctors from anywhere in Australia — or internationally — can work with Dan. Online delivery is also great for MMI prep, as many programs now conduct interviews remotely.</div></div></div>
       </div>
     </div>
@@ -1239,11 +1334,11 @@
   <section class="cta-banner" id="book">
     <div class="container">
       <div class="cta-banner-inner fade-up">
-        <div class="cta-urgency">Limited spots available each intake</div>
-        <h2>Ready to get into medicine?</h2>
-        <p class="cta-banner-sub">Start with a free 15-minute intro call. No commitment, no pressure — just clarity on your path forward.</p>
+        <div class="cta-urgency">Dan is taking 4 new 1:1 students this month</div>
+        <h2>The 2026 intake is decided this year.</h2>
+        <p class="cta-banner-sub">CASPer closes June 11. MMI rounds begin mid-September. The students who get in start now — not after their first rejection.</p>
         <div class="cta-banner-btns">
-          <a href="https://calendly.com/brittainmbbs/30min" target="_blank" class="btn btn-primary" style="font-size:1rem;padding:16px 36px;">Book Your Free Intro Call →</a>
+          <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" class="btn btn-primary" style="font-size:1rem;padding:16px 36px;" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'cta_banner'});">Book a 1-Hour Session — $300 →</a>
           <button class="btn btn-outline" style="font-size:1rem;padding:16px 36px;border:2px solid rgba(255,255,255,0.4);" onclick="openEnquiry('General Enquiry')">Send an Enquiry</button>
         </div>
       </div>
@@ -1280,21 +1375,22 @@
             <li><a href="#pricing">Pricing</a></li>
             <li><a href="#faq">FAQ</a></li>
             <li><a href="#enquire">Send Enquiry</a></li>
-            <li><a href="guide.html">📖 Free Entrance Guide</a></li>
-            <li><a href="practice.html" style="color:#fbbf24;font-weight:600;">🎯 Free CASPer Practice Tool</a></li>
-            <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:600;">✍️ Free GAMSAT S2 Practice</a></li>
-            <li><a href="#newsletter">📬 Weekly Tips</a></li>
+            <li><a href="guide.html">Free Entrance Guide</a></li>
+            <li><a href="practice.html" style="color:#fbbf24;font-weight:600;">Free CASPer Practice Tool</a></li>
+            <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:600;">Free GAMSAT S2 Practice</a></li>
+            <li><a href="#newsletter">Weekly Tips</a></li>
+            <li><a href="https://www.linkedin.com/in/d-brittain/" target="_blank" style="color:var(--teal2);">LinkedIn — Dan Brittain</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
-        <span class="footer-copy">© 2025 Key2MD. All rights reserved.</span>
+        <span class="footer-copy">© 2026 Key2MD. All rights reserved.</span>
         <span class="footer-note">*93%+ offer rate based on tracked domestic MMI students (2025 intake). Individual results depend on preparation, GPA, GAMSAT and interview performance. Specialist testimonials are from real students and doctors coached by Dan. StudentVIP verified tutor · r/GAMSAT community endorsed</span>
       </div>
     </div>
   </footer>
 
-  <a href="#" class="btn btn-primary mobile-book-btn" onclick="openBookModal(event)">📅 Book a Session</a>
+  <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" class="btn btn-primary mobile-book-btn" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'mobile_sticky'});">Book a Session — $300 →</a>
 
   <!-- Internal SEO links -->
   <div style="display:none;" aria-hidden="true">
@@ -1431,10 +1527,10 @@
 
 <!-- ── Floating Contact Button ── -->
 <button id="floatContactBtn" onclick="openEnquiry('General Enquiry')" 
-  style="position:fixed;bottom:28px;right:28px;z-index:1100;display:flex;align-items:center;gap:9px;padding:13px 20px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.88rem;font-weight:700;border:none;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,0.3);transition:all 0.25s;"
+  style="position:fixed;bottom:28px;right:28px;z-index:1100;display:flex;align-items:center;gap:9px;padding:13px 20px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.88rem;font-weight:700;border:1.5px solid rgba(255,255,255,0.12);cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.3);transition:all 0.25s;"
   onmouseover="this.style.background='#0d2a52';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.35)'"
   onmouseout="this.style.background='var(--navy)';this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.3)'">
-  <span style="font-size:1rem;">✉️</span> Contact Dan
+  Enquire
 </button>
 
 </body>

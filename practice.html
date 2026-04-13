@@ -638,7 +638,17 @@
       </div>
     </div>
 
-    <!-- CASPer Class Ad -->
+    <!-- Category Heatmap - Product #3 -->
+    <div class="sidebar-card" id="categoryHeatmapCard" style="display:none;">
+      <h3 style="margin-bottom:4px;">Category Heatmap</h3>
+      <p style="font-size:0.72rem;color:var(--gray400);margin-bottom:12px;line-height:1.4;">Your average score by category. Red = weakest area.</p>
+      <div id="heatmapRows" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <div id="heatmapWeakAlert" style="display:none;margin-top:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:10px 12px;">
+        <div style="font-size:0.72rem;font-weight:700;color:#dc2626;margin-bottom:4px;">Weakest category: <span id="heatmapWeakLabel">—</span></div>
+        <div style="font-size:0.75rem;color:var(--gray600);line-height:1.4;margin-bottom:8px;">Dan's 1:1 sessions target your exact weak patterns — not generic frameworks.</div>
+        <a href="https://calendly.com/brittainmbbs/mmi-casper-gamsat-coaching" target="_blank" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:700;text-decoration:none;">Book a Session →</a>
+      </div>
+    </div>
     <div class="sidebar-card" style="background:linear-gradient(135deg,#0a1628 0%,#0d2a52 100%);border:1px solid rgba(14,165,233,0.25);">
       <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal2);margin-bottom:8px;">📅 Weekly Live Classes</div>
       <div style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:8px;">CASPer Group Coaching with Dan</div>
@@ -781,7 +791,7 @@
         <div id="scenarioIdle" class="idle-hero">
           <div class="idle-icon">🎤</div>
           <div class="idle-title">Ready to practise?</div>
-          <div class="idle-sub" id="idle-sub-text">Choose a category and press Start Session to begin your CASPer practice simulation.</div>
+          <div class="idle-sub" id="idle-sub-text">The closest thing to the real CASPer you'll find online — real timing, AI scoring on Dan's Q1–Q4 framework, and a calibration score that updates after every station.</div>
           <!-- Timer mode picker — shown only when idle -->
           <div id="timerModePicker" style="margin-top:28px;text-align:left;max-width:480px;margin-left:auto;margin-right:auto;">
             <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">⏱ Timer Mode</div>
@@ -1810,15 +1820,61 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
 
 function getAiFbEl(){return currentMode===MODE_MMI?$('aiFeedbackWrapMMI'):aiFeedbackWrap;}
 function showAiLoading(){getAiFbEl().innerHTML=`<div class="ai-loading"><div class="spinner"></div>AI reviewing your response…</div>`;}
+function getCalibrationQuartile(){
+  // Returns calibration based on ALL scored stations so far
+  const scores=sessionHistory.filter(h=>h&&h.score!=null).map(h=>h.score);
+  if(!scores.length)return null;
+  const avg=scores.reduce((a,b)=>a+b,0)/scores.length;
+  const qi=getQuartile(avg);
+  return {avg:Math.round(avg*10)/10, n:scores.length, ...qi};
+}
+
 function showFeedback(score,fb){
   if(!fb)return;
   // Confetti for high scores
   if(score>=8) triggerConfetti();
+  const qi=getQuartile(score);
+  const cal=getCalibrationQuartile();
+  // Calibration bar
+  const calHtml=cal?`
+  <div style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid rgba(14,165,233,0.15);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);">Your Calibration Score</div>
+      <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);">Based on ${cal.n} station${cal.n===1?'':'s'}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div style="text-align:center;flex-shrink:0;">
+        <div style="font-size:2rem;font-weight:800;color:${cal.color};line-height:1;">${cal.q}</div>
+        <div style="font-size:0.7rem;color:rgba(255,255,255,0.45);margin-top:2px;">avg ${cal.avg}/10</div>
+      </div>
+      <div style="flex:1;">
+        <div style="display:flex;gap:4px;margin-bottom:6px;">
+          <div style="flex:1;height:6px;border-radius:3px;background:${cal.q==='Q1'?'#ef4444':'rgba(239,68,68,0.25)'};transition:all 0.4s;"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:${cal.q==='Q2'?'#f59e0b':'rgba(245,158,11,0.25)'};transition:all 0.4s;"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:${cal.q==='Q3'?'#0ea5e9':'rgba(14,165,233,0.25)'};transition:all 0.4s;"></div>
+          <div style="flex:1;height:6px;border-radius:3px;background:${cal.q==='Q4'?'#22c55e':'rgba(34,197,94,0.25)'};transition:all 0.4s;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:rgba(255,255,255,0.3);font-weight:600;">
+          <span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span>
+        </div>
+        <div style="margin-top:8px;font-size:0.78rem;color:rgba(255,255,255,0.6);line-height:1.4;">${
+          cal.q==='Q4'?'Tracking Q4. Keep going — consistency is what gets you there.':
+          cal.q==='Q3'?`Tracking ${cal.q}. ${cal.n<5?'Do more stations to sharpen your calibration.':'A few more stations to confirm your trajectory.'}`:
+          cal.q==='Q2'?`Tracking ${cal.q}. Focus on the "Improve" notes — they\'re specific to your weak patterns.`:
+          `Tracking ${cal.q}. Don\'t panic — this is what a first session often looks like. It moves fast.`
+        }</div>
+      </div>
+    </div>
+    ${cal.n>=3&&cal.q!=='Q4'?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:12px;"><div style="font-size:0.78rem;color:rgba(255,255,255,0.55);">Want to move to ${cal.q==='Q1'?'Q2':cal.q==='Q2'?'Q3':'Q4'}? Dan\'s 1:1 sessions are built around exactly this gap.</div><a href="https://calendly.com/brittainmbbs/mmi-casper-gamsat-coaching" target="_blank" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 16px;font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap;text-decoration:none;flex-shrink:0;">Book a Session →</a></div>`:''}
+  </div>`:'';
+
   getAiFbEl().innerHTML=`
+  ${calHtml}
   <div class="ai-feedback">
     <div class="ai-feedback-header">
       <span class="ai-feedback-title">✦ AI Feedback</span>
       <span class="ai-score-badge ${scoreCls(score)}">${score}/10</span>
+      <span style="margin-left:4px;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:50px;background:${qi.color}22;color:${qi.color};border:1px solid ${qi.color}44;">${qi.q}</span>
     </div>
     <div class="ai-feedback-body">
       <strong>Strengths:</strong> ${fb.strengths}<br><br>
@@ -1866,7 +1922,52 @@ function updateTrend(){
   const avg=sc.reduce((a,b)=>a+b,0)/sc.length;
   if(trendAvgLine)trendAvgLine.style.display='flex';if(trendAvgNum)trendAvgNum.textContent=(Math.round(avg*10)/10)+'/10';
 }
-function updateAvgStat(){const avg=avgScores();if(avg!==null){statAvg.textContent=avg+'/10';statAvg.style.color=avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';} updateLeaderboard();}
+function updateAvgStat(){const avg=avgScores();if(avg!==null){statAvg.textContent=avg+'/10';statAvg.style.color=avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';} updateLeaderboard(); updateCategoryHeatmap();}
+
+function updateCategoryHeatmap(){
+  // Build per-category average from sessionHistory
+  const catData={};
+  sessionHistory.forEach(h=>{
+    if(!h||h.score==null||!h.station)return;
+    const cat=h.station.category||'Other';
+    if(!catData[cat])catData[cat]={sum:0,n:0};
+    catData[cat].sum+=h.score;
+    catData[cat].n++;
+  });
+  const cats=Object.keys(catData);
+  if(!cats.length){document.getElementById('categoryHeatmapCard').style.display='none';return;}
+  document.getElementById('categoryHeatmapCard').style.display='block';
+
+  // Sort by avg ascending (worst first)
+  const sorted=cats.map(c=>({cat:c,avg:catData[c].sum/catData[c].n,n:catData[c].n}))
+    .sort((a,b)=>a.avg-b.avg);
+
+  const rowsEl=document.getElementById('heatmapRows');
+  rowsEl.innerHTML=sorted.map(item=>{
+    const qi=getQuartile(item.avg);
+    const pct=Math.round((item.avg/10)*100);
+    return`<div style="display:flex;flex-direction:column;gap:3px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.75rem;font-weight:600;color:var(--gray800);">${item.cat}</span>
+        <span style="font-size:0.72rem;font-weight:700;color:${qi.color};">${item.avg.toFixed(1)} · ${qi.q}</span>
+      </div>
+      <div style="height:5px;background:var(--gray100);border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:${qi.color};border-radius:3px;transition:width 0.4s;"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Show weak alert if enough data and weakest is below Q3
+  const weakest=sorted[0];
+  const alertEl=document.getElementById('heatmapWeakAlert');
+  const weakLabel=document.getElementById('heatmapWeakLabel');
+  if(weakest&&weakest.avg<6&&weakest.n>=2){
+    alertEl.style.display='block';
+    weakLabel.textContent=weakest.cat+' ('+weakest.avg.toFixed(1)+'/10)';
+  } else {
+    alertEl.style.display='none';
+  }
+}
 
 // ══════════════════════════════════════
 // LEADERBOARD + STREAKS
