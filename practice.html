@@ -646,7 +646,7 @@
       <div id="heatmapWeakAlert" style="display:none;margin-top:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:10px 12px;">
         <div style="font-size:0.72rem;font-weight:700;color:#dc2626;margin-bottom:4px;">Weakest category: <span id="heatmapWeakLabel">—</span></div>
         <div style="font-size:0.75rem;color:var(--gray600);line-height:1.4;margin-bottom:8px;">Dan's 1:1 sessions target your exact weak patterns — not generic frameworks.</div>
-        <a href="https://calendly.com/brittainmbbs/mmi-casper-gamsat-coaching" target="_blank" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:700;text-decoration:none;">Book a Session →</a>
+        <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:700;text-decoration:none;">Book a Session →</a>
       </div>
     </div>
     <div class="sidebar-card" style="background:linear-gradient(135deg,#0a1628 0%,#0d2a52 100%);border:1px solid rgba(14,165,233,0.25);">
@@ -710,7 +710,7 @@
         <div class="webcam-controls">
           <span class="webcam-timer-display" id="webcamTimerDisp">—:——</span>
           <button class="btn-webcam-restart" id="btnRestartRecording" disabled title="Restart this station">↺</button>
-          <button class="btn-webcam-dl" id="btnDownloadVideo" disabled>⬇</button>
+          <button class="btn-webcam-dl" id="btnDownloadVideo" disabled title="Save recording — available anytime during or after recording">⬇ Save</button>
         </div>
       </div>
     </div>
@@ -839,7 +839,7 @@
         <div class="answer-label">Your response <span class="word-count" id="wordCount">0 words</span>
           <button class="btn-download" id="btnDownloadResponse" title="Download your response">⬇ Save Response</button>
             <span id="btnGetAIWrap" style="display:none;align-items:center;gap:8px;">
-              <button class="btn-download" id="btnGetAI" onclick="manualRunAI()" title="Get AI feedback on your response" style="background:rgba(14,165,233,0.12);">✦ Get AI Feedback</button>
+              <button class="btn-download" id="btnGetAI" onclick="manualRunAI()" title="Get AI feedback on your response" style="background:rgba(14,165,233,0.12);">✦ Get AI Feedback + Quartile</button>
               <span id="btnAIRemaining" style="font-size:0.75rem;color:var(--teal3);font-weight:700;white-space:nowrap;"></span>
             </span>
         </div>
@@ -1391,7 +1391,6 @@ function runTimer(secs,done){
     progressFill.style.width=Math.max(0,left/secs*100)+'%';
     const urg=left<=5;
     timerNum.classList.toggle('urgent',urg);progressFill.classList.toggle('urgent',urg);
-    if(left>0&&left<=5)beep(0.25,false);
     if(left===0){clearTimer();flashTimeUp(()=>{done&&done();});}
   },1000);
 }
@@ -1399,7 +1398,38 @@ function flashTimeUp(cb){
   beep(0.5,true);let f=0;
   const iv=setInterval(()=>{timerNum.textContent=f%2===0?'TIME UP':'——:——';timerNum.classList.toggle('urgent',f%2===0);f++;if(f>=6){clearInterval(iv);timerNum.textContent='TIME UP';setTimeout(cb,400);}},300);
 }
-function beep(vol,long){try{const a=new Audio(long?'https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg':'https://actions.google.com/sounds/v1/alarms/beep_short.ogg');a.volume=vol;a.play();}catch(e){}}
+function beep(vol,long){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    if(long){
+      // Writing time over — two soft descending tones
+      [0,0.35].forEach((delay,i)=>{
+        const osc=ctx.createOscillator();
+        const gain=ctx.createGain();
+        osc.connect(gain);gain.connect(ctx.destination);
+        osc.type='sine';
+        osc.frequency.setValueAtTime(i===0?520:420,ctx.currentTime+delay);
+        gain.gain.setValueAtTime(0,ctx.currentTime+delay);
+        gain.gain.linearRampToValueAtTime(vol*0.35,ctx.currentTime+delay+0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+0.55);
+        osc.start(ctx.currentTime+delay);
+        osc.stop(ctx.currentTime+delay+0.6);
+      });
+    } else {
+      // Reading time over — single soft chime
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.type='sine';
+      osc.frequency.setValueAtTime(660,ctx.currentTime);
+      gain.gain.setValueAtTime(0,ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(vol*0.3,ctx.currentTime+0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime+0.55);
+    }
+  }catch(e){}
+}
 function setPhaseUI(p){
   phase=p;phaseBadge.className='phase-badge';progressFill.className='progress-fill';
   if(p==='reading'){phaseBadge.classList.add('phase-reading');phaseBadge.textContent='📖 Reading';progressFill.classList.add('reading');}
@@ -1512,7 +1542,7 @@ async function initWebcam(){
 function startRecording(){
   if(!webcamReady||!webcamStream)return;
   recordedChunks=[];recordingBlob=null;
-  $('btnDownloadVideo').disabled=true;
+  $('btnDownloadVideo').disabled=false; // enable from start — user can download at any point
   $('webcamPlayback').style.display='none';
   $('webcamLive').style.display='block';
   const opts=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
@@ -1541,6 +1571,19 @@ function stopRecording(){
 }
 $('btnStartWebcam').addEventListener('click',async()=>{await initWebcam();});
 $('btnDownloadVideo').addEventListener('click',()=>{
+  // If still recording, snapshot what we have so far
+  if(mediaRecorder&&mediaRecorder.state==='recording'){
+    // Request data up to now, then download
+    const snapChunks=[...recordedChunks];
+    mediaRecorder.requestData(); // flush latest chunk
+    setTimeout(()=>{
+      const allChunks=[...snapChunks,...recordedChunks.slice(snapChunks.length)];
+      const snapBlob=new Blob(allChunks,{type:mediaRecorder.mimeType||'video/webm'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(snapBlob);
+      a.download='MMI-response-Key2MD-'+Date.now()+'.webm';a.click();
+    },300);
+    return;
+  }
   if(!recordingBlob)return;
   const a=document.createElement('a');a.href=URL.createObjectURL(recordingBlob);
   a.download='MMI-response-Key2MD-'+Date.now()+'.webm';a.click();
@@ -1646,6 +1689,7 @@ function loadStation(){
 }
 
 function startWriting(){
+  beep(0.5,false); // soft single chime — reading time over
   const s=pool[currentIdx];
   const isMmi=currentMode===MODE_MMI;
   // Always reveal prompts at writing phase
@@ -1865,10 +1909,34 @@ function showFeedback(score,fb){
         }</div>
       </div>
     </div>
-    ${cal.n>=3&&cal.q!=='Q4'?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:12px;"><div style="font-size:0.78rem;color:rgba(255,255,255,0.55);">Want to move to ${cal.q==='Q1'?'Q2':cal.q==='Q2'?'Q3':'Q4'}? Dan\'s 1:1 sessions are built around exactly this gap.</div><a href="https://calendly.com/brittainmbbs/mmi-casper-gamsat-coaching" target="_blank" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 16px;font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap;text-decoration:none;flex-shrink:0;">Book a Session →</a></div>`:''}
+    ${cal.n>=3&&cal.q!=='Q4'?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:12px;"><div style="font-size:0.78rem;color:rgba(255,255,255,0.55);">Want to move to ${cal.q==='Q1'?'Q2':cal.q==='Q2'?'Q3':'Q4'}? Dan\'s 1:1 sessions are built around exactly this gap.</div><a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 16px;font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap;text-decoration:none;flex-shrink:0;">Book a Session →</a></div>`:''}
   </div>`:'';
 
   getAiFbEl().innerHTML=`
+  <div style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-radius:14px;padding:22px 24px;margin-bottom:14px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:${qi.color}18;pointer-events:none;"></div>
+    <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:12px;">This station — quartile estimate</div>
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div style="flex-shrink:0;">
+        <div style="font-size:3.8rem;font-weight:800;color:${qi.color};line-height:1;letter-spacing:-2px;">${qi.q}</div>
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);margin-top:4px;">${qi.q==='Q4'?'Excellent':'Q4'==='Q4'?'':(qi.q==='Q3'?'Good — above median':'Q2'==='Q2'?'Developing':'Needs work')} ${score}/10</div>
+      </div>
+      <div style="flex:1;min-width:140px;">
+        <div style="display:flex;gap:5px;margin-bottom:6px;">
+          ${['Q1','Q2','Q3','Q4'].map((q,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+            <div style="width:100%;height:8px;border-radius:4px;background:${qi.q===q?qi.color:'rgba(255,255,255,0.1)'};transition:all 0.4s;${qi.q===q?'box-shadow:0 0 8px '+qi.color+'66;':''}"></div>
+            <span style="font-size:0.6rem;font-weight:${qi.q===q?'800':'500'};color:${qi.q===q?qi.color:'rgba(255,255,255,0.25)'};">${q}</span>
+          </div>`).join('')}
+        </div>
+        <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:4px;">${
+          qi.q==='Q4'?'Top quartile. This is what medical schools want to see.':
+          qi.q==='Q3'?'Above median. Strong foundation — some refinement needed.':
+          qi.q==='Q2'?'Below median. The feedback below shows exactly where to focus.':
+          'Needs significant work. Read the improvement notes carefully.'
+        }</div>
+      </div>
+    </div>
+  </div>
   ${calHtml}
   <div class="ai-feedback">
     <div class="ai-feedback-header">
