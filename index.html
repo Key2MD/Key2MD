@@ -137,11 +137,12 @@
     .hero-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;color:#fff;flex-shrink:0}
 
     /* ── STATS BAR ── */
-    .stats-bar{background:var(--gray50);border-bottom:1px solid var(--gray200);padding:32px 0}
-    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-    .stat-card{text-align:center;padding:20px}
-    .stat-number{font-size:2rem;font-weight:800;color:var(--navy);display:block;margin-bottom:4px}
-    .stat-label{font-size:0.82rem;color:var(--gray600);font-weight:500}
+    .stats-bar{background:linear-gradient(180deg,var(--navy) 0%,var(--navy2) 100%);padding:0 0 48px;border-bottom:1px solid rgba(255,255,255,0.06)}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+    .stat-card{text-align:center;padding:36px 20px;position:relative}
+    .stat-card+.stat-card::before{content:'';position:absolute;left:0;top:20%;height:60%;width:1px;background:rgba(255,255,255,0.08)}
+    .stat-number{font-size:2.2rem;font-weight:800;color:var(--white);display:block;margin-bottom:6px;letter-spacing:-0.5px;font-family:'DM Serif Display',Georgia,serif}
+    .stat-label{font-size:0.78rem;color:rgba(255,255,255,0.45);font-weight:500;letter-spacing:0.04em}
 
     /* ── SERVICES ── */
     .services{background:var(--white)}
@@ -666,40 +667,23 @@
         <div class="hero-text">
           <div class="hero-badge fade-up visible">Australia's Most Trusted Medical Tutor</div>
           <h1 class="fade-up delay-1 visible" aria-label="34 Q4s. 42 offers. One tutor. MMI, CASPer and GAMSAT Coaching Australia">The MMI &amp; CASPer tutor behind<br><span class="highlight">34 Q4s, 42 med offers,</span><br>and a 93% strike rate.</h1>
-          <p class="hero-sub fade-up delay-2 visible">
-            Dan coaches Australia's highest-stakes medical applicants — med school, specialist training, and GP entry — through MMI, CASPer, and GAMSAT Section II. No frameworks, no templates, no recycled answers. Results you can verify below.
-          </p>
-          <div class="hero-proof fade-up delay-3 visible">
-            <strong>34/38 Q4 · 2025 CASPer</strong>
-            <span class="dot"></span>
-            <strong>42/45 MMI offers · 2025</strong>
-            <span class="dot"></span>
-            StudentVIP verified
-          </div>
-          <div class="hero-ctas fade-up delay-4 visible">
+          <p class="hero-sub fade-up delay-2 visible">Real results, real students, real names below.<br>No frameworks. No recycled answers.</p>
+          <div class="hero-ctas fade-up delay-3 visible">
             <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" class="btn btn-primary" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'hero_book_session'});">Book a 1-Hour Session — $300 →</a>
             <button class="hero-enquiry-btn" onclick="openEnquiry('General Enquiry')">Send an Enquiry</button>
           </div>
+          <a href="#results" class="fade-up delay-4 visible" style="display:inline-flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:28px;text-decoration:none;opacity:0.45;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='0.45'">
+            <span style="font-size:0.72rem;font-weight:600;color:#fff;letter-spacing:0.08em;text-transform:uppercase;">See the 2025 results</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:bounceDown 1.8s ease-in-out infinite;">
+              <path d="M10 4v12M4 10l6 6 6-6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <style>@keyframes bounceDown{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}</style>
         </div>
         <div class="hero-photo-wrap fade-up delay-2 visible">
           <div class="hero-photo">
             <img src="Selfie.jpg" loading="eager" fetchpriority="high" alt="Dan — University of Melbourne MD student and Australian medical entrance tutor specialising in MMI, CASPer and GAMSAT Section II">
             <div class="hero-photo-badge">Dan · <span>UniMelb MD Student</span></div>
-          </div>
-          <!-- Compact stats strip below photo -->
-          <div style="display:flex;gap:10px;width:300px;flex-wrap:wrap;">
-            <div style="flex:1;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:12px 14px;text-align:center;">
-              <div style="font-size:1.3rem;font-weight:800;color:var(--teal);">200+</div>
-              <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:2px;">Students coached</div>
-            </div>
-            <div style="flex:1;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:12px 14px;text-align:center;">
-              <div style="font-size:1.3rem;font-weight:800;color:var(--teal);">93%+</div>
-              <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:2px;">Offer rate</div>
-            </div>
-            <div style="flex:1;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:12px 14px;text-align:center;">
-              <div style="font-size:0.75rem;font-weight:700;color:#22c55e;">✓ StudentVIP</div>
-              <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:2px;">Verified tutor</div>
-            </div>
           </div>
         </div>
       </div>
@@ -710,10 +694,13 @@
   <section class="stats-bar">
     <div class="container">
       <div class="stats-grid">
-        <div class="stat-card fade-up visible"><span class="stat-number">200+</span><span class="stat-label">Students Tutored</span></div>
+        <div class="stat-card fade-up visible">
+          <span class="stat-number" style="color:var(--teal2);">200+</span>
+          <span class="stat-label">Students Tutored</span>
+        </div>
         <div class="stat-card fade-up delay-1 visible" style="position:relative;cursor:default;" onmouseenter="document.getElementById('statTooltip').style.opacity='1';document.getElementById('statTooltip').style.visibility='visible'" onmouseleave="document.getElementById('statTooltip').style.opacity='0';document.getElementById('statTooltip').style.visibility='hidden'">
-          <span class="stat-number">93%+</span>
-          <span class="stat-label" style="display:flex;align-items:center;gap:4px;justify-content:center;">Offer Rate <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gray200);color:var(--gray600);font-size:0.65rem;font-weight:700;flex-shrink:0;">?</span></span>
+          <span class="stat-number" style="color:var(--teal2);">93%+</span>
+          <span class="stat-label" style="display:flex;align-items:center;gap:5px;justify-content:center;">Offer Rate <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:0.65rem;font-weight:700;flex-shrink:0;">?</span></span>
           <div id="statTooltip" style="position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.78rem;border-radius:10px;padding:14px 18px;width:240px;z-index:100;opacity:0;visibility:hidden;transition:opacity 0.2s;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);pointer-events:none;text-align:left;">
             <div style="font-weight:700;margin-bottom:8px;color:var(--teal2);">2025 Transparency Record</div>
             <div style="display:flex;flex-direction:column;gap:5px;">
@@ -722,11 +709,17 @@
               <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.7);">CASPer Q4</span><span style="font-weight:700;">34/38</span></div>
             </div>
             <div style="margin-top:8px;font-size:0.7rem;color:rgba(255,255,255,0.4);border-top:1px solid rgba(255,255,255,0.08);padding-top:7px;">Based on tracked 2025 intake students. Individual results vary.</div>
-            <div style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:12px;height:12px;background:var(--navy);border-right:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);transform:translateX(-50%) rotate(45deg);"></div>
+            <div style="position:absolute;bottom:-6px;left:50%;width:12px;height:12px;background:var(--navy);border-right:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);transform:translateX(-50%) rotate(45deg);"></div>
           </div>
         </div>
-        <div class="stat-card fade-up delay-2 visible"><span class="stat-number">r/GAMSAT</span><span class="stat-label">Admin Trusted</span></div>
-        <div class="stat-card fade-up delay-3 visible"><span class="stat-number">✓</span><span class="stat-label">StudentVIP Verified</span></div>
+        <div class="stat-card fade-up delay-2 visible">
+          <span class="stat-number" style="font-size:1.4rem;letter-spacing:0;font-family:'DM Sans',system-ui,sans-serif;">r/GAMSAT</span>
+          <span class="stat-label">Community Endorsed</span>
+        </div>
+        <div class="stat-card fade-up delay-3 visible">
+          <span class="stat-number" style="color:#22c55e;">✓</span>
+          <span class="stat-label">StudentVIP Verified</span>
+        </div>
       </div>
     </div>
   </section>
@@ -903,7 +896,7 @@
         </div>
         <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius);padding:32px 28px;">
           <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:6px;">Get the free checklist</div>
-          <p style="font-size:0.83rem;color:rgba(255,255,255,0.5);margin-bottom:20px;">Sent to your inbox instantly. No spam, unsubscribe anytime.</p>
+          <p style="font-size:0.83rem;color:rgba(255,255,255,0.5);margin-bottom:20px;">Dan will send it to your inbox within a few hours. No spam, unsubscribe anytime.</p>
           <div id="kitForm" style="display:flex;flex-direction:column;gap:12px;">
             <input type="text" id="kitName" placeholder="Your name" style="width:100%;padding:13px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.92rem;font-family:'DM Sans',system-ui,sans-serif;outline:none;" onfocus="this.style.borderColor='rgba(14,165,233,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
             <input type="email" id="kitEmail" placeholder="Your email address" style="width:100%;padding:13px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.92rem;font-family:'DM Sans',system-ui,sans-serif;outline:none;" onfocus="this.style.borderColor='rgba(14,165,233,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
@@ -920,8 +913,8 @@
           </div>
           <div id="kitSuccess" style="display:none;text-align:center;padding:20px 0;">
             <div style="font-size:2rem;margin-bottom:10px;">📋</div>
-            <div style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px;">Kit on its way!</div>
-            <div style="font-size:0.83rem;color:rgba(255,255,255,0.5);">Check your inbox — and good luck in there.</div>
+            <div style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px;">You're on the list!</div>
+            <div style="font-size:0.83rem;color:rgba(255,255,255,0.5);line-height:1.6;">Dan will send the kit to your inbox within a few hours. Check your spam if it doesn't arrive.</div>
           </div>
         </div>
       </div>
