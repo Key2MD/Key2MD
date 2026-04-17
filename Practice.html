@@ -391,6 +391,7 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="testimonials.html">Results</a></li>
+      <li><a href="plans.html">Plans</a></li>
       <li><a href="guide.html">📖 Free Guide</a></li>
       <li><a href="practice.html" style="color:var(--gold);font-weight:700;" class="active">🎯 CASPer Practice</a></li>
       <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a></li>
@@ -404,7 +405,7 @@
   <a href="index.html#services" class="mobile-link">Services</a>
   <a href="about.html" class="mobile-link">About</a>
   <a href="testimonials.html" class="mobile-link">Results</a>
-  <a href="index.html#pricing" class="mobile-link">Pricing</a>
+  <a href="plans.html" class="mobile-link">Plans & Pricing</a>
   <a href="guide.html" class="mobile-link">📖 Free Guide</a>
   <a href="practice.html" class="mobile-link" style="color:var(--gold);font-weight:700;">🎯 CASPer Practice</a>
   <a href="gamsat-s2-practice.html" class="mobile-link" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a>
@@ -623,6 +624,22 @@
         <button onclick="openCreditShop()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.08);color:var(--teal3);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='rgba(14,165,233,0.15)'" onmouseout="this.style.background='rgba(14,165,233,0.08)'">Buy More AI Reviews →</button>
       </div>
 
+      <!-- CASPer Pro upgrade (shown when logged in and not Pro) -->
+      <div id="proUpgradeCard" style="display:none;margin-top:12px;background:linear-gradient(135deg,rgba(14,165,233,0.08) 0%,rgba(14,165,233,0.04) 100%);border:1px solid rgba(14,165,233,0.2);border-radius:10px;padding:12px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:0.78rem;font-weight:700;color:var(--navy);">⭐ CASPer Pro</span>
+          <span style="font-size:0.68rem;font-weight:700;background:rgba(14,165,233,0.12);color:var(--teal3);padding:2px 8px;border-radius:50px;">$40/week</span>
+        </div>
+        <p style="font-size:0.73rem;color:var(--gray600);line-height:1.5;margin-bottom:10px;">Unlimited AI reviews. No daily cap. Cancel anytime. <a href="plans.html" style="color:var(--teal3);font-weight:600;">Learn more →</a></p>
+        <button id="proUpgradeBtn" onclick="upgradeToPro()" style="width:100%;padding:9px;border-radius:8px;border:none;background:var(--teal);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='var(--teal2)'" onmouseout="this.style.background='var(--teal)'">Upgrade to Pro →</button>
+      </div>
+
+      <!-- CASPer Pro active badge (shown when user IS Pro) -->
+      <div id="proActiveBadge" style="display:none;margin-top:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:10px 14px;align-items:center;gap:8px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;display:inline-block;"></span>
+        <span style="font-size:0.78rem;font-weight:700;color:var(--navy);">⭐ CASPer Pro — Active</span>
+      </div>
+
       <!-- MMI AI note -->
       <div id="mmiAiNote" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:8px;">
         <div style="font-size:0.78rem;font-weight:600;color:#7c3aed;">🎤 MMI AI Marking — Coming Soon</div>
@@ -715,69 +732,6 @@
       </div>
     </div>
 
-
-
-    <!-- Leaderboard - collapsible -->
-    <div class="sidebar-card" id="leaderboardCard" style="padding:0;overflow:hidden;">
-      <div onclick="toggleLeaderboard()" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none;">
-        <h3 style="margin:0;">🏆 Today's Leaderboard</h3>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:0.68rem;font-weight:600;color:var(--teal3);background:rgba(14,165,233,0.1);padding:2px 8px;border-radius:50px;">Live</span>
-          <span id="lbCollapseIcon" style="font-size:0.72rem;color:var(--gray400);transition:transform 0.25s;display:inline-block;">▼</span>
-        </div>
-      </div>
-      <!-- Collapsed preview: always visible -->
-      <div id="lbCollapsedPreview" style="padding:0 16px 14px;border-top:1px solid var(--gray100);">
-        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
-          <div style="flex:1;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:8px 10px;">
-            <div style="font-size:0.62rem;color:var(--gray400);margin-bottom:2px;">🥇 Top Today</div>
-            <div style="font-size:0.8rem;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="lbTop1Name">—</div>
-            <div style="font-size:0.75rem;color:var(--gold);font-weight:700;" id="lbTop1Score">—</div>
-          </div>
-          <div style="flex:1;background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.15);border-radius:8px;padding:8px 10px;">
-            <div style="font-size:0.62rem;color:var(--gray400);margin-bottom:2px;">📍 Your Rank</div>
-            <div style="font-size:0.8rem;font-weight:700;color:var(--teal3);" id="lbYourRankNum">—</div>
-            <div style="font-size:0.68rem;font-weight:600;color:var(--gray400);" id="lbYourQPill">Complete a station</div>
-          </div>
-        </div>
-      </div>
-      <!-- Expanded full board -->
-      <div id="lbExpanded" style="display:none;border-top:1px solid var(--gray100);padding:14px 16px;">
-        <div id="streakWrap" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;">
-          <span style="font-size:1.2rem;">🔥</span>
-          <div>
-            <div style="font-size:0.82rem;font-weight:700;color:var(--navy);" id="streakText">Start practising to build a streak</div>
-            <div style="font-size:0.7rem;color:var(--gray400);" id="streakSub">Complete at least 1 station per day</div>
-          </div>
-        </div>
-        <div id="lbYourRank" style="display:none;padding:10px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:8px;margin-bottom:10px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div>
-              <div style="font-size:0.78rem;color:var(--teal3);font-weight:700;">Your Ranking</div>
-              <div style="font-size:1.1rem;font-weight:800;color:var(--navy);" id="lbYourPos">#—</div>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-size:0.78rem;color:var(--gray400);">Quartile</div>
-              <div style="font-size:1rem;font-weight:800;" id="lbYourQ">—</div>
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px;" id="lbRows">
-          <div style="font-size:0.72rem;color:var(--gray400);padding:0 4px 4px;display:flex;justify-content:space-between;"><span>Student</span><span>Avg Score</span></div>
-        </div>
-        <div style="margin-top:12px;">
-          <div style="font-size:0.7rem;color:var(--gray400);margin-bottom:6px;">Score Distribution Today</div>
-          <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;gap:1px;" id="lbDistBar">
-            <div style="flex:1;background:#ef4444;border-radius:3px 0 0 3px;"></div>
-            <div style="flex:1.5;background:#f59e0b;"></div>
-            <div style="flex:2;background:#0ea5e9;"></div>
-            <div style="flex:1;background:#22c55e;border-radius:0 3px 3px 0;"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--gray400);margin-top:3px;"><span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span></div>
-        </div>
-        <div style="font-size:0.68rem;color:var(--gray400);margin-top:10px;text-align:center;" id="lbParticipants">— students practising today</div>
-      </div>
-    </div>
 
     <!-- Hidden timer sliders - still needed by JS -->
     <input type="range" id="readingSlider" min="15" max="120" step="5" value="60" style="display:none;">
@@ -1280,6 +1234,13 @@ function updateLimitUI(){
 
   // Show buy button if logged in
   if(buyBtn) buyBtn.style.display = loggedIn ? 'block' : 'none';
+
+  // Show/hide Pro upgrade card vs active badge
+  const proCard = document.getElementById('proUpgradeCard');
+  const proActiveBadge = document.getElementById('proActiveBadge');
+  const isPro = Key2MDAuth.isPro();
+  if(proCard) proCard.style.display = (loggedIn && !isPro) ? 'block' : 'none';
+  if(proActiveBadge) proActiveBadge.style.display = (loggedIn && isPro) ? 'flex' : 'none';
 
   // Update note
   if(noteEl){
@@ -1814,7 +1775,8 @@ async function runAI(idx){
         <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">Free AI review used for today</strong>
         <span style="font-size:0.82rem;color:#78350f;">Buy credits for more AI reviews, or wait until midnight AEST.</span>
         <br><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-          <button onclick="openCreditShop()" style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Buy AI Credits →</button>
+          <button onclick="openCreditShop()" style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Buy Credits →</button>
+          <button onclick="upgradeToPro()" style="background:var(--navy,#0a1628);color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">⭐ Go Unlimited ($40/wk) →</button>
           <button onclick="openMarkingModal()" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Submit to Dan ($35) →</button>
         </div>
       </div>`;
@@ -2874,10 +2836,49 @@ function purchaseCredits(){
 }
 window.purchaseCredits = purchaseCredits;
 
+// ══ CASPER PRO UPGRADE ══
+async function upgradeToPro() {
+  if (!Key2MDAuth.isLoggedIn()) { Key2MDAuth.showAuthModal('signup'); return; }
+  if (Key2MDAuth.isPro()) { alert('You already have CASPer Pro!'); return; }
+  const btn = document.getElementById('proUpgradeBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Redirecting\u2026'; }
+  try {
+    const res = await fetch(API_BASE + '/api/pro/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + Key2MDAuth.getToken() },
+      body: JSON.stringify({
+        success_url: window.location.origin + window.location.pathname + '?pro=success',
+        cancel_url:  window.location.origin + '/plans.html',
+      }),
+    });
+    const data = await res.json();
+    if (data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      if (btn) { btn.disabled = false; btn.textContent = 'Upgrade to Pro \u2192'; }
+      alert(data.error || 'Something went wrong. Please try again.');
+    }
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Upgrade to Pro \u2192'; }
+    alert('Error: ' + e.message);
+  }
+}
+window.upgradeToPro = upgradeToPro;
+
 // \u2550\u2550 HANDLE STRIPE RETURN \u2550\u2550
 (function handlePaymentReturn(){
   const params = new URLSearchParams(window.location.search);
-  if(params.get('payment') === 'success'){
+  if(params.get('pro') === 'success'){
+    window.history.replaceState({}, '', window.location.pathname);
+    setTimeout(function(){
+      Key2MDAuth.checkSession();
+      const notice = document.createElement('div');
+      notice.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#0a1628;border:1px solid rgba(34,197,94,0.4);border-radius:12px;padding:14px 24px;color:#fff;font-size:0.9rem;font-weight:600;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:flex;align-items:center;gap:10px;white-space:nowrap;';
+      notice.innerHTML = '<span style="font-size:1.2rem;">\u2b50</span> CASPer Pro activated \u2014 unlimited AI reviews, no daily cap.';
+      document.body.appendChild(notice);
+      setTimeout(() => notice.remove(), 5000);
+    }, 1500);
+  } else if(params.get('payment') === 'success'){
     // Clean URL
     window.history.replaceState({}, '', window.location.pathname);
     // Wait for auth to init, then show success
