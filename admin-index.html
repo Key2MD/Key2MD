@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet" />
+  <title>Key2MD Admin</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --bg: #060d18;
+      --surface: rgba(255,255,255,0.04);
+      --surface2: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.09);
+      --border2: rgba(255,255,255,0.15);
+      --text: #eef2f8;
+      --muted: #8896aa;
+      --muted2: #5a6a7e;
+      --blue: #38bdf8;
+      --blue-dim: rgba(56,189,248,0.12);
+      --green: #4ade80;
+      --green-dim: rgba(74,222,128,0.12);
+      --amber: #fbbf24;
+      --amber-dim: rgba(251,191,36,0.12);
+      --red: #f87171;
+      --red-dim: rgba(248,113,113,0.12);
+      --purple: #a78bfa;
+      --purple-dim: rgba(167,139,250,0.12);
+      --radius: 14px;
+      --font: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 60% 40% at 10% 0%, rgba(56,189,248,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 90% 5%, rgba(167,139,250,0.06) 0%, transparent 50%);
+    }
+
+    .hidden { display: none !important; }
+
+    /* ── LOGIN ── */
+    .login-wrap { min-height:100vh; display:grid; place-items:center; padding:24px; }
+    .login-card {
+      width: min(420px,100%);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 36px 32px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    }
+    .login-logo { font-size:1.6rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:4px; }
+    .login-logo span { color:var(--blue); }
+    .login-eyebrow { font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--blue); margin-bottom:28px; }
+    .login-card h2 { font-size:1.6rem; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px; }
+    .login-card p { color:var(--muted); font-size:0.88rem; line-height:1.5; margin-bottom:24px; }
+    .field { margin-bottom:14px; }
+    .field label { display:block; font-size:0.78rem; font-weight:600; color:var(--muted); margin-bottom:6px; }
+    .field input {
+      width:100%; padding:11px 14px;
+      background:rgba(255,255,255,0.06); border:1px solid var(--border2);
+      border-radius:10px; color:var(--text); font:inherit; font-size:0.92rem;
+      outline:none; transition:border-color 0.2s, background 0.2s;
+    }
+    .field input:focus { border-color:var(--blue); background:rgba(56,189,248,0.06); }
+    .field input::placeholder { color:var(--muted2); }
+    .btn-primary {
+      width:100%; padding:12px; border-radius:50px; border:none;
+      background:var(--blue); color:#030d1a; font:inherit;
+      font-size:0.92rem; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:4px;
+    }
+    .btn-primary:hover { background:#7dd3fc; transform:translateY(-1px); }
+    .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .login-error {
+      margin-top:12px; padding:10px 14px; border-radius:8px;
+      background:var(--red-dim); border:1px solid rgba(248,113,113,0.25);
+      color:var(--red); font-size:0.82rem; display:none;
+    }
+
+    /* ── SHELL ── */
+    .shell { max-width:1520px; margin:0 auto; padding:16px 16px 64px; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:12px 18px;
+      background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      border-radius:16px; margin-bottom:16px; backdrop-filter:blur(16px);
+    }
+    .topbar-brand { display:flex; align-items:center; gap:12px; }
+    .topbar-logo { font-size:1.2rem; font-weight:800; letter-spacing:-0.02em; }
+    .topbar-logo span { color:var(--blue); }
+    .topbar-divider { width:1px; height:20px; background:var(--border2); }
+    .topbar-title { font-size:0.85rem; font-weight:600; color:var(--muted); }
+    .topbar-nav { display:flex; align-items:center; gap:4px; }
+    .topbar-nav-btn {
+      padding:6px 12px; border-radius:8px; border:1px solid transparent;
+      background:transparent; color:var(--muted); font:inherit; font-size:0.78rem;
+      font-weight:600; cursor:pointer; transition:all 0.2s; text-decoration:none;
+      display:inline-flex; align-items:center; gap:5px;
+    }
+    .topbar-nav-btn:hover { background:var(--surface2); color:var(--text); }
+    .topbar-nav-btn.active { background:var(--blue-dim); color:var(--blue); border-color:rgba(56,189,248,0.2); }
+    .topbar-right { display:flex; align-items:center; gap:8px; }
+    .admin-badge {
+      display:inline-flex; align-items:center; gap:6px; padding:5px 10px;
+      border-radius:50px; background:var(--blue-dim); border:1px solid rgba(56,189,248,0.2);
+      color:var(--blue); font-size:0.75rem; font-weight:600;
+    }
+    .admin-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--blue); flex-shrink:0; }
+    .btn-sm {
+      padding:6px 12px; border-radius:8px; border:1px solid var(--border2);
+      background:var(--surface2); color:var(--muted); font:inherit; font-size:0.75rem;
+      font-weight:600; cursor:pointer; transition:all 0.2s; white-space:nowrap;
+    }
+    .btn-sm:hover { color:var(--text); background:rgba(255,255,255,0.1); }
+    .btn-sm.danger:hover { color:var(--red); border-color:rgba(248,113,113,0.3); }
+
+    /* ── STATS GRID ── */
+    .stats-grid {
+      display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:16px;
+    }
+    .stat-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:14px 16px; position:relative; overflow:hidden;
+    }
+    .stat-card.highlight { border-color:rgba(56,189,248,0.2); background:var(--blue-dim); }
+    .stat-card.revenue { border-color:rgba(74,222,128,0.2); background:var(--green-dim); }
+    .stat-label { font-size:0.68rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+    .stat-value { font-size:1.6rem; font-weight:800; letter-spacing:-0.03em; color:var(--text); }
+    .stat-value.green { color:var(--green); }
+    .stat-value.blue { color:var(--blue); }
+    .stat-value.amber { color:var(--amber); }
+    .stat-sub { font-size:0.68rem; color:var(--muted2); margin-top:3px; }
+
+    /* ── TABS ── */
+    .tabs {
+      display:inline-flex; gap:6px; padding:5px;
+      background:rgba(255,255,255,0.04); border:1px solid var(--border);
+      border-radius:12px; margin-bottom:14px;
+    }
+    .tab-btn {
+      padding:8px 14px; border:1px solid transparent; background:transparent;
+      color:var(--muted); border-radius:9px; font:inherit; font-size:0.82rem;
+      font-weight:700; cursor:pointer; transition:all 0.15s; white-space:nowrap;
+    }
+    .tab-btn.active { background:var(--blue-dim); color:var(--blue); border-color:rgba(56,189,248,0.2); }
+
+    /* ── CONTROLS ── */
+    .controls {
+      display:grid; grid-template-columns:1fr auto auto auto auto auto;
+      gap:8px; margin-bottom:12px; align-items:center;
+    }
+    .ctrl-input, .ctrl-select {
+      padding:9px 12px; background:var(--surface); border:1px solid var(--border);
+      border-radius:9px; color:var(--text); font:inherit; font-size:0.82rem;
+      outline:none; transition:border-color 0.2s; width:100%;
+    }
+    .ctrl-input:focus, .ctrl-select:focus { border-color:var(--blue); }
+    .ctrl-input::placeholder { color:var(--muted2); }
+    .ctrl-select option { background:#0d1a2d; }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:16px; overflow:hidden;
+    }
+    .table-toolbar {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding:12px 16px; border-bottom:1px solid var(--border);
+    }
+    .table-status { font-size:0.8rem; color:var(--muted); }
+    .table-actions { display:flex; gap:6px; }
+    .table-scroller { overflow-x:auto; }
+
+    table { width:100%; border-collapse:collapse; min-width:900px; }
+    thead tr { background:rgba(0,0,0,0.2); }
+    th {
+      padding:10px 14px; text-align:left; font-size:0.65rem; font-weight:700;
+      letter-spacing:0.1em; text-transform:uppercase; color:var(--muted2);
+      border-bottom:1px solid var(--border); white-space:nowrap;
+    }
+    td { padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:middle; font-size:0.85rem; }
+    tr:last-child td { border-bottom:none; }
+    tr.data-row { cursor:pointer; transition:background 0.15s; }
+    tr.data-row:hover { background:rgba(255,255,255,0.025); }
+    tr.data-row.expanded { background:rgba(56,189,248,0.04); }
+
+    .truncate-cell {
+      max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      color:var(--muted); font-size:0.8rem;
+    }
+
+    /* ── BADGES ── */
+    .badge {
+      display:inline-flex; align-items:center; gap:4px; padding:3px 9px;
+      border-radius:50px; font-size:0.68rem; font-weight:700;
+      letter-spacing:0.02em; border:1px solid transparent; white-space:nowrap;
+    }
+    .badge-casper { background:var(--blue-dim); color:var(--blue); border-color:rgba(56,189,248,0.2); }
+    .badge-gamsat { background:var(--purple-dim); color:var(--purple); border-color:rgba(167,139,250,0.2); }
+    .badge-mmi { background:var(--amber-dim); color:var(--amber); border-color:rgba(251,191,36,0.2); }
+    .badge-default { background:var(--surface2); color:var(--muted); border-color:var(--border); }
+    .badge-free { background:var(--surface2); color:var(--muted); border-color:var(--border); }
+    .badge-pro { background:var(--green-dim); color:var(--green); border-color:rgba(74,222,128,0.2); }
+    .badge-paid,.badge-premium { background:var(--amber-dim); color:var(--amber); border-color:rgba(251,191,36,0.2); }
+    .badge-yes { background:var(--green-dim); color:var(--green); border-color:rgba(74,222,128,0.2); }
+    .badge-no { background:var(--surface2); color:var(--muted); border-color:var(--border); }
+    .badge-paying { background:rgba(74,222,128,0.15); color:var(--green); border-color:rgba(74,222,128,0.3); }
+
+    .score-badge {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:30px; height:30px; border-radius:7px; font-size:0.8rem; font-weight:800;
+    }
+    .score-high { background:var(--green-dim); color:var(--green); }
+    .score-mid { background:var(--amber-dim); color:var(--amber); }
+    .score-low { background:var(--red-dim); color:var(--red); }
+
+    .expand-icon {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:18px; height:18px; border-radius:50%; background:var(--surface2);
+      color:var(--muted); font-size:0.55rem; transition:transform 0.2s, background 0.2s;
+    }
+    tr.data-row.expanded .expand-icon { transform:rotate(180deg); background:var(--blue-dim); color:var(--blue); }
+
+    /* ── DETAIL PANEL ── */
+    .detail-row { display:none; }
+    .detail-row.open { display:table-row; }
+    .detail-panel { padding:0; background:rgba(0,0,0,0.15); border-bottom:1px solid var(--border); }
+    .detail-inner { padding:16px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+
+    .detail-box {
+      border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:8px;
+      background:rgba(255,255,255,0.03); border:1px solid var(--border);
+    }
+    .detail-box-header { display:flex; align-items:center; gap:8px; margin-bottom:2px; }
+    .detail-box-icon {
+      width:22px; height:22px; border-radius:6px; display:flex; align-items:center;
+      justify-content:center; font-size:0.7rem; background:rgba(255,255,255,0.08); flex-shrink:0;
+    }
+    .detail-box-title { font-size:0.65rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+    .detail-box-body { font-size:0.8rem; line-height:1.7; color:var(--muted); white-space:pre-wrap; overflow-wrap:anywhere; }
+
+    .subtable { width:100%; min-width:100%; }
+    .subtable th,.subtable td { padding:7px 9px; font-size:0.75rem; }
+    .subtable th { color:var(--muted2); }
+
+    /* ── ACTION BUTTONS in detail ── */
+    .action-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+    .action-btn {
+      padding:5px 12px; border-radius:7px; border:1px solid var(--border2);
+      background:var(--surface2); color:var(--muted); font:inherit; font-size:0.72rem;
+      font-weight:600; cursor:pointer; transition:all 0.2s;
+    }
+    .action-btn:hover { color:var(--text); background:rgba(255,255,255,0.1); }
+    .action-btn.blue { border-color:rgba(56,189,248,0.3); color:var(--blue); background:var(--blue-dim); }
+    .action-btn.blue:hover { background:rgba(56,189,248,0.2); }
+    .action-btn.green { border-color:rgba(74,222,128,0.3); color:var(--green); background:var(--green-dim); }
+    .action-btn.green:hover { background:rgba(74,222,128,0.2); }
+    .action-btn.amber { border-color:rgba(251,191,36,0.3); color:var(--amber); background:var(--amber-dim); }
+    .action-btn.amber:hover { background:rgba(251,191,36,0.2); }
+    .action-btn.red { border-color:rgba(248,113,113,0.3); color:var(--red); background:var(--red-dim); }
+    .action-btn.red:hover { background:rgba(248,113,113,0.2); }
+
+    /* credit editor inline */
+    .credit-editor { display:flex; align-items:center; gap:6px; margin-top:6px; }
+    .credit-editor input {
+      width:64px; padding:5px 8px; background:rgba(255,255,255,0.07);
+      border:1px solid var(--border2); border-radius:7px; color:var(--text);
+      font:inherit; font-size:0.8rem; outline:none;
+    }
+    .credit-editor input:focus { border-color:var(--blue); }
+
+    /* ── STUDENT / USER CELL ── */
+    .student-name { font-weight:600; color:var(--text); font-size:0.85rem; }
+    .student-sub { font-size:0.72rem; color:var(--muted2); margin-top:2px; }
+    .time-main { font-size:0.8rem; color:var(--text); font-variant-numeric:tabular-nums; }
+    .time-sub { font-size:0.68rem; color:var(--muted2); margin-top:1px; }
+
+    /* credits cell */
+    .credits-cell { display:flex; gap:6px; flex-wrap:wrap; }
+    .credit-pill {
+      display:inline-flex; align-items:center; gap:3px; padding:2px 8px;
+      border-radius:50px; font-size:0.68rem; font-weight:700;
+    }
+    .credit-pill.casper { background:var(--blue-dim); color:var(--blue); }
+    .credit-pill.gamsat { background:var(--purple-dim); color:var(--purple); }
+    .credit-pill.zero { opacity:0.4; }
+
+    /* spend cell */
+    .spend-cell { font-weight:700; font-size:0.85rem; }
+    .spend-cell.has-paid { color:var(--green); }
+    .spend-cell.zero { color:var(--muted2); }
+
+    /* ── EMPTY / ERROR ── */
+    .empty-state { padding:40px; text-align:center; color:var(--muted2); font-size:0.88rem; }
+    .error-banner {
+      margin-top:12px; padding:11px 14px; border-radius:9px;
+      background:var(--red-dim); border:1px solid rgba(248,113,113,0.2);
+      color:var(--red); font-size:0.82rem; display:none;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);
+      backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal-card {
+      background:#0d1a2d; border:1px solid var(--border2); border-radius:18px;
+      padding:28px; width:min(480px,94vw); box-shadow:0 24px 60px rgba(0,0,0,0.5);
+    }
+    .modal-title { font-size:1rem; font-weight:800; margin-bottom:16px; }
+    .modal-row { margin-bottom:12px; }
+    .modal-label { font-size:0.75rem; font-weight:600; color:var(--muted); margin-bottom:5px; display:block; }
+    .modal-input {
+      width:100%; padding:9px 12px; background:rgba(255,255,255,0.06);
+      border:1px solid var(--border2); border-radius:9px; color:var(--text);
+      font:inherit; font-size:0.88rem; outline:none;
+    }
+    .modal-input:focus { border-color:var(--blue); }
+    .modal-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+    .modal-alert { padding:9px 12px; border-radius:8px; font-size:0.8rem; font-weight:600; margin-top:10px; display:none; }
+    .modal-alert.success { background:var(--green-dim); border:1px solid rgba(74,222,128,0.3); color:var(--green); display:block; }
+    .modal-alert.error { background:var(--red-dim); border:1px solid rgba(248,113,113,0.3); color:var(--red); display:block; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:1200px) { .stats-grid { grid-template-columns:repeat(3,1fr); } }
+    @media (max-width:800px) {
+      .stats-grid { grid-template-columns:repeat(2,1fr); }
+      .controls { grid-template-columns:1fr 1fr; }
+      .detail-inner { grid-template-columns:1fr; }
+      .topbar { flex-direction:column; align-items:flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════ LOGIN ══════════════════════ -->
+<section id="loginSection" class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">Key2<span>MD</span></div>
+    <div class="login-eyebrow">Private Admin</div>
+    <h2>Sign in</h2>
+    <p>Internal access only. Session expires in 30 minutes.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" placeholder="admin@key2md.com" required />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+      </div>
+      <button class="btn-primary" id="submitBtn" type="submit">Sign in →</button>
+      <div class="login-error" id="loginError"></div>
+    </form>
+  </div>
+</section>
+
+<!-- ══════════════════════ DASHBOARD ══════════════════════ -->
+<section id="dashboardSection" class="hidden">
+  <div class="shell">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-brand">
+        <div class="topbar-logo">Key2<span>MD</span></div>
+        <div class="topbar-divider"></div>
+        <div class="topbar-title" id="viewTitle">Dashboard</div>
+      </div>
+      <div class="topbar-nav">
+        <button class="topbar-nav-btn active" id="navReviews" onclick="switchTab('reviews')">📋 Reviews</button>
+        <button class="topbar-nav-btn" id="navUsers" onclick="switchTab('users')">👥 Users</button>
+        <a class="topbar-nav-btn" id="navInbox" href="admin-inbox.html">✉️ Inbox</a>
+      </div>
+      <div class="topbar-right">
+        <div class="admin-badge" id="adminBadge">Not signed in</div>
+        <button class="btn-sm" id="refreshBtn">↺ Refresh</button>
+        <button class="btn-sm" id="exportBtn">⬇ CSV</button>
+        <button class="btn-sm danger" id="logoutBtn">Log out</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card revenue">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value green" id="statRevenue">—</div>
+        <div class="stat-sub" id="statRevenueSub">all time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value" id="statUsers">—</div>
+        <div class="stat-sub" id="statUsersSub">registered accounts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Paying Customers</div>
+        <div class="stat-value amber" id="statPaying">—</div>
+        <div class="stat-sub" id="statPayingSub">any spend > $0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Reviews</div>
+        <div class="stat-value blue" id="statReviews">—</div>
+        <div class="stat-sub" id="statReviewsSub">AI reviews run</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Credits Held</div>
+        <div class="stat-value" id="statCredits">—</div>
+        <div class="stat-sub" id="statCreditsSub">unused purchased credits</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pro Accounts</div>
+        <div class="stat-value green" id="statPro">—</div>
+        <div class="stat-sub">unlimited AI access</div>
+      </div>
+    </div>
+
+    <!-- Tabs + Controls -->
+    <div class="tabs">
+      <button class="tab-btn active" id="reviewsTabBtn">📋 Reviews</button>
+      <button class="tab-btn" id="usersTabBtn">👥 Users</button>
+    </div>
+
+    <div class="controls">
+      <input class="ctrl-input" id="searchInput" type="text" placeholder="🔍 Search email, name, scenario…" />
+      <select class="ctrl-select" id="toolFilter">
+        <option value="">All tools</option>
+        <option value="casper">CASPer</option>
+        <option value="mmi">MMI</option>
+        <option value="gamsat">GAMSAT</option>
+      </select>
+      <select class="ctrl-select" id="tierFilter">
+        <option value="">All tiers</option>
+        <option value="free">Free</option>
+        <option value="paid">Paid</option>
+        <option value="premium">Premium</option>
+        <option value="pro">Pro</option>
+      </select>
+      <select class="ctrl-select" id="payingFilter" style="display:none;">
+        <option value="">All users</option>
+        <option value="paying">Paying only</option>
+        <option value="credits">Has credits</option>
+        <option value="free_only">Never paid</option>
+      </select>
+      <select class="ctrl-select" id="limitFilter">
+        <option value="25">25 rows</option>
+        <option value="50" selected>50 rows</option>
+        <option value="100">100 rows</option>
+        <option value="250">250 rows</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <div class="table-status" id="statusText">Loading…</div>
+        <div class="table-actions">
+          <span id="loadingIndicator" style="font-size:0.75rem;color:var(--muted);display:none;">⟳ Loading…</span>
+        </div>
+      </div>
+      <div class="table-scroller">
+
+        <!-- Reviews table -->
+        <table id="reviewsTable">
+          <thead>
+            <tr>
+              <th style="width:32px;"></th>
+              <th>Time</th>
+              <th>Student</th>
+              <th>Tool</th>
+              <th>Tier</th>
+              <th>Score</th>
+              <th>Scenario (preview)</th>
+              <th>Response (preview)</th>
+            </tr>
+          </thead>
+          <tbody id="reviewsBody"></tbody>
+        </table>
+
+        <!-- Users table -->
+        <table id="usersTable" class="hidden">
+          <thead>
+            <tr>
+              <th style="width:32px;"></th>
+              <th>User</th>
+              <th>Tier</th>
+              <th>Credits</th>
+              <th>Reviews</th>
+              <th>Spend</th>
+              <th>Payments</th>
+              <th>Free today</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+
+      </div>
+      <div class="empty-state hidden" id="emptyState">No records match your filters.</div>
+    </div>
+
+    <div class="error-banner" id="dashboardError"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════ CREDIT MODAL ══════════════════════ -->
+<div class="modal-overlay" id="creditModal">
+  <div class="modal-card">
+    <div class="modal-title">💳 Manage Credits — <span id="creditModalEmail" style="color:var(--blue);font-weight:600;"></span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div>
+        <div class="modal-label">CASPer balance</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--blue);" id="creditModalCasperBal">—</div>
+      </div>
+      <div>
+        <div class="modal-label">GAMSAT balance</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--purple);" id="creditModalGamsatBal">—</div>
+      </div>
+    </div>
+    <div class="modal-row">
+      <label class="modal-label">Tool</label>
+      <select class="modal-input" id="creditModalTool">
+        <option value="casper">CASPer</option>
+        <option value="gamsat">GAMSAT</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <label class="modal-label">Credits to add (use negative to remove)</label>
+      <input class="modal-input" type="number" id="creditModalAmount" placeholder="e.g. 5 or -2" min="-100" max="100">
+    </div>
+    <div class="modal-alert" id="creditModalAlert"></div>
+    <div class="modal-footer">
+      <button class="btn-sm" onclick="closeCreditModal()">Cancel</button>
+      <button class="action-btn green" id="creditModalSaveBtn" onclick="saveCreditChange()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ TIER MODAL ══════════════════════ -->
+<div class="modal-overlay" id="tierModal">
+  <div class="modal-card">
+    <div class="modal-title">⭐ Change Tier — <span id="tierModalEmail" style="color:var(--blue);font-weight:600;"></span></div>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px;line-height:1.6;">
+      <strong style="color:var(--text);">Pro tier</strong> gives a user unlimited AI reviews with no daily cap — same as paying customers but without needing credits. Use this for students doing intensive coaching with you.<br><br>
+      <strong style="color:var(--text);">Free tier</strong> = 1 free AI review/day per tool. Credits still work on top of this.
+    </p>
+    <div class="modal-row">
+      <label class="modal-label">New tier</label>
+      <select class="modal-input" id="tierModalTier">
+        <option value="free">Free (default)</option>
+        <option value="pro">Pro (unlimited AI)</option>
+      </select>
+    </div>
+    <div class="modal-alert" id="tierModalAlert"></div>
+    <div class="modal-footer">
+      <button class="btn-sm" onclick="closeTierModal()">Cancel</button>
+      <button class="action-btn amber" id="tierModalSaveBtn" onclick="saveTierChange()">Update Tier</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+
+const state = {
+  token: null,
+  adminEmail: null,
+  currentView: 'reviews',
+  reviews: [],
+  users: [],
+  userDetailCache: new Map(),
+  creditModalUserId: null,
+  tierModalUserId: null,
+};
+
+// ── HELPERS ──────────────────────────────────────────────────
+
+function esc(v) {
+  return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+function formatDate(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (isNaN(d)) return { date: iso, time: '' };
+  return {
+    date: d.toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' }),
+    time: d.toLocaleTimeString('en-AU', { hour:'numeric', minute:'2-digit' }),
+  };
+}
+
+function formatRelTime(iso) {
+  if (!iso) return '—';
+  const diff = (Date.now() - new Date(iso)) / 1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+  if (diff < 604800) return `${Math.floor(diff/86400)}d ago`;
+  const d = formatDate(iso);
+  return d ? d.date : '—';
+}
+
+function formatMoney(aud) { return `$${Number(aud || 0).toFixed(2)}`; }
+
+function toolBadge(tool) {
+  const t = String(tool||'').toLowerCase();
+  const cls = t==='casper'?'badge-casper':t==='gamsat'?'badge-gamsat':t==='mmi'?'badge-mmi':'badge-default';
+  return `<span class="badge ${cls}">${esc(tool||'—')}</span>`;
+}
+
+function tierBadge(tier) {
+  const t = String(tier||'').toLowerCase();
+  const cls = t==='pro'?'badge-pro':t==='paid'||t==='premium'?'badge-paid':'badge-free';
+  return `<span class="badge ${cls}">${esc(tier||'free')}</span>`;
+}
+
+function yesNoBadge(val) {
+  return `<span class="badge ${val?'badge-yes':'badge-no'}">${val?'Yes':'No'}</span>`;
+}
+
+function parseFeedbackJson(raw) {
+  if (!raw) return null;
+  if (typeof raw === 'object') return raw;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+function scoreClass(score) {
+  const n = parseInt(score,10);
+  return n>=7?'score-high':n>=5?'score-mid':'score-low';
+}
+
+function quartileLabel(score) {
+  const n = parseInt(score,10);
+  if (n>=8) return { label:'Q4 — Excellent', cls:'q4' };
+  if (n>=6) return { label:'Q3 — Good', cls:'q3' };
+  if (n>=4) return { label:'Q2 — Developing', cls:'q2' };
+  return { label:'Q1 — Needs Work', cls:'q1' };
+}
+
+function parseQuestionText(text) {
+  if (!text) return null;
+  const raw = String(text).trim();
+  const scenarioMatch = raw.match(/SCENARIO:\s*([\s\S]*?)(?=PROMPT\s*1:|$)/i);
+  const p1Match = raw.match(/PROMPT\s*1:\s*([\s\S]*?)(?=PROMPT\s*2:|$)/i);
+  const p2Match = raw.match(/PROMPT\s*2:\s*([\s\S]*?)$/i);
+  if (scenarioMatch||p1Match||p2Match) {
+    return {
+      scenario: scenarioMatch?scenarioMatch[1].trim():'',
+      prompt1: p1Match?p1Match[1].trim():'',
+      prompt2: p2Match?p2Match[1].trim():'',
+    };
+  }
+  return null;
+}
+
+function renderQuestionBox(qt) {
+  const p = parseQuestionText(qt);
+  if (!p) return `<div class="detail-box-body">${esc(qt||'—')}</div>`;
+  return `
+    ${p.scenario?`<div><div class="detail-box-title">Scenario</div><div class="detail-box-body">${esc(p.scenario)}</div></div>`:''}
+    ${p.prompt1?`<div><div class="detail-box-title">Prompt 1</div><div class="detail-box-body">${esc(p.prompt1)}</div></div>`:''}
+    ${p.prompt2?`<div><div class="detail-box-title">Prompt 2</div><div class="detail-box-body">${esc(p.prompt2)}</div></div>`:''}
+  `;
+}
+
+function renderFeedbackBox(raw) {
+  const fb = parseFeedbackJson(raw);
+  if (!fb) return `<div class="detail-box-body">${esc(String(raw||'—'))}</div>`;
+  const score = fb.score;
+  const q = score ? quartileLabel(score) : null;
+  return `
+    ${score?`<div class="detail-box-body" style="margin-bottom:8px;">
+      <strong>${esc(score)}/10</strong>
+      ${q?`<span class="badge ${q.cls}" style="margin-left:6px;">${q.label}</span>`:''}
+    </div>`:''}
+    ${fb.strengths?`<div><div class="detail-box-title">Strengths</div><div class="detail-box-body">${esc(fb.strengths)}</div></div>`:''}
+    ${fb.improvements?`<div><div class="detail-box-title">Improvements</div><div class="detail-box-body">${esc(fb.improvements)}</div></div>`:''}
+    ${fb.empathy?`<div><div class="detail-box-title">Empathy</div><div class="detail-box-body">${esc(fb.empathy)}</div></div>`:''}
+    ${fb.missed?`<div><div class="detail-box-title">Missed</div><div class="detail-box-body">${esc(fb.missed)}</div></div>`:''}
+  `;
+}
+
+// ── API ──────────────────────────────────────────────────────
+
+async function apiFetch(path, opts={}) {
+  const headers = new Headers(opts.headers||{});
+  if (state.token) headers.set('Authorization', `Bearer ${state.token}`);
+  return fetch(`${API_BASE}${path}`, {...opts, headers});
+}
+
+function setLoginError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg||''; el.style.display = msg?'block':'none';
+}
+
+function setError(msg) {
+  const el = document.getElementById('dashboardError');
+  el.textContent = msg||''; el.style.display = msg?'block':'none';
+}
+
+function setLoading(on) {
+  document.getElementById('loadingIndicator').style.display = on?'inline':'none';
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────
+
+document.getElementById('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  setLoginError('');
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    const res = await apiFetch('/admin/login', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email: document.getElementById('email').value.trim(), password: document.getElementById('password').value }),
+    });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Sign in failed.');
+    if (!data?.token) throw new Error('No token returned.');
+    state.token = data.token;
+    state.adminEmail = data.email || document.getElementById('email').value.trim();
+    document.getElementById('adminBadge').textContent = state.adminEmail;
+    document.getElementById('loginSection').classList.add('hidden');
+    document.getElementById('dashboardSection').classList.remove('hidden');
+    // Load everything in parallel
+    await Promise.all([loadReviews(), loadUsers()]);
+    switchTab('reviews');
+  } catch(err) {
+    setLoginError(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign in →';
+  }
+});
+
+// ── TABS ──────────────────────────────────────────────────────
+
+function switchTab(tab) {
+  state.currentView = tab;
+  document.getElementById('viewTitle').textContent = tab==='reviews' ? 'Student Reviews' : 'User Accounts';
+  document.getElementById('reviewsTable').classList.toggle('hidden', tab!=='reviews');
+  document.getElementById('usersTable').classList.toggle('hidden', tab!=='users');
+  document.getElementById('toolFilter').style.display = tab==='reviews' ? '' : 'none';
+  document.getElementById('payingFilter').style.display = tab==='users' ? '' : 'none';
+  document.getElementById('reviewsTabBtn').classList.toggle('active', tab==='reviews');
+  document.getElementById('usersTabBtn').classList.toggle('active', tab==='users');
+  document.getElementById('navReviews').classList.toggle('active', tab==='reviews');
+  document.getElementById('navUsers').classList.toggle('active', tab==='users');
+  if (tab==='reviews') renderReviewsTable();
+  else renderUsersTable();
+}
+
+document.getElementById('reviewsTabBtn').onclick = () => switchTab('reviews');
+document.getElementById('usersTabBtn').onclick = () => switchTab('users');
+
+// ── LOAD DATA (parallel) ──────────────────────────────────────
+
+async function loadReviews() {
+  setLoading(true);
+  try {
+    const params = new URLSearchParams({ limit: document.getElementById('limitFilter').value||'50' });
+    const res = await apiFetch(`/admin/reviews?${params}`);
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) {
+      if (res.status===401) throw new Error('Session expired. Please sign in again.');
+      throw new Error(data?.error||'Failed to load reviews.');
+    }
+    state.reviews = Array.isArray(data?.rows) ? data.rows : [];
+    if (state.currentView==='reviews') renderReviewsTable();
+    updateGlobalStats();
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function loadUsers() {
+  setLoading(true);
+  try {
+    const params = new URLSearchParams({ limit: document.getElementById('limitFilter').value||'50' });
+    const q = document.getElementById('searchInput').value.trim();
+    const tier = document.getElementById('tierFilter').value.trim();
+    if (q) params.set('q', q);
+    if (tier) params.set('tier', tier);
+    const res = await apiFetch(`/admin/users?${params}`);
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) {
+      if (res.status===401) throw new Error('Session expired. Please sign in again.');
+      throw new Error(data?.error||'Failed to load users.');
+    }
+    state.users = Array.isArray(data?.rows) ? data.rows : [];
+    if (state.currentView==='users') renderUsersTable();
+    updateGlobalStats();
+  } finally {
+    setLoading(false);
+  }
+}
+
+// Load user detail on demand (cached)
+async function loadUserDetail(userId) {
+  if (state.userDetailCache.has(userId)) return state.userDetailCache.get(userId);
+  const res = await apiFetch(`/admin/users/${encodeURIComponent(userId)}`);
+  const data = await res.json().catch(()=>({}));
+  if (!res.ok) throw new Error(data?.error||'Failed to load user detail.');
+  state.userDetailCache.set(userId, data);
+  return data;
+}
+
+// ── STATS ────────────────────────────────────────────────────
+
+function updateGlobalStats() {
+  const users = state.users;
+  const reviews = state.reviews;
+
+  const totalRevenue = users.reduce((s,u)=>s+Number(u.total_spend_aud||0),0);
+  const payingUsers = users.filter(u=>Number(u.total_spend_aud||0)>0).length;
+  const totalCredits = users.reduce((s,u)=>s+Number(u.casper_balance||0)+Number(u.gamsat_balance||0),0);
+  const proUsers = users.filter(u=>String(u.tier||'').toLowerCase()==='pro').length;
+
+  document.getElementById('statRevenue').textContent = formatMoney(totalRevenue);
+  document.getElementById('statUsers').textContent = users.length;
+  document.getElementById('statUsersSub').textContent = `${users.filter(u=>String(u.tier||'').toLowerCase()==='free').length} free`;
+  document.getElementById('statPaying').textContent = payingUsers;
+  document.getElementById('statPayingSub').textContent = `${((payingUsers/Math.max(users.length,1))*100).toFixed(0)}% conversion`;
+  document.getElementById('statReviews').textContent = reviews.length;
+  document.getElementById('statReviewsSub').textContent = `${new Set(reviews.map(r=>r.email)).size} unique students`;
+  document.getElementById('statCredits').textContent = totalCredits;
+  document.getElementById('statCreditsSub').textContent = `across ${users.filter(u=>Number(u.casper_balance||0)+Number(u.gamsat_balance||0)>0).length} accounts`;
+  document.getElementById('statPro').textContent = proUsers;
+}
+
+// ── REVIEWS RENDER ────────────────────────────────────────────
+
+function getFilteredReviews() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const tool = document.getElementById('toolFilter').value.toLowerCase();
+  const tier = document.getElementById('tierFilter').value.toLowerCase();
+  return state.reviews.filter(r => {
+    const search = !q || [r.email,r.name,r.tool,r.question_text,r.response_text].some(v=>String(v||'').toLowerCase().includes(q));
+    const matchTool = !tool || String(r.tool||'').toLowerCase()===tool;
+    const matchTier = !tier || String(r.tier||'').toLowerCase()===tier;
+    return search && matchTool && matchTier;
+  });
+}
+
+function renderReviewsTable() {
+  const rows = getFilteredReviews();
+  document.getElementById('statusText').textContent = `${rows.length} review${rows.length===1?'':'s'}`;
+  document.getElementById('emptyState').classList.toggle('hidden', rows.length>0);
+
+  const tbody = document.getElementById('reviewsBody');
+  tbody.innerHTML = '';
+
+  rows.forEach(row => {
+    const fb = parseFeedbackJson(row.ai_feedback);
+    const score = fb?.score;
+    const dt = formatDate(row.created_at);
+    const parsed = parseQuestionText(row.question_text);
+    const scenarioPreview = parsed?.scenario || row.question_text || '';
+
+    const dataRow = document.createElement('tr');
+    dataRow.className = 'data-row';
+    dataRow.innerHTML = `
+      <td><div class="expand-icon">▼</div></td>
+      <td><div class="time-main">${dt?dt.date:'—'}</div><div class="time-sub">${dt?dt.time:''}</div></td>
+      <td><div class="student-name">${esc(row.email||'Unknown')}</div><div class="student-sub">${esc(row.name||'No name')}</div></td>
+      <td>${toolBadge(row.tool)}</td>
+      <td>${tierBadge(row.tier)}</td>
+      <td>${score?`<div class="score-badge ${scoreClass(score)}">${score}</div>`:'<span style="color:var(--muted2);font-size:0.78rem;">—</span>'}</td>
+      <td><div class="truncate-cell">${esc(scenarioPreview.substring(0,110))}${scenarioPreview.length>110?'…':''}</div></td>
+      <td><div class="truncate-cell">${esc((row.response_text||'').substring(0,110))}${(row.response_text||'').length>110?'…':''}</div></td>
+    `;
+
+    const detailRow = document.createElement('tr');
+    detailRow.className = 'detail-row';
+    detailRow.innerHTML = `
+      <td colspan="8" class="detail-panel">
+        <div class="detail-inner">
+          <div class="detail-box"><div class="detail-box-header"><div class="detail-box-icon">📋</div><div class="detail-box-title">Scenario & Prompts</div></div>${renderQuestionBox(row.question_text)}</div>
+          <div class="detail-box"><div class="detail-box-header"><div class="detail-box-icon">✍️</div><div class="detail-box-title">Student Response</div></div><div class="detail-box-body">${esc(row.response_text||'—')}</div></div>
+          <div class="detail-box"><div class="detail-box-header"><div class="detail-box-icon">✦</div><div class="detail-box-title">AI Feedback</div></div>${renderFeedbackBox(row.ai_feedback)}</div>
+        </div>
+      </td>
+    `;
+
+    dataRow.addEventListener('click', () => {
+      const isOpen = detailRow.classList.contains('open');
+      detailRow.classList.toggle('open', !isOpen);
+      dataRow.classList.toggle('expanded', !isOpen);
+    });
+
+    tbody.appendChild(dataRow);
+    tbody.appendChild(detailRow);
+  });
+}
+
+// ── USERS RENDER ──────────────────────────────────────────────
+
+function getFilteredUsers() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const tier = document.getElementById('tierFilter').value.toLowerCase();
+  const paying = document.getElementById('payingFilter').value;
+  return state.users.filter(u => {
+    const search = !q || [u.email,u.name].some(v=>String(v||'').toLowerCase().includes(q));
+    const matchTier = !tier || String(u.tier||'').toLowerCase()===tier;
+    const spend = Number(u.total_spend_aud||0);
+    const credits = Number(u.casper_balance||0)+Number(u.gamsat_balance||0);
+    const matchPaying =
+      !paying ||
+      (paying==='paying' && spend>0) ||
+      (paying==='credits' && credits>0) ||
+      (paying==='free_only' && spend===0);
+    return search && matchTier && matchPaying;
+  });
+}
+
+function renderUsersTable() {
+  const rows = getFilteredUsers();
+  document.getElementById('statusText').textContent = `${rows.length} user${rows.length===1?'':'s'}`;
+  document.getElementById('emptyState').classList.toggle('hidden', rows.length>0);
+
+  const tbody = document.getElementById('usersBody');
+  tbody.innerHTML = '';
+
+  rows.forEach(row => {
+    const dt = formatDate(row.created_at);
+    const freeToday = Boolean(row.usage_today?.casper?.used_free_today || row.usage_today?.gamsat?.used_free_today);
+    const spend = Number(row.total_spend_aud||0);
+    const casperBal = Number(row.casper_balance||0);
+    const gamsatBal = Number(row.gamsat_balance||0);
+    const isPaying = spend > 0;
+
+    const dataRow = document.createElement('tr');
+    dataRow.className = 'data-row';
+    dataRow.innerHTML = `
+      <td><div class="expand-icon">▼</div></td>
+      <td>
+        <div class="student-name">${esc(row.email||'Unknown')}</div>
+        <div class="student-sub">${esc(row.name||'No name')} ${isPaying?'<span class="badge badge-paying" style="font-size:0.6rem;padding:1px 6px;">💳 Paid</span>':''}</div>
+      </td>
+      <td>${tierBadge(row.tier)}</td>
+      <td>
+        <div class="credits-cell">
+          <span class="credit-pill casper ${casperBal===0?'zero':''}">💬 ${casperBal}</span>
+          <span class="credit-pill gamsat ${gamsatBal===0?'zero':''}">✍️ ${gamsatBal}</span>
+        </div>
+      </td>
+      <td>${esc(row.review_count)}</td>
+      <td><span class="spend-cell ${spend>0?'has-paid':'zero'}">${formatMoney(spend)}</span></td>
+      <td>${esc(row.payment_count)}</td>
+      <td>${yesNoBadge(freeToday)}</td>
+      <td><div class="time-main">${dt?dt.date:'—'}</div></td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="action-btn blue" onclick="event.stopPropagation();openCreditModal('${esc(row.id)}','${esc(row.email)}',${casperBal},${gamsatBal})">Credits</button>
+          <button class="action-btn amber" onclick="event.stopPropagation();openTierModal('${esc(row.id)}','${esc(row.email)}','${esc(row.tier||'free')}')">Tier</button>
+          <button class="action-btn" onclick="event.stopPropagation();window.open('admin-inbox.html','_blank')">✉</button>
+        </div>
+      </td>
+    `;
+
+    const detailRow = document.createElement('tr');
+    detailRow.className = 'detail-row';
+    detailRow.innerHTML = `<td colspan="10" class="detail-panel"><div class="detail-inner"><div class="detail-box"><div class="detail-box-body" style="color:var(--muted2);">Click to expand…</div></div></div></td>`;
+
+    dataRow.addEventListener('click', async () => {
+      const isOpen = detailRow.classList.contains('open');
+      if (isOpen) {
+        detailRow.classList.remove('open');
+        dataRow.classList.remove('expanded');
+        return;
+      }
+      detailRow.innerHTML = `<td colspan="10" class="detail-panel"><div class="detail-inner"><div class="detail-box"><div class="detail-box-body">Loading…</div></div></div></td>`;
+      detailRow.classList.add('open');
+      dataRow.classList.add('expanded');
+      try {
+        const detail = await loadUserDetail(row.id);
+        detailRow.innerHTML = `<td colspan="10" class="detail-panel">${renderUserDetailHtml(detail)}</td>`;
+      } catch(err) {
+        detailRow.innerHTML = `<td colspan="10" class="detail-panel"><div class="detail-inner"><div class="detail-box"><div class="detail-box-body" style="color:var(--red);">${esc(err.message)}</div></div></div></td>`;
+      }
+    });
+
+    tbody.appendChild(dataRow);
+    tbody.appendChild(detailRow);
+  });
+}
+
+function renderUserDetailHtml(detail) {
+  const user = detail.user;
+  const credits = detail.credits||[];
+  const payments = detail.payments||[];
+  const reviews = detail.reviews||[];
+  const totalSpend = payments.filter(p=>p.status==='completed').reduce((s,p)=>s+Number(p.amount_aud||0),0);
+
+  return `
+    <div class="detail-inner">
+      <div class="detail-box">
+        <div class="detail-box-header"><div class="detail-box-icon">👤</div><div class="detail-box-title">Account</div></div>
+        <div class="detail-box-body"><strong>${esc(user.email||'—')}</strong></div>
+        <div class="detail-box-body">Name: ${esc(user.name||'—')}</div>
+        <div class="detail-box-body">Tier: ${tierBadge(user.tier)}</div>
+        <div class="detail-box-body">Stripe: ${esc(user.stripe_customer_id||'Not set')}</div>
+        <div class="detail-box-body">Joined: ${esc(user.created_at||'—')}</div>
+        <div class="detail-box-body">CASPer free today: ${user.usage_today?.casper?.used||0}/${user.usage_today?.casper?.limit||1}</div>
+        <div class="detail-box-body">GAMSAT free today: ${user.usage_today?.gamsat?.used||0}/${user.usage_today?.gamsat?.limit||1}</div>
+        <div class="action-row">
+          <button class="action-btn blue" onclick="openCreditModal('${esc(user.id)}','${esc(user.email)}',${credits.find(c=>c.tool==='casper')?.balance||0},${credits.find(c=>c.tool==='gamsat')?.balance||0})">💳 Manage Credits</button>
+          <button class="action-btn amber" onclick="openTierModal('${esc(user.id)}','${esc(user.email)}','${esc(user.tier||'free')}')">⭐ Change Tier</button>
+          <button class="action-btn" onclick="window.open('admin-inbox.html','_blank')">✉ Email</button>
+        </div>
+      </div>
+
+      <div class="detail-box">
+        <div class="detail-box-header"><div class="detail-box-icon">💳</div><div class="detail-box-title">Credits & Payments — ${formatMoney(totalSpend)} total</div></div>
+        <div class="detail-box-body">
+          <table class="subtable">
+            <thead><tr><th>Tool</th><th>Balance</th><th>Updated</th></tr></thead>
+            <tbody>
+              ${credits.length ? credits.map(c=>`<tr><td>${esc(c.tool)}</td><td><strong>${esc(c.balance)}</strong></td><td>${esc(c.updated_at||'—')}</td></tr>`).join('') : '<tr><td colspan="3" style="color:var(--muted2);">No credits</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+        <div class="detail-box-body" style="margin-top:8px;">
+          <table class="subtable">
+            <thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Time</th></tr></thead>
+            <tbody>
+              ${payments.length ? payments.map(p=>`<tr><td>${esc(p.type)}</td><td><strong style="color:${p.status==='completed'?'var(--green)':'var(--muted)'}">${formatMoney(p.amount_aud)}</strong></td><td>${esc(p.status)}</td><td>${formatRelTime(p.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" style="color:var(--muted2);">No payments</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="detail-box">
+        <div class="detail-box-header"><div class="detail-box-icon">📝</div><div class="detail-box-title">Recent Reviews (${reviews.length})</div></div>
+        <div class="detail-box-body">
+          <table class="subtable">
+            <thead><tr><th>Tool</th><th>Score</th><th>Source</th><th>Time</th></tr></thead>
+            <tbody>
+              ${reviews.length ? reviews.map(r=>{
+                const fb = parseFeedbackJson(r.ai_feedback);
+                const score = fb?.score||'—';
+                return `<tr><td>${toolBadge(r.tool)}</td><td>${score}</td><td>${esc(r.credit_source||'—')}</td><td>${formatRelTime(r.created_at)}</td></tr>`;
+              }).join('') : '<tr><td colspan="4" style="color:var(--muted2);">No reviews</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── CREDIT MODAL ──────────────────────────────────────────────
+
+function openCreditModal(userId, email, casperBal, gamsatBal) {
+  state.creditModalUserId = userId;
+  document.getElementById('creditModalEmail').textContent = email;
+  document.getElementById('creditModalCasperBal').textContent = casperBal;
+  document.getElementById('creditModalGamsatBal').textContent = gamsatBal;
+  document.getElementById('creditModalAmount').value = '';
+  document.getElementById('creditModalAlert').className = 'modal-alert';
+  document.getElementById('creditModal').classList.add('open');
+}
+
+function closeCreditModal() {
+  document.getElementById('creditModal').classList.remove('open');
+  state.creditModalUserId = null;
+}
+
+async function saveCreditChange() {
+  const userId = state.creditModalUserId;
+  const tool = document.getElementById('creditModalTool').value;
+  const amount = parseInt(document.getElementById('creditModalAmount').value, 10);
+  const alertEl = document.getElementById('creditModalAlert');
+  const btn = document.getElementById('creditModalSaveBtn');
+
+  alertEl.className = 'modal-alert';
+  if (!userId || isNaN(amount) || amount === 0) {
+    alertEl.className = 'modal-alert error';
+    alertEl.textContent = 'Enter a non-zero number of credits.';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const res = await apiFetch('/admin/users/credits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, tool, amount }),
+    });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed to update credits.');
+    alertEl.className = 'modal-alert success';
+    alertEl.textContent = `✓ ${amount > 0 ? 'Added' : 'Removed'} ${Math.abs(amount)} ${tool} credit${Math.abs(amount)===1?'':'s'}.`;
+    state.userDetailCache.clear();
+    await loadUsers();
+  } catch(err) {
+    alertEl.className = 'modal-alert error';
+    alertEl.textContent = err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Changes';
+  }
+}
+
+// ── TIER MODAL ────────────────────────────────────────────────
+
+function openTierModal(userId, email, currentTier) {
+  state.tierModalUserId = userId;
+  document.getElementById('tierModalEmail').textContent = email;
+  document.getElementById('tierModalTier').value = currentTier;
+  document.getElementById('tierModalAlert').className = 'modal-alert';
+  document.getElementById('tierModal').classList.add('open');
+}
+
+function closeTierModal() {
+  document.getElementById('tierModal').classList.remove('open');
+  state.tierModalUserId = null;
+}
+
+async function saveTierChange() {
+  const userId = state.tierModalUserId;
+  const tier = document.getElementById('tierModalTier').value;
+  const alertEl = document.getElementById('tierModalAlert');
+  const btn = document.getElementById('tierModalSaveBtn');
+
+  alertEl.className = 'modal-alert';
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const res = await apiFetch('/admin/users/tier', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, tier }),
+    });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed to update tier.');
+    alertEl.className = 'modal-alert success';
+    alertEl.textContent = `✓ Tier updated to ${tier}.`;
+    state.userDetailCache.clear();
+    await loadUsers();
+  } catch(err) {
+    alertEl.className = 'modal-alert error';
+    alertEl.textContent = err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Update Tier';
+  }
+}
+
+// Close modals on backdrop click
+document.getElementById('creditModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeCreditModal(); });
+document.getElementById('tierModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeTierModal(); });
+
+// ── FILTER / REFRESH / EXPORT ─────────────────────────────────
+
+[document.getElementById('searchInput'), document.getElementById('payingFilter')].forEach(el => {
+  el?.addEventListener('input', () => {
+    if (state.currentView==='reviews') renderReviewsTable();
+    else renderUsersTable();
+  });
+});
+
+[document.getElementById('toolFilter'), document.getElementById('tierFilter')].forEach(el => {
+  el?.addEventListener('change', async () => {
+    if (state.currentView==='reviews') renderReviewsTable();
+    else { await loadUsers(); }
+  });
+});
+
+document.getElementById('limitFilter').addEventListener('change', async () => {
+  await Promise.all([loadReviews(), loadUsers()]);
+});
+
+document.getElementById('refreshBtn').addEventListener('click', async () => {
+  state.userDetailCache.clear();
+  await Promise.all([loadReviews(), loadUsers()]);
+});
+
+document.getElementById('exportBtn').addEventListener('click', async () => {
+  try {
+    const base = state.currentView==='reviews' ? '/admin/reviews.csv' : '/admin/users.csv';
+    const params = new URLSearchParams({ limit: document.getElementById('limitFilter').value||'50' });
+    const res = await apiFetch(`${base}?${params}`);
+    if (!res.ok) throw new Error('Export failed.');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${state.currentView}-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  } catch(err) { setError(err.message); }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  try { if(state.token) await apiFetch('/admin/logout',{method:'POST'}); } catch {}
+  state.token = null;
+  state.reviews = []; state.users = [];
+  state.userDetailCache.clear();
+  document.getElementById('loginSection').classList.remove('hidden');
+  document.getElementById('dashboardSection').classList.add('hidden');
+});
+</script>
+</body>
+</html>
