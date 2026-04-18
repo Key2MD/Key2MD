@@ -157,6 +157,7 @@
       border-bottom: 1px solid rgba(255,255,255,0.06);
       transition: background 0.3s ease, box-shadow 0.3s ease;
     }
+    @media(max-width:768px){header{background:#0a1628!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;}}
     header.scrolled {
       background: rgba(10, 22, 40, 0.98);
       box-shadow: 0 2px 24px rgba(0,0,0,0.4);
@@ -215,10 +216,10 @@
       display: none;
       position: fixed;
       top: 68px; left: 0; right: 0;
-      background: #060f1e;
+      background: #060f1e !important; background-color: #060f1e !important;
       border-bottom: 2px solid rgba(14,165,233,0.2);
       padding: 16px 20px 20px;
-      z-index: 9998;
+      z-index: 10000; isolation: isolate; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
       flex-direction: column;
       gap: 2px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.6);
@@ -708,6 +709,7 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="testimonials.html" class="active">Results</a></li>
+      <li><a href="plans.html">Plans</a></li>
       <li><a href="guide.html">📖 Free Guide</a></li>
       <li><a href="practice.html" style="color:var(--gold);font-weight:700;">🎯 CASPer Practice</a></li>
       <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a></li>
@@ -725,7 +727,7 @@
   <a href="index.html#services" class="mobile-link">Services</a>
   <a href="about.html" class="mobile-link">About</a>
   <a href="testimonials.html" class="mobile-link">Results</a>
-  <a href="index.html#pricing" class="mobile-link">Pricing</a>
+  <a href="plans.html" class="mobile-link">Plans &amp; Pricing</a>
   <a href="guide.html" class="mobile-link">📖 Free Guide</a>
   <a href="practice.html" class="mobile-link" style="color:var(--gold);font-weight:700;">🎯 CASPer Practice</a>
   <a href="gamsat-s2-practice.html" class="mobile-link" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a>

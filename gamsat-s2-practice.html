@@ -94,59 +94,8 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   NAV — mirrors Key2MD
+   NAV — replaced with fixed header (see HTML)
 ═══════════════════════════════════════════════ */
-nav {
-  background: var(--black);
-  padding: 0 5%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-}
-.nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-}
-.nav-logo img { height: 36px; }
-.nav-logo span {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--white);
-  letter-spacing: -0.02em;
-}
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  list-style: none;
-}
-.nav-links a {
-  color: rgba(255,255,255,0.75);
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-.nav-links a:hover { color: var(--white); }
-.nav-links .nav-cta {
-  background: var(--accent);
-  color: var(--white) !important;
-  padding: 8px 18px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: background 0.2s !important;
-}
-.nav-links .nav-cta:hover { background: var(--accent-dark) !important; }
-.btn-nav { padding:9px 20px; border-radius:50px; background:#0ea5e9; color:#fff !important; font-size:0.88rem; font-weight:600; transition:all 0.2s; white-space:nowrap; text-decoration:none; }
-.btn-nav:hover { background:#38bdf8 !important; transform:translateY(-1px); }
 
 /* ═══════════════════════════════════════════════
    HERO SECTION
@@ -1243,7 +1192,6 @@ footer a:hover { color: var(--white); }
   .stimulus-card { padding: 24px 20px; }
   .seo-grid { grid-template-columns: 1fr; }
   .score-breakdown { grid-template-columns: 1fr 1fr; }
-  .nav-links { display: none; }
   .hero h1 { font-size: 1.8rem; }
   .hero-stats { gap: 24px; }
 }
@@ -1492,19 +1440,52 @@ footer a:hover { color: var(--white); }
 <body>
 
 <!-- NAV -->
-<nav>
-  <a href="index.html" class="nav-logo" style="font-size:1.4rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-0.5px;">Key2<span style="color:#0ea5e9">MD</span></a>
-  <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="testimonials.html">Results</a></li>
-      <li><a href="guide.html">📖 Free Guide</a></li>
-      <li><a href="practice.html" style="color:var(--gold);font-weight:700;">🎯 CASPer Practice</a></li>
-      <li><a href="gamsat-s2-practice.html" class="active" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a></li>
-      <li><a href="blog.html">Blog</a></li>
-      <li><a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session</a></li>
-    </ul>
+<header id="gsHeader" style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,10,10,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s,box-shadow 0.3s;">
+  <div style="max-width:1500px;margin:0 auto;padding:0 24px;">
+    <nav style="display:flex;align-items:center;justify-content:space-between;height:68px;">
+      <a href="index.html" style="font-size:1.5rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-0.5px;flex-shrink:0;">Key2<span style="color:#0ea5e9;">MD</span></a>
+      <ul class="nav-links" style="display:flex;align-items:center;gap:24px;list-style:none;margin:0;padding:0;">
+        <li><a href="index.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Home</a></li>
+        <li><a href="about.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">About</a></li>
+        <li><a href="testimonials.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Results</a></li>
+        <li><a href="plans.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Plans</a></li>
+        <li><a href="guide.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Free Guide</a></li>
+        <li><a href="practice.html" style="color:#f59e0b;font-weight:700;font-size:0.88rem;text-decoration:none;transition:color 0.2s;">🎯 CASPer Practice</a></li>
+        <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;font-size:0.88rem;text-decoration:none;">✍️ GAMSAT S2 Practice</a></li>
+        <li><a href="blog.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Blog</a></li>
+        <li><a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session →</a></li>
+      </ul>
+      <button id="gsHamburger" aria-label="Toggle menu" onclick="document.getElementById('gsMobileNav').classList.toggle('open');this.classList.toggle('open');" style="display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;">
+        <span style="display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;"></span>
+        <span style="display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;"></span>
+        <span style="display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;"></span>
+      </button>
+    </nav>
+  </div>
+</header>
+<nav id="gsMobileNav" style="display:none;position:fixed;top:68px;left:0;right:0;background-color:#060f1e;background:#060f1e;border-bottom:2px solid rgba(14,165,233,0.2);padding:16px 20px 20px;z-index:10000;isolation:isolate;-webkit-backdrop-filter:none;backdrop-filter:none;flex-direction:column;gap:2px;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+  <a href="index.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">Home</a>
+  <a href="about.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">About</a>
+  <a href="testimonials.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">Results</a>
+  <a href="plans.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">Plans &amp; Pricing</a>
+  <a href="guide.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">Free Guide</a>
+  <a href="practice.html" style="color:#f59e0b;font-weight:700;font-size:1rem;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">🎯 CASPer Practice</a>
+  <a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;font-size:1rem;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">✍️ GAMSAT S2 Practice</a>
+  <a href="blog.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">Blog</a>
+  <a href="#" onclick="openBookModal(event)" style="display:block;width:100%;text-align:center;margin-top:8px;padding:13px;border-radius:50px;background:#0ea5e9;color:#fff;font-size:0.88rem;font-weight:600;text-decoration:none;">Book a Session →</a>
 </nav>
+<style>
+  #gsMobileNav.open { display:flex; }
+  #gsHamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  #gsHamburger.open span:nth-child(2){opacity:0;}
+  #gsHamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+  @media(max-width:900px){
+    #gsHamburger{display:flex!important;}
+    #gsHeader ul.nav-links{display:none!important;}
+    #gsHeader{background:#0a0a0a!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;}
+  }
+  body { padding-top: 68px; }
+</style>
 
 <!-- Book Modal -->
 <div id="bookModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
@@ -1790,6 +1771,16 @@ footer a:hover { color: var(--white); }
       <div id="buyCreditsBtnWrap" style="display:none;">
         <button class="buy-credits-btn" onclick="openCreditShop()">Buy More AI Reviews →</button>
       </div>
+
+      <!-- GAMSAT Pro Coming Soon -->
+      <div style="margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(124,58,237,0.08) 0%,rgba(167,139,250,0.04) 100%);border:1.5px solid rgba(124,58,237,0.2);border-radius:10px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:rgba(124,58,237,0.15);color:#a78bfa;padding:2px 9px;border-radius:50px;">Coming Soon</span>
+          <span style="font-size:0.85rem;font-weight:700;color:var(--text);">GAMSAT S2 Pro</span>
+        </div>
+        <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.55;margin:0 0 10px;">Unlimited AI essay reviews, daily — no cap. Same marking engine, unlimited access. Join the waitlist to get early access and a launch discount.</p>
+        <a href="plans.html" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:8px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#7c3aed;font-size:0.8rem;font-weight:700;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(124,58,237,0.18)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'">View Plans &amp; Join Waitlist →</a>
+      </div>
     </div>
 
     <!-- Mailing List Panel -->
@@ -1838,11 +1829,12 @@ footer a:hover { color: var(--white); }
 
 <!-- FOOTER -->
 <footer>
-  <span class="footer-logo">Key2MD</span>
+  <span class="footer-logo" style="font-family:'DM Sans',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;">Key2<span style="color:#0ea5e9;">MD</span></span>
   <div class="footer-links">
     <a href="https://www.key2md.com">Home</a>
     <a href="https://www.key2md.com/about.html">About Dan</a>
     <a href="https://www.key2md.com/testimonials.html">Results</a>
+    <a href="https://www.key2md.com/plans.html">Plans &amp; Pricing</a>
     <a href="https://www.key2md.com/practice.html">CASPer Tool</a>
     <a href="https://www.key2md.com/guide.html">Free Guide</a>
     <a href="https://www.key2md.com/blog.html">Blog</a>

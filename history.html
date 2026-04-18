@@ -21,6 +21,7 @@
     a { text-decoration: none; color: inherit; }
 
     header { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(10,22,40,0.92); backdrop-filter:blur(16px); border-bottom:1px solid rgba(255,255,255,0.06); }
+    @media(max-width:768px){header{background:#0a1628!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;}}
     nav { display:flex; align-items:center; justify-content:space-between; height:68px; max-width:1200px; margin:0 auto; padding:0 24px; }
     .logo { font-size:1.5rem; font-weight:800; color:var(--white); letter-spacing:-0.5px; }
     .logo span { color:var(--teal); }
@@ -31,7 +32,7 @@
     .btn-nav:hover { background:var(--teal2); }
     .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; background:none; border:none; }
     .hamburger span { display:block; width:24px; height:2px; background:var(--white); border-radius:2px; }
-    .mobile-nav { display:none; position:fixed; top:68px; left:0; right:0; background:#060f1e; border-bottom:2px solid rgba(14,165,233,0.2); padding:16px 20px 20px; z-index:9998; flex-direction:column; gap:2px; }
+    .mobile-nav { display:none; position:fixed; top:68px; left:0; right:0; background:#060f1e!important;background-color:#060f1e!important; border-bottom:2px solid rgba(14,165,233,0.2); padding:16px 20px 20px; z-index:10000;isolation:isolate;-webkit-backdrop-filter:none!important;backdrop-filter:none!important; flex-direction:column; gap:2px; }
     .mobile-nav.open { display:flex; }
     .mobile-nav a { color:rgba(255,255,255,0.95); font-size:1rem; font-weight:600; padding:13px 14px; border-radius:10px; transition:background 0.2s; border-bottom:1px solid rgba(255,255,255,0.06); }
     .mobile-nav a:hover { background:rgba(255,255,255,0.08); color:var(--teal); }
@@ -152,6 +153,7 @@
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="testimonials.html">Results</a></li>
+      <li><a href="plans.html">Plans</a></li>
       <li><a href="guide.html">📖 Free Guide</a></li>
       <li><a href="practice.html" style="color:var(--gold);font-weight:700;">🎯 CASPer Practice</a></li>
       <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a></li>
@@ -164,6 +166,7 @@
   <a href="index.html">Home</a>
   <a href="about.html">About</a>
   <a href="testimonials.html">Results</a>
+  <a href="plans.html">Plans &amp; Pricing</a>
   <a href="guide.html">📖 Free Guide</a>
   <a href="practice.html" style="color:var(--gold);font-weight:700;">🎯 CASPer Practice</a>
   <a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;">✍️ GAMSAT S2 Practice</a>

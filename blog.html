@@ -45,7 +45,7 @@ nav { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(10,2
 .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
 .hamburger.open span:nth-child(2) { opacity:0; }
 .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
-.mobile-nav { display:none; position:fixed; top:68px; left:0; right:0; background:#060f1e; border-bottom:2px solid rgba(14,165,233,0.2); padding:16px 20px 20px; z-index:9998; flex-direction:column; gap:2px; box-shadow:0 8px 32px rgba(0,0,0,0.6); }
+.mobile-nav { display:none; position:fixed; top:68px; left:0; right:0; background:#060f1e!important;background-color:#060f1e!important; border-bottom:2px solid rgba(14,165,233,0.2); padding:16px 20px 20px; z-index:10000;isolation:isolate;-webkit-backdrop-filter:none!important;backdrop-filter:none!important; flex-direction:column; gap:2px; box-shadow:0 8px 32px rgba(0,0,0,0.6); }
 .mobile-nav.open { display:flex; }
 .mobile-nav a { color:rgba(255,255,255,0.95); font-size:1rem; font-weight:600; padding:13px 14px; border-radius:10px; transition:background 0.2s; }
 .mobile-nav a:hover { background:rgba(255,255,255,0.08); color:var(--teal); }
@@ -203,6 +203,7 @@ footer a:hover { color:var(--white); }
     <li><a href="index.html">Home</a></li>
     <li><a href="about.html">About</a></li>
     <li><a href="testimonials.html">Results</a></li>
+    <li><a href="plans.html">Plans</a></li>
     <li><a href="guide.html">📖 Free Guide</a></li>
     <li><a href="practice.html">🎯 CASPer Practice</a></li>
     <li><a href="gamsat-s2-practice.html">✍️ GAMSAT Practice</a></li>
@@ -217,6 +218,7 @@ footer a:hover { color:var(--white); }
   <a href="index.html">Home</a>
   <a href="about.html">About</a>
   <a href="testimonials.html">Results</a>
+  <a href="plans.html">Plans &amp; Pricing</a>
   <a href="guide.html">📖 Free Guide</a>
   <a href="practice.html">🎯 CASPer Practice</a>
   <a href="gamsat-s2-practice.html">✍️ GAMSAT Practice</a>
