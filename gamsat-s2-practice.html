@@ -1436,82 +1436,113 @@ footer a:hover { color: var(--white); }
 </style>
   <meta name="robots" content="index, follow">
   <script src="auth.js"></script>
+<style id="k2-nav-styles">
+/* ═══════════════════════════════════════════════════════
+   KEY2MD CANONICAL NAVIGATION — do not edit per page
+   Applied identically across all pages. If you need to
+   change nav, change it here and re-sync to all pages.
+   ═══════════════════════════════════════════════════════ */
+.k2-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,22,40,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s,box-shadow 0.3s;overflow:visible;}
+.k2-header.scrolled{background:rgba(10,22,40,0.98);box-shadow:0 2px 24px rgba(0,0,0,0.4);}
+.k2-nav{display:flex;align-items:center;justify-content:space-between;height:68px;max-width:1200px;margin:0 auto;padding:0 24px;}
+.k2-logo{font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-0.5px;text-decoration:none;flex-shrink:0;font-family:'DM Sans',system-ui,sans-serif;}
+.k2-logo span{color:#0ea5e9;}
+.k2-nav-links{display:flex;align-items:center;gap:22px;list-style:none;margin:0;padding:0;}
+.k2-nav-links a{color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;transition:color 0.2s;text-decoration:none;white-space:nowrap;font-family:'DM Sans',system-ui,sans-serif;}
+.k2-nav-links a:hover{color:#0ea5e9;}
+.k2-nav-links a.k2-gold{color:#f59e0b;font-weight:700;}
+.k2-nav-links a.k2-gold:hover{color:#fbbf24;}
+.k2-nav-links a.k2-purple{color:#a78bfa;font-weight:700;}
+.k2-nav-links a.k2-purple:hover{color:#c4b5fd;}
+.k2-btn-nav{padding:9px 20px;border-radius:50px;background:#0ea5e9;color:#fff!important;font-size:0.88rem;font-weight:600;transition:all 0.2s;white-space:nowrap;text-decoration:none;display:inline-block;border:none;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;}
+.k2-btn-nav:hover{background:#38bdf8;transform:translateY(-1px);}
+/* Active page highlight */
+body[data-page="home"]     .k2-nav-links a[data-nav="home"],
+body[data-page="about"]    .k2-nav-links a[data-nav="about"],
+body[data-page="results"]  .k2-nav-links a[data-nav="results"],
+body[data-page="plans"]    .k2-nav-links a[data-nav="plans"],
+body[data-page="guide"]    .k2-nav-links a[data-nav="guide"],
+body[data-page="practice"] .k2-nav-links a[data-nav="practice"],
+body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"],
+body[data-page="blog"]     .k2-nav-links a[data-nav="blog"]{color:#0ea5e9;}
+body[data-page="practice"] .k2-nav-links a[data-nav="practice"]{color:#fbbf24;}
+body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
+/* Hamburger */
+.k2-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;flex-shrink:0;}
+.k2-hamburger span{display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s ease;}
+.k2-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.k2-hamburger.open span:nth-child(2){opacity:0;}
+.k2-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+/* Mobile nav panel */
+.k2-mobile-nav{display:none;position:absolute;top:100%;left:0;right:0;background:#060f1e;background-color:#060f1e;border-bottom:2px solid rgba(14,165,233,0.25);padding:12px 16px 18px;z-index:10000;flex-direction:column;gap:0;box-shadow:0 12px 40px rgba(0,0,0,0.8);-webkit-backdrop-filter:none!important;backdrop-filter:none!important;}
+.k2-mobile-nav.open{display:flex;}
+.k2-mobile-nav a{color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s,color 0.2s;border-bottom:1px solid rgba(255,255,255,0.06);display:block;text-decoration:none;font-family:'DM Sans',system-ui,sans-serif;}
+.k2-mobile-nav a:last-child{border-bottom:none;}
+.k2-mobile-nav a:hover{background:rgba(255,255,255,0.08);color:#0ea5e9;}
+.k2-mobile-nav a.k2-gold{color:#f59e0b;font-weight:700;}
+.k2-mobile-nav a.k2-purple{color:#a78bfa;font-weight:700;}
+.k2-mobile-nav .k2-btn-nav{margin-top:10px;border-bottom:none!important;border-radius:50px;text-align:center;padding:13px;width:100%;}
+@media(max-width:900px){
+  .k2-nav-links{display:none;}
+  .k2-hamburger{display:flex;}
+  .k2-header{background:#0a1628!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;overflow:visible!important;}
+}
+</style>
 </head>
-<body>
+<body data-page="gamsat">
+<!-- ═══ KEY2MD CANONICAL NAV — do not edit per page ═══ -->
+<header class="k2-header" id="k2Header">
+  <nav class="k2-nav">
+    <a href="index.html" class="k2-logo">Key<span>2</span>MD</a>
+    <ul class="k2-nav-links">
+      <li><a href="index.html" data-nav="home">Home</a></li>
+      <li><a href="about.html" data-nav="about">About</a></li>
+      <li><a href="testimonials.html" data-nav="results">Results</a></li>
+      <li><a href="plans.html" data-nav="plans">Plans</a></li>
+      <li><a href="guide.html" data-nav="guide">Free Guide</a></li>
+      <li><a href="practice.html" class="k2-gold" data-nav="practice">🎯 CASPer Practice</a></li>
+      <li><a href="gamsat-s2-practice.html" class="k2-purple" data-nav="gamsat">✍️ GAMSAT S2</a></li>
+      <li><a href="blog.html" data-nav="blog">Blog</a></li>
+      <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session →</a></li>
+    </ul>
+    <button class="k2-hamburger" id="k2Hamburger" aria-label="Toggle menu" type="button"><span></span><span></span><span></span></button>
+  </nav>
+  <nav class="k2-mobile-nav" id="k2MobileNav">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="testimonials.html">Results</a>
+    <a href="plans.html">Plans &amp; Pricing</a>
+    <a href="guide.html">📖 Free Guide</a>
+    <a href="practice.html" class="k2-gold">🎯 CASPer Practice</a>
+    <a href="gamsat-s2-practice.html" class="k2-purple">✍️ GAMSAT S2 Practice</a>
+    <a href="blog.html">Blog</a>
+    <a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session →</a>
+  </nav>
+</header>
+<script>
+(function(){
+  var h = document.getElementById('k2Hamburger');
+  var m = document.getElementById('k2MobileNav');
+  var hdr = document.getElementById('k2Header');
+  if (h && m) {
+    h.addEventListener('click', function(){ h.classList.toggle('open'); m.classList.toggle('open'); });
+    m.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){ h.classList.remove('open'); m.classList.remove('open'); });
+    });
+  }
+  if (hdr) {
+    window.addEventListener('scroll', function(){ hdr.classList.toggle('scrolled', window.scrollY > 40); }, {passive:true});
+  }
+})();
+</script>
+<!-- ═══ END CANONICAL NAV ═══ -->
 
 <!-- NAV -->
-<header id="gsHeader" style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,10,10,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s,box-shadow 0.3s;overflow:visible;">
-  <div style="max-width:1500px;margin:0 auto;padding:0 24px;">
-    <nav style="display:flex;align-items:center;justify-content:space-between;height:68px;">
-      <a href="index.html" style="font-size:1.5rem;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-0.5px;flex-shrink:0;">Key<span style="color:#0ea5e9;">2</span>MD</a>
-      <ul class="nav-links" style="display:flex;align-items:center;gap:24px;list-style:none;margin:0;padding:0;">
-        <li><a href="index.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Home</a></li>
-        <li><a href="about.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">About</a></li>
-        <li><a href="testimonials.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Results</a></li>
-        <li><a href="plans.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Plans</a></li>
-        <li><a href="guide.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Free Guide</a></li>
-        <li><a href="practice.html" style="color:#f59e0b;font-weight:700;font-size:0.88rem;text-decoration:none;transition:color 0.2s;">🎯 CASPer Practice</a></li>
-        <li><a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;font-size:0.88rem;text-decoration:none;">✍️ GAMSAT S2 Practice</a></li>
-        <li><a href="blog.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Blog</a></li>
-        <li><a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session →</a></li>
-      </ul>
-      <button id="gsHamburger" aria-label="Toggle menu" onclick="document.getElementById('gsMobileNav').classList.toggle('open');this.classList.toggle('open');" style="flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;">
-        <span style="display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;"></span>
-        <span style="display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;"></span>
-        <span style="display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;"></span>
-      </button>
-    </nav>
-  </div>
-<nav id="gsMobileNav" style="display:none;position:absolute;top:100%;left:0;right:0;background:#060f1e;background-color:#060f1e;border-bottom:2px solid rgba(14,165,233,0.25);padding:12px 16px 18px;z-index:10000;flex-direction:column;gap:0;box-shadow:0 12px 40px rgba(0,0,0,0.8);-webkit-backdrop-filter:none;backdrop-filter:none;">
-  <a href="index.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">Home</a>
-  <a href="about.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">About</a>
-  <a href="testimonials.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">Results</a>
-  <a href="plans.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">Plans &amp; Pricing</a>
-  <a href="guide.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">Free Guide</a>
-  <a href="practice.html" style="color:#f59e0b;font-weight:700;font-size:1rem;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">🎯 CASPer Practice</a>
-  <a href="gamsat-s2-practice.html" style="color:#a78bfa;font-weight:700;font-size:1rem;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">✍️ GAMSAT S2 Practice</a>
-  <a href="blog.html" style="color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s;border-bottom:1px solid rgba(255,255,255,0.05);display:block;text-decoration:none;">Blog</a>
-  <a href="#" onclick="openBookModal(event)" style="display:block;width:100%;text-align:center;margin-top:8px;padding:13px;border-radius:50px;background:#0ea5e9;color:#fff;font-size:0.88rem;font-weight:600;text-decoration:none;">Book a Session →</a>
-</nav>
-</header>
+
 <style>
-  #gsHamburger { display:none; }
-  #gsMobileNav.open { display:flex; }
-  #gsHamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
-  #gsHamburger.open span:nth-child(2){opacity:0;}
-  #gsHamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-  @media(max-width:900px){
-    #gsHamburger{display:flex;}
-    #gsHeader ul.nav-links{display:none!important;}
-    #gsHeader{background:#0a0a0a!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;overflow:visible!important;}
-  }
+
   body { padding-top: 68px; }
 </style>
-
-<!-- Book Modal -->
-<div id="bookModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
-  <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:40px 36px;max-width:480px;width:90%;position:relative;">
-    <button onclick="closeBookModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
-    <h3 style="color:#fff;font-size:1.3rem;font-weight:800;margin-bottom:8px;">Book with Dan</h3>
-    <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin-bottom:28px;">Choose the session type that suits you:</p>
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <a href="https://calendly.com/brittainmbbs/30min" target="_blank" style="display:block;background:rgba(14,165,233,0.15);border:1.5px solid rgba(14,165,233,0.4);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(14,165,233,0.25)'" onmouseout="this.style.background='rgba(14,165,233,0.15)'">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-          <span style="background:#0ea5e9;color:#fff;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">FREE</span>
-          <span style="color:#fff;font-weight:700;font-size:1rem;">Intro Call — 15 Minutes</span>
-        </div>
-        <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Free, no commitment. 15 minutes to discuss your goals, timeline, and fit.</p>
-      </a>
-      <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-          <span style="background:#f59e0b;color:#0a1628;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$300</span>
-          <span style="color:#fff;font-weight:700;font-size:1rem;">1:1 Tutoring Session — 1 Hour</span>
-        </div>
-        <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Full personalised session — MMI, CASPer, or GAMSAT S2 prep with Dan.</p>
-      </a>
-    </div>
-  </div>
-</div>
 
 <!-- HERO -->
 <section class="hero" style="padding:56px 5% 40px;">
@@ -1797,8 +1828,6 @@ footer a:hover { color: var(--white); }
     </div>
 
   </div>
-
-  
 
 <!-- SEO CONTENT SECTION -->
 <section class="seo-section">
@@ -3039,9 +3068,6 @@ document.getElementById('markingModal').addEventListener('click', function(e) {
   if (e.target === this) closeMarkingModal();
 });
 
-function openBookModal(e){if(e)e.preventDefault();const m=document.getElementById('bookModal');m.style.display='flex';}
-function closeBookModal(){document.getElementById('bookModal').style.display='none';}
-document.getElementById('bookModal').addEventListener('click',function(e){if(e.target===this)closeBookModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookModal();closeCreditShop();}});
 </script>
 
@@ -3251,5 +3277,36 @@ window.subscribeGamsat=subscribeGamsat;
     <a href="https://www.key2md.com/testimonials.html">Student Results</a>
     <a href="https://www.key2md.com/about.html">About Dan</a>
   </div>
+<!-- ═══ KEY2MD CANONICAL BOOK MODAL ═══ -->
+<div id="bookModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:40px 36px;max-width:480px;width:100%;position:relative;font-family:'DM Sans',system-ui,sans-serif;">
+    <button onclick="closeBookModal()" aria-label="Close" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
+    <h3 style="color:#fff;font-size:1.3rem;font-weight:800;margin:0 0 8px;">Book with Dan</h3>
+    <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin:0 0 28px;">Choose the option that suits you:</p>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+          <span style="background:#f59e0b;color:#0a1628;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$300</span>
+          <span style="color:#fff;font-weight:700;font-size:1rem;">1:1 Coaching Session — 1 Hour</span>
+        </div>
+        <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">MMI, CASPer, or GAMSAT S2. Full personalised session with Dan.</p>
+      </a>
+      <a href="https://calendly.com/brittainmbbs/30min" target="_blank" rel="noopener" style="display:block;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
+          <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">Free</span>
+          <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">15-Min Intro Call</span>
+        </div>
+        <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">Not sure yet? Quick chat to see if we're a fit — no commitment.</p>
+      </a>
+    </div>
+  </div>
+</div>
+<script>
+function openBookModal(e){ if(e && e.preventDefault) e.preventDefault(); var m=document.getElementById('bookModal'); if(m){ m.style.display='flex'; document.body.style.overflow='hidden'; } }
+function closeBookModal(){ var m=document.getElementById('bookModal'); if(m){ m.style.display='none'; document.body.style.overflow=''; } }
+document.addEventListener('click', function(e){ var m=document.getElementById('bookModal'); if(m && e.target===m) closeBookModal(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=document.getElementById('bookModal'); if(m && m.style.display==='flex') closeBookModal(); } });
+</script>
+<!-- ═══ END CANONICAL BOOK MODAL ═══ -->
 </body>
 </html>
