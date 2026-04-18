@@ -166,7 +166,7 @@
       border-bottom: 1px solid rgba(255,255,255,0.06);
       transition: background 0.3s ease, box-shadow 0.3s ease;
     }
-    @media(max-width:768px){header{background:#0a1628!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;}}
+    @media(max-width:768px){header{background:#0a1628!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;overflow:visible!important;}}
     header.scrolled {
       background: rgba(10, 22, 40, 0.98);
       box-shadow: 0 2px 24px rgba(0,0,0,0.4);
@@ -221,30 +221,12 @@
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-    .mobile-nav {
-      display: none;
-      position: fixed;
-      top: 68px; left: 0; right: 0;
-      background: #060f1e !important; background-color: #060f1e !important;
-      border-bottom: 2px solid rgba(14,165,233,0.2);
-      padding: 16px 20px 20px;
-      z-index: 10000; isolation: isolate; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
-      flex-direction: column;
-      gap: 2px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-    }
-    .mobile-nav.open { display: flex; }
-    .mobile-nav a {
-      color: rgba(255,255,255,0.92);
-      font-size: 1rem;
-      font-weight: 500;
-      padding: 13px 14px;
-      border-radius: 10px;
-      transition: background 0.2s, color 0.2s;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .mobile-nav a:hover { background: rgba(255,255,255,0.08); color: var(--teal); }
-    .mobile-nav .btn { width: 100%; justify-content: center; margin-top: 8px; }
+    .mobile-nav{display:none;position:absolute;top:100%;left:0;right:0;background:#060f1e;background-color:#060f1e;border-bottom:2px solid rgba(14,165,233,0.25);padding:12px 16px 18px;z-index:10000;flex-direction:column;gap:0;box-shadow:0 12px 40px rgba(0,0,0,0.8);-webkit-backdrop-filter:none!important;backdrop-filter:none!important;}
+    .mobile-nav.open{display:flex}
+    .mobile-nav a{color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s,color 0.2s;border-bottom:1px solid rgba(255,255,255,0.06);display:block;text-decoration:none;}
+    .mobile-nav a:last-child{border-bottom:none}
+    .mobile-nav a:hover{background:rgba(255,255,255,0.08);color:var(--teal)}
+    .mobile-nav .btn-nav{margin-top:10px;border-bottom:none!important;border-radius:50px;text-align:center;padding:13px;background:var(--teal);color:#fff!important;font-weight:700;display:block;}
 
     /* ── PAGE HERO ── */
     .page-hero {
@@ -756,8 +738,6 @@
         </button>
       </nav>
     </div>
-  </header>
-
   <nav class="mobile-nav" id="mobileNav">
   <a href="index.html#services" class="mobile-link">Services</a>
   <a href="about.html" class="mobile-link">About</a>
@@ -769,6 +749,7 @@
   <a href="blog.html" class="mobile-link">Blog</a>
   <a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session →</a>
 </nav>
+  </header>
 
   <!-- Book Modal -->
   <div id="bookModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
