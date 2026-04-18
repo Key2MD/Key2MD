@@ -89,7 +89,7 @@
     .section-sub{font-size:1.05rem;color:var(--gray600);max-width:540px;line-height:1.7;font-family:'DM Sans',system-ui,sans-serif;}
 
     /* ── HEADER ── */
-    header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,22,40,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s ease,box-shadow 0.3s ease}
+    header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,22,40,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s ease,box-shadow 0.3s ease;overflow:visible;}
     @media(max-width:768px){header{background:#0a1628!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;overflow:visible!important;}}
     header.scrolled{background:rgba(10,22,40,0.98);box-shadow:0 2px 24px rgba(0,0,0,0.4)}
     nav{display:flex;align-items:center;justify-content:space-between;height:68px}
@@ -703,7 +703,7 @@
         <div class="stat-card fade-up delay-1 visible" style="position:relative;cursor:default;" onmouseenter="document.getElementById('statTooltip').style.opacity='1';document.getElementById('statTooltip').style.visibility='visible'" onmouseleave="document.getElementById('statTooltip').style.opacity='0';document.getElementById('statTooltip').style.visibility='hidden'">
           <span class="stat-number" style="color:var(--teal2);">93%+</span>
           <span class="stat-label" style="display:flex;align-items:center;gap:5px;justify-content:center;">Offer Rate <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:0.65rem;font-weight:700;flex-shrink:0;">?</span></span>
-          <div id="statTooltip" style="position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.78rem;border-radius:10px;padding:14px 18px;width:270px;z-index:100;opacity:0;visibility:hidden;transition:opacity 0.2s;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);pointer-events:none;text-align:left;">
+          <div id="statTooltip" style="position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.78rem;border-radius:10px;padding:14px 18px;width:270px;z-index:9000;opacity:0;visibility:hidden;transition:opacity 0.2s;box-shadow:0 8px 32px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);pointer-events:none;text-align:left;">
             <div style="font-weight:700;margin-bottom:8px;color:var(--teal2);">2025 — Med School Offers from Interview</div>
             <div style="display:flex;flex-direction:column;gap:5px;">
               <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.7);">Domestic MMI</span><span style="font-weight:700;">32/35</span></div>
@@ -719,7 +719,7 @@
               </div>
             </div>
             <div style="margin-top:8px;font-size:0.7rem;color:rgba(255,255,255,0.35);border-top:1px solid rgba(255,255,255,0.06);padding-top:7px;">Tracked students only. Individual results vary.</div>
-            <div style="position:absolute;bottom:-6px;left:50%;width:12px;height:12px;background:var(--navy);border-right:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);transform:translateX(-50%) rotate(45deg);"></div>
+            <div style="position:absolute;top:-6px;left:50%;width:12px;height:12px;background:var(--navy);border-left:1px solid rgba(255,255,255,0.1);border-top:1px solid rgba(255,255,255,0.1);transform:translateX(-50%) rotate(45deg);"></div>
           </div>
         </div>
         <div class="stat-card fade-up delay-2 visible">
@@ -729,6 +729,53 @@
         <div class="stat-card fade-up delay-3 visible">
           <span class="stat-number" style="color:#22c55e;">✓</span>
           <span class="stat-label">StudentVIP Verified</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ABOUT ═══ -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-photo-wrap fade-up visible">
+          <div style="background:linear-gradient(135deg,#0d1f3c 0%,#112347 100%);border:1px solid rgba(14,165,233,0.25);border-radius:20px;padding:32px 28px;display:flex;flex-direction:column;gap:20px;box-shadow:0 12px 48px rgba(0,0,0,0.3);">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;color:#fff;flex-shrink:0;">D</div>
+              <div><div style="font-size:1rem;font-weight:800;color:#fff;">Dan</div><div style="font-size:0.78rem;color:var(--teal2);font-weight:600;">UniMelb MD Student</div></div>
+              <div style="margin-left:auto;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);border-radius:50px;padding:4px 10px;font-size:0.68rem;font-weight:700;color:#22c55e;">✓ Verified</div>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">🎓</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">99.85 ATAR</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Top 0.15% nationally</div></div></div>
+              <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">🏆</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">r/GAMSAT Admin Trusted</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Community endorsed tutor</div></div></div>
+              <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">⭐</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">StudentVIP Verified</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Background checked &amp; reviewed</div></div></div>
+              <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">👥</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">200+ Students Coached</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">93%+ offer rate</div></div></div>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+            <div style="text-align:center;"><span style="font-size:1.8rem;font-weight:800;color:var(--teal);">6+</span><span style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-left:6px;">years tutoring</span></div>
+          </div>
+          <div class="about-badges">
+            <span class="badge teal">UniMelb MD Student</span>
+            <span class="badge">99.85 ATAR</span>
+            <span class="badge teal">r/GAMSAT Endorsed</span>
+            <span class="badge">StudentVIP Verified</span>
+            <span class="badge teal">Specialist MMI Coach</span>
+            <span class="badge">GP CASPer Training</span>
+          </div>
+        </div>
+        <div class="about-content fade-up delay-1 visible">
+          <p class="section-label">Why Dan?</p>
+          <h2 class="section-title">MMI &amp; CASPer Coaching by a UniMelb MD Student — for Medical School and Beyond</h2>
+          <p class="about-bio">Dan is a current <strong>University of Melbourne MD student</strong> who achieved a <strong>99.85 ATAR</strong> and knows exactly what it takes to get into Australia's most competitive medical programs. He's not just a tutor — he's been chosen by the moderators of <strong>r/GAMSAT</strong>, one of Australia's largest med-aspiring communities, and is verified on StudentVIP.</p>
+          <p class="about-bio">With 200+ students coached — including candidates who received offers from <strong>all 6 universities they applied to</strong>, doctors accepted into <strong>specialty training programs</strong>, and GP applicants who passed RACGP CASPer on their first attempt — Dan's methods are proven, personalised, and built around what actually works in the room.</p>
+          <div class="about-highlights">
+            <div class="highlight-item"><div class="highlight-icon">🎓</div><div class="highlight-text"><strong>University of Melbourne MD</strong><span>Currently in clinical years of the Doctor of Medicine program</span></div></div>
+            <div class="highlight-item"><div class="highlight-icon">📊</div><div class="highlight-text"><strong>99.85 ATAR</strong><span>Top 0.15% academic performer nationally</span></div></div>
+            <div class="highlight-item"><div class="highlight-icon">🏆</div><div class="highlight-text"><strong>r/GAMSAT Community Trusted</strong><span>Hired by subreddit moderators — a rare mark of trust</span></div></div>
+            <div class="highlight-item"><div class="highlight-icon">🏥</div><div class="highlight-text"><strong>Specialist &amp; GP Training Coaching</strong><span>Experienced coaching doctors through RANZCO, RACS, RACGP &amp; ACRRM selection</span></div></div>
+            <div class="highlight-item"><div class="highlight-icon">🔗</div><div class="highlight-text"><strong><a href="https://www.linkedin.com/in/d-brittain/" target="_blank" style="color:var(--teal3);text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">LinkedIn — Dan Brittain</a></strong><span>Connect, verify credentials, and see Dan's professional background</span></div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -946,53 +993,6 @@
     .catch(function(){document.getElementById('kitForm').style.display='none';document.getElementById('kitSuccess').style.display='block';});
   }
   </script>
-
-  <!-- ═══ ABOUT ═══ -->
-  <section class="about" id="about">
-    <div class="container">
-      <div class="about-grid">
-        <div class="about-photo-wrap fade-up visible">
-          <div style="background:linear-gradient(135deg,#0d1f3c 0%,#112347 100%);border:1px solid rgba(14,165,233,0.25);border-radius:20px;padding:32px 28px;display:flex;flex-direction:column;gap:20px;box-shadow:0 12px 48px rgba(0,0,0,0.3);">
-            <div style="display:flex;align-items:center;gap:14px;">
-              <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;color:#fff;flex-shrink:0;">D</div>
-              <div><div style="font-size:1rem;font-weight:800;color:#fff;">Dan</div><div style="font-size:0.78rem;color:var(--teal2);font-weight:600;">UniMelb MD Student</div></div>
-              <div style="margin-left:auto;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);border-radius:50px;padding:4px 10px;font-size:0.68rem;font-weight:700;color:#22c55e;">✓ Verified</div>
-            </div>
-            <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
-            <div style="display:flex;flex-direction:column;gap:12px;">
-              <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">🎓</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">99.85 ATAR</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Top 0.15% nationally</div></div></div>
-              <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">🏆</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">r/GAMSAT Admin Trusted</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Community endorsed tutor</div></div></div>
-              <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">⭐</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">StudentVIP Verified</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Background checked &amp; reviewed</div></div></div>
-              <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">👥</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">200+ Students Coached</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">93%+ offer rate</div></div></div>
-            </div>
-            <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
-            <div style="text-align:center;"><span style="font-size:1.8rem;font-weight:800;color:var(--teal);">6+</span><span style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-left:6px;">years tutoring</span></div>
-          </div>
-          <div class="about-badges">
-            <span class="badge teal">UniMelb MD Student</span>
-            <span class="badge">99.85 ATAR</span>
-            <span class="badge teal">r/GAMSAT Endorsed</span>
-            <span class="badge">StudentVIP Verified</span>
-            <span class="badge teal">Specialist MMI Coach</span>
-            <span class="badge">GP CASPer Training</span>
-          </div>
-        </div>
-        <div class="about-content fade-up delay-1 visible">
-          <p class="section-label">Why Dan?</p>
-          <h2 class="section-title">MMI &amp; CASPer Coaching by a UniMelb MD Student — for Medical School and Beyond</h2>
-          <p class="about-bio">Dan is a current <strong>University of Melbourne MD student</strong> who achieved a <strong>99.85 ATAR</strong> and knows exactly what it takes to get into Australia's most competitive medical programs. He's not just a tutor — he's been chosen by the moderators of <strong>r/GAMSAT</strong>, one of Australia's largest med-aspiring communities, and is verified on StudentVIP.</p>
-          <p class="about-bio">With 200+ students coached — including candidates who received offers from <strong>all 6 universities they applied to</strong>, doctors accepted into <strong>specialty training programs</strong>, and GP applicants who passed RACGP CASPer on their first attempt — Dan's methods are proven, personalised, and built around what actually works in the room.</p>
-          <div class="about-highlights">
-            <div class="highlight-item"><div class="highlight-icon">🎓</div><div class="highlight-text"><strong>University of Melbourne MD</strong><span>Currently in clinical years of the Doctor of Medicine program</span></div></div>
-            <div class="highlight-item"><div class="highlight-icon">📊</div><div class="highlight-text"><strong>99.85 ATAR</strong><span>Top 0.15% academic performer nationally</span></div></div>
-            <div class="highlight-item"><div class="highlight-icon">🏆</div><div class="highlight-text"><strong>r/GAMSAT Community Trusted</strong><span>Hired by subreddit moderators — a rare mark of trust</span></div></div>
-            <div class="highlight-item"><div class="highlight-icon">🏥</div><div class="highlight-text"><strong>Specialist &amp; GP Training Coaching</strong><span>Experienced coaching doctors through RANZCO, RACS, RACGP &amp; ACRRM selection</span></div></div>
-            <div class="highlight-item"><div class="highlight-icon">🔗</div><div class="highlight-text"><strong><a href="https://www.linkedin.com/in/d-brittain/" target="_blank" style="color:var(--teal3);text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">LinkedIn — Dan Brittain</a></strong><span>Connect, verify credentials, and see Dan's professional background</span></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- ═══ TESTIMONIALS ═══ -->
   <section class="testimonials" id="results">

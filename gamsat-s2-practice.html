@@ -1455,7 +1455,7 @@ footer a:hover { color: var(--white); }
         <li><a href="blog.html" style="color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='rgba(255,255,255,0.78)'">Blog</a></li>
         <li><a href="#" class="btn-nav" onclick="openBookModal(event)">Book a Session →</a></li>
       </ul>
-      <button id="gsHamburger" aria-label="Toggle menu" onclick="document.getElementById('gsMobileNav').classList.toggle('open');this.classList.toggle('open');" style="display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;">
+      <button id="gsHamburger" aria-label="Toggle menu" onclick="document.getElementById('gsMobileNav').classList.toggle('open');this.classList.toggle('open');" style="flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;">
         <span style="display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;"></span>
         <span style="display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;"></span>
         <span style="display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;"></span>
@@ -1475,12 +1475,13 @@ footer a:hover { color: var(--white); }
 </nav>
 </header>
 <style>
+  #gsHamburger { display:none; }
   #gsMobileNav.open { display:flex; }
   #gsHamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
   #gsHamburger.open span:nth-child(2){opacity:0;}
   #gsHamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
   @media(max-width:900px){
-    #gsHamburger{display:flex!important;}
+    #gsHamburger{display:flex;}
     #gsHeader ul.nav-links{display:none!important;}
     #gsHeader{background:#0a0a0a!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;overflow:visible!important;}
   }
