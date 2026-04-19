@@ -26,14 +26,15 @@
   <meta property="og:description" content="UniMelb MD student. 200+ students coached. 93%+ offer rate. Real results.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.key2md.com/">
-  <meta property="og:image" content="https://www.key2md.com/Selfie.jpg">
+  <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Key2MD — Australia's Most Trusted MMI, CASPer & GAMSAT Coaching">
+  <meta property="og:image:alt" content="Key2MD — MMI, CASPer and GAMSAT Section II coaching. 200+ students tutored, 93%+ offer rate.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Key2MD — MMI, CASPer &amp; GAMSAT S2 Coaching">
   <meta name="twitter:description" content="UniMelb MD student. 200+ students coached. 93%+ offer rate. Real results.">
-  <meta name="twitter:image" content="https://www.key2md.com/Selfie.jpg">
+  <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
+  <meta name="twitter:image:alt" content="Key2MD — MMI, CASPer and GAMSAT Section II coaching.">
 
   <script type="application/ld+json">
   {
@@ -71,7 +72,8 @@
     img{max-width:100%;display:block}
     a{text-decoration:none;color:inherit}
     .container{width:100%;max-width:1200px;margin:0 auto;padding:0 20px}
-    section{padding:80px 0}
+    section{padding:64px 0}
+    @media (min-width: 900px){section{padding:72px 0}}
     .fade-up{opacity:0;transform:translateY(28px);transition:opacity 0.65s ease,transform 0.65s ease}
     .fade-up.visible{opacity:1;transform:translateY(0)}
     .fade-up.delay-1{transition-delay:0.1s}
@@ -114,6 +116,11 @@
     .hero-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
     .hero-photo-badge{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,0.88);backdrop-filter:blur(8px);border:1px solid rgba(14,165,233,0.3);color:var(--white);font-size:0.78rem;font-weight:600;padding:6px 16px;border-radius:50px;white-space:nowrap}
     .hero-photo-badge span{color:var(--teal2)}
+    .who-is-dan{display:inline-flex;align-items:center;gap:10px;padding:11px 22px;border-radius:999px;background:rgba(14,165,233,0.12);color:#fff;font-family:'DM Sans',system-ui,sans-serif;font-weight:600;font-size:0.92rem;letter-spacing:0.01em;text-decoration:none;border:1px solid rgba(56,189,248,0.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:background 0.25s ease,border-color 0.25s ease,transform 0.25s ease,box-shadow 0.25s ease;box-shadow:0 4px 18px rgba(14,165,233,0.10);}
+    .who-is-dan:hover{background:rgba(14,165,233,0.22);border-color:rgba(56,189,248,0.7);transform:translateY(-2px);box-shadow:0 10px 30px rgba(14,165,233,0.28);}
+    .who-is-dan .wid-dot{width:6px;height:6px;border-radius:50%;background:#38bdf8;box-shadow:0 0 0 4px rgba(56,189,248,0.18);}
+    .who-is-dan .wid-arrow{transition:transform 0.25s ease;}
+    .who-is-dan:hover .wid-arrow{transform:translateX(4px);}
     .hero-enquiry-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:50px;background:transparent;color:rgba(255,255,255,0.85);border:2px solid rgba(255,255,255,0.3);font-weight:600;font-size:0.95rem;cursor:pointer;transition:all 0.25s;font-family:inherit}
     .hero-enquiry-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.6);transform:translateY(-2px)}
 
@@ -471,9 +478,17 @@
     }
   
     /* Stats breakdown tooltip — mobile-friendly, constrained to viewport */
-    .stat-card-breakdown .stat-tooltip{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.78rem;border-radius:12px;padding:14px 18px;width:min(270px, calc(100vw - 32px));max-width:270px;z-index:9000;opacity:0;visibility:hidden;transition:opacity 0.2s,visibility 0.2s;box-shadow:0 12px 40px rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.1);pointer-events:none;text-align:left;box-sizing:border-box;display:none;}
+    .stat-card-breakdown .stat-tooltip{position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%);background:#0a1628;color:#fff;font-size:0.78rem;border-radius:14px;padding:16px 20px 14px;width:min(280px, calc(100vw - 32px));max-width:280px;z-index:10000;opacity:0;visibility:hidden;transition:opacity 0.18s ease,visibility 0.18s ease;box-shadow:0 20px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(56,189,248,0.15);border:1px solid rgba(255,255,255,0.10);pointer-events:none;text-align:left;box-sizing:border-box;display:none;font-style:normal;line-height:1.45;}
     .stat-card-breakdown.tooltip-open .stat-tooltip{opacity:1;visibility:visible;display:block;}
-    .stat-card-breakdown .stat-tooltip-arrow{position:absolute;top:-6px;left:50%;width:12px;height:12px;background:var(--navy);border-left:1px solid rgba(255,255,255,0.1);border-top:1px solid rgba(255,255,255,0.1);transform:translateX(-50%) rotate(45deg);}
+    .stat-card-breakdown .stat-tooltip-arrow{position:absolute;top:-6px;left:50%;width:12px;height:12px;background:#0a1628;border-left:1px solid rgba(255,255,255,0.10);border-top:1px solid rgba(255,255,255,0.10);transform:translateX(-50%) rotate(45deg);z-index:1;}
+    .stat-tooltip .tt-year-label{font-weight:700;margin-bottom:6px;color:#94a3b8;font-size:0.72rem;letter-spacing:0.04em;text-transform:uppercase;}
+    .stat-tooltip .tt-row{display:flex;justify-content:space-between;gap:12px;}
+    .stat-tooltip .tt-row .tt-key{color:#cbd5e1;}
+    .stat-tooltip .tt-row .tt-value{color:#ffffff;font-weight:700;}
+    .stat-tooltip .tt-2024 .tt-row .tt-key{color:#94a3b8;}
+    .stat-tooltip .tt-2024 .tt-row .tt-value{color:#e2e8f0;font-weight:700;}
+    .stat-tooltip .tt-divider{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.10);}
+    .stat-tooltip .tt-disclaimer{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);font-size:0.68rem;color:#64748b;}
     /* On narrow viewports, disable the tooltip entirely — the 93%+ stat
        stands on its own, and a properly-placed tooltip on mobile would need
        more machinery than this cosmetic enhancement warrants. */
@@ -726,6 +741,11 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
             <img src="Selfie.jpg" loading="eager" fetchpriority="high" alt="Dan — University of Melbourne MD student and Australian medical entrance tutor specialising in MMI, CASPer and GAMSAT Section II">
             <div class="hero-photo-badge">Dan · <span>UniMelb MD Student</span></div>
           </div>
+          <a class="who-is-dan" href="about.html" aria-label="Learn more about Dan — UniMelb MD student and MMI, CASPer, GAMSAT tutor">
+            <span class="wid-dot" aria-hidden="true"></span>
+            <span>Who is Dan?</span>
+            <span class="wid-arrow" aria-hidden="true">→</span>
+          </a>
         </div>
       </div>
     </div>
@@ -745,19 +765,19 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <div id="statTooltip" class="stat-tooltip">
             <div style="font-weight:700;margin-bottom:8px;color:var(--teal2);">2025 — Med School Offers from Interview</div>
             <div style="display:flex;flex-direction:column;gap:5px;">
-              <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.7);">Domestic MMI</span><span style="font-weight:700;">32/35</span></div>
-              <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.7);">International MMI</span><span style="font-weight:700;">10/10</span></div>
-              <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.7);">CASPer Q4</span><span style="font-weight:700;">34/38</span></div>
+              <div class="tt-row"><span class="tt-key">Domestic MMI</span><span class="tt-value">32/35</span></div>
+              <div class="tt-row"><span class="tt-key">International MMI</span><span class="tt-value">10/10</span></div>
+              <div class="tt-row"><span class="tt-key">CASPer Q4</span><span class="tt-value">34/38</span></div>
             </div>
-            <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);">
-              <div style="font-weight:700;margin-bottom:6px;color:rgba(255,255,255,0.55);font-size:0.72rem;letter-spacing:0.04em;text-transform:uppercase;">2024</div>
+            <div class="tt-divider tt-2024">
+              <div class="tt-year-label">2024</div>
               <div style="display:flex;flex-direction:column;gap:5px;">
-                <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.6);">Domestic MMI</span><span style="font-weight:700;color:rgba(255,255,255,0.85);">24/27</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.6);">International MMI</span><span style="font-weight:700;color:rgba(255,255,255,0.85);">6/6</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:rgba(255,255,255,0.6);">CASPer Q4</span><span style="font-weight:700;color:rgba(255,255,255,0.85);">20/23</span></div>
+                <div class="tt-row"><span class="tt-key">Domestic MMI</span><span class="tt-value">24/27</span></div>
+                <div class="tt-row"><span class="tt-key">International MMI</span><span class="tt-value">6/6</span></div>
+                <div class="tt-row"><span class="tt-key">CASPer Q4</span><span class="tt-value">20/23</span></div>
               </div>
             </div>
-            <div style="margin-top:8px;font-size:0.7rem;color:rgba(255,255,255,0.35);border-top:1px solid rgba(255,255,255,0.06);padding-top:7px;">Tracked students only. Individual results vary.</div>
+            <div class="tt-disclaimer">Tracked students only. Individual results vary.</div>
             <div class="stat-tooltip-arrow"></div>
           </div>
         </div>
@@ -894,6 +914,104 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <a href="#" class="btn" style="margin-top:auto;justify-content:center;background:#16a34a;color:#fff;" onclick="event.preventDefault();openEnquiry('GP CASPer')">Enquire Now →</a>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       MASTERCLASSES
+  ══════════════════════════════ -->
+  <section style="background:var(--gray50);padding:80px 0;" id="masterclasses">
+    <div class="container">
+      <div class="fade-up" style="text-align:center;margin-bottom:48px;">
+        <p class="section-label">Group Events</p>
+        <h2 class="section-title">Upcoming MMI &amp; CASPer Masterclasses</h2>
+        <p class="section-sub" style="margin:0 auto;">Deep-dive group sessions for students who want more than 1:1 — structured, high-value, and built around what actually moves the needle.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:900px;margin:0 auto 48px;" class="fade-up masterclass-grid">
+
+        <!-- CASPer Masterclass -->
+        <div style="background:var(--white);border:1px solid var(--gray200);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:all 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 40px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="background:linear-gradient(135deg,#0a1628,#0d2a52);padding:28px 28px 22px;">
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(14,165,233,0.2);border:1px solid rgba(14,165,233,0.4);border-radius:50px;padding:5px 14px;font-size:0.72rem;font-weight:700;color:var(--teal2);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px;">💬 CASPer Masterclass</div>
+            <h3 style="font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2;">CASPer Intensive<br>Seminar</h3>
+            <p style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-bottom:12px;">2–2.5 hours · 7 high-impact topics · Online via Zoom</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+              <div style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
+                <div style="font-size:1.1rem;font-weight:800;color:var(--teal2);">Early June</div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">2025</div>
+              </div>
+              <div style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
+                <div style="font-size:1.1rem;font-weight:800;color:#fbbf24;">$300</div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">per person</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:22px 28px;flex:1;display:flex;flex-direction:column;gap:12px;">
+            <p style="font-size:0.75rem;font-weight:700;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:2px;">Session Structure</p>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">1.</span>Scene-setting — expectations, exam format, and what separates top scorers</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">2.</span>The Key2MD CASPer Framework — a proven, structured approach to every question type</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">3.</span>High-yield question deep-dive — the scenarios that matter most, and exactly why</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">4.</span>Live student demonstration — real-time answering, then a full examiner-style debrief</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">5.</span>What strong responses actually look like — Dan's personal assessment criteria, broken down in detail</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">6.</span>Speed &amp; efficiency — how to maximise every second of your response window without sacrificing quality</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">7.</span>Open Q&amp;A — no topic off limits</div>
+            </div>
+            <div style="margin-top:auto;padding-top:12px;">
+              <a href="#" onclick="event.preventDefault();openEnquiry('CASPer Masterclass');" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.9rem;font-weight:700;text-decoration:none;transition:all 0.2s;cursor:pointer;">Register Interest →</a>
+              <p style="text-align:center;font-size:0.73rem;color:var(--gray400);margin-top:8px;">EOI open now · Spots strictly limited</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- MMI Masterclass -->
+        <div style="background:var(--white);border:1px solid var(--gray200);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:all 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 40px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div style="background:linear-gradient(135deg,#1a0a3c,#2d1060);padding:28px 28px 22px;">
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);border-radius:50px;padding:5px 14px;font-size:0.72rem;font-weight:700;color:#c4b5fd;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px;">🎤 MMI Masterclass</div>
+            <h3 style="font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2;">MMI Interview<br>Masterclass</h3>
+            <p style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-bottom:12px;">2–2.5 hours · Online via Zoom</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+              <div style="background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
+                <div style="font-size:1.1rem;font-weight:800;color:#c4b5fd;">Early Sept</div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">2025</div>
+              </div>
+              <div style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
+                <div style="font-size:1.1rem;font-weight:800;color:#fbbf24;">$400</div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">per person</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:22px 28px;flex:1;display:flex;flex-direction:column;gap:12px;">
+            <p style="font-size:0.75rem;font-weight:700;color:#7c3aed;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:2px;">Session Structure</p>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">1.</span>Looking the part — camera setup, presentation, and what to do before you log in</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">2.</span>What MMI examiners are really looking for — Dan's inside view</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">3.</span>The mistakes that sink good candidates — and how to avoid them</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">4.</span>The skills that actually matter — including how to express emotion authentically</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">5.</span>What Dan looks for when assessing students — his personal marking philosophy, explained in full</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">6.</span>Every station type covered — with model answers and live breakdown</div>
+              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">7.</span>Your questions answered — nothing is off the table</div>
+            </div>
+            <div style="margin-top:auto;padding-top:12px;">
+              <a href="#" onclick="event.preventDefault();openEnquiry('MMI Masterclass');" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:50px;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;font-size:0.9rem;font-weight:700;text-decoration:none;transition:all 0.2s;cursor:pointer;">Register Interest →</a>
+              <p style="text-align:center;font-size:0.73rem;color:var(--gray400);margin-top:8px;">EOI open now · Spots strictly limited</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- EOI callout -->
+      <div class="fade-up" style="max-width:620px;margin:0 auto;background:var(--white);border:1px solid var(--gray200);border-radius:var(--radius-sm);padding:22px 28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <div style="font-size:1.6rem;">📩</div>
+        <div style="flex:1;min-width:200px;">
+          <p style="font-size:0.92rem;font-weight:700;color:var(--navy);margin-bottom:3px;">Expressions of interest open year-round</p>
+          <p style="font-size:0.83rem;color:var(--gray600);">Email Dan any time to secure your spot before they open publicly — masterclasses fill fast.</p>
+        </div>
+        <a href="#" onclick="event.preventDefault();openEnquiry('General Enquiry');" style="display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.87rem;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;cursor:pointer;">Send EOI →</a>
+      </div>
+
     </div>
   </section>
 
@@ -1195,104 +1313,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
       </div>
     </div>
-
-  <!-- ══════════════════════════════
-       MASTERCLASSES
-  ══════════════════════════════ -->
-  <section style="background:var(--gray50);padding:80px 0;" id="masterclasses">
-    <div class="container">
-      <div class="fade-up" style="text-align:center;margin-bottom:48px;">
-        <p class="section-label">Group Events</p>
-        <h2 class="section-title">Upcoming MMI &amp; CASPer Masterclasses</h2>
-        <p class="section-sub" style="margin:0 auto;">Deep-dive group sessions for students who want more than 1:1 — structured, high-value, and built around what actually moves the needle.</p>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:900px;margin:0 auto 48px;" class="fade-up masterclass-grid">
-
-        <!-- CASPer Masterclass -->
-        <div style="background:var(--white);border:1px solid var(--gray200);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:all 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 40px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-          <div style="background:linear-gradient(135deg,#0a1628,#0d2a52);padding:28px 28px 22px;">
-            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(14,165,233,0.2);border:1px solid rgba(14,165,233,0.4);border-radius:50px;padding:5px 14px;font-size:0.72rem;font-weight:700;color:var(--teal2);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px;">💬 CASPer Masterclass</div>
-            <h3 style="font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2;">CASPer Intensive<br>Seminar</h3>
-            <p style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-bottom:12px;">2–2.5 hours · 7 high-impact topics · Online via Zoom</p>
-            <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
-              <div style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
-                <div style="font-size:1.1rem;font-weight:800;color:var(--teal2);">Early June</div>
-                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">2025</div>
-              </div>
-              <div style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
-                <div style="font-size:1.1rem;font-weight:800;color:#fbbf24;">$300</div>
-                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">per person</div>
-              </div>
-            </div>
-          </div>
-          <div style="padding:22px 28px;flex:1;display:flex;flex-direction:column;gap:12px;">
-            <p style="font-size:0.75rem;font-weight:700;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:2px;">Session Structure</p>
-            <div style="display:flex;flex-direction:column;gap:7px;">
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">1.</span>Scene-setting — expectations, exam format, and what separates top scorers</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">2.</span>The Key2MD CASPer Framework — a proven, structured approach to every question type</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">3.</span>High-yield question deep-dive — the scenarios that matter most, and exactly why</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">4.</span>Live student demonstration — real-time answering, then a full examiner-style debrief</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">5.</span>What strong responses actually look like — Dan's personal assessment criteria, broken down in detail</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">6.</span>Speed &amp; efficiency — how to maximise every second of your response window without sacrificing quality</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:var(--teal3);font-weight:800;flex-shrink:0;min-width:18px;">7.</span>Open Q&amp;A — no topic off limits</div>
-            </div>
-            <div style="margin-top:auto;padding-top:12px;">
-              <a href="#" onclick="event.preventDefault();openEnquiry('CASPer Masterclass');" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.9rem;font-weight:700;text-decoration:none;transition:all 0.2s;cursor:pointer;">Register Interest →</a>
-              <p style="text-align:center;font-size:0.73rem;color:var(--gray400);margin-top:8px;">EOI open now · Spots strictly limited</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- MMI Masterclass -->
-        <div style="background:var(--white);border:1px solid var(--gray200);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:all 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 40px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-          <div style="background:linear-gradient(135deg,#1a0a3c,#2d1060);padding:28px 28px 22px;">
-            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);border-radius:50px;padding:5px 14px;font-size:0.72rem;font-weight:700;color:#c4b5fd;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:16px;">🎤 MMI Masterclass</div>
-            <h3 style="font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2;">MMI Interview<br>Masterclass</h3>
-            <p style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-bottom:12px;">2–2.5 hours · Online via Zoom</p>
-            <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
-              <div style="background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
-                <div style="font-size:1.1rem;font-weight:800;color:#c4b5fd;">Early Sept</div>
-                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">2025</div>
-              </div>
-              <div style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
-                <div style="font-size:1.1rem;font-weight:800;color:#fbbf24;">$400</div>
-                <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">per person</div>
-              </div>
-            </div>
-          </div>
-          <div style="padding:22px 28px;flex:1;display:flex;flex-direction:column;gap:12px;">
-            <p style="font-size:0.75rem;font-weight:700;color:#7c3aed;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:2px;">Session Structure</p>
-            <div style="display:flex;flex-direction:column;gap:7px;">
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">1.</span>Looking the part — camera setup, presentation, and what to do before you log in</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">2.</span>What MMI examiners are really looking for — Dan's inside view</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">3.</span>The mistakes that sink good candidates — and how to avoid them</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">4.</span>The skills that actually matter — including how to express emotion authentically</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">5.</span>What Dan looks for when assessing students — his personal marking philosophy, explained in full</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">6.</span>Every station type covered — with model answers and live breakdown</div>
-              <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">7.</span>Your questions answered — nothing is off the table</div>
-            </div>
-            <div style="margin-top:auto;padding-top:12px;">
-              <a href="#" onclick="event.preventDefault();openEnquiry('MMI Masterclass');" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:50px;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;font-size:0.9rem;font-weight:700;text-decoration:none;transition:all 0.2s;cursor:pointer;">Register Interest →</a>
-              <p style="text-align:center;font-size:0.73rem;color:var(--gray400);margin-top:8px;">EOI open now · Spots strictly limited</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- EOI callout -->
-      <div class="fade-up" style="max-width:620px;margin:0 auto;background:var(--white);border:1px solid var(--gray200);border-radius:var(--radius-sm);padding:22px 28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-        <div style="font-size:1.6rem;">📩</div>
-        <div style="flex:1;min-width:200px;">
-          <p style="font-size:0.92rem;font-weight:700;color:var(--navy);margin-bottom:3px;">Expressions of interest open year-round</p>
-          <p style="font-size:0.83rem;color:var(--gray600);">Email Dan any time to secure your spot before they open publicly — masterclasses fill fast.</p>
-        </div>
-        <a href="#" onclick="event.preventDefault();openEnquiry('General Enquiry');" style="display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.87rem;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;cursor:pointer;">Send EOI →</a>
-      </div>
-
-    </div>
-  </section>
 
   </section>
 
