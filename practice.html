@@ -134,7 +134,8 @@
     .eq-success-sub { color:rgba(255,255,255,0.5); font-size:0.85rem; }
 
     .main-content { display:flex; flex-direction:column; gap:20px; }
-    .station-header { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); padding:20px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+    /* Sticky station header — keeps timer visible while user types/scrolls. */
+    .station-header { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); padding:20px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; position:sticky; top:76px; z-index:50; box-shadow:0 2px 12px rgba(10,22,40,0.04); }
     .station-num { font-size:0.78rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray400); }
     .category-pill { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:50px; font-size:0.78rem; font-weight:700; }
     .cat-ethics { background:rgba(245,158,11,0.12); color:#b45309; }
@@ -318,7 +319,17 @@
     /* ── Category badge for MMI ── */
     .cat-mmi { background:rgba(139,92,246,0.12); color:#7c3aed; }
 
-    @media (max-width:600px) { .app-wrapper { padding:80px 16px 32px; } .scenario-top,.prompts-area,.answer-section,.review-list,.review-trend,.review-footer { padding:20px; } .review-stat-row { grid-template-columns:repeat(2,1fr); } .review-header { padding:24px 20px; } }
+    @media (max-width:600px) {
+      .app-wrapper { padding:80px 16px 32px; }
+      .scenario-top,.prompts-area,.answer-section,.review-list,.review-trend,.review-footer { padding:20px; }
+      .review-stat-row { grid-template-columns:repeat(2,1fr); }
+      .review-header { padding:24px 20px; }
+      /* Tighter sticky header on mobile so it doesn't eat the screen */
+      .station-header { padding:12px 14px; gap:10px; top:70px; border-radius:12px; }
+      .timer-num { font-size:1.2rem; min-width:52px; }
+      .phase-badge { font-size:0.66rem; padding:3px 10px; }
+      .station-num { font-size:0.7rem; }
+    }
   
     /* ── DAN MARKING CTA ── */
     .dan-marking-card { background:linear-gradient(135deg,var(--navy) 0%,#0d2a52 100%); border-radius:16px; padding:22px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; margin:16px 0; border:1px solid rgba(14,165,233,0.2); position:relative; overflow:hidden; }
@@ -795,68 +806,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <button class="btn-webcam-restart" id="btnRestartRecording" disabled title="Restart this station">↺</button>
           <button class="btn-webcam-dl" id="btnDownloadVideo" disabled title="Save recording — available anytime during or after recording">⬇ Save</button>
         </div>
-      </div>
-    </div>
-
-    <!-- Leaderboard - collapsible -->
-    <div class="sidebar-card" id="leaderboardCard" style="padding:0;overflow:hidden;">
-      <div onclick="toggleLeaderboard()" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none;">
-        <h3 style="margin:0;">🏆 Today's Leaderboard</h3>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:0.68rem;font-weight:600;color:var(--teal3);background:rgba(14,165,233,0.1);padding:2px 8px;border-radius:50px;">Live</span>
-          <span id="lbCollapseIcon" style="font-size:0.72rem;color:var(--gray400);transition:transform 0.25s;display:inline-block;">▼</span>
-        </div>
-      </div>
-      <!-- Collapsed preview: always visible -->
-      <div id="lbCollapsedPreview" style="padding:0 16px 14px;border-top:1px solid var(--gray100);">
-        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
-          <div style="flex:1;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:8px 10px;">
-            <div style="font-size:0.62rem;color:var(--gray400);margin-bottom:2px;">🥇 Top Today</div>
-            <div style="font-size:0.8rem;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="lbTop1Name">—</div>
-            <div style="font-size:0.75rem;color:var(--gold);font-weight:700;" id="lbTop1Score">—</div>
-          </div>
-          <div style="flex:1;background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.15);border-radius:8px;padding:8px 10px;">
-            <div style="font-size:0.62rem;color:var(--gray400);margin-bottom:2px;">📍 Your Rank</div>
-            <div style="font-size:0.8rem;font-weight:700;color:var(--teal3);" id="lbYourRankNum">—</div>
-            <div style="font-size:0.68rem;font-weight:600;color:var(--gray400);" id="lbYourQPill">Complete a station</div>
-          </div>
-        </div>
-      </div>
-      <!-- Expanded full board -->
-      <div id="lbExpanded" style="display:none;border-top:1px solid var(--gray100);padding:14px 16px;">
-        <div id="streakWrap" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;">
-          <span style="font-size:1.2rem;">🔥</span>
-          <div>
-            <div style="font-size:0.82rem;font-weight:700;color:var(--navy);" id="streakText">Start practising to build a streak</div>
-            <div style="font-size:0.7rem;color:var(--gray400);" id="streakSub">Complete at least 1 station per day</div>
-          </div>
-        </div>
-        <div id="lbYourRank" style="display:none;padding:10px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:8px;margin-bottom:10px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div>
-              <div style="font-size:0.78rem;color:var(--teal3);font-weight:700;">Your Ranking</div>
-              <div style="font-size:1.1rem;font-weight:800;color:var(--navy);" id="lbYourPos">#—</div>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-size:0.78rem;color:var(--gray400);">Quartile</div>
-              <div style="font-size:1rem;font-weight:800;" id="lbYourQ">—</div>
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px;" id="lbRows">
-          <div style="font-size:0.72rem;color:var(--gray400);padding:0 4px 4px;display:flex;justify-content:space-between;"><span>Student</span><span>Avg Score</span></div>
-        </div>
-        <div style="margin-top:12px;">
-          <div style="font-size:0.7rem;color:var(--gray400);margin-bottom:6px;">Score Distribution Today</div>
-          <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;gap:1px;" id="lbDistBar">
-            <div style="flex:1;background:#ef4444;border-radius:3px 0 0 3px;"></div>
-            <div style="flex:1.5;background:#f59e0b;"></div>
-            <div style="flex:2;background:#0ea5e9;"></div>
-            <div style="flex:1;background:#22c55e;border-radius:0 3px 3px 0;"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--gray400);margin-top:3px;"><span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span></div>
-        </div>
-        <div style="font-size:0.68rem;color:var(--gray400);margin-top:10px;text-align:center;" id="lbParticipants">— students practising today</div>
       </div>
     </div>
 
@@ -1520,7 +1469,10 @@ answerTextarea.addEventListener('input',()=>{
   const n=wc(answerTextarea.value);wordCountEl.textContent=n+' word'+(n!==1?'s':'');
   const aiwrap=$('btnGetAIWrap');
   if(aiwrap){
-    const show=(n>20&&phase==='writing');
+    // Show while writing OR after time expires (done phase with textarea still open).
+    // Hide once this station has already been AI-marked.
+    const alreadyMarked = sessionHistory[currentIdx] && sessionHistory[currentIdx].score != null;
+    const show=(n>20 && (phase==='writing' || phase==='done') && !alreadyMarked);
     aiwrap.style.display=show?'inline-flex':'none';
     const limits = Key2MDAuth.getLimits();
     const toolLimits = limits?.casper;
@@ -1813,6 +1765,16 @@ async function finishStation(){
     saveAnswer();
   }
   setPhaseUI('done');updateBtns();
+  // Re-evaluate AI button visibility — textarea may stay open in non-strict mode,
+  // so user must still be able to get AI feedback even if they stop typing.
+  if(!isMmi){
+    const aiwrap=$('btnGetAIWrap');
+    if(aiwrap){
+      const n=wc(answerTextarea.value);
+      const alreadyMarked = sessionHistory[currentIdx] && sessionHistory[currentIdx].score != null;
+      aiwrap.style.display = (n>20 && !alreadyMarked) ? 'inline-flex' : 'none';
+    }
+  }
 }
 
 function saveAnswer(){if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;}
@@ -1833,6 +1795,11 @@ try {
   updateBtns(); // ← ALWAYS runs
 }
   if(btn){btn.textContent='✦ Get AI Feedback';}
+  // Hide the button once this station has been marked — prevents confusion/re-clicks.
+  if(sessionHistory[currentIdx] && sessionHistory[currentIdx].score != null){
+    if(wrap) wrap.style.display='none';
+    return;
+  }
   // After marking, update based on server limits
   const limits = Key2MDAuth.getLimits();
   const toolLimits = limits?.casper;
@@ -1858,6 +1825,12 @@ try {
 
 async function runAI(idx){
   const h=sessionHistory[idx];if(!h||!h.answer.trim())return;
+
+  // ── Guard: don't re-mark if already scored (prevents accidental double-charge) ──
+  if(h.score != null && h.feedback){
+    showFeedback(h.score, h.feedback);
+    return;
+  }
 
   // ── Block MMI AI marking ──
   if(currentMode===MODE_MMI){
