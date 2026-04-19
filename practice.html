@@ -410,6 +410,9 @@
 .k2-nav-links a.k2-gold:hover{color:#fbbf24;}
 .k2-nav-links a.k2-purple{color:#a78bfa;font-weight:700;}
 .k2-nav-links a.k2-purple:hover{color:#c4b5fd;}
+.k2-nav-links a.k2-green{color:#22c55e;font-weight:700;}
+.k2-nav-links a.k2-green:hover{color:#4ade80;}
+.k2-mobile-nav a.k2-green{color:#22c55e;font-weight:700;}
 .k2-btn-nav{padding:9px 20px;border-radius:50px;background:#0ea5e9;color:#fff!important;font-size:0.88rem;font-weight:600;transition:all 0.2s;white-space:nowrap;text-decoration:none;display:inline-block;border:none;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;}
 .k2-btn-nav:hover{background:#38bdf8;transform:translateY(-1px);}
 /* Active page highlight */
@@ -452,10 +455,10 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <a href="index.html" class="k2-logo">Key<span>2</span>MD</a>
     <ul class="k2-nav-links">
       <li><a href="index.html" data-nav="home">Home</a></li>
-      <li><a href="about.html" data-nav="about">About</a></li>
       <li><a href="testimonials.html" data-nav="results">Results</a></li>
       <li><a href="plans.html" data-nav="plans">Plans</a></li>
       <li><a href="guide.html" data-nav="guide">Free Guide</a></li>
+      <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">📊 Chances</a></li>
       <li><a href="practice.html" class="k2-gold" data-nav="practice">🎯 CASPer Practice</a></li>
       <li><a href="gamsat-s2-practice.html" class="k2-purple" data-nav="gamsat">✍️ GAMSAT S2</a></li>
       <li><a href="blog.html" data-nav="blog">Blog</a></li>
@@ -469,6 +472,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <a href="testimonials.html">Results</a>
     <a href="plans.html">Plans &amp; Pricing</a>
     <a href="guide.html">📖 Free Guide</a>
+    <a href="medical-school-chances.html" class="k2-green">📊 Chances Calculator</a>
     <a href="practice.html" class="k2-gold">🎯 CASPer Practice</a>
     <a href="gamsat-s2-practice.html" class="k2-purple">✍️ GAMSAT S2 Practice</a>
     <a href="blog.html">Blog</a>
@@ -525,7 +529,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
   </div>
 </div>
 
-<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Free CASPer & MMI Practice Tool — Australian Medical Applicants</h1>
 <div class="app-wrapper">
   <aside class="sidebar">
     <!-- Mode Toggle -->
@@ -1051,6 +1054,14 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 <button id="bugBtn" onclick="openBugReport()" style="position:fixed;bottom:24px;right:24px;z-index:1200;background:var(--white);border:1.5px solid var(--gray200);border-radius:50px;padding:10px 18px;font-size:0.82rem;font-weight:600;color:var(--gray600);cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,0.1);display:flex;align-items:center;gap:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal3)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">
   🐛 Any issues?
 </button>
+
+<div style="background:var(--gray50);padding:28px 24px;border-top:1px solid var(--gray200);">
+  <div style="max-width:720px;margin:0 auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center;text-align:center;">
+    <div style="font-size:0.92rem;color:var(--gray600);line-height:1.55;">
+      <strong style="color:var(--navy);">Before you start practising:</strong> use the free <a href="medical-school-chances.html" style="color:#16a34a;font-weight:700;text-decoration:underline;text-underline-offset:3px;">📊 Chances Calculator</a> to see where your combo sits at every Australian medical school — so you know which interviews you're preparing for.
+    </div>
+  </div>
+</div>
 
 <footer>
   <div class="footer-inner">
@@ -1926,6 +1937,8 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
     h.score=fb.score;h.feedback=fb;
     updateLimitUI();
     showFeedback(fb.score,fb);updateTrend();updateAvgStat();
+    // Persistent progress tracking for conversion nudges
+    try{ k2TrackCompletion(fb.score); }catch(e){}
   }catch(err){
     getAiFbEl().innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">AI marking failed. (${err.message})</div>`;
   }
@@ -2973,6 +2986,154 @@ function subscribePractice(){
   .catch(function(){document.getElementById('practiceEmailForm').style.display='none';document.getElementById('practiceEmailDone').style.display='block';});
 }
 window.subscribePractice=subscribePractice;
+
+// ═══════════════════════════════════════════════════════════
+// PROGRESS TRACKING & CONVERSION NUDGES
+const K2_PROGRESS_KEY = 'k2md_practice_progress_v1';
+const K2_NUDGE_DISMISSED_KEY = 'k2md_nudge_dismissed_v1';
+
+function k2GetProgress(){
+  try{
+    const raw = localStorage.getItem(K2_PROGRESS_KEY);
+    return raw ? JSON.parse(raw) : {count:0, scores:[], firstSeen:Date.now()};
+  }catch(e){ return {count:0, scores:[], firstSeen:Date.now()}; }
+}
+function k2SaveProgress(p){
+  try{ localStorage.setItem(K2_PROGRESS_KEY, JSON.stringify(p)); }catch(e){}
+}
+function k2GetDismissed(){
+  try{ return JSON.parse(localStorage.getItem(K2_NUDGE_DISMISSED_KEY) || '{}'); }
+  catch(e){ return {}; }
+}
+function k2Dismiss(nudgeKey){
+  const d = k2GetDismissed();
+  d[nudgeKey] = Date.now();
+  try{ localStorage.setItem(K2_NUDGE_DISMISSED_KEY, JSON.stringify(d)); }catch(e){}
+  const el = document.getElementById('k2Nudge');
+  if (el) el.remove();
+}
+window.k2Dismiss = k2Dismiss;
+
+function k2TrackCompletion(score){
+  const p = k2GetProgress();
+  p.count = (p.count || 0) + 1;
+  p.scores = p.scores || [];
+  p.scores.push({score:score, at:Date.now()});
+  // Keep last 20
+  if (p.scores.length > 20) p.scores = p.scores.slice(-20);
+  k2SaveProgress(p);
+  // Render appropriate nudge
+  setTimeout(() => k2RenderNudge(), 400);  // after feedback animates in
+}
+
+function k2DetectPlateau(scores){
+  // Look at last 4 sessions; if std dev < 0.8 AND avg < 7, it's a plateau
+  if (scores.length < 4) return false;
+  const last = scores.slice(-4).map(s => s.score).filter(s => s != null);
+  if (last.length < 4) return false;
+  const avg = last.reduce((a,b)=>a+b,0) / last.length;
+  const variance = last.reduce((a,b) => a + Math.pow(b-avg, 2), 0) / last.length;
+  const std = Math.sqrt(variance);
+  return std < 0.8 && avg < 7;
+}
+
+function k2RenderNudge(){
+  const p = k2GetProgress();
+  const dismissed = k2GetDismissed();
+  const count = p.count || 0;
+  const scores = (p.scores || []).map(s => s.score).filter(s => s != null);
+  const avgScore = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
+
+  // Remove any existing nudge
+  const existing = document.getElementById('k2Nudge');
+  if (existing) existing.remove();
+
+  let nudge = null;
+
+  // Plateau detection (highest priority after 4+ sessions)
+  if (count >= 4 && !dismissed['plateau'] && k2DetectPlateau(p.scores)) {
+    nudge = {
+      key: 'plateau',
+      badge: '📊 Progress Insight',
+      title: "Your last few scores are clustered around the same mark.",
+      body: "Most students hit this wall — and it's usually the same 2-3 habits causing it. A 1-hour session with Dan will identify exactly what's holding your score steady. Students typically see a 1-2 quartile jump in their next 5 stations.",
+      cta: {text:'Book a 1-Hour Session — $300 →', href:'https://calendly.com/brittainmbbs/1-1-tutoring-1-hour'},
+      secondary: {text:'Or 15-min chat (free)', href:'https://calendly.com/brittainmbbs/30min'},
+    };
+  }
+  // 15+ sessions — serious learner
+  else if (count >= 15 && !dismissed['serious']) {
+    nudge = {
+      key: 'serious',
+      badge: '🎯 You\'re seriously preparing',
+      title: `${count} stations completed. You're in the top 5% of users.`,
+      body: `Your average is ${avgScore?avgScore.toFixed(1):'—'}/10. At this volume of prep, the next gain usually comes from targeted feedback — not more reps. Book a session to refine the specifics before your real CASPer or MMI.`,
+      cta: {text:'Book a 1-Hour Session — $300 →', href:'https://calendly.com/brittainmbbs/1-1-tutoring-1-hour'},
+      secondary: {text:'Submit 1 response for expert marking ($35)', href:'#', onclick:"openMarkingModal();return false;"},
+    };
+  }
+  // 8-14 sessions — regular user
+  else if (count >= 8 && count < 15 && !dismissed['regular']) {
+    nudge = {
+      key: 'regular',
+      badge: '✨ You\'ve been practising',
+      title: `${count} stations done. Want Dan to mark one personally?`,
+      body: "AI feedback is great for pattern recognition, but for the nuance that moves you from Q3 to Q4, nothing beats an MD student who's coached 200+ applicants. $35 per CASPer response, 48hr turnaround.",
+      cta: {text:'Submit a Response — $35', href:'#', onclick:"openMarkingModal();return false;"},
+      secondary: {text:'Or book a full session', href:'https://calendly.com/brittainmbbs/1-1-tutoring-1-hour'},
+    };
+  }
+  // 3-7 sessions — first real check-in
+  else if (count >= 3 && count < 8 && !dismissed['first']) {
+    nudge = {
+      key: 'first',
+      badge: '💡 Tip',
+      title: `${count} sessions in. Know where you actually stand?`,
+      body: "The AI score is a rough guide. If you want Dan (UniMelb MD · 200+ students · 42 med offers) to personally tell you what a Q4 response would look like for your answer — that's what expert marking is for.",
+      cta: {text:'Expert Marking — $35', href:'#', onclick:"openMarkingModal();return false;"},
+      secondary: null,
+    };
+  }
+
+  if (!nudge) return;
+
+  // Find the right container — the AI feedback panel on the active mode
+  const container = getAiFbEl ? getAiFbEl() : null;
+  if (!container) return;
+
+  const el = document.createElement('div');
+  el.id = 'k2Nudge';
+  el.style.cssText = 'margin-top:18px;background:linear-gradient(135deg,#0a1628,#0d2a52);border:1px solid rgba(14,165,233,0.3);border-radius:14px;padding:20px 22px;color:#fff;font-family:inherit;position:relative;animation:k2NudgeFadeIn 0.4s ease-out;';
+  el.innerHTML = `
+    <button aria-label="Dismiss" onclick="k2Dismiss('${nudge.key}')" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:0.9rem;line-height:1;display:flex;align-items:center;justify-content:center;">✕</button>
+    <div style="display:inline-block;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#38bdf8;background:rgba(14,165,233,0.15);padding:4px 10px;border-radius:50px;margin-bottom:10px;">${nudge.badge}</div>
+    <div style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:8px;line-height:1.35;">${nudge.title}</div>
+    <p style="font-size:0.85rem;color:rgba(255,255,255,0.72);margin:0 0 14px;line-height:1.55;">${nudge.body}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+      <a href="${nudge.cta.href}" ${nudge.cta.onclick?`onclick="${nudge.cta.onclick}"`:'target="_blank" rel="noopener"'} style="display:inline-block;background:#0ea5e9;color:#fff;font-weight:700;font-size:0.88rem;padding:10px 20px;border-radius:50px;text-decoration:none;transition:all 0.2s;">${nudge.cta.text}</a>
+      ${nudge.secondary ? `<a href="${nudge.secondary.href}" ${nudge.secondary.onclick?`onclick="${nudge.secondary.onclick}"`:'target="_blank" rel="noopener"'} style="font-size:0.82rem;color:rgba(255,255,255,0.6);text-decoration:underline;text-underline-offset:3px;">${nudge.secondary.text}</a>` : ''}
+    </div>
+  `;
+  container.appendChild(el);
+}
+
+// Animation keyframes — inject once
+(function(){
+  if (document.getElementById('k2NudgeStyles')) return;
+  const s = document.createElement('style');
+  s.id = 'k2NudgeStyles';
+  s.textContent = '@keyframes k2NudgeFadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}';
+  document.head.appendChild(s);
+})();
+
+// Expose to global scope so they can be called after AI finishes scoring
+window.k2TrackCompletion = k2TrackCompletion;
+window.k2RenderNudge = k2RenderNudge;
+
+// Render any eligible nudge on page load (if user has past progress)
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(function(){ try{ k2RenderNudge(); }catch(e){} }, 1200);
+});
 
 </script>
 
