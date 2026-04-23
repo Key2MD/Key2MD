@@ -1563,7 +1563,18 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       const btn=item.querySelector('.faq-q');
       const answer=item.querySelector('.faq-a');
       const inner=item.querySelector('.faq-a-inner');
-      
+      answer.style.maxHeight='0px';
+      btn.addEventListener('click',()=>{
+        const isOpen=item.classList.contains('open');
+        faqItems.forEach(i=>{
+          i.classList.remove('open');
+          i.querySelector('.faq-a').style.maxHeight='0px';
+        });
+        if(!isOpen){
+          item.classList.add('open');
+          answer.style.maxHeight=inner.scrollHeight+'px';
+        }
+      });
     });
 
     // ── Email capture ──
