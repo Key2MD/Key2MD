@@ -13,7 +13,6 @@
 
   <title>Key2MD — MMI, CASPer &amp; GAMSAT S2 Coaching | Australia</title>
   <meta name="description" content="MMI, CASPer &amp; GAMSAT Section II coaching by Dan — UniMelb MD student. 200+ students, 93%+ offer rate. StudentVIP verified.">
-  <meta name="keywords" content="MMI coaching Australia, CASPer tutor Australia, GAMSAT Section 2 tutor, medical interview coaching Melbourne, MMI tutor Melbourne, CASPer preparation Australia, GAMSAT essay tutor, medical school coaching Australia, specialist training MMI, ophthalmology MMI, surgery MMI, RACGP CASPer, ACRRM CASPer, GP training interview, specialty training interview Australia, MMI Unimelb, MMI Monash, MMI UQ, CASPer Q4, medical school interview prep">
 
   <link rel="canonical" href="https://www.key2md.com/">
   <!-- Favicon (inline SVG, matches Key2MD brand) -->
@@ -48,7 +47,7 @@
     "priceRange": "$120 - $400",
     "areaServed": ["Melbourne","Sydney","Brisbane","Perth","Adelaide","Australia"],
     "serviceType": ["MMI Coaching","CASPer Tutoring","GAMSAT Section II Tutoring","Specialist Training MMI","GP Training CASPer","RACGP CASPer Preparation","ACRRM Interview Coaching"],
-    "aggregateRating": {"@type":"AggregateRating","ratingValue":"5","reviewCount":"200"}
+    "aggregateRating": {"@type":"AggregateRating","ratingValue":"5","reviewCount":"23","bestRating":"5","worstRating":"5"}
   }
   </script>
 
@@ -300,7 +299,6 @@
     .pricing-features{list-style:none;display:flex;flex-direction:column;gap:8px;flex:1}
     .pricing-feature{font-size:0.87rem;color:var(--gray600);display:flex;align-items:flex-start;gap:8px}
     .pricing-feature::before{content:'✓';color:var(--teal);font-weight:700;flex-shrink:0;margin-top:1px}
-    .friday-feature::before{color:#d97706!important}
 
     /* ── ENQUIRY SECTION ── */
     .enquiry-section{background:linear-gradient(135deg,var(--navy) 0%,#0d2a52 100%);padding:80px 0;position:relative;overflow:hidden}
@@ -491,15 +489,32 @@
     .stat-tooltip .tt-2024 .tt-row .tt-value{color:#e2e8f0;font-weight:700;}
     .stat-tooltip .tt-divider{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.10);}
     .stat-tooltip .tt-disclaimer{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);font-size:0.68rem;color:#64748b;}
-    /* On narrow viewports, disable the tooltip entirely — the 93%+ stat
-       stands on its own, and a properly-placed tooltip on mobile would need
-       more machinery than this cosmetic enhancement warrants. */
+
+    /* Mobile inline breakdown — replaces the desktop floating tooltip below 600px.
+       Sits directly inside the stats-bar as a full-width expandable panel so it
+       never has viewport-positioning bugs and works on every phone. */
+    .stat-breakdown-panel{display:none;}
     @media(max-width:600px){
+      /* Hide the desktop floating tooltip entirely on mobile */
       .stat-card-breakdown .stat-tooltip,
       .stat-card-breakdown .stat-tooltip-arrow{display:none!important;}
-      .stat-card-breakdown{cursor:default!important;}
-      .stat-card-breakdown .stat-label{text-decoration:none;}
-      .stat-card-breakdown .stat-label span:last-child{display:none!important;}  /* hide the "?" hint on mobile */
+      /* Show the inline panel container, but keep it collapsed by default */
+      .stat-breakdown-panel{display:block;grid-column:1 / -1;max-height:0;overflow:hidden;transition:max-height 0.3s ease,margin 0.3s ease,opacity 0.3s ease;opacity:0;margin:0 16px;}
+      .stat-breakdown-panel.open{max-height:520px;opacity:1;margin:8px 16px 16px;}
+      .stat-breakdown-inner{background:rgba(255,255,255,0.04);border:1px solid rgba(56,189,248,0.18);border-radius:14px;padding:18px 20px;color:#fff;font-size:0.82rem;line-height:1.5;text-align:left;}
+      .stat-breakdown-inner .sb-year{font-weight:700;color:#38bdf8;font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;}
+      .stat-breakdown-inner .sb-year.dim{color:#94a3b8;}
+      .stat-breakdown-inner .sb-row{display:flex;justify-content:space-between;gap:12px;padding:3px 0;}
+      .stat-breakdown-inner .sb-row .sb-key{color:#cbd5e1;}
+      .stat-breakdown-inner .sb-row .sb-value{color:#fff;font-weight:700;}
+      .stat-breakdown-inner .sb-2024 .sb-row .sb-key{color:#94a3b8;}
+      .stat-breakdown-inner .sb-2024 .sb-row .sb-value{color:#e2e8f0;}
+      .stat-breakdown-inner .sb-divider{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.10);}
+      .stat-breakdown-inner .sb-disclaimer{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);font-size:0.68rem;color:#64748b;}
+      /* On mobile, repurpose the "?" hint as a tap affordance */
+      .stat-card-breakdown{cursor:pointer!important;}
+      .stat-card-breakdown .stat-label span:last-child{background:rgba(56,189,248,0.18)!important;color:#38bdf8!important;border:1px solid rgba(56,189,248,0.35);}
+      .stat-card-breakdown.tooltip-open .stat-label span:last-child{background:#38bdf8!important;color:#0a1628!important;}
     }
     /* Subtle "tap for details" hint */
     .stat-card-breakdown .stat-label{text-decoration:underline;text-decoration-style:dotted;text-decoration-color:rgba(255,255,255,0.25);text-underline-offset:3px;}
@@ -543,6 +558,13 @@
     "@type": "EducationalOrganization",
     "name": "Key2MD",
     "url": "https://www.key2md.com",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5",
+      "reviewCount": "23",
+      "bestRating": "5",
+      "worstRating": "5"
+    },
     "review": [
       {
         "@type": "Review",
@@ -733,6 +755,10 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
             <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" class="btn btn-primary" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'hero_book_session'});">Book a 1-Hour Session — $300 →</a>
             <button class="hero-enquiry-btn" onclick="openEnquiry('General Enquiry')">Send an Enquiry</button>
           </div>
+          <a href="https://calendly.com/brittainmbbs/30min" target="_blank" rel="noopener" class="hero-intro-link fade-up delay-3 visible" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'hero_free_intro'});" style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:rgba(255,255,255,0.7);font-size:0.88rem;font-weight:500;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.3);padding-bottom:2px;transition:all 0.2s;" onmouseover="this.style.color='#38bdf8';this.style.borderBottomColor='#38bdf8'" onmouseout="this.style.color='rgba(255,255,255,0.7)';this.style.borderBottomColor='rgba(255,255,255,0.3)'">
+            <span style="display:inline-flex;width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,0.18);"></span>
+            Or book a free 15-min intro call — no commitment
+          </a>
           <a href="#results" class="fade-up delay-4 visible" style="display:inline-flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:28px;text-decoration:none;opacity:0.45;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='0.45'">
             <span style="font-size:0.72rem;font-weight:600;color:#fff;letter-spacing:0.08em;text-transform:uppercase;">See the 2025 results</span>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:bounceDown 1.8s ease-in-out infinite;">
@@ -764,26 +790,26 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <span class="stat-number" style="color:var(--teal2);">200+</span>
           <span class="stat-label">Students Tutored</span>
         </div>
-        <div class="stat-card stat-card-breakdown fade-up delay-1 visible" style="position:relative;cursor:pointer;" onclick="this.classList.toggle('tooltip-open')" onmouseenter="if(window.matchMedia('(hover:hover)').matches)this.classList.add('tooltip-open')" onmouseleave="if(window.matchMedia('(hover:hover)').matches)this.classList.remove('tooltip-open')">
+        <div class="stat-card stat-card-breakdown fade-up delay-1 visible" id="statCardBreakdown" style="position:relative;cursor:pointer;" onclick="window.toggleStatBreakdown && window.toggleStatBreakdown(this, event)" onmouseenter="if(window.matchMedia('(hover:hover)').matches)this.classList.add('tooltip-open')" onmouseleave="if(window.matchMedia('(hover:hover)').matches)this.classList.remove('tooltip-open')">
           <span class="stat-number" style="color:var(--teal2);">93%+</span>
           <span class="stat-label" style="display:flex;align-items:center;gap:5px;justify-content:center;">Offer Rate <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:0.65rem;font-weight:700;flex-shrink:0;">?</span></span>
           <div id="statTooltip" class="stat-tooltip">
-            <div class="stat-tooltip-arrow"></div>
             <div style="font-weight:700;margin-bottom:8px;color:var(--teal2);">2025 — Med School Offers from Interview</div>
             <div style="display:flex;flex-direction:column;gap:5px;">
               <div class="tt-row"><span class="tt-key">Domestic MMI</span><span class="tt-value">32/35</span></div>
               <div class="tt-row"><span class="tt-key">International MMI</span><span class="tt-value">10/10</span></div>
               <div class="tt-row"><span class="tt-key">CASPer Q4</span><span class="tt-value">34/38</span></div>
             </div>
-            <div class="tt-divider">
+            <div class="tt-divider tt-2024">
               <div class="tt-year-label">2024</div>
-              <div class="tt-2024" style="display:flex;flex-direction:column;gap:5px;">
+              <div style="display:flex;flex-direction:column;gap:5px;">
                 <div class="tt-row"><span class="tt-key">Domestic MMI</span><span class="tt-value">24/27</span></div>
                 <div class="tt-row"><span class="tt-key">International MMI</span><span class="tt-value">6/6</span></div>
                 <div class="tt-row"><span class="tt-key">CASPer Q4</span><span class="tt-value">20/23</span></div>
               </div>
             </div>
             <div class="tt-disclaimer">Tracked students only. Individual results vary.</div>
+            <div class="stat-tooltip-arrow"></div>
           </div>
         </div>
         <div class="stat-card fade-up delay-2 visible">
@@ -794,9 +820,93 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <span class="stat-number" style="color:#22c55e;">✓</span>
           <span class="stat-label">StudentVIP Verified</span>
         </div>
+        <!-- Mobile inline breakdown panel (hidden on desktop, shown when 93% card is tapped on mobile) -->
+        <div class="stat-breakdown-panel" id="statBreakdownPanel" aria-hidden="true">
+          <div class="stat-breakdown-inner">
+            <div class="sb-year">2025 — Med School Offers from Interview</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div class="sb-row"><span class="sb-key">Domestic MMI</span><span class="sb-value">32 / 35</span></div>
+              <div class="sb-row"><span class="sb-key">International MMI</span><span class="sb-value">10 / 10</span></div>
+              <div class="sb-row"><span class="sb-key">CASPer Q4</span><span class="sb-value">34 / 38</span></div>
+            </div>
+            <div class="sb-divider sb-2024">
+              <div class="sb-year dim">2024</div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <div class="sb-row"><span class="sb-key">Domestic MMI</span><span class="sb-value">24 / 27</span></div>
+                <div class="sb-row"><span class="sb-key">International MMI</span><span class="sb-value">6 / 6</span></div>
+                <div class="sb-row"><span class="sb-key">CASPer Q4</span><span class="sb-value">20 / 23</span></div>
+              </div>
+            </div>
+            <div class="sb-disclaimer">Tracked students only. Individual results vary.</div>
+          </div>
+        </div>
       </div>
     </div>
+    <script>
+      // Single click handler — drives both the desktop tooltip AND the mobile inline panel.
+      window.toggleStatBreakdown = function(card, ev){
+        if(ev){ ev.stopPropagation(); }
+        var open = card.classList.toggle('tooltip-open');
+        var panel = document.getElementById('statBreakdownPanel');
+        if(panel){
+          panel.classList.toggle('open', open);
+          panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+        }
+      };
+      // Tap-outside to close on mobile
+      document.addEventListener('click', function(ev){
+        var card = document.getElementById('statCardBreakdown');
+        var panel = document.getElementById('statBreakdownPanel');
+        if(!card || !panel) return;
+        if(card.contains(ev.target) || panel.contains(ev.target)) return;
+        card.classList.remove('tooltip-open');
+        panel.classList.remove('open');
+        panel.setAttribute('aria-hidden', 'true');
+      });
+    </script>
   </section>
+
+  <!-- ═══ SOCIAL PROOF STRIP — named voices right after the numbers ═══ -->
+  <section class="proof-strip" style="background:linear-gradient(180deg,var(--navy2) 0%,var(--navy) 100%);padding:48px 0 56px;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div class="container">
+      <div class="proof-strip-grid fade-up" style="display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:center;max-width:1080px;margin:0 auto;">
+
+        <!-- Avatars -->
+        <div class="proof-avatars" style="display:flex;align-items:center;flex-shrink:0;">
+          <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;color:#fff;border:2.5px solid var(--navy);">A</div>
+          <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;color:#fff;border:2.5px solid var(--navy);margin-left:-14px;">C</div>
+          <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;color:#fff;border:2.5px solid var(--navy);margin-left:-14px;">S</div>
+          <div style="width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.06);border:2.5px solid var(--navy);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.55);margin-left:-14px;">+more</div>
+        </div>
+
+        <!-- Quote -->
+        <div class="proof-quote">
+          <div style="display:flex;gap:2px;margin-bottom:8px;color:#fbbf24;font-size:0.92rem;letter-spacing:1px;">★★★★★</div>
+          <p style="color:rgba(255,255,255,0.92);font-size:1.05rem;line-height:1.55;font-style:italic;margin:0 0 10px;font-family:'DM Serif Display',Georgia,serif;font-weight:400;letter-spacing:-0.2px;">
+            &ldquo;I got into all 6 universities I applied to. Dan&rsquo;s MMI coaching was the difference-maker.&rdquo;
+          </p>
+          <p style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin:0;">
+            <strong style="color:#fff;font-weight:700;">Alethea</strong> &middot; ANU Medicine &middot; <span style="color:var(--teal2);">StudentVIP Verified</span>
+          </p>
+        </div>
+
+        <!-- Link -->
+        <a href="testimonials.html" class="proof-link" style="flex-shrink:0;display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:50px;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.3);color:#fff;font-size:0.85rem;font-weight:600;text-decoration:none;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.background='rgba(14,165,233,0.22)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(14,165,233,0.12)';this.style.transform=''">
+          Read every student story <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+    <style>
+      @media(max-width:780px){
+        .proof-strip-grid{grid-template-columns:1fr!important;text-align:center;justify-items:center;gap:18px!important;}
+        .proof-strip-grid .proof-avatars{justify-content:center;}
+        .proof-strip-grid .proof-quote{text-align:center;}
+        .proof-strip-grid .proof-quote > div:first-child{justify-content:center;}
+      }
+    </style>
+  </section>
+
+  <!-- ═══ ABOUT ═══ -->
 
   <!-- ═══ ABOUT ═══ -->
   <section class="about" id="about">
@@ -1435,18 +1545,18 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           </ul>
           <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" class="btn btn-dark" style="width:100%;justify-content:center;" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'pricing_book_11'});">Book 1:1 — $300/hr →</a>
         </div>
-        <div class="pricing-card fade-up delay-1 visible" style="border:2px solid rgba(245,158,11,0.5);background:linear-gradient(180deg,#fffbf0 0%,#fff 100%);position:relative;">
+        <div class="pricing-card featured fade-up delay-1 visible" style="border-color:rgba(245,158,11,0.4);background:linear-gradient(180deg,#fffbf0 0%,#fff 100%);">
           <span class="featured-tag" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;">⭐ Most Popular</span>
           <div class="pricing-label" style="color:#d97706;">Friday Group Class</div>
-          <div class="pricing-title" style="color:#0a1628;">Friday CASPer Classes</div>
-          <div class="pricing-price" style="color:#d97706;">$120 <sub style="color:#92400e;">/ session</sub></div>
-          <p class="pricing-desc" style="color:#44403c;">The weekly class that produced 34 Q4s in 2025. Drop in any Friday — get individually scored feedback and peer benchmarking.</p>
+          <div class="pricing-title">Friday CASPer Classes</div>
+          <div class="pricing-price" style="color:#d97706;">$120 <sub>/ session</sub></div>
+          <p class="pricing-desc">The weekly class that produced 34 Q4s in 2025. Drop in any Friday — get individually scored feedback and peer benchmarking.</p>
           <ul class="pricing-features">
-            <li class="pricing-feature friday-feature" style="color:#44403c;"><strong style="color:#0a1628;">Individual feedback from Dan</strong> on your response</li>
-            <li class="pricing-feature friday-feature" style="color:#44403c;">Peer benchmarking against 8–12 other students</li>
-            <li class="pricing-feature friday-feature" style="color:#44403c;">Live station walk-throughs &amp; common traps</li>
-            <li class="pricing-feature friday-feature" style="color:#44403c;">Fridays 6:00pm AEST via Zoom</li>
-            <li class="pricing-feature friday-feature" style="color:#44403c;">Drop in any week — no commitment</li>
+            <li class="pricing-feature"><strong>Individual feedback from Dan</strong> on your response</li>
+            <li class="pricing-feature">Peer benchmarking against 8–12 other students</li>
+            <li class="pricing-feature">Live station walk-throughs &amp; common traps</li>
+            <li class="pricing-feature">Fridays 6:00pm AEST via Zoom</li>
+            <li class="pricing-feature">Drop in any week — no commitment</li>
           </ul>
           <a href="#casper-classes" class="btn btn-primary" style="width:100%;justify-content:center;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;box-shadow:0 4px 20px rgba(245,158,11,0.35);">Reserve My Spot →</a>
         </div>
