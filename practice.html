@@ -1084,20 +1084,9 @@ const STATIONS=[
 {category:"Professionalism",scenario:"After spending days developing an innovative idea, you're ready to share it with colleagues. Before you can present it, team member Lucas stands up in an all-hands meeting and delivers your idea almost word-for-word, claiming it as his own and accepting significant praise from leadership. You are stunned. Others in the room do not know the idea originated with you.",prompt1:"Do you speak up, or do you keep quiet?",prompt2:"Imagine it was your boss who took credit for your hard work. Would this change your reaction?"},
 {category:"Professionalism",scenario:"You are organising a group trip with the university Chess club and are in charge as a senior executive. The trip is an important club event with students from multiple universities attending. One night, a junior player sneaks alcohol into the hotel room. You catch him mid-drink. He begs you not to say anything, claiming he'll be kicked out of the club. Other junior players are watching to see what you do.",prompt1:"Do you remove the player from the trip?",prompt2:"How can you prevent such an incident from happening again?"},
 {category:"Ethics",scenario:"Your close friend Savanna — someone you've known for over ten years and consider family — has been using your credit card to make personal purchases without your knowledge. You discover this reviewing your transaction history. The total is over $800. When you confront her, she becomes tearful and admits it, saying she was going through a financial crisis and was too embarrassed to ask for help.",prompt1:"What will you do?",prompt2:"What does this situation reveal about the tension between compassion for someone you love and the need to hold people accountable for their choices?"},
-,
-,
-,
-,
-,
-,
-
-
 {category:"Personal",scenario:"You are a junior lawyer offered a prestigious interstate training opportunity. It requires 5 days a week away for 6 months to 2 years. Your partner struggles with depression and asks you to postpone and reapply in a couple of years — you're unsure the opportunity will exist then.",prompt1:"How would you approach this decision?",prompt2:"What considerations are most important?"},
 {category:"Professionalism",scenario:"You've been working at a consulting firm for a few months. A senior executive of the opposite sex who has influence over promotions has taken a noticeable interest in your work. On a Friday evening, they approach you: 'You've been doing really well lately — why don't you join me for a drink nearby?'",prompt1:"What would be going through your mind?",prompt2:"What would you say to this executive?"},
-{category:"Conflict Resolution",scenario:"Priya, a junior team member, regularly contributes creative ideas in meetings, but they're quickly brushed aside by senior members who call them unrealistic. Priya tells you privately she feels discouraged and believes she isn't being taken seriously because of her junior status.",prompt1:"What would you say to Priya?",prompt2:"If you were head of this team, how would you ensure equity among members?"},
-,
-,
-,
+{category:"Conflict Resolution",scenario:"Priya, a junior team member, regularly contributes creative ideas in meetings, but they're quickly brushed aside by senior members who call them unrealistic. Priya tells you privately she feels discouraged and believes she isn't being taken seriously because of her junior status.",prompt1:"What would you say to Priya?",prompt2:"If you were head of this team, how would you ensure equity among members?"}
 
 // ── BATCH 1: 20 stations from previous session ──
 ,{category:"Ethics",scenario:"You are a close friend. Your friend Daniel has been battling severe depression for the past year and has been isolating himself from most people. He has recently confided in you — and only you — that he has been secretly researching assisted dying options, not because he has a terminal illness, but because he feels his quality of life is unbearable. He hasn't said he is going to act on anything, and he was very clear that he only told you because he trusted you completely and does not want you to involve anyone else. You are genuinely worried.",prompt1:"What is going through your mind, and what do you say to Daniel in this moment?",prompt2:"Daniel asks you directly: 'You're not going to tell anyone, are you?' How do you respond?"}
@@ -1290,6 +1279,10 @@ const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev'; // Change if usi
 const AI_LIMIT_MAX = 1;
 let aiEnabled=true;
 function updateLimitUI(){
+  // Defensive: auth.js is loaded with `defer`, but this script is inline and runs first.
+  // Bail out gracefully on the initial top-level call; Key2MDAuth.init() will trigger
+  // updateLimitUI again via onAuthChange/onLimitsLoaded once auth.js has loaded.
+  if(typeof Key2MDAuth === 'undefined') return;
   const limits = Key2MDAuth.getLimits();
   const loggedIn = Key2MDAuth.isLoggedIn();
   const el = document.getElementById('aiLimitCount');
