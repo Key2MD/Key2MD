@@ -15,8 +15,11 @@
   <meta name="description" content="Meet Dan — University of Melbourne MD student and Australia's most trusted MMI, CASPer and GAMSAT Section II tutor. 200+ students coached.">
   <link rel="canonical" href="https://www.key2md.com/about.html">
   <!-- Favicon (inline SVG, matches Key2MD brand) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a1628'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' font-size='28' font-weight='800' fill='white'%3EK%3Ctspan fill='%230ea5e9'%3E2%3C/tspan%3E%3C/text%3E%3C/svg%3E">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%230a1628'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' font-size='80' font-weight='800' fill='white'%3EK%3Ctspan fill='%230ea5e9'%3E2%3C/tspan%3E%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta property="og:title" content="About Dan — MMI, CASPer &amp; GAMSAT Tutor">
   <meta property="og:description" content="UniMelb MD student. 200+ students coached across MMI, CASPer and GAMSAT S2.">
   <meta property="og:type" content="profile">
@@ -642,14 +645,57 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Dan Brittain",
-    "jobTitle": "Medical Entrance Exam Tutor",
-    "description": "University of Melbourne MD student and Australia's most trusted MMI, CASPer and GAMSAT Section II tutor. 200+ students coached, 93%+ offer rate.",
-    "url": "https://www.key2md.com/about.html",
-    "image": "https://www.key2md.com/key2md-og.png",
-    "alumniOf": {"@type": "EducationalOrganization", "name": "University of Melbourne"},
-    "knowsAbout": ["MMI coaching", "CASPer preparation", "GAMSAT Section II", "Australian medical school admissions"]
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://www.key2md.com/about.html#dan",
+        "name": "Dan Brittain",
+        "givenName": "Dan",
+        "familyName": "Brittain",
+        "jobTitle": "Australian Medical Entrance Tutor",
+        "description": "University of Melbourne MD student. 99.85 ATAR. r/GAMSAT community-endorsed tutor with 200+ students coached for MMI, CASPer and GAMSAT Section II. 93%+ offer rate across tracked domestic MMI students.",
+        "url": "https://www.key2md.com/about.html",
+        "image": "https://www.key2md.com/Selfie.jpg",
+        "alumniOf": [
+          {
+            "@type": "CollegeOrUniversity",
+            "name": "University of Melbourne",
+            "sameAs": "https://www.unimelb.edu.au/"
+          },
+          {
+            "@type": "CollegeOrUniversity",
+            "name": "University of Queensland",
+            "sameAs": "https://www.uq.edu.au/"
+          }
+        ],
+        "knowsAbout": [
+          "Multiple Mini Interview (MMI) preparation",
+          "CASPer test preparation",
+          "GAMSAT Section II essay writing",
+          "Australian medical school admissions",
+          "GEMSAS application process",
+          "RACGP CASPer for GP training",
+          "ACRRM CASPer for rural GP training",
+          "Specialist training MMI selection",
+          "Medical ethics scenarios"
+        ],
+        "knowsLanguage": ["en"],
+        "nationality": {"@type": "Country", "name": "Australia"},
+        "sameAs": [
+          "https://www.linkedin.com/in/d-brittain/",
+          "https://studentvip.com.au/tutors/16125/dan"
+        ],
+        "worksFor": {"@id": "https://www.key2md.com/#organization"},
+        "founder": {"@id": "https://www.key2md.com/#organization"}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.key2md.com/"},
+          {"@type": "ListItem", "position": 2, "name": "About Dan", "item": "https://www.key2md.com/about.html"}
+        ]
+      }
+    ]
   }
   </script>
   <meta name="robots" content="index, follow">
