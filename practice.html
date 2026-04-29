@@ -270,7 +270,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:22px 20px;">
         <div style="font-size:1.6rem;margin-bottom:10px;">📊</div>
         <h3 style="font-size:0.98rem;font-weight:700;color:#0a1628;margin-bottom:6px;">Competency heatmap</h3>
-        <p style="font-size:0.86rem;color:#475569;line-height:1.6;margin:0;">See exactly which of the nine CASPer competencies you're consistently strong on, and which you keep missing. Most prep tools don't tell you this — and it's the most useful thing in the room.</p>
+        <p style="font-size:0.86rem;color:#475569;line-height:1.6;margin:0;">See which of the nine Casper competencies you're consistently strong on, and which you keep missing. Most prep tools don't tell you this — and it's the most useful thing in the room.</p>
       </div>
       <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:22px 20px;">
         <div style="font-size:1.6rem;margin-bottom:10px;">🆓</div>
@@ -391,6 +391,23 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
             <div style="font-size:0.7rem;color:var(--gray400);" id="streakSub">Complete at least 1 station per day</div>
           </div>
         </div>
+        <div id="lbShareWrap" style="padding:10px 12px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.16);border-radius:8px;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <div>
+              <div style="font-size:0.78rem;color:var(--navy);font-weight:700;">Share my AI average</div>
+              <div id="lbShareHint" style="font-size:0.68rem;color:var(--gray400);line-height:1.4;margin-top:2px;">Off by default. Only AI-rated scores are eligible.</div>
+            </div>
+            <label class="toggle-switch" title="Show your AI-rated daily average on the public leaderboard">
+              <input type="checkbox" id="lbShareToggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div id="lbNameRow" style="display:none;margin-top:10px;">
+            <input id="lbDisplayName" type="text" maxlength="24" placeholder="Choose a public name" autocomplete="nickname" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--gray200);border-radius:7px;background:#fff;color:var(--gray800);font-size:0.78rem;font-family:inherit;outline:none;">
+            <button id="lbSaveNameBtn" type="button" onclick="saveLeaderboardSettingsFromUI()" style="margin-top:7px;width:100%;padding:8px;border-radius:7px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.1);color:var(--teal3);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;">Save leaderboard settings</button>
+          </div>
+          <div id="lbShareStatus" style="font-size:0.68rem;color:var(--gray400);line-height:1.4;margin-top:7px;">Sign in to publish your daily average.</div>
+        </div>
         <div id="lbYourRank" style="display:none;padding:10px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:8px;margin-bottom:10px;">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <div>
@@ -496,13 +513,13 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       </div>
     </div>
 
-    <!-- Category Heatmap - Product #3 -->
+    <!-- Competency Heatmap - Product #3 -->
     <div class="sidebar-card" id="categoryHeatmapCard" style="display:none;">
-      <h3 style="margin-bottom:4px;">Category Heatmap</h3>
-      <p style="font-size:0.72rem;color:var(--gray400);margin-bottom:12px;line-height:1.4;">Your average score by category. Red = weakest area.</p>
+      <h3 style="margin-bottom:4px;">Competency Heatmap</h3>
+      <p style="font-size:0.72rem;color:var(--gray400);margin-bottom:12px;line-height:1.4;">Your average by Casper competency. Lower rows show where to focus.</p>
       <div id="heatmapRows" style="display:flex;flex-direction:column;gap:6px;"></div>
       <div id="heatmapWeakAlert" style="display:none;margin-top:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:10px 12px;">
-        <div style="font-size:0.72rem;font-weight:700;color:#dc2626;margin-bottom:4px;">Weakest category: <span id="heatmapWeakLabel">—</span></div>
+        <div style="font-size:0.72rem;font-weight:700;color:#dc2626;margin-bottom:4px;">Weakest competency: <span id="heatmapWeakLabel">—</span></div>
         <div style="font-size:0.75rem;color:var(--gray600);line-height:1.4;margin-bottom:8px;">Dan's 1:1 sessions target your exact weak patterns — not generic frameworks.</div>
         <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:700;text-decoration:none;" rel="noopener noreferrer">Book a Session →</a>
       </div>
@@ -959,6 +976,73 @@ function clearTimer(){if(timerInterval){clearInterval(timerInterval);timerInterv
 function wc(t){return t.trim()===''?0:t.trim().split(/\s+/).length;}
 function scoreCls(s){return s>=7?'score-high':s>=5?'score-mid':'score-low';}
 function avgScores(){const sc=sessionHistory.filter(h=>h&&h.score!=null).map(h=>h.score);return sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length*10)/10:null;}
+const CASPER_COMPETENCIES=[
+  'Collaboration',
+  'Communication',
+  'Empathy',
+  'Fairness',
+  'Ethics',
+  'Motivation',
+  'Problem Solving',
+  'Resilience',
+  'Self-Awareness'
+];
+const COMPETENCY_LOOKUP=CASPER_COMPETENCIES.reduce((acc,name)=>{acc[name.toLowerCase().replace(/[^a-z0-9]/g,'')]=name;return acc;},{});
+function normalizeCompetencyName(name){
+  const key=String(name||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  if(key==='problemsolving')return 'Problem Solving';
+  if(key==='selfawareness')return 'Self-Awareness';
+  return COMPETENCY_LOOKUP[key]||null;
+}
+function normalizeCompetencies(raw){
+  if(!raw)return[];
+  let items=[];
+  if(Array.isArray(raw))items=raw;
+  else if(typeof raw==='object')items=Object.keys(raw).map(k=>{
+    const v=raw[k]||{};
+    return typeof v==='object'?{name:k,...v}:{name:k,score:v};
+  });
+  const byName={};
+  items.forEach(item=>{
+    const name=normalizeCompetencyName(item.name||item.competency||item.label);
+    const score=Number(item.score);
+    if(!name||!Number.isFinite(score))return;
+    byName[name]={
+      name,
+      score:Math.max(1,Math.min(10,Math.round(score*10)/10)),
+      evidence:String(item.evidence||item.reason||item.note||'').trim(),
+      improve:String(item.improve||item.improvement||item.next_step||item.nextStep||'').trim()
+    };
+  });
+  return CASPER_COMPETENCIES.map(name=>byName[name]).filter(Boolean);
+}
+function competencyRowsHtml(comps,compact){
+  const normalized=normalizeCompetencies(comps).sort((a,b)=>a.score-b.score);
+  if(!normalized.length)return'';
+  const rows=normalized.map(c=>{
+    const qi=getQuartile(c.score);
+    const pct=Math.round(c.score*10);
+    const detail=compact?'':`<div style="font-size:0.74rem;color:var(--gray500,#64748b);line-height:1.45;margin-top:4px;">${c.evidence?`<strong style="color:var(--gray600);">Evidence:</strong> ${escInline(c.evidence)} `:''}${c.improve?`<strong style="color:var(--gray600);">Next:</strong> ${escInline(c.improve)}`:''}</div>`;
+    return`<div style="padding:8px 0;border-top:1px solid var(--gray100);">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <span style="font-size:0.8rem;font-weight:700;color:var(--navy);">${escInline(c.name)}</span>
+        <span style="font-size:0.72rem;font-weight:800;color:${qi.color};white-space:nowrap;">${c.score.toFixed(1)} · ${qi.q}</span>
+      </div>
+      <div style="height:5px;background:var(--gray100);border-radius:3px;overflow:hidden;margin-top:5px;">
+        <div style="height:100%;width:${pct}%;background:${qi.color};border-radius:3px;"></div>
+      </div>
+      ${detail}
+    </div>`;
+  }).join('');
+  return`<div style="margin-top:12px;border:1px solid rgba(14,165,233,0.16);border-radius:12px;padding:12px 14px;background:rgba(14,165,233,0.035);">
+    <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal3);margin-bottom:4px;">Competency Breakdown</div>
+    <div style="font-size:0.76rem;color:var(--gray400);line-height:1.45;margin-bottom:6px;">Scores are rough AI estimates for the nine Casper competencies, not official Casper sub-scores.</div>
+    ${rows}
+  </div>`;
+}
+function escInline(v){
+  return String(v??'').replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});
+}
 
 // Timer
 function runTimer(secs,done){
@@ -1446,6 +1530,7 @@ async function runAI(idx){
   showAiLoading();
   const s=h.station;
   const isMmi=currentMode===MODE_MMI;
+  const competencyList=CASPER_COMPETENCIES.join(', ');
   const p=`You are an expert ${isMmi?'MMI (Multiple Mini Interview)':'CASPer'} assessor for Australian medical school admissions. You use Dan's Q1-Q4 framework. Evaluate this student response honestly.
 
 SCENARIO: ${s.scenario}
@@ -1453,17 +1538,20 @@ PROMPT 1: ${s.prompt1}
 PROMPT 2: ${s.prompt2}
 STUDENT RESPONSE: ${h.answer}
 
-Respond ONLY with a raw JSON object (no markdown, no backticks):
-{"score":<integer 1-10>,"strengths":"<2-3 sentences>","improvements":"<2-3 sentences>","empathy":"<1-2 sentences>","missed":"<key missed point or None>"}
+Assess these nine Casper competencies: ${competencyList}.
 
-Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs significant work Q1. Be honest and specific. Penalise framework-speak like 'non-confrontational' or 'stakeholders'.`;
+Respond ONLY with a raw JSON object (no markdown, no backticks):
+{"score":<integer 1-10>,"strengths":"<2-3 sentences>","improvements":"<2-3 sentences>","empathy":"<1-2 sentences>","missed":"<key missed point or None>","competencies":[{"name":"Collaboration","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Communication","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Empathy","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Fairness","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Ethics","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Motivation","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Problem Solving","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Resilience","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Self-Awareness","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"}]}
+
+Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs significant work Q1. Be honest and specific. Penalise framework-speak like 'non-confrontational' or 'stakeholders'. Score competencies independently: it is okay for a response to be strong in empathy but weak in problem solving, or vice versa.`;
   try{
     const data = await Key2MDAuth.requestReview(
       [{role:'user',content:p}],
       {
   question: `SCENARIO: ${s.scenario}\n\nPROMPT 1: ${s.prompt1}\n\nPROMPT 2: ${s.prompt2}`,
   response: h.answer,
-  use_credit: useCredit
+  use_credit: useCredit,
+  max_tokens: 2200
 }
     );
     if(data.error){
@@ -1472,9 +1560,11 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
 }
     const txt=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
     const fb=JSON.parse(txt);
+    fb.competencies=normalizeCompetencies(fb.competencies);
     h.score=fb.score;h.feedback=fb;
     updateLimitUI();
     showFeedback(fb.score,fb);updateTrend();updateAvgStat();
+    refreshLeaderboardData({silent:true});
     // Persistent progress tracking for conversion nudges
     try{ k2TrackCompletion(fb.score); }catch(e){}
   }catch(err){
@@ -1569,6 +1659,7 @@ function showFeedback(score,fb){
       <strong>Improve:</strong> ${fb.improvements}<br><br>
       <strong>Empathy:</strong> ${fb.empathy}
       ${fb.missed&&fb.missed!=='None'?`<br><br><strong>Missed:</strong> ${fb.missed}`:''}
+      ${competencyRowsHtml(fb.competencies,false)}
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;">
@@ -1613,21 +1704,24 @@ function updateTrend(){
 function updateAvgStat(){const avg=avgScores();if(avg!==null){statAvg.textContent=avg+'/10';statAvg.style.color=avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';} updateLeaderboard(); updateCategoryHeatmap();}
 
 function updateCategoryHeatmap(){
-  // Build per-category average from sessionHistory
-  const catData={};
+  // Build per-competency average from AI feedback. Older saved responses may not
+  // have competency data, so ignore them instead of guessing.
+  const compData={};
   sessionHistory.forEach(h=>{
-    if(!h||h.score==null||!h.station)return;
-    const cat=h.station.category||'Other';
-    if(!catData[cat])catData[cat]={sum:0,n:0};
-    catData[cat].sum+=h.score;
-    catData[cat].n++;
+    if(!h||!h.feedback)return;
+    normalizeCompetencies(h.feedback.competencies).forEach(c=>{
+      if(!compData[c.name])compData[c.name]={sum:0,n:0,improve:''};
+      compData[c.name].sum+=c.score;
+      compData[c.name].n++;
+      if(c.improve)compData[c.name].improve=c.improve;
+    });
   });
-  const cats=Object.keys(catData);
-  if(!cats.length){document.getElementById('categoryHeatmapCard').style.display='none';return;}
+  const comps=Object.keys(compData);
+  if(!comps.length){document.getElementById('categoryHeatmapCard').style.display='none';return;}
   document.getElementById('categoryHeatmapCard').style.display='block';
 
   // Sort by avg ascending (worst first)
-  const sorted=cats.map(c=>({cat:c,avg:catData[c].sum/catData[c].n,n:catData[c].n}))
+  const sorted=comps.map(c=>({name:c,avg:compData[c].sum/compData[c].n,n:compData[c].n,improve:compData[c].improve}))
     .sort((a,b)=>a.avg-b.avg);
 
   const rowsEl=document.getElementById('heatmapRows');
@@ -1636,12 +1730,13 @@ function updateCategoryHeatmap(){
     const pct=Math.round((item.avg/10)*100);
     return`<div style="display:flex;flex-direction:column;gap:3px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:0.75rem;font-weight:600;color:var(--gray800);">${item.cat}</span>
+        <span style="font-size:0.75rem;font-weight:600;color:var(--gray800);">${item.name}</span>
         <span style="font-size:0.72rem;font-weight:700;color:${qi.color};">${item.avg.toFixed(1)} · ${qi.q}</span>
       </div>
       <div style="height:5px;background:var(--gray100);border-radius:3px;overflow:hidden;">
         <div style="height:100%;width:${pct}%;background:${qi.color};border-radius:3px;transition:width 0.4s;"></div>
       </div>
+      ${item.improve?`<div style="font-size:0.68rem;color:var(--gray400);line-height:1.35;">${escInline(item.improve)}</div>`:''}
     </div>`;
   }).join('');
 
@@ -1651,7 +1746,7 @@ function updateCategoryHeatmap(){
   const weakLabel=document.getElementById('heatmapWeakLabel');
   if(weakest&&weakest.avg<6&&weakest.n>=2){
     alertEl.style.display='block';
-    weakLabel.textContent=weakest.cat+' ('+weakest.avg.toFixed(1)+'/10)';
+    weakLabel.textContent=weakest.name+' ('+weakest.avg.toFixed(1)+'/10)';
   } else {
     alertEl.style.display='none';
   }
@@ -1733,22 +1828,239 @@ function getQuartile(score){
   return {q:'Q1',label:'Q1 — Needs Work',color:'#ef4444'};
 }
 
-function updateLeaderboard(){
-  const avg=avgScores();
-  const students=generateSimulatedLeaderboard();
+const LB_TOOL='casper';
+const LB_NAME_MAX=24;
+const LB_NAME_MIN=2;
+const LB_BAD_WORDS=[
+  'fuck','shit','cunt','bitch','slut','whore','dick','cock','pussy','asshole',
+  'fag','faggot','nigger','nigga','kike','spic','chink','retard'
+];
+let leaderboardRows=[];
+let leaderboardSettings={opt_in:false,display_name:''};
+let savedLeaderboardSettings={opt_in:false,display_name:''};
+let leaderboardLoaded=false;
+let leaderboardError='';
+let leaderboardSaving=false;
 
-  // If user has scores, insert them
-  const userName=Key2MDAuth.getUser()?.name||Key2MDAuth.getUser()?.email?.split('@')[0]||'You';
-  if(avg!==null){
-    students.push({name:userName+' (You)',score:avg,isReal:true});
+function lbEsc(v){
+  return String(v??'').replace(/[&<>"']/g,function(ch){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+  });
+}
+
+function normalizeLeaderboardName(name){
+  return String(name||'').trim().replace(/\s+/g,' ');
+}
+
+function validateLeaderboardName(name){
+  const clean=normalizeLeaderboardName(name);
+  if(clean.length<LB_NAME_MIN) return 'Use at least 2 characters.';
+  if(clean.length>LB_NAME_MAX) return 'Keep it to 24 characters or fewer.';
+  if(!/^[a-zA-Z0-9 _.\-]+$/.test(clean)) return 'Use letters, numbers, spaces, dots, hyphens or underscores only.';
+  const compact=clean.toLowerCase().replace(/[^a-z0-9]/g,'');
+  if(LB_BAD_WORDS.some(w=>compact.includes(w))) return 'Choose a different public name.';
+  return '';
+}
+
+function getLeaderboardHeaders(){
+  const headers={'Content-Type':'application/json'};
+  if(typeof Key2MDAuth!=='undefined' && Key2MDAuth.getToken()){
+    headers.Authorization='Bearer '+Key2MDAuth.getToken();
   }
+  return headers;
+}
+
+async function leaderboardFetch(path, options){
+  const res=await fetch(API_BASE+path,{
+    ...(options||{}),
+    headers:{...getLeaderboardHeaders(),...((options&&options.headers)||{})}
+  });
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.message||data.error||'Leaderboard request failed');
+  return data;
+}
+
+function renderLeaderboardSettings(){
+  const toggle=document.getElementById('lbShareToggle');
+  const nameRow=document.getElementById('lbNameRow');
+  const input=document.getElementById('lbDisplayName');
+  const status=document.getElementById('lbShareStatus');
+  const hint=document.getElementById('lbShareHint');
+  const saveBtn=document.getElementById('lbSaveNameBtn');
+  const loggedIn=typeof Key2MDAuth!=='undefined' && Key2MDAuth.isLoggedIn();
+
+  if(toggle){
+    toggle.checked=!!leaderboardSettings.opt_in;
+    toggle.disabled=leaderboardSaving;
+    if(!toggle.dataset.bound){
+      toggle.dataset.bound='1';
+      toggle.addEventListener('change',function(){handleLeaderboardToggle(this.checked);});
+    }
+  }
+  if(input){
+    input.value=leaderboardSettings.display_name||'';
+    if(!input.dataset.bound){
+      input.dataset.bound='1';
+      input.addEventListener('input',function(){
+        if(status && leaderboardSettings.opt_in){
+          const err=validateLeaderboardName(this.value);
+          status.textContent=err||'Save to update your public leaderboard name.';
+          status.style.color=err?'#dc2626':'var(--gray400)';
+        }
+      });
+    }
+  }
+  if(nameRow) nameRow.style.display=(loggedIn && leaderboardSettings.opt_in)?'block':'none';
+  if(saveBtn) saveBtn.disabled=leaderboardSaving;
+  if(hint){
+    hint.textContent=loggedIn
+      ? 'Off by default. Only AI-rated scores are eligible.'
+      : 'Sign in first. Sharing stays off until you enable it.';
+  }
+  if(status){
+    status.style.color=leaderboardError?'#dc2626':'var(--gray400)';
+    if(leaderboardSaving) status.textContent='Saving leaderboard settings...';
+    else if(leaderboardError) status.textContent=leaderboardError;
+    else if(!loggedIn) status.textContent='Sign in to publish your daily average.';
+    else if(leaderboardSettings.opt_in) status.textContent='On. Your Melbourne-day AI average appears after at least one AI review today.';
+    else status.textContent='Off. Your AI scores are private and only shown to you.';
+  }
+}
+
+async function loadLeaderboardSettings(){
+  if(typeof Key2MDAuth==='undefined' || !Key2MDAuth.isLoggedIn()){
+    leaderboardSettings={opt_in:false,display_name:''};
+    savedLeaderboardSettings={...leaderboardSettings};
+    leaderboardError='';
+    renderLeaderboardSettings();
+    updateLeaderboard();
+    return;
+  }
+  try{
+    const data=await leaderboardFetch('/api/leaderboard/settings');
+    leaderboardSettings={
+      opt_in:!!(data.settings&&data.settings.opt_in),
+      display_name:(data.settings&&data.settings.display_name)||''
+    };
+    savedLeaderboardSettings={...leaderboardSettings};
+    leaderboardError='';
+  }catch(err){
+    leaderboardError=err.message;
+  }
+  renderLeaderboardSettings();
+  updateLeaderboard();
+}
+
+async function refreshLeaderboardData(opts){
+  const silent=opts&&opts.silent;
+  try{
+    const data=await leaderboardFetch('/api/leaderboard?tool='+encodeURIComponent(LB_TOOL));
+    leaderboardRows=Array.isArray(data.rows)?data.rows:[];
+    leaderboardLoaded=true;
+    leaderboardError='';
+  }catch(err){
+    leaderboardLoaded=false;
+    if(!silent) leaderboardError=err.message;
+  }
+  renderLeaderboardSettings();
+  updateLeaderboard();
+}
+
+async function saveLeaderboardSettings(optIn, displayName){
+  if(typeof Key2MDAuth==='undefined' || !Key2MDAuth.isLoggedIn()){
+    if(typeof Key2MDAuth!=='undefined') Key2MDAuth.showAuthModal('signup');
+    leaderboardSettings.opt_in=false;
+    renderLeaderboardSettings();
+    return;
+  }
+  const clean=normalizeLeaderboardName(displayName);
+  if(optIn){
+    const err=validateLeaderboardName(clean);
+    if(err){leaderboardError=err;renderLeaderboardSettings();return;}
+  }
+  leaderboardSaving=true;
+  leaderboardError='';
+  renderLeaderboardSettings();
+  try{
+    const data=await leaderboardFetch('/api/leaderboard/settings',{
+      method:'POST',
+      body:JSON.stringify({tool:LB_TOOL,opt_in:!!optIn,display_name:clean})
+    });
+    leaderboardSettings={
+      opt_in:!!(data.settings&&data.settings.opt_in),
+      display_name:(data.settings&&data.settings.display_name)||''
+    };
+    savedLeaderboardSettings={...leaderboardSettings};
+    leaderboardError='';
+    await refreshLeaderboardData({silent:true});
+  }catch(err){
+    leaderboardSettings={...savedLeaderboardSettings};
+    leaderboardError=err.message;
+  }finally{
+    leaderboardSaving=false;
+    renderLeaderboardSettings();
+    updateLeaderboard();
+  }
+}
+
+function handleLeaderboardToggle(checked){
+  const input=document.getElementById('lbDisplayName');
+  const status=document.getElementById('lbShareStatus');
+  let name=normalizeLeaderboardName(input&&input.value);
+  if(checked && !name){
+    const user=(typeof Key2MDAuth!=='undefined' && Key2MDAuth.getUser) ? Key2MDAuth.getUser() : null;
+    name=normalizeLeaderboardName(user?.name||'');
+    if(input) input.value=name;
+  }
+  leaderboardSettings.opt_in=!!checked;
+  leaderboardSettings.display_name=name;
+  renderLeaderboardSettings();
+  if(checked && !name){
+    if(status){status.textContent='Choose a public name, then save to opt in.';status.style.color='var(--gray400)';}
+    if(input) input.focus();
+    return;
+  }
+  saveLeaderboardSettings(checked,name);
+}
+
+function saveLeaderboardSettingsFromUI(){
+  const input=document.getElementById('lbDisplayName');
+  saveLeaderboardSettings(leaderboardSettings.opt_in, input?input.value:'');
+}
+
+function getRemoteLeaderboardStudents(){
+  const currentUser=typeof Key2MDAuth!=='undefined' ? Key2MDAuth.getUser() : null;
+  return leaderboardRows
+    .map(row=>{
+      const score=Number(row.avg_score??row.score);
+      if(!Number.isFinite(score)) return null;
+      const isYou=!!row.is_current_user || (!!currentUser && row.user_id===currentUser.id);
+      return {
+        name:row.display_name||'Student',
+        score:Math.round(score*10)/10,
+        isReal:true,
+        isYou,
+        reviewCount:Number(row.review_count||row.n||0)
+      };
+    })
+    .filter(Boolean);
+}
+
+function updateLeaderboard(){
+  const remoteStudents=getRemoteLeaderboardStudents();
+  const realNames=new Set(remoteStudents.map(s=>String(s.name).toLowerCase()));
+  const students=[
+    ...remoteStudents,
+    ...generateSimulatedLeaderboard().filter(s=>!realNames.has(String(s.name).toLowerCase()))
+  ];
 
   // Sort descending
   students.sort((a,b)=>b.score-a.score);
 
   // Find user's position
-  const userIdx=students.findIndex(s=>s.isReal);
+  const userIdx=students.findIndex(s=>s.isYou);
   const totalStudents=students.length;
+  const hasSharedScore=userIdx>=0;
 
   // Update collapsed preview
   const top1=students[0];
@@ -1758,9 +2070,10 @@ function updateLeaderboard(){
   if(top1ScoreEl)top1ScoreEl.textContent=top1?top1.score.toFixed(1)+'/10':'—';
   const yourRankNumEl=document.getElementById('lbYourRankNum');
   const yourQPillEl=document.getElementById('lbYourQPill');
-  if(avg!==null&&yourRankNumEl){
+  if(hasSharedScore&&yourRankNumEl){
+    const userScore=students[userIdx].score;
     yourRankNumEl.textContent='#'+(userIdx+1)+' of '+totalStudents;
-    const qi=getQuartile(avg);
+    const qi=getQuartile(userScore);
     if(yourQPillEl){yourQPillEl.textContent=qi.label;yourQPillEl.style.color=qi.color;}
     // Update header rank badge
     const badge=document.getElementById('lbRankBadge');
@@ -1768,21 +2081,30 @@ function updateLeaderboard(){
     if(badge&&badgeText){badgeText.textContent='#'+(userIdx+1)+' of '+totalStudents;badge.style.display='flex';}
   } else if(yourRankNumEl){
     yourRankNumEl.textContent='—';
-    if(yourQPillEl){yourQPillEl.textContent='Complete a station';yourQPillEl.style.color='var(--gray400)';}
+    if(yourQPillEl){
+      yourQPillEl.textContent=leaderboardSettings.opt_in?'Awaiting AI score':'Opt in to share';
+      yourQPillEl.style.color='var(--gray400)';
+    }
+    const badge=document.getElementById('lbRankBadge');
+    if(badge) badge.style.display='none';
   }
 
   // Update participant count
   const partEl=document.getElementById('lbParticipants');
-  if(partEl) partEl.textContent=totalStudents+' students practising today';
+  if(partEl){
+    const suffix=leaderboardLoaded?' practising today':' simulated today';
+    partEl.textContent=totalStudents+' students'+suffix;
+  }
 
   // Update your rank
   const rankWrap=document.getElementById('lbYourRank');
   const posEl=document.getElementById('lbYourPos');
   const qEl=document.getElementById('lbYourQ');
-  if(avg!==null && rankWrap){
+  if(hasSharedScore && rankWrap){
+    const userScore=students[userIdx].score;
     rankWrap.style.display='block';
     posEl.textContent='#'+(userIdx+1)+' of '+totalStudents;
-    const qi=getQuartile(avg);
+    const qi=getQuartile(userScore);
     qEl.textContent=qi.label;
     qEl.style.color=qi.color;
   } else if(rankWrap){
@@ -1803,7 +2125,7 @@ function updateLeaderboard(){
   });
 
   // If user not in top 5, show separator + their row
-  if(avg!==null && !userInTop5 && userIdx>=0){
+  if(hasSharedScore && !userInTop5 && userIdx>=0){
     rowsEl.innerHTML+='<div style="text-align:center;font-size:0.68rem;color:var(--gray400);padding:2px 0;">···</div>';
     rowsEl.innerHTML+=lbRowHTML(userIdx+1,students[userIdx]);
   }
@@ -1827,14 +2149,14 @@ function updateLeaderboard(){
 function lbRowHTML(rank,s){
   const medals=['🥇','🥈','🥉'];
   const medal=rank<=3?medals[rank-1]:'';
-  const isYou=s.isReal;
+  const isYou=s.isYou;
   const bg=isYou?'background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);':'';
   const fw=isYou?'font-weight:700;color:var(--navy);':'';
   const qi=getQuartile(s.score);
   return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:6px;font-size:0.8rem;${bg}">
     <div style="display:flex;align-items:center;gap:8px;${fw}">
       <span style="color:var(--gray400);font-size:0.72rem;min-width:20px;">${medal||'#'+rank}</span>
-      <span style="${isYou?'color:var(--teal3);font-weight:700;':'color:var(--gray600);'}">${s.name}</span>
+      <span style="${isYou?'color:var(--teal3);font-weight:700;':'color:var(--gray600);'}">${lbEsc(s.name)}${isYou?' (You)':''}</span>
     </div>
     <div style="display:flex;align-items:center;gap:6px;">
       <span style="font-weight:700;color:var(--navy);font-size:0.82rem;">${s.score.toFixed(1)}</span>
@@ -2072,7 +2394,7 @@ function updateStreakUI(streak){
 }
 
 // Init leaderboard + streak on page load
-setTimeout(()=>{loadStreak();updateLeaderboard();},200);
+setTimeout(()=>{loadStreak();loadLeaderboardSettings();refreshLeaderboardData({silent:true});},200);
 
 function drawChart(canvas,scores,h){
   const W=canvas.parentElement.offsetWidth||220;canvas.width=W;canvas.height=h;
@@ -2129,7 +2451,8 @@ function renderList(filter){
   con.innerHTML=list.map((h,li)=>{
     const ba=avg!==null&&h.score!=null&&h.score<avg;
     const sb=h.score!=null?`<span class="src-score-badge ${scoreCls(h.score)}">${h.score}/10${ba?'<span class="below-avg-tag">↓ below avg</span>':''}</span>`:`<span class="src-score-badge" style="background:var(--gray100);color:var(--gray400)">No score</span>`;
-    const fb=h.feedback?`<div class="src-section-label">AI Feedback</div><div class="src-feedback-text"><strong>Strengths:</strong> ${h.feedback.strengths}<br><strong>Improve:</strong> ${h.feedback.improvements}<br><strong>Empathy:</strong> ${h.feedback.empathy}${h.feedback.missed&&h.feedback.missed!=='None'?`<br><strong>Missed:</strong> ${h.feedback.missed}`:''}</div>`:'';
+    const comps=h.feedback&&normalizeCompetencies(h.feedback.competencies).length?`<div class="src-section-label">Competencies</div><div class="src-feedback-text">${competencyRowsHtml(h.feedback.competencies,true)}</div>`:'';
+    const fb=h.feedback?`<div class="src-section-label">AI Feedback</div><div class="src-feedback-text"><strong>Strengths:</strong> ${h.feedback.strengths}<br><strong>Improve:</strong> ${h.feedback.improvements}<br><strong>Empathy:</strong> ${h.feedback.empathy}${h.feedback.missed&&h.feedback.missed!=='None'?`<br><strong>Missed:</strong> ${h.feedback.missed}`:''}</div>${comps}`:'';
     const ans=h.answer&&h.answer.trim()?`<div class="src-section-label">Your Response</div><div class="src-answer-text">${h.answer.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`:`<div class="src-section-label" style="color:var(--gray400)">No response recorded</div>`;
     const n=items.indexOf(h)+1;
     return`<div class="station-review-card"><div class="src-header" onclick="this.nextElementSibling.classList.toggle('open')"><span class="src-num">${n}</span><span class="src-scenario">${h.station.scenario.substring(0,110)}…</span>${sb}</div><div class="src-body"><div class="src-section-label">Prompts</div><div class="src-feedback-text">1. ${h.station.prompt1}<br>2. ${h.station.prompt2}</div>${ans}${fb}</div></div>`;
@@ -2329,6 +2652,8 @@ window.addEventListener('DOMContentLoaded',function(){
     apiBase: API_BASE,
     onAuthChange: function(user) {
       updateLimitUI();
+      loadLeaderboardSettings();
+      refreshLeaderboardData({silent:true});
       // Update AI status indicator
       var statusEl = document.getElementById('aiStatusEl');
       if(statusEl){

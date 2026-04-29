@@ -73,6 +73,31 @@
     .stat-num { font-size:1.8rem; font-weight:800; color:var(--teal); display:block; }
     .stat-label { font-size:0.72rem; color:var(--gray400); font-weight:500; text-transform:uppercase; letter-spacing:0.06em; }
 
+    /* Competency progress */
+    .competency-panel { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); padding:18px 20px; margin-bottom:20px; display:none; }
+    .competency-panel-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px; }
+    .competency-panel-title { font-size:0.95rem; font-weight:800; color:var(--navy); }
+    .competency-panel-sub { font-size:0.78rem; color:var(--gray400); line-height:1.45; margin-top:2px; }
+    .competency-filter-clear { display:none; border:1px solid rgba(14,165,233,0.24); background:rgba(14,165,233,0.08); color:var(--teal3); border-radius:50px; padding:6px 12px; font-size:0.76rem; font-weight:700; cursor:pointer; font-family:inherit; white-space:nowrap; }
+    .competency-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
+    .competency-chip { border:1px solid var(--gray200); background:var(--gray50); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s; text-align:left; font-family:inherit; }
+    .competency-chip:hover { border-color:var(--teal); background:rgba(14,165,233,0.04); }
+    .competency-chip.active { border-color:var(--teal); background:rgba(14,165,233,0.09); box-shadow:0 0 0 1px rgba(14,165,233,0.18); }
+    .competency-chip-top { display:flex; justify-content:space-between; gap:8px; align-items:center; margin-bottom:6px; }
+    .competency-name { font-size:0.78rem; font-weight:800; color:var(--navy); }
+    .competency-score { font-size:0.76rem; font-weight:800; white-space:nowrap; }
+    .competency-track { height:5px; border-radius:3px; background:var(--gray200); overflow:hidden; }
+    .competency-fill { height:100%; border-radius:3px; }
+    .competency-meta { font-size:0.68rem; color:var(--gray400); margin-top:5px; line-height:1.35; }
+    .competency-breakdown { margin-top:14px; border:1px solid rgba(14,165,233,0.16); border-radius:12px; padding:12px 14px; background:rgba(14,165,233,0.035); }
+    .competency-breakdown-title { font-size:0.72rem; font-weight:800; color:var(--teal3); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:4px; }
+    .competency-breakdown-note { font-size:0.76rem; color:var(--gray400); line-height:1.45; margin-bottom:8px; }
+    .competency-row { padding:8px 0; border-top:1px solid var(--gray100); }
+    .competency-row-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .competency-row-name { font-size:0.8rem; font-weight:700; color:var(--navy); }
+    .competency-row-score { font-size:0.72rem; font-weight:800; white-space:nowrap; }
+    .competency-row-detail { font-size:0.74rem; color:var(--gray600); line-height:1.5; margin-top:5px; }
+
     /* Review cards */
     .reviews-list { display:flex; flex-direction:column; gap:14px; }
 
@@ -145,6 +170,7 @@
     @media (max-width: 700px) {
       .stats-bar { grid-template-columns:1fr 1fr; }
       .feedback-grid { grid-template-columns:1fr; }
+      .competency-panel-header { flex-direction:column; align-items:stretch; }
     }
   </style>
 <style id="k2-nav-styles">
@@ -278,6 +304,18 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="stat-card"><span class="stat-num" id="statAvg">—</span><span class="stat-label">Avg Score</span></div>
     </div>
 
+    <!-- Competency progress -->
+    <div class="competency-panel" id="competencyPanel">
+      <div class="competency-panel-header">
+        <div>
+          <div class="competency-panel-title">CASPer Competency Progress</div>
+          <div class="competency-panel-sub" id="competencyPanelSub">Track your nine-competency pattern across AI-marked CASPer reviews.</div>
+        </div>
+        <button class="competency-filter-clear" id="clearCompetencyFilterBtn" onclick="clearCompetencyFilter()">Clear competency filter</button>
+      </div>
+      <div class="competency-grid" id="competencyGrid"></div>
+    </div>
+
     <!-- Filters -->
     <div class="filters-row">
       <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
@@ -322,6 +360,22 @@ const TOKEN_KEY = 'key2md_token';
 
 let allReviews = [];
 let currentFilter = 'all';
+let currentCompetencyFilter = null;
+const CASPER_COMPETENCIES = [
+  'Collaboration',
+  'Communication',
+  'Empathy',
+  'Fairness',
+  'Ethics',
+  'Motivation',
+  'Problem Solving',
+  'Resilience',
+  'Self-Awareness',
+];
+const COMPETENCY_LOOKUP = CASPER_COMPETENCIES.reduce((acc, name) => {
+  acc[name.toLowerCase().replace(/[^a-z0-9]/g, '')] = name;
+  return acc;
+}, {});
 
 // ── Init ──
 document.addEventListener('DOMContentLoaded', () => {
@@ -364,6 +418,7 @@ async function loadReviews() {
     const data = await res.json();
     allReviews = data.reviews || [];
     updateStats();
+    renderCompetencyProgress();
     renderReviews();
   } catch (err) {
     showState('error');
@@ -408,11 +463,138 @@ function setFilter(filter, btn) {
 }
 window.setFilter = setFilter;
 
+function setCompetencyFilter(name) {
+  currentCompetencyFilter = currentCompetencyFilter === name ? null : name;
+  renderCompetencyProgress();
+  renderReviews();
+}
+window.setCompetencyFilter = setCompetencyFilter;
+
+function clearCompetencyFilter() {
+  currentCompetencyFilter = null;
+  renderCompetencyProgress();
+  renderReviews();
+}
+window.clearCompetencyFilter = clearCompetencyFilter;
+
+function normalizeCompetencyName(name) {
+  const key = String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (key === 'problemsolving') return 'Problem Solving';
+  if (key === 'selfawareness') return 'Self-Awareness';
+  return COMPETENCY_LOOKUP[key] || null;
+}
+
+function normalizeCompetencies(raw) {
+  if (!raw) return [];
+  let items = [];
+  if (Array.isArray(raw)) {
+    items = raw;
+  } else if (typeof raw === 'object') {
+    items = Object.keys(raw).map(key => {
+      const value = raw[key] || {};
+      return typeof value === 'object' ? { name: key, ...value } : { name: key, score: value };
+    });
+  }
+
+  const byName = {};
+  items.forEach(item => {
+    const name = normalizeCompetencyName(item.name || item.competency || item.label);
+    const score = Number(item.score);
+    if (!name || !Number.isFinite(score)) return;
+    byName[name] = {
+      name,
+      score: Math.max(1, Math.min(10, Math.round(score * 10) / 10)),
+      evidence: String(item.evidence || item.reason || item.note || '').trim(),
+      improve: String(item.improve || item.improvement || item.next_step || item.nextStep || '').trim(),
+    };
+  });
+
+  return CASPER_COMPETENCIES.map(name => byName[name]).filter(Boolean);
+}
+
+function parseFeedback(review) {
+  if (!review.ai_feedback) return null;
+  try { return JSON.parse(review.ai_feedback); } catch { return null; }
+}
+
+function getCasperCompetencyReviews() {
+  return allReviews
+    .filter(r => r.tool === 'casper')
+    .map(r => ({ review: r, feedback: parseFeedback(r) }))
+    .filter(item => normalizeCompetencies(item.feedback?.competencies).length > 0);
+}
+
+function getCompetencyStats() {
+  const stats = {};
+  getCasperCompetencyReviews().forEach(({ feedback }) => {
+    normalizeCompetencies(feedback.competencies).forEach(comp => {
+      if (!stats[comp.name]) stats[comp.name] = { name: comp.name, sum: 0, count: 0, latestImprove: '' };
+      stats[comp.name].sum += comp.score;
+      stats[comp.name].count += 1;
+      if (comp.improve) stats[comp.name].latestImprove = comp.improve;
+    });
+  });
+  return CASPER_COMPETENCIES
+    .filter(name => stats[name])
+    .map(name => ({
+      ...stats[name],
+      avg: Math.round((stats[name].sum / stats[name].count) * 10) / 10,
+    }))
+    .sort((a, b) => a.avg - b.avg);
+}
+
+function renderCompetencyProgress() {
+  const panel = document.getElementById('competencyPanel');
+  const grid = document.getElementById('competencyGrid');
+  const sub = document.getElementById('competencyPanelSub');
+  const clearBtn = document.getElementById('clearCompetencyFilterBtn');
+  if (!panel || !grid) return;
+
+  const stats = getCompetencyStats();
+  if (!stats.length) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  panel.style.display = 'block';
+  if (clearBtn) clearBtn.style.display = currentCompetencyFilter ? 'inline-flex' : 'none';
+  if (sub) {
+    const weakest = stats[0];
+    sub.textContent = currentCompetencyFilter
+      ? `Showing reviews where ${currentCompetencyFilter} has competency data.`
+      : `Weakest current area: ${weakest.name} (${weakest.avg}/10). Click a competency to filter reviews.`;
+  }
+
+  grid.innerHTML = stats.map(stat => {
+    const cls = scoreClass(stat.avg);
+    const color = scoreColor(stat.avg);
+    const active = currentCompetencyFilter === stat.name ? ' active' : '';
+    const pct = Math.round(stat.avg * 10);
+    return `
+      <button class="competency-chip${active}" type="button" onclick="setCompetencyFilter('${escapeAttr(stat.name)}')">
+        <div class="competency-chip-top">
+          <span class="competency-name">${escapeHtml(stat.name)}</span>
+          <span class="competency-score ${cls}" style="background:transparent;padding:0;color:${color};">${stat.avg.toFixed(1)}/10</span>
+        </div>
+        <div class="competency-track"><div class="competency-fill" style="width:${pct}%;background:${color};"></div></div>
+        <div class="competency-meta">${stat.count} review${stat.count !== 1 ? 's' : ''}${stat.latestImprove ? ' · ' + escapeHtml(stat.latestImprove) : ''}</div>
+      </button>
+    `;
+  }).join('');
+}
+
 // ── Render ──
 function renderReviews() {
-  const filtered = currentFilter === 'all'
+  let filtered = currentFilter === 'all'
     ? allReviews
     : allReviews.filter(r => r.tool === currentFilter);
+
+  if (currentCompetencyFilter) {
+    filtered = filtered.filter(r => {
+      const fb = parseFeedback(r);
+      return normalizeCompetencies(fb?.competencies).some(c => c.name === currentCompetencyFilter);
+    });
+  }
 
   document.getElementById('resultCount').textContent =
     filtered.length + ' review' + (filtered.length !== 1 ? 's' : '');
@@ -445,8 +627,7 @@ function reviewCardHTML(r, i) {
   let bodyHTML = '';
 
   // Parse feedback
-  let fb = null;
-  try { fb = JSON.parse(r.ai_feedback); } catch {}
+  const fb = parseFeedback(r);
 
   if (r.tool === 'casper' && fb && fb.score) {
     const cls = fb.score >= 7 ? 'score-high' : fb.score >= 5 ? 'score-mid' : 'score-low';
@@ -484,6 +665,7 @@ function casperBodyHTML(r, fb) {
   const missedSection = fb.missed && fb.missed !== 'None'
     ? `<div class="feedback-item feedback-missed"><div class="feedback-item-label">Missed</div><p>${escapeHtml(fb.missed)}</p></div>`
     : '';
+  const competencySection = competencyBreakdownHTML(fb.competencies);
 
   return `
     ${r.question_text ? `
@@ -514,6 +696,43 @@ function casperBodyHTML(r, fb) {
           <p>${escapeHtml(fb.empathy || '—')}</p>
         </div>
         ${missedSection}
+      </div>
+    </div>
+    ${competencySection}
+  `;
+}
+
+function competencyBreakdownHTML(rawCompetencies) {
+  const competencies = normalizeCompetencies(rawCompetencies).sort((a, b) => a.score - b.score);
+  if (!competencies.length) return '';
+
+  const rows = competencies.map(comp => {
+    const color = scoreColor(comp.score);
+    const pct = Math.round(comp.score * 10);
+    return `
+      <div class="competency-row">
+        <div class="competency-row-head">
+          <span class="competency-row-name">${escapeHtml(comp.name)}</span>
+          <span class="competency-row-score" style="color:${color};">${comp.score.toFixed(1)}/10</span>
+        </div>
+        <div class="competency-track" style="margin-top:5px;"><div class="competency-fill" style="width:${pct}%;background:${color};"></div></div>
+        ${(comp.evidence || comp.improve) ? `
+          <div class="competency-row-detail">
+            ${comp.evidence ? `<strong>Evidence:</strong> ${escapeHtml(comp.evidence)} ` : ''}
+            ${comp.improve ? `<strong>Next:</strong> ${escapeHtml(comp.improve)}` : ''}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="review-section">
+      <div class="review-section-label">Competency Breakdown</div>
+      <div class="competency-breakdown">
+        <div class="competency-breakdown-title">Nine Casper Competencies</div>
+        <div class="competency-breakdown-note">Saved from this AI review. Scores are rough practice estimates, not official Casper sub-scores.</div>
+        ${rows}
       </div>
     </div>
   `;
@@ -607,9 +826,21 @@ function creditBadge(source) {
   return '';
 }
 
+function scoreClass(score) {
+  return score >= 7 ? 'score-high' : score >= 5 ? 'score-mid' : 'score-low';
+}
+
+function scoreColor(score) {
+  return score >= 7 ? '#16a34a' : score >= 5 ? '#92400e' : '#dc2626';
+}
+
 function escapeHtml(str) {
   if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function escapeAttr(str) {
+  return escapeHtml(str).replace(/`/g,'&#96;');
 }
 </script>
 
