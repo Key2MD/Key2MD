@@ -20,7 +20,14 @@
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html{font-size:14px;}
-    body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+    body{
+      font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;
+      background-image:
+        linear-gradient(180deg,rgba(18,28,44,0.72) 0%,rgba(6,13,24,0.96) 340px),
+        radial-gradient(ellipse 42% 24% at 78% 0%,rgba(74,222,128,0.08) 0%,transparent 62%),
+        radial-gradient(ellipse 38% 26% at 20% 4%,rgba(56,189,248,0.1) 0%,transparent 58%);
+      background-attachment:fixed;
+    }
     a{text-decoration:none;color:inherit;}
     .hidden{display:none!important;}
     input,select,textarea,button{font-family:inherit;}
@@ -92,15 +99,17 @@
 
     /* ══ MAIN CONTENT ══ */
     .main{flex:1;overflow-y:auto;min-width:0;}
-    .page-header{padding:20px 24px 0;margin-bottom:20px;}
-    .page-title{font-size:1.3rem;font-weight:800;letter-spacing:-0.02em;}
+    .page-header{padding:22px 24px 0;margin-bottom:18px;display:flex;justify-content:space-between;gap:18px;align-items:flex-start;}
+    .page-title{font-size:1.36rem;font-weight:800;letter-spacing:-0.02em;}
     .page-sub{font-size:0.82rem;color:var(--muted);margin-top:4px;}
     .page{display:none;padding:0 24px 40px;}
     .page.active{display:block;}
+    .page-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .refresh-note{font-size:0.72rem;color:var(--muted2);white-space:nowrap;}
 
     /* ══ STATS GRID ══ */
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px;}
-    .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:18px;}
+    .stat{background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.035));border:1px solid var(--border);border-radius:var(--radius);padding:15px 16px;box-shadow:0 10px 30px rgba(0,0,0,0.14);}
     .stat.green{border-color:var(--green-border);background:var(--green-dim);}
     .stat.blue{border-color:var(--blue-border);background:var(--blue-dim);}
     .stat.amber{border-color:var(--amber-border);background:var(--amber-dim);}
@@ -112,19 +121,41 @@
     .stat-sub{font-size:0.68rem;color:var(--muted2);margin-top:3px;}
 
     /* ══ DASHBOARD CARDS ══ */
-    .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
-    .dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
-    .dash-card-title{font-size:0.72rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
-    .dash-list{display:flex;flex-direction:column;gap:8px;}
-    .dash-row{display:flex;align-items:center;justify-content:space-between;font-size:0.82rem;}
+    .command-card{background:linear-gradient(135deg,rgba(56,189,248,0.13),rgba(74,222,128,0.08) 52%,rgba(251,191,36,0.06));border:1px solid var(--border2);border-radius:16px;padding:18px 20px;margin-bottom:16px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,0.65fr);gap:18px;box-shadow:0 24px 60px rgba(0,0,0,0.2);}
+    .command-kicker{font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.11em;color:var(--blue);margin-bottom:6px;}
+    .command-title{font-size:1.52rem;font-weight:850;letter-spacing:-0.03em;}
+    .command-copy{font-size:0.86rem;color:rgba(238,242,248,0.72);line-height:1.6;margin-top:6px;max-width:760px;}
+    .command-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
+    .dash-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:16px;margin-bottom:18px;}
+    .dash-card{background:rgba(255,255,255,0.045);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:0 14px 36px rgba(0,0,0,0.12);}
+    .dash-card-title{font-size:0.72rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .dash-list{display:flex;flex-direction:column;gap:9px;}
+    .dash-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:0.82rem;}
     .dash-row-label{color:var(--muted);}
     .dash-row-val{font-weight:700;}
+    .ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+    .ops-card{background:rgba(255,255,255,0.045);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
+    .queue-item{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+    .queue-item:last-child{border-bottom:none;}
+    .queue-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--surface2);font-size:0.9rem;}
+    .queue-title{font-size:0.84rem;font-weight:750;}
+    .queue-sub{font-size:0.72rem;color:var(--muted2);margin-top:2px;}
+    .insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .insight{border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.14);padding:12px;}
+    .insight-label{font-size:0.62rem;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;}
+    .insight-val{font-size:1.15rem;font-weight:850;margin-top:4px;}
+    .insight-note{font-size:0.68rem;color:var(--muted2);margin-top:3px;line-height:1.45;}
+    .activity-item{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+    .activity-item:last-child{border-bottom:none;}
+    .activity-type{font-size:0.64rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted2);}
+    .meter{height:7px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;margin-top:8px;}
+    .meter-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--green));}
 
     /* ══ TABLE ══ */
     .tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
     .tbl-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);}
     .tbl-status{font-size:0.78rem;color:var(--muted);}
-    .tbl-actions{display:flex;gap:6px;align-items:center;}
+    .tbl-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
     .tbl-scroller{overflow-x:auto;}
     table{width:100%;border-collapse:collapse;min-width:700px;}
     thead tr{background:rgba(0,0,0,0.2);}
@@ -178,6 +209,20 @@
     .spend{font-weight:700;font-size:0.83rem;}
     .spend.has{color:var(--green);}
     .spend.none{color:var(--muted2);}
+    .mini-metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+    .mini-metric{background:rgba(0,0,0,0.14);border:1px solid var(--border);border-radius:9px;padding:10px;}
+    .mini-metric div:first-child{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted2);font-weight:800;margin-bottom:3px;}
+    .mini-metric div:last-child{font-size:1.05rem;font-weight:850;}
+    .competency-list{display:flex;flex-direction:column;gap:7px;margin-top:8px;}
+    .competency-row{display:grid;grid-template-columns:1fr 34px;gap:8px;align-items:center;}
+    .competency-name{font-size:0.72rem;color:var(--muted);}
+    .competency-score{font-size:0.72rem;font-weight:850;text-align:right;}
+    .competency-bar{height:5px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;margin-top:4px;}
+    .competency-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));border-radius:99px;}
+    .signal-stack{display:flex;gap:4px;align-items:center;flex-wrap:wrap;}
+    .signal-chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:999px;border:1px solid var(--border);font-size:0.62rem;font-weight:750;color:var(--muted);background:rgba(255,255,255,0.04);}
+    .signal-chip.low{color:var(--red);border-color:var(--red-border);background:var(--red-dim);}
+    .signal-chip.high{color:var(--green);border-color:var(--green-border);background:var(--green-dim);}
 
     /* ══ CONTROLS ══ */
     .controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
@@ -186,6 +231,10 @@
     .ctrl-in:focus,.ctrl-sel:focus{border-color:var(--blue);}
     .ctrl-in::placeholder{color:var(--muted2);}
     .ctrl-sel option{background:#0d1a2d;}
+    .segment-bar{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px;}
+    .seg{border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);border-radius:999px;padding:6px 11px;font-size:0.73rem;font-weight:750;cursor:pointer;transition:all 0.15s;}
+    .seg:hover{color:var(--text);background:rgba(255,255,255,0.08);}
+    .seg.active{color:#06111f;background:var(--blue);border-color:var(--blue);}
 
     /* ══ BUTTONS ══ */
     .btn{padding:7px 13px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
@@ -291,10 +340,19 @@
     @media(max-width:900px){
       .sidebar{display:none;}
       .detail-inner{grid-template-columns:1fr;}
+      .page-header{display:block;}
+      .page-actions{margin-top:12px;}
+      .command-card,.ops-grid,.insight-grid{grid-template-columns:1fr;}
+      .command-actions{justify-content:flex-start;}
+      .mini-metric-row{grid-template-columns:1fr;}
     }
     @media(max-width:1100px){
-      .dash-grid{grid-template-columns:1fr;}
+      .dash-grid,.ops-grid,.command-card{grid-template-columns:1fr;}
       .stats-grid{grid-template-columns:repeat(3,1fr);}
+    }
+    @media(max-width:620px){
+      .stats-grid{grid-template-columns:1fr 1fr;}
+      .activity-item{grid-template-columns:1fr;}
     }
   </style>
 </head>
@@ -348,8 +406,26 @@
     <!-- ── DASHBOARD ── -->
     <div id="pageDashboard" class="page active">
       <div class="page-header">
-        <div class="page-title">Dashboard</div>
-        <div class="page-sub">Overview of your Key2MD platform</div>
+        <div>
+          <div class="page-title">Admin Command Center</div>
+          <div class="page-sub">Revenue, student momentum, workload, and owner priorities in one place.</div>
+        </div>
+        <div class="page-actions">
+          <span class="refresh-note" id="lastUpdated">Not refreshed yet</span>
+          <button class="btn blue" onclick="refreshAll()">Refresh all</button>
+        </div>
+      </div>
+      <div class="command-card">
+        <div>
+          <div class="command-kicker">Today at a glance</div>
+          <div class="command-title" id="dashHeadline">Loading platform health…</div>
+          <div class="command-copy" id="dashBrief">Pulling reviews, accounts, enquiries and inbox state from the Worker.</div>
+        </div>
+        <div class="command-actions">
+          <button class="btn blue" onclick="nav('reviews')">Review latest feedback</button>
+          <button class="btn green" onclick="nav('users')">Manage students</button>
+          <button class="btn amber" onclick="nav('inbox')">Open inbox</button>
+        </div>
       </div>
       <div class="stats-grid" id="dashStats">
         <div class="stat green"><div class="stat-label">Total Revenue</div><div class="stat-val" id="dRevenue">—</div><div class="stat-sub">all time</div></div>
@@ -360,14 +436,38 @@
         <div class="stat green"><div class="stat-label">CASPer Pro</div><div class="stat-val" id="dPro">—</div><div class="stat-sub">active subscriptions</div></div>
         <div class="stat"><div class="stat-label">Subscribers</div><div class="stat-val" id="dSubs">—</div><div class="stat-sub">newsletter list</div></div>
         <div class="stat amber"><div class="stat-label">Enquiries</div><div class="stat-val" id="dEnq">—</div><div class="stat-sub">contact form</div></div>
+        <div class="stat blue"><div class="stat-label">Today</div><div class="stat-val" id="dTodayReviews">—</div><div class="stat-sub">AI reviews today</div></div>
+        <div class="stat"><div class="stat-label">Avg Score</div><div class="stat-val" id="dAvgScore">—</div><div class="stat-sub">recent scored reviews</div></div>
+        <div class="stat green"><div class="stat-label">Pro Run Rate</div><div class="stat-val" id="dProRunRate">—</div><div class="stat-sub">weekly AUD estimate</div></div>
+        <div class="stat amber"><div class="stat-label">Inbox</div><div class="stat-val" id="dUnread">—</div><div class="stat-sub">unread conversations</div></div>
+      </div>
+      <div class="ops-grid">
+        <div class="ops-card">
+          <div class="dash-card-title">Priority Queue <span class="badge badge-default" id="dashQueueCount">—</span></div>
+          <div id="dashActionQueue"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+        <div class="ops-card">
+          <div class="dash-card-title">Business Health</div>
+          <div class="insight-grid" id="dashInsights"></div>
+        </div>
       </div>
       <div class="dash-grid">
         <div class="dash-card">
-          <div class="dash-card-title">Recent Enquiries</div>
+          <div class="dash-card-title">Recent Activity</div>
+          <div class="dash-list" id="dashActivity"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">Review Quality Signals</div>
+          <div class="dash-list" id="dashReviewQuality"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-title">Recent Enquiries <button class="btn" style="font-size:0.68rem;padding:3px 8px;" onclick="nav('enquiries')">View all</button></div>
           <div class="dash-list" id="dashRecentEnq"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
         </div>
         <div class="dash-card">
-          <div class="dash-card-title">Recent Signups</div>
+          <div class="dash-card-title">Recent Signups <button class="btn" style="font-size:0.68rem;padding:3px 8px;" onclick="nav('users')">View all</button></div>
           <div class="dash-list" id="dashRecentUsers"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
         </div>
       </div>
@@ -394,6 +494,13 @@
           <option value="pro">Pro</option>
           <option value="paid">Paid</option>
         </select>
+        <select class="ctrl-sel" id="revScore" onchange="renderReviews()">
+          <option value="">All scores</option>
+          <option value="high">High 8-10</option>
+          <option value="mid">Mid 5-7</option>
+          <option value="low">Low 1-4</option>
+          <option value="missing">No score</option>
+        </select>
         <select class="ctrl-sel" id="revLimit" onchange="loadReviews()">
           <option value="50" selected>50 rows</option>
           <option value="100">100 rows</option>
@@ -405,7 +512,7 @@
       <div class="tbl-wrap">
         <div class="tbl-toolbar"><span class="tbl-status" id="revStatus">—</span></div>
         <div class="tbl-scroller"><table><thead><tr>
-          <th style="width:26px;"></th><th>Time</th><th>Student</th><th>Tool</th><th>Tier</th><th>Score</th><th>Scenario</th><th>Response</th>
+          <th style="width:26px;"></th><th>Time</th><th>Student</th><th>Tool</th><th>Tier</th><th>Score</th><th>Signals</th><th>Scenario</th><th>Response</th>
         </tr></thead><tbody id="revBody"></tbody></table></div>
         <div class="empty hidden" id="revEmpty">No reviews match your filters.</div>
       </div>
@@ -414,8 +521,19 @@
     <!-- ── USERS ── -->
     <div id="pageUsers" class="page">
       <div class="page-header">
-        <div class="page-title">User Accounts</div>
-        <div class="page-sub">All registered accounts</div>
+        <div>
+          <div class="page-title">User Accounts</div>
+          <div class="page-sub">Student accounts, credits, spend, activity, and admin actions.</div>
+        </div>
+      </div>
+      <div class="segment-bar" id="usrSegments">
+        <button class="seg active" data-segment="all" onclick="setUserSegment('all')">All</button>
+        <button class="seg" data-segment="pro" onclick="setUserSegment('pro')">Pro</button>
+        <button class="seg" data-segment="paying" onclick="setUserSegment('paying')">Paying</button>
+        <button class="seg" data-segment="credits" onclick="setUserSegment('credits')">Has credits</button>
+        <button class="seg" data-segment="today" onclick="setUserSegment('today')">Used free today</button>
+        <button class="seg" data-segment="needs_review" onclick="setUserSegment('needs_review')">No reviews</button>
+        <button class="seg" data-segment="high_value" onclick="setUserSegment('high_value')">High value</button>
       </div>
       <div class="controls">
         <input class="ctrl-in" id="usrSearch" type="text" placeholder="🔍 Search email or name…" oninput="renderUsers()">
@@ -635,6 +753,7 @@ const S = {
   detailCache: new Map(),
   creditModalUserId: null,
   tierModalUserId: null,
+  userSegment: 'all',
 };
 
 // ══════════════════════════════════════════════════════
@@ -732,7 +851,15 @@ async function bootLoad() {
     loadReviews(), loadUsers(), loadEnquiries(),
     loadSubscribers(), loadInbox(),
   ]);
+  const lu = document.getElementById('lastUpdated');
+  if (lu) lu.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
   updateDashboard();
+}
+
+async function refreshAll() {
+  const lu = document.getElementById('lastUpdated');
+  if (lu) lu.textContent = 'Refreshing…';
+  await bootLoad();
 }
 
 // ══════════════════════════════════════════════════════
@@ -748,18 +875,41 @@ function updateDashboard() {
   const paying  = users.filter(u=>Number(u.total_spend_aud||0)>0).length;
   const credits = users.reduce((s,u)=>s+Number(u.casper_balance||0)+Number(u.gamsat_balance||0),0);
   const pro     = users.filter(u=>(u.tier||'').toLowerCase()==='pro').length;
+  const todayReviews = reviews.filter(r=>isToday(r.created_at)).length;
+  const signups7 = users.filter(u=>withinDays(u.created_at,7)).length;
+  const enqs7 = enqs.filter(e=>withinDays(e.created_at,7)).length;
+  const scored = reviews.map(r=>Number(parseFb(r.ai_feedback)?.score)).filter(n=>Number.isFinite(n));
+  const avgScore = scored.length ? scored.reduce((a,b)=>a+b,0)/scored.length : null;
+  const uniqueReviewers = new Set(reviews.map(r=>r.email).filter(Boolean)).size;
+  const unread = S.conversations.filter(c=>c.messages?.some(m=>m.direction==='inbound'&&!m.read)).length;
+  const noReviews = users.filter(u=>Number(u.review_count||0)===0).length;
+  const freeToday = users.filter(u=>u.usage_today?.casper?.used_free_today||u.usage_today?.gamsat?.used_free_today).length;
+  const proRunRate = pro * 40;
+  const conversion = (paying/Math.max(users.length,1))*100;
 
   document.getElementById('dRevenue').textContent  = `$${revenue.toFixed(2)}`;
   document.getElementById('dUsers').textContent     = users.length;
-  document.getElementById('dUsersSub').textContent  = `${users.filter(u=>(u.tier||'')==='free').length} free`;
+  document.getElementById('dUsersSub').textContent  = `${signups7} new in 7 days`;
   document.getElementById('dPaying').textContent    = paying;
-  document.getElementById('dPayingSub').textContent = `${((paying/Math.max(users.length,1))*100).toFixed(0)}% conversion`;
+  document.getElementById('dPayingSub').textContent = `${conversion.toFixed(0)}% conversion`;
   document.getElementById('dReviews').textContent   = reviews.length;
-  document.getElementById('dReviewsSub').textContent= `${new Set(reviews.map(r=>r.email)).size} students`;
+  document.getElementById('dReviewsSub').textContent= `${uniqueReviewers} students`;
   document.getElementById('dCredits').textContent   = credits;
   document.getElementById('dPro').textContent       = pro;
   document.getElementById('dSubs').textContent      = subs.length;
   document.getElementById('dEnq').textContent       = enqs.length;
+  document.getElementById('dTodayReviews').textContent = todayReviews;
+  document.getElementById('dAvgScore').textContent = avgScore ? avgScore.toFixed(1) : '—';
+  document.getElementById('dProRunRate').textContent = `$${proRunRate}`;
+  document.getElementById('dUnread').textContent = unread;
+  document.getElementById('dashHeadline').textContent = `${todayReviews} reviews today, ${unread} unread conversation${unread===1?'':'s'}`;
+  document.getElementById('dashBrief').textContent =
+    `${users.length} registered students, ${paying} paying customers, ${pro} Pro accounts, ${enqs7} enquiries in the last 7 days. Average recent AI score is ${avgScore ? `${avgScore.toFixed(1)}/10` : 'not available yet'}.`;
+
+  renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length});
+  renderBusinessInsights({conversion,revenue,pro,proRunRate,paying,users,credits,reviews,todayReviews,signups7,enqs7,avgScore});
+  renderActivityFeed();
+  renderReviewQuality();
 
   // Recent enquiries
   const enqEl = document.getElementById('dashRecentEnq');
@@ -778,11 +928,70 @@ function updateDashboard() {
     </div>`).join('')||'<div style="color:var(--muted2);font-size:0.8rem;">No users yet</div>';
 
   // Update nav badges
-  const unread = S.conversations.filter(c=>c.messages?.some(m=>m.direction==='inbound'&&!m.read)).length;
   const ib = document.getElementById('inboxBadge');
   ib.textContent = unread; ib.classList.toggle('show', unread>0);
   const eb = document.getElementById('enqBadge');
   eb.textContent = enqs.length; eb.classList.toggle('show', enqs.length>0);
+}
+
+function renderActionQueue(m) {
+  const items = [
+    {icon:'!', title:`${m.unread} unread inbox thread${m.unread===1?'':'s'}`, sub:'Reply quickly to keep coaching leads warm.', page:'inbox', show:m.unread>0, tone:'red'},
+    {icon:'$', title:`${m.enqs7} fresh enquir${m.enqs7===1?'y':'ies'} this week`, sub:'Follow up while intent is highest.', page:'enquiries', show:m.enqs7>0, tone:'amber'},
+    {icon:'AI', title:`${m.freeToday} student${m.freeToday===1?'':'s'} used free reviews today`, sub:'Good moment to invite credit purchase or Pro.', page:'users', show:m.freeToday>0, tone:'blue'},
+    {icon:'0', title:`${m.noReviews} account${m.noReviews===1?'':'s'} with no reviews`, sub:'Candidates for onboarding or activation email.', page:'users', show:m.noReviews>0, tone:'amber'},
+  ].filter(item=>item.show).slice(0,4);
+  if (!items.length) items.push({icon:'OK', title:'No urgent owner actions', sub:'Inbox, enquiries, and student usage look calm.', page:'dashboard', show:true, tone:'green'});
+  document.getElementById('dashQueueCount').textContent = `${items.length}`;
+  document.getElementById('dashActionQueue').innerHTML = items.map(item=>`
+    <div class="queue-item">
+      <div class="queue-icon" style="color:var(--${item.tone});">${esc(item.icon)}</div>
+      <div><div class="queue-title">${esc(item.title)}</div><div class="queue-sub">${esc(item.sub)}</div></div>
+      <button class="btn ${item.tone==='green'?'green':item.tone==='red'?'red':item.tone==='amber'?'amber':'blue'}" onclick="nav('${item.page}')">Open</button>
+    </div>`).join('');
+}
+
+function renderBusinessInsights(m) {
+  const reviewPerUser = m.users.length ? m.reviews.length / m.users.length : 0;
+  const creditPerUser = m.users.length ? m.credits / m.users.length : 0;
+  document.getElementById('dashInsights').innerHTML = `
+    <div class="insight"><div class="insight-label">Paid conversion</div><div class="insight-val">${m.conversion.toFixed(0)}%</div><div class="meter"><div class="meter-fill" style="width:${Math.min(100,m.conversion)}%"></div></div><div class="insight-note">${m.paying} paying of ${m.users.length} users</div></div>
+    <div class="insight"><div class="insight-label">Pro weekly</div><div class="insight-val">$${m.proRunRate}</div><div class="insight-note">${m.pro} active subscriptions at $40/week</div></div>
+    <div class="insight"><div class="insight-label">Engagement</div><div class="insight-val">${reviewPerUser.toFixed(1)}</div><div class="insight-note">AI reviews per registered user</div></div>
+    <div class="insight"><div class="insight-label">Credits Held</div><div class="insight-val">${m.credits}</div><div class="insight-note">${creditPerUser.toFixed(1)} unused credits per user</div></div>
+    <div class="insight"><div class="insight-label">Today</div><div class="insight-val">${m.todayReviews}</div><div class="insight-note">reviews submitted today</div></div>
+    <div class="insight"><div class="insight-label">Lead Flow</div><div class="insight-val">${m.enqs7}</div><div class="insight-note">enquiries in the last 7 days</div></div>`;
+}
+
+function renderActivityFeed() {
+  const events = [
+    ...S.reviews.slice(0,8).map(r=>({type:'Review', title:r.email||r.name||'Unknown student', sub:`${r.tool||'AI'} review ${parseFb(r.ai_feedback)?.score ? `· ${parseFb(r.ai_feedback).score}/10` : ''}`, at:r.created_at, page:'reviews'})),
+    ...S.users.slice(0,8).map(u=>({type:'Signup', title:u.email||u.name||'New user', sub:`${u.tier||'free'} account`, at:u.created_at, page:'users'})),
+    ...S.enquiries.slice(0,8).map(e=>({type:'Enquiry', title:e.name||e.email||'New enquiry', sub:e.type||'General', at:e.created_at, page:'enquiries'})),
+  ].filter(e=>e.at).sort((a,b)=>new Date(b.at)-new Date(a.at)).slice(0,8);
+  document.getElementById('dashActivity').innerHTML = events.length ? events.map(e=>`
+    <div class="activity-item">
+      <div class="activity-type">${esc(e.type)}</div>
+      <div><div class="queue-title">${esc(e.title)}</div><div class="queue-sub">${esc(e.sub)}</div></div>
+      <button class="btn" onclick="nav('${e.page}')">${relTime(e.at)}</button>
+    </div>`).join('') : '<div style="color:var(--muted2);font-size:0.8rem;">No activity yet.</div>';
+}
+
+function renderReviewQuality() {
+  const rows = S.reviews.map(r=>({row:r, fb:parseFb(r.ai_feedback)})).filter(x=>x.fb);
+  const scored = rows.map(x=>Number(x.fb.score)).filter(Number.isFinite);
+  const avg = scored.length ? scored.reduce((a,b)=>a+b,0)/scored.length : null;
+  const lows = rows.filter(x=>Number(x.fb.score)<=4).slice(0,4);
+  const comps = aggregateCompetencies(rows.map(x=>x.fb));
+  const weakest = comps.slice().sort((a,b)=>a.avg-b.avg).slice(0,3);
+  document.getElementById('dashReviewQuality').innerHTML = `
+    <div class="mini-metric-row">
+      <div class="mini-metric"><div>Avg score</div><div>${avg ? avg.toFixed(1) : '—'}</div></div>
+      <div class="mini-metric"><div>Low scores</div><div>${lows.length}</div></div>
+      <div class="mini-metric"><div>Competency data</div><div>${comps.length}</div></div>
+    </div>
+    ${weakest.length ? `<div class="competency-list">${weakest.map(c=>competencyRow(c.name,c.avg)).join('')}</div>` : '<div style="color:var(--muted2);font-size:0.8rem;">Competency breakdowns will appear as new CASPer reviews are marked.</div>'}
+    ${lows.length ? `<div style="margin-top:12px;">${lows.map(x=>`<div class="dash-row"><span class="dash-row-label">${esc(x.row.email||'Unknown')}</span><span class="score-box ${scoreC(x.fb.score)}">${esc(x.fb.score)}</span></div>`).join('')}</div>` : ''}`;
 }
 
 // ══════════════════════════════════════════════════════
@@ -796,6 +1005,7 @@ async function loadReviews() {
     if (!res.ok) throw new Error(data?.error||'Failed');
     S.reviews = data.rows||[];
     renderReviews();
+    updateDashboard();
   } catch(e) { console.error('Reviews load error:', e); }
 }
 
@@ -803,11 +1013,18 @@ function renderReviews() {
   const q    = (document.getElementById('revSearch')?.value||'').toLowerCase();
   const tool = document.getElementById('revTool')?.value||'';
   const tier = document.getElementById('revTier')?.value||'';
+  const scoreFilter = document.getElementById('revScore')?.value||'';
   const rows = S.reviews.filter(r => {
+    const score = Number(parseFb(r.ai_feedback)?.score);
     const sm = !q || [r.email,r.name,r.tool,r.question_text,r.response_text].some(v=>String(v||'').toLowerCase().includes(q));
     const tm = !tool || r.tool===tool;
     const trm= !tier || r.tier===tier;
-    return sm&&tm&&trm;
+    const scm = !scoreFilter
+      || (scoreFilter==='missing' && !Number.isFinite(score))
+      || (scoreFilter==='high' && score>=8)
+      || (scoreFilter==='mid' && score>=5 && score<8)
+      || (scoreFilter==='low' && score>0 && score<5);
+    return sm&&tm&&trm&&scm;
   });
   document.getElementById('revStatus').textContent = `${rows.length} review${rows.length===1?'':'s'}`;
   document.getElementById('revEmpty').classList.toggle('hidden', rows.length>0);
@@ -819,6 +1036,7 @@ function renderReviews() {
     const dt    = fmtDate(row.created_at);
     const p     = parseQ(row.question_text);
     const prev  = (p?.scenario||row.question_text||'').substring(0,100);
+    const signals = renderReviewSignals(fb);
 
     const dr = document.createElement('tr');
     dr.className = 'data-row';
@@ -829,11 +1047,12 @@ function renderReviews() {
       <td>${toolBadge(row.tool)}</td>
       <td>${tierBadge(row.tier)}</td>
       <td>${score?`<div class="score-box ${scoreC(score)}">${score}</div>`:'<span style="color:var(--muted2);">—</span>'}</td>
+      <td>${signals}</td>
       <td><div class="trunc">${esc(prev)}${prev.length>=100?'…':''}</div></td>
       <td><div class="trunc">${esc((row.response_text||'').substring(0,100))}</div></td>`;
     const xr = document.createElement('tr');
     xr.className = 'detail-row';
-    xr.innerHTML = `<td colspan="8" class="detail-panel"><div class="detail-inner">
+    xr.innerHTML = `<td colspan="9" class="detail-panel"><div class="detail-inner">
       <div class="detail-box"><div class="detail-box-hd">Scenario & Prompts</div>${renderQBox(row.question_text)}</div>
       <div class="detail-box"><div class="detail-box-hd">Student Response</div><div class="detail-box-body">${esc(row.response_text||'—')}</div></div>
       <div class="detail-box"><div class="detail-box-hd">AI Feedback</div>${renderFbBox(row.ai_feedback)}</div>
@@ -861,6 +1080,12 @@ async function loadUsers() {
   } catch(e) { console.error('Users load error:', e); }
 }
 
+function setUserSegment(segment) {
+  S.userSegment = segment;
+  document.querySelectorAll('#usrSegments .seg').forEach(btn => btn.classList.toggle('active', btn.dataset.segment===segment));
+  renderUsers();
+}
+
 function renderUsers() {
   const q      = (document.getElementById('usrSearch')?.value||'').toLowerCase();
   const paying = document.getElementById('usrPaying')?.value||'';
@@ -868,8 +1093,17 @@ function renderUsers() {
     const sm = !q || [u.email,u.name].some(v=>String(v||'').toLowerCase().includes(q));
     const spend = Number(u.total_spend_aud||0);
     const creds = Number(u.casper_balance||0)+Number(u.gamsat_balance||0);
+    const usedToday = u.usage_today?.casper?.used_free_today||u.usage_today?.gamsat?.used_free_today;
+    const seg = S.userSegment||'all';
     const pm = !paying ||(paying==='paying'&&spend>0)||(paying==='credits'&&creds>0)||(paying==='never'&&spend===0);
-    return sm&&pm;
+    const segMatch = seg==='all'
+      || (seg==='pro' && String(u.tier||'').toLowerCase()==='pro')
+      || (seg==='paying' && spend>0)
+      || (seg==='credits' && creds>0)
+      || (seg==='today' && usedToday)
+      || (seg==='needs_review' && Number(u.review_count||0)===0)
+      || (seg==='high_value' && spend>=50);
+    return sm&&pm&&segMatch;
   });
   document.getElementById('usrStatus').textContent = `${rows.length} user${rows.length===1?'':'s'}`;
   document.getElementById('usrEmpty').classList.toggle('hidden', rows.length>0);
@@ -939,9 +1173,18 @@ function renderUserDetail(det) {
   const payments = det.payments||[];
   const reviews  = det.reviews||[];
   const totalSpend = payments.filter(p=>p.status==='completed').reduce((s,p)=>s+Number(p.amount_aud||0),0);
+  const scored = reviews.map(r=>Number(parseFb(r.ai_feedback)?.score)).filter(Number.isFinite);
+  const avgScore = scored.length ? scored.reduce((a,b)=>a+b,0)/scored.length : null;
+  const comps = aggregateCompetencies(reviews.map(r=>parseFb(r.ai_feedback)).filter(Boolean));
+  const weakest = comps.slice().sort((a,b)=>a.avg-b.avg).slice(0,4);
   return `<div class="detail-inner">
     <div class="detail-box">
       <div class="detail-box-hd">Account</div>
+      <div class="mini-metric-row">
+        <div class="mini-metric"><div>Spend</div><div>${fmtMoney(totalSpend)}</div></div>
+        <div class="mini-metric"><div>Reviews</div><div>${reviews.length}</div></div>
+        <div class="mini-metric"><div>Avg score</div><div>${avgScore ? avgScore.toFixed(1) : '—'}</div></div>
+      </div>
       <div class="detail-box-row"><strong>${esc(u.email||'—')}</strong></div>
       <div class="detail-box-row">Name: <strong>${esc(u.name||'—')}</strong></div>
       <div class="detail-box-row">Tier: ${tierBadge(u.tier)}</div>
@@ -967,6 +1210,7 @@ function renderUserDetail(det) {
     </div>
     <div class="detail-box">
       <div class="detail-box-hd">Recent Reviews (${reviews.length})</div>
+      ${weakest.length ? `<div class="competency-list" style="margin-bottom:10px;">${weakest.map(c=>competencyRow(c.name,c.avg)).join('')}</div>` : ''}
       <table class="subtbl"><thead><tr><th>Tool</th><th>Score</th><th>Source</th><th>Time</th></tr></thead><tbody>
         ${reviews.length?reviews.map(r=>{const fb=parseFb(r.ai_feedback);return`<tr><td>${toolBadge(r.tool)}</td><td>${fb?.score||'—'}</td><td>${esc(r.credit_source||'—')}</td><td>${relTime(r.created_at)}</td></tr>`;}).join(''):'<tr><td colspan="4" style="color:var(--muted2);">No reviews</td></tr>'}
       </tbody></table>
@@ -1341,7 +1585,68 @@ function toolBadge(t) { const c=String(t||'').toLowerCase(); return `<span class
 function tierBadge(t) { const c=String(t||'').toLowerCase(); return `<span class="badge badge-${c==='pro'?'pro':c==='paid'||c==='premium'?'paid':'free'}">${esc(t||'free')}</span>`; }
 function yesNo(v) { return `<span class="badge badge-${v?'yes':'no'}">${v?'Yes':'No'}</span>`; }
 function scoreC(s) { const n=parseInt(s,10); return n>=7?'score-h':n>=5?'score-m':'score-l'; }
-function parseFb(raw) { if(!raw) return null; if(typeof raw==='object') return raw; try{return JSON.parse(raw);}catch{return null;} }
+function parseFb(raw) {
+  if(!raw) return null;
+  if(typeof raw==='object') return raw;
+  const text = String(raw).trim();
+  try { return JSON.parse(text); } catch {}
+  const match = text.match(/\{[\s\S]*\}/);
+  if (match) { try { return JSON.parse(match[0]); } catch {} }
+  const scoreMatch = text.match(/(?:score|mark)\D{0,12}(\d+(?:\.\d+)?)\s*(?:\/\s*10)?/i);
+  return scoreMatch ? { score:Number(scoreMatch[1]), summary:text } : null;
+}
+function localDay(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d)) return '';
+  return d.toLocaleDateString('en-CA',{timeZone:'Australia/Melbourne'});
+}
+function isToday(iso) { return localDay(iso)===localDay(new Date().toISOString()); }
+function withinDays(iso, days) {
+  if (!iso) return false;
+  const t = new Date(iso).getTime();
+  return Number.isFinite(t) && (Date.now()-t) <= days*86400000;
+}
+function getCompetencies(fb) {
+  if (!fb) return [];
+  const raw = Array.isArray(fb.competencies) ? fb.competencies : Array.isArray(fb.competency_breakdown) ? fb.competency_breakdown : [];
+  return raw.map(c=>({
+    name:String(c.name||c.competency||c.label||'Competency').trim(),
+    score:Number(c.score ?? c.mark ?? c.rating),
+    note:String(c.note||c.feedback||c.evidence||'').trim()
+  })).filter(c=>c.name && Number.isFinite(c.score));
+}
+function aggregateCompetencies(feedbacks) {
+  const map = new Map();
+  feedbacks.forEach(fb => getCompetencies(fb).forEach(c => {
+    const key = c.name.toLowerCase();
+    if (!map.has(key)) map.set(key,{name:c.name,total:0,count:0});
+    const row = map.get(key);
+    row.total += c.score; row.count += 1;
+  }));
+  return [...map.values()].map(c=>({name:c.name,avg:c.total/c.count,count:c.count}));
+}
+function competencyRow(name, score) {
+  const pct = Math.max(0, Math.min(100, (Number(score)||0)*10));
+  return `<div class="competency-row">
+    <div><div class="competency-name">${esc(name)}</div><div class="competency-bar"><span style="width:${pct}%"></span></div></div>
+    <div class="competency-score">${Number(score).toFixed(1)}</div>
+  </div>`;
+}
+function renderReviewSignals(fb) {
+  const comps = getCompetencies(fb);
+  if (!comps.length) return '<span style="color:var(--muted2);">—</span>';
+  const sorted = comps.slice().sort((a,b)=>a.score-b.score);
+  const low = sorted[0];
+  const high = sorted[sorted.length-1];
+  return `<div class="signal-stack">
+    <span class="signal-chip low">Low: ${esc(shortCompetency(low.name))} ${low.score}</span>
+    <span class="signal-chip high">High: ${esc(shortCompetency(high.name))} ${high.score}</span>
+  </div>`;
+}
+function shortCompetency(name) {
+  return String(name||'').replace('Problem Solving','Problem').replace('Self-Awareness','Self-aware');
+}
 function parseQ(text) {
   if (!text) return null;
   const raw=String(text).trim();
@@ -1361,7 +1666,14 @@ function renderFbBox(raw) {
   if(!fb) return `<div class="detail-box-body">${esc(String(raw||'—'))}</div>`;
   const s=fb.score; const n=s?parseInt(s,10):null;
   const q=n?n>=8?'Q4 — Excellent':n>=6?'Q3 — Good':n>=4?'Q2 — Developing':'Q1 — Needs Work':null;
-  return `${s?`<div class="detail-box-body" style="margin-bottom:8px;"><strong>${esc(s)}/10</strong> ${q?`<span class="badge badge-default" style="margin-left:4px;">${q}</span>`:''}</div>`:''}${fb.strengths?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Strengths</div><div class="detail-box-body">${esc(fb.strengths)}</div></div>`:''}${fb.improvements?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Improvements</div><div class="detail-box-body">${esc(fb.improvements)}</div></div>`:''}${fb.empathy?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Empathy</div><div class="detail-box-body">${esc(fb.empathy)}</div></div>`:''}${fb.missed&&fb.missed!=='None'?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Missed</div><div class="detail-box-body">${esc(fb.missed)}</div></div>`:''}`;
+  const comps = getCompetencies(fb);
+  return `${s?`<div class="detail-box-body" style="margin-bottom:8px;"><strong>${esc(s)}/10</strong> ${q?`<span class="badge badge-default" style="margin-left:4px;">${q}</span>`:''}</div>`:''}
+    ${comps.length?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Competencies</div><div class="competency-list">${comps.map(c=>competencyRow(c.name,c.score)).join('')}</div></div>`:''}
+    ${fb.strengths?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Strengths</div><div class="detail-box-body">${esc(fb.strengths)}</div></div>`:''}
+    ${fb.improvements?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Improvements</div><div class="detail-box-body">${esc(fb.improvements)}</div></div>`:''}
+    ${fb.empathy?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Empathy</div><div class="detail-box-body">${esc(fb.empathy)}</div></div>`:''}
+    ${fb.missed&&fb.missed!=='None'?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Missed</div><div class="detail-box-body">${esc(fb.missed)}</div></div>`:''}
+    ${fb.summary&&!fb.strengths?`<div style="margin-top:6px;"><div class="detail-box-body">${esc(fb.summary)}</div></div>`:''}`;
 }
 </script>
 </body>
