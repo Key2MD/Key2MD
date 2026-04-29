@@ -1664,7 +1664,18 @@ function updateCategoryHeatmap(){
 // Simulated student pool — deterministic per day so it looks consistent
 function seededRandom(seed){let s=seed;return function(){s=(s*16807+0)%2147483647;return(s-1)/2147483646;};}
 
-function getTodaysSeed(){const d=new Date();return d.getFullYear()*10000+d.getMonth()*100+d.getDate();}
+function getTodaysSeed(){
+  const d=new Date();
+  // Pack date into integer, then hash with multiplicative mixer.
+  // Without the hash, adjacent days produce near-identical seeds and the LCG's first output
+  // barely changes day-to-day — which locks the leaderboard count at the same value forever.
+  const dateInt = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
+  let h = dateInt;
+  h = ((h ^ (h >>> 16)) * 0x85ebca6b) >>> 0;
+  h = ((h ^ (h >>> 13)) * 0xc2b2ae35) >>> 0;
+  h = (h ^ (h >>> 16)) >>> 0;
+  return (h % 2147483646) + 1;  // ensure non-zero so LCG doesn't stall
+}
 
 const LB_NAMES=[
   // Real-ish names (some people just use their name)
