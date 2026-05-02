@@ -31,6 +31,7 @@
   <meta name="twitter:title" content="Free CASPer Practice — 90+ Scenarios, AI Feedback">
   <meta name="twitter:description" content="Timed stations, AI feedback, 90+ real-style scenarios. For Australian med applicants.">
   <link rel="stylesheet" href="practice.css">
+  <link rel="stylesheet" href="mmi-styles.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -345,16 +346,66 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
     <!-- MMI options -->
     <div class="sidebar-card" id="mmiOptionsCard" style="display:none;">
-      <h3>MMI Options</h3>
-      <div class="mmi-options">
-        <div class="mmi-opt-row">
-          <span class="mmi-opt-label">Hide prompts during reading</span>
+      <h3>MMI Setup</h3>
+
+      <!-- Timing Preset -->
+      <div class="mmi-config-section">
+        <label class="mmi-config-label">Timing Preset</label>
+        <div class="preset-grid" id="presetGrid">
+          <button class="preset-card active" data-preset="quickfire" onclick="selectMMIPreset('quickfire')">
+            <div class="preset-name">Quickfire</div>
+            <div class="preset-detail">45s read · 4 prompts · 1 min each</div>
+          </button>
+          <button class="preset-card" data-preset="standard" onclick="selectMMIPreset('standard')">
+            <div class="preset-name">Standard (UQ)</div>
+            <div class="preset-detail">2 min read · 3 prompts · 5 min</div>
+          </button>
+          <button class="preset-card" data-preset="extended" onclick="selectMMIPreset('extended')">
+            <div class="preset-name">Extended (UNSW)</div>
+            <div class="preset-detail">2 min read · 4 sequential · 8 min</div>
+          </button>
+          <button class="preset-card" data-preset="random" onclick="selectMMIPreset('random')">
+            <div class="preset-name">Random Probe</div>
+            <div class="preset-detail">2 min + 1st Q · 7 min · random follow-ups</div>
+          </button>
+          <button class="preset-card" data-preset="custom" onclick="selectMMIPreset('custom')" style="grid-column:1/-1;">
+            <div class="preset-name">Custom</div>
+            <div class="preset-detail">Set your own timing and prompt count</div>
+          </button>
+        </div>
+        <div class="mmi-custom-config" id="mmiCustomConfig">
+          <label class="mmi-config-label" style="margin-top:0;">Reading Time (seconds, 0–300)</label>
+          <input type="number" id="customReadingTime" min="0" max="300" value="120">
+          <label class="mmi-config-label">Recording Time (seconds, max 600)</label>
+          <input type="number" id="customRecordingTime" min="60" max="600" value="300">
+          <label class="mmi-config-label">Number of Prompts (1–4)</label>
+          <input type="number" id="customPromptCount" min="1" max="4" value="2">
+        </div>
+      </div>
+
+      <!-- Hide prompts toggle -->
+      <div class="mmi-config-section">
+        <label class="mmi-config-label">Station Options</label>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:0.8rem;color:var(--gray800);">Hide prompts during reading</span>
           <label class="toggle-switch">
             <input type="checkbox" id="mmiHidePrompts">
             <span class="toggle-slider"></span>
           </label>
         </div>
-        <div style="font-size:0.72rem;color:var(--gray400);line-height:1.5;margin-top:2px;">Off by default. Enable to simulate universities that hide questions until answering begins.</div>
+        <div style="font-size:0.7rem;color:var(--gray400);line-height:1.4;">Enable to simulate universities that reveal questions only when answering begins.</div>
+      </div>
+
+      <!-- Specialist mode -->
+      <div class="mmi-specialist-row" id="specialistModeRow">
+        <div>
+          <div class="mmi-specialist-label">Specialist Training Mode</div>
+          <div class="mmi-specialist-sub">Higher bar on all five criteria. For RACS, RANZCP, ACEM, ACRRM, etc.</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="specialistModeToggle" onchange="toggleSpecialistMode()">
+          <span class="toggle-slider"></span>
+        </label>
       </div>
     </div>
 
@@ -498,10 +549,19 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         </div>
       </div>
 
-      <!-- MMI AI note -->
-      <div id="mmiAiNote" style="display:none;margin-top:10px;padding:10px 12px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:8px;">
-        <div style="font-size:0.78rem;font-weight:600;color:#7c3aed;">🎤 MMI AI Marking — Coming Soon</div>
-        <div style="font-size:0.72rem;color:var(--gray400);margin-top:3px;">AI marking for video/spoken MMI responses is in development. For now, use the free practice stations and submit to Dan for expert feedback.</div>
+      <!-- MMI AI credits display -->
+      <div id="mmiAiNote" style="display:none;margin-top:10px;">
+        <div class="mmi-credit-info">
+          <div class="mmi-credit-row" style="margin-bottom:6px;">
+            <span class="mmi-credit-label">Free daily MMI review</span>
+            <span class="mmi-credit-count" id="mmiFreeBadge">1 remaining</span>
+          </div>
+          <div class="mmi-credit-row">
+            <span class="mmi-credit-label">Purchased credits</span>
+            <span class="mmi-credit-count" id="mmiCreditCount">0</span>
+          </div>
+        </div>
+        <a href="plans.html" style="display:block;margin-top:8px;padding:8px;border-radius:8px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);color:#7c3aed;font-size:0.78rem;font-weight:600;text-align:center;text-decoration:none;" onmouseover="this.style.background='rgba(124,58,237,0.14)'" onmouseout="this.style.background='rgba(124,58,237,0.08)'">Buy MMI Credits →</a>
       </div>
     </div>
 
@@ -645,6 +705,16 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <div id="prompt2Wrap" style="display:none;">
           <div class="prompt-item"><div class="prompt-num">2</div><div class="prompt-text" id="prompt2Text"></div></div>
         </div>
+        <div id="prompt3Wrap" style="display:none;">
+          <div class="prompt-item"><div class="prompt-num">3</div><div class="prompt-text" id="prompt3Text"></div></div>
+        </div>
+        <div id="prompt4Wrap" style="display:none;">
+          <div class="prompt-item"><div class="prompt-num">4</div><div class="prompt-text" id="prompt4Text"></div></div>
+        </div>
+        <button class="btn-reveal-next" id="btnRevealNext" style="display:none;" onclick="mmiRevealNextPrompt()">
+          Reveal Next Prompt →
+          <span class="reveal-counter" id="revealCounter">1 of 2</span>
+        </button>
       </div>
       <div class="answer-section" id="answerSection" style="display:none;">
         <div class="answer-label">Your response <span class="word-count" id="wordCount">0 words</span>
@@ -671,6 +741,17 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="mmi-speaking-area" id="mmiSpeakingArea">
         <div class="speaking-instruction" id="speakingInstruction">
           <strong>🎤 Speak your answer aloud</strong> — this is a spoken station. Use the camera above to record and review your response. Focus on structure, empathy, and authentic delivery.
+        </div>
+        <div class="mmi-recording-status" id="mmiRecordingStatus" style="display:none;">
+          <div class="mmi-rec-dot"></div>
+          <span class="mmi-recording-timer" id="mmiRecordingTimer">0:00</span>
+          <span class="mmi-recording-label" id="mmiRecordingLabel">Recording…</span>
+        </div>
+        <div id="mmiSubmitWrap" style="display:none;">
+          <button class="btn-mmi-submit" id="btnMMISubmit" onclick="submitMMIForFeedback()">
+            ✦ Get AI Feedback
+          </button>
+          <div style="font-size:0.7rem;color:var(--gray400);text-align:center;margin-top:6px;">Transcribes and analyses your spoken response (15–30 seconds)</div>
         </div>
         <div id="aiFeedbackWrapMMI"></div>
       </div>
@@ -803,7 +884,237 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
 
 <script src="practice-stations.js"></script>
+<script src="mmi-recording.js"></script>
+<script src="mmi-feedback-render.js"></script>
 <script>
+// ══ MMI CONFIG & STATE ══════════════════════════════════════════════
+const MMI_PRESETS = {
+  quickfire: { readingTime:45,  recordingTime:240, promptCount:4, revealMode:'sequential' },
+  standard:  { readingTime:120, recordingTime:300, promptCount:3, revealMode:'all_at_once' },
+  extended:  { readingTime:120, recordingTime:480, promptCount:4, revealMode:'sequential' },
+  random:    { readingTime:120, recordingTime:420, promptCount:3, revealMode:'sequential' },
+  custom:    { readingTime:120, recordingTime:300, promptCount:2, revealMode:'all_at_once' },
+};
+let mmiActivePreset = 'quickfire';
+let mmiSpecialistMode = false;
+let mmiPromptRevealTimestamps = [];
+let mmiPromptsRevealedCount = 0;
+let mmiRecordingInterval = null;
+let mmiRecordingStartedAt = null;
+let mmiCurrentPrompts = [];
+let mmiRecordingDurationSec = 0;
+
+function selectMMIPreset(preset) {
+  mmiActivePreset = preset;
+  document.querySelectorAll('.preset-card').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`[data-preset="${preset}"]`);
+  if(btn) btn.classList.add('active');
+  const cc = document.getElementById('mmiCustomConfig');
+  if(cc) cc.classList.toggle('visible', preset === 'custom');
+  const p = MMI_PRESETS[preset];
+  if(p && preset !== 'custom') { mmiReadingTime = p.readingTime; mmiAnswerTime = p.recordingTime; }
+}
+
+function toggleSpecialistMode() {
+  mmiSpecialistMode = document.getElementById('specialistModeToggle')?.checked || false;
+  const row = document.getElementById('specialistModeRow');
+  if(row) row.classList.toggle('active', mmiSpecialistMode);
+}
+
+function getMMIConfig() {
+  if(mmiActivePreset === 'custom') {
+    return {
+      preset: 'custom',
+      readingTime:   Math.min(300, Math.max(0, parseInt(document.getElementById('customReadingTime')?.value||'120',10))),
+      recordingTime: Math.min(600, Math.max(60, parseInt(document.getElementById('customRecordingTime')?.value||'300',10))),
+      promptCount:   Math.min(4, Math.max(1, parseInt(document.getElementById('customPromptCount')?.value||'2',10))),
+      revealMode: 'all_at_once',
+    };
+  }
+  return { preset: mmiActivePreset, ...MMI_PRESETS[mmiActivePreset] };
+}
+
+function getPrompts(station) {
+  if(Array.isArray(station.prompts)) return station.prompts;
+  const p = [];
+  if(station.prompt1) p.push(station.prompt1);
+  if(station.prompt2) p.push(station.prompt2);
+  if(station.prompt3) p.push(station.prompt3);
+  if(station.prompt4) p.push(station.prompt4);
+  return p;
+}
+
+// ══ MMI RECORDING LIFECYCLE ═════════════════════════════════════════
+
+function mmiOnRecordingStart() {
+  const cfg = getMMIConfig();
+  const s = pool[currentIdx];
+  mmiCurrentPrompts = getPrompts(s).slice(0, cfg.promptCount);
+  mmiPromptRevealTimestamps = [];
+  mmiPromptsRevealedCount = 0;
+  mmiRecordingStartedAt = Date.now();
+  mmiRecordingDurationSec = 0;
+
+  // Sequential: first prompt already visible — log it at t=0
+  if(cfg.revealMode === 'sequential') {
+    mmiPromptRevealTimestamps.push({ prompt_index: 0, revealed_at_recording_seconds: 0 });
+    mmiPromptsRevealedCount = 1;
+  }
+
+  const statusBar = document.getElementById('mmiRecordingStatus');
+  if(statusBar) statusBar.style.display = 'flex';
+
+  clearInterval(mmiRecordingInterval);
+  mmiRecordingInterval = setInterval(() => {
+    mmiRecordingDurationSec = (Date.now() - mmiRecordingStartedAt) / 1000;
+    const el = document.getElementById('mmiRecordingTimer');
+    if(el) {
+      const m = Math.floor(mmiRecordingDurationSec / 60);
+      const s = Math.floor(mmiRecordingDurationSec % 60);
+      el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    }
+  }, 500);
+
+  updateRevealButton();
+}
+
+function mmiOnRecordingStop() {
+  clearInterval(mmiRecordingInterval);
+  mmiRecordingDurationSec = (Date.now() - mmiRecordingStartedAt) / 1000;
+  const bnr = document.getElementById('btnRevealNext');
+  if(bnr) bnr.style.display = 'none';
+  const sb = document.getElementById('mmiRecordingStatus');
+  if(sb) sb.style.display = 'none';
+  const sw = document.getElementById('mmiSubmitWrap');
+  if(sw) sw.style.display = 'block';
+}
+
+function mmiResetForRestart() {
+  clearInterval(mmiRecordingInterval);
+  mmiPromptRevealTimestamps = [];
+  mmiPromptsRevealedCount = 0;
+  mmiRecordingStartedAt = null;
+  mmiCurrentPrompts = [];
+  const sw = document.getElementById('mmiSubmitWrap');
+  if(sw) sw.style.display = 'none';
+  const sb = document.getElementById('mmiRecordingStatus');
+  if(sb) sb.style.display = 'none';
+  const bnr = document.getElementById('btnRevealNext');
+  if(bnr) bnr.style.display = 'none';
+  MMIFeedbackRender.clear(document.getElementById('aiFeedbackWrapMMI'));
+}
+
+function mmiRevealNextPrompt() {
+  if(mmiPromptsRevealedCount >= mmiCurrentPrompts.length) return;
+  const elapsed = (Date.now() - mmiRecordingStartedAt) / 1000;
+  mmiPromptRevealTimestamps.push({ prompt_index: mmiPromptsRevealedCount, revealed_at_recording_seconds: elapsed });
+  const idx = mmiPromptsRevealedCount;
+  const wrapEl = document.getElementById(`prompt${idx+1}Wrap`);
+  const textEl = document.getElementById(`prompt${idx+1}Text`);
+  if(wrapEl && textEl) { textEl.textContent = mmiCurrentPrompts[idx] || ''; wrapEl.style.display = 'block'; }
+  mmiPromptsRevealedCount++;
+  updateRevealButton();
+}
+
+function updateRevealButton() {
+  const cfg = getMMIConfig();
+  const btn = document.getElementById('btnRevealNext');
+  const counter = document.getElementById('revealCounter');
+  if(!btn) return;
+  if(cfg.revealMode !== 'sequential') { btn.style.display = 'none'; return; }
+  const remaining = mmiCurrentPrompts.length - mmiPromptsRevealedCount;
+  if(remaining <= 0) { btn.style.display = 'none'; return; }
+  btn.style.display = 'flex';
+  btn.disabled = false;
+  if(counter) counter.textContent = `${mmiPromptsRevealedCount + 1} of ${mmiCurrentPrompts.length}`;
+}
+
+// ══ MMI SUBMIT ═══════════════════════════════════════════════════════
+
+async function submitMMIForFeedback() {
+  if(!recordingBlob) { alert('No recording found. Please record your response first.'); return; }
+  const btn = document.getElementById('btnMMISubmit');
+  if(btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
+  const sw = document.getElementById('mmiSubmitWrap');
+  if(sw) sw.style.display = 'none';
+  const feedbackWrap = document.getElementById('aiFeedbackWrapMMI');
+  MMIFeedbackRender.renderLoading(feedbackWrap);
+
+  if(!Key2MDAuth.isLoggedIn()) {
+    Key2MDAuth.showAuthModal('signup');
+    MMIFeedbackRender.clear(feedbackWrap);
+    if(sw) sw.style.display = 'block';
+    if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
+    return;
+  }
+
+  const cfg = getMMIConfig();
+  const s = pool[currentIdx] || {};
+  const audioFile = new File([recordingBlob], 'recording.webm', { type: recordingBlob.type || 'audio/webm' });
+  const fd = new FormData();
+  fd.append('audio', audioFile);
+  fd.append('station_id', s.id || `mmi_${MMI_STATIONS.indexOf(s)}`);
+  fd.append('station_category', s.category || '');
+  fd.append('station_scenario', s.scenario || '');
+  fd.append('prompts', JSON.stringify(mmiCurrentPrompts));
+  fd.append('prompt_reveal_timestamps', JSON.stringify(mmiPromptRevealTimestamps));
+  fd.append('timing_preset', cfg.preset);
+  fd.append('reveal_mode', cfg.revealMode);
+  fd.append('recording_duration_seconds', String(Math.round(mmiRecordingDurationSec)));
+  fd.append('tier', 'transcript');
+  fd.append('specialist_mode', mmiSpecialistMode ? '1' : '0');
+  fd.append('use_credit', '0');
+
+  const token = Key2MDAuth.getToken();
+  try {
+    const res = await fetch(API_BASE + '/api/mmi-review', {
+      method: 'POST',
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      body: fd,
+    });
+    if(res.status === 401) {
+      Key2MDAuth.showAuthModal('signup');
+      MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_required', message: 'Sign in to get AI feedback on your MMI response.' });
+      if(sw) sw.style.display = 'block';
+      if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
+      return;
+    }
+    if(!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      MMIFeedbackRender.renderError(feedbackWrap, { code: data.error, message: data.message || 'Something went wrong. Please try again.' });
+      if(sw) sw.style.display = 'block';
+      if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
+      return;
+    }
+    const data = await res.json();
+    MMIFeedbackRender.render(feedbackWrap, data, {
+      tier: 'transcript',
+      specialistMode: mmiSpecialistMode,
+      stationCategory: s.category || '',
+      durationSec: mmiRecordingDurationSec,
+    });
+    updateMMILimitsUI();
+  } catch(err) {
+    MMIFeedbackRender.renderError(feedbackWrap, { code: 'network_error', message: 'Network error. Please check your connection and try again.' });
+    if(sw) sw.style.display = 'block';
+    if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
+  }
+}
+
+async function updateMMILimitsUI() {
+  const token = Key2MDAuth.getToken();
+  if(!token) return;
+  try {
+    const res = await fetch(API_BASE + '/api/mmi/limits', { headers: { 'Authorization': `Bearer ${token}` } });
+    if(!res.ok) return;
+    const data = await res.json();
+    const freeEl   = document.getElementById('mmiFreeBadge');
+    const creditEl = document.getElementById('mmiCreditCount');
+    if(freeEl)   freeEl.textContent   = data.transcript?.unlimited ? 'Unlimited' : `${data.transcript?.remaining ?? 0} remaining`;
+    if(creditEl) creditEl.textContent = data.mmi_transcript_credits ?? 0;
+  } catch {}
+}
+</script>
 // ══ STATE ══
 const MODE_CASPER = 'casper';
 const MODE_MMI = 'mmi';
@@ -1192,6 +1503,7 @@ function setMode(mode){
   $('startBtn').classList.remove('running');$('startBtnText').textContent='Start Session';$('startBtnIcon').textContent='▶';
   reviewPanel.classList.remove('show');scenarioCard.style.display='';
   updateLimitUI(); // Update AI sidebar for mode change
+  if(currentMode===MODE_MMI) updateMMILimitsUI();
 }
 
 // ══ WEBCAM ══
@@ -1226,12 +1538,14 @@ function startRecording(){
     $('btnRestartRecording').disabled=false;
     $('recDot').style.display='none';$('recLabel').style.display='none';
     $('webcamTitle').textContent='📹 Review your response — or restart below';
+    if(currentMode===MODE_MMI) mmiOnRecordingStop();
   };
   mediaRecorder.start(1000);
   webcamActive=true;
   $('btnRestartRecording').disabled=false;
   $('recDot').style.display='block';$('recLabel').style.display='block';
   $('webcamTitle').textContent='🔴 Recording';
+  if(currentMode===MODE_MMI) mmiOnRecordingStart();
 }
 function stopRecording(){
   if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
@@ -1259,6 +1573,8 @@ $('btnDownloadVideo').addEventListener('click',()=>{
 
 $('btnRestartRecording').addEventListener('click',()=>{
   if(!sessionActive||currentMode!==MODE_MMI)return;
+  // Reset MMI state
+  if(typeof mmiResetForRestart==='function') mmiResetForRestart();
   // Stop any active recording cleanly
   stopRecording();
   // Reset playback, re-show live feed
@@ -1328,6 +1644,15 @@ function loadStation(){
   aiFeedbackWrap.innerHTML='';
   $('aiFeedbackWrapMMI').innerHTML='';
   const _aw=$('btnGetAIWrap');if(_aw)_aw.style.display='none';
+
+  // Hide prompt3/4 wraps always on load
+  const p3w=$('prompt3Wrap'),p4w=$('prompt4Wrap');
+  if(p3w)p3w.style.display='none';
+  if(p4w)p4w.style.display='none';
+  // Reset submit wrap
+  const sw=$('mmiSubmitWrap');if(sw)sw.style.display='none';
+  const rs=$('mmiRecordingStatus');if(rs)rs.style.display='none';
+  const bnr=$('btnRevealNext');if(bnr)bnr.style.display='none';
 
   // MMI mode: show all prompts from start (unless hide option enabled)
   const isMmi=currentMode===MODE_MMI;
@@ -1483,11 +1808,7 @@ async function runAI(idx){
 
   // ── Block MMI AI marking ──
   if(currentMode===MODE_MMI){
-    getAiFbEl().innerHTML=`<div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:14px 16px;margin-top:10px;">
-      <strong style="color:#7c3aed;font-size:0.88rem;display:block;margin-bottom:4px;">🎤 MMI AI Marking — Coming Soon</strong>
-      <span style="font-size:0.82rem;color:#475569;">AI marking for MMI spoken/video responses is in development. For now, submit to Dan for expert human feedback on your MMI performance.</span>
-      <br><button onclick="openMarkingModal()" style="margin-top:10px;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Submit to Dan →</button>
-    </div>`;
+    // MMI uses its own submitMMIForFeedback() flow via the submit button
     return;
   }
 

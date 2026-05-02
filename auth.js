@@ -79,7 +79,7 @@ if (toolLimits && toolLimits.remaining <= 0 && !toolLimits.credits) return { all
       },
       body: JSON.stringify({
         tool: _config.tool,
-        model: extraContext.model || 'claude-sonnet-4-20250514',
+        model: extraContext.model || 'claude-sonnet-4-6',
         max_tokens: extraContext.max_tokens || 625,
         system: extraContext.system || undefined,
         use_credit: extraContext.use_credit || false,
@@ -481,6 +481,13 @@ if (toolLimits && toolLimits.remaining <= 0 && !toolLimits.credits) return { all
     }
   }
 
+  function getApiBase() { return _config.apiBase; }
+
+  /**
+   * Alias for canReview() — used by MMI submit flow.
+   */
+  function canMakeRequest() { return canReview(); }
+
   // ── Expose public API ──
   return {
     init,
@@ -489,7 +496,9 @@ if (toolLimits && toolLimits.remaining <= 0 && !toolLimits.credits) return { all
     isLoggedIn,
     isPro,
     getToken,
+    getApiBase,
     canReview,
+    canMakeRequest,
     requestReview,
     showAuthModal,
     hideAuthModal,
