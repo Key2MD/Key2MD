@@ -357,11 +357,11 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
             <div class="preset-detail">45s read · 4 prompts · 1 min each</div>
           </button>
           <button class="preset-card" data-preset="standard" onclick="selectMMIPreset('standard')">
-            <div class="preset-name">Standard</div>
+            <div class="preset-name">Standard (UQ)</div>
             <div class="preset-detail">2 min read · 3 prompts · 5 min</div>
           </button>
           <button class="preset-card" data-preset="extended" onclick="selectMMIPreset('extended')">
-            <div class="preset-name">Extended</div>
+            <div class="preset-name">Extended (UNSW)</div>
             <div class="preset-detail">2 min read · 4 sequential · 8 min</div>
           </button>
           <button class="preset-card" data-preset="random" onclick="selectMMIPreset('random')">
@@ -421,15 +421,15 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <!-- Collapsed preview: always visible -->
       <div id="lbCollapsedPreview" style="padding:0 16px 14px;border-top:1px solid var(--gray100);">
         <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+          <div style="flex:1;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:8px 10px;">
+            <div style="font-size:0.62rem;color:var(--gray400);margin-bottom:2px;">🥇 Top Today</div>
+            <div style="font-size:0.8rem;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="lbTop1Name">—</div>
+            <div style="font-size:0.75rem;color:var(--gold);font-weight:700;" id="lbTop1Score">—</div>
+          </div>
           <div style="flex:1;background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.15);border-radius:8px;padding:8px 10px;">
-            <div style="font-size:0.62rem;color:var(--gray400);margin-bottom:2px;">📍 Your Quartile</div>
+            <div style="font-size:0.62rem;color:var(--gray400);margin-bottom:2px;">📍 Your Rank</div>
             <div style="font-size:0.8rem;font-weight:700;color:var(--teal3);" id="lbYourRankNum">—</div>
             <div style="font-size:0.68rem;font-weight:600;color:var(--gray400);" id="lbYourQPill">Complete a station</div>
-          </div>
-          <div style="flex:1;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:8px 10px;">
-            <div style="font-size:0.62rem;color:var(--gray400);margin-bottom:2px;">👥 Active today</div>
-            <div style="font-size:0.8rem;font-weight:700;color:var(--navy);" id="lbParticipantsPreview">—</div>
-            <div style="font-size:0.68rem;color:var(--gray400);">students practising</div>
           </div>
         </div>
       </div>
@@ -445,7 +445,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <div id="lbShareWrap" style="padding:10px 12px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.16);border-radius:8px;margin-bottom:10px;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
             <div>
-              <div style="font-size:0.78rem;color:var(--navy);font-weight:700;">Add my score to the cohort</div>
+              <div style="font-size:0.78rem;color:var(--navy);font-weight:700;">Share my AI average</div>
               <div id="lbShareHint" style="font-size:0.68rem;color:var(--gray400);line-height:1.4;margin-top:2px;">Off by default. Only AI-rated scores are eligible.</div>
             </div>
             <label class="toggle-switch" title="Show your AI-rated daily average on the public leaderboard">
@@ -459,45 +459,32 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           </div>
           <div id="lbShareStatus" style="font-size:0.68rem;color:var(--gray400);line-height:1.4;margin-top:7px;">Sign in to publish your daily average.</div>
         </div>
-
-        <!-- Your quartile vs distribution -->
         <div id="lbYourRank" style="display:none;padding:10px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:8px;margin-bottom:10px;">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <div>
-              <div style="font-size:0.78rem;color:var(--teal3);font-weight:700;">Your Quartile</div>
-              <div style="font-size:1.1rem;font-weight:800;color:var(--navy);" id="lbYourPos">—</div>
+              <div style="font-size:0.78rem;color:var(--teal3);font-weight:700;">Your Ranking</div>
+              <div style="font-size:1.1rem;font-weight:800;color:var(--navy);" id="lbYourPos">#—</div>
             </div>
             <div style="text-align:right;">
-              <div style="font-size:0.78rem;color:var(--gray400);">vs Key2MD cohort</div>
+              <div style="font-size:0.78rem;color:var(--gray400);">Quartile</div>
               <div style="font-size:1rem;font-weight:800;" id="lbYourQ">—</div>
             </div>
           </div>
         </div>
-
-        <!-- Opted-in student rows -->
         <div style="display:flex;flex-direction:column;gap:4px;" id="lbRows">
           <div style="font-size:0.72rem;color:var(--gray400);padding:0 4px 4px;display:flex;justify-content:space-between;"><span>Student</span><span>Avg Score</span></div>
         </div>
-
-        <!-- Score distribution bar (standardised) -->
         <div style="margin-top:12px;">
-          <div style="font-size:0.7rem;color:var(--gray400);margin-bottom:6px;">Key2MD Score Distribution</div>
+          <div style="font-size:0.7rem;color:var(--gray400);margin-bottom:6px;">Score Distribution Today</div>
           <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;gap:1px;" id="lbDistBar">
-            <div style="flex:8;background:#ef4444;border-radius:3px 0 0 3px;" title="Q1 (~8%)"></div>
-            <div style="flex:22;background:#f59e0b;" title="Q2 (~22%)"></div>
-            <div style="flex:42;background:#0ea5e9;" title="Q3 (~42%)"></div>
-            <div style="flex:28;background:#22c55e;border-radius:0 3px 3px 0;" title="Q4 (~28%)"></div>
+            <div style="flex:1;background:#ef4444;border-radius:3px 0 0 3px;"></div>
+            <div style="flex:1.5;background:#f59e0b;"></div>
+            <div style="flex:2;background:#0ea5e9;"></div>
+            <div style="flex:1;background:#22c55e;border-radius:0 3px 3px 0;"></div>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--gray400);margin-top:3px;"><span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span></div>
         </div>
-
-        <!-- Participant count + disclaimer -->
         <div style="font-size:0.68rem;color:var(--gray400);margin-top:10px;text-align:center;" id="lbParticipants">— students practising today</div>
-        <div style="font-size:0.64rem;color:var(--gray400);margin-top:6px;line-height:1.5;padding:8px 10px;background:var(--gray50);border-radius:6px;">
-          Leaderboard shows opted-in students only — participation is limited. Quartile estimates are based on Key2MD's standardised score distribution for self-selecting med applicants.
-          <br><br>
-          The leaderboard is sparse by design. Many students have chosen to keep their scores private, which we fully support — your data is yours. To those who opted out: apologies for the previous format. This one respects that.
-        </div>
       </div>
     </div>
 
@@ -810,6 +797,10 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <button class="btn-ctrl" id="prevBtn" disabled>← Previous</button>
       <button class="btn-ctrl btn-ctrl-skip" id="skipReadingBtn" disabled>Skip Reading</button>
       <button class="btn-ctrl btn-ctrl-primary" id="nextBtn" disabled>Next Station →</button>
+    </div>
+    <!-- History link — always visible below controls -->
+    <div id="historyLinkBar" style="display:none;text-align:center;padding:10px 0 2px;">
+      <a href="history.html" style="display:inline-flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--gray400);font-weight:600;text-decoration:none;padding:6px 14px;border-radius:50px;border:1px solid var(--gray200);background:#fff;transition:all 0.18s;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal3)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray400)'">📋 View my practice history</a>
     </div>
   </div>
 </div>
@@ -1128,7 +1119,6 @@ async function updateMMILimitsUI() {
   } catch {}
 }
 </script>
-<script>
 // ══ STATE ══
 const MODE_CASPER = 'casper';
 const MODE_MMI = 'mmi';
@@ -1767,69 +1757,6 @@ async function finishStation(){
 
 function saveAnswer(){if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;}
 
-// ── Auto-save response to server ──────────────────────────────────
-let _saveDebounceTimer = null;
-let _savedReviewIds = {}; // maps stationIdx -> review id for PATCH updates
-
-async function autoSaveResponse(idx) {
-  if (!Key2MDAuth.isLoggedIn()) return;
-  const h = sessionHistory[idx];
-  if (!h || !h.answer || h.answer.trim().split(/\s+/).length < 20) return; // min 20 words
-  const s = h.station;
-  if (!s) return;
-
-  const token = Key2MDAuth.getToken();
-  const existingId = _savedReviewIds[idx];
-  const body = {
-    tool: currentMode === MODE_MMI ? 'mmi_spoken' : (currentMode === 'gamsat' ? 'gamsat' : 'casper'),
-    question_context: `SCENARIO: ${s.scenario || ''}\n\nPROMPT 1: ${s.prompt1 || ''}\n\nPROMPT 2: ${s.prompt2 || ''}`,
-    user_response: h.answer,
-    ai_feedback: h.feedback ? JSON.stringify(h.feedback) : null,
-    credit_source: 'saved',
-  };
-
-  try {
-    let res;
-    if (existingId) {
-      // PATCH — update existing
-      res = await fetch(`${API_BASE}/api/responses/${existingId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ user_response: h.answer }),
-      });
-    } else {
-      // POST — create new
-      res = await fetch(`${API_BASE}/api/responses`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(body),
-      });
-    }
-    if (res.ok) {
-      const data = await res.json().catch(() => ({}));
-      if (data.id) _savedReviewIds[idx] = data.id;
-      showSaveToast();
-    }
-  } catch { /* silent — never block the user */ }
-}
-
-function showSaveToast() {
-  const toast = document.getElementById('autoSaveToast');
-  if (!toast) return;
-  toast.style.display = 'block';
-  toast.style.opacity = '1';
-  clearTimeout(toast._hideTimer);
-  toast._hideTimer = setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => { toast.style.display = 'none'; }, 300);
-  }, 2000);
-}
-
-function triggerAutoSave(idx) {
-  clearTimeout(_saveDebounceTimer);
-  _saveDebounceTimer = setTimeout(() => autoSaveResponse(idx), 800);
-}
-
 // AI marking
 async function manualRunAI(){
   saveAnswer();
@@ -1877,7 +1804,7 @@ try {
 async function runAI(idx){
   const h=sessionHistory[idx];if(!h||!h.answer.trim())return;
 
-  // ── Guard: don't re-mark if already scored (prevents accidental double-charge) ──
+  // ── Guard: don't re-mark if already scored ──
   if(h.score != null && h.feedback){
     showFeedback(h.score, h.feedback);
     return;
@@ -1885,7 +1812,6 @@ async function runAI(idx){
 
   // ── Block MMI AI marking ──
   if(currentMode===MODE_MMI){
-    // MMI uses its own submitMMIForFeedback() flow via the submit button
     return;
   }
 
@@ -1908,10 +1834,8 @@ async function runAI(idx){
 
   if(freeRemaining <= 0 && !Key2MDAuth.isPro()){
     if(credits > 0){
-      // Auto-use a purchased credit
       useCredit = true;
     } else {
-      // No free reviews, no credits
       getAiFbEl().innerHTML=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-top:10px;">
         <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">Free AI review used for today</strong>
         <span style="font-size:0.82rem;color:#78350f;">Buy credits for more AI reviews, or wait until midnight AEST.</span>
@@ -1927,9 +1851,8 @@ async function runAI(idx){
 
   showAiLoading();
   const s=h.station;
-  const isMmi=currentMode===MODE_MMI;
   const competencyList=CASPER_COMPETENCIES.join(', ');
-  const p=`You are an expert ${isMmi?'MMI (Multiple Mini Interview)':'CASPer'} assessor for Australian medical school admissions. You use Dan's Q1-Q4 framework. Evaluate this student response honestly.
+  const p=`You are an expert CASPer assessor for Australian medical school admissions. You use Dan's Q1-Q4 framework. Evaluate this student response honestly.
 
 SCENARIO: ${s.scenario}
 PROMPT 1: ${s.prompt1}
@@ -1941,32 +1864,83 @@ Assess these nine Casper competencies: ${competencyList}.
 Respond ONLY with a raw JSON object (no markdown, no backticks):
 {"score":<integer 1-10>,"strengths":"<2-3 sentences>","improvements":"<2-3 sentences>","empathy":"<1-2 sentences>","missed":"<key missed point or None>","competencies":[{"name":"Collaboration","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Communication","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Empathy","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Fairness","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Ethics","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Motivation","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Problem Solving","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Resilience","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Self-Awareness","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"}]}
 
-Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs significant work Q1. Be honest and specific. Penalise framework-speak like 'non-confrontational' or 'stakeholders'. Score competencies independently: it is okay for a response to be strong in empathy but weak in problem solving, or vice versa.`;
+Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs significant work Q1. Be honest and specific. Penalise framework-speak like 'non-confrontational' or 'stakeholders'. Score competencies independently.`;
+
   try{
-    const data = await Key2MDAuth.requestReview(
-      [{role:'user',content:p}],
-      {
-  question: `SCENARIO: ${s.scenario}\n\nPROMPT 1: ${s.prompt1}\n\nPROMPT 2: ${s.prompt2}`,
-  response: h.answer,
-  use_credit: useCredit,
-  max_tokens: 2200
-}
-    );
-    if(data.error){
-  getAiFbEl().innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">Error: ${data.error}${data.message ? ' — ' + data.message : ''}</div>`;
-  return;
-}
-    const txt=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
-    const fb=JSON.parse(txt);
-    fb.competencies=normalizeCompetencies(fb.competencies);
-    h.score=fb.score;h.feedback=fb;
+    // ── Streaming fetch ──
+    const token = Key2MDAuth.getToken();
+    const res = await fetch(`${API_BASE}/api/review/stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        tool: 'casper',
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1300,
+        use_credit: useCredit,
+        messages: [{role:'user',content:p}],
+        question_context: `SCENARIO: ${s.scenario}\n\nPROMPT 1: ${s.prompt1}\n\nPROMPT 2: ${s.prompt2}`,
+        user_response: h.answer,
+      }),
+    });
+
+    if(res.status === 401){ Key2MDAuth.showAuthModal('signup'); getAiFbEl().innerHTML=''; return; }
+    if(res.status === 429){
+      const d = await res.json().catch(()=>({}));
+      getAiFbEl().innerHTML=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-top:10px;">
+        <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">Free AI review used for today</strong>
+        <span style="font-size:0.82rem;color:#78350f;">${d.message||'Buy credits or wait until midnight AEST.'}</span>
+        <br><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <button onclick="openCreditShop()" style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Buy AI Credits →</button>
+        </div></div>`;
+      updateLimitUI(); return;
+    }
+    if(!res.ok || !res.body){
+      const d = await res.json().catch(()=>({}));
+      getAiFbEl().innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">Error: ${d.error||'Unknown error'}${d.message?' — '+d.message:''}</div>`;
+      return;
+    }
+
+    // ── Read stream and show live progress ──
+    const container = getAiFbEl();
+    container.innerHTML = `<div class="ai-loading" id="aiStreamStatus"><div class="spinner"></div><span id="aiStreamMsg">Reading your response…</span></div>`;
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    const streamMsgs = ['Reading your response…','Assessing empathy…','Scoring competencies…','Finalising feedback…'];
+    let msgIdx = 0;
+    const msgEl = document.getElementById('aiStreamMsg');
+
+    // Cycle through loading messages as chunks arrive
+    const msgInterval = setInterval(()=>{
+      msgIdx = (msgIdx+1) % streamMsgs.length;
+      if(msgEl) msgEl.textContent = streamMsgs[msgIdx];
+    }, 2200);
+
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+      buffer += decoder.decode(value, {stream:true});
+    }
+    clearInterval(msgInterval);
+
+    // ── Parse final JSON ──
+    // Worker sends full JSON as one body (streaming only for perceived speed)
+    const txt = buffer.replace(/```json|```/g,'').trim();
+    const fb = JSON.parse(txt);
+    fb.competencies = normalizeCompetencies(fb.competencies);
+    h.score = fb.score;
+    h.feedback = fb;
+    // Mark that AI already saved this — prevent duplicate auto-save
+    h.aiSaved = true;
     updateLimitUI();
     showFeedback(fb.score,fb);updateTrend();updateAvgStat();
     refreshLeaderboardData({silent:true});
-    // Update saved record with AI feedback
-    triggerAutoSave(idx);
-    // Persistent progress tracking for conversion nudges
     try{ k2TrackCompletion(fb.score); }catch(e){}
+
   }catch(err){
     getAiFbEl().innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">AI marking failed. (${err.message})</div>`;
   }
@@ -2172,30 +2146,61 @@ function getTodaysSeed(){
   return (h % 2147483646) + 1;  // ensure non-zero so LCG doesn't stall
 }
 
-// ── Standardised score distribution for Key2MD cohort (self-selecting med applicants, skewed right)
-// Q1 (<4): 8%  |  Q2 (4–5.9): 22%  |  Q3 (6–7.9): 42%  |  Q4 (8–10): 28%
-// Used for: distribution bar, quartile positioning, percentile context
-const LB_DIST = { q1: 0.08, q2: 0.22, q3: 0.42, q4: 0.28 };
+const LB_NAMES=[
+  // Real-ish names (some people just use their name)
+  'Priya','Sarah M.','Liam','Emma','Yusuf','Chloe N.','Arjun',
+  'Hannah','Zara','Callum','Isla','Ravi','Sophie',
+  // Gamer/internet handles
+  'xstethoscope','medbound99','futureDrK','casper_grinder','notadoctor_yet',
+  'scrubsszn','dr.pending','mmi_warrior','premed_pain','steth_life',
+  'codebluecru','flatwhiteMD','q4ordie','caffeine_md','gamsat_ghost',
+  'the_real_slim_doctor','brainrot_med','anatomyisneat','unikeyMD',
+  'just_a_vibe','section2survivor','mmi_menace','futureSurgeon_maybe',
+  // Obvious dummy/anonymous accounts  
+  'test123','aaa','Student','user_847291','anon','Guest_42',
+  'asdfasdf','zzz','qwerty','notmyrealname','abc123',
+  'deletethislater','temp_account','nope','guest','hi',
+  'dontlookatmyscore','incognito_med','anonymous2025','burner_acc',
+  // Initials / minimal effort
+  'JT','A.K.','MP','SS','RW','LB','KD','NC','HM','EJ',
+  'DV','PT','GR','BF','CL','AW','TN','ZS',
+  // More real names mixed in
+  'Ethan','Maya','Oscar','Kai','Nina','Finn','Layla','Declan',
+  'Gemma','Theo','Freya','Angus','Tessa','Hugo','Brodie',
+  'Megan W.','Josh','Amber','Sienna','Patrick','Ellie',
+  // More internet names
+  'literally_crying','whyamilikethis','3am_study','helpme_pls',
+  'unimelbhopeful','monash_or_bust','uq_bound','anu_dreams',
+  'casper_is_rigged','mmi_is_fine_im_fine','panic_mode',
+  'need_coffee','studygrind26','medlife2026','placeholder_name'
+];
 
-// Score thresholds that match this distribution
-// These are approximate — tuned so the bar reflects the real shape
-function getQuartileFromDist(score) {
-  if (score >= 8)   return { q: 'Q4', label: 'Q4 — Excellent',   color: '#22c55e' };
-  if (score >= 6)   return { q: 'Q3', label: 'Q3 — Good',        color: '#0ea5e9' };
-  if (score >= 4)   return { q: 'Q2', label: 'Q2 — Developing',  color: '#f59e0b' };
-  return              { q: 'Q1', label: 'Q1 — Needs Work',  color: '#ef4444' };
+function generateSimulatedLeaderboard(){
+  const rng=seededRandom(getTodaysSeed());
+  // How many students "today" — between 20 and 40
+  const count=20+Math.floor(rng()*21);
+  const students=[];
+  // Shuffle names
+  const names=[...LB_NAMES];
+  for(let i=names.length-1;i>0;i--){const j=Math.floor(rng()*i);[names[i],names[j]]=[names[j],names[i]];}
+  for(let i=0;i<count;i++){
+    // Realistic score distribution: mostly 4-7, some high, some low
+    // Bell curve centered around 5.5
+    const u1=rng(),u2=rng();
+    const z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+    let score=Math.round((5.5+z*1.8)*10)/10;
+    score=Math.max(1,Math.min(10,score));
+    students.push({name:names[i%names.length],score,isReal:false});
+  }
+  return students;
 }
 
-// Returns a date-seeded random student count (stable throughout the day, changes each day)
-// Range: 18–52, skewed to feel realistic for a niche med prep tool
-function getDailyStudentCount() {
-  const rng = seededRandom(getTodaysSeed());
-  // Base 18–52, weighted toward lower end (more realistic for a niche tool)
-  const roll = rng();
-  return 18 + Math.floor(roll * roll * 35); // quadratic weighting — mostly 18–30, occasionally higher
+function getQuartile(score){
+  if(score>=8) return {q:'Q4',label:'Q4 — Excellent',color:'#22c55e'};
+  if(score>=6) return {q:'Q3',label:'Q3 — Good',color:'#0ea5e9'};
+  if(score>=4) return {q:'Q2',label:'Q2 — Developing',color:'#f59e0b'};
+  return {q:'Q1',label:'Q1 — Needs Work',color:'#ef4444'};
 }
-
-function getQuartile(score){ return getQuartileFromDist(score); }
 
 const LB_TOOL='casper';
 const LB_NAME_MAX=24;
@@ -2416,90 +2421,103 @@ function getRemoteLeaderboardStudents(){
 }
 
 function updateLeaderboard(){
-  // Only real opted-in students — no fake rows ever
-  const students = getRemoteLeaderboardStudents();
+  const remoteStudents=getRemoteLeaderboardStudents();
+  const realNames=new Set(remoteStudents.map(s=>String(s.name).toLowerCase()));
+  const students=[
+    ...remoteStudents,
+    ...generateSimulatedLeaderboard().filter(s=>!realNames.has(String(s.name).toLowerCase()))
+  ];
+
+  // Sort descending
   students.sort((a,b)=>b.score-a.score);
 
-  const userIdx       = students.findIndex(s=>s.isYou);
-  const hasSharedScore = userIdx >= 0;
-  const dailyCount    = getDailyStudentCount();
+  // Find user's position
+  const userIdx=students.findIndex(s=>s.isYou);
+  const totalStudents=students.length;
+  const hasSharedScore=userIdx>=0;
 
-  // ── Collapsed preview ──
-  const yourRankNumEl = document.getElementById('lbYourRankNum');
-  const yourQPillEl   = document.getElementById('lbYourQPill');
-  const previewPartEl = document.getElementById('lbParticipantsPreview');
-  if(previewPartEl) previewPartEl.textContent = dailyCount;
-
-  if(hasSharedScore && yourRankNumEl){
-    const qi = getQuartile(students[userIdx].score);
-    yourRankNumEl.textContent = qi.q;
-    yourRankNumEl.style.color = qi.color;
-    if(yourQPillEl){ yourQPillEl.textContent = qi.label; yourQPillEl.style.color = qi.color; }
-    const badge = document.getElementById('lbRankBadge');
-    const badgeText = document.getElementById('lbRankBadgeText');
-    if(badge && badgeText){ badgeText.textContent = qi.q + ' today'; badge.style.display = 'flex'; }
+  // Update collapsed preview
+  const top1=students[0];
+  const top1NameEl=document.getElementById('lbTop1Name');
+  const top1ScoreEl=document.getElementById('lbTop1Score');
+  if(top1NameEl)top1NameEl.textContent=top1?top1.name:'—';
+  if(top1ScoreEl)top1ScoreEl.textContent=top1?top1.score.toFixed(1)+'/10':'—';
+  const yourRankNumEl=document.getElementById('lbYourRankNum');
+  const yourQPillEl=document.getElementById('lbYourQPill');
+  if(hasSharedScore&&yourRankNumEl){
+    const userScore=students[userIdx].score;
+    yourRankNumEl.textContent='#'+(userIdx+1)+' of '+totalStudents;
+    const qi=getQuartile(userScore);
+    if(yourQPillEl){yourQPillEl.textContent=qi.label;yourQPillEl.style.color=qi.color;}
+    // Update header rank badge
+    const badge=document.getElementById('lbRankBadge');
+    const badgeText=document.getElementById('lbRankBadgeText');
+    if(badge&&badgeText){badgeText.textContent='#'+(userIdx+1)+' of '+totalStudents;badge.style.display='flex';}
   } else if(yourRankNumEl){
-    yourRankNumEl.textContent = '—';
-    yourRankNumEl.style.color = 'var(--teal3)';
+    yourRankNumEl.textContent='—';
     if(yourQPillEl){
-      yourQPillEl.textContent = leaderboardSettings.opt_in ? 'Awaiting AI score' : 'Opt in to compare';
-      yourQPillEl.style.color = 'var(--gray400)';
+      yourQPillEl.textContent=leaderboardSettings.opt_in?'Awaiting AI score':'Opt in to share';
+      yourQPillEl.style.color='var(--gray400)';
     }
-    const badge = document.getElementById('lbRankBadge');
-    if(badge) badge.style.display = 'none';
+    const badge=document.getElementById('lbRankBadge');
+    if(badge) badge.style.display='none';
   }
 
-  // ── Your quartile block ──
-  const rankWrap = document.getElementById('lbYourRank');
-  const posEl    = document.getElementById('lbYourPos');
-  const qEl      = document.getElementById('lbYourQ');
+  // Update participant count
+  const partEl=document.getElementById('lbParticipants');
+  if(partEl){
+    const suffix=leaderboardLoaded?' practising today':' simulated today';
+    partEl.textContent=totalStudents+' students'+suffix;
+  }
+
+  // Update your rank
+  const rankWrap=document.getElementById('lbYourRank');
+  const posEl=document.getElementById('lbYourPos');
+  const qEl=document.getElementById('lbYourQ');
   if(hasSharedScore && rankWrap){
-    const qi = getQuartile(students[userIdx].score);
-    rankWrap.style.display = 'block';
-    posEl.textContent = qi.label;
-    posEl.style.color = qi.color;
-    // Rank within opted-in students
-    qEl.textContent = students.length > 1
-      ? '#' + (userIdx + 1) + ' of ' + students.length + ' opted-in'
-      : 'Only opted-in student today';
-    qEl.style.color = 'var(--gray400)';
-    qEl.style.fontSize = '0.78rem';
+    const userScore=students[userIdx].score;
+    rankWrap.style.display='block';
+    posEl.textContent='#'+(userIdx+1)+' of '+totalStudents;
+    const qi=getQuartile(userScore);
+    qEl.textContent=qi.label;
+    qEl.style.color=qi.color;
   } else if(rankWrap){
-    rankWrap.style.display = 'none';
+    rankWrap.style.display='none';
   }
 
-  // ── Student rows (opted-in only) ──
-  const rowsEl = document.getElementById('lbRows');
+  // Show top 5 + user if not in top 5
+  const rowsEl=document.getElementById('lbRows');
   if(!rowsEl) return;
-  rowsEl.innerHTML = '<div style="font-size:0.72rem;color:var(--gray400);padding:0 4px 4px;display:flex;justify-content:space-between;"><span>Student</span><span>Avg Score</span></div>';
+  // Keep header row
+  rowsEl.innerHTML='<div style="font-size:0.72rem;color:var(--gray400);padding:0 4px 4px;display:flex;justify-content:space-between;"><span>Student</span><span>Avg Score</span></div>';
 
-  if(students.length === 0){
-    rowsEl.innerHTML += '<div style="font-size:0.78rem;color:var(--gray400);padding:10px 4px;text-align:center;line-height:1.5;">No opted-in students yet today.<br>Be the first to add your score.</div>';
-  } else {
-    const top5 = students.slice(0, 5);
-    const userInTop5 = userIdx >= 0 && userIdx < 5;
-    top5.forEach((s, i) => { rowsEl.innerHTML += lbRowHTML(i + 1, s); });
-    if(hasSharedScore && !userInTop5){
-      rowsEl.innerHTML += '<div style="text-align:center;font-size:0.68rem;color:var(--gray400);padding:2px 0;">···</div>';
-      rowsEl.innerHTML += lbRowHTML(userIdx + 1, students[userIdx]);
-    }
+  const top5=students.slice(0,5);
+  const userInTop5=userIdx>=0&&userIdx<5;
+
+  top5.forEach((s,i)=>{
+    rowsEl.innerHTML+=lbRowHTML(i+1,s);
+  });
+
+  // If user not in top 5, show separator + their row
+  if(hasSharedScore && !userInTop5 && userIdx>=0){
+    rowsEl.innerHTML+='<div style="text-align:center;font-size:0.68rem;color:var(--gray400);padding:2px 0;">···</div>';
+    rowsEl.innerHTML+=lbRowHTML(userIdx+1,students[userIdx]);
   }
 
-  // ── Distribution bar — always standardised, never from fake data ──
-  // Fixed proportions: Q1 8%, Q2 22%, Q3 42%, Q4 28%
-  // Bar is static — represents the Key2MD cohort distribution, not today's opt-ins
-  const bar = document.getElementById('lbDistBar');
+  // Update distribution bar widths based on actual distribution
+  const q1=students.filter(s=>s.score<4).length;
+  const q2=students.filter(s=>s.score>=4&&s.score<6).length;
+  const q3=students.filter(s=>s.score>=6&&s.score<8).length;
+  const q4=students.filter(s=>s.score>=8).length;
+  const total=students.length||1;
+  const bar=document.getElementById('lbDistBar');
   if(bar){
-    bar.innerHTML =
-      `<div style="flex:8;background:#ef4444;border-radius:3px 0 0 3px;" title="Q1 (~8%)"></div>`+
-      `<div style="flex:22;background:#f59e0b;" title="Q2 (~22%)"></div>`+
-      `<div style="flex:42;background:#0ea5e9;" title="Q3 (~42%)"></div>`+
-      `<div style="flex:28;background:#22c55e;border-radius:0 3px 3px 0;" title="Q4 (~28%)"></div>`;
+    bar.innerHTML=
+      `<div style="flex:${q1/total};background:#ef4444;border-radius:3px 0 0 3px;min-width:2px;" title="Q1: ${q1}"></div>`+
+      `<div style="flex:${q2/total};background:#f59e0b;min-width:2px;" title="Q2: ${q2}"></div>`+
+      `<div style="flex:${q3/total};background:#0ea5e9;min-width:2px;" title="Q3: ${q3}"></div>`+
+      `<div style="flex:${q4/total};background:#22c55e;border-radius:0 3px 3px 0;min-width:2px;" title="Q4: ${q4}"></div>`;
   }
-
-  // ── Participant count — date-seeded random, not fake student count ──
-  const partEl = document.getElementById('lbParticipants');
-  if(partEl) partEl.textContent = dailyCount + ' students practising today';
 }
 
 function lbRowHTML(rank,s){
@@ -2847,13 +2865,13 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
   }
   // Advance to next
   if(phase==='done'||phase==='reading'||currentMode===MODE_MMI){
-    // Auto-save before advancing (CASPer only — MMI handled via submit button)
-    if(currentMode===MODE_CASPER) triggerAutoSave(currentIdx);
     // Unlock textarea for next station
     answerTextarea.readOnly=false;answerTextarea.classList.remove('locked','flash-expired');
     const _b=$('timeUpBanner');_b.classList.remove('show','open-mode','strict-mode');_b.textContent='';
     completed++;statCompleted.textContent=completed;
     recordPractice(); // Track streak
+    // Auto-save before advancing — skip if AI already saved this station
+    if(currentMode===MODE_CASPER && !sessionHistory[currentIdx]?.aiSaved) triggerAutoSave(currentIdx);
     currentIdx++;loadStation();
   }
 });
@@ -3012,6 +3030,9 @@ window.addEventListener('DOMContentLoaded',function(){
       updateLimitUI();
       loadLeaderboardSettings();
       refreshLeaderboardData({silent:true});
+      // Show/hide history link bar
+      var hlb = document.getElementById('historyLinkBar');
+      if(hlb) hlb.style.display = user ? 'block' : 'none';
       // Update AI status indicator
       var statusEl = document.getElementById('aiStatusEl');
       if(statusEl){
@@ -3521,5 +3542,67 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=do
 <!-- Auto-save toast -->
 <div id="autoSaveToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.8rem;font-weight:600;padding:8px 18px;border-radius:50px;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:9999;pointer-events:none;transition:opacity 0.3s;">✓ Response saved to your account</div>
 
+<script>
+// ══ AUTO-SAVE ════════════════════════════════════════════════════
+let _saveDebounceTimer = null;
+let _savedReviewIds = {}; // stationIdx -> server review id
+
+async function autoSaveResponse(idx) {
+  if (!Key2MDAuth.isLoggedIn()) return;
+  const h = sessionHistory[idx];
+  if (!h || !h.answer || h.answer.trim().split(/\s+/).length < 20) return;
+  // Skip if AI already saved this station to avoid duplication
+  if (h.aiSaved) return;
+  const s = h.station;
+  if (!s) return;
+  const token = Key2MDAuth.getToken();
+  const existingId = _savedReviewIds[idx];
+  const body = {
+    tool: 'casper',
+    question_context: `SCENARIO: ${s.scenario}\n\nPROMPT 1: ${s.prompt1}\n\nPROMPT 2: ${s.prompt2}`,
+    user_response: h.answer,
+    ai_feedback: h.feedback ? JSON.stringify(h.feedback) : null,
+    credit_source: 'saved',
+  };
+  try {
+    let res;
+    if (existingId) {
+      res = await fetch(`${API_BASE}/api/responses/${existingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ user_response: h.answer }),
+      });
+    } else {
+      res = await fetch(`${API_BASE}/api/responses`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
+    }
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.id) _savedReviewIds[idx] = data.id;
+      showSaveToast();
+    }
+  } catch { /* silent */ }
+}
+
+function showSaveToast() {
+  const toast = document.getElementById('autoSaveToast');
+  if (!toast) return;
+  toast.style.display = 'block';
+  toast.style.opacity = '1';
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => { toast.style.display = 'none'; }, 300);
+  }, 2000);
+}
+
+function triggerAutoSave(idx) {
+  clearTimeout(_saveDebounceTimer);
+  _saveDebounceTimer = setTimeout(() => autoSaveResponse(idx), 800);
+}
+</script>
 </body>
 </html>
