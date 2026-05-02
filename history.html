@@ -167,6 +167,16 @@
     /* Response text box */
     .response-box { background:var(--gray50); border:1px solid var(--gray200); border-radius:10px; padding:14px 16px; font-size:0.87rem; color:var(--gray600); line-height:1.75; white-space:pre-wrap; max-height:200px; overflow-y:auto; }
 
+    /* Editable response */
+    .response-edit-wrap { display:flex; flex-direction:column; gap:8px; }
+    .response-textarea { width:100%; min-height:140px; padding:14px 16px; border:1.5px solid var(--gray200); border-radius:10px; font-size:0.87rem; color:var(--gray800); line-height:1.75; font-family:inherit; resize:vertical; outline:none; transition:border-color 0.2s; box-sizing:border-box; }
+    .response-textarea:focus { border-color:var(--teal); background:#fff; }
+    .response-edit-actions { display:flex; align-items:center; gap:10px; }
+    .btn-save-edit { padding:7px 18px; border-radius:50px; border:none; background:var(--teal); color:#fff; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background 0.2s; }
+    .btn-save-edit:hover { background:var(--teal2); }
+    .btn-save-edit:disabled { opacity:0.5; cursor:not-allowed; }
+    .edit-save-status { font-size:0.75rem; color:var(--gray400); }
+
     @media (max-width: 700px) {
       .stats-bar { grid-template-columns:1fr 1fr; }
       .feedback-grid { grid-template-columns:1fr; }
@@ -281,8 +291,8 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 <div class="page-wrap">
 
   <div class="page-hero">
-    <h1>📋 My Review History</h1>
-    <p>All your AI-marked responses in one place. Track your progress over time.</p>
+    <h1>📋 My Practice History</h1>
+    <p>All your saved responses and AI-marked stations in one place. Reflect, edit, and track your progress over time.</p>
   </div>
 
   <!-- Auth gate (shown when not logged in) -->
@@ -321,6 +331,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
       <button class="filter-btn" data-filter="casper" onclick="setFilter('casper', this)">💬 CASPer</button>
       <button class="filter-btn" data-filter="gamsat" onclick="setFilter('gamsat', this)">✍️ GAMSAT</button>
+      <button class="filter-btn" data-filter="saved" onclick="setFilter('saved', this)">💾 Saved (no AI)</button>
       <div class="filter-spacer"></div>
       <span class="result-count" id="resultCount"></span>
     </div>
@@ -428,10 +439,10 @@ async function loadReviews() {
 
 // ── Stats ──
 function updateStats() {
-  const casperReviews = allReviews.filter(r => r.tool === 'casper');
+  const casperReviews = allReviews.filter(r => r.tool === 'casper' && r.ai_feedback && r.credit_source !== 'saved');
   const gamsatReviews = allReviews.filter(r => r.tool === 'gamsat');
+  const savedOnly = allReviews.filter(r => r.credit_source === 'saved' || !r.ai_feedback);
 
-  // Extract numeric scores where possible
   const scores = allReviews.map(r => extractScore(r)).filter(s => s !== null);
   const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10 : null;
 
@@ -585,9 +596,12 @@ function renderCompetencyProgress() {
 
 // ── Render ──
 function renderReviews() {
-  let filtered = currentFilter === 'all'
-    ? allReviews
-    : allReviews.filter(r => r.tool === currentFilter);
+  let filtered = allReviews;
+  if (currentFilter === 'saved') {
+    filtered = allReviews.filter(r => r.credit_source === 'saved' || !r.ai_feedback);
+  } else if (currentFilter !== 'all') {
+    filtered = allReviews.filter(r => r.tool === currentFilter);
+  }
 
   if (currentCompetencyFilter) {
     filtered = filtered.filter(r => {
@@ -596,8 +610,9 @@ function renderReviews() {
     });
   }
 
+  const label = currentFilter === 'saved' ? 'saved response' : 'review';
   document.getElementById('resultCount').textContent =
-    filtered.length + ' review' + (filtered.length !== 1 ? 's' : '');
+    filtered.length + ' ' + label + (filtered.length !== 1 ? 's' : '');
 
   if (filtered.length === 0) {
     showState(allReviews.length === 0 ? 'empty' : 'emptyFilter');
@@ -619,26 +634,26 @@ function renderReviews() {
 
 function reviewCardHTML(r, i) {
   const date = formatDate(r.created_at);
-  const toolClass = r.tool === 'casper' ? 'tool-casper' : 'tool-gamsat';
-  const toolLabel = r.tool === 'casper' ? '💬 CASPer' : '✍️ GAMSAT';
+  const isSavedOnly = r.credit_source === 'saved' || !r.ai_feedback;
+  const toolClass = r.tool === 'gamsat' ? 'tool-gamsat' : 'tool-casper';
+  const toolLabel = r.tool === 'gamsat' ? '✍️ GAMSAT' : (r.tool === 'mmi_spoken' ? '🎤 MMI' : '💬 CASPer');
   const creditLabel = creditBadge(r.credit_source);
 
   let scoreHTML = '';
   let bodyHTML = '';
 
-  // Parse feedback
   const fb = parseFeedback(r);
 
-  if (r.tool === 'casper' && fb && fb.score) {
+  if (!isSavedOnly && r.tool === 'casper' && fb && fb.score) {
     const cls = fb.score >= 7 ? 'score-high' : fb.score >= 5 ? 'score-mid' : 'score-low';
     scoreHTML = `<span class="score-badge ${cls}">${fb.score}/10</span>`;
     bodyHTML = casperBodyHTML(r, fb);
-  } else if (r.tool === 'gamsat' && fb && fb.bandScore) {
+  } else if (!isSavedOnly && r.tool === 'gamsat' && fb && fb.bandScore) {
     scoreHTML = `<span class="score-badge score-mid">${fb.bandScore}</span>`;
     bodyHTML = gamsatBodyHTML(r, fb);
   } else {
-    scoreHTML = `<span class="score-badge score-none">No score</span>`;
-    bodyHTML = plainBodyHTML(r);
+    scoreHTML = `<span class="score-badge score-none" style="font-size:0.72rem;">💾 Saved</span>`;
+    bodyHTML = savedBodyHTML(r);
   }
 
   const scenario = (r.question_text || 'No scenario recorded').substring(0, 120);
@@ -776,25 +791,83 @@ function gamsatBodyHTML(r, fb) {
   `;
 }
 
-function plainBodyHTML(r) {
+function savedBodyHTML(r) {
+  const textareaId = `edit-${r.id}`;
+  const statusId = `status-${r.id}`;
+  const btnId = `savebtn-${r.id}`;
   return `
     ${r.question_text ? `
     <div class="review-section">
-      <div class="review-section-label">Question / Scenario</div>
+      <div class="review-section-label">Scenario / Prompts</div>
       <div class="review-section-text">${escapeHtml(r.question_text)}</div>
     </div>` : ''}
-    ${r.response_text ? `
     <div class="review-section">
-      <div class="review-section-label">Your Response</div>
-      <div class="response-box">${escapeHtml(r.response_text)}</div>
-    </div>` : ''}
-    ${r.ai_feedback ? `
-    <div class="review-section">
-      <div class="review-section-label">AI Feedback</div>
-      <div class="review-section-text">${escapeHtml(r.ai_feedback)}</div>
-    </div>` : ''}
+      <div class="review-section-label" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Your Response</span>
+        <span style="font-size:0.68rem;color:var(--gray400);font-weight:400;">Editable — changes save to your account</span>
+      </div>
+      <div class="response-edit-wrap">
+        <textarea class="response-textarea" id="${textareaId}" oninput="markEdited('${r.id}')">${escapeHtml(r.response_text || '')}</textarea>
+        <div class="response-edit-actions">
+          <button class="btn-save-edit" id="${btnId}" onclick="saveEditedResponse('${r.id}', '${textareaId}', '${statusId}', '${btnId}')">Save changes</button>
+          <span class="edit-save-status" id="${statusId}"></span>
+        </div>
+      </div>
+    </div>
+    <div class="review-section" style="background:rgba(14,165,233,0.03);">
+      <div class="review-section-label">Get AI Feedback</div>
+      <p style="font-size:0.83rem;color:var(--gray600);line-height:1.6;">This response hasn't been marked yet. Head to the <a href="practice.html" style="color:var(--teal3);font-weight:600;">practice tool</a> to practise this type of station and request AI feedback.</p>
+    </div>
   `;
 }
+
+function plainBodyHTML(r) {
+  return savedBodyHTML(r);
+}
+
+// Track which response IDs have been edited (to enable save button)
+const _editedIds = new Set();
+function markEdited(id) { _editedIds.add(id); }
+window.markEdited = markEdited;
+
+async function saveEditedResponse(reviewId, textareaId, statusId, btnId) {
+  const textarea = document.getElementById(textareaId);
+  const statusEl = document.getElementById(statusId);
+  const btn = document.getElementById(btnId);
+  if (!textarea || !statusEl || !btn) return;
+
+  const newText = textarea.value.trim();
+  if (!newText) { statusEl.textContent = 'Response cannot be empty.'; statusEl.style.color = '#dc2626'; return; }
+
+  btn.disabled = true;
+  statusEl.textContent = 'Saving…';
+  statusEl.style.color = 'var(--gray400)';
+
+  try {
+    const token = localStorage.getItem('key2md_token');
+    const res = await fetch(`${API_BASE}/api/responses/${reviewId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ user_response: newText }),
+    });
+    if (res.ok) {
+      statusEl.textContent = '✓ Saved';
+      statusEl.style.color = '#16a34a';
+      _editedIds.delete(reviewId);
+      setTimeout(() => { statusEl.textContent = ''; }, 3000);
+    } else {
+      const d = await res.json().catch(() => ({}));
+      statusEl.textContent = d.error || 'Save failed. Try again.';
+      statusEl.style.color = '#dc2626';
+    }
+  } catch {
+    statusEl.textContent = 'Network error. Try again.';
+    statusEl.style.color = '#dc2626';
+  } finally {
+    btn.disabled = false;
+  }
+}
+window.saveEditedResponse = saveEditedResponse;
 
 // ── Helpers ──
 function showState(state) {
@@ -820,6 +893,7 @@ function formatDate(iso) {
 
 function creditBadge(source) {
   if (!source) return '';
+  if (source === 'saved') return ' · <span style="color:var(--gray400);font-weight:600;">Saved</span>';
   if (source === 'free_daily') return ' · <span style="color:var(--green);font-weight:600;">Free</span>';
   if (source === 'paid_credit') return ' · <span style="color:var(--gold);font-weight:600;">Credit</span>';
   if (source === 'pro_unlimited') return ' · <span style="color:var(--teal3);font-weight:600;">Pro</span>';

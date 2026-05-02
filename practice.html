@@ -1767,6 +1767,69 @@ async function finishStation(){
 
 function saveAnswer(){if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;}
 
+// ── Auto-save response to server ──────────────────────────────────
+let _saveDebounceTimer = null;
+let _savedReviewIds = {}; // maps stationIdx -> review id for PATCH updates
+
+async function autoSaveResponse(idx) {
+  if (!Key2MDAuth.isLoggedIn()) return;
+  const h = sessionHistory[idx];
+  if (!h || !h.answer || h.answer.trim().split(/\s+/).length < 20) return; // min 20 words
+  const s = h.station;
+  if (!s) return;
+
+  const token = Key2MDAuth.getToken();
+  const existingId = _savedReviewIds[idx];
+  const body = {
+    tool: currentMode === MODE_MMI ? 'mmi_spoken' : (currentMode === 'gamsat' ? 'gamsat' : 'casper'),
+    question_context: `SCENARIO: ${s.scenario || ''}\n\nPROMPT 1: ${s.prompt1 || ''}\n\nPROMPT 2: ${s.prompt2 || ''}`,
+    user_response: h.answer,
+    ai_feedback: h.feedback ? JSON.stringify(h.feedback) : null,
+    credit_source: 'saved',
+  };
+
+  try {
+    let res;
+    if (existingId) {
+      // PATCH — update existing
+      res = await fetch(`${API_BASE}/api/responses/${existingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ user_response: h.answer }),
+      });
+    } else {
+      // POST — create new
+      res = await fetch(`${API_BASE}/api/responses`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
+    }
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.id) _savedReviewIds[idx] = data.id;
+      showSaveToast();
+    }
+  } catch { /* silent — never block the user */ }
+}
+
+function showSaveToast() {
+  const toast = document.getElementById('autoSaveToast');
+  if (!toast) return;
+  toast.style.display = 'block';
+  toast.style.opacity = '1';
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => { toast.style.display = 'none'; }, 300);
+  }, 2000);
+}
+
+function triggerAutoSave(idx) {
+  clearTimeout(_saveDebounceTimer);
+  _saveDebounceTimer = setTimeout(() => autoSaveResponse(idx), 800);
+}
+
 // AI marking
 async function manualRunAI(){
   saveAnswer();
@@ -1900,6 +1963,8 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
     updateLimitUI();
     showFeedback(fb.score,fb);updateTrend();updateAvgStat();
     refreshLeaderboardData({silent:true});
+    // Update saved record with AI feedback
+    triggerAutoSave(idx);
     // Persistent progress tracking for conversion nudges
     try{ k2TrackCompletion(fb.score); }catch(e){}
   }catch(err){
@@ -2782,6 +2847,8 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
   }
   // Advance to next
   if(phase==='done'||phase==='reading'||currentMode===MODE_MMI){
+    // Auto-save before advancing (CASPer only — MMI handled via submit button)
+    if(currentMode===MODE_CASPER) triggerAutoSave(currentIdx);
     // Unlock textarea for next station
     answerTextarea.readOnly=false;answerTextarea.classList.remove('locked','flash-expired');
     const _b=$('timeUpBanner');_b.classList.remove('show','open-mode','strict-mode');_b.textContent='';
@@ -3451,5 +3518,8 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=do
 </script>
 <!-- ═══ END CANONICAL BOOK MODAL ═══ -->
 </div><!-- /#practice-app -->
+<!-- Auto-save toast -->
+<div id="autoSaveToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.8rem;font-weight:600;padding:8px 18px;border-radius:50px;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:9999;pointer-events:none;transition:opacity 0.3s;">✓ Response saved to your account</div>
+
 </body>
 </html>
