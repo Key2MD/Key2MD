@@ -564,17 +564,17 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
       <!-- MMI AI credits display -->
       <div id="mmiAiNote" style="display:none;margin-top:10px;">
+        <div style="font-size:0.75rem;color:var(--gray600);line-height:1.6;padding:10px 12px;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.18);border-radius:8px;margin-bottom:8px;">
+          <strong style="color:#7c3aed;display:block;margin-bottom:4px;">MMI AI Feedback — Credits Required</strong>
+          We previously offered free daily MMI reviews. Unfortunately, due to significant account duplication and abuse, we've had to move MMI AI feedback behind a paywall. We're sorry to those who used it fairly — this was a difficult decision. MMI transcription and AI analysis is genuinely expensive to run, and the free tier wasn't sustainable.
+        </div>
         <div class="mmi-credit-info">
-          <div class="mmi-credit-row" style="margin-bottom:6px;">
-            <span class="mmi-credit-label">Free daily MMI review</span>
-            <span class="mmi-credit-count" id="mmiFreeBadge">1 remaining</span>
-          </div>
           <div class="mmi-credit-row">
-            <span class="mmi-credit-label">Purchased credits</span>
+            <span class="mmi-credit-label">Your MMI credits</span>
             <span class="mmi-credit-count" id="mmiCreditCount">0</span>
           </div>
         </div>
-        <a href="plans.html" style="display:block;margin-top:8px;padding:8px;border-radius:8px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);color:#7c3aed;font-size:0.78rem;font-weight:600;text-align:center;text-decoration:none;" onmouseover="this.style.background='rgba(124,58,237,0.14)'" onmouseout="this.style.background='rgba(124,58,237,0.08)'">Buy MMI Credits →</a>
+        <a href="plans.html" style="display:block;margin-top:8px;padding:9px;border-radius:8px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#7c3aed;font-size:0.8rem;font-weight:700;text-align:center;text-decoration:none;transition:background 0.18s;" onmouseover="this.style.background='rgba(124,58,237,0.18)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'">Buy MMI Credits →</a>
       </div>
     </div>
 
@@ -1048,7 +1048,11 @@ function updateRevealButton() {
 // ══ MMI SUBMIT ═══════════════════════════════════════════════════════
 
 async function submitMMIForFeedback() {
-  if(!recordingBlob) { alert('No recording found. Please record your response first.'); return; }
+  // Use audio-only blob for Tier 1 (smaller, safe for upload)
+  // Fall back to full recordingBlob only if audio recorder failed
+  const uploadBlob = audioBlob || recordingBlob;
+  if(!uploadBlob) { alert('No recording found. Please record your response first.'); return; }
+
   const btn = document.getElementById('btnMMISubmit');
   if(btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
   const sw = document.getElementById('mmiSubmitWrap');
@@ -1066,7 +1070,9 @@ async function submitMMIForFeedback() {
 
   const cfg = getMMIConfig();
   const s = pool[currentIdx] || {};
-  const audioFile = new File([recordingBlob], 'recording.webm', { type: recordingBlob.type || 'audio/webm' });
+
+  // Use audio-only blob for Tier 1 upload — ~10MB for 10 min vs 300MB+ for video
+  const audioFile = new File([uploadBlob], 'recording.webm', { type: uploadBlob.type || 'audio/webm' });
   const fd = new FormData();
   fd.append('audio', audioFile);
   fd.append('station_id', s.id || `mmi_${MMI_STATIONS.indexOf(s)}`);
@@ -1079,7 +1085,7 @@ async function submitMMIForFeedback() {
   fd.append('recording_duration_seconds', String(Math.round(mmiRecordingDurationSec)));
   fd.append('tier', 'transcript');
   fd.append('specialist_mode', mmiSpecialistMode ? '1' : '0');
-  fd.append('use_credit', '0');
+  fd.append('use_credit', '1'); // MMI always requires a credit — no free tier
 
   const token = Key2MDAuth.getToken();
   try {
@@ -1091,6 +1097,16 @@ async function submitMMIForFeedback() {
     if(res.status === 401) {
       Key2MDAuth.showAuthModal('signup');
       MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_required', message: 'Sign in to get AI feedback on your MMI response.' });
+      if(sw) sw.style.display = 'block';
+      if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
+      return;
+    }
+    if(res.status === 402) {
+      const data = await res.json().catch(() => ({}));
+      MMIFeedbackRender.renderError(feedbackWrap, {
+        code: 'no_credits',
+        message: data.message || 'You need MMI credits to get AI feedback.'
+      });
       if(sw) sw.style.display = 'block';
       if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
       return;
@@ -1124,9 +1140,7 @@ async function updateMMILimitsUI() {
     const res = await fetch(API_BASE + '/api/mmi/limits', { headers: { 'Authorization': `Bearer ${token}` } });
     if(!res.ok) return;
     const data = await res.json();
-    const freeEl   = document.getElementById('mmiFreeBadge');
     const creditEl = document.getElementById('mmiCreditCount');
-    if(freeEl)   freeEl.textContent   = data.transcript?.unlimited ? 'Unlimited' : `${data.transcript?.remaining ?? 0} remaining`;
     if(creditEl) creditEl.textContent = data.mmi_transcript_credits ?? 0;
   } catch {}
 }
@@ -1223,6 +1237,8 @@ let mmiHidePrompts=false;
 
 // Webcam/recording state
 let webcamStream=null,mediaRecorder=null,recordedChunks=[],recordingBlob=null;
+// Separate audio-only recorder for Tier 1 MMI upload (keeps video local only)
+let audioRecorder=null,audioChunks=[],audioBlob=null;
 let webcamReady=false,webcamActive=false;
 
 // DOM
@@ -1539,9 +1555,12 @@ async function initWebcam(){
 function startRecording(){
   if(!webcamReady||!webcamStream)return;
   recordedChunks=[];recordingBlob=null;
-  $('btnDownloadVideo').disabled=false; // enable from start — user can download at any point
+  audioChunks=[];audioBlob=null;
+  $('btnDownloadVideo').disabled=false;
   $('webcamPlayback').style.display='none';
   $('webcamLive').style.display='block';
+
+  // ── Video recorder (full quality, local playback only) ──
   const opts=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
               MediaRecorder.isTypeSupported('video/webm')?{mimeType:'video/webm'}:{};
   mediaRecorder=new MediaRecorder(webcamStream,opts);
@@ -1558,6 +1577,27 @@ function startRecording(){
     if(currentMode===MODE_MMI) mmiOnRecordingStop();
   };
   mediaRecorder.start(1000);
+
+  // ── Audio-only recorder (Tier 1 MMI upload — small file, safe for Whisper) ──
+  if(currentMode===MODE_MMI){
+    try{
+      const audioTrack = webcamStream.getAudioTracks()[0];
+      if(audioTrack){
+        const audioStream = new MediaStream([audioTrack]);
+        const audioOpts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? {mimeType:'audio/webm;codecs=opus'}
+          : MediaRecorder.isTypeSupported('audio/webm')
+            ? {mimeType:'audio/webm'} : {};
+        audioRecorder = new MediaRecorder(audioStream, audioOpts);
+        audioRecorder.ondataavailable = e => { if(e.data.size>0) audioChunks.push(e.data); };
+        audioRecorder.onstop = () => {
+          audioBlob = new Blob(audioChunks, {type: audioRecorder.mimeType || 'audio/webm'});
+        };
+        audioRecorder.start(1000);
+      }
+    }catch(e){ console.warn('Audio-only recorder failed, will fall back to video blob:', e); }
+  }
+
   webcamActive=true;
   $('btnRestartRecording').disabled=false;
   $('recDot').style.display='block';$('recLabel').style.display='block';
@@ -1566,6 +1606,7 @@ function startRecording(){
 }
 function stopRecording(){
   if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
+  if(audioRecorder&&audioRecorder.state!=='inactive')audioRecorder.stop();
   webcamActive=false;
 }
 $('btnStartWebcam').addEventListener('click',async()=>{await initWebcam();});
@@ -1600,6 +1641,7 @@ $('btnRestartRecording').addEventListener('click',()=>{
   $('btnDownloadVideo').disabled=true;
   $('btnRestartRecording').disabled=true;
   recordedChunks=[];recordingBlob=null;
+  audioChunks=[];audioBlob=null;
   // Reload the station from scratch - resets timers and phase
   clearTimer();
   loadStation();
@@ -1936,7 +1978,7 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({
-        tool: 'casper', model: 'claude-sonnet-4-6', max_tokens: 1300,
+        tool: 'casper', model: 'claude-sonnet-4-6', max_tokens: 1500,
         use_credit: useCredit,
         messages: [{role:'user',content:p}],
         question_context: `SCENARIO: ${s.scenario}\n\nPROMPT 1: ${s.prompt1}\n\nPROMPT 2: ${s.prompt2}`,
