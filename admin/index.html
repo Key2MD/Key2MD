@@ -113,11 +113,13 @@
     .stat.green{border-color:var(--green-border);background:var(--green-dim);}
     .stat.blue{border-color:var(--blue-border);background:var(--blue-dim);}
     .stat.amber{border-color:var(--amber-border);background:var(--amber-dim);}
+    .stat.red{border-color:var(--red-border);background:var(--red-dim);}
     .stat-label{font-size:0.65rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
     .stat-val{font-size:1.7rem;font-weight:800;letter-spacing:-0.03em;}
     .stat.green .stat-val{color:var(--green);}
     .stat.blue .stat-val{color:var(--blue);}
     .stat.amber .stat-val{color:var(--amber);}
+    .stat.red .stat-val{color:var(--red);}
     .stat-sub{font-size:0.68rem;color:var(--muted2);margin-top:3px;}
 
     /* ══ DASHBOARD CARDS ══ */
@@ -393,6 +395,7 @@
 
     <div class="sidebar-section">Finance</div>
     <button class="nav-item" data-page="revenue" onclick="nav('revenue')"><span class="icon">💰</span> Revenue</button>
+    <button class="nav-item" data-page="monitoring" onclick="nav('monitoring')"><span class="icon">🔍</span> Monitoring</button>
 
     <div class="sidebar-section">Comms</div>
     <button class="nav-item" data-page="inbox" onclick="nav('inbox')"><span class="icon">✉️</span> Inbox <span class="nav-badge" id="inboxBadge">0</span></button>
@@ -438,6 +441,7 @@
         <div class="stat amber"><div class="stat-label">MMI Reviews</div><div class="stat-val" id="dMMIReviews">—</div><div class="stat-sub">total sessions</div></div>
         <div class="stat green"><div class="stat-label">CASPer Pro</div><div class="stat-val" id="dPro">—</div><div class="stat-sub">active subscriptions</div></div>
         <div class="stat blue"><div class="stat-label">MMI Pro</div><div class="stat-val" id="dMMIPro">—</div><div class="stat-sub">active MMI subscribers</div></div>
+        <div class="stat"><div class="stat-label">Founding Members</div><div class="stat-val" id="dFoundingCount">—</div><div class="stat-sub" id="dFoundingSub">of 15 slots</div></div>
         <div class="stat"><div class="stat-label">Credits Held</div><div class="stat-val" id="dCredits">—</div><div class="stat-sub">CASPer + GAMSAT</div></div>
         <div class="stat"><div class="stat-label">MMI Credits</div><div class="stat-val" id="dMMICredits">—</div><div class="stat-sub">transcript balance</div></div>
         <div class="stat blue"><div class="stat-label">Today</div><div class="stat-val" id="dTodayReviews">—</div><div class="stat-sub">AI reviews today</div></div>
@@ -651,32 +655,88 @@
     <!-- ── BROADCAST ── -->
     <div id="pageBroadcast" class="page">
       <div class="page-header">
-        <div class="page-title">Broadcast</div>
-        <div class="page-sub">Send an email to your entire list</div>
+        <div>
+          <div class="page-title">Broadcast</div>
+          <div class="page-sub">Send a branded email to your list — with live preview</div>
+        </div>
       </div>
-      <div class="bc-card">
-        <div class="bc-stats">
-          <div class="bc-stat"><div class="bc-stat-num" id="bcSubs">—</div><div class="bc-stat-lbl">Subscribers</div></div>
-          <div class="bc-stat"><div class="bc-stat-num" id="bcUsers">—</div><div class="bc-stat-lbl">Users</div></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
+
+        <!-- LEFT: Compose -->
+        <div>
+          <div class="bc-card" style="max-width:100%;">
+            <div class="bc-stats">
+              <div class="bc-stat"><div class="bc-stat-num" id="bcSubs">—</div><div class="bc-stat-lbl">Subscribers</div></div>
+              <div class="bc-stat"><div class="bc-stat-num" id="bcUsers">—</div><div class="bc-stat-lbl">Users</div></div>
+            </div>
+
+            <div class="form-row">
+              <label class="form-lbl">Send to</label>
+              <select class="form-sel" id="bcList">
+                <option value="subscribers">Newsletter subscribers</option>
+                <option value="users">All registered users</option>
+                <option value="both">Both (deduplicated)</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label class="form-lbl">Subject line</label>
+              <input class="form-in" id="bcSubject" type="text" placeholder="e.g. CASPer tips this week…" oninput="updateBcPreview()">
+            </div>
+
+            <div class="form-row">
+              <label class="form-lbl" style="display:flex;align-items:center;justify-content:space-between;">
+                <span>Message</span>
+                <div style="display:flex;gap:6px;">
+                  <button class="seg active" id="bcModeRich" onclick="setBcMode('rich')" style="font-size:0.68rem;padding:3px 10px;">✦ Rich</button>
+                  <button class="seg" id="bcModePlain" onclick="setBcMode('plain')" style="font-size:0.68rem;padding:3px 10px;">Plain text</button>
+                </div>
+              </label>
+
+              <!-- Rich mode toolbar -->
+              <div id="bcRichToolbar" style="display:flex;gap:4px;flex-wrap:wrap;padding:8px;background:var(--surface2);border:1px solid var(--border2);border-bottom:none;border-radius:8px 8px 0 0;">
+                <button onclick="bcFormat('bold')" title="Bold" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-weight:800;font-size:0.82rem;">B</button>
+                <button onclick="bcFormat('italic')" title="Italic" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-style:italic;font-size:0.82rem;">I</button>
+                <div style="width:1px;background:var(--border2);margin:0 2px;"></div>
+                <button onclick="bcInsert('h2')" title="Heading" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-size:0.75rem;font-weight:700;">H2</button>
+                <button onclick="bcInsert('h3')" title="Subheading" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-size:0.75rem;font-weight:700;">H3</button>
+                <div style="width:1px;background:var(--border2);margin:0 2px;"></div>
+                <button onclick="bcInsert('bullet')" title="Bullet list" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-size:0.82rem;">• List</button>
+                <button onclick="bcInsert('divider')" title="Divider" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-size:0.82rem;">— Line</button>
+                <button onclick="bcInsert('cta')" title="CTA Button" style="background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:0.75rem;font-weight:700;">+ CTA Button</button>
+              </div>
+
+              <!-- Rich editor (contenteditable) -->
+              <div id="bcRichEditor" contenteditable="true" oninput="updateBcPreview()" style="min-height:220px;padding:14px;background:var(--surface);border:1px solid var(--border2);border-radius:0 0 8px 8px;color:var(--text);font-size:0.88rem;line-height:1.75;outline:none;white-space:pre-wrap;" placeholder="Write your message here. Use the toolbar above for formatting."></div>
+
+              <!-- Plain text fallback -->
+              <textarea id="bcPlainBody" oninput="updateBcPreview()" style="display:none;" class="form-ta" placeholder="Write your email here. Plain text — no formatting."></textarea>
+            </div>
+
+            <div style="margin-bottom:14px;padding:10px 12px;background:rgba(56,189,248,0.06);border:1px solid var(--blue-border);border-radius:8px;font-size:0.75rem;color:var(--muted);">
+              💡 <strong style="color:var(--text);">Tip:</strong> Replies from students go directly to <strong style="color:var(--blue);">dan@key2md.net</strong> and appear in your Inbox tab.
+            </div>
+
+            <button class="btn primary" id="bcBtn" onclick="sendBroadcast()" style="width:100%;padding:11px;border-radius:50px;font-size:0.88rem;">Send Broadcast →</button>
+            <div class="alert" id="bcAlert"></div>
+          </div>
         </div>
-        <div class="form-row">
-          <label class="form-lbl">Send to</label>
-          <select class="form-sel" id="bcList">
-            <option value="subscribers">Newsletter subscribers</option>
-            <option value="users">All registered users</option>
-            <option value="both">Both (deduplicated)</option>
-          </select>
+
+        <!-- RIGHT: Live preview -->
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted2);margin-bottom:8px;">Live Email Preview</div>
+          <div style="border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:1px solid var(--border2);">
+            <!-- Email client chrome -->
+            <div style="background:rgba(255,255,255,0.06);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:8px;">
+              <div style="display:flex;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#ff5f57;"></div><div style="width:10px;height:10px;border-radius:50%;background:#ffbd2e;"></div><div style="width:10px;height:10px;border-radius:50%;background:#28ca41;"></div></div>
+              <div style="flex:1;background:rgba(255,255,255,0.06);border-radius:4px;padding:4px 10px;font-size:0.72rem;color:var(--muted2);" id="bcPreviewSubject">Subject line will appear here</div>
+            </div>
+            <iframe id="bcPreviewFrame" style="width:100%;height:520px;border:none;background:#fff;" srcdoc="<p style='color:#aaa;text-align:center;padding:40px;font-family:sans-serif;'>Start typing to see a preview…</p>"></iframe>
+          </div>
+          <div style="margin-top:8px;font-size:0.7rem;color:var(--muted2);text-align:center;">Preview updates as you type</div>
         </div>
-        <div class="form-row">
-          <label class="form-lbl">Subject</label>
-          <input class="form-in" id="bcSubject" type="text" placeholder="e.g. CASPer tips this week…">
-        </div>
-        <div class="form-row">
-          <label class="form-lbl">Message</label>
-          <textarea class="form-ta" id="bcBody" placeholder="Write your email here. Plain text is fine."></textarea>
-        </div>
-        <button class="btn primary" id="bcBtn" onclick="sendBroadcast()" style="width:100%;padding:11px;border-radius:50px;font-size:0.88rem;">Send Broadcast →</button>
-        <div class="alert" id="bcAlert"></div>
+
       </div>
     </div>
 
@@ -791,6 +851,63 @@
       </div>
     </div>
 
+    <!-- ── MONITORING ── -->
+    <div id="pageMonitoring" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Monitoring</div>
+          <div class="page-sub">Parse failures, Whisper errors, COGS, and founding member slots</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn" onclick="loadMonitoring()">↺ Refresh</button>
+        </div>
+      </div>
+
+      <!-- Founding + COGS stats -->
+      <div class="stats-grid" style="margin-bottom:20px;">
+        <div class="stat green"><div class="stat-label">Founding Members</div><div class="stat-val" id="mFoundingCount">—</div><div class="stat-sub" id="mFoundingSub">of 15 slots claimed</div></div>
+        <div class="stat blue"><div class="stat-label">Total MMI Reviews</div><div class="stat-val" id="mTotalReviews">—</div><div class="stat-sub" id="mReviewSplit">Tier 1 vs Tier 2</div></div>
+        <div class="stat amber"><div class="stat-label">Avg COGS</div><div class="stat-val" id="mAvgCogs">—</div><div class="stat-sub" id="mAvgCogsSub">per review</div></div>
+        <div class="stat"><div class="stat-label">Total COGS</div><div class="stat-val" id="mTotalCogs">—</div><div class="stat-sub">all-time spend</div></div>
+        <div class="stat red"><div class="stat-label">Parse Failures</div><div class="stat-val" id="mParseFails">—</div><div class="stat-sub">AI response errors</div></div>
+        <div class="stat red"><div class="stat-label">Whisper Failures</div><div class="stat-val" id="mWhisperFails">—</div><div class="stat-sub">transcription errors</div></div>
+      </div>
+
+      <!-- Per-tier COGS breakdown -->
+      <div class="dash-grid" style="margin-bottom:20px;">
+        <div class="dash-card">
+          <div class="dash-card-title">COGS Breakdown by Tier</div>
+          <div id="mCogsBreakdown"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">Founding Member Slots <button class="btn" style="font-size:0.68rem;padding:3px 8px;" onclick="nav('users')">View users</button></div>
+          <div id="mFoundingDetail"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- Parse failures -->
+      <div style="margin-bottom:20px;">
+        <div class="dash-card-title" style="padding:0 0 10px;">Parse Failures <span class="badge badge-default" id="mParseCount">0</span></div>
+        <div class="tbl-wrap">
+          <div class="tbl-scroller"><table><thead><tr>
+            <th>Time</th><th>User</th><th>Tier</th><th>Error</th>
+          </tr></thead><tbody id="mParseBody"></tbody></table></div>
+          <div class="empty hidden" id="mParseEmpty">No parse failures. ✅</div>
+        </div>
+      </div>
+
+      <!-- Whisper failures -->
+      <div>
+        <div class="dash-card-title" style="padding:0 0 10px;">Whisper Failures <span class="badge badge-default" id="mWhisperCount">0</span></div>
+        <div class="tbl-wrap">
+          <div class="tbl-scroller"><table><thead><tr>
+            <th>Time</th><th>User</th><th>Duration</th><th>Error</th>
+          </tr></thead><tbody id="mWhisperBody"></tbody></table></div>
+          <div class="empty hidden" id="mWhisperEmpty">No Whisper failures. ✅</div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -853,7 +970,7 @@ const S = {
   token: null,
   reviews: [], users: [], enquiries: [], subscribers: [],
   conversations: [], filteredConvs: [],
-  mmiReviews: [], revenue: [],
+  mmiReviews: [], revenue: [], monitoring: null,
   activeConv: null,
   detailCache: new Map(),
   creditModalUserId: null,
@@ -949,6 +1066,7 @@ function nav(page) {
   if (page==='broadcast') updateBcStats();
   if (page==='mmi' && !S.mmiReviews.length) loadMMI();
   if (page==='revenue' && !S.revenue.length) loadRevenue();
+  if (page==='monitoring') loadMonitoring();
 }
 
 // ══════════════════════════════════════════════════════
@@ -957,7 +1075,7 @@ function nav(page) {
 async function bootLoad() {
   await Promise.all([
     loadReviews(), loadUsers(), loadEnquiries(),
-    loadSubscribers(), loadInbox(), loadMMI(), loadRevenue(),
+    loadSubscribers(), loadInbox(), loadMMI(), loadRevenue(), loadMonitoring(),
   ]);
   const lu = document.getElementById('lastUpdated');
   if (lu) lu.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
@@ -984,6 +1102,7 @@ function updateDashboard() {
   const credits = users.reduce((s,u)=>s+Number(u.casper_balance||0)+Number(u.gamsat_balance||0),0);
   const pro     = users.filter(u=>(u.tier||'').toLowerCase()==='pro').length;
   const mmiPro  = mmi.filter(r=>r.charged_pro).length;
+  const foundingCount = S.monitoring?.founding_count || 0;
   const todayReviews = reviews.filter(r=>isToday(r.created_at)).length;
   const signups7 = users.filter(u=>withinDays(u.created_at,7)).length;
   const enqs7 = enqs.filter(e=>withinDays(e.created_at,7)).length;
@@ -1007,6 +1126,10 @@ function updateDashboard() {
   document.getElementById('dMMICredits').textContent = mmiCreditsHeld || '—';
   document.getElementById('dPro').textContent       = pro;
   document.getElementById('dMMIPro').textContent    = mmiPro || '—';
+  const fcEl = document.getElementById('dFoundingCount');
+  const fsEl = document.getElementById('dFoundingSub');
+  if(fcEl) fcEl.textContent = foundingCount;
+  if(fsEl) fsEl.textContent = `${15-foundingCount} slot${15-foundingCount===1?'':'s'} remaining`;
   document.getElementById('dSubs').textContent      = subs.length;
   document.getElementById('dTodayReviews').textContent = todayReviews;
   document.getElementById('dAvgScore').textContent = avgScore ? avgScore.toFixed(1) : '—';
@@ -1545,22 +1668,116 @@ async function updateBcStats() {
   document.getElementById('bcUsers').textContent = S.users.length||'—';
 }
 
+// ══════════════════════════════════════════════════════
+// BROADCAST
+// ══════════════════════════════════════════════════════
+let bcMode = 'rich'; // 'rich' | 'plain'
+
+function setBcMode(mode) {
+  bcMode = mode;
+  document.getElementById('bcModeRich').classList.toggle('active', mode==='rich');
+  document.getElementById('bcModePlain').classList.toggle('active', mode==='plain');
+  document.getElementById('bcRichToolbar').style.display = mode==='rich' ? 'flex' : 'none';
+  document.getElementById('bcRichEditor').style.display  = mode==='rich' ? 'block' : 'none';
+  document.getElementById('bcPlainBody').style.display   = mode==='plain' ? 'block' : 'none';
+  updateBcPreview();
+}
+
+function bcFormat(cmd) {
+  document.getElementById('bcRichEditor').focus();
+  document.execCommand(cmd, false, null);
+  updateBcPreview();
+}
+
+function bcInsert(type) {
+  const ed = document.getElementById('bcRichEditor');
+  ed.focus();
+  const templates = {
+    h2:      '<h2 style="font-size:1.25rem;font-weight:800;color:#0a1628;margin:20px 0 8px;">Your heading here</h2>',
+    h3:      '<h3 style="font-size:1rem;font-weight:700;color:#0a1628;margin:16px 0 6px;">Your subheading here</h3>',
+    bullet:  '<ul style="padding-left:20px;line-height:1.9;color:#374151;"><li>First point</li><li>Second point</li><li>Third point</li></ul>',
+    divider: '<hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;">',
+    cta:     '<div style="text-align:center;margin:24px 0;"><a href="https://www.key2md.com/practice.html" style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;font-weight:800;padding:14px 32px;border-radius:50px;text-decoration:none;font-size:15px;">Button text →</a></div>',
+  };
+  document.execCommand('insertHTML', false, templates[type] || '');
+  updateBcPreview();
+}
+
+function getBcBodyHtml() {
+  if (bcMode === 'plain') {
+    const txt = document.getElementById('bcPlainBody').value;
+    return `<div style="font-size:15px;line-height:1.8;color:#374151;white-space:pre-wrap;">${txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+  }
+  return document.getElementById('bcRichEditor').innerHTML || '';
+}
+
+function getBcBodyText() {
+  if (bcMode === 'plain') return document.getElementById('bcPlainBody').value;
+  return document.getElementById('bcRichEditor').innerText || '';
+}
+
+function buildBroadcastHtml(subject, bodyHtml) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#eef2f7;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:40px 16px;">
+<tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;">
+  <tr><td style="background:linear-gradient(160deg,#091525 0%,#0d2244 55%,#0a2e40 100%);border-radius:16px 16px 0 0;padding:28px 44px 24px;">
+    <span style="font-size:24px;font-weight:900;letter-spacing:-0.04em;color:#fff;">Key</span><span style="font-size:24px;font-weight:900;letter-spacing:-0.04em;color:#38bdf8;">2</span><span style="font-size:24px;font-weight:900;letter-spacing:-0.04em;color:#fff;">MD</span>
+  </td></tr>
+  <tr><td style="background:#fff;padding:36px 44px 28px;">
+    ${bodyHtml}
+    <hr style="border:none;border-top:1px solid #f1f5f9;margin:28px 0 22px;">
+    <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0;">— Dan<br><span style="color:#9ca3af;font-size:12px;">UniMelb MD · Key2MD founder</span></p>
+  </td></tr>
+  <tr><td style="background:#f8fafc;border-top:1px solid #e5e7eb;border-radius:0 0 16px 16px;padding:16px 44px;">
+    <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.7;text-align:center;">
+      Key2MD · <a href="https://www.key2md.com" style="color:#0ea5e9;text-decoration:none;">key2md.com</a> · You're receiving this as a Key2MD subscriber.<br>
+      Reply to this email — it comes straight to Dan.
+    </p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`;
+}
+
+function updateBcPreview() {
+  const subj  = document.getElementById('bcSubject')?.value || 'Subject line will appear here';
+  const prevS = document.getElementById('bcPreviewSubject');
+  const frame = document.getElementById('bcPreviewFrame');
+  if (prevS) prevS.textContent = subj || 'Subject line will appear here';
+  if (!frame) return;
+  const bodyHtml = getBcBodyHtml();
+  if (!bodyHtml.trim()) {
+    frame.srcdoc = "<p style='color:#aaa;text-align:center;padding:40px;font-family:sans-serif;'>Start typing to see a preview…</p>";
+    return;
+  }
+  frame.srcdoc = buildBroadcastHtml(subj, bodyHtml);
+}
+
 async function sendBroadcast() {
   const list  = document.getElementById('bcList').value;
   const subj  = document.getElementById('bcSubject').value.trim();
-  const body  = document.getElementById('bcBody').value.trim();
+  const bodyHtml = getBcBodyHtml();
+  const bodyText = getBcBodyText().trim();
   const al    = document.getElementById('bcAlert');
   const btn   = document.getElementById('bcBtn');
   al.className='alert';
-  if (!subj||!body) { al.className='alert err'; al.textContent='Subject and message required.'; return; }
+  if (!subj || !bodyText) { al.className='alert err'; al.textContent='Subject and message required.'; return; }
   if (!confirm(`Send to all ${list==='both'?'subscribers + users':list}?\n\nSubject: ${subj}`)) return;
   btn.disabled=true; btn.textContent='Sending…';
   try {
-    const res = await api('/admin/inbox/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({list,subject:subj,body})});
+    const res = await api('/admin/inbox/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({list, subject:subj, body:bodyText, html:buildBroadcastHtml(subj, bodyHtml)})});
     const d   = await res.json().catch(()=>({}));
     if (!res.ok) throw new Error(d?.error||'Failed');
     al.className='alert ok'; al.textContent=`✓ Sent to ${d.sent||'?'} recipients`;
-    document.getElementById('bcSubject').value=''; document.getElementById('bcBody').value='';
+    document.getElementById('bcSubject').value='';
+    document.getElementById('bcRichEditor').innerHTML='';
+    document.getElementById('bcPlainBody').value='';
+    updateBcPreview();
   } catch(e) { al.className='alert err'; al.textContent=e.message; }
   finally { btn.disabled=false; btn.textContent='Send Broadcast →'; }
 }
@@ -1745,6 +1962,85 @@ function renderRevenue() {
       <td><span class="badge badge-yes">Completed</span></td>
     </tr>`;
   }).join('') : '';
+}
+
+// ══════════════════════════════════════════════════════
+// MONITORING
+// ══════════════════════════════════════════════════════
+async function loadMonitoring() {
+  try {
+    const res  = await api('/admin/monitoring');
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.monitoring = data;
+    renderMonitoring();
+    updateDashboard();
+  } catch(e) { console.error('Monitoring load error:', e); }
+}
+
+function renderMonitoring() {
+  const m = S.monitoring;
+  if (!m) return;
+
+  const stats = m.mmi_stats || {};
+  const setEl = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+
+  setEl('mFoundingCount', m.founding_count||0);
+  setEl('mFoundingSub',   `${m.slots_remaining} slot${m.slots_remaining===1?'':'s'} remaining`);
+  setEl('mTotalReviews',  stats.total_reviews||0);
+  setEl('mReviewSplit',   `T1: ${stats.transcript_count||0} · T2: ${stats.premium_count||0}`);
+  setEl('mAvgCogs',       stats.avg_cogs_cents ? `¢${stats.avg_cogs_cents}` : '—');
+  setEl('mAvgCogsSub',    `T1: ¢${stats.avg_cogs_transcript||'—'} · T2: ¢${stats.avg_cogs_premium||'—'}`);
+  setEl('mTotalCogs',     stats.total_cogs_cents ? `$${(stats.total_cogs_cents/100).toFixed(2)}` : '—');
+  setEl('mParseFails',    m.parse_failures?.length||0);
+  setEl('mWhisperFails',  m.whisper_failures?.length||0);
+
+  // COGS breakdown card
+  const cogsEl = document.getElementById('mCogsBreakdown');
+  if (cogsEl) cogsEl.innerHTML = `
+    <div class="mini-metric-row" style="grid-template-columns:1fr 1fr;">
+      <div class="mini-metric"><div>Transcript avg</div><div>¢${stats.avg_cogs_transcript||'—'}</div></div>
+      <div class="mini-metric"><div>Premium avg</div><div>¢${stats.avg_cogs_premium||'—'}</div></div>
+      <div class="mini-metric"><div>Max single review</div><div>¢${stats.max_cogs_cents||'—'}</div></div>
+      <div class="mini-metric"><div>Total all-time</div><div>$${stats.total_cogs_cents?(stats.total_cogs_cents/100).toFixed(2):'—'}</div></div>
+    </div>
+    ${stats.avg_cogs_cents > 150 ? `<div style="margin-top:8px;padding:8px 10px;background:var(--red-dim);border:1px solid var(--red-border);border-radius:7px;color:var(--red);font-size:0.78rem;font-weight:600;">⚠ Avg COGS above ¢150 — consider reviewing pricing</div>` : ''}`;
+
+  // Founding detail card
+  const foundingEl = document.getElementById('mFoundingDetail');
+  if (foundingEl) {
+    const pct = Math.round((m.founding_count/15)*100);
+    foundingEl.innerHTML = `
+      <div style="font-size:2rem;font-weight:800;color:var(--purple);margin-bottom:6px;">${m.founding_count} <span style="font-size:1rem;color:var(--muted);">/ 15</span></div>
+      <div style="height:8px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:99px;transition:width 0.4s;"></div>
+      </div>
+      <div style="font-size:0.8rem;color:var(--muted);">${m.slots_remaining} slot${m.slots_remaining===1?'':'s'} remaining · ${pct}% claimed</div>`;
+  }
+
+  // Parse failures table
+  const parseCount = document.getElementById('mParseCount');
+  if(parseCount) parseCount.textContent = m.parse_failures?.length||0;
+  document.getElementById('mParseEmpty')?.classList.toggle('hidden', (m.parse_failures?.length||0)>0);
+  const parseBody = document.getElementById('mParseBody');
+  if(parseBody) parseBody.innerHTML = (m.parse_failures||[]).map(f=>`<tr class="data-row">
+    <td><div class="cell-main">${fmtDate(f.created_at)?.date||'—'}</div><div class="cell-sub">${fmtDate(f.created_at)?.time||''}</div></td>
+    <td><div class="trunc">${esc(f.user_id||'—')}</div></td>
+    <td><span class="badge badge-${f.tier==='premium'?'pro':'casper'}">${esc(f.tier||'—')}</span></td>
+    <td><div class="trunc" style="max-width:320px;">${esc(f.error_msg||'—')}</div></td>
+  </tr>`).join('');
+
+  // Whisper failures table
+  const whisperCount = document.getElementById('mWhisperCount');
+  if(whisperCount) whisperCount.textContent = m.whisper_failures?.length||0;
+  document.getElementById('mWhisperEmpty')?.classList.toggle('hidden', (m.whisper_failures?.length||0)>0);
+  const whisperBody = document.getElementById('mWhisperBody');
+  if(whisperBody) whisperBody.innerHTML = (m.whisper_failures||[]).map(f=>`<tr class="data-row">
+    <td><div class="cell-main">${fmtDate(f.created_at)?.date||'—'}</div><div class="cell-sub">${fmtDate(f.created_at)?.time||''}</div></td>
+    <td><div class="trunc">${esc(f.user_id||'—')}</div></td>
+    <td>${f.duration_sec ? `${Math.floor(f.duration_sec/60)}m ${f.duration_sec%60}s` : '—'}</td>
+    <td><div class="trunc" style="max-width:320px;">${esc(f.error_msg||'—')}</div></td>
+  </tr>`).join('');
 }
 
 // ══════════════════════════════════════════════════════
