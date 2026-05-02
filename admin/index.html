@@ -708,6 +708,7 @@
                 <div style="display:flex;gap:6px;">
                   <button class="seg active" id="bcModeRich" onclick="setBcMode('rich')" style="font-size:0.68rem;padding:3px 10px;">✦ Rich</button>
                   <button class="seg" id="bcModePlain" onclick="setBcMode('plain')" style="font-size:0.68rem;padding:3px 10px;">Plain text</button>
+                  <button class="seg" id="bcModeHtml" onclick="setBcMode('html')" style="font-size:0.68rem;padding:3px 10px;">⌨ Raw HTML</button>
                 </div>
               </label>
 
@@ -729,6 +730,12 @@
 
               <!-- Plain text fallback -->
               <textarea id="bcPlainBody" oninput="updateBcPreview()" style="display:none;" class="form-ta" placeholder="Write your email here. Plain text — no formatting."></textarea>
+
+              <!-- Raw HTML mode -->
+              <textarea id="bcHtmlBody" oninput="updateBcPreview()" style="display:none;" class="form-ta" placeholder="Paste your full HTML email here. The preview will update live." style="font-family:monospace;font-size:0.78rem;min-height:260px;"></textarea>
+              <div id="bcHtmlHint" style="display:none;margin-top:6px;padding:8px 12px;background:rgba(14,165,233,0.06);border:1px solid var(--blue-border);border-radius:7px;font-size:0.72rem;color:var(--muted);">
+                💡 Paste a full HTML email (e.g. your newsletter file). The preview updates live. This HTML is sent exactly as-is — no wrapper added.
+              </div>
             </div>
 
             <div style="margin-bottom:14px;padding:10px 12px;background:rgba(56,189,248,0.06);border:1px solid var(--blue-border);border-radius:8px;font-size:0.75rem;color:var(--muted);">
@@ -1694,9 +1701,12 @@ function setBcMode(mode) {
   bcMode = mode;
   document.getElementById('bcModeRich').classList.toggle('active', mode==='rich');
   document.getElementById('bcModePlain').classList.toggle('active', mode==='plain');
+  document.getElementById('bcModeHtml').classList.toggle('active', mode==='html');
   document.getElementById('bcRichToolbar').style.display = mode==='rich' ? 'flex' : 'none';
   document.getElementById('bcRichEditor').style.display  = mode==='rich' ? 'block' : 'none';
   document.getElementById('bcPlainBody').style.display   = mode==='plain' ? 'block' : 'none';
+  document.getElementById('bcHtmlBody').style.display    = mode==='html' ? 'block' : 'none';
+  document.getElementById('bcHtmlHint').style.display    = mode==='html' ? 'block' : 'none';
   updateBcPreview();
 }
 
@@ -1721,6 +1731,7 @@ function bcInsert(type) {
 }
 
 function getBcBodyHtml() {
+  if (bcMode === 'html') return document.getElementById('bcHtmlBody').value || '';
   if (bcMode === 'plain') {
     const txt = document.getElementById('bcPlainBody').value;
     return `<div style="font-size:15px;line-height:1.8;color:#374151;white-space:pre-wrap;">${txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
@@ -1729,6 +1740,7 @@ function getBcBodyHtml() {
 }
 
 function getBcBodyText() {
+  if (bcMode === 'html') return (document.getElementById('bcHtmlBody').value||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,500)+'…';
   if (bcMode === 'plain') return document.getElementById('bcPlainBody').value;
   return document.getElementById('bcRichEditor').innerText || '';
 }
@@ -1772,7 +1784,8 @@ function updateBcPreview() {
     frame.srcdoc = "<p style='color:#aaa;text-align:center;padding:40px;font-family:sans-serif;'>Start typing to see a preview…</p>";
     return;
   }
-  frame.srcdoc = buildBroadcastHtml(subj, bodyHtml);
+  // In raw HTML mode, preview the HTML exactly as-is (it's a complete email)
+  frame.srcdoc = bcMode === 'html' ? bodyHtml : buildBroadcastHtml(subj, bodyHtml);
 }
 
 function getBcListLabel(list) {
@@ -1804,8 +1817,10 @@ async function sendBroadcast() {
   if (!subj || !bodyText) { al.className='alert err'; al.textContent='Subject and message required.'; return; }
   if (!confirm(`Send to: ${getBcListLabel(list)}\n\nSubject: ${subj}\n\nThis cannot be undone.`)) return;
   btn.disabled=true; btn.textContent='Sending…';
+  // In raw HTML mode, send the HTML exactly as-is (don't wrap in template)
+  const finalHtml = bcMode === 'html' ? bodyHtml : buildBroadcastHtml(subj, bodyHtml);
   try {
-    const res = await api('/admin/inbox/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({list, subject:subj, body:bodyText, html:buildBroadcastHtml(subj, bodyHtml)})});
+    const res = await api('/admin/inbox/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({list, subject:subj, body:bodyText, html:finalHtml})});
     const d   = await res.json().catch(()=>({}));
     if (!res.ok) throw new Error(d?.error||'Failed');
     al.className='alert ok'; al.textContent=`✓ Sent to ${d.sent||'?'} recipients`;
