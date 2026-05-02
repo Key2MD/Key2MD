@@ -660,3 +660,144 @@
   .mmi-criterion-row { grid-template-columns: 1fr; }
   .mmi-score-pips { margin-top: 4px; }
 }
+
+/* ── Phase 3: Premium sections ────────────────────────────── */
+.mmi-premium-section {
+  background: rgba(124,58,237,0.05);
+  border: 1px solid rgba(124,58,237,0.18);
+  border-radius: 12px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+.mmi-premium-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 16px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--navy);
+  list-style: none;
+  user-select: none;
+}
+.mmi-premium-summary::-webkit-details-marker { display: none; }
+.mmi-premium-summary-icon { font-size: 1rem; }
+.mmi-premium-badge {
+  margin-left: auto;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7c3aed;
+  background: rgba(124,58,237,0.1);
+  padding: 2px 8px;
+  border-radius: 50px;
+}
+.mmi-premium-chevron {
+  font-size: 0.6rem;
+  color: var(--gray400);
+  transition: transform 0.2s;
+}
+details[open] .mmi-premium-chevron { transform: rotate(180deg); }
+.mmi-premium-body { padding: 0 16px 16px; }
+.mmi-premium-caveat {
+  font-size: 0.72rem;
+  color: var(--gray400);
+  line-height: 1.5;
+  margin-top: 12px;
+  padding: 8px 10px;
+  background: var(--gray50);
+  border-radius: 7px;
+}
+
+/* Voice metrics grid */
+.mmi-voice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.mmi-voice-stat {
+  background: rgba(124,58,237,0.06);
+  border: 1px solid rgba(124,58,237,0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.mmi-voice-val {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #7c3aed;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.mmi-voice-lbl {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--gray400);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+.mmi-voice-note { font-size: 0.72rem; color: var(--gray600); line-height: 1.4; }
+.mmi-voice-trend {
+  font-size: 0.8rem;
+  color: var(--gray600);
+  line-height: 1.6;
+  padding: 8px 12px;
+  background: rgba(124,58,237,0.04);
+  border-radius: 7px;
+  margin-top: 8px;
+}
+
+/* Visual/presentation grid */
+.mmi-visual-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.mmi-visual-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: rgba(124,58,237,0.04);
+  border-radius: 7px;
+  font-size: 0.82rem;
+}
+.mmi-visual-label { color: var(--gray400); font-weight: 600; }
+.mmi-visual-val { font-weight: 700; color: var(--navy); }
+.mmi-visual-summary {
+  font-size: 0.82rem;
+  color: var(--gray600);
+  line-height: 1.65;
+  padding: 8px 12px;
+  background: rgba(124,58,237,0.04);
+  border-radius: 7px;
+  margin-top: 6px;
+}
+
+/* Loading steps for premium */
+.mmi-loading-steps {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 16px;
+}
+.mmi-step {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 50px;
+  border: 1px solid var(--gray200);
+  color: var(--gray400);
+  background: #fff;
+  transition: all 0.3s;
+}
+.mmi-step.active {
+  color: #7c3aed;
+  border-color: rgba(124,58,237,0.3);
+  background: rgba(124,58,237,0.06);
+}

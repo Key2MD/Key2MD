@@ -42,7 +42,90 @@ const MMIFeedbackRender = (() => {
       </div>`;
   }
 
-  function renderPromptCard(pp, index) {
+  function renderVoiceMetrics(voice) {
+    if (!voice) return '';
+    const pace = voice.pace_wpm || 0;
+    const paceNote = pace > 200 ? 'Faster than average — may signal nerves'
+      : pace < 100 ? 'Slower than average — thoughtful or hesitant'
+      : 'Natural conversational pace';
+    const fillerPct = voice.filler_density_pct || 0;
+    const fillerNote = fillerPct > 8
+      ? `${fillerPct}% — slightly above average, but examiners do not mark fillers`
+      : `${fillerPct}% — well within normal range`;
+    const pauseAvg = voice.avg_pause_seconds || 0;
+    const pauseNote = pauseAvg > 2
+      ? 'Longer pauses — often a sign of genuine thought'
+      : 'Short, natural pauses';
+
+    return `
+      <details class="mmi-premium-section">
+        <summary class="mmi-premium-summary">
+          <span class="mmi-premium-summary-icon">🎙️</span>
+          <span>Voice &amp; Pacing</span>
+          <span class="mmi-premium-badge">Premium</span>
+          <span class="mmi-premium-chevron">▼</span>
+        </summary>
+        <div class="mmi-premium-body">
+          <div class="mmi-voice-grid">
+            <div class="mmi-voice-stat">
+              <div class="mmi-voice-val">${pace}</div>
+              <div class="mmi-voice-lbl">Words/min</div>
+              <div class="mmi-voice-note">${esc(paceNote)}</div>
+            </div>
+            <div class="mmi-voice-stat">
+              <div class="mmi-voice-val">${voice.word_count || 0}</div>
+              <div class="mmi-voice-lbl">Total words</div>
+              <div class="mmi-voice-note">${voice.filler_count || 0} filler words</div>
+            </div>
+            <div class="mmi-voice-stat">
+              <div class="mmi-voice-val">${voice.pause_count || 0}</div>
+              <div class="mmi-voice-lbl">Meaningful pauses</div>
+              <div class="mmi-voice-note">${esc(pauseNote)}</div>
+            </div>
+            <div class="mmi-voice-stat">
+              <div class="mmi-voice-val">${fillerPct}%</div>
+              <div class="mmi-voice-lbl">Filler density</div>
+              <div class="mmi-voice-note">${esc(fillerNote)}</div>
+            </div>
+          </div>
+          ${voice.pace_trend ? `<div class="mmi-voice-trend">${esc(voice.pace_trend)}</div>` : ''}
+          <div class="mmi-premium-caveat">Filler words (um, uh, like) are tracked for your awareness only — MMI examiners do not mark them down. Pauses are often positive signals of genuine thought.</div>
+        </div>
+      </details>`;
+  }
+
+  function renderPresentationMetrics(visual) {
+    if (!visual) return '';
+    const eyeMap = { consistent: '✅ Consistent', mostly: '👍 Mostly consistent', inconsistent: '⚠ Inconsistent', rare: '❌ Rare' };
+    const postureMap = { engaged: '✅ Engaged', neutral: '➖ Neutral', withdrawn: '⚠ Withdrawn' };
+    const composureMap = { engaged: '✅ Engaged', neutral: '➖ Neutral', performative: '⚠ Performative', disengaged: '❌ Disengaged' };
+
+    const distractions = Array.isArray(visual.distractions) && visual.distractions.length
+      ? `<div class="mmi-visual-row"><span class="mmi-visual-label">Distractions</span><span class="mmi-visual-val">${visual.distractions.map(d => esc(d)).join(', ')}</span></div>`
+      : '';
+
+    return `
+      <details class="mmi-premium-section">
+        <summary class="mmi-premium-summary">
+          <span class="mmi-premium-summary-icon">📹</span>
+          <span>Presentation Analysis</span>
+          <span class="mmi-premium-badge">Premium</span>
+          <span class="mmi-premium-chevron">▼</span>
+        </summary>
+        <div class="mmi-premium-body">
+          <div class="mmi-visual-grid">
+            <div class="mmi-visual-row"><span class="mmi-visual-label">Eye contact</span><span class="mmi-visual-val">${eyeMap[visual.eye_contact] || esc(visual.eye_contact || '—')}</span></div>
+            <div class="mmi-visual-row"><span class="mmi-visual-label">Posture</span><span class="mmi-visual-val">${postureMap[visual.posture] || esc(visual.posture || '—')}</span></div>
+            <div class="mmi-visual-row"><span class="mmi-visual-label">Composure</span><span class="mmi-visual-val">${composureMap[visual.composure] || esc(visual.composure || '—')}</span></div>
+            ${distractions}
+          </div>
+          ${visual.summary ? `<div class="mmi-visual-summary">${esc(visual.summary)}</div>` : ''}
+          <div class="mmi-premium-caveat">Examiners weight substance over polish. Strong content with imperfect eye contact still scores well. This section is informational — it does not change your criterion scores.</div>
+        </div>
+      </details>`;
+  }
+
+
     const criteria = ['empathy','communication','reasoning','reflection','real_world_awareness'];
     const criteriaRows = criteria.map(k => {
       const crit = pp.scores?.[k];
@@ -69,6 +152,7 @@ const MMIFeedbackRender = (() => {
   }
 
   function render(container, data, context) {
+    if (window._mmiLoadingInterval) { clearInterval(window._mmiLoadingInterval); window._mmiLoadingInterval = null; }
     // context: { tier, specialistMode, stationCategory, durationSec }
     if (!container || !data) return;
 
@@ -92,6 +176,12 @@ const MMIFeedbackRender = (() => {
 
     const promptCards = (feedback.per_prompt || []).map((pp, i) => renderPromptCard(pp, i)).join('');
 
+    // Premium sections
+    const voiceSection = (tier === 'premium' && data.voice_metrics)
+      ? renderVoiceMetrics(data.voice_metrics) : '';
+    const visualSection = (tier === 'premium' && data.visual_metrics)
+      ? renderPresentationMetrics(data.visual_metrics) : '';
+
     const auditorFlag = feedback.polished_auditor_detected ? `
       <div class="mmi-flag mmi-flag-auditor">
         <div class="mmi-flag-title">⚠ Polished Auditor Trap detected</div>
@@ -114,6 +204,9 @@ const MMIFeedbackRender = (() => {
           ${promptCards}
         </div>
 
+        ${voiceSection}
+        ${visualSection}
+
         <div class="mmi-overall-summary">
           <div class="mmi-summary-section">
             <div class="mmi-summary-label">💪 Biggest Strength</div>
@@ -132,7 +225,7 @@ const MMIFeedbackRender = (() => {
         <div class="mmi-limitations">
           <strong>About this feedback</strong><br>
           This AI feedback is calibrated to the rubric Dan uses with his coaching students — empathy, communication, reasoning, reflection, and real-world awareness. It is designed to complement, not replace, human review.<br><br>
-          The AI is good at: structural feedback, identifying some common traps, spotting reflection without consequence, flagging textbook answers, and benchmarking your response against Dan's rubric.<br><br>
+          The AI is good at: structural feedback, identifying the Polished Auditor trap, spotting reflection without consequence, flagging textbook answers, and benchmarking your response against Dan's rubric.<br><br>
           The AI is less good at: subtle interpersonal nuance, the kind of judgement only experienced examiners bring, and the emotional weight of how something landed in the room.
         </div>
 
@@ -154,14 +247,29 @@ const MMIFeedbackRender = (() => {
     container.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function renderLoading(container) {
+  function renderLoading(container, tier) {
     if (!container) return;
+    const isPremium = tier === 'premium';
     container.innerHTML = `
       <div class="mmi-loading">
         <div class="mmi-loading-spinner"></div>
-        <div class="mmi-loading-text">Transcribing and analysing your response…</div>
-        <div class="mmi-loading-sub">This takes 15–30 seconds</div>
+        <div class="mmi-loading-text">${isPremium ? 'Analysing your response — voice, presentation, and content…' : 'Transcribing and analysing your response…'}</div>
+        <div class="mmi-loading-sub">${isPremium ? 'Premium analysis takes 20–40 seconds — please keep this tab open' : 'This takes 15–30 seconds'}</div>
+        ${isPremium ? '<div class="mmi-loading-steps" id="mmiLoadingSteps"><span class="mmi-step active">📝 Transcribing</span><span class="mmi-step">🎙️ Analysing voice</span><span class="mmi-step">📹 Reviewing presentation</span><span class="mmi-step">🤖 Generating feedback</span></div>' : ''}
       </div>`;
+    if (isPremium) startLoadingSteps();
+  }
+
+  function startLoadingSteps() {
+    const steps = document.querySelectorAll('.mmi-step');
+    if (!steps.length) return;
+    let current = 0;
+    const interval = setInterval(() => {
+      steps.forEach((s, i) => s.classList.toggle('active', i === current));
+      current = (current + 1) % steps.length;
+    }, 5000);
+    // Store so we can clear it
+    window._mmiLoadingInterval = interval;
   }
 
   function renderError(container, error) {

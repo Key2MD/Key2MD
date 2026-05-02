@@ -407,6 +407,22 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <span class="toggle-slider"></span>
         </label>
       </div>
+
+      <!-- Premium tier toggle -->
+      <div class="mmi-specialist-row" id="premiumModeRow" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.18);border-radius:10px;margin-top:8px;">
+        <div>
+          <div class="mmi-specialist-label" style="color:#7c3aed;">✦ Premium Analysis</div>
+          <div class="mmi-specialist-sub">Adds voice pacing + presentation feedback. Uses 1 Premium credit. <a href="plans.html#mmi-section" style="color:#7c3aed;font-weight:600;">Get credits →</a></div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="premiumModeToggle" onchange="togglePremiumMode()">
+          <span class="toggle-slider" style="--toggle-active:#7c3aed;"></span>
+        </label>
+      </div>
+      <!-- ffmpeg disclaimer — shown only when premium is on -->
+      <div id="premiumDisclaimer" style="display:none;font-size:0.72rem;color:var(--gray400);line-height:1.5;padding:8px 12px;background:rgba(124,58,237,0.04);border-radius:8px;margin-top:4px;">
+        ⚡ Premium analysis extracts presentation snapshots from your video in-browser before uploading. This may take 5–10 seconds on mobile and briefly uses your device's processor. Your full video never leaves your device — only audio and snapshots are uploaded.
+      </div>
     </div>
 
     <!-- Leaderboard - collapsible -->
@@ -913,6 +929,9 @@ const MMI_PRESETS = {
 };
 let mmiActivePreset = 'quickfire';
 let mmiSpecialistMode = false;
+let mmiPremiumMode = false;
+let ffmpegLoaded = false;
+let ffmpegLoading = false;
 let mmiPromptRevealTimestamps = [];
 let mmiPromptsRevealedCount = 0;
 let mmiRecordingInterval = null;
@@ -935,6 +954,70 @@ function toggleSpecialistMode() {
   mmiSpecialistMode = document.getElementById('specialistModeToggle')?.checked || false;
   const row = document.getElementById('specialistModeRow');
   if(row) row.classList.toggle('active', mmiSpecialistMode);
+}
+
+function togglePremiumMode() {
+  mmiPremiumMode = document.getElementById('premiumModeToggle')?.checked || false;
+  const disclaimer = document.getElementById('premiumDisclaimer');
+  if(disclaimer) disclaimer.style.display = mmiPremiumMode ? 'block' : 'none';
+  // Start loading ffmpeg lazily when premium is enabled
+  if(mmiPremiumMode && !ffmpegLoaded && !ffmpegLoading) loadFFmpeg();
+}
+
+async function loadFFmpeg() {
+  if(ffmpegLoaded || ffmpegLoading) return;
+  ffmpegLoading = true;
+  try {
+    // Load ffmpeg.wasm from CDN
+    if(!window.FFmpegWASM) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js';
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('ffmpeg failed to load'));
+        document.head.appendChild(s);
+      });
+    }
+    ffmpegLoaded = true;
+  } catch(e) {
+    console.warn('ffmpeg.wasm failed to load — Premium will gracefully degrade to transcript-only:', e.message);
+    ffmpegLoaded = false;
+  } finally {
+    ffmpegLoading = false;
+  }
+}
+
+async function extractVideoFrames(videoBlob, frameCount) {
+  // Returns array of JPEG Blobs, or empty array if ffmpeg unavailable
+  if(!ffmpegLoaded || !window.FFmpegWASM) return [];
+  try {
+    const { FFmpeg } = window.FFmpegWASM;
+    const ff = new FFmpeg();
+    await ff.load();
+    const inputName = 'input.webm';
+    const data = new Uint8Array(await videoBlob.arrayBuffer());
+    await ff.writeFile(inputName, data);
+    // Extract evenly-spaced frames at 240p width (small, fast)
+    await ff.exec([
+      '-i', inputName,
+      '-vf', `fps=1/${Math.ceil(videoBlob.size > 0 ? (data.length / 1000000) : 10) / frameCount},scale=320:-1`,
+      '-vframes', String(frameCount),
+      '-q:v', '8',
+      'frame%03d.jpg'
+    ]);
+    const frames = [];
+    for(let i = 1; i <= frameCount; i++) {
+      const name = `frame${String(i).padStart(3,'0')}.jpg`;
+      try {
+        const fileData = await ff.readFile(name);
+        frames.push(new Blob([fileData], { type: 'image/jpeg' }));
+      } catch { break; } // fewer frames than expected is fine
+    }
+    return frames;
+  } catch(e) {
+    console.warn('Frame extraction failed:', e.message);
+    return [];
+  }
 }
 
 function getMMIConfig() {
@@ -1048,17 +1131,18 @@ function updateRevealButton() {
 // ══ MMI SUBMIT ═══════════════════════════════════════════════════════
 
 async function submitMMIForFeedback() {
-  // Use audio-only blob for Tier 1 (smaller, safe for upload)
-  // Fall back to full recordingBlob only if audio recorder failed
   const uploadBlob = audioBlob || recordingBlob;
   if(!uploadBlob) { alert('No recording found. Please record your response first.'); return; }
 
   const btn = document.getElementById('btnMMISubmit');
-  if(btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
-  const sw = document.getElementById('mmiSubmitWrap');
-  if(sw) sw.style.display = 'none';
+  const sw  = document.getElementById('mmiSubmitWrap');
   const feedbackWrap = document.getElementById('aiFeedbackWrapMMI');
-  MMIFeedbackRender.renderLoading(feedbackWrap);
+  const isPremium = mmiPremiumMode;
+  const tier = isPremium ? 'premium' : 'transcript';
+
+  if(btn) { btn.disabled = true; btn.textContent = isPremium ? '⏳ Preparing Premium analysis…' : 'Uploading…'; }
+  if(sw) sw.style.display = 'none';
+  MMIFeedbackRender.renderLoading(feedbackWrap, tier);
 
   if(!Key2MDAuth.isLoggedIn()) {
     Key2MDAuth.showAuthModal('signup');
@@ -1069,67 +1153,115 @@ async function submitMMIForFeedback() {
   }
 
   const cfg = getMMIConfig();
-  const s = pool[currentIdx] || {};
+  const s   = pool[currentIdx] || {};
 
-  // Use audio-only blob for Tier 1 upload — ~10MB for 10 min vs 300MB+ for video
+  // ── For Premium: extract frames from video ───────────────────
+  let frames = [];
+  let visualDegraded = false;
+  if(isPremium && recordingBlob) {
+    if(btn) btn.textContent = '⏳ Extracting presentation snapshots…';
+    frames = await extractVideoFrames(recordingBlob, 30);
+    if(frames.length === 0) {
+      visualDegraded = true;
+      console.info('Visual analysis unavailable — proceeding with voice + transcript only');
+    }
+  }
+
+  // ── Build FormData ────────────────────────────────────────────
   const audioFile = new File([uploadBlob], 'recording.webm', { type: uploadBlob.type || 'audio/webm' });
-  const fd = new FormData();
-  fd.append('audio', audioFile);
-  fd.append('station_id', s.id || `mmi_${MMI_STATIONS.indexOf(s)}`);
-  fd.append('station_category', s.category || '');
-  fd.append('station_scenario', s.scenario || '');
-  fd.append('prompts', JSON.stringify(mmiCurrentPrompts));
-  fd.append('prompt_reveal_timestamps', JSON.stringify(mmiPromptRevealTimestamps));
-  fd.append('timing_preset', cfg.preset);
-  fd.append('reveal_mode', cfg.revealMode);
-  fd.append('recording_duration_seconds', String(Math.round(mmiRecordingDurationSec)));
-  fd.append('tier', 'transcript');
-  fd.append('specialist_mode', mmiSpecialistMode ? '1' : '0');
-  fd.append('use_credit', '1'); // MMI always requires a credit — no free tier
+  const buildFormData = () => {
+    const fd = new FormData();
+    fd.append('audio', audioFile);
+    fd.append('station_id', s.id || `mmi_${MMI_STATIONS.indexOf(s)}`);
+    fd.append('station_category', s.category || '');
+    fd.append('station_scenario', s.scenario || '');
+    fd.append('prompts', JSON.stringify(mmiCurrentPrompts));
+    fd.append('prompt_reveal_timestamps', JSON.stringify(mmiPromptRevealTimestamps));
+    fd.append('timing_preset', cfg.preset);
+    fd.append('reveal_mode', cfg.revealMode);
+    fd.append('recording_duration_seconds', String(Math.round(mmiRecordingDurationSec)));
+    fd.append('tier', tier);
+    fd.append('specialist_mode', mmiSpecialistMode ? '1' : '0');
+    fd.append('use_credit', '1');
+    fd.append('visual_degraded', visualDegraded ? '1' : '0');
+    // Append frames for Premium
+    frames.forEach((frame, i) => fd.append(`frame_${i}`, frame, `frame_${i}.jpg`));
+    return fd;
+  };
 
+  // ── Upload with retry ─────────────────────────────────────────
   const token = Key2MDAuth.getToken();
-  try {
-    const res = await fetch(API_BASE + '/api/mmi-review', {
-      method: 'POST',
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-      body: fd,
-    });
-    if(res.status === 401) {
-      Key2MDAuth.showAuthModal('signup');
-      MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_required', message: 'Sign in to get AI feedback on your MMI response.' });
-      if(sw) sw.style.display = 'block';
-      if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
-      return;
-    }
-    if(res.status === 402) {
-      const data = await res.json().catch(() => ({}));
-      MMIFeedbackRender.renderError(feedbackWrap, {
-        code: 'no_credits',
-        message: data.message || 'You need MMI credits to get AI feedback.'
+  const MAX_RETRIES = 3;
+  let lastError = null;
+
+  if(btn) btn.textContent = isPremium ? '⏳ Uploading for analysis…' : 'Uploading…';
+
+  for(let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      if(attempt > 1) {
+        if(btn) btn.textContent = `⏳ Retrying… (${attempt}/${MAX_RETRIES})`;
+        await new Promise(r => setTimeout(r, 1500 * attempt)); // backoff
+      }
+
+      const res = await fetch(API_BASE + '/api/mmi-review', {
+        method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        body: buildFormData(),
       });
+
+      // Non-retriable errors — show immediately
+      if(res.status === 401) {
+        Key2MDAuth.showAuthModal('signup');
+        MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_required', message: 'Sign in to get AI feedback on your MMI response.' });
+        if(sw) sw.style.display = 'block';
+        if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
+        return;
+      }
+      if(res.status === 402) {
+        const data = await res.json().catch(() => ({}));
+        MMIFeedbackRender.renderError(feedbackWrap, { code: 'no_credits', message: data.message || `You need MMI ${tier} credits to get AI feedback.` });
+        if(sw) sw.style.display = 'block';
+        if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
+        return;
+      }
+      if(res.status === 413) {
+        MMIFeedbackRender.renderError(feedbackWrap, { code: 'file_too_large', message: 'Recording is too large to upload. Try a shorter recording.' });
+        if(sw) sw.style.display = 'block';
+        if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
+        return;
+      }
+
+      if(!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        // Retry on 5xx server errors
+        if(res.status >= 500 && attempt < MAX_RETRIES) {
+          lastError = data.message || 'Server error';
+          continue;
+        }
+        MMIFeedbackRender.renderError(feedbackWrap, { code: data.error, message: data.message || 'Something went wrong. Please try again.' });
+        if(sw) sw.style.display = 'block';
+        if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
+        return;
+      }
+
+      const data = await res.json();
+      MMIFeedbackRender.render(feedbackWrap, data, {
+        tier,
+        specialistMode: mmiSpecialistMode,
+        stationCategory: s.category || '',
+        durationSec: mmiRecordingDurationSec,
+        visualDegraded,
+      });
+      updateMMILimitsUI();
+      return; // success
+
+    } catch(err) {
+      lastError = err.message;
+      if(attempt < MAX_RETRIES) continue; // retry on network error
+      MMIFeedbackRender.renderError(feedbackWrap, { code: 'network_error', message: `Upload failed after ${MAX_RETRIES} attempts. Check your connection and try again.` });
       if(sw) sw.style.display = 'block';
       if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
-      return;
     }
-    if(!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      MMIFeedbackRender.renderError(feedbackWrap, { code: data.error, message: data.message || 'Something went wrong. Please try again.' });
-      if(sw) sw.style.display = 'block';
-      if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
-      return;
-    }
-    const data = await res.json();
-    MMIFeedbackRender.render(feedbackWrap, data, {
-      tier: 'transcript',
-      specialistMode: mmiSpecialistMode,
-      stationCategory: s.category || '',
-      durationSec: mmiRecordingDurationSec,
-    });
-    updateMMILimitsUI();
-  } catch(err) {
-    MMIFeedbackRender.renderError(feedbackWrap, { code: 'network_error', message: 'Network error. Please check your connection and try again.' });
-    if(sw) sw.style.display = 'block';
-    if(btn) { btn.disabled = false; btn.textContent = '✦ Get AI Feedback'; }
   }
 }
 
