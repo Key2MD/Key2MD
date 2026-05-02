@@ -386,9 +386,13 @@
     <button class="nav-item active" data-page="dashboard" onclick="nav('dashboard')"><span class="icon">📊</span> Dashboard</button>
 
     <div class="sidebar-section">Students</div>
-    <button class="nav-item" data-page="reviews" onclick="nav('reviews')"><span class="icon">📋</span> Reviews</button>
+    <button class="nav-item" data-page="reviews" onclick="nav('reviews')"><span class="icon">📋</span> CASPer Reviews</button>
+    <button class="nav-item" data-page="mmi" onclick="nav('mmi')"><span class="icon">🎤</span> MMI Reviews <span class="nav-badge" id="mmiBadge">0</span></button>
     <button class="nav-item" data-page="users" onclick="nav('users')"><span class="icon">👥</span> Users</button>
     <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')"><span class="icon">📩</span> Enquiries <span class="nav-badge" id="enqBadge">0</span></button>
+
+    <div class="sidebar-section">Finance</div>
+    <button class="nav-item" data-page="revenue" onclick="nav('revenue')"><span class="icon">💰</span> Revenue</button>
 
     <div class="sidebar-section">Comms</div>
     <button class="nav-item" data-page="inbox" onclick="nav('inbox')"><span class="icon">✉️</span> Inbox <span class="nav-badge" id="inboxBadge">0</span></button>
@@ -428,17 +432,17 @@
         </div>
       </div>
       <div class="stats-grid" id="dashStats">
-        <div class="stat green"><div class="stat-label">Total Revenue</div><div class="stat-val" id="dRevenue">—</div><div class="stat-sub">all time</div></div>
         <div class="stat"><div class="stat-label">Total Users</div><div class="stat-val" id="dUsers">—</div><div class="stat-sub" id="dUsersSub">registered</div></div>
         <div class="stat amber"><div class="stat-label">Paying Customers</div><div class="stat-val" id="dPaying">—</div><div class="stat-sub" id="dPayingSub">ever paid</div></div>
-        <div class="stat blue"><div class="stat-label">AI Reviews Run</div><div class="stat-val" id="dReviews">—</div><div class="stat-sub" id="dReviewsSub">total</div></div>
-        <div class="stat"><div class="stat-label">Credits Held</div><div class="stat-val" id="dCredits">—</div><div class="stat-sub">unused purchased</div></div>
+        <div class="stat blue"><div class="stat-label">CASPer Reviews</div><div class="stat-val" id="dReviews">—</div><div class="stat-sub" id="dReviewsSub">total</div></div>
+        <div class="stat amber"><div class="stat-label">MMI Reviews</div><div class="stat-val" id="dMMIReviews">—</div><div class="stat-sub">total sessions</div></div>
         <div class="stat green"><div class="stat-label">CASPer Pro</div><div class="stat-val" id="dPro">—</div><div class="stat-sub">active subscriptions</div></div>
-        <div class="stat"><div class="stat-label">Subscribers</div><div class="stat-val" id="dSubs">—</div><div class="stat-sub">newsletter list</div></div>
-        <div class="stat amber"><div class="stat-label">Enquiries</div><div class="stat-val" id="dEnq">—</div><div class="stat-sub">contact form</div></div>
+        <div class="stat blue"><div class="stat-label">MMI Pro</div><div class="stat-val" id="dMMIPro">—</div><div class="stat-sub">active MMI subscribers</div></div>
+        <div class="stat"><div class="stat-label">Credits Held</div><div class="stat-val" id="dCredits">—</div><div class="stat-sub">CASPer + GAMSAT</div></div>
+        <div class="stat"><div class="stat-label">MMI Credits</div><div class="stat-val" id="dMMICredits">—</div><div class="stat-sub">transcript balance</div></div>
         <div class="stat blue"><div class="stat-label">Today</div><div class="stat-val" id="dTodayReviews">—</div><div class="stat-sub">AI reviews today</div></div>
-        <div class="stat"><div class="stat-label">Avg Score</div><div class="stat-val" id="dAvgScore">—</div><div class="stat-sub">recent scored reviews</div></div>
-        <div class="stat green"><div class="stat-label">Pro Run Rate</div><div class="stat-val" id="dProRunRate">—</div><div class="stat-sub">weekly AUD estimate</div></div>
+        <div class="stat"><div class="stat-label">Avg Score</div><div class="stat-val" id="dAvgScore">—</div><div class="stat-sub">recent CASPer scores</div></div>
+        <div class="stat"><div class="stat-label">Subscribers</div><div class="stat-val" id="dSubs">—</div><div class="stat-sub">newsletter list</div></div>
         <div class="stat amber"><div class="stat-label">Inbox</div><div class="stat-val" id="dUnread">—</div><div class="stat-sub">unread conversations</div></div>
       </div>
       <div class="ops-grid">
@@ -694,6 +698,99 @@
       </div>
     </div>
 
+    <!-- ── MMI REVIEWS ── -->
+    <div id="pageMmi" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">MMI Reviews</div>
+          <div class="page-sub">All MMI AI feedback sessions — transcripts, scores, tier, duration</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn" onclick="loadMMI()">↺ Refresh</button>
+        </div>
+      </div>
+      <div class="controls">
+        <input class="ctrl-in" id="mmiSearch" type="text" placeholder="🔍 Search email, scenario, category…" oninput="renderMMI()">
+        <select class="ctrl-sel" id="mmiCategory" onchange="renderMMI()">
+          <option value="">All categories</option>
+          <option value="Ethics">Ethics</option>
+          <option value="Role-Play">Role-Play</option>
+          <option value="Conflict Resolution">Conflict Resolution</option>
+          <option value="Policy">Policy</option>
+          <option value="Motivation">Motivation</option>
+        </select>
+        <select class="ctrl-sel" id="mmiTier" onchange="renderMMI()">
+          <option value="">All tiers</option>
+          <option value="transcript">Transcript</option>
+          <option value="premium">Premium</option>
+        </select>
+        <select class="ctrl-sel" id="mmiScore" onchange="renderMMI()">
+          <option value="">All scores</option>
+          <option value="5">Excellent (5)</option>
+          <option value="4">Good (4)</option>
+          <option value="3">Satisfactory (3)</option>
+          <option value="2">Unsatisfactory (2)</option>
+          <option value="1">Poor (1)</option>
+        </select>
+        <select class="ctrl-sel" id="mmiLimit" onchange="loadMMI()">
+          <option value="50" selected>50 rows</option>
+          <option value="100">100 rows</option>
+          <option value="250">250 rows</option>
+        </select>
+        <button class="btn" onclick="loadMMI()">↺</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar"><span class="tbl-status" id="mmiStatus">—</span></div>
+        <div class="tbl-scroller"><table><thead><tr>
+          <th style="width:26px;"></th><th>Time</th><th>Student</th><th>Category</th><th>Tier</th><th>Score</th><th>Duration</th><th>Specialist</th><th>COGS</th>
+        </tr></thead><tbody id="mmiBody"></tbody></table></div>
+        <div class="empty hidden" id="mmiEmpty">No MMI reviews found.</div>
+      </div>
+    </div>
+
+    <!-- ── REVENUE ── -->
+    <div id="pageRevenue" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Revenue</div>
+          <div class="page-sub">All transactions, MRR, and financial breakdown</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn" onclick="loadRevenue()">↺ Refresh</button>
+        </div>
+      </div>
+      <div class="stats-grid" style="margin-bottom:20px;">
+        <div class="stat green"><div class="stat-label">Total Revenue</div><div class="stat-val" id="rvTotal">—</div><div class="stat-sub">all time</div></div>
+        <div class="stat blue"><div class="stat-label">MRR (est.)</div><div class="stat-val" id="rvMRR">—</div><div class="stat-sub">monthly recurring</div></div>
+        <div class="stat amber"><div class="stat-label">Credit Sales</div><div class="stat-val" id="rvCredits">—</div><div class="stat-sub">one-off purchases</div></div>
+        <div class="stat green"><div class="stat-label">Subscriptions</div><div class="stat-val" id="rvSubs">—</div><div class="stat-sub">active recurring</div></div>
+        <div class="stat"><div class="stat-label">Avg Order Value</div><div class="stat-val" id="rvAOV">—</div><div class="stat-sub">per transaction</div></div>
+        <div class="stat amber"><div class="stat-label">This Month</div><div class="stat-val" id="rvMonth">—</div><div class="stat-sub">month to date</div></div>
+      </div>
+      <div class="controls">
+        <input class="ctrl-in" id="rvSearch" type="text" placeholder="🔍 Search email, type…" oninput="renderRevenue()">
+        <select class="ctrl-sel" id="rvType" onchange="renderRevenue()">
+          <option value="">All types</option>
+          <option value="pro_subscription">CASPer Pro</option>
+          <option value="mmi_pro_subscription">MMI Pro</option>
+          <option value="credits">Credit packs</option>
+          <option value="mmi_credits">MMI credits</option>
+          <option value="marking">Expert marking</option>
+        </select>
+        <select class="ctrl-sel" id="rvLimit" onchange="loadRevenue()">
+          <option value="100" selected>100 rows</option>
+          <option value="250">250 rows</option>
+        </select>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar"><span class="tbl-status" id="rvStatus">—</span></div>
+        <div class="tbl-scroller"><table><thead><tr>
+          <th>Time</th><th>Student</th><th>Type</th><th>Amount</th><th>Status</th>
+        </tr></thead><tbody id="rvBody"></tbody></table></div>
+        <div class="empty hidden" id="rvEmpty">No transactions yet.</div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -704,8 +801,15 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
       <div><div class="form-lbl">CASPer balance</div><div style="font-size:1.3rem;font-weight:800;color:var(--blue);" id="cmCasper">—</div></div>
       <div><div class="form-lbl">GAMSAT balance</div><div style="font-size:1.3rem;font-weight:800;color:var(--purple);" id="cmGamsat">—</div></div>
+      <div><div class="form-lbl">MMI Transcript</div><div style="font-size:1.3rem;font-weight:800;color:var(--amber);" id="cmMMITranscript">—</div></div>
+      <div><div class="form-lbl">MMI Premium</div><div style="font-size:1.3rem;font-weight:800;color:var(--green);" id="cmMMIPremium">—</div></div>
     </div>
-    <div class="form-row"><label class="form-lbl">Tool</label><select class="form-sel" id="cmTool"><option value="casper">CASPer</option><option value="gamsat">GAMSAT</option></select></div>
+    <div class="form-row"><label class="form-lbl">Tool</label><select class="form-sel" id="cmTool">
+      <option value="casper">CASPer</option>
+      <option value="gamsat">GAMSAT</option>
+      <option value="mmi_transcript">MMI Transcript</option>
+      <option value="mmi_premium">MMI Premium</option>
+    </select></div>
     <div class="form-row"><label class="form-lbl">Credits to add (negative to remove)</label><input class="form-in" type="number" id="cmAmount" placeholder="e.g. 5 or -2"></div>
     <div class="modal-alert" id="cmAlert"></div>
     <div class="modal-footer"><button class="btn" onclick="closeCreditModal()">Cancel</button><button class="btn green" id="cmSave" onclick="saveCreditChange()">Save</button></div>
@@ -749,6 +853,7 @@ const S = {
   token: null,
   reviews: [], users: [], enquiries: [], subscribers: [],
   conversations: [], filteredConvs: [],
+  mmiReviews: [], revenue: [],
   activeConv: null,
   detailCache: new Map(),
   creditModalUserId: null,
@@ -833,14 +938,17 @@ async function api(path, opts={}) {
 function nav(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById(`page${page.charAt(0).toUpperCase()+page.slice(1)}`).classList.add('active');
-  document.querySelector(`[data-page="${page}"]`).classList.add('active');
+  const pageEl = document.getElementById(`page${page.charAt(0).toUpperCase()+page.slice(1)}`);
+  if (pageEl) pageEl.classList.add('active');
+  const navEl = document.querySelector(`[data-page="${page}"]`);
+  if (navEl) navEl.classList.add('active');
 
-  // Lazy load data on first visit
   if (page==='inbox' && !S.conversations.length) loadInbox();
   if (page==='subscribers' && !S.subscribers.length) loadSubscribers();
   if (page==='enquiries' && !S.enquiries.length) loadEnquiries();
   if (page==='broadcast') updateBcStats();
+  if (page==='mmi' && !S.mmiReviews.length) loadMMI();
+  if (page==='revenue' && !S.revenue.length) loadRevenue();
 }
 
 // ══════════════════════════════════════════════════════
@@ -849,7 +957,7 @@ function nav(page) {
 async function bootLoad() {
   await Promise.all([
     loadReviews(), loadUsers(), loadEnquiries(),
-    loadSubscribers(), loadInbox(),
+    loadSubscribers(), loadInbox(), loadMMI(), loadRevenue(),
   ]);
   const lu = document.getElementById('lastUpdated');
   if (lu) lu.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
@@ -870,11 +978,12 @@ function updateDashboard() {
   const reviews = S.reviews;
   const enqs    = S.enquiries;
   const subs    = S.subscribers;
+  const mmi     = S.mmiReviews;
 
-  const revenue = users.reduce((s,u)=>s+Number(u.total_spend_aud||0),0);
   const paying  = users.filter(u=>Number(u.total_spend_aud||0)>0).length;
   const credits = users.reduce((s,u)=>s+Number(u.casper_balance||0)+Number(u.gamsat_balance||0),0);
   const pro     = users.filter(u=>(u.tier||'').toLowerCase()==='pro').length;
+  const mmiPro  = mmi.filter(r=>r.charged_pro).length;
   const todayReviews = reviews.filter(r=>isToday(r.created_at)).length;
   const signups7 = users.filter(u=>withinDays(u.created_at,7)).length;
   const enqs7 = enqs.filter(e=>withinDays(e.created_at,7)).length;
@@ -884,34 +993,37 @@ function updateDashboard() {
   const unread = S.conversations.filter(c=>c.messages?.some(m=>m.direction==='inbound'&&!m.read)).length;
   const noReviews = users.filter(u=>Number(u.review_count||0)===0).length;
   const freeToday = users.filter(u=>u.usage_today?.casper?.used_free_today||u.usage_today?.gamsat?.used_free_today).length;
-  const proRunRate = pro * 40;
+  const mmiCreditsHeld = mmi.reduce((s,r)=>s+(r.mmi_transcript_balance||0),0);
   const conversion = (paying/Math.max(users.length,1))*100;
 
-  document.getElementById('dRevenue').textContent  = `$${revenue.toFixed(2)}`;
   document.getElementById('dUsers').textContent     = users.length;
   document.getElementById('dUsersSub').textContent  = `${signups7} new in 7 days`;
   document.getElementById('dPaying').textContent    = paying;
   document.getElementById('dPayingSub').textContent = `${conversion.toFixed(0)}% conversion`;
   document.getElementById('dReviews').textContent   = reviews.length;
   document.getElementById('dReviewsSub').textContent= `${uniqueReviewers} students`;
+  document.getElementById('dMMIReviews').textContent = mmi.length;
   document.getElementById('dCredits').textContent   = credits;
+  document.getElementById('dMMICredits').textContent = mmiCreditsHeld || '—';
   document.getElementById('dPro').textContent       = pro;
+  document.getElementById('dMMIPro').textContent    = mmiPro || '—';
   document.getElementById('dSubs').textContent      = subs.length;
-  document.getElementById('dEnq').textContent       = enqs.length;
   document.getElementById('dTodayReviews').textContent = todayReviews;
   document.getElementById('dAvgScore').textContent = avgScore ? avgScore.toFixed(1) : '—';
-  document.getElementById('dProRunRate').textContent = `$${proRunRate}`;
   document.getElementById('dUnread').textContent = unread;
-  document.getElementById('dashHeadline').textContent = `${todayReviews} reviews today, ${unread} unread conversation${unread===1?'':'s'}`;
+  document.getElementById('dashHeadline').textContent = `${todayReviews} reviews today · ${mmi.filter(r=>isToday(r.created_at)).length} MMI sessions · ${unread} unread message${unread===1?'':'s'}`;
   document.getElementById('dashBrief').textContent =
-    `${users.length} registered students, ${paying} paying customers, ${pro} Pro accounts, ${enqs7} enquiries in the last 7 days. Average recent AI score is ${avgScore ? `${avgScore.toFixed(1)}/10` : 'not available yet'}.`;
+    `${users.length} registered students · ${paying} paying customers · ${pro} CASPer Pro · ${mmi.length} MMI sessions total · ${enqs7} enquiries in the last 7 days`;
 
   renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length});
-  renderBusinessInsights({conversion,revenue,pro,proRunRate,paying,users,credits,reviews,todayReviews,signups7,enqs7,avgScore});
+  renderBusinessInsights({conversion,pro,paying,users,credits,reviews,todayReviews,signups7,enqs7,avgScore,mmi});
   renderActivityFeed();
   renderReviewQuality();
 
-  // Recent enquiries
+  // MMI badge
+  const mb = document.getElementById('mmiBadge');
+  if (mb) { mb.textContent = mmi.length; mb.classList.toggle('show', mmi.length>0); }
+
   const enqEl = document.getElementById('dashRecentEnq');
   enqEl.innerHTML = enqs.slice(0,5).map(e=>`
     <div class="dash-row">
@@ -919,7 +1031,6 @@ function updateDashboard() {
       <span class="dash-row-val"><span class="enq-type">${esc(e.type||'General')}</span></span>
     </div>`).join('')||'<div style="color:var(--muted2);font-size:0.8rem;">No enquiries yet</div>';
 
-  // Recent signups
   const usrEl = document.getElementById('dashRecentUsers');
   usrEl.innerHTML = users.slice(0,5).map(u=>`
     <div class="dash-row">
@@ -927,7 +1038,6 @@ function updateDashboard() {
       <span class="dash-row-val">${tierBadge(u.tier)}</span>
     </div>`).join('')||'<div style="color:var(--muted2);font-size:0.8rem;">No users yet</div>';
 
-  // Update nav badges
   const ib = document.getElementById('inboxBadge');
   ib.textContent = unread; ib.classList.toggle('show', unread>0);
   const eb = document.getElementById('enqBadge');
@@ -954,13 +1064,14 @@ function renderActionQueue(m) {
 function renderBusinessInsights(m) {
   const reviewPerUser = m.users.length ? m.reviews.length / m.users.length : 0;
   const creditPerUser = m.users.length ? m.credits / m.users.length : 0;
+  const mmiToday = (m.mmi||[]).filter(r=>isToday(r.created_at)).length;
   document.getElementById('dashInsights').innerHTML = `
     <div class="insight"><div class="insight-label">Paid conversion</div><div class="insight-val">${m.conversion.toFixed(0)}%</div><div class="meter"><div class="meter-fill" style="width:${Math.min(100,m.conversion)}%"></div></div><div class="insight-note">${m.paying} paying of ${m.users.length} users</div></div>
-    <div class="insight"><div class="insight-label">Pro weekly</div><div class="insight-val">$${m.proRunRate}</div><div class="insight-note">${m.pro} active subscriptions at $40/week</div></div>
-    <div class="insight"><div class="insight-label">Engagement</div><div class="insight-val">${reviewPerUser.toFixed(1)}</div><div class="insight-note">AI reviews per registered user</div></div>
+    <div class="insight"><div class="insight-label">CASPer Pro</div><div class="insight-val">${m.pro}</div><div class="insight-note">${m.pro} active subscriptions</div></div>
+    <div class="insight"><div class="insight-label">Engagement</div><div class="insight-val">${reviewPerUser.toFixed(1)}</div><div class="insight-note">CASPer reviews per user</div></div>
     <div class="insight"><div class="insight-label">Credits Held</div><div class="insight-val">${m.credits}</div><div class="insight-note">${creditPerUser.toFixed(1)} unused credits per user</div></div>
-    <div class="insight"><div class="insight-label">Today</div><div class="insight-val">${m.todayReviews}</div><div class="insight-note">reviews submitted today</div></div>
-    <div class="insight"><div class="insight-label">Lead Flow</div><div class="insight-val">${m.enqs7}</div><div class="insight-note">enquiries in the last 7 days</div></div>`;
+    <div class="insight"><div class="insight-label">Today</div><div class="insight-val">${m.todayReviews}</div><div class="insight-note">${mmiToday} MMI + ${m.todayReviews} CASPer today</div></div>
+    <div class="insight"><div class="insight-label">Lead Flow</div><div class="insight-val">${m.enqs7}</div><div class="insight-note">enquiries in last 7 days</div></div>`;
 }
 
 function renderActivityFeed() {
@@ -1137,7 +1248,7 @@ function renderUsers() {
       <td><div class="cell-main">${dt?.date||'—'}</div></td>
       <td>
         <div style="display:flex;gap:4px;">
-          <button class="btn blue" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openCreditModal('${esc(row.id)}','${esc(row.email)}',${cbA},${gbA})">Credits</button>
+          <button class="btn blue" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openCreditModal('${esc(row.id)}','${esc(row.email)}',${cbA},${gbA},0,0)">Credits</button>
           <button class="btn amber" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openTierModal('${esc(row.id)}','${esc(row.email)}','${esc(row.tier||'free')}')">Tier</button>
           <button class="btn" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();composeToUser('${esc(row.email)}')">✉</button>
         </div>
@@ -1194,7 +1305,7 @@ function renderUserDetail(det) {
       <div class="detail-box-row">CASPer free today: ${u.usage_today?.casper?.used||0}/${u.usage_today?.casper?.limit||1}</div>
       <div class="detail-box-row">GAMSAT free today: ${u.usage_today?.gamsat?.used||0}/${u.usage_today?.gamsat?.limit||1}</div>
       <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="btn blue" onclick="openCreditModal('${esc(u.id)}','${esc(u.email)}',${credits.find(c=>c.tool==='casper')?.balance||0},${credits.find(c=>c.tool==='gamsat')?.balance||0})">💳 Credits</button>
+        <button class="btn blue" onclick="openCreditModal('${esc(u.id)}','${esc(u.email)}',${credits.find(c=>c.tool==='casper')?.balance||0},${credits.find(c=>c.tool==='gamsat')?.balance||0},${credits.find(c=>c.tool==='mmi_transcript')?.balance||0},${credits.find(c=>c.tool==='mmi_premium')?.balance||0})">💳 Credits</button>
         <button class="btn amber" onclick="openTierModal('${esc(u.id)}','${esc(u.email)}','${esc(u.tier||'free')}')">⭐ Tier</button>
         <button class="btn" onclick="composeToUser('${esc(u.email)}')">✉ Email</button>
       </div>
@@ -1482,13 +1593,170 @@ function renderSubscribers() {
 }
 
 // ══════════════════════════════════════════════════════
+// MMI REVIEWS
+// ══════════════════════════════════════════════════════
+async function loadMMI() {
+  const limit = document.getElementById('mmiLimit')?.value||'50';
+  try {
+    const res  = await api(`/admin/mmi?limit=${limit}`);
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.mmiReviews = data.rows||[];
+    renderMMI();
+    updateDashboard();
+  } catch(e) { console.error('MMI load error:', e); }
+}
+
+function renderMMI() {
+  const q        = (document.getElementById('mmiSearch')?.value||'').toLowerCase();
+  const category = document.getElementById('mmiCategory')?.value||'';
+  const tier     = document.getElementById('mmiTier')?.value||'';
+  const scoreF   = document.getElementById('mmiScore')?.value||'';
+  const rows = S.mmiReviews.filter(r => {
+    const fb = parseMMIFb(r.ai_feedback_json);
+    const sm = !q || [r.email,r.name,r.station_category,r.station_scenario].some(v=>String(v||'').toLowerCase().includes(q));
+    const cm = !category || r.station_category===category;
+    const tm = !tier || r.tier===tier;
+    const sc = !scoreF || String(fb?.overall?.score||'')===scoreF;
+    return sm&&cm&&tm&&sc;
+  });
+  document.getElementById('mmiStatus').textContent = `${rows.length} MMI session${rows.length===1?'':'s'}`;
+  document.getElementById('mmiEmpty').classList.toggle('hidden', rows.length>0);
+  const tbody = document.getElementById('mmiBody');
+  tbody.innerHTML = '';
+  rows.forEach(row => {
+    const fb  = parseMMIFb(row.ai_feedback_json);
+    const dt  = fmtDate(row.created_at);
+    const dur = row.recording_duration_seconds ? `${Math.floor(row.recording_duration_seconds/60)}:${String(row.recording_duration_seconds%60).padStart(2,'0')}` : '—';
+    const score = fb?.overall?.score;
+    const scoreLabel = fb?.overall?.label||'';
+    const dr = document.createElement('tr');
+    dr.className = 'data-row';
+    dr.innerHTML = `
+      <td><div class="expander">▼</div></td>
+      <td><div class="cell-main">${dt?.date||'—'}</div><div class="cell-sub">${dt?.time||''}</div></td>
+      <td><div class="cell-main">${esc(row.email||'?')}</div><div class="cell-sub">${esc(row.name||'')}</div></td>
+      <td><span class="badge badge-default">${esc(row.station_category||'—')}</span></td>
+      <td><span class="badge badge-${row.tier==='premium'?'pro':'casper'}">${esc(row.tier||'—')}</span></td>
+      <td>${score ? `<div class="score-box ${mmiScoreC(score)}" title="${esc(scoreLabel)}">${score}</div>` : '<span style="color:var(--muted2);">—</span>'}</td>
+      <td>${esc(dur)}</td>
+      <td>${row.specialist_mode ? '<span class="badge badge-pro">Specialist</span>' : '<span style="color:var(--muted2);">—</span>'}</td>
+      <td><span style="color:var(--muted2);font-size:0.75rem;">${row.cogs_cents ? `¢${row.cogs_cents}` : '—'}</span></td>`;
+    const xr = document.createElement('tr');
+    xr.className = 'detail-row';
+    xr.innerHTML = `<td colspan="9" class="detail-panel"><div class="detail-inner">${renderMMIDetail(row, fb)}</div></td>`;
+    dr.addEventListener('click', () => { xr.classList.toggle('open'); dr.classList.toggle('expanded'); });
+    tbody.appendChild(dr); tbody.appendChild(xr);
+  });
+}
+
+function renderMMIDetail(row, fb) {
+  const prompts = (() => { try { return JSON.parse(row.prompts_json||'[]'); } catch { return []; } })();
+  const promptsHtml = prompts.map((p,i)=>`<div style="margin-bottom:6px;"><span style="font-size:0.63rem;font-weight:700;color:var(--muted);text-transform:uppercase;">Prompt ${i+1}</span><div class="detail-box-body">${esc(typeof p==='object'?p.prompt:p)}</div></div>`).join('');
+  const perPromptHtml = fb?.per_prompt?.map((pp,i) => {
+    const scores = pp.scores||{};
+    const scoreItems = Object.entries(scores).map(([k,v])=>`<span style="font-size:0.72rem;color:var(--muted);margin-right:8px;">${esc(k)}: <strong style="color:var(--text);">${v.score||'—'}</strong></span>`).join('');
+    return `<div style="margin-bottom:10px;padding:8px;background:rgba(0,0,0,0.1);border-radius:8px;">
+      <div style="font-size:0.63rem;font-weight:700;color:var(--blue);text-transform:uppercase;margin-bottom:4px;">Prompt ${i+1}</div>
+      <div style="margin-bottom:4px;">${scoreItems}</div>
+      ${pp.summary?`<div class="detail-box-body">${esc(pp.summary)}</div>`:''}
+      ${pp.specific_quote?`<div style="margin-top:4px;font-style:italic;color:var(--muted2);font-size:0.75rem;">"${esc(pp.specific_quote)}"</div>`:''}
+    </div>`;
+  }).join('')||'';
+  return `
+    <div class="detail-box">
+      <div class="detail-box-hd">Station</div>
+      <div class="detail-box-row">Category: <strong>${esc(row.station_category||'—')}</strong></div>
+      <div class="detail-box-row">Tier: <strong>${esc(row.tier||'—')}</strong></div>
+      <div class="detail-box-row">Specialist: <strong>${row.specialist_mode?'Yes':'No'}</strong></div>
+      <div style="margin-top:8px;">${promptsHtml}</div>
+    </div>
+    <div class="detail-box">
+      <div class="detail-box-hd">Transcript</div>
+      <div class="detail-box-body">${esc(row.transcript_text||'No transcript available.')}</div>
+    </div>
+    <div class="detail-box">
+      <div class="detail-box-hd">AI Feedback ${fb?.overall ? `— ${esc(fb.overall.label||'')} (${fb.overall.score}/5)` : ''}</div>
+      ${fb?.polished_auditor_detected ? `<div style="margin-bottom:8px;padding:6px 10px;border-radius:7px;background:var(--amber-dim);border:1px solid var(--amber-border);color:var(--amber);font-size:0.75rem;font-weight:700;">⚠️ Polished Auditor Trap detected</div>` : ''}
+      ${fb?.overall?.biggest_strength ? `<div style="margin-bottom:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--green);text-transform:uppercase;margin-bottom:3px;">Biggest Strength</div><div class="detail-box-body">${esc(fb.overall.biggest_strength)}</div></div>` : ''}
+      ${fb?.overall?.biggest_improvement ? `<div style="margin-bottom:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--red);text-transform:uppercase;margin-bottom:3px;">Biggest Improvement</div><div class="detail-box-body">${esc(fb.overall.biggest_improvement)}</div></div>` : ''}
+      ${perPromptHtml}
+    </div>`;
+}
+
+function parseMMIFb(raw) {
+  if (!raw) return null;
+  if (typeof raw==='object') return raw;
+  try { return JSON.parse(String(raw)); } catch { return null; }
+}
+
+function mmiScoreC(s) { const n=parseInt(s,10); return n>=4?'score-h':n>=3?'score-m':'score-l'; }
+
+// ══════════════════════════════════════════════════════
+// REVENUE
+// ══════════════════════════════════════════════════════
+async function loadRevenue() {
+  const limit = document.getElementById('rvLimit')?.value||'100';
+  try {
+    const res  = await api(`/admin/payments?limit=${limit}`);
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.revenue = data.rows||[];
+    renderRevenue();
+  } catch(e) { console.error('Revenue load error:', e); }
+}
+
+function renderRevenue() {
+  const q    = (document.getElementById('rvSearch')?.value||'').toLowerCase();
+  const type = document.getElementById('rvType')?.value||'';
+  const rows = S.revenue.filter(r => {
+    const sm = !q || [r.email,r.name,r.type].some(v=>String(v||'').toLowerCase().includes(q));
+    const tm = !type || String(r.type||'').includes(type);
+    return sm&&tm;
+  });
+
+  // Stats
+  const total   = S.revenue.reduce((s,r)=>s+Number(r.amount_aud||0),0);
+  const pro     = S.users.filter(u=>(u.tier||'').toLowerCase()==='pro').length;
+  const mrr     = pro * 40 * 4.33;
+  const creditR = S.revenue.filter(r=>String(r.type||'').includes('credit')).reduce((s,r)=>s+Number(r.amount_aud||0),0);
+  const aov     = S.revenue.length ? total/S.revenue.length : 0;
+  const monthR  = S.revenue.filter(r=>withinDays(r.created_at,30)).reduce((s,r)=>s+Number(r.amount_aud||0),0);
+
+  const setEl = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  setEl('rvTotal', `$${total.toFixed(2)}`);
+  setEl('rvMRR',   `$${mrr.toFixed(0)}/mo`);
+  setEl('rvCredits',`$${creditR.toFixed(2)}`);
+  setEl('rvSubs',  pro);
+  setEl('rvAOV',   `$${aov.toFixed(2)}`);
+  setEl('rvMonth', `$${monthR.toFixed(2)}`);
+
+  document.getElementById('rvStatus').textContent = `${rows.length} transaction${rows.length===1?'':'s'} · $${rows.reduce((s,r)=>s+Number(r.amount_aud||0),0).toFixed(2)} filtered total`;
+  document.getElementById('rvEmpty').classList.toggle('hidden', rows.length>0);
+
+  const tbody = document.getElementById('rvBody');
+  tbody.innerHTML = rows.length ? rows.map(r => {
+    const dt = fmtDate(r.created_at);
+    return `<tr class="data-row" onclick="composeToUser('${esc(r.email||'')}')">
+      <td><div class="cell-main">${dt?.date||'—'}</div><div class="cell-sub">${dt?.time||''}</div></td>
+      <td><div class="cell-main">${esc(r.email||'?')}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
+      <td><span class="badge badge-default" style="font-size:0.62rem;">${esc(r.type||'—')}</span></td>
+      <td><span class="spend has">$${Number(r.amount_aud||0).toFixed(2)}</span></td>
+      <td><span class="badge badge-yes">Completed</span></td>
+    </tr>`;
+  }).join('') : '';
+}
+
+// ══════════════════════════════════════════════════════
 // CREDIT MODAL
 // ══════════════════════════════════════════════════════
-function openCreditModal(id,email,cb,gb) {
+function openCreditModal(id,email,cb,gb,mmiT,mmiP) {
   S.creditModalUserId=id;
   document.getElementById('cmEmail').textContent=email;
-  document.getElementById('cmCasper').textContent=cb;
-  document.getElementById('cmGamsat').textContent=gb;
+  document.getElementById('cmCasper').textContent=cb||0;
+  document.getElementById('cmGamsat').textContent=gb||0;
+  document.getElementById('cmMMITranscript').textContent=mmiT||0;
+  document.getElementById('cmMMIPremium').textContent=mmiP||0;
   document.getElementById('cmAmount').value='';
   document.getElementById('cmAlert').className='modal-alert';
   document.getElementById('creditModal').classList.add('open');
