@@ -674,9 +674,26 @@
             <div class="form-row">
               <label class="form-lbl">Send to</label>
               <select class="form-sel" id="bcList">
-                <option value="subscribers">Newsletter subscribers</option>
-                <option value="users">All registered users</option>
-                <option value="both">Both (deduplicated)</option>
+                <optgroup label="🧪 Test">
+                  <option value="test">Test — send to brittainmbbs@gmail.com only</option>
+                </optgroup>
+                <optgroup label="📋 All">
+                  <option value="subscribers">Newsletter subscribers only</option>
+                  <option value="users">All registered users</option>
+                  <option value="both">Everyone — subscribers + users (deduplicated)</option>
+                </optgroup>
+                <optgroup label="💰 By payment">
+                  <option value="paying">Paying customers only (ever purchased)</option>
+                  <option value="non_paying">Non-paying users (never purchased)</option>
+                  <option value="pro">CASPer Pro subscribers</option>
+                  <option value="mmi_pro">MMI Pro subscribers</option>
+                </optgroup>
+                <optgroup label="📊 By activity">
+                  <option value="active">Active users (reviewed in last 14 days)</option>
+                  <option value="inactive">Inactive users (no reviews in 30+ days)</option>
+                  <option value="no_reviews">Never reviewed (signed up, never used AI)</option>
+                  <option value="mmi_users">MMI users (at least 1 MMI review)</option>
+                </optgroup>
               </select>
             </div>
 
@@ -1758,6 +1775,24 @@ function updateBcPreview() {
   frame.srcdoc = buildBroadcastHtml(subj, bodyHtml);
 }
 
+function getBcListLabel(list) {
+  const labels = {
+    test:       'TEST — brittainmbbs@gmail.com only',
+    subscribers:'Newsletter subscribers',
+    users:      'All registered users',
+    both:       'Everyone (subscribers + users)',
+    paying:     'Paying customers only',
+    non_paying: 'Non-paying users',
+    pro:        'CASPer Pro subscribers',
+    mmi_pro:    'MMI Pro subscribers',
+    active:     'Active users (last 14 days)',
+    inactive:   'Inactive users (30+ days)',
+    no_reviews: 'Never reviewed',
+    mmi_users:  'MMI users',
+  };
+  return labels[list] || list;
+}
+
 async function sendBroadcast() {
   const list  = document.getElementById('bcList').value;
   const subj  = document.getElementById('bcSubject').value.trim();
@@ -1767,7 +1802,7 @@ async function sendBroadcast() {
   const btn   = document.getElementById('bcBtn');
   al.className='alert';
   if (!subj || !bodyText) { al.className='alert err'; al.textContent='Subject and message required.'; return; }
-  if (!confirm(`Send to all ${list==='both'?'subscribers + users':list}?\n\nSubject: ${subj}`)) return;
+  if (!confirm(`Send to: ${getBcListLabel(list)}\n\nSubject: ${subj}\n\nThis cannot be undone.`)) return;
   btn.disabled=true; btn.textContent='Sending…';
   try {
     const res = await api('/admin/inbox/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({list, subject:subj, body:bodyText, html:buildBroadcastHtml(subj, bodyHtml)})});
