@@ -5,10 +5,10 @@
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BZ01FP28PC');</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CASPer Pro Plans — Unlimited AI Practice Reviews | Key2MD</title>
-  <meta name="description" content="Unlimited CASPer AI feedback with Pro ($40/week) or pay-per-review credits from $7. Built on Dan's Q1–Q4 framework.">
-  <meta property="og:title" content="CASPer Pro Plans — Unlimited AI Practice Reviews">
-  <meta property="og:description" content="Unlimited CASPer AI feedback with Pro, or pay-per-review credits from $7.">
+  <title>CASPer & MMI Plans — AI Practice Reviews | Key2MD</title>
+  <meta name="description" content="Unlimited CASPer AI feedback with Pro ($40/week), MMI spoken feedback from $5/review, or pay-per-review credits. Built on Dan's coaching framework.">
+  <meta property="og:title" content="CASPer & MMI Plans — AI Practice Reviews">
+  <meta property="og:description" content="CASPer Pro, MMI Transcript credits, and expert marking. Built on Dan's Q1–Q4 framework.">
   <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -162,6 +162,25 @@
     /* ── PRO SECTION ── */
     .pro-section{background:var(--navy);padding:88px 0;position:relative;overflow:hidden;}
     .pro-section::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal3),var(--teal),var(--teal2));}
+    /* MMI section */
+    .mmi-section{background:linear-gradient(180deg,#0c1a2e 0%,#0a1628 100%);padding:88px 0;position:relative;overflow:hidden;}
+    .mmi-section::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#a78bfa,#8b5cf6,#7c3aed);}
+    .mmi-card{background:rgba(167,139,250,0.07);border:1.5px solid rgba(167,139,250,0.28);border-radius:20px;padding:36px 32px;position:relative;}
+    .mmi-card-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:0.68rem;font-weight:800;padding:4px 18px;border-radius:50px;white-space:nowrap;letter-spacing:0.06em;text-transform:uppercase;}
+    .mmi-pro-tab{display:flex;gap:6px;margin-bottom:20px;background:rgba(255,255,255,0.06);border-radius:50px;padding:4px;}
+    .mmi-pro-tab-btn{flex:1;padding:8px 12px;border-radius:46px;border:none;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:rgba(255,255,255,0.5);}
+    .mmi-pro-tab-btn.active{background:#7c3aed;color:#fff;}
+    .btn-mmi-pro{width:100%;padding:14px 20px;border-radius:50px;border:none;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;transition:all 0.25s;margin-bottom:10px;}
+    .btn-mmi-pro:hover{background:linear-gradient(135deg,#a78bfa,#8b5cf6);transform:translateY(-2px);}
+    .btn-mmi-pro:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+    .mmi-credit-packs{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+    .mmi-credit-pack{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:10px;border:1.5px solid rgba(167,139,250,0.18);background:rgba(167,139,250,0.05);cursor:pointer;transition:all 0.18s;}
+    .mmi-credit-pack:hover{border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.1);}
+    .mmi-credit-pack.selected{border-color:#8b5cf6;background:rgba(139,92,246,0.18);}
+    .mmi-pack-name{font-size:0.85rem;font-weight:600;color:rgba(255,255,255,0.85);}
+    .mmi-pack-right{display:flex;align-items:center;gap:8px;}
+    .mmi-pack-save{font-size:0.65rem;font-weight:800;color:#a78bfa;background:rgba(167,139,250,0.15);padding:2px 8px;border-radius:50px;}
+    .mmi-pack-price{font-size:0.88rem;font-weight:800;color:#fff;}
     .pro-inner{display:grid;grid-template-columns:1fr 400px;gap:64px;align-items:center;}
     .pro-eyebrow{font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal2);margin-bottom:16px;}
     .pro-inner h2{font-size:clamp(2rem,3.5vw,2.8rem);color:var(--white);margin-bottom:16px;}
@@ -496,6 +515,92 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <div class="value-box">
             <strong>Value check:</strong> At $7/credit, Pro pays for itself after just <strong>6 stations/week</strong>. At 15–20 stations/week, Pro costs <strong>~$2–3 per review</strong>.
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MMI SECTION -->
+<section class="mmi-section" id="mmi-section">
+  <div class="container">
+    <div class="pro-inner">
+      <div class="fade-up">
+        <div class="pro-eyebrow" style="color:#a78bfa;">🎤 MMI AI Feedback</div>
+        <h2 style="color:#fff;">Speak. Get marked.<br>Improve fast.</h2>
+        <p style="color:rgba(255,255,255,0.72);">Record your MMI response, and get detailed feedback across 5 criteria — Empathy, Communication, Reasoning, Reflection, and Real-world Awareness — using the same examiner rubric Dan applies in live coaching.</p>
+        <div class="pro-feats">
+          <div class="pro-feat">
+            <div class="pro-feat-icon">🎙️</div>
+            <div><h4 style="color:#fff;">Record directly in the browser</h4><p style="color:rgba(255,255,255,0.6);">No downloads, no setup. Hit record, speak your response, hit submit. Works on desktop and mobile.</p></div>
+          </div>
+          <div class="pro-feat">
+            <div class="pro-feat-icon">🔍</div>
+            <div><h4 style="color:#fff;">Per-prompt criterion breakdown</h4><p style="color:rgba(255,255,255,0.6);">Each prompt is scored individually. You see exactly where empathy landed vs reasoning — not just an average.</p></div>
+          </div>
+          <div class="pro-feat">
+            <div class="pro-feat-icon">⚠️</div>
+            <div><h4 style="color:#fff;">Polished Auditor Trap detection</h4><p style="color:rgba(255,255,255,0.6);">Fluent but hollow? The AI flags when a response sounds good but lacks genuine understanding — a common MMI failure mode.</p></div>
+          </div>
+          <div class="pro-feat">
+            <div class="pro-feat-icon">🏥</div>
+            <div><h4 style="color:#fff;">Specialist mode for advanced prep</h4><p style="color:rgba(255,255,255,0.6);">Toggle specialist training for a higher bar — appropriate for registrar-track or postgrad applicants.</p></div>
+          </div>
+        </div>
+        <div style="margin-top:24px;padding:16px 20px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:12px;">
+          <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Why credits, not free?</div>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.65;margin:0;">MMI feedback requires speech-to-text transcription (Whisper) plus AI analysis — it costs roughly 10× more than a CASPer text review to run. We offered free daily reviews during launch but had to end it due to account duplication. We apologise to those who used it fairly.</p>
+        </div>
+      </div>
+
+      <div class="fade-up delay-1">
+        <div class="mmi-card">
+          <div class="mmi-card-badge">🎤 MMI Feedback</div>
+
+          <!-- Tab: Pro vs Credits -->
+          <div class="mmi-pro-tab">
+            <button class="mmi-pro-tab-btn active" id="mmiTabPro" onclick="switchMMITab('pro')">Pro (Unlimited)</button>
+            <button class="mmi-pro-tab-btn" id="mmiTabCredits" onclick="switchMMITab('credits')">Credit Packs</button>
+          </div>
+
+          <!-- Pro panel -->
+          <div id="mmiProPanel">
+            <div style="display:flex;gap:10px;margin-bottom:14px;">
+              <button class="mmi-pro-tab-btn active" id="mmiFreqWeekly" onclick="switchMMIFreq('weekly')" style="background:rgba(139,92,246,0.2);color:#c4b5fd;border-radius:8px;flex:1;padding:10px;">Weekly<br><strong style="font-size:1.1rem;color:#fff;">$80</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/wk</span></button>
+              <button class="mmi-pro-tab-btn" id="mmiFreqMonthly" onclick="switchMMIFreq('monthly')" style="background:transparent;color:rgba(255,255,255,0.5);border-radius:8px;flex:1;padding:10px;border:1px solid rgba(255,255,255,0.1);">Monthly<br><strong style="font-size:1.1rem;color:rgba(255,255,255,0.7);">$240</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/mo</span></button>
+            </div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:16px;text-align:center;" id="mmiProNote">Save ~25% vs weekly · Cancel anytime</div>
+            <button class="btn-mmi-pro" id="mmiProBtn" onclick="handleMMIPro()">Start MMI Pro →</button>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:16px;">🔒 Secure checkout via Stripe · Cancel anytime</div>
+            <ul class="pro-list" style="color:rgba(255,255,255,0.7);">
+              <li>Unlimited MMI Transcript reviews</li>
+              <li>5-criterion feedback per prompt</li>
+              <li>Polished Auditor Trap detection</li>
+              <li>Specialist mode included</li>
+              <li>All 60 MMI stations unlocked</li>
+              <li>Video playback for self-review</li>
+              <li class="dim">Premium (voice + visual) not included</li>
+            </ul>
+          </div>
+
+          <!-- Credits panel -->
+          <div id="mmiCreditsPanel" style="display:none;">
+            <div class="mmi-credit-packs" id="mmiCreditPacks">
+              <div class="mmi-credit-pack" data-pack="mmi_transcript_1" onclick="selectMMIPack(this,'mmi_transcript_1')"><span class="mmi-pack-name">🎤 1 MMI review</span><div class="mmi-pack-right"><span class="mmi-pack-price">$5.00</span></div></div>
+              <div class="mmi-credit-pack" data-pack="mmi_transcript_5" onclick="selectMMIPack(this,'mmi_transcript_5')"><span class="mmi-pack-name">🎤 5 MMI reviews</span><div class="mmi-pack-right"><span class="mmi-pack-save">Save 10%</span><span class="mmi-pack-price">$22.50</span></div></div>
+              <div class="mmi-credit-pack" data-pack="mmi_transcript_10" onclick="selectMMIPack(this,'mmi_transcript_10')"><span class="mmi-pack-name">🎤 10 MMI reviews</span><div class="mmi-pack-right"><span class="mmi-pack-save">Save 20%</span><span class="mmi-pack-price">$40.00</span></div></div>
+            </div>
+            <button class="btn-mmi-pro" id="mmiCreditsBtn" onclick="handleMMICredits()">Buy MMI Credits →</button>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:16px;">Credits never expire · Use anytime</div>
+            <ul class="pro-list" style="color:rgba(255,255,255,0.7);">
+              <li>Full 5-criterion feedback per response</li>
+              <li>Polished Auditor Trap detection</li>
+              <li>No subscription — pay as you go</li>
+              <li>Credits never expire</li>
+              <li class="dim">Pro is better value at volume</li>
+            </ul>
+          </div>
+
         </div>
       </div>
     </div>
@@ -861,6 +966,91 @@ function toggleFaq(btn) {
 function initFadeObserver() {
   const obs = new IntersectionObserver(entries => { entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.08});
   document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+}
+
+// ── MMI ──────────────────────────────────────────────
+let selectedMMIPackId = null;
+let mmiProFreq = 'weekly';
+
+function switchMMITab(tab) {
+  document.getElementById('mmiProPanel').style.display    = tab==='pro' ? 'block' : 'none';
+  document.getElementById('mmiCreditsPanel').style.display = tab==='credits' ? 'block' : 'none';
+  document.getElementById('mmiTabPro').classList.toggle('active', tab==='pro');
+  document.getElementById('mmiTabCredits').classList.toggle('active', tab==='credits');
+}
+
+function switchMMIFreq(freq) {
+  mmiProFreq = freq;
+  const wBtn = document.getElementById('mmiFreqWeekly');
+  const mBtn = document.getElementById('mmiFreqMonthly');
+  const note = document.getElementById('mmiProNote');
+  if (freq==='weekly') {
+    wBtn.style.background='rgba(139,92,246,0.2)'; wBtn.style.color='#c4b5fd'; wBtn.style.border='none';
+    mBtn.style.background='transparent'; mBtn.style.color='rgba(255,255,255,0.5)'; mBtn.style.border='1px solid rgba(255,255,255,0.1)';
+    note.textContent='Cancel anytime · Auto-renews weekly';
+  } else {
+    mBtn.style.background='rgba(139,92,246,0.2)'; mBtn.style.color='#c4b5fd'; mBtn.style.border='none';
+    wBtn.style.background='transparent'; wBtn.style.color='rgba(255,255,255,0.5)'; wBtn.style.border='1px solid rgba(255,255,255,0.1)';
+    note.textContent='Save ~25% vs weekly · Cancel anytime';
+  }
+}
+
+function selectMMIPack(el, packId) {
+  document.querySelectorAll('.mmi-credit-pack').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedMMIPackId = packId;
+  const labels = {mmi_transcript_1:'1 MMI Review — $5.00', mmi_transcript_5:'5 MMI Reviews — $22.50', mmi_transcript_10:'10 MMI Reviews — $40.00'};
+  document.getElementById('mmiCreditsBtn').textContent = `Buy ${labels[packId]} →`;
+}
+
+function handleMMIPro() {
+  if (!Key2MDAuth.isLoggedIn()) { Key2MDAuth.showAuthModal('signup'); return; }
+  const label = mmiProFreq==='weekly' ? 'MMI Transcript Pro — Weekly' : 'MMI Transcript Pro — Monthly';
+  const price = mmiProFreq==='weekly' ? '$80.00 AUD/week' : '$240.00 AUD/month';
+  openMMIModal(label, `${price} · Unlimited MMI reviews · Cancel anytime`, 'mmi_pro');
+}
+
+function handleMMICredits() {
+  if (!Key2MDAuth.isLoggedIn()) { Key2MDAuth.showAuthModal('signup'); return; }
+  if (!selectedMMIPackId) { alert('Please select a credit pack first.'); return; }
+  const prices = {mmi_transcript_1:'$5.00', mmi_transcript_5:'$22.50', mmi_transcript_10:'$40.00'};
+  const labels = {mmi_transcript_1:'1 MMI Review', mmi_transcript_5:'5 MMI Reviews', mmi_transcript_10:'10 MMI Reviews'};
+  openMMIModal(`Buy ${labels[selectedMMIPackId]}`, `${prices[selectedMMIPackId]} · One-time · Credits never expire`, 'mmi_credits');
+}
+
+function openMMIModal(title, sub, action) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalSub').textContent = sub;
+  document.getElementById('modalAlert').className = 'modal-alert';
+  document.getElementById('modalConfirmBtn').disabled = false;
+  document.getElementById('modalConfirmBtn').textContent = 'Continue to Payment →';
+  pendingAction = action;
+  document.getElementById('checkoutModal').classList.add('open');
+}
+
+// Extend confirmCheckout to handle MMI
+const _originalConfirmCheckout = confirmCheckout;
+async function confirmCheckout() {
+  if (pendingAction !== 'mmi_pro' && pendingAction !== 'mmi_credits') {
+    return _originalConfirmCheckout();
+  }
+  const btn = document.getElementById('modalConfirmBtn');
+  const al  = document.getElementById('modalAlert');
+  btn.disabled = true; btn.textContent = 'Redirecting…';
+  al.className = 'modal-alert';
+  try {
+    const token = Key2MDAuth.getToken();
+    const body = pendingAction === 'mmi_pro'
+      ? { pro_tier: `transcript_${mmiProFreq}`, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` }
+      : { pack_id: selectedMMIPackId, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
+    const res = await fetch(`${API_BASE}/api/mmi/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(body)});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Checkout failed');
+    window.location.href = data.checkout_url;
+  } catch(e) {
+    al.className = 'modal-alert err'; al.textContent = e.message;
+    btn.disabled = false; btn.textContent = 'Continue to Payment →';
+  }
 }
 
 document.getElementById('checkoutModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
