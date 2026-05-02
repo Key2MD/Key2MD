@@ -132,7 +132,7 @@ const MMIFeedbackRender = (() => {
         <div class="mmi-limitations">
           <strong>About this feedback</strong><br>
           This AI feedback is calibrated to the rubric Dan uses with his coaching students — empathy, communication, reasoning, reflection, and real-world awareness. It is designed to complement, not replace, human review.<br><br>
-          The AI is good at: structural feedback, identifying the Polished Auditor trap, spotting reflection without consequence, flagging textbook answers, and benchmarking your response against Dan's rubric.<br><br>
+          The AI is good at: structural feedback, identifying some common traps, spotting reflection without consequence, flagging textbook answers, and benchmarking your response against Dan's rubric.<br><br>
           The AI is less good at: subtle interpersonal nuance, the kind of judgement only experienced examiners bring, and the emotional weight of how something landed in the room.
         </div>
 
