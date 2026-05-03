@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet"/>
+  <title>Key2MD Admin</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    :root {
+      --bg:#060d18; --surface:rgba(255,255,255,0.04); --surface2:rgba(255,255,255,0.07);
+      --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.14);
+      --text:#eef2f8; --muted:#8896aa; --muted2:#5a6a7e;
+      --blue:#38bdf8; --blue-dim:rgba(56,189,248,0.12); --blue-border:rgba(56,189,248,0.22);
+      --green:#4ade80; --green-dim:rgba(74,222,128,0.12); --green-border:rgba(74,222,128,0.22);
+      --amber:#fbbf24; --amber-dim:rgba(251,191,36,0.12); --amber-border:rgba(251,191,36,0.22);
+      --red:#f87171; --red-dim:rgba(248,113,113,0.12); --red-border:rgba(248,113,113,0.22);
+      --purple:#a78bfa; --purple-dim:rgba(167,139,250,0.12);
+      --sidebar:220px; --radius:12px; --font:'Inter',ui-sans-serif,system-ui,sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{font-size:14px;}
+    body{
+      font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;
+      background-image:
+        linear-gradient(180deg,rgba(18,28,44,0.72) 0%,rgba(6,13,24,0.96) 340px),
+        radial-gradient(ellipse 42% 24% at 78% 0%,rgba(74,222,128,0.08) 0%,transparent 62%),
+        radial-gradient(ellipse 38% 26% at 20% 4%,rgba(56,189,248,0.1) 0%,transparent 58%);
+      background-attachment:fixed;
+    }
+    a{text-decoration:none;color:inherit;}
+    .hidden{display:none!important;}
+    input,select,textarea,button{font-family:inherit;}
+    ::-webkit-scrollbar{width:4px;height:4px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:4px;}
+
+    /* ══ LOGIN ══ */
+    #loginWrap{
+      min-height:100vh;display:grid;place-items:center;padding:24px;
+      background:var(--bg);
+      background-image:radial-gradient(ellipse 60% 40% at 15% 10%,rgba(56,189,248,0.08) 0%,transparent 60%),
+        radial-gradient(ellipse 40% 30% at 85% 5%,rgba(167,139,250,0.06) 0%,transparent 50%);
+    }
+    .login-card{
+      width:min(400px,100%);background:rgba(255,255,255,0.05);
+      border:1px solid var(--border2);border-radius:20px;padding:36px 32px;
+      backdrop-filter:blur(20px);box-shadow:0 24px 60px rgba(0,0,0,0.5);
+    }
+    .login-logo{font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px;}
+    .login-logo span{color:var(--blue);}
+    .login-sub{font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);margin-bottom:28px;}
+    .login-card h2{font-size:1.4rem;font-weight:800;margin-bottom:6px;}
+    .login-card p{color:var(--muted);font-size:0.85rem;margin-bottom:22px;}
+    .f{margin-bottom:12px;}
+    .f label{display:block;font-size:0.75rem;font-weight:600;color:var(--muted);margin-bottom:5px;}
+    .f input{width:100%;padding:10px 13px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:9px;color:var(--text);font-size:0.9rem;outline:none;transition:border-color 0.2s;}
+    .f input:focus{border-color:var(--blue);}
+    .f input::placeholder{color:var(--muted2);}
+    .btn-login{width:100%;padding:11px;border-radius:50px;border:none;background:var(--blue);color:#030d1a;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:4px;}
+    .btn-login:hover{background:#7dd3fc;transform:translateY(-1px);}
+    .btn-login:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+    .login-err{margin-top:10px;padding:9px 13px;border-radius:8px;background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);font-size:0.8rem;display:none;}
+
+    /* ══ APP SHELL ══ */
+    #appWrap{display:flex;min-height:100vh;}
+
+    /* ══ SIDEBAR ══ */
+    .sidebar{
+      width:var(--sidebar);flex-shrink:0;background:rgba(255,255,255,0.03);
+      border-right:1px solid var(--border);display:flex;flex-direction:column;
+      position:sticky;top:0;height:100vh;overflow-y:auto;
+    }
+    .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
+    .sidebar-logo-text{font-size:1.2rem;font-weight:800;letter-spacing:-0.02em;}
+    .sidebar-logo-text span{color:var(--blue);}
+    .sidebar-admin{font-size:0.68rem;color:var(--muted2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+    .sidebar-section{padding:16px 10px 6px;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);margin-top:4px;}
+    .nav-item{
+      display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;
+      font-size:0.82rem;font-weight:600;color:var(--muted);cursor:pointer;
+      transition:all 0.15s;margin:1px 8px;border:none;background:none;width:calc(100% - 16px);
+      text-align:left;position:relative;
+    }
+    .nav-item:hover{background:var(--surface2);color:var(--text);}
+    .nav-item.active{background:var(--blue-dim);color:var(--blue);}
+    .nav-item .icon{width:18px;text-align:center;font-size:0.9rem;flex-shrink:0;}
+    .nav-badge{
+      margin-left:auto;min-width:18px;height:18px;border-radius:9px;
+      background:var(--red);color:#fff;font-size:0.62rem;font-weight:800;
+      display:none;align-items:center;justify-content:center;padding:0 5px;
+    }
+    .nav-badge.show{display:flex;}
+
+    .sidebar-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid var(--border);}
+    .btn-logout{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:left;}
+    .btn-logout:hover{color:var(--red);border-color:var(--red-border);}
+
+    /* ══ MAIN CONTENT ══ */
+    .main{flex:1;overflow-y:auto;min-width:0;}
+    .page-header{padding:22px 24px 0;margin-bottom:18px;display:flex;justify-content:space-between;gap:18px;align-items:flex-start;}
+    .page-title{font-size:1.36rem;font-weight:800;letter-spacing:-0.02em;}
+    .page-sub{font-size:0.82rem;color:var(--muted);margin-top:4px;}
+    .page{display:none;padding:0 24px 40px;}
+    .page.active{display:block;}
+    .page-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .refresh-note{font-size:0.72rem;color:var(--muted2);white-space:nowrap;}
+
+    /* ══ STATS GRID ══ */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:18px;}
+    .stat{background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.035));border:1px solid var(--border);border-radius:var(--radius);padding:15px 16px;box-shadow:0 10px 30px rgba(0,0,0,0.14);}
+    .stat.green{border-color:var(--green-border);background:var(--green-dim);}
+    .stat.blue{border-color:var(--blue-border);background:var(--blue-dim);}
+    .stat.amber{border-color:var(--amber-border);background:var(--amber-dim);}
+    .stat.red{border-color:var(--red-border);background:var(--red-dim);}
+    .stat-label{font-size:0.65rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+    .stat-val{font-size:1.7rem;font-weight:800;letter-spacing:-0.03em;}
+    .stat.green .stat-val{color:var(--green);}
+    .stat.blue .stat-val{color:var(--blue);}
+    .stat.amber .stat-val{color:var(--amber);}
+    .stat.red .stat-val{color:var(--red);}
+    .stat-sub{font-size:0.68rem;color:var(--muted2);margin-top:3px;}
+
+    /* ══ DASHBOARD CARDS ══ */
+    .command-card{background:linear-gradient(135deg,rgba(56,189,248,0.13),rgba(74,222,128,0.08) 52%,rgba(251,191,36,0.06));border:1px solid var(--border2);border-radius:16px;padding:18px 20px;margin-bottom:16px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,0.65fr);gap:18px;box-shadow:0 24px 60px rgba(0,0,0,0.2);}
+    .command-kicker{font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.11em;color:var(--blue);margin-bottom:6px;}
+    .command-title{font-size:1.52rem;font-weight:850;letter-spacing:-0.03em;}
+    .command-copy{font-size:0.86rem;color:rgba(238,242,248,0.72);line-height:1.6;margin-top:6px;max-width:760px;}
+    .command-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
+    .dash-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:16px;margin-bottom:18px;}
+    .dash-card{background:rgba(255,255,255,0.045);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:0 14px 36px rgba(0,0,0,0.12);}
+    .dash-card-title{font-size:0.72rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .dash-list{display:flex;flex-direction:column;gap:9px;}
+    .dash-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:0.82rem;}
+    .dash-row-label{color:var(--muted);}
+    .dash-row-val{font-weight:700;}
+    .ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+    .ops-card{background:rgba(255,255,255,0.045);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
+    .queue-item{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+    .queue-item:last-child{border-bottom:none;}
+    .queue-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--surface2);font-size:0.9rem;}
+    .queue-title{font-size:0.84rem;font-weight:750;}
+    .queue-sub{font-size:0.72rem;color:var(--muted2);margin-top:2px;}
+    .insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .insight{border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.14);padding:12px;}
+    .insight-label{font-size:0.62rem;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;}
+    .insight-val{font-size:1.15rem;font-weight:850;margin-top:4px;}
+    .insight-note{font-size:0.68rem;color:var(--muted2);margin-top:3px;line-height:1.45;}
+    .activity-item{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+    .activity-item:last-child{border-bottom:none;}
+    .activity-type{font-size:0.64rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted2);}
+    .meter{height:7px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;margin-top:8px;}
+    .meter-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--green));}
+
+    /* ══ TABLE ══ */
+    .tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+    .tbl-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);}
+    .tbl-status{font-size:0.78rem;color:var(--muted);}
+    .tbl-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+    .tbl-scroller{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;min-width:700px;}
+    thead tr{background:rgba(0,0,0,0.2);}
+    th{padding:9px 13px;text-align:left;font-size:0.63rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);border-bottom:1px solid var(--border);white-space:nowrap;}
+    td{padding:10px 13px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:0.82rem;}
+    tr:last-child td{border-bottom:none;}
+    tr.data-row{cursor:pointer;transition:background 0.12s;}
+    tr.data-row:hover{background:rgba(255,255,255,0.025);}
+    tr.data-row.expanded{background:rgba(56,189,248,0.04);}
+    .trunc{max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);}
+    .cell-main{font-weight:600;font-size:0.83rem;}
+    .cell-sub{font-size:0.7rem;color:var(--muted2);margin-top:1px;}
+
+    /* detail rows */
+    .detail-row{display:none;}
+    .detail-row.open{display:table-row;}
+    .detail-panel{padding:0!important;background:rgba(0,0,0,0.15);border-bottom:1px solid var(--border);}
+    .detail-inner{padding:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+    .detail-box{border-radius:10px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);}
+    .detail-box-hd{font-size:0.63rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+    .detail-box-body{font-size:0.78rem;color:var(--muted);line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;}
+    .detail-box-row{font-size:0.78rem;color:var(--muted);margin-bottom:4px;}
+    .detail-box-row strong{color:var(--text);}
+    .subtbl{width:100%;}
+    .subtbl th,.subtbl td{padding:6px 8px;font-size:0.74rem;}
+    .subtbl th{color:var(--muted2);}
+
+    /* expand icon */
+    .expander{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--surface2);color:var(--muted);font-size:0.5rem;transition:transform 0.2s,background 0.2s;}
+    tr.expanded .expander{transform:rotate(180deg);background:var(--blue-dim);color:var(--blue);}
+
+    /* ══ BADGES ══ */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:50px;font-size:0.65rem;font-weight:700;letter-spacing:0.02em;border:1px solid transparent;white-space:nowrap;}
+    .badge-casper{background:var(--blue-dim);color:var(--blue);border-color:var(--blue-border);}
+    .badge-gamsat{background:var(--purple-dim);color:var(--purple);border-color:rgba(167,139,250,0.22);}
+    .badge-mmi{background:var(--amber-dim);color:var(--amber);border-color:var(--amber-border);}
+    .badge-free{background:var(--surface2);color:var(--muted);border-color:var(--border2);}
+    .badge-pro{background:var(--green-dim);color:var(--green);border-color:var(--green-border);}
+    .badge-paid,.badge-premium{background:var(--amber-dim);color:var(--amber);border-color:var(--amber-border);}
+    .badge-yes{background:var(--green-dim);color:var(--green);border-color:var(--green-border);}
+    .badge-no{background:var(--surface2);color:var(--muted);border-color:var(--border);}
+    .badge-default{background:var(--surface2);color:var(--muted);}
+    .score-box{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;font-size:0.78rem;font-weight:800;}
+    .score-h{background:var(--green-dim);color:var(--green);}
+    .score-m{background:var(--amber-dim);color:var(--amber);}
+    .score-l{background:var(--red-dim);color:var(--red);}
+    .credit-pill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:50px;font-size:0.65rem;font-weight:700;}
+    .credit-pill.c{background:var(--blue-dim);color:var(--blue);}
+    .credit-pill.g{background:var(--purple-dim);color:var(--purple);}
+    .credit-pill.zero{opacity:0.35;}
+    .spend{font-weight:700;font-size:0.83rem;}
+    .spend.has{color:var(--green);}
+    .spend.none{color:var(--muted2);}
+    .mini-metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+    .mini-metric{background:rgba(0,0,0,0.14);border:1px solid var(--border);border-radius:9px;padding:10px;}
+    .mini-metric div:first-child{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted2);font-weight:800;margin-bottom:3px;}
+    .mini-metric div:last-child{font-size:1.05rem;font-weight:850;}
+    .competency-list{display:flex;flex-direction:column;gap:7px;margin-top:8px;}
+    .competency-row{display:grid;grid-template-columns:1fr 34px;gap:8px;align-items:center;}
+    .competency-name{font-size:0.72rem;color:var(--muted);}
+    .competency-score{font-size:0.72rem;font-weight:850;text-align:right;}
+    .competency-bar{height:5px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;margin-top:4px;}
+    .competency-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));border-radius:99px;}
+    .signal-stack{display:flex;gap:4px;align-items:center;flex-wrap:wrap;}
+    .signal-chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:999px;border:1px solid var(--border);font-size:0.62rem;font-weight:750;color:var(--muted);background:rgba(255,255,255,0.04);}
+    .signal-chip.low{color:var(--red);border-color:var(--red-border);background:var(--red-dim);}
+    .signal-chip.high{color:var(--green);border-color:var(--green-border);background:var(--green-dim);}
+
+    /* ══ CONTROLS ══ */
+    .controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+    .ctrl-in,.ctrl-sel{padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.82rem;outline:none;transition:border-color 0.2s;}
+    .ctrl-in{flex:1;min-width:180px;}
+    .ctrl-in:focus,.ctrl-sel:focus{border-color:var(--blue);}
+    .ctrl-in::placeholder{color:var(--muted2);}
+    .ctrl-sel option{background:#0d1a2d;}
+    .segment-bar{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px;}
+    .seg{border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);border-radius:999px;padding:6px 11px;font-size:0.73rem;font-weight:750;cursor:pointer;transition:all 0.15s;}
+    .seg:hover{color:var(--text);background:rgba(255,255,255,0.08);}
+    .seg.active{color:#06111f;background:var(--blue);border-color:var(--blue);}
+
+    /* ══ BUTTONS ══ */
+    .btn{padding:7px 13px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+    .btn:hover{color:var(--text);background:rgba(255,255,255,0.1);}
+    .btn.blue{border-color:var(--blue-border);color:var(--blue);background:var(--blue-dim);}
+    .btn.blue:hover{background:rgba(56,189,248,0.2);}
+    .btn.green{border-color:var(--green-border);color:var(--green);background:var(--green-dim);}
+    .btn.amber{border-color:var(--amber-border);color:var(--amber);background:var(--amber-dim);}
+    .btn.red{border-color:var(--red-border);color:var(--red);background:var(--red-dim);}
+    .btn.primary{background:var(--blue);color:#030d1a;border-color:var(--blue);}
+    .btn.primary:hover{background:#7dd3fc;}
+    .btn-send{padding:9px 20px;border-radius:50px;border:none;background:var(--blue);color:#030d1a;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:7px;}
+    .btn-send:hover{background:#7dd3fc;transform:translateY(-1px);}
+    .btn-send:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+    /* ══ EMPTY / ERROR ══ */
+    .empty{padding:40px;text-align:center;color:var(--muted2);font-size:0.85rem;}
+    .err-banner{margin-top:12px;padding:10px 14px;border-radius:9px;background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);font-size:0.82rem;display:none;}
+
+    /* ══ INBOX ══ */
+    #pageInbox.active{display:flex!important;flex-direction:column;padding:0;height:calc(100vh - 0px);}
+    .inbox-body{display:flex;flex:1;overflow:hidden;}
+    .conv-list{width:260px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+    .conv-list-hd{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .conv-list-title{font-size:0.72rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);}
+    .conv-search{padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .conv-search input{width:100%;padding:7px 10px;background:rgba(255,255,255,0.05);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:0.8rem;outline:none;}
+    .conv-search input:focus{border-color:var(--blue);}
+    .conv-items{overflow-y:auto;flex:1;}
+    .conv-item{padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;position:relative;}
+    .conv-item:hover{background:var(--surface2);}
+    .conv-item.active{background:var(--blue-dim);border-left:2px solid var(--blue);}
+    .conv-item.unread .conv-name{font-weight:700;}
+    .conv-item.unread::after{content:'';position:absolute;top:14px;right:12px;width:7px;height:7px;border-radius:50%;background:var(--blue);}
+    .conv-name{font-size:0.83rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:14px;}
+    .conv-preview{font-size:0.72rem;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+    .conv-time{font-size:0.66rem;color:var(--muted2);margin-top:3px;}
+    .conv-empty{padding:28px 16px;text-align:center;color:var(--muted2);font-size:0.8rem;line-height:1.6;}
+
+    .thread-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:rgba(0,0,0,0.1);}
+    .thread-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted2);gap:10px;}
+    .thread-empty-icon{font-size:2.5rem;opacity:0.3;}
+    .thread-hd{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+    .thread-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0284c7,#0a1628);display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0;}
+    .thread-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+    .msg{max-width:72%;display:flex;flex-direction:column;gap:3px;}
+    .msg.out{align-self:flex-end;}
+    .msg.in{align-self:flex-start;}
+    .msg-body{padding:10px 14px;border-radius:12px;font-size:0.83rem;line-height:1.65;white-space:pre-wrap;word-break:break-word;}
+    .msg.out .msg-body{background:#0c2340;color:rgba(255,255,255,0.88);border-bottom-right-radius:3px;}
+    .msg.in .msg-body{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:3px;}
+    .msg-subj{font-size:0.65rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;}
+    .msg-meta{font-size:0.66rem;color:var(--muted2);}
+    .msg.out .msg-meta{text-align:right;}
+
+    .compose{background:var(--surface);border-top:1px solid var(--border);padding:14px 18px;flex-shrink:0;}
+    .compose-to-row{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--border2);border-radius:8px 8px 0 0;border-bottom:none;background:rgba(255,255,255,0.03);}
+    .compose-to-lbl{font-size:0.72rem;font-weight:600;color:var(--muted);}
+    .compose-subj-row{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--border2);border-top:none;border-bottom:none;}
+    .compose-subj-in{flex:1;border:none;outline:none;font-size:0.82rem;background:transparent;color:var(--text);}
+    .compose-textarea{width:100%;padding:10px;border:1px solid var(--border2);border-radius:0 0 8px 8px;border-top:none;min-height:90px;max-height:180px;resize:vertical;font-size:0.83rem;color:var(--text);background:rgba(255,255,255,0.03);outline:none;line-height:1.6;}
+    .compose-textarea:focus{border-color:var(--blue);}
+    .compose-footer{display:flex;align-items:center;justify-content:space-between;margin-top:9px;}
+    .compose-hint{font-size:0.7rem;color:var(--muted2);}
+    .spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,0.2);border-top-color:#030d1a;border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ══ BROADCAST / SUBS ══ */
+    .bc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:680px;}
+    .bc-title{font-size:1rem;font-weight:800;margin-bottom:4px;}
+    .bc-sub{font-size:0.82rem;color:var(--muted);margin-bottom:20px;}
+    .form-row{margin-bottom:14px;}
+    .form-lbl{display:block;font-size:0.72rem;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.05em;}
+    .form-in,.form-sel,.form-ta{width:100%;padding:9px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:0.85rem;outline:none;transition:border-color 0.2s;}
+    .form-in:focus,.form-sel:focus,.form-ta:focus{border-color:var(--blue);}
+    .form-ta{min-height:180px;resize:vertical;line-height:1.7;}
+    .form-sel option{background:#0d1a2d;}
+    .bc-stats{display:flex;gap:14px;margin-bottom:20px;}
+    .bc-stat{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px 18px;text-align:center;}
+    .bc-stat-num{font-size:1.4rem;font-weight:800;color:var(--blue);}
+    .bc-stat-lbl{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
+    .alert{padding:10px 13px;border-radius:8px;font-size:0.8rem;font-weight:600;margin-top:12px;display:none;}
+    .alert.ok{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);display:block;}
+    .alert.err{background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);display:block;}
+
+    /* ══ ENQUIRIES ══ */
+    .enq-type{display:inline-flex;align-items:center;padding:2px 8px;border-radius:50px;font-size:0.65rem;font-weight:700;background:var(--purple-dim);color:var(--purple);border:1px solid rgba(167,139,250,0.22);}
+
+    /* ══ MODAL ══ */
+    .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;padding:20px;}
+    .modal-ov.open{display:flex;}
+    .modal-card{background:#0d1a2d;border:1px solid var(--border2);border-radius:16px;padding:26px;width:min(460px,100%);box-shadow:0 24px 60px rgba(0,0,0,0.6);}
+    .modal-title{font-size:0.95rem;font-weight:800;margin-bottom:14px;}
+    .modal-alert{padding:8px 12px;border-radius:7px;font-size:0.78rem;font-weight:600;margin-top:10px;display:none;}
+    .modal-alert.ok{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);display:block;}
+    .modal-alert.err{background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);display:block;}
+    .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+
+    /* ══ NEW COMPOSE MODAL ══ */
+    .nc-modal .modal-card{max-width:520px;}
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width:900px){
+      .sidebar{display:none;}
+      .detail-inner{grid-template-columns:1fr;}
+      .page-header{display:block;}
+      .page-actions{margin-top:12px;}
+      .command-card,.ops-grid,.insight-grid{grid-template-columns:1fr;}
+      .command-actions{justify-content:flex-start;}
+      .mini-metric-row{grid-template-columns:1fr;}
+    }
+    @media(max-width:1100px){
+      .dash-grid,.ops-grid,.command-card{grid-template-columns:1fr;}
+      .stats-grid{grid-template-columns:repeat(3,1fr);}
+    }
+    @media(max-width:620px){
+      .stats-grid{grid-template-columns:1fr 1fr;}
+      .activity-item{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="loginWrap">
+  <div class="login-card">
+    <div class="login-logo">Key2<span>MD</span></div>
+    <div class="login-sub">Admin Portal</div>
+    <h2>Sign in</h2>
+    <p>Internal access only. Session persists for this browser tab.</p>
+    <div class="f"><label>Email</label><input id="liEmail" type="email" autocomplete="username" placeholder="admin@key2md.com"></div>
+    <div class="f"><label>Password</label><input id="liPw" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="btn-login" id="liBtn" onclick="doLogin()">Sign in →</button>
+    <div class="login-err" id="liErr"></div>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="appWrap" class="hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-text">Key2<span>MD</span></div>
+      <div class="sidebar-admin" id="sidebarAdmin">—</div>
+    </div>
+
+    <div class="sidebar-section">Overview</div>
+    <button class="nav-item active" data-page="dashboard" onclick="nav('dashboard')"><span class="icon">📊</span> Dashboard</button>
+
+    <div class="sidebar-section">Students</div>
+    <button class="nav-item" data-page="reviews" onclick="nav('reviews')"><span class="icon">📋</span> CASPer Reviews</button>
+    <button class="nav-item" data-page="mmi" onclick="nav('mmi')"><span class="icon">🎤</span> MMI Reviews <span class="nav-badge" id="mmiBadge">0</span></button>
+    <button class="nav-item" data-page="users" onclick="nav('users')"><span class="icon">👥</span> Users</button>
+    <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')"><span class="icon">📩</span> Enquiries <span class="nav-badge" id="enqBadge">0</span></button>
+
+    <div class="sidebar-section">Finance</div>
+    <button class="nav-item" data-page="revenue" onclick="nav('revenue')"><span class="icon">💰</span> Revenue</button>
+    <button class="nav-item" data-page="monitoring" onclick="nav('monitoring')"><span class="icon">🔍</span> Monitoring</button>
+
+    <div class="sidebar-section">Comms</div>
+    <button class="nav-item" data-page="inbox" onclick="nav('inbox')"><span class="icon">✉️</span> Inbox <span class="nav-badge" id="inboxBadge">0</span></button>
+    <button class="nav-item" data-page="broadcast" onclick="nav('broadcast')"><span class="icon">📣</span> Broadcast</button>
+    <button class="nav-item" data-page="subscribers" onclick="nav('subscribers')"><span class="icon">👥</span> Subscribers</button>
+
+    <div class="sidebar-bottom">
+      <button class="btn-logout" onclick="doLogout()">↩ Log out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="pageDashboard" class="page active">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Admin Command Center</div>
+          <div class="page-sub">Revenue, student momentum, workload, and owner priorities in one place.</div>
+        </div>
+        <div class="page-actions">
+          <span class="refresh-note" id="lastUpdated">Not refreshed yet</span>
+          <button class="btn blue" onclick="refreshAll()">Refresh all</button>
+        </div>
+      </div>
+      <div class="command-card">
+        <div>
+          <div class="command-kicker">Today at a glance</div>
+          <div class="command-title" id="dashHeadline">Loading platform health…</div>
+          <div class="command-copy" id="dashBrief">Pulling reviews, accounts, enquiries and inbox state from the Worker.</div>
+        </div>
+        <div class="command-actions">
+          <button class="btn blue" onclick="nav('reviews')">Review latest feedback</button>
+          <button class="btn green" onclick="nav('users')">Manage students</button>
+          <button class="btn amber" onclick="nav('inbox')">Open inbox</button>
+        </div>
+      </div>
+      <div class="stats-grid" id="dashStats">
+        <div class="stat"><div class="stat-label">Total Users</div><div class="stat-val" id="dUsers">—</div><div class="stat-sub" id="dUsersSub">registered</div></div>
+        <div class="stat amber"><div class="stat-label">Paying Customers</div><div class="stat-val" id="dPaying">—</div><div class="stat-sub" id="dPayingSub">ever paid</div></div>
+        <div class="stat blue"><div class="stat-label">CASPer Reviews</div><div class="stat-val" id="dReviews">—</div><div class="stat-sub" id="dReviewsSub">total</div></div>
+        <div class="stat amber"><div class="stat-label">MMI Reviews</div><div class="stat-val" id="dMMIReviews">—</div><div class="stat-sub">total sessions</div></div>
+        <div class="stat green"><div class="stat-label">CASPer Pro</div><div class="stat-val" id="dPro">—</div><div class="stat-sub">active subscriptions</div></div>
+        <div class="stat blue"><div class="stat-label">MMI Pro</div><div class="stat-val" id="dMMIPro">—</div><div class="stat-sub">active MMI subscribers</div></div>
+        <div class="stat"><div class="stat-label">Founding Members</div><div class="stat-val" id="dFoundingCount">—</div><div class="stat-sub" id="dFoundingSub">of 15 slots</div></div>
+        <div class="stat"><div class="stat-label">Credits Held</div><div class="stat-val" id="dCredits">—</div><div class="stat-sub">CASPer + GAMSAT</div></div>
+        <div class="stat"><div class="stat-label">MMI Credits</div><div class="stat-val" id="dMMICredits">—</div><div class="stat-sub">transcript balance</div></div>
+        <div class="stat blue"><div class="stat-label">Today</div><div class="stat-val" id="dTodayReviews">—</div><div class="stat-sub">AI reviews today</div></div>
+        <div class="stat"><div class="stat-label">Avg Score</div><div class="stat-val" id="dAvgScore">—</div><div class="stat-sub">recent CASPer scores</div></div>
+        <div class="stat"><div class="stat-label">Subscribers</div><div class="stat-val" id="dSubs">—</div><div class="stat-sub">newsletter list</div></div>
+        <div class="stat amber"><div class="stat-label">Inbox</div><div class="stat-val" id="dUnread">—</div><div class="stat-sub">unread conversations</div></div>
+      </div>
+      <div class="ops-grid">
+        <div class="ops-card">
+          <div class="dash-card-title">Priority Queue <span class="badge badge-default" id="dashQueueCount">—</span></div>
+          <div id="dashActionQueue"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+        <div class="ops-card">
+          <div class="dash-card-title">Business Health</div>
+          <div class="insight-grid" id="dashInsights"></div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-title">Recent Activity</div>
+          <div class="dash-list" id="dashActivity"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">Review Quality Signals</div>
+          <div class="dash-list" id="dashReviewQuality"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-card-title">Recent Enquiries <button class="btn" style="font-size:0.68rem;padding:3px 8px;" onclick="nav('enquiries')">View all</button></div>
+          <div class="dash-list" id="dashRecentEnq"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">Recent Signups <button class="btn" style="font-size:0.68rem;padding:3px 8px;" onclick="nav('users')">View all</button></div>
+          <div class="dash-list" id="dashRecentUsers"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+      </div>
+      <div class="err-banner" id="dashErr"></div>
+    </div>
+
+    <!-- ── REVIEWS ── -->
+    <div id="pageReviews" class="page">
+      <div class="page-header">
+        <div class="page-title">Student Reviews</div>
+        <div class="page-sub">All AI feedback sessions</div>
+      </div>
+      <div class="controls">
+        <input class="ctrl-in" id="revSearch" type="text" placeholder="🔍 Search email, name, scenario…" oninput="renderReviews()">
+        <select class="ctrl-sel" id="revTool" onchange="renderReviews()">
+          <option value="">All tools</option>
+          <option value="casper">CASPer</option>
+          <option value="gamsat">GAMSAT</option>
+          <option value="mmi">MMI</option>
+        </select>
+        <select class="ctrl-sel" id="revTier" onchange="renderReviews()">
+          <option value="">All tiers</option>
+          <option value="free">Free</option>
+          <option value="pro">Pro</option>
+          <option value="paid">Paid</option>
+        </select>
+        <select class="ctrl-sel" id="revScore" onchange="renderReviews()">
+          <option value="">All scores</option>
+          <option value="high">High 8-10</option>
+          <option value="mid">Mid 5-7</option>
+          <option value="low">Low 1-4</option>
+          <option value="missing">No score</option>
+        </select>
+        <select class="ctrl-sel" id="revLimit" onchange="loadReviews()">
+          <option value="50" selected>50 rows</option>
+          <option value="100">100 rows</option>
+          <option value="250">250 rows</option>
+        </select>
+        <button class="btn" onclick="loadReviews()">↺</button>
+        <button class="btn" onclick="exportCsv('reviews')">⬇ CSV</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar"><span class="tbl-status" id="revStatus">—</span></div>
+        <div class="tbl-scroller"><table><thead><tr>
+          <th style="width:26px;"></th><th>Time</th><th>Student</th><th>Tool</th><th>Tier</th><th>Score</th><th>Signals</th><th>Scenario</th><th>Response</th>
+        </tr></thead><tbody id="revBody"></tbody></table></div>
+        <div class="empty hidden" id="revEmpty">No reviews match your filters.</div>
+      </div>
+    </div>
+
+    <!-- ── USERS ── -->
+    <div id="pageUsers" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">User Accounts</div>
+          <div class="page-sub">Student accounts, credits, spend, activity, and admin actions.</div>
+        </div>
+      </div>
+      <div class="segment-bar" id="usrSegments">
+        <button class="seg active" data-segment="all" onclick="setUserSegment('all')">All</button>
+        <button class="seg" data-segment="pro" onclick="setUserSegment('pro')">Pro</button>
+        <button class="seg" data-segment="paying" onclick="setUserSegment('paying')">Paying</button>
+        <button class="seg" data-segment="credits" onclick="setUserSegment('credits')">Has credits</button>
+        <button class="seg" data-segment="today" onclick="setUserSegment('today')">Used free today</button>
+        <button class="seg" data-segment="needs_review" onclick="setUserSegment('needs_review')">No reviews</button>
+        <button class="seg" data-segment="high_value" onclick="setUserSegment('high_value')">High value</button>
+      </div>
+      <div class="controls">
+        <input class="ctrl-in" id="usrSearch" type="text" placeholder="🔍 Search email or name…" oninput="renderUsers()">
+        <select class="ctrl-sel" id="usrTier" onchange="loadUsers()">
+          <option value="">All tiers</option>
+          <option value="free">Free</option>
+          <option value="pro">Pro</option>
+          <option value="paid">Paid</option>
+        </select>
+        <select class="ctrl-sel" id="usrPaying" onchange="renderUsers()">
+          <option value="">All users</option>
+          <option value="paying">Paying only</option>
+          <option value="credits">Has credits</option>
+          <option value="never">Never paid</option>
+        </select>
+        <select class="ctrl-sel" id="usrLimit" onchange="loadUsers()">
+          <option value="50" selected>50 rows</option>
+          <option value="100">100 rows</option>
+          <option value="250">250 rows</option>
+        </select>
+        <button class="btn" onclick="loadUsers()">↺</button>
+        <button class="btn" onclick="exportCsv('users')">⬇ CSV</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar"><span class="tbl-status" id="usrStatus">—</span></div>
+        <div class="tbl-scroller"><table><thead><tr>
+          <th style="width:26px;"></th><th>User</th><th>Tier</th><th>Credits</th><th>Reviews</th><th>Spend</th><th>Payments</th><th>Free today</th><th>Joined</th><th>Actions</th>
+        </tr></thead><tbody id="usrBody"></tbody></table></div>
+        <div class="empty hidden" id="usrEmpty">No users match your filters.</div>
+      </div>
+    </div>
+
+    <!-- ── ENQUIRIES ── -->
+    <div id="pageEnquiries" class="page">
+      <div class="page-header">
+        <div class="page-title">Enquiries</div>
+        <div class="page-sub">Contact form submissions from your website</div>
+      </div>
+      <div class="controls">
+        <input class="ctrl-in" id="enqSearch" type="text" placeholder="🔍 Search name, email, notes…" oninput="renderEnquiries()">
+        <select class="ctrl-sel" id="enqType" onchange="renderEnquiries()">
+          <option value="">All types</option>
+          <option value="CASPer">CASPer</option>
+          <option value="MMI">MMI</option>
+          <option value="GAMSAT">GAMSAT</option>
+          <option value="General">General</option>
+        </select>
+        <select class="ctrl-sel" id="enqLimit" onchange="loadEnquiries()">
+          <option value="50" selected>50 rows</option>
+          <option value="100">100 rows</option>
+        </select>
+        <button class="btn" onclick="loadEnquiries()">↺</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar"><span class="tbl-status" id="enqStatus">—</span></div>
+        <div class="tbl-scroller"><table><thead><tr>
+          <th style="width:26px;"></th><th>Time</th><th>Name</th><th>Email</th><th>Type</th><th>Universities</th><th>Exam Date</th>
+        </tr></thead><tbody id="enqBody"></tbody></table></div>
+        <div class="empty hidden" id="enqEmpty">No enquiries yet.</div>
+      </div>
+    </div>
+
+    <!-- ── INBOX ── -->
+    <div id="pageInbox" class="page">
+      <div class="inbox-body">
+        <div class="conv-list">
+          <div class="conv-list-hd">
+            <span class="conv-list-title">Conversations</span>
+            <button class="btn blue" style="font-size:0.7rem;padding:4px 10px;" onclick="openNewCompose()">+ New</button>
+          </div>
+          <div class="conv-search"><input type="text" id="convSearch" placeholder="Search…" oninput="filterConvs()"></div>
+          <div class="conv-items" id="convItems"><div class="conv-empty">Loading…</div></div>
+        </div>
+        <div class="thread-panel" id="threadPanel">
+          <div class="thread-empty" id="threadEmpty">
+            <div class="thread-empty-icon">✉️</div>
+            <div style="font-size:0.85rem;color:var(--muted2);">Select a conversation</div>
+          </div>
+          <div id="threadContent" class="hidden" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+            <div class="thread-hd" id="threadHd">
+              <div class="thread-avatar" id="threadAvatar">?</div>
+              <div>
+                <div style="font-size:0.88rem;font-weight:700;" id="threadName">—</div>
+                <div style="font-size:0.72rem;color:var(--muted2);" id="threadEmail">—</div>
+              </div>
+              <button class="btn" style="margin-left:auto;font-size:0.7rem;" onclick="markRead()">✓ Mark read</button>
+            </div>
+            <div class="thread-msgs" id="threadMsgs"></div>
+            <div class="compose">
+              <div class="compose-to-row">
+                <span class="compose-to-lbl">To:</span>
+                <span style="font-size:0.83rem;" id="composeTo">—</span>
+              </div>
+              <div class="compose-subj-row">
+                <span class="compose-to-lbl">Subj:</span>
+                <input class="compose-subj-in" id="composeSubj" type="text" placeholder="Re: …">
+              </div>
+              <textarea class="compose-textarea" id="composeBody" placeholder="Write your reply…"></textarea>
+              <div class="compose-footer">
+                <span class="compose-hint">Sent from dan@key2md.net</span>
+                <button class="btn-send" id="sendBtn" onclick="sendReply()">
+                  <span class="spinner" id="sendSpinner"></span>Send ↗
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BROADCAST ── -->
+    <div id="pageBroadcast" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Broadcast</div>
+          <div class="page-sub">Send a branded email to your list — with live preview</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
+
+        <!-- LEFT: Compose -->
+        <div>
+          <div class="bc-card" style="max-width:100%;">
+            <div class="bc-stats">
+              <div class="bc-stat"><div class="bc-stat-num" id="bcSubs">—</div><div class="bc-stat-lbl">Subscribers</div></div>
+              <div class="bc-stat"><div class="bc-stat-num" id="bcUsers">—</div><div class="bc-stat-lbl">Users</div></div>
+            </div>
+
+            <div class="form-row">
+              <label class="form-lbl">Send to</label>
+              <select class="form-sel" id="bcList">
+                <optgroup label="🧪 Test">
+                  <option value="test">Test — send to brittainmbbs@gmail.com only</option>
+                </optgroup>
+                <optgroup label="📋 All">
+                  <option value="subscribers">Newsletter subscribers only</option>
+                  <option value="users">All registered users</option>
+                  <option value="both">Everyone — subscribers + users (deduplicated)</option>
+                </optgroup>
+                <optgroup label="💰 By payment">
+                  <option value="paying">Paying customers only (ever purchased)</option>
+                  <option value="non_paying">Non-paying users (never purchased)</option>
+                  <option value="pro">CASPer Pro subscribers</option>
+                  <option value="mmi_pro">MMI Pro subscribers</option>
+                </optgroup>
+                <optgroup label="📊 By activity">
+                  <option value="active">Active users (reviewed in last 14 days)</option>
+                  <option value="inactive">Inactive users (no reviews in 30+ days)</option>
+                  <option value="no_reviews">Never reviewed (signed up, never used AI)</option>
+                  <option value="mmi_users">MMI users (at least 1 MMI review)</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label class="form-lbl">Subject line</label>
+              <input class="form-in" id="bcSubject" type="text" placeholder="e.g. CASPer tips this week…" oninput="updateBcPreview()">
+            </div>
+
+            <div class="form-row">
+              <label class="form-lbl" style="display:flex;align-items:center;justify-content:space-between;">
+                <span>Message</span>
+                <div style="display:flex;gap:6px;">
+                  <button class="seg active" id="bcModeRich" onclick="setBcMode('rich')" style="font-size:0.68rem;padding:3px 10px;">✦ Rich</button>
+                  <button class="seg" id="bcModePlain" onclick="setBcMode('plain')" style="font-size:0.68rem;padding:3px 10px;">Plain text</button>
+                  <button class="seg" id="bcModeHtml" onclick="setBcMode('html')" style="font-size:0.68rem;padding:3px 10px;">⌨ Raw HTML</button>
+                </div>
+              </label>
+
+              <!-- Rich mode toolbar -->
+              <div id="bcRichToolbar" style="display:flex;gap:4px;flex-wrap:wrap;padding:8px;background:var(--surface2);border:1px solid var(--border2);border-bottom:none;border-radius:8px 8px 0 0;">
+                <button onclick="bcFormat('bold')" title="Bold" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-weight:800;font-size:0.82rem;">B</button>
+                <button onclick="bcFormat('italic')" title="Italic" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-style:italic;font-size:0.82rem;">I</button>
+                <div style="width:1px;background:var(--border2);margin:0 2px;"></div>
+                <button onclick="bcInsert('h2')" title="Heading" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-size:0.75rem;font-weight:700;">H2</button>
+                <button onclick="bcInsert('h3')" title="Subheading" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-size:0.75rem;font-weight:700;">H3</button>
+                <div style="width:1px;background:var(--border2);margin:0 2px;"></div>
+                <button onclick="bcInsert('bullet')" title="Bullet list" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-size:0.82rem;">• List</button>
+                <button onclick="bcInsert('divider')" title="Divider" style="background:none;border:1px solid var(--border2);color:var(--text);border-radius:5px;padding:4px 8px;cursor:pointer;font-size:0.82rem;">— Line</button>
+                <button onclick="bcInsert('cta')" title="CTA Button" style="background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:0.75rem;font-weight:700;">+ CTA Button</button>
+              </div>
+
+              <!-- Rich editor (contenteditable) -->
+              <div id="bcRichEditor" contenteditable="true" oninput="updateBcPreview()" style="min-height:220px;padding:14px;background:var(--surface);border:1px solid var(--border2);border-radius:0 0 8px 8px;color:var(--text);font-size:0.88rem;line-height:1.75;outline:none;white-space:pre-wrap;" placeholder="Write your message here. Use the toolbar above for formatting."></div>
+
+              <!-- Plain text fallback -->
+              <textarea id="bcPlainBody" oninput="updateBcPreview()" style="display:none;" class="form-ta" placeholder="Write your email here. Plain text — no formatting."></textarea>
+
+              <!-- Raw HTML mode -->
+              <textarea id="bcHtmlBody" oninput="updateBcPreview()" style="display:none;" class="form-ta" placeholder="Paste your full HTML email here. The preview will update live." style="font-family:monospace;font-size:0.78rem;min-height:260px;"></textarea>
+              <div id="bcHtmlHint" style="display:none;margin-top:6px;padding:8px 12px;background:rgba(14,165,233,0.06);border:1px solid var(--blue-border);border-radius:7px;font-size:0.72rem;color:var(--muted);">
+                💡 Paste a full HTML email (e.g. your newsletter file). The preview updates live. This HTML is sent exactly as-is — no wrapper added.
+              </div>
+            </div>
+
+            <div style="margin-bottom:14px;padding:10px 12px;background:rgba(56,189,248,0.06);border:1px solid var(--blue-border);border-radius:8px;font-size:0.75rem;color:var(--muted);">
+              💡 <strong style="color:var(--text);">Tip:</strong> Replies from students go directly to <strong style="color:var(--blue);">dan@key2md.net</strong> and appear in your Inbox tab.
+            </div>
+
+            <button class="btn primary" id="bcBtn" onclick="sendBroadcast()" style="width:100%;padding:11px;border-radius:50px;font-size:0.88rem;">Send Broadcast →</button>
+            <div class="alert" id="bcAlert"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Live preview -->
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted2);margin-bottom:8px;">Live Email Preview</div>
+          <div style="border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:1px solid var(--border2);">
+            <!-- Email client chrome -->
+            <div style="background:rgba(255,255,255,0.06);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:8px;">
+              <div style="display:flex;gap:5px;"><div style="width:10px;height:10px;border-radius:50%;background:#ff5f57;"></div><div style="width:10px;height:10px;border-radius:50%;background:#ffbd2e;"></div><div style="width:10px;height:10px;border-radius:50%;background:#28ca41;"></div></div>
+              <div style="flex:1;background:rgba(255,255,255,0.06);border-radius:4px;padding:4px 10px;font-size:0.72rem;color:var(--muted2);" id="bcPreviewSubject">Subject line will appear here</div>
+            </div>
+            <iframe id="bcPreviewFrame" style="width:100%;height:520px;border:none;background:#fff;" srcdoc="<p style='color:#aaa;text-align:center;padding:40px;font-family:sans-serif;'>Start typing to see a preview…</p>"></iframe>
+          </div>
+          <div style="margin-top:8px;font-size:0.7rem;color:var(--muted2);text-align:center;">Preview updates as you type</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── SUBSCRIBERS ── -->
+    <div id="pageSubscribers" class="page">
+      <div class="page-header">
+        <div class="page-title">Subscribers</div>
+        <div class="page-sub">Newsletter email list</div>
+      </div>
+      <div class="controls">
+        <input class="ctrl-in" id="subSearch" type="text" placeholder="🔍 Filter by email…" oninput="renderSubscribers()">
+        <button class="btn" onclick="loadSubscribers()">↺ Refresh</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar"><span class="tbl-status" id="subStatus">—</span></div>
+        <div class="tbl-scroller"><table><thead><tr>
+          <th>Email</th><th>Subscribed</th><th>Action</th>
+        </tr></thead><tbody id="subBody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ── MMI REVIEWS ── -->
+    <div id="pageMmi" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">MMI Reviews</div>
+          <div class="page-sub">All MMI AI feedback sessions — transcripts, scores, tier, duration</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn" onclick="loadMMI()">↺ Refresh</button>
+        </div>
+      </div>
+      <div class="controls">
+        <input class="ctrl-in" id="mmiSearch" type="text" placeholder="🔍 Search email, scenario, category…" oninput="renderMMI()">
+        <select class="ctrl-sel" id="mmiCategory" onchange="renderMMI()">
+          <option value="">All categories</option>
+          <option value="Ethics">Ethics</option>
+          <option value="Role-Play">Role-Play</option>
+          <option value="Conflict Resolution">Conflict Resolution</option>
+          <option value="Policy">Policy</option>
+          <option value="Motivation">Motivation</option>
+        </select>
+        <select class="ctrl-sel" id="mmiTier" onchange="renderMMI()">
+          <option value="">All tiers</option>
+          <option value="transcript">Transcript</option>
+          <option value="premium">Premium</option>
+        </select>
+        <select class="ctrl-sel" id="mmiScore" onchange="renderMMI()">
+          <option value="">All scores</option>
+          <option value="5">Excellent (5)</option>
+          <option value="4">Good (4)</option>
+          <option value="3">Satisfactory (3)</option>
+          <option value="2">Unsatisfactory (2)</option>
+          <option value="1">Poor (1)</option>
+        </select>
+        <select class="ctrl-sel" id="mmiLimit" onchange="loadMMI()">
+          <option value="50" selected>50 rows</option>
+          <option value="100">100 rows</option>
+          <option value="250">250 rows</option>
+        </select>
+        <button class="btn" onclick="loadMMI()">↺</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar"><span class="tbl-status" id="mmiStatus">—</span></div>
+        <div class="tbl-scroller"><table><thead><tr>
+          <th style="width:26px;"></th><th>Time</th><th>Student</th><th>Category</th><th>Tier</th><th>Score</th><th>Duration</th><th>Specialist</th><th>COGS</th>
+        </tr></thead><tbody id="mmiBody"></tbody></table></div>
+        <div class="empty hidden" id="mmiEmpty">No MMI reviews found.</div>
+      </div>
+    </div>
+
+    <!-- ── REVENUE ── -->
+    <div id="pageRevenue" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Revenue</div>
+          <div class="page-sub">All transactions, MRR, and financial breakdown</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn" onclick="loadRevenue()">↺ Refresh</button>
+        </div>
+      </div>
+      <div class="stats-grid" style="margin-bottom:20px;">
+        <div class="stat green"><div class="stat-label">Total Revenue</div><div class="stat-val" id="rvTotal">—</div><div class="stat-sub">all time</div></div>
+        <div class="stat blue"><div class="stat-label">MRR (est.)</div><div class="stat-val" id="rvMRR">—</div><div class="stat-sub">monthly recurring</div></div>
+        <div class="stat amber"><div class="stat-label">Credit Sales</div><div class="stat-val" id="rvCredits">—</div><div class="stat-sub">one-off purchases</div></div>
+        <div class="stat green"><div class="stat-label">Subscriptions</div><div class="stat-val" id="rvSubs">—</div><div class="stat-sub">active recurring</div></div>
+        <div class="stat"><div class="stat-label">Avg Order Value</div><div class="stat-val" id="rvAOV">—</div><div class="stat-sub">per transaction</div></div>
+        <div class="stat amber"><div class="stat-label">This Month</div><div class="stat-val" id="rvMonth">—</div><div class="stat-sub">month to date</div></div>
+      </div>
+      <div class="controls">
+        <input class="ctrl-in" id="rvSearch" type="text" placeholder="🔍 Search email, type…" oninput="renderRevenue()">
+        <select class="ctrl-sel" id="rvType" onchange="renderRevenue()">
+          <option value="">All types</option>
+          <option value="pro_subscription">CASPer Pro</option>
+          <option value="mmi_pro_subscription">MMI Pro</option>
+          <option value="credits">Credit packs</option>
+          <option value="mmi_credits">MMI credits</option>
+          <option value="marking">Expert marking</option>
+        </select>
+        <select class="ctrl-sel" id="rvLimit" onchange="loadRevenue()">
+          <option value="100" selected>100 rows</option>
+          <option value="250">250 rows</option>
+        </select>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-toolbar"><span class="tbl-status" id="rvStatus">—</span></div>
+        <div class="tbl-scroller"><table><thead><tr>
+          <th>Time</th><th>Student</th><th>Type</th><th>Amount</th><th>Status</th>
+        </tr></thead><tbody id="rvBody"></tbody></table></div>
+        <div class="empty hidden" id="rvEmpty">No transactions yet.</div>
+      </div>
+    </div>
+
+    <!-- ── MONITORING ── -->
+    <div id="pageMonitoring" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Monitoring</div>
+          <div class="page-sub">Parse failures, Whisper errors, COGS, and founding member slots</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn" onclick="loadMonitoring()">↺ Refresh</button>
+        </div>
+      </div>
+
+      <!-- Founding + COGS stats -->
+      <div class="stats-grid" style="margin-bottom:20px;">
+        <div class="stat green"><div class="stat-label">Founding Members</div><div class="stat-val" id="mFoundingCount">—</div><div class="stat-sub" id="mFoundingSub">of 15 slots claimed</div></div>
+        <div class="stat blue"><div class="stat-label">Total MMI Reviews</div><div class="stat-val" id="mTotalReviews">—</div><div class="stat-sub" id="mReviewSplit">Tier 1 vs Tier 2</div></div>
+        <div class="stat amber"><div class="stat-label">Avg COGS</div><div class="stat-val" id="mAvgCogs">—</div><div class="stat-sub" id="mAvgCogsSub">per review</div></div>
+        <div class="stat"><div class="stat-label">Total COGS</div><div class="stat-val" id="mTotalCogs">—</div><div class="stat-sub">all-time spend</div></div>
+        <div class="stat red"><div class="stat-label">Parse Failures</div><div class="stat-val" id="mParseFails">—</div><div class="stat-sub">AI response errors</div></div>
+        <div class="stat red"><div class="stat-label">Whisper Failures</div><div class="stat-val" id="mWhisperFails">—</div><div class="stat-sub">transcription errors</div></div>
+      </div>
+
+      <!-- Per-tier COGS breakdown -->
+      <div class="dash-grid" style="margin-bottom:20px;">
+        <div class="dash-card">
+          <div class="dash-card-title">COGS Breakdown by Tier</div>
+          <div id="mCogsBreakdown"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-title">Founding Member Slots <button class="btn" style="font-size:0.68rem;padding:3px 8px;" onclick="nav('users')">View users</button></div>
+          <div id="mFoundingDetail"><div style="color:var(--muted2);font-size:0.8rem;">Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- ── Per-user profit table ── -->
+      <div style="margin-bottom:20px;">
+        <div class="dash-card-title" style="padding:0 0 10px;display:flex;align-items:center;gap:10px;">
+          Profit by Student — MMI
+          <span style="font-size:0.7rem;font-weight:500;color:var(--muted);">Revenue − COGS · sorted by profit desc</span>
+          <span class="badge badge-default" id="mProfitCount">0</span>
+          <span style="margin-left:auto;font-size:0.72rem;color:var(--muted);">Total profit: <strong id="mProfitTotal" style="color:var(--green);">—</strong></span>
+        </div>
+        <div class="tbl-wrap">
+          <div class="tbl-scroller"><table><thead><tr>
+            <th>Student</th><th>Revenue</th><th>COGS</th><th>Profit</th><th>Margin</th><th>Reviews</th><th>Avg ¢/review</th><th>Tier</th>
+          </tr></thead><tbody id="mProfitBody"></tbody></table></div>
+          <div class="empty hidden" id="mProfitEmpty">No MMI payment data yet.</div>
+        </div>
+      </div>
+
+      <!-- Parse failures -->
+      <div style="margin-bottom:20px;">
+        <div class="dash-card-title" style="padding:0 0 10px;">Parse Failures <span class="badge badge-default" id="mParseCount">0</span></div>
+        <div class="tbl-wrap">
+          <div class="tbl-scroller"><table><thead><tr>
+            <th>Time</th><th>User</th><th>Tier</th><th>Error</th>
+          </tr></thead><tbody id="mParseBody"></tbody></table></div>
+          <div class="empty hidden" id="mParseEmpty">No parse failures. ✅</div>
+        </div>
+      </div>
+
+      <!-- Whisper failures -->
+      <div>
+        <div class="dash-card-title" style="padding:0 0 10px;">Whisper Failures <span class="badge badge-default" id="mWhisperCount">0</span></div>
+        <div class="tbl-wrap">
+          <div class="tbl-scroller"><table><thead><tr>
+            <th>Time</th><th>User</th><th>Duration</th><th>Error</th>
+          </tr></thead><tbody id="mWhisperBody"></tbody></table></div>
+          <div class="empty hidden" id="mWhisperEmpty">No Whisper failures. ✅</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ CREDIT MODAL ══ -->
+<div class="modal-ov" id="creditModal">
+  <div class="modal-card">
+    <div class="modal-title">💳 Manage Credits — <span id="cmEmail" style="color:var(--blue);"></span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div><div class="form-lbl">CASPer balance</div><div style="font-size:1.3rem;font-weight:800;color:var(--blue);" id="cmCasper">—</div></div>
+      <div><div class="form-lbl">GAMSAT balance</div><div style="font-size:1.3rem;font-weight:800;color:var(--purple);" id="cmGamsat">—</div></div>
+      <div><div class="form-lbl">MMI Transcript</div><div style="font-size:1.3rem;font-weight:800;color:var(--amber);" id="cmMMITranscript">—</div></div>
+      <div><div class="form-lbl">MMI Premium</div><div style="font-size:1.3rem;font-weight:800;color:var(--green);" id="cmMMIPremium">—</div></div>
+    </div>
+    <div class="form-row"><label class="form-lbl">Tool</label><select class="form-sel" id="cmTool">
+      <option value="casper">CASPer</option>
+      <option value="gamsat">GAMSAT</option>
+      <option value="mmi_transcript">MMI Transcript</option>
+      <option value="mmi_premium">MMI Premium</option>
+    </select></div>
+    <div class="form-row"><label class="form-lbl">Credits to add (negative to remove)</label><input class="form-in" type="number" id="cmAmount" placeholder="e.g. 5 or -2"></div>
+    <div class="modal-alert" id="cmAlert"></div>
+    <div class="modal-footer"><button class="btn" onclick="closeCreditModal()">Cancel</button><button class="btn green" id="cmSave" onclick="saveCreditChange()">Save</button></div>
+  </div>
+</div>
+
+<!-- ══ TIER MODAL ══ -->
+<div class="modal-ov" id="tierModal">
+  <div class="modal-card">
+    <div class="modal-title">⭐ Change Tier — <span id="tmEmail" style="color:var(--blue);"></span></div>
+    <p style="color:var(--muted);font-size:0.82rem;margin-bottom:16px;line-height:1.6;"><strong style="color:var(--text);">Pro</strong> = unlimited CASPer AI reviews, no daily cap. Use for students doing intensive coaching with you. GAMSAT S2 still uses credits regardless of tier.</p>
+    <div class="form-row"><label class="form-lbl">New tier</label><select class="form-sel" id="tmTier"><option value="free">Free (default)</option><option value="pro">Pro (unlimited CASPer AI)</option></select></div>
+    <div class="modal-alert" id="tmAlert"></div>
+    <div class="modal-footer"><button class="btn" onclick="closeTierModal()">Cancel</button><button class="btn amber" id="tmSave" onclick="saveTierChange()">Update Tier</button></div>
+  </div>
+</div>
+
+<!-- ══ NEW COMPOSE MODAL ══ -->
+<div class="modal-ov nc-modal" id="ncModal">
+  <div class="modal-card">
+    <div class="modal-title">✉️ New Email</div>
+    <div class="form-row"><label class="form-lbl">To</label><input class="form-in" type="email" id="ncTo" placeholder="student@email.com"></div>
+    <div class="form-row"><label class="form-lbl">Subject</label><input class="form-in" type="text" id="ncSubject" placeholder="Re: your CASPer prep…"></div>
+    <div class="form-row"><label class="form-lbl">Message</label><textarea class="form-ta" id="ncBody" style="min-height:140px;" placeholder="Write your message…"></textarea></div>
+    <div class="modal-alert" id="ncAlert"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeNewCompose()">Cancel</button>
+      <button class="btn-send" id="ncSendBtn" onclick="sendNewEmail()"><span class="spinner" id="ncSpinner"></span>Send ↗</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONFIG + STATE
+// ══════════════════════════════════════════════════════
+const API = 'https://key2md-api.brittainmbbs.workers.dev';
+const SS_KEY = 'k2md_admin_token';
+
+const S = {
+  token: null,
+  reviews: [], users: [], enquiries: [], subscribers: [],
+  conversations: [], filteredConvs: [],
+  mmiReviews: [], revenue: [], monitoring: null,
+  activeConv: null,
+  detailCache: new Map(),
+  creditModalUserId: null,
+  tierModalUserId: null,
+  userSegment: 'all',
+};
+
+// ══════════════════════════════════════════════════════
+// INIT — restore session from sessionStorage
+// ══════════════════════════════════════════════════════
+(async () => {
+  const saved = sessionStorage.getItem(SS_KEY);
+  if (saved) {
+    S.token = saved;
+    try {
+      // Verify token is still valid
+      const res = await api('/admin/users?limit=1');
+      if (res.ok) {
+        showApp('Restored');
+        bootLoad();
+        return;
+      }
+    } catch {}
+    sessionStorage.removeItem(SS_KEY);
+    S.token = null;
+  }
+})();
+
+document.getElementById('liEmail').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('liPw').focus(); });
+document.getElementById('liPw').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+// ══════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════
+async function doLogin() {
+  const email = document.getElementById('liEmail').value.trim();
+  const pw    = document.getElementById('liPw').value;
+  const btn   = document.getElementById('liBtn');
+  const err   = document.getElementById('liErr');
+  err.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    const res  = await fetch(`${API}/admin/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password:pw}) });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Sign in failed');
+    S.token = data.token;
+    sessionStorage.setItem(SS_KEY, S.token);
+    showApp(data.email||email);
+    bootLoad();
+  } catch(e) {
+    err.textContent = e.message; err.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign in →';
+  }
+}
+
+function showApp(email) {
+  document.getElementById('loginWrap').classList.add('hidden');
+  document.getElementById('appWrap').classList.remove('hidden');
+  document.getElementById('sidebarAdmin').textContent = email;
+}
+
+async function doLogout() {
+  try { await api('/admin/logout', {method:'POST'}); } catch {}
+  sessionStorage.removeItem(SS_KEY);
+  S.token = null;
+  location.reload();
+}
+
+// ══════════════════════════════════════════════════════
+// API HELPER
+// ══════════════════════════════════════════════════════
+async function api(path, opts={}) {
+  const h = new Headers(opts.headers||{});
+  if (S.token) h.set('Authorization', `Bearer ${S.token}`);
+  return fetch(`${API}${path}`, {...opts, headers:h});
+}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const pageEl = document.getElementById(`page${page.charAt(0).toUpperCase()+page.slice(1)}`);
+  if (pageEl) pageEl.classList.add('active');
+  const navEl = document.querySelector(`[data-page="${page}"]`);
+  if (navEl) navEl.classList.add('active');
+
+  if (page==='inbox' && !S.conversations.length) loadInbox();
+  if (page==='subscribers' && !S.subscribers.length) loadSubscribers();
+  if (page==='enquiries' && !S.enquiries.length) loadEnquiries();
+  if (page==='broadcast') updateBcStats();
+  if (page==='mmi' && !S.mmiReviews.length) loadMMI();
+  if (page==='revenue' && !S.revenue.length) loadRevenue();
+  if (page==='monitoring') loadMonitoring();
+}
+
+// ══════════════════════════════════════════════════════
+// BOOT — load all data in parallel on login
+// ══════════════════════════════════════════════════════
+async function bootLoad() {
+  await Promise.all([
+    loadReviews(), loadUsers(), loadEnquiries(),
+    loadSubscribers(), loadInbox(), loadMMI(), loadRevenue(), loadMonitoring(),
+  ]);
+  const lu = document.getElementById('lastUpdated');
+  if (lu) lu.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
+  updateDashboard();
+}
+
+async function refreshAll() {
+  const lu = document.getElementById('lastUpdated');
+  if (lu) lu.textContent = 'Refreshing…';
+  await bootLoad();
+}
+
+// ══════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════
+function updateDashboard() {
+  const users   = S.users;
+  const reviews = S.reviews;
+  const enqs    = S.enquiries;
+  const subs    = S.subscribers;
+  const mmi     = S.mmiReviews;
+
+  const paying  = users.filter(u=>Number(u.total_spend_aud||0)>0).length;
+  const credits = users.reduce((s,u)=>s+Number(u.casper_balance||0)+Number(u.gamsat_balance||0),0);
+  const pro     = users.filter(u=>(u.tier||'').toLowerCase()==='pro').length;
+  const mmiPro  = mmi.filter(r=>r.charged_pro).length;
+  const foundingCount = S.monitoring?.founding_count || 0;
+  const todayReviews = reviews.filter(r=>isToday(r.created_at)).length;
+  const signups7 = users.filter(u=>withinDays(u.created_at,7)).length;
+  const enqs7 = enqs.filter(e=>withinDays(e.created_at,7)).length;
+  const scored = reviews.map(r=>Number(parseFb(r.ai_feedback)?.score)).filter(n=>Number.isFinite(n));
+  const avgScore = scored.length ? scored.reduce((a,b)=>a+b,0)/scored.length : null;
+  const uniqueReviewers = new Set(reviews.map(r=>r.email).filter(Boolean)).size;
+  const unread = S.conversations.filter(c=>c.messages?.some(m=>m.direction==='inbound'&&!m.read)).length;
+  const noReviews = users.filter(u=>Number(u.review_count||0)===0).length;
+  const freeToday = users.filter(u=>u.usage_today?.casper?.used_free_today||u.usage_today?.gamsat?.used_free_today).length;
+  const mmiCreditsHeld = mmi.reduce((s,r)=>s+(r.mmi_transcript_balance||0),0);
+  const conversion = (paying/Math.max(users.length,1))*100;
+
+  document.getElementById('dUsers').textContent     = users.length;
+  document.getElementById('dUsersSub').textContent  = `${signups7} new in 7 days`;
+  document.getElementById('dPaying').textContent    = paying;
+  document.getElementById('dPayingSub').textContent = `${conversion.toFixed(0)}% conversion`;
+  document.getElementById('dReviews').textContent   = reviews.length;
+  document.getElementById('dReviewsSub').textContent= `${uniqueReviewers} students`;
+  document.getElementById('dMMIReviews').textContent = mmi.length;
+  document.getElementById('dCredits').textContent   = credits;
+  document.getElementById('dMMICredits').textContent = mmiCreditsHeld || '—';
+  document.getElementById('dPro').textContent       = pro;
+  document.getElementById('dMMIPro').textContent    = mmiPro || '—';
+  const fcEl = document.getElementById('dFoundingCount');
+  const fsEl = document.getElementById('dFoundingSub');
+  if(fcEl) fcEl.textContent = foundingCount;
+  if(fsEl) fsEl.textContent = `${15-foundingCount} slot${15-foundingCount===1?'':'s'} remaining`;
+  document.getElementById('dSubs').textContent      = subs.length;
+  document.getElementById('dTodayReviews').textContent = todayReviews;
+  document.getElementById('dAvgScore').textContent = avgScore ? avgScore.toFixed(1) : '—';
+  document.getElementById('dUnread').textContent = unread;
+  document.getElementById('dashHeadline').textContent = `${todayReviews} reviews today · ${mmi.filter(r=>isToday(r.created_at)).length} MMI sessions · ${unread} unread message${unread===1?'':'s'}`;
+  document.getElementById('dashBrief').textContent =
+    `${users.length} registered students · ${paying} paying customers · ${pro} CASPer Pro · ${mmi.length} MMI sessions total · ${enqs7} enquiries in the last 7 days`;
+
+  renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length});
+  renderBusinessInsights({conversion,pro,paying,users,credits,reviews,todayReviews,signups7,enqs7,avgScore,mmi});
+  renderActivityFeed();
+  renderReviewQuality();
+
+  // MMI badge
+  const mb = document.getElementById('mmiBadge');
+  if (mb) { mb.textContent = mmi.length; mb.classList.toggle('show', mmi.length>0); }
+
+  const enqEl = document.getElementById('dashRecentEnq');
+  enqEl.innerHTML = enqs.slice(0,5).map(e=>`
+    <div class="dash-row">
+      <span class="dash-row-label">${esc(e.name)} <span style="color:var(--muted2);font-size:0.75rem;">${esc(e.email)}</span></span>
+      <span class="dash-row-val"><span class="enq-type">${esc(e.type||'General')}</span></span>
+    </div>`).join('')||'<div style="color:var(--muted2);font-size:0.8rem;">No enquiries yet</div>';
+
+  const usrEl = document.getElementById('dashRecentUsers');
+  usrEl.innerHTML = users.slice(0,5).map(u=>`
+    <div class="dash-row">
+      <span class="dash-row-label">${esc(u.name||u.email.split('@')[0])} <span style="color:var(--muted2);font-size:0.75rem;">${esc(u.email)}</span></span>
+      <span class="dash-row-val">${tierBadge(u.tier)}</span>
+    </div>`).join('')||'<div style="color:var(--muted2);font-size:0.8rem;">No users yet</div>';
+
+  const ib = document.getElementById('inboxBadge');
+  ib.textContent = unread; ib.classList.toggle('show', unread>0);
+  const eb = document.getElementById('enqBadge');
+  eb.textContent = enqs.length; eb.classList.toggle('show', enqs.length>0);
+}
+
+function renderActionQueue(m) {
+  const items = [
+    {icon:'!', title:`${m.unread} unread inbox thread${m.unread===1?'':'s'}`, sub:'Reply quickly to keep coaching leads warm.', page:'inbox', show:m.unread>0, tone:'red'},
+    {icon:'$', title:`${m.enqs7} fresh enquir${m.enqs7===1?'y':'ies'} this week`, sub:'Follow up while intent is highest.', page:'enquiries', show:m.enqs7>0, tone:'amber'},
+    {icon:'AI', title:`${m.freeToday} student${m.freeToday===1?'':'s'} used free reviews today`, sub:'Good moment to invite credit purchase or Pro.', page:'users', show:m.freeToday>0, tone:'blue'},
+    {icon:'0', title:`${m.noReviews} account${m.noReviews===1?'':'s'} with no reviews`, sub:'Candidates for onboarding or activation email.', page:'users', show:m.noReviews>0, tone:'amber'},
+  ].filter(item=>item.show).slice(0,4);
+  if (!items.length) items.push({icon:'OK', title:'No urgent owner actions', sub:'Inbox, enquiries, and student usage look calm.', page:'dashboard', show:true, tone:'green'});
+  document.getElementById('dashQueueCount').textContent = `${items.length}`;
+  document.getElementById('dashActionQueue').innerHTML = items.map(item=>`
+    <div class="queue-item">
+      <div class="queue-icon" style="color:var(--${item.tone});">${esc(item.icon)}</div>
+      <div><div class="queue-title">${esc(item.title)}</div><div class="queue-sub">${esc(item.sub)}</div></div>
+      <button class="btn ${item.tone==='green'?'green':item.tone==='red'?'red':item.tone==='amber'?'amber':'blue'}" onclick="nav('${item.page}')">Open</button>
+    </div>`).join('');
+}
+
+function renderBusinessInsights(m) {
+  const reviewPerUser = m.users.length ? m.reviews.length / m.users.length : 0;
+  const creditPerUser = m.users.length ? m.credits / m.users.length : 0;
+  const mmiToday = (m.mmi||[]).filter(r=>isToday(r.created_at)).length;
+  document.getElementById('dashInsights').innerHTML = `
+    <div class="insight"><div class="insight-label">Paid conversion</div><div class="insight-val">${m.conversion.toFixed(0)}%</div><div class="meter"><div class="meter-fill" style="width:${Math.min(100,m.conversion)}%"></div></div><div class="insight-note">${m.paying} paying of ${m.users.length} users</div></div>
+    <div class="insight"><div class="insight-label">CASPer Pro</div><div class="insight-val">${m.pro}</div><div class="insight-note">${m.pro} active subscriptions</div></div>
+    <div class="insight"><div class="insight-label">Engagement</div><div class="insight-val">${reviewPerUser.toFixed(1)}</div><div class="insight-note">CASPer reviews per user</div></div>
+    <div class="insight"><div class="insight-label">Credits Held</div><div class="insight-val">${m.credits}</div><div class="insight-note">${creditPerUser.toFixed(1)} unused credits per user</div></div>
+    <div class="insight"><div class="insight-label">Today</div><div class="insight-val">${m.todayReviews}</div><div class="insight-note">${mmiToday} MMI + ${m.todayReviews} CASPer today</div></div>
+    <div class="insight"><div class="insight-label">Lead Flow</div><div class="insight-val">${m.enqs7}</div><div class="insight-note">enquiries in last 7 days</div></div>`;
+}
+
+function renderActivityFeed() {
+  const events = [
+    ...S.reviews.slice(0,8).map(r=>({type:'Review', title:r.email||r.name||'Unknown student', sub:`${r.tool||'AI'} review ${parseFb(r.ai_feedback)?.score ? `· ${parseFb(r.ai_feedback).score}/10` : ''}`, at:r.created_at, page:'reviews'})),
+    ...S.users.slice(0,8).map(u=>({type:'Signup', title:u.email||u.name||'New user', sub:`${u.tier||'free'} account`, at:u.created_at, page:'users'})),
+    ...S.enquiries.slice(0,8).map(e=>({type:'Enquiry', title:e.name||e.email||'New enquiry', sub:e.type||'General', at:e.created_at, page:'enquiries'})),
+  ].filter(e=>e.at).sort((a,b)=>new Date(b.at)-new Date(a.at)).slice(0,8);
+  document.getElementById('dashActivity').innerHTML = events.length ? events.map(e=>`
+    <div class="activity-item">
+      <div class="activity-type">${esc(e.type)}</div>
+      <div><div class="queue-title">${esc(e.title)}</div><div class="queue-sub">${esc(e.sub)}</div></div>
+      <button class="btn" onclick="nav('${e.page}')">${relTime(e.at)}</button>
+    </div>`).join('') : '<div style="color:var(--muted2);font-size:0.8rem;">No activity yet.</div>';
+}
+
+function renderReviewQuality() {
+  const rows = S.reviews.map(r=>({row:r, fb:parseFb(r.ai_feedback)})).filter(x=>x.fb);
+  const scored = rows.map(x=>Number(x.fb.score)).filter(Number.isFinite);
+  const avg = scored.length ? scored.reduce((a,b)=>a+b,0)/scored.length : null;
+  const lows = rows.filter(x=>Number(x.fb.score)<=4).slice(0,4);
+  const comps = aggregateCompetencies(rows.map(x=>x.fb));
+  const weakest = comps.slice().sort((a,b)=>a.avg-b.avg).slice(0,3);
+  document.getElementById('dashReviewQuality').innerHTML = `
+    <div class="mini-metric-row">
+      <div class="mini-metric"><div>Avg score</div><div>${avg ? avg.toFixed(1) : '—'}</div></div>
+      <div class="mini-metric"><div>Low scores</div><div>${lows.length}</div></div>
+      <div class="mini-metric"><div>Competency data</div><div>${comps.length}</div></div>
+    </div>
+    ${weakest.length ? `<div class="competency-list">${weakest.map(c=>competencyRow(c.name,c.avg)).join('')}</div>` : '<div style="color:var(--muted2);font-size:0.8rem;">Competency breakdowns will appear as new CASPer reviews are marked.</div>'}
+    ${lows.length ? `<div style="margin-top:12px;">${lows.map(x=>`<div class="dash-row"><span class="dash-row-label">${esc(x.row.email||'Unknown')}</span><span class="score-box ${scoreC(x.fb.score)}">${esc(x.fb.score)}</span></div>`).join('')}</div>` : ''}`;
+}
+
+// ══════════════════════════════════════════════════════
+// REVIEWS
+// ══════════════════════════════════════════════════════
+async function loadReviews() {
+  const limit = document.getElementById('revLimit')?.value||'50';
+  try {
+    const res  = await api(`/admin/reviews?limit=${limit}`);
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.reviews = data.rows||[];
+    renderReviews();
+    updateDashboard();
+  } catch(e) { console.error('Reviews load error:', e); }
+}
+
+function renderReviews() {
+  const q    = (document.getElementById('revSearch')?.value||'').toLowerCase();
+  const tool = document.getElementById('revTool')?.value||'';
+  const tier = document.getElementById('revTier')?.value||'';
+  const scoreFilter = document.getElementById('revScore')?.value||'';
+  const rows = S.reviews.filter(r => {
+    const score = Number(parseFb(r.ai_feedback)?.score);
+    const sm = !q || [r.email,r.name,r.tool,r.question_text,r.response_text].some(v=>String(v||'').toLowerCase().includes(q));
+    const tm = !tool || r.tool===tool;
+    const trm= !tier || r.tier===tier;
+    const scm = !scoreFilter
+      || (scoreFilter==='missing' && !Number.isFinite(score))
+      || (scoreFilter==='high' && score>=8)
+      || (scoreFilter==='mid' && score>=5 && score<8)
+      || (scoreFilter==='low' && score>0 && score<5);
+    return sm&&tm&&trm&&scm;
+  });
+  document.getElementById('revStatus').textContent = `${rows.length} review${rows.length===1?'':'s'}`;
+  document.getElementById('revEmpty').classList.toggle('hidden', rows.length>0);
+  const tbody = document.getElementById('revBody');
+  tbody.innerHTML = '';
+  rows.forEach(row => {
+    const fb    = parseFb(row.ai_feedback);
+    const score = fb?.score;
+    const dt    = fmtDate(row.created_at);
+    const p     = parseQ(row.question_text);
+    const prev  = (p?.scenario||row.question_text||'').substring(0,100);
+    const signals = renderReviewSignals(fb);
+
+    const dr = document.createElement('tr');
+    dr.className = 'data-row';
+    dr.innerHTML = `
+      <td><div class="expander">▼</div></td>
+      <td><div class="cell-main">${dt?.date||'—'}</div><div class="cell-sub">${dt?.time||''}</div></td>
+      <td><div class="cell-main">${esc(row.email||'?')}</div><div class="cell-sub">${esc(row.name||'')}</div></td>
+      <td>${toolBadge(row.tool)}</td>
+      <td>${tierBadge(row.tier)}</td>
+      <td>${score?`<div class="score-box ${scoreC(score)}">${score}</div>`:'<span style="color:var(--muted2);">—</span>'}</td>
+      <td>${signals}</td>
+      <td><div class="trunc">${esc(prev)}${prev.length>=100?'…':''}</div></td>
+      <td><div class="trunc">${esc((row.response_text||'').substring(0,100))}</div></td>`;
+    const xr = document.createElement('tr');
+    xr.className = 'detail-row';
+    xr.innerHTML = `<td colspan="9" class="detail-panel"><div class="detail-inner">
+      <div class="detail-box"><div class="detail-box-hd">Scenario & Prompts</div>${renderQBox(row.question_text)}</div>
+      <div class="detail-box"><div class="detail-box-hd">Student Response</div><div class="detail-box-body">${esc(row.response_text||'—')}</div></div>
+      <div class="detail-box"><div class="detail-box-hd">AI Feedback</div>${renderFbBox(row.ai_feedback)}</div>
+    </div></td>`;
+    dr.addEventListener('click', () => { xr.classList.toggle('open'); dr.classList.toggle('expanded'); });
+    tbody.appendChild(dr); tbody.appendChild(xr);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// USERS
+// ══════════════════════════════════════════════════════
+async function loadUsers() {
+  const limit = document.getElementById('usrLimit')?.value||'50';
+  const tier  = document.getElementById('usrTier')?.value||'';
+  let url = `/admin/users?limit=${limit}`;
+  if (tier) url += `&tier=${tier}`;
+  try {
+    const res  = await api(url);
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.users = data.rows||[];
+    renderUsers();
+    updateDashboard();
+  } catch(e) { console.error('Users load error:', e); }
+}
+
+function setUserSegment(segment) {
+  S.userSegment = segment;
+  document.querySelectorAll('#usrSegments .seg').forEach(btn => btn.classList.toggle('active', btn.dataset.segment===segment));
+  renderUsers();
+}
+
+function renderUsers() {
+  const q      = (document.getElementById('usrSearch')?.value||'').toLowerCase();
+  const paying = document.getElementById('usrPaying')?.value||'';
+  const rows = S.users.filter(u => {
+    const sm = !q || [u.email,u.name].some(v=>String(v||'').toLowerCase().includes(q));
+    const spend = Number(u.total_spend_aud||0);
+    const creds = Number(u.casper_balance||0)+Number(u.gamsat_balance||0);
+    const usedToday = u.usage_today?.casper?.used_free_today||u.usage_today?.gamsat?.used_free_today;
+    const seg = S.userSegment||'all';
+    const pm = !paying ||(paying==='paying'&&spend>0)||(paying==='credits'&&creds>0)||(paying==='never'&&spend===0);
+    const segMatch = seg==='all'
+      || (seg==='pro' && String(u.tier||'').toLowerCase()==='pro')
+      || (seg==='paying' && spend>0)
+      || (seg==='credits' && creds>0)
+      || (seg==='today' && usedToday)
+      || (seg==='needs_review' && Number(u.review_count||0)===0)
+      || (seg==='high_value' && spend>=50);
+    return sm&&pm&&segMatch;
+  });
+  document.getElementById('usrStatus').textContent = `${rows.length} user${rows.length===1?'':'s'}`;
+  document.getElementById('usrEmpty').classList.toggle('hidden', rows.length>0);
+  const tbody = document.getElementById('usrBody');
+  tbody.innerHTML = '';
+  rows.forEach(row => {
+    const dt    = fmtDate(row.created_at);
+    const spend = Number(row.total_spend_aud||0);
+    const cbA   = Number(row.casper_balance||0);
+    const gbA   = Number(row.gamsat_balance||0);
+    const ft    = row.usage_today?.casper?.used_free_today||row.usage_today?.gamsat?.used_free_today;
+    const dr = document.createElement('tr');
+    dr.className = 'data-row';
+    dr.innerHTML = `
+      <td><div class="expander">▼</div></td>
+      <td>
+        <div class="cell-main">${esc(row.email||'?')}</div>
+        <div class="cell-sub">${esc(row.name||'—')} ${spend>0?'<span class="badge badge-yes" style="font-size:0.6rem;">💳 Paid</span>':''}</div>
+      </td>
+      <td>${tierBadge(row.tier)}</td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <span class="credit-pill c ${cbA===0?'zero':''}">💬 ${cbA}</span>
+          <span class="credit-pill g ${gbA===0?'zero':''}">✍️ ${gbA}</span>
+        </div>
+      </td>
+      <td>${row.review_count||0}</td>
+      <td><span class="spend ${spend>0?'has':'none'}">${fmtMoney(spend)}</span></td>
+      <td>${row.payment_count||0}</td>
+      <td>${yesNo(ft)}</td>
+      <td><div class="cell-main">${dt?.date||'—'}</div></td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn blue" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openCreditModal('${esc(row.id)}','${esc(row.email)}',${cbA},${gbA},0,0)">Credits</button>
+          <button class="btn amber" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openTierModal('${esc(row.id)}','${esc(row.email)}','${esc(row.tier||'free')}')">Tier</button>
+          <button class="btn" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();composeToUser('${esc(row.email)}')">✉</button>
+        </div>
+      </td>`;
+    const xr = document.createElement('tr');
+    xr.className = 'detail-row';
+    xr.innerHTML = `<td colspan="10" class="detail-panel"><div style="padding:12px;color:var(--muted2);font-size:0.8rem;">Click to expand…</div></td>`;
+    dr.addEventListener('click', async () => {
+      const open = xr.classList.contains('open');
+      if (open) { xr.classList.remove('open'); dr.classList.remove('expanded'); return; }
+      xr.innerHTML = `<td colspan="10" class="detail-panel"><div style="padding:12px;color:var(--muted2);font-size:0.8rem;">Loading…</div></td>`;
+      xr.classList.add('open'); dr.classList.add('expanded');
+      try {
+        let det = S.detailCache.get(row.id);
+        if (!det) {
+          const r = await api(`/admin/users/${encodeURIComponent(row.id)}`);
+          const d = await r.json().catch(()=>({}));
+          if (!r.ok) throw new Error(d?.error||'Failed');
+          det = d; S.detailCache.set(row.id, det);
+        }
+        xr.innerHTML = `<td colspan="10" class="detail-panel">${renderUserDetail(det)}</td>`;
+      } catch(e) {
+        xr.innerHTML = `<td colspan="10" class="detail-panel"><div style="padding:12px;color:var(--red);font-size:0.8rem;">${esc(e.message)}</div></td>`;
+      }
+    });
+    tbody.appendChild(dr); tbody.appendChild(xr);
+  });
+}
+
+function renderUserDetail(det) {
+  const u = det.user||{};
+  const credits  = det.credits||[];
+  const payments = det.payments||[];
+  const reviews  = det.reviews||[];
+  const totalSpend = payments.filter(p=>p.status==='completed').reduce((s,p)=>s+Number(p.amount_aud||0),0);
+  const scored = reviews.map(r=>Number(parseFb(r.ai_feedback)?.score)).filter(Number.isFinite);
+  const avgScore = scored.length ? scored.reduce((a,b)=>a+b,0)/scored.length : null;
+  const comps = aggregateCompetencies(reviews.map(r=>parseFb(r.ai_feedback)).filter(Boolean));
+  const weakest = comps.slice().sort((a,b)=>a.avg-b.avg).slice(0,4);
+  return `<div class="detail-inner">
+    <div class="detail-box">
+      <div class="detail-box-hd">Account</div>
+      <div class="mini-metric-row">
+        <div class="mini-metric"><div>Spend</div><div>${fmtMoney(totalSpend)}</div></div>
+        <div class="mini-metric"><div>Reviews</div><div>${reviews.length}</div></div>
+        <div class="mini-metric"><div>Avg score</div><div>${avgScore ? avgScore.toFixed(1) : '—'}</div></div>
+      </div>
+      <div class="detail-box-row"><strong>${esc(u.email||'—')}</strong></div>
+      <div class="detail-box-row">Name: <strong>${esc(u.name||'—')}</strong></div>
+      <div class="detail-box-row">Tier: ${tierBadge(u.tier)}</div>
+      <div class="detail-box-row">Stripe: <span style="font-size:0.72rem;">${esc(u.stripe_customer_id||'—')}</span></div>
+      <div class="detail-box-row">Sub ID: <span style="font-size:0.72rem;">${esc(u.stripe_subscription_id||'—')}</span></div>
+      <div class="detail-box-row">Joined: ${esc(u.created_at?.slice(0,10)||'—')}</div>
+      <div class="detail-box-row">CASPer free today: ${u.usage_today?.casper?.used||0}/${u.usage_today?.casper?.limit||1}</div>
+      <div class="detail-box-row">GAMSAT free today: ${u.usage_today?.gamsat?.used||0}/${u.usage_today?.gamsat?.limit||1}</div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn blue" onclick="openCreditModal('${esc(u.id)}','${esc(u.email)}',${credits.find(c=>c.tool==='casper')?.balance||0},${credits.find(c=>c.tool==='gamsat')?.balance||0},${credits.find(c=>c.tool==='mmi_transcript')?.balance||0},${credits.find(c=>c.tool==='mmi_premium')?.balance||0})">💳 Credits</button>
+        <button class="btn amber" onclick="openTierModal('${esc(u.id)}','${esc(u.email)}','${esc(u.tier||'free')}')">⭐ Tier</button>
+        <button class="btn" onclick="composeToUser('${esc(u.email)}')">✉ Email</button>
+      </div>
+    </div>
+    <div class="detail-box">
+      <div class="detail-box-hd">Credits & Payments — ${fmtMoney(totalSpend)}</div>
+      <table class="subtbl"><thead><tr><th>Tool</th><th>Balance</th><th>Updated</th></tr></thead><tbody>
+        ${credits.length?credits.map(c=>`<tr><td>${esc(c.tool)}</td><td><strong>${c.balance}</strong></td><td>${relTime(c.updated_at)}</td></tr>`).join(''):'<tr><td colspan="3" style="color:var(--muted2);">No credits</td></tr>'}
+      </tbody></table>
+      <table class="subtbl" style="margin-top:10px;"><thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Time</th></tr></thead><tbody>
+        ${payments.length?payments.map(p=>`<tr><td>${esc(p.type)}</td><td><strong style="color:${p.status==='completed'?'var(--green)':'var(--muted)'}">${fmtMoney(p.amount_aud)}</strong></td><td>${esc(p.status)}</td><td>${relTime(p.created_at)}</td></tr>`).join(''):'<tr><td colspan="4" style="color:var(--muted2);">No payments</td></tr>'}
+      </tbody></table>
+    </div>
+    <div class="detail-box">
+      <div class="detail-box-hd">Recent Reviews (${reviews.length})</div>
+      ${weakest.length ? `<div class="competency-list" style="margin-bottom:10px;">${weakest.map(c=>competencyRow(c.name,c.avg)).join('')}</div>` : ''}
+      <table class="subtbl"><thead><tr><th>Tool</th><th>Score</th><th>Source</th><th>Time</th></tr></thead><tbody>
+        ${reviews.length?reviews.map(r=>{const fb=parseFb(r.ai_feedback);return`<tr><td>${toolBadge(r.tool)}</td><td>${fb?.score||'—'}</td><td>${esc(r.credit_source||'—')}</td><td>${relTime(r.created_at)}</td></tr>`;}).join(''):'<tr><td colspan="4" style="color:var(--muted2);">No reviews</td></tr>'}
+      </tbody></table>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// ENQUIRIES
+// ══════════════════════════════════════════════════════
+async function loadEnquiries() {
+  const limit = document.getElementById('enqLimit')?.value||'50';
+  try {
+    const res  = await api(`/admin/enquiries?limit=${limit}`);
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.enquiries = data.rows||[];
+    renderEnquiries();
+    updateDashboard();
+  } catch(e) { console.error('Enquiries load error:', e); }
+}
+
+function renderEnquiries() {
+  const q    = (document.getElementById('enqSearch')?.value||'').toLowerCase();
+  const type = document.getElementById('enqType')?.value||'';
+  const rows = S.enquiries.filter(e => {
+    const sm = !q||[e.name,e.email,e.notes,e.universities].some(v=>String(v||'').toLowerCase().includes(q));
+    const tm = !type||e.type===type;
+    return sm&&tm;
+  });
+  document.getElementById('enqStatus').textContent = `${rows.length} enquir${rows.length===1?'y':'ies'}`;
+  document.getElementById('enqEmpty').classList.toggle('hidden', rows.length>0);
+  const tbody = document.getElementById('enqBody');
+  tbody.innerHTML = '';
+  rows.forEach(row => {
+    const dt = fmtDate(row.created_at);
+    const dr = document.createElement('tr');
+    dr.className = 'data-row';
+    dr.innerHTML = `
+      <td><div class="expander">▼</div></td>
+      <td><div class="cell-main">${dt?.date||'—'}</div><div class="cell-sub">${dt?.time||''}</div></td>
+      <td><div class="cell-main">${esc(row.name||'—')}</div></td>
+      <td>
+        <div class="cell-main">${esc(row.email||'—')}</div>
+        <button class="btn blue" style="font-size:0.68rem;padding:2px 8px;margin-top:3px;" onclick="event.stopPropagation();composeToUser('${esc(row.email)}')">✉ Email</button>
+      </td>
+      <td><span class="enq-type">${esc(row.type||'General')}</span></td>
+      <td><div class="trunc">${esc(row.universities||'—')}</div></td>
+      <td>${esc(row.exam_date||'—')}</td>`;
+    const xr = document.createElement('tr');
+    xr.className = 'detail-row';
+    xr.innerHTML = `<td colspan="7" class="detail-panel"><div class="detail-inner" style="grid-template-columns:1fr 1fr;">
+      <div class="detail-box"><div class="detail-box-hd">Contact Details</div>
+        <div class="detail-box-row">Name: <strong>${esc(row.name||'—')}</strong></div>
+        <div class="detail-box-row">Email: <strong>${esc(row.email||'—')}</strong></div>
+        <div class="detail-box-row">Type: <strong>${esc(row.type||'—')}</strong></div>
+        <div class="detail-box-row">Universities: <strong>${esc(row.universities||'—')}</strong></div>
+        <div class="detail-box-row">Exam date: <strong>${esc(row.exam_date||'—')}</strong></div>
+        <div class="detail-box-row">Submitted: ${esc(row.created_at?.slice(0,16).replace('T',' ')||'—')}</div>
+        <div style="margin-top:8px;">
+          <button class="btn blue" onclick="composeToUser('${esc(row.email)}')">✉ Reply via Email</button>
+        </div>
+      </div>
+      <div class="detail-box"><div class="detail-box-hd">Notes</div>
+        <div class="detail-box-body">${esc(row.notes||'No notes provided.')}</div>
+      </div>
+    </div></td>`;
+    dr.addEventListener('click', () => { xr.classList.toggle('open'); dr.classList.toggle('expanded'); });
+    tbody.appendChild(dr); tbody.appendChild(xr);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// INBOX
+// ══════════════════════════════════════════════════════
+async function loadInbox() {
+  try {
+    const res  = await api('/admin/inbox');
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.conversations = data.conversations||[];
+    S.filteredConvs = [...S.conversations];
+    renderConvList();
+    updateDashboard();
+  } catch(e) {
+    document.getElementById('convItems').innerHTML = `<div class="conv-empty">⚠️ ${esc(e.message)}</div>`;
+  }
+}
+
+function renderConvList() {
+  const el = document.getElementById('convItems');
+  if (!S.filteredConvs.length) {
+    el.innerHTML = '<div class="conv-empty">No conversations yet.<br>Use + New to start one.</div>';
+    return;
+  }
+  el.innerHTML = S.filteredConvs.map(conv => {
+    const last    = conv.messages?.[conv.messages.length-1];
+    const preview = last?.body?.slice(0,55)||'—';
+    const time    = last ? relTime(last.created_at) : '';
+    const unread  = conv.messages?.some(m=>m.direction==='inbound'&&!m.read);
+    return `<div class="conv-item${S.activeConv===conv.email?' active':''}${unread?' unread':''}" onclick="openConv('${esc(conv.email)}')">
+      <div class="conv-name">${esc(conv.name||conv.email)}</div>
+      <div class="conv-preview">${esc(preview)}</div>
+      <div class="conv-time">${time}</div>
+    </div>`;
+  }).join('');
+  // Update badge
+  const unreadCt = S.conversations.filter(c=>c.messages?.some(m=>m.direction==='inbound'&&!m.read)).length;
+  const badge = document.getElementById('inboxBadge');
+  badge.textContent = unreadCt; badge.classList.toggle('show', unreadCt>0);
+}
+
+function filterConvs() {
+  const q = document.getElementById('convSearch').value.toLowerCase();
+  S.filteredConvs = q ? S.conversations.filter(c=>(c.email+(c.name||'')).toLowerCase().includes(q)) : [...S.conversations];
+  renderConvList();
+}
+
+function openConv(email) {
+  S.activeConv = email;
+  const conv = S.conversations.find(c=>c.email===email);
+  if (!conv) return;
+  renderConvList();
+  document.getElementById('threadEmpty').classList.add('hidden');
+  const tc = document.getElementById('threadContent');
+  tc.classList.remove('hidden'); tc.style.display='flex';
+  const name = conv.name||conv.email;
+  document.getElementById('threadAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('threadName').textContent = name;
+  document.getElementById('threadEmail').textContent = conv.email;
+  document.getElementById('composeTo').textContent = conv.email;
+  const lastIn = [...(conv.messages||[])].reverse().find(m=>m.direction==='inbound');
+  document.getElementById('composeSubj').value = lastIn?.subject ? (lastIn.subject.startsWith('Re:')?lastIn.subject:`Re: ${lastIn.subject}`) : '';
+  document.getElementById('composeBody').value = '';
+  renderMsgs(conv.messages||[]);
+  markRead();
+}
+
+function renderMsgs(msgs) {
+  const el = document.getElementById('threadMsgs');
+  if (!msgs.length) { el.innerHTML = '<div style="color:var(--muted2);font-size:0.82rem;text-align:center;padding:24px;">No messages yet.</div>'; return; }
+  el.innerHTML = msgs.map(m => {
+    const dir  = m.direction==='outbound'?'out':'in';
+    const from = dir==='out'?'You (dan@key2md.net)':(m.from_name||m.from_email||'Student');
+    return `<div class="msg ${dir}">
+      ${m.subject?`<div class="msg-subj">${esc(m.subject)}</div>`:''}
+      <div class="msg-body">${esc(m.body)}</div>
+      <div class="msg-meta">${esc(from)} · ${relTime(m.created_at)}</div>
+    </div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendReply() {
+  const to   = S.activeConv;
+  const subj = document.getElementById('composeSubj').value.trim();
+  const body = document.getElementById('composeBody').value.trim();
+  if (!to||!body) return;
+  const btn = document.getElementById('sendBtn');
+  const sp  = document.getElementById('sendSpinner');
+  btn.disabled=true; sp.style.display='inline-block';
+  try {
+    const res = await api('/admin/inbox/send', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({to,subject:subj||'Message from Key2MD',body}) });
+    const d   = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d?.error||'Send failed');
+    const conv = S.conversations.find(c=>c.email===to);
+    if (conv) { conv.messages=(conv.messages||[]); conv.messages.push({direction:'outbound',subject:subj,body,created_at:new Date().toISOString(),from_email:'dan@key2md.net'}); renderMsgs(conv.messages); }
+    document.getElementById('composeBody').value='';
+  } catch(e) { alert('Send failed: '+e.message); }
+  finally { btn.disabled=false; sp.style.display='none'; }
+}
+
+async function markRead() {
+  if (!S.activeConv) return;
+  const conv = S.conversations.find(c=>c.email===S.activeConv);
+  if (!conv) return;
+  conv.messages?.forEach(m=>{ if(m.direction==='inbound') m.read=true; });
+  renderConvList();
+  api('/admin/inbox/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contact_email:S.activeConv})}).catch(()=>{});
+}
+
+// ══════════════════════════════════════════════════════
+// NEW COMPOSE MODAL
+// ══════════════════════════════════════════════════════
+function openNewCompose() { document.getElementById('ncModal').classList.add('open'); document.getElementById('ncTo').focus(); }
+function closeNewCompose() { document.getElementById('ncModal').classList.remove('open'); document.getElementById('ncAlert').className='modal-alert'; }
+function composeToUser(email) {
+  document.getElementById('ncTo').value = email;
+  document.getElementById('ncSubject').value = '';
+  document.getElementById('ncBody').value = '';
+  openNewCompose();
+  nav('inbox');
+}
+async function sendNewEmail() {
+  const to   = document.getElementById('ncTo').value.trim();
+  const subj = document.getElementById('ncSubject').value.trim();
+  const body = document.getElementById('ncBody').value.trim();
+  const al   = document.getElementById('ncAlert');
+  const btn  = document.getElementById('ncSendBtn');
+  const sp   = document.getElementById('ncSpinner');
+  al.className='modal-alert';
+  if (!to||!body) { al.className='modal-alert err'; al.textContent='Recipient and message required.'; return; }
+  btn.disabled=true; sp.style.display='inline-block';
+  try {
+    const res = await api('/admin/inbox/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject:subj||'Message from Key2MD',body})});
+    const d   = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d?.error||'Send failed');
+    al.className='modal-alert ok'; al.textContent=`✓ Sent to ${to}`;
+    document.getElementById('ncTo').value=''; document.getElementById('ncSubject').value=''; document.getElementById('ncBody').value='';
+    await loadInbox();
+    setTimeout(closeNewCompose, 1800);
+  } catch(e) { al.className='modal-alert err'; al.textContent=e.message; }
+  finally { btn.disabled=false; sp.style.display='none'; }
+}
+
+// ══════════════════════════════════════════════════════
+// BROADCAST
+// ══════════════════════════════════════════════════════
+async function updateBcStats() {
+  document.getElementById('bcSubs').textContent = S.subscribers.length||'—';
+  document.getElementById('bcUsers').textContent = S.users.length||'—';
+}
+
+// ══════════════════════════════════════════════════════
+// BROADCAST
+// ══════════════════════════════════════════════════════
+let bcMode = 'rich'; // 'rich' | 'plain'
+
+function setBcMode(mode) {
+  bcMode = mode;
+  document.getElementById('bcModeRich').classList.toggle('active', mode==='rich');
+  document.getElementById('bcModePlain').classList.toggle('active', mode==='plain');
+  document.getElementById('bcModeHtml').classList.toggle('active', mode==='html');
+  document.getElementById('bcRichToolbar').style.display = mode==='rich' ? 'flex' : 'none';
+  document.getElementById('bcRichEditor').style.display  = mode==='rich' ? 'block' : 'none';
+  document.getElementById('bcPlainBody').style.display   = mode==='plain' ? 'block' : 'none';
+  document.getElementById('bcHtmlBody').style.display    = mode==='html' ? 'block' : 'none';
+  document.getElementById('bcHtmlHint').style.display    = mode==='html' ? 'block' : 'none';
+  updateBcPreview();
+}
+
+function bcFormat(cmd) {
+  document.getElementById('bcRichEditor').focus();
+  document.execCommand(cmd, false, null);
+  updateBcPreview();
+}
+
+function bcInsert(type) {
+  const ed = document.getElementById('bcRichEditor');
+  ed.focus();
+  const templates = {
+    h2:      '<h2 style="font-size:1.25rem;font-weight:800;color:#0a1628;margin:20px 0 8px;">Your heading here</h2>',
+    h3:      '<h3 style="font-size:1rem;font-weight:700;color:#0a1628;margin:16px 0 6px;">Your subheading here</h3>',
+    bullet:  '<ul style="padding-left:20px;line-height:1.9;color:#374151;"><li>First point</li><li>Second point</li><li>Third point</li></ul>',
+    divider: '<hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;">',
+    cta:     '<div style="text-align:center;margin:24px 0;"><a href="https://www.key2md.com/practice.html" style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;font-weight:800;padding:14px 32px;border-radius:50px;text-decoration:none;font-size:15px;">Button text →</a></div>',
+  };
+  document.execCommand('insertHTML', false, templates[type] || '');
+  updateBcPreview();
+}
+
+function getBcBodyHtml() {
+  if (bcMode === 'html') return document.getElementById('bcHtmlBody').value || '';
+  if (bcMode === 'plain') {
+    const txt = document.getElementById('bcPlainBody').value;
+    return `<div style="font-size:15px;line-height:1.8;color:#374151;white-space:pre-wrap;">${txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+  }
+  return document.getElementById('bcRichEditor').innerHTML || '';
+}
+
+function getBcBodyText() {
+  if (bcMode === 'html') return (document.getElementById('bcHtmlBody').value||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,500)+'…';
+  if (bcMode === 'plain') return document.getElementById('bcPlainBody').value;
+  return document.getElementById('bcRichEditor').innerText || '';
+}
+
+function buildBroadcastHtml(subject, bodyHtml) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#eef2f7;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:40px 16px;">
+<tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;">
+  <tr><td style="background:linear-gradient(160deg,#091525 0%,#0d2244 55%,#0a2e40 100%);border-radius:16px 16px 0 0;padding:28px 44px 24px;">
+    <span style="font-size:24px;font-weight:900;letter-spacing:-0.04em;color:#fff;">Key</span><span style="font-size:24px;font-weight:900;letter-spacing:-0.04em;color:#38bdf8;">2</span><span style="font-size:24px;font-weight:900;letter-spacing:-0.04em;color:#fff;">MD</span>
+  </td></tr>
+  <tr><td style="background:#fff;padding:36px 44px 28px;">
+    ${bodyHtml}
+    <hr style="border:none;border-top:1px solid #f1f5f9;margin:28px 0 22px;">
+    <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0;">— Dan<br><span style="color:#9ca3af;font-size:12px;">UniMelb MD · Key2MD founder</span></p>
+  </td></tr>
+  <tr><td style="background:#f8fafc;border-top:1px solid #e5e7eb;border-radius:0 0 16px 16px;padding:16px 44px;">
+    <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.7;text-align:center;">
+      Key2MD · <a href="https://www.key2md.com" style="color:#0ea5e9;text-decoration:none;">key2md.com</a> · You're receiving this as a Key2MD subscriber.<br>
+      Reply to this email — it comes straight to Dan.
+    </p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`;
+}
+
+function updateBcPreview() {
+  const subj  = document.getElementById('bcSubject')?.value || 'Subject line will appear here';
+  const prevS = document.getElementById('bcPreviewSubject');
+  const frame = document.getElementById('bcPreviewFrame');
+  if (prevS) prevS.textContent = subj || 'Subject line will appear here';
+  if (!frame) return;
+  const bodyHtml = getBcBodyHtml();
+  if (!bodyHtml.trim()) {
+    frame.srcdoc = "<p style='color:#aaa;text-align:center;padding:40px;font-family:sans-serif;'>Start typing to see a preview…</p>";
+    return;
+  }
+  // In raw HTML mode, preview the HTML exactly as-is (it's a complete email)
+  frame.srcdoc = bcMode === 'html' ? bodyHtml : buildBroadcastHtml(subj, bodyHtml);
+}
+
+function getBcListLabel(list) {
+  const labels = {
+    test:       'TEST — brittainmbbs@gmail.com only',
+    subscribers:'Newsletter subscribers',
+    users:      'All registered users',
+    both:       'Everyone (subscribers + users)',
+    paying:     'Paying customers only',
+    non_paying: 'Non-paying users',
+    pro:        'CASPer Pro subscribers',
+    mmi_pro:    'MMI Pro subscribers',
+    active:     'Active users (last 14 days)',
+    inactive:   'Inactive users (30+ days)',
+    no_reviews: 'Never reviewed',
+    mmi_users:  'MMI users',
+  };
+  return labels[list] || list;
+}
+
+async function sendBroadcast() {
+  const list  = document.getElementById('bcList').value;
+  const subj  = document.getElementById('bcSubject').value.trim();
+  const bodyHtml = getBcBodyHtml();
+  const bodyText = getBcBodyText().trim();
+  const al    = document.getElementById('bcAlert');
+  const btn   = document.getElementById('bcBtn');
+  al.className='alert';
+  if (!subj || !bodyText) { al.className='alert err'; al.textContent='Subject and message required.'; return; }
+  if (!confirm(`Send to: ${getBcListLabel(list)}\n\nSubject: ${subj}\n\nThis cannot be undone.`)) return;
+  btn.disabled=true; btn.textContent='Sending…';
+  // In raw HTML mode, send the HTML exactly as-is (don't wrap in template)
+  const finalHtml = bcMode === 'html' ? bodyHtml : buildBroadcastHtml(subj, bodyHtml);
+  try {
+    const res = await api('/admin/inbox/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({list, subject:subj, body:bodyText, html:finalHtml})});
+    const d   = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d?.error||'Failed');
+    al.className='alert ok'; al.textContent=`✓ Sent to ${d.sent||'?'} recipients`;
+    document.getElementById('bcSubject').value='';
+    document.getElementById('bcRichEditor').innerHTML='';
+    document.getElementById('bcPlainBody').value='';
+    updateBcPreview();
+  } catch(e) { al.className='alert err'; al.textContent=e.message; }
+  finally { btn.disabled=false; btn.textContent='Send Broadcast →'; }
+}
+
+// ══════════════════════════════════════════════════════
+// SUBSCRIBERS
+// ══════════════════════════════════════════════════════
+async function loadSubscribers() {
+  try {
+    const res  = await api('/admin/subscribers');
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.subscribers = data.rows||[];
+    renderSubscribers();
+    updateBcStats();
+  } catch(e) { console.error('Subscribers load error:', e); }
+}
+
+function renderSubscribers() {
+  const q = (document.getElementById('subSearch')?.value||'').toLowerCase();
+  const rows = q ? S.subscribers.filter(s=>s.email.toLowerCase().includes(q)) : S.subscribers;
+  document.getElementById('subStatus').textContent = `${rows.length} subscriber${rows.length===1?'':'s'}`;
+  document.getElementById('subBody').innerHTML = rows.length
+    ? rows.map(s=>`<tr>
+        <td>${esc(s.email)}</td>
+        <td>${fmtDate(s.created_at)?.date||'—'}</td>
+        <td><button class="btn blue" style="font-size:0.7rem;padding:4px 9px;" onclick="composeToUser('${esc(s.email)}')">✉ Email</button></td>
+      </tr>`).join('')
+    : '<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted2);">No subscribers yet.</td></tr>';
+}
+
+// ══════════════════════════════════════════════════════
+// MMI REVIEWS
+// ══════════════════════════════════════════════════════
+async function loadMMI() {
+  const limit = document.getElementById('mmiLimit')?.value||'50';
+  try {
+    const res  = await api(`/admin/mmi?limit=${limit}`);
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.mmiReviews = data.rows||[];
+    renderMMI();
+    updateDashboard();
+  } catch(e) { console.error('MMI load error:', e); }
+}
+
+function renderMMI() {
+  const q        = (document.getElementById('mmiSearch')?.value||'').toLowerCase();
+  const category = document.getElementById('mmiCategory')?.value||'';
+  const tier     = document.getElementById('mmiTier')?.value||'';
+  const scoreF   = document.getElementById('mmiScore')?.value||'';
+  const rows = S.mmiReviews.filter(r => {
+    const fb = parseMMIFb(r.ai_feedback_json);
+    const sm = !q || [r.email,r.name,r.station_category,r.station_scenario].some(v=>String(v||'').toLowerCase().includes(q));
+    const cm = !category || r.station_category===category;
+    const tm = !tier || r.tier===tier;
+    const sc = !scoreF || String(fb?.overall?.score||'')===scoreF;
+    return sm&&cm&&tm&&sc;
+  });
+  document.getElementById('mmiStatus').textContent = `${rows.length} MMI session${rows.length===1?'':'s'}`;
+  document.getElementById('mmiEmpty').classList.toggle('hidden', rows.length>0);
+  const tbody = document.getElementById('mmiBody');
+  tbody.innerHTML = '';
+  rows.forEach(row => {
+    const fb  = parseMMIFb(row.ai_feedback_json);
+    const dt  = fmtDate(row.created_at);
+    const dur = row.recording_duration_seconds ? `${Math.floor(row.recording_duration_seconds/60)}:${String(row.recording_duration_seconds%60).padStart(2,'0')}` : '—';
+    const score = fb?.overall?.score;
+    const scoreLabel = fb?.overall?.label||'';
+    const dr = document.createElement('tr');
+    dr.className = 'data-row';
+    dr.innerHTML = `
+      <td><div class="expander">▼</div></td>
+      <td><div class="cell-main">${dt?.date||'—'}</div><div class="cell-sub">${dt?.time||''}</div></td>
+      <td><div class="cell-main">${esc(row.email||'?')}</div><div class="cell-sub">${esc(row.name||'')}</div></td>
+      <td><span class="badge badge-default">${esc(row.station_category||'—')}</span></td>
+      <td><span class="badge badge-${row.tier==='premium'?'pro':'casper'}">${esc(row.tier||'—')}</span></td>
+      <td>${score ? `<div class="score-box ${mmiScoreC(score)}" title="${esc(scoreLabel)}">${score}</div>` : '<span style="color:var(--muted2);">—</span>'}</td>
+      <td>${esc(dur)}</td>
+      <td>${row.specialist_mode ? '<span class="badge badge-pro">Specialist</span>' : '<span style="color:var(--muted2);">—</span>'}</td>
+      <td><span style="color:var(--muted2);font-size:0.75rem;">${row.cogs_cents ? `¢${row.cogs_cents}` : '—'}</span></td>`;
+    const xr = document.createElement('tr');
+    xr.className = 'detail-row';
+    xr.innerHTML = `<td colspan="9" class="detail-panel"><div class="detail-inner">${renderMMIDetail(row, fb)}</div></td>`;
+    dr.addEventListener('click', () => { xr.classList.toggle('open'); dr.classList.toggle('expanded'); });
+    tbody.appendChild(dr); tbody.appendChild(xr);
+  });
+}
+
+function renderMMIDetail(row, fb) {
+  const prompts = (() => { try { return JSON.parse(row.prompts_json||'[]'); } catch { return []; } })();
+  const promptsHtml = prompts.map((p,i)=>`<div style="margin-bottom:6px;"><span style="font-size:0.63rem;font-weight:700;color:var(--muted);text-transform:uppercase;">Prompt ${i+1}</span><div class="detail-box-body">${esc(typeof p==='object'?p.prompt:p)}</div></div>`).join('');
+  const perPromptHtml = fb?.per_prompt?.map((pp,i) => {
+    const scores = pp.scores||{};
+    const scoreItems = Object.entries(scores).map(([k,v])=>`<span style="font-size:0.72rem;color:var(--muted);margin-right:8px;">${esc(k)}: <strong style="color:var(--text);">${v.score||'—'}</strong></span>`).join('');
+    return `<div style="margin-bottom:10px;padding:8px;background:rgba(0,0,0,0.1);border-radius:8px;">
+      <div style="font-size:0.63rem;font-weight:700;color:var(--blue);text-transform:uppercase;margin-bottom:4px;">Prompt ${i+1}</div>
+      <div style="margin-bottom:4px;">${scoreItems}</div>
+      ${pp.summary?`<div class="detail-box-body">${esc(pp.summary)}</div>`:''}
+      ${pp.specific_quote?`<div style="margin-top:4px;font-style:italic;color:var(--muted2);font-size:0.75rem;">"${esc(pp.specific_quote)}"</div>`:''}
+    </div>`;
+  }).join('')||'';
+  return `
+    <div class="detail-box">
+      <div class="detail-box-hd">Station</div>
+      <div class="detail-box-row">Category: <strong>${esc(row.station_category||'—')}</strong></div>
+      <div class="detail-box-row">Tier: <strong>${esc(row.tier||'—')}</strong></div>
+      <div class="detail-box-row">Specialist: <strong>${row.specialist_mode?'Yes':'No'}</strong></div>
+      <div style="margin-top:8px;">${promptsHtml}</div>
+    </div>
+    <div class="detail-box">
+      <div class="detail-box-hd">Transcript</div>
+      <div class="detail-box-body">${esc(row.transcript_text||'No transcript available.')}</div>
+    </div>
+    <div class="detail-box">
+      <div class="detail-box-hd">AI Feedback ${fb?.overall ? `— ${esc(fb.overall.label||'')} (${fb.overall.score}/5)` : ''}</div>
+      ${fb?.polished_auditor_detected ? `<div style="margin-bottom:8px;padding:6px 10px;border-radius:7px;background:var(--amber-dim);border:1px solid var(--amber-border);color:var(--amber);font-size:0.75rem;font-weight:700;">⚠️ Polished Auditor Trap detected</div>` : ''}
+      ${fb?.overall?.biggest_strength ? `<div style="margin-bottom:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--green);text-transform:uppercase;margin-bottom:3px;">Biggest Strength</div><div class="detail-box-body">${esc(fb.overall.biggest_strength)}</div></div>` : ''}
+      ${fb?.overall?.biggest_improvement ? `<div style="margin-bottom:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--red);text-transform:uppercase;margin-bottom:3px;">Biggest Improvement</div><div class="detail-box-body">${esc(fb.overall.biggest_improvement)}</div></div>` : ''}
+      ${perPromptHtml}
+    </div>`;
+}
+
+function parseMMIFb(raw) {
+  if (!raw) return null;
+  if (typeof raw==='object') return raw;
+  try { return JSON.parse(String(raw)); } catch { return null; }
+}
+
+function mmiScoreC(s) { const n=parseInt(s,10); return n>=4?'score-h':n>=3?'score-m':'score-l'; }
+
+// ══════════════════════════════════════════════════════
+// REVENUE
+// ══════════════════════════════════════════════════════
+async function loadRevenue() {
+  const limit = document.getElementById('rvLimit')?.value||'100';
+  try {
+    const res  = await api(`/admin/payments?limit=${limit}`);
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.revenue = data.rows||[];
+    renderRevenue();
+  } catch(e) { console.error('Revenue load error:', e); }
+}
+
+function renderRevenue() {
+  const q    = (document.getElementById('rvSearch')?.value||'').toLowerCase();
+  const type = document.getElementById('rvType')?.value||'';
+  const rows = S.revenue.filter(r => {
+    const sm = !q || [r.email,r.name,r.type].some(v=>String(v||'').toLowerCase().includes(q));
+    const tm = !type || String(r.type||'').includes(type);
+    return sm&&tm;
+  });
+
+  // Stats
+  const total   = S.revenue.reduce((s,r)=>s+Number(r.amount_aud||0),0);
+  const pro     = S.users.filter(u=>(u.tier||'').toLowerCase()==='pro').length;
+  const mrr     = pro * 40 * 4.33;
+  const creditR = S.revenue.filter(r=>String(r.type||'').includes('credit')).reduce((s,r)=>s+Number(r.amount_aud||0),0);
+  const aov     = S.revenue.length ? total/S.revenue.length : 0;
+  const monthR  = S.revenue.filter(r=>withinDays(r.created_at,30)).reduce((s,r)=>s+Number(r.amount_aud||0),0);
+
+  const setEl = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  setEl('rvTotal', `$${total.toFixed(2)}`);
+  setEl('rvMRR',   `$${mrr.toFixed(0)}/mo`);
+  setEl('rvCredits',`$${creditR.toFixed(2)}`);
+  setEl('rvSubs',  pro);
+  setEl('rvAOV',   `$${aov.toFixed(2)}`);
+  setEl('rvMonth', `$${monthR.toFixed(2)}`);
+
+  document.getElementById('rvStatus').textContent = `${rows.length} transaction${rows.length===1?'':'s'} · $${rows.reduce((s,r)=>s+Number(r.amount_aud||0),0).toFixed(2)} filtered total`;
+  document.getElementById('rvEmpty').classList.toggle('hidden', rows.length>0);
+
+  const tbody = document.getElementById('rvBody');
+  tbody.innerHTML = rows.length ? rows.map(r => {
+    const dt = fmtDate(r.created_at);
+    return `<tr class="data-row" onclick="composeToUser('${esc(r.email||'')}')">
+      <td><div class="cell-main">${dt?.date||'—'}</div><div class="cell-sub">${dt?.time||''}</div></td>
+      <td><div class="cell-main">${esc(r.email||'?')}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
+      <td><span class="badge badge-default" style="font-size:0.62rem;">${esc(r.type||'—')}</span></td>
+      <td><span class="spend has">$${Number(r.amount_aud||0).toFixed(2)}</span></td>
+      <td><span class="badge badge-yes">Completed</span></td>
+    </tr>`;
+  }).join('') : '';
+}
+
+// ══════════════════════════════════════════════════════
+// MONITORING
+// ══════════════════════════════════════════════════════
+async function loadMonitoring() {
+  try {
+    const res  = await api('/admin/monitoring');
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error||'Failed');
+    S.monitoring = data;
+    renderMonitoring();
+    updateDashboard();
+  } catch(e) { console.error('Monitoring load error:', e); }
+}
+
+function renderMonitoring() {
+  const m = S.monitoring;
+  if (!m) return;
+
+  const stats = m.mmi_stats || {};
+  const setEl = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+
+  setEl('mFoundingCount', m.founding_count||0);
+  setEl('mFoundingSub',   `${m.slots_remaining} slot${m.slots_remaining===1?'':'s'} remaining`);
+  setEl('mTotalReviews',  stats.total_reviews||0);
+  setEl('mReviewSplit',   `T1: ${stats.transcript_count||0} · T2: ${stats.premium_count||0}`);
+  setEl('mAvgCogs',       stats.avg_cogs_cents ? `¢${stats.avg_cogs_cents}` : '—');
+  setEl('mAvgCogsSub',    `T1: ¢${stats.avg_cogs_transcript||'—'} · T2: ¢${stats.avg_cogs_premium||'—'}`);
+  setEl('mTotalCogs',     stats.total_cogs_cents ? `$${(stats.total_cogs_cents/100).toFixed(2)}` : '—');
+  setEl('mParseFails',    m.parse_failures?.length||0);
+  setEl('mWhisperFails',  m.whisper_failures?.length||0);
+
+  // COGS breakdown card
+  const cogsEl = document.getElementById('mCogsBreakdown');
+  if (cogsEl) cogsEl.innerHTML = `
+    <div class="mini-metric-row" style="grid-template-columns:1fr 1fr;">
+      <div class="mini-metric"><div>Transcript avg</div><div>¢${stats.avg_cogs_transcript||'—'}</div></div>
+      <div class="mini-metric"><div>Premium avg</div><div>¢${stats.avg_cogs_premium||'—'}</div></div>
+      <div class="mini-metric"><div>Max single review</div><div>¢${stats.max_cogs_cents||'—'}</div></div>
+      <div class="mini-metric"><div>Total all-time</div><div>$${stats.total_cogs_cents?(stats.total_cogs_cents/100).toFixed(2):'—'}</div></div>
+    </div>
+    ${stats.avg_cogs_cents > 150 ? `<div style="margin-top:8px;padding:8px 10px;background:var(--red-dim);border:1px solid var(--red-border);border-radius:7px;color:var(--red);font-size:0.78rem;font-weight:600;">⚠ Avg COGS above ¢150 — consider reviewing pricing</div>` : ''}`;
+
+  // Founding detail card
+  const foundingEl = document.getElementById('mFoundingDetail');
+  if (foundingEl) {
+    const pct = Math.round((m.founding_count/15)*100);
+    foundingEl.innerHTML = `
+      <div style="font-size:2rem;font-weight:800;color:var(--purple);margin-bottom:6px;">${m.founding_count} <span style="font-size:1rem;color:var(--muted);">/ 15</span></div>
+      <div style="height:8px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:99px;transition:width 0.4s;"></div>
+      </div>
+      <div style="font-size:0.8rem;color:var(--muted);">${m.slots_remaining} slot${m.slots_remaining===1?'':'s'} remaining · ${pct}% claimed</div>`;
+  }
+
+  // ── Profit-per-user table ──────────────────────────────────────────
+  // Cross-references S.revenue (payments) with m.profit_by_user (COGS per user from monitoring endpoint)
+  const profitData = m.profit_by_user || [];
+  const profitBody = document.getElementById('mProfitBody');
+  const profitEmpty = document.getElementById('mProfitEmpty');
+  const profitCount = document.getElementById('mProfitCount');
+  const profitTotal = document.getElementById('mProfitTotal');
+  if (profitBody) {
+    const sorted = [...profitData].sort((a,b) => b.profit_cents - a.profit_cents);
+    const totalProfit = sorted.reduce((s,r) => s + (r.profit_cents||0), 0);
+    if (profitCount) profitCount.textContent = sorted.length;
+    if (profitTotal) profitTotal.textContent = `$${(totalProfit/100).toFixed(2)}`;
+    if (profitEmpty) profitEmpty.classList.toggle('hidden', sorted.length > 0);
+    profitBody.innerHTML = sorted.map(r => {
+      const rev    = r.revenue_cents || 0;
+      const cogs   = r.cogs_cents || 0;
+      const profit = r.profit_cents || 0;
+      const margin = rev > 0 ? Math.round((profit/rev)*100) : 0;
+      const avgCogs = r.review_count > 0 ? Math.round(cogs/r.review_count) : 0;
+      const marginColor = margin >= 70 ? 'var(--green)' : margin >= 40 ? 'var(--amber)' : 'var(--red)';
+      const profitColor = profit >= 0 ? 'var(--green)' : 'var(--red)';
+      const tierBadge = r.mmi_pro_tier
+        ? `<span class="badge badge-pro" style="font-size:0.62rem;">${esc(r.mmi_pro_tier)}</span>`
+        : r.founding_member
+          ? `<span class="badge" style="background:var(--purple-dim);color:var(--purple);font-size:0.62rem;">founding</span>`
+          : `<span class="badge badge-default" style="font-size:0.62rem;">credits</span>`;
+      return `<tr class="data-row" onclick="composeToUser('${esc(r.email||'')}')">
+        <td><div class="cell-main">${esc(r.email||'—')}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
+        <td><span class="spend has">$${(rev/100).toFixed(2)}</span></td>
+        <td><span style="color:var(--red);font-size:0.82rem;font-weight:600;">¢${cogs}</span></td>
+        <td><span style="color:${profitColor};font-weight:700;">$${(profit/100).toFixed(2)}</span></td>
+        <td><span style="color:${marginColor};font-weight:600;">${margin}%</span></td>
+        <td style="text-align:center;">${r.review_count||0}</td>
+        <td style="text-align:center;color:var(--muted);">¢${avgCogs}</td>
+        <td>${tierBadge}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Parse failures table
+  const parseCount = document.getElementById('mParseCount');
+  if(parseCount) parseCount.textContent = m.parse_failures?.length||0;
+  document.getElementById('mParseEmpty')?.classList.toggle('hidden', (m.parse_failures?.length||0)>0);
+  const parseBody = document.getElementById('mParseBody');
+  if(parseBody) parseBody.innerHTML = (m.parse_failures||[]).map(f=>`<tr class="data-row">
+    <td><div class="cell-main">${fmtDate(f.created_at)?.date||'—'}</div><div class="cell-sub">${fmtDate(f.created_at)?.time||''}</div></td>
+    <td><div class="trunc">${esc(f.user_id||'—')}</div></td>
+    <td><span class="badge badge-${f.tier==='premium'?'pro':'casper'}">${esc(f.tier||'—')}</span></td>
+    <td><div class="trunc" style="max-width:320px;">${esc(f.error_msg||'—')}</div></td>
+  </tr>`).join('');
+
+  // Whisper failures table
+  const whisperCount = document.getElementById('mWhisperCount');
+  if(whisperCount) whisperCount.textContent = m.whisper_failures?.length||0;
+  document.getElementById('mWhisperEmpty')?.classList.toggle('hidden', (m.whisper_failures?.length||0)>0);
+  const whisperBody = document.getElementById('mWhisperBody');
+  if(whisperBody) whisperBody.innerHTML = (m.whisper_failures||[]).map(f=>`<tr class="data-row">
+    <td><div class="cell-main">${fmtDate(f.created_at)?.date||'—'}</div><div class="cell-sub">${fmtDate(f.created_at)?.time||''}</div></td>
+    <td><div class="trunc">${esc(f.user_id||'—')}</div></td>
+    <td>${f.duration_sec ? `${Math.floor(f.duration_sec/60)}m ${f.duration_sec%60}s` : '—'}</td>
+    <td><div class="trunc" style="max-width:320px;">${esc(f.error_msg||'—')}</div></td>
+  </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// CREDIT MODAL
+// ══════════════════════════════════════════════════════
+function openCreditModal(id,email,cb,gb,mmiT,mmiP) {
+  S.creditModalUserId=id;
+  document.getElementById('cmEmail').textContent=email;
+  document.getElementById('cmCasper').textContent=cb||0;
+  document.getElementById('cmGamsat').textContent=gb||0;
+  document.getElementById('cmMMITranscript').textContent=mmiT||0;
+  document.getElementById('cmMMIPremium').textContent=mmiP||0;
+  document.getElementById('cmAmount').value='';
+  document.getElementById('cmAlert').className='modal-alert';
+  document.getElementById('creditModal').classList.add('open');
+}
+function closeCreditModal() { document.getElementById('creditModal').classList.remove('open'); }
+async function saveCreditChange() {
+  const id = S.creditModalUserId;
+  const tool = document.getElementById('cmTool').value;
+  const amt  = parseInt(document.getElementById('cmAmount').value,10);
+  const al   = document.getElementById('cmAlert');
+  al.className='modal-alert';
+  if (!id||isNaN(amt)||amt===0) { al.className='modal-alert err'; al.textContent='Enter a non-zero amount.'; return; }
+  document.getElementById('cmSave').disabled=true;
+  try {
+    const res = await api('/admin/users/credits',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:id,tool,amount:amt})});
+    const d   = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d?.error||'Failed');
+    al.className='modal-alert ok'; al.textContent=`✓ ${amt>0?'Added':'Removed'} ${Math.abs(amt)} ${tool} credit${Math.abs(amt)===1?'':'s'}.`;
+    S.detailCache.clear(); await loadUsers();
+  } catch(e) { al.className='modal-alert err'; al.textContent=e.message; }
+  finally { document.getElementById('cmSave').disabled=false; }
+}
+
+// ══════════════════════════════════════════════════════
+// TIER MODAL
+// ══════════════════════════════════════════════════════
+function openTierModal(id,email,tier) {
+  S.tierModalUserId=id;
+  document.getElementById('tmEmail').textContent=email;
+  document.getElementById('tmTier').value=tier;
+  document.getElementById('tmAlert').className='modal-alert';
+  document.getElementById('tierModal').classList.add('open');
+}
+function closeTierModal() { document.getElementById('tierModal').classList.remove('open'); }
+async function saveTierChange() {
+  const id   = S.tierModalUserId;
+  const tier = document.getElementById('tmTier').value;
+  const al   = document.getElementById('tmAlert');
+  al.className='modal-alert';
+  document.getElementById('tmSave').disabled=true;
+  try {
+    const res = await api('/admin/users/tier',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:id,tier})});
+    const d   = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d?.error||'Failed');
+    al.className='modal-alert ok'; al.textContent=`✓ Tier updated to ${tier}`;
+    S.detailCache.clear(); await loadUsers();
+  } catch(e) { al.className='modal-alert err'; al.textContent=e.message; }
+  finally { document.getElementById('tmSave').disabled=false; }
+}
+
+// ══════════════════════════════════════════════════════
+// CSV EXPORT
+// ══════════════════════════════════════════════════════
+async function exportCsv(type) {
+  const limit = type==='reviews'?document.getElementById('revLimit').value:document.getElementById('usrLimit').value;
+  try {
+    const res = await api(`/admin/${type}.csv?limit=${limit}`);
+    if (!res.ok) throw new Error('Export failed');
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${type}-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  } catch(e) { alert(e.message); }
+}
+
+// ══════════════════════════════════════════════════════
+// MODAL BACKDROPS
+// ══════════════════════════════════════════════════════
+document.getElementById('creditModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCreditModal();});
+document.getElementById('tierModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeTierModal();});
+document.getElementById('ncModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeNewCompose();});
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+function esc(v) { return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(iso) {
+  if (!iso) return null;
+  const d = new Date(iso); if(isNaN(d)) return {date:iso,time:''};
+  return {date:d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}),time:d.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})};
+}
+function relTime(iso) {
+  if (!iso) return '—';
+  const diff=(Date.now()-new Date(iso))/1000;
+  if(diff<60) return 'just now';
+  if(diff<3600) return `${Math.floor(diff/60)}m ago`;
+  if(diff<86400) return `${Math.floor(diff/3600)}h ago`;
+  if(diff<604800) return `${Math.floor(diff/86400)}d ago`;
+  return fmtDate(iso)?.date||'—';
+}
+function fmtMoney(v) { return `$${Number(v||0).toFixed(2)}`; }
+function toolBadge(t) { const c=String(t||'').toLowerCase(); return `<span class="badge badge-${c==='casper'?'casper':c==='gamsat'?'gamsat':c==='mmi'?'mmi':'default'}">${esc(t||'—')}</span>`; }
+function tierBadge(t) { const c=String(t||'').toLowerCase(); return `<span class="badge badge-${c==='pro'?'pro':c==='paid'||c==='premium'?'paid':'free'}">${esc(t||'free')}</span>`; }
+function yesNo(v) { return `<span class="badge badge-${v?'yes':'no'}">${v?'Yes':'No'}</span>`; }
+function scoreC(s) { const n=parseInt(s,10); return n>=7?'score-h':n>=5?'score-m':'score-l'; }
+function parseFb(raw) {
+  if(!raw) return null;
+  if(typeof raw==='object') return raw;
+  const text = String(raw).trim();
+  try { return JSON.parse(text); } catch {}
+  const match = text.match(/\{[\s\S]*\}/);
+  if (match) { try { return JSON.parse(match[0]); } catch {} }
+  const scoreMatch = text.match(/(?:score|mark)\D{0,12}(\d+(?:\.\d+)?)\s*(?:\/\s*10)?/i);
+  return scoreMatch ? { score:Number(scoreMatch[1]), summary:text } : null;
+}
+function localDay(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d)) return '';
+  return d.toLocaleDateString('en-CA',{timeZone:'Australia/Melbourne'});
+}
+function isToday(iso) { return localDay(iso)===localDay(new Date().toISOString()); }
+function withinDays(iso, days) {
+  if (!iso) return false;
+  const t = new Date(iso).getTime();
+  return Number.isFinite(t) && (Date.now()-t) <= days*86400000;
+}
+function getCompetencies(fb) {
+  if (!fb) return [];
+  const raw = Array.isArray(fb.competencies) ? fb.competencies : Array.isArray(fb.competency_breakdown) ? fb.competency_breakdown : [];
+  return raw.map(c=>({
+    name:String(c.name||c.competency||c.label||'Competency').trim(),
+    score:Number(c.score ?? c.mark ?? c.rating),
+    note:String(c.note||c.feedback||c.evidence||'').trim()
+  })).filter(c=>c.name && Number.isFinite(c.score));
+}
+function aggregateCompetencies(feedbacks) {
+  const map = new Map();
+  feedbacks.forEach(fb => getCompetencies(fb).forEach(c => {
+    const key = c.name.toLowerCase();
+    if (!map.has(key)) map.set(key,{name:c.name,total:0,count:0});
+    const row = map.get(key);
+    row.total += c.score; row.count += 1;
+  }));
+  return [...map.values()].map(c=>({name:c.name,avg:c.total/c.count,count:c.count}));
+}
+function competencyRow(name, score) {
+  const pct = Math.max(0, Math.min(100, (Number(score)||0)*10));
+  return `<div class="competency-row">
+    <div><div class="competency-name">${esc(name)}</div><div class="competency-bar"><span style="width:${pct}%"></span></div></div>
+    <div class="competency-score">${Number(score).toFixed(1)}</div>
+  </div>`;
+}
+function renderReviewSignals(fb) {
+  const comps = getCompetencies(fb);
+  if (!comps.length) return '<span style="color:var(--muted2);">—</span>';
+  const sorted = comps.slice().sort((a,b)=>a.score-b.score);
+  const low = sorted[0];
+  const high = sorted[sorted.length-1];
+  return `<div class="signal-stack">
+    <span class="signal-chip low">Low: ${esc(shortCompetency(low.name))} ${low.score}</span>
+    <span class="signal-chip high">High: ${esc(shortCompetency(high.name))} ${high.score}</span>
+  </div>`;
+}
+function shortCompetency(name) {
+  return String(name||'').replace('Problem Solving','Problem').replace('Self-Awareness','Self-aware');
+}
+function parseQ(text) {
+  if (!text) return null;
+  const raw=String(text).trim();
+  const sm=raw.match(/SCENARIO:\s*([\s\S]*?)(?=PROMPT\s*1:|$)/i);
+  const p1=raw.match(/PROMPT\s*1:\s*([\s\S]*?)(?=PROMPT\s*2:|$)/i);
+  const p2=raw.match(/PROMPT\s*2:\s*([\s\S]*?)$/i);
+  if(sm||p1||p2) return {scenario:sm?sm[1].trim():'',prompt1:p1?p1[1].trim():'',prompt2:p2?p2[1].trim():''};
+  return null;
+}
+function renderQBox(qt) {
+  const p=parseQ(qt);
+  if(!p) return `<div class="detail-box-body">${esc(qt||'—')}</div>`;
+  return `${p.scenario?`<div><div style="font-size:0.63rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Scenario</div><div class="detail-box-body">${esc(p.scenario)}</div></div>`:''}${p.prompt1?`<div style="margin-top:8px;"><div style="font-size:0.63rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Prompt 1</div><div class="detail-box-body">${esc(p.prompt1)}</div></div>`:''}${p.prompt2?`<div style="margin-top:8px;"><div style="font-size:0.63rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Prompt 2</div><div class="detail-box-body">${esc(p.prompt2)}</div></div>`:''}`;
+}
+function renderFbBox(raw) {
+  const fb=parseFb(raw);
+  if(!fb) return `<div class="detail-box-body">${esc(String(raw||'—'))}</div>`;
+  const s=fb.score; const n=s?parseInt(s,10):null;
+  const q=n?n>=8?'Q4 — Excellent':n>=6?'Q3 — Good':n>=4?'Q2 — Developing':'Q1 — Needs Work':null;
+  const comps = getCompetencies(fb);
+  return `${s?`<div class="detail-box-body" style="margin-bottom:8px;"><strong>${esc(s)}/10</strong> ${q?`<span class="badge badge-default" style="margin-left:4px;">${q}</span>`:''}</div>`:''}
+    ${comps.length?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Competencies</div><div class="competency-list">${comps.map(c=>competencyRow(c.name,c.score)).join('')}</div></div>`:''}
+    ${fb.strengths?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Strengths</div><div class="detail-box-body">${esc(fb.strengths)}</div></div>`:''}
+    ${fb.improvements?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Improvements</div><div class="detail-box-body">${esc(fb.improvements)}</div></div>`:''}
+    ${fb.empathy?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Empathy</div><div class="detail-box-body">${esc(fb.empathy)}</div></div>`:''}
+    ${fb.missed&&fb.missed!=='None'?`<div style="margin-top:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Missed</div><div class="detail-box-body">${esc(fb.missed)}</div></div>`:''}
+    ${fb.summary&&!fb.strengths?`<div style="margin-top:6px;"><div class="detail-box-body">${esc(fb.summary)}</div></div>`:''}`;
+}
+</script>
+</body>
+</html>

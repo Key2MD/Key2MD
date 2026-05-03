@@ -310,9 +310,10 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <!-- Mode Toggle -->
     <div class="mode-toggle-wrap">
       <div class="mode-toggle-label">Practice Mode</div>
-      <div class="mode-pill-row">
+      <div class="mode-pill-row" style="grid-template-columns:1fr 1fr 1fr;">
         <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper')">💬 CASPer</button>
         <button class="mode-pill" id="modeMMI" onclick="setMode('mmi')">🎤 MMI</button>
+        <button class="mode-pill" id="modeCircuit" onclick="MMICircuit.activateCircuitMode()" style="font-size:0.78rem;">🏃 Circuit</button>
       </div>
     </div>
 
@@ -957,6 +958,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 <script src="mmi-recording.js"></script>
 <script src="mmi-engine.js"></script>
 <script src="mmi-feedback-render.js"></script>
+<script src="mmi-circuit.js"></script>
 <script>
 // ══ MMI CONFIG & STATE ══════════════════════════════════════════════
 const MMI_PRESETS = {
@@ -3943,6 +3945,13 @@ document.addEventListener('DOMContentLoaded', function(){
 .pack-price { margin-left:8px; color:rgba(255,255,255,0.6); font-weight:400; }
 .pack-save { margin-left:8px; font-size:0.72rem; font-weight:700; color:#22c55e; background:rgba(34,197,94,0.15); padding:2px 8px; border-radius:50px; }
 .pack-rec { font-size:0.68rem; font-weight:700; color:#fbbf24; background:rgba(245,158,11,0.15); padding:3px 10px; border-radius:50px; white-space:nowrap; }
+
+/* ── Circuit Mode ── */
+.mode-pill.active-circuit { border-color:#7c3aed; background:rgba(124,58,237,0.1); color:#7c3aed; }
+.mode-pill.active-circuit:hover { border-color:#7c3aed; color:#7c3aed; }
+.circuit-debrief-step { font-size:0.75rem; font-weight:600; padding:5px 12px; border-radius:50px; border:1px solid var(--gray200); color:var(--gray400); background:#fff; transition:all 0.3s; }
+.circuit-debrief-step.active { color:#7c3aed; border-color:rgba(124,58,237,0.3); background:rgba(124,58,237,0.06); }
+@keyframes mmi-spin { to { transform:rotate(360deg); } }
 </style>
 
   <div style="display:none;" aria-hidden="true">
