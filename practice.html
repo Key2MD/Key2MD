@@ -354,19 +354,19 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <div class="preset-grid" id="presetGrid">
           <button class="preset-card active" data-preset="quickfire" onclick="selectMMIPreset('quickfire')">
             <div class="preset-name">Quickfire</div>
-            <div class="preset-detail">45s read · 4 prompts · 1 min each</div>
+            <div class="preset-detail">45s read · 4 Qs · 15s read + 60s each</div>
           </button>
           <button class="preset-card" data-preset="standard" onclick="selectMMIPreset('standard')">
             <div class="preset-name">Standard</div>
-            <div class="preset-detail">2 min read · 3 prompts · 5 min</div>
+            <div class="preset-detail">2 min read all · 3 Qs · 5 min speaking</div>
           </button>
           <button class="preset-card" data-preset="extended" onclick="selectMMIPreset('extended')">
             <div class="preset-name">Extended</div>
-            <div class="preset-detail">2 min read · 4 sequential · 8 min</div>
+            <div class="preset-detail">2 min read · advance Qs freely · 8 min</div>
           </button>
           <button class="preset-card" data-preset="random" onclick="selectMMIPreset('random')">
             <div class="preset-name">Random Probe</div>
-            <div class="preset-detail">2 min + 1st Q · 7 min · random follow-ups</div>
+            <div class="preset-detail">2 min · hidden timer · random follow-ups</div>
           </button>
           <button class="preset-card" data-preset="custom" onclick="selectMMIPreset('custom')" style="grid-column:1/-1;">
             <div class="preset-name">Custom</div>
@@ -394,6 +394,18 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           </label>
         </div>
         <div style="font-size:0.7rem;color:var(--gray400);line-height:1.4;">Enable to simulate universities that reveal questions only when answering begins.</div>
+      </div>
+
+      <!-- Quickfire only: reveal all questions from start -->
+      <div id="quickfireRevealAllRow" style="display:none;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.15);border-radius:8px;margin-top:8px;">
+        <div>
+          <div style="font-size:0.8rem;font-weight:600;color:var(--gray800);">Show all questions from the start</div>
+          <div style="font-size:0.68rem;color:var(--gray400);margin-top:2px;">Still timed (15s read / 60s answer each). Helps you see the full picture while being guided through timing.</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="mmiRevealAllToggle">
+          <span class="toggle-slider"></span>
+        </label>
       </div>
 
       <!-- Specialist mode -->
@@ -677,8 +689,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           </div>
         </div>
         <div class="webcam-controls" id="recordingControls">
-          <span class="webcam-timer-display" id="webcamTimerDisp">0:00</span>
-          <span style="font-size:0.62rem;color:rgba(255,255,255,0.35);margin-right:auto;">elapsed</span>
           <button class="btn-webcam-restart" id="btnRestartRecording" disabled title="Re-record (erases current recording)" onclick="confirmRestartRecording()">&#8635; Restart</button>
           <button class="btn-webcam-dl" id="btnDownloadVideo" disabled title="Save recording to your device">&#11015; Save</button>
         </div>
@@ -691,7 +701,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
             <span id="pbDuration" style="font-size:0.7rem;color:rgba(255,255,255,0.4);font-variant-numeric:tabular-nums;min-width:32px;text-align:right;">--:--</span>
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
-            <button onclick="togglePlayback()" id="pbPlayBtn" style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:50px;background:rgba(14,165,233,0.15);color:var(--teal2);border:1px solid rgba(14,165,233,0.3);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;">&#9654; Play</button>
+            <button onclick="togglePlayback()" id="pbPlayBtn" style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:50px;background:rgba(14,165,233,0.15);color:var(--teal2);border:1px solid rgba(14,165,233,0.3);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;">▶ Play</button>
             <button onclick="restartPlayback()" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:50px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.1);font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;">&#9198; Rewind</button>
             <div style="flex:1;"></div>
             <button class="btn-webcam-dl" id="btnDownloadVideo2" disabled title="Save video to device">&#11015; Save video</button>
@@ -747,6 +757,11 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <p class="scenario-text" id="scenarioText" style="display:none;"></p>
       </div>
       <div class="prompts-area" id="promptsArea">
+        <div id="mmiCentralTimer" style="display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 20px;background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.18);border-radius:12px;margin-bottom:14px;font-family:inherit;">
+          <span id="mmiCtLabel" style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--teal3);min-width:80px;"></span>
+          <span id="mmiCtNum" style="font-size:1.9rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;text-align:center;flex:1;"></span>
+          <span style="font-size:0.68rem;color:var(--gray400);font-weight:500;min-width:60px;text-align:right;">remaining</span>
+        </div>
         <div class="prompts-locked" id="promptsLocked">
           <div class="lock-icon">🔒</div>Prompts revealed after reading time
         </div>
@@ -940,14 +955,15 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
 <script src="practice-stations.js"></script>
 <script src="mmi-recording.js"></script>
+<script src="mmi-engine.js"></script>
 <script src="mmi-feedback-render.js"></script>
 <script>
 // ══ MMI CONFIG & STATE ══════════════════════════════════════════════
 const MMI_PRESETS = {
-  quickfire: { readingTime:45,  recordingTime:240, promptCount:4, revealMode:'sequential' },
+  quickfire: { readingTime:45,  recordingTime:300, promptCount:4, revealMode:'quickfire',            perPromptRead:15, perPromptAnswer:60 },
   standard:  { readingTime:120, recordingTime:300, promptCount:3, revealMode:'all_at_once' },
-  extended:  { readingTime:120, recordingTime:480, promptCount:4, revealMode:'sequential' },
-  random:    { readingTime:120, recordingTime:420, promptCount:3, revealMode:'sequential' },
+  extended:  { readingTime:120, recordingTime:480, promptCount:4, revealMode:'extended_sequential' },
+  random:    { readingTime:120, recordingTime:420, promptCount:3, revealMode:'random',               followUpMin:1, followUpMax:2 },
   custom:    { readingTime:120, recordingTime:300, promptCount:2, revealMode:'all_at_once' },
 };
 let mmiActivePreset = 'quickfire';
@@ -961,6 +977,14 @@ let mmiRecordingInterval = null;
 let mmiRecordingStartedAt = null;
 let mmiCurrentPrompts = [];
 let mmiRecordingDurationSec = 0;
+// Per-format engine state (managed by mmi-engine.js)
+let mmiQuickfireCurrentPrompt = 0;
+let mmiExtendedPromptsShown = 0;
+let mmiRandomFollowUpsGiven = 0;
+let mmiRandomRevealTimes = [];
+let mmiRandomTimerInterval = null;
+let mmiRandomWarnShown = false;
+let mmiCentralTimerInterval = null;
 
 function selectMMIPreset(preset) {
   mmiActivePreset = preset;
@@ -971,6 +995,9 @@ function selectMMIPreset(preset) {
   if(cc) cc.classList.toggle('visible', preset === 'custom');
   const p = MMI_PRESETS[preset];
   if(p && preset !== 'custom') { mmiReadingTime = p.readingTime; mmiAnswerTime = p.recordingTime; }
+  // Show/hide quickfire reveal-all option
+  const qfRow = document.getElementById('quickfireRevealAllRow');
+  if(qfRow) qfRow.style.display = preset === 'quickfire' ? 'flex' : 'none';
 }
 
 function toggleSpecialistMode() {
@@ -1126,6 +1153,7 @@ function mmiResetForRestart() {
   const bnr = document.getElementById('btnRevealNext');
   if(bnr) bnr.style.display = 'none';
   MMIFeedbackRender.clear(document.getElementById('aiFeedbackWrapMMI'));
+  if(typeof mmiEngineReset==='function') mmiEngineReset();
 }
 
 function mmiRevealNextPrompt() {
@@ -1328,6 +1356,14 @@ const MODE_CASPER = 'casper';
 const MODE_MMI = 'mmi';
 let currentMode = MODE_CASPER;
 let pool=[],currentIdx=0,completed=0,sessionPool=[];
+// Expose these globals so mmi-engine.js can read them
+window.pool = pool; // updated by reference won't work for primitives — engine reads window.currentIdx
+Object.defineProperty(window,'currentIdx',{get:()=>currentIdx,set:(v)=>{currentIdx=v;},configurable:true});
+Object.defineProperty(window,'pool',{get:()=>pool,set:(v)=>{pool=v;},configurable:true});
+Object.defineProperty(window,'webcamReady',{get:()=>webcamReady,set:(v)=>{webcamReady=v;},configurable:true});
+Object.defineProperty(window,'webcamActive',{get:()=>webcamActive,set:(v)=>{webcamActive=v;},configurable:true});
+Object.defineProperty(window,'mmiPromptRevealTimestamps',{get:()=>mmiPromptRevealTimestamps,set:(v)=>{mmiPromptRevealTimestamps=v;},configurable:true});
+Object.defineProperty(window,'mmiRecordingStartedAt',{get:()=>mmiRecordingStartedAt,set:(v)=>{mmiRecordingStartedAt=v;},configurable:true});
 let timerInterval=null,phase='idle',sessionActive=false;
 let selectedCategory='All',readingTime=60,writingTime=210;
 let mmiReadingTime=120,mmiAnswerTime=300;
@@ -1742,15 +1778,7 @@ function startRecording(){
   $('webcamPlayback').style.display='none';
   $('webcamLive').style.display='block';
 
-  // Elapsed timer
-  const wcd=$('webcamTimerDisp');
-  if(wcd){wcd.textContent='0:00';}
-  let elapsedSec=0;
-  if(window._elapsedInterval) clearInterval(window._elapsedInterval);
-  window._elapsedInterval=setInterval(()=>{
-    elapsedSec++;
-    if(wcd) wcd.textContent=fmt(elapsedSec);
-  },1000);
+  // (elapsed timer removed — central question timer near prompts replaces this)
 
   // ── Video recorder (full quality, local playback only) ──
   const opts=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
@@ -1843,16 +1871,16 @@ function initPlaybackUI(vid) {
   // Update progress on timeupdate
   vid.addEventListener('timeupdate', updatePlaybackProgress);
   vid.addEventListener('ended', ()=>{
-    const btn=$('pbPlayBtn');if(btn)btn.textContent='&#9654; Play';
+    const btn=$('pbPlayBtn');if(btn)btn.textContent='▶ Play';
     const ppo=$('playbackPlayOverlay');if(ppo){ppo.style.display='flex';}
-    const icon=$('playOverlayIcon');if(icon)icon.innerHTML='&#9654;';
+    const icon=$('playOverlayIcon');if(icon)icon.innerHTML='▶';
   });
   vid.addEventListener('play',()=>{
-    const btn=$('pbPlayBtn');if(btn)btn.textContent='&#9646;&#9646; Pause';
+    const btn=$('pbPlayBtn');if(btn)btn.textContent='⏸ Pause';
     const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='none';
   });
   vid.addEventListener('pause',()=>{
-    const btn=$('pbPlayBtn');if(btn)btn.textContent='&#9654; Play';
+    const btn=$('pbPlayBtn');if(btn)btn.textContent='▶ Play';
     if(!vid.ended){
       const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='flex';
     }
@@ -2006,10 +2034,40 @@ function loadStation(){
   const sw=$('mmiSubmitWrap');if(sw)sw.style.display='none';
   const rs=$('mmiRecordingStatus');if(rs)rs.style.display='none';
   const bnr=$('btnRevealNext');if(bnr)bnr.style.display='none';
+  if(typeof mmiEngineReset==='function') mmiEngineReset();
 
-  // MMI mode: show all prompts from start (unless hide option enabled)
+  // MMI mode: show prompts based on preset format
   const isMmi=currentMode===MODE_MMI;
-  if(isMmi&&!mmiHidePrompts){
+  if(isMmi){
+    const cfg=getMMIConfig();
+    const allPrompts=getPrompts(s).slice(0,cfg.promptCount);
+    // Populate all text content
+    allPrompts.forEach((p,i)=>{ const t=$(`prompt${i+1}Text`); if(t)t.textContent=p; });
+    // Hide all prompt wraps initially
+    ['prompt1Wrap','prompt2Wrap','prompt3Wrap','prompt4Wrap'].forEach(id=>{ const w=$(id); if(w)w.style.display='none'; });
+
+    if(mmiHidePrompts){
+      // User toggled hide-prompts — show locked placeholder only
+      promptsLocked.style.display='flex';
+    } else {
+      promptsLocked.style.display='none';
+      if(cfg.revealMode==='quickfire'){
+        // Show reading hint — questions appear one at a time after initial read
+        const hint=document.createElement('div');
+        hint.id='qfReadingHint';
+        hint.style.cssText='background:rgba(14,165,233,0.06);border:1px dashed rgba(14,165,233,0.25);border-radius:10px;padding:10px 16px;font-size:0.78rem;color:var(--teal3);font-weight:600;text-align:center;margin-top:8px;';
+        hint.textContent=`⚡ ${allPrompts.length} questions will appear one at a time — 15s to read each, 60s to answer.`;
+        const pa=$('promptsArea');
+        if(pa && !$('qfReadingHint')) pa.appendChild(hint);
+      } else if(cfg.revealMode==='all_at_once'){
+        // Standard: show ALL questions during reading
+        allPrompts.forEach((_,i)=>{ const w=$(`prompt${i+1}Wrap`); if(w)w.style.display='block'; });
+      } else {
+        // Extended / random: show Q1 only during reading
+        if($('prompt1Wrap')) $('prompt1Wrap').style.display='block';
+      }
+    }
+  } else if(!mmiHidePrompts){
     promptsLocked.style.display='none';
     prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
     prompt1Wrap.style.display='block';prompt2Wrap.style.display='block';
@@ -2030,7 +2088,9 @@ function loadStation(){
     setPhaseUI('writing');
     // No timer running — user clicks Next when done
   } else {
-    setPhaseUI('reading');runTimer(rt,()=>startWriting());
+    setPhaseUI('reading');
+    if(isMmi && typeof mmiShowCentralTimer==='function') mmiShowCentralTimer(rt,'Reading','purple');
+    runTimer(rt,()=>startWriting());
   }
 }
 
@@ -2041,43 +2101,9 @@ function startWriting(){
   promptsLocked.style.display='none';
 
   if(isMmi){
-    // ── MMI: populate prompts from mmiCurrentPrompts (set by mmiOnRecordingStart) ──
-    // We need to know prompts now so we can pre-populate all wraps before recording starts.
-    // mmiOnRecordingStart() will set mmiCurrentPrompts when startRecording() is called below.
-    // Pre-populate all wraps from the station using getPrompts() so reveal works correctly.
-    const cfg = getMMIConfig();
-    const allPrompts = getPrompts(s).slice(0, cfg.promptCount);
-    const isSequential = cfg.revealMode === 'sequential';
-
-    // Always show prompt 1
-    prompt1Text.textContent = allPrompts[0] || s.prompt1 || '';
-    prompt1Wrap.style.display = 'block';
-
-    // For sequential: hide remaining prompts — they reveal via button
-    // For all_at_once: show all prompts immediately
-    const promptWraps = ['prompt2Wrap','prompt3Wrap','prompt4Wrap'];
-    const promptTexts = ['prompt2Text','prompt3Text','prompt4Text'];
-    for(let i=0;i<3;i++){
-      const wrap=$(promptWraps[i]);
-      const text=$(promptTexts[i]);
-      if(wrap && text){
-        if(allPrompts[i+1]){
-          text.textContent = allPrompts[i+1];
-          wrap.style.display = isSequential ? 'none' : 'block';
-        } else {
-          wrap.style.display = 'none';
-        }
-      }
-    }
-    prompt2Wrap.style.display = (allPrompts[1] && !isSequential) ? 'block' : 'none';
-
-    // MMI: show speaking area, start recording
-    $('mmiSpeakingArea').classList.add('show');
-    answerSection.style.display='none';
-    if(webcamReady)startRecording();
-    const wt=mmiAnswerTime;
+    // Delegate to mmi-engine.js per-format timing engine
+    if(typeof mmiDispatchStartWriting==='function') mmiDispatchStartWriting();
     setPhaseUI('writing');
-    runTimer(wt,()=>finishStation());
   } else {
     // CASPer: always show both prompts
     prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
@@ -2204,43 +2230,45 @@ async function manualRunAI(){
   saveAnswer();
   const btn=$('btnGetAI'),wrap=$('btnGetAIWrap'),remEl=$('btnAIRemaining');
   if(btn){btn.disabled=true;btn.textContent='⏳ Marking…';}
-nextBtn.disabled = true;
-prevBtn.disabled = true;
+  nextBtn.disabled=true; prevBtn.disabled=true;
+  let marked=false;
+  try{
+    await runAI(currentIdx);
+    marked = !!(sessionHistory[currentIdx] && sessionHistory[currentIdx].score != null);
+  }catch(e){
+    console.error('AI marking error:',e);
+    const fbEl=getAiFbEl();
+    if(fbEl && !fbEl.innerHTML.includes('quartile'))
+      fbEl.innerHTML+=`<div style="font-size:0.82rem;color:#dc2626;padding:8px 0;">Marking failed — please try again.</div>`;
+  }finally{ updateBtns(); }
 
-try {
-  await runAI(currentIdx);
-} catch (e) {
-  console.error(e);
-} finally {
-  updateBtns(); // ← ALWAYS runs
-}
-  if(btn){btn.textContent='✦ Get AI Feedback';}
-  // Hide the button once this station has been marked — prevents confusion/re-clicks.
-  if(sessionHistory[currentIdx] && sessionHistory[currentIdx].score != null){
+  if(btn) btn.textContent='✦ Get AI Feedback';
+
+  if(marked){
     if(wrap) wrap.style.display='none';
+    if(typeof maybeShowLeaderboardNudge==='function') maybeShowLeaderboardNudge(sessionHistory[currentIdx].score);
     return;
   }
-  // After marking, update based on server limits
-  const limits = Key2MDAuth.getLimits();
-  const toolLimits = limits?.casper;
-  const rem = toolLimits ? Math.max(0, toolLimits.limit - toolLimits.used) : 0;
-  const credits = toolLimits?.credits || 0;
-  const canUse = Key2MDAuth.isPro() || rem > 0 || credits > 0;
+
+  // Not marked — restore button so user can retry / see sign-up prompt
+  if(btn){btn.disabled=false;btn.style.opacity='1';}
   if(!Key2MDAuth.isLoggedIn()){
-    if(btn){btn.disabled=false;btn.style.opacity='1';}
-  } else if(!canUse){
-    if(wrap)wrap.style.display='none';
-  } else {
-    if(remEl){
-      if(Key2MDAuth.isPro()) remEl.textContent='∞ unlimited';
-      else if(rem > 0) remEl.textContent=rem+' free left today';
-      else remEl.textContent=credits+' credit'+(credits!==1?'s':'')+' remaining';
-    }
-    if(btn){
-      btn.disabled=false;btn.style.opacity='1';
-      btn.textContent=(rem<=0&&credits>0)?'✦ Get AI Feedback (1 credit)':'✦ Get AI Feedback';
-    }
+    if(wrap) wrap.style.display='inline-flex';
+    return;
   }
+  const limits=Key2MDAuth.getLimits();
+  const toolLimits=limits?.casper;
+  const rem=Key2MDAuth.isPro()?99:(toolLimits?Math.max(0,toolLimits.limit-toolLimits.used):0);
+  const credits=toolLimits?.credits||0;
+  const canUse=Key2MDAuth.isPro()||rem>0||credits>0;
+  if(!canUse){ if(wrap)wrap.style.display='none'; return; }
+  if(remEl){
+    if(Key2MDAuth.isPro()) remEl.textContent='∞ unlimited';
+    else if(rem>0) remEl.textContent=rem+' free left today';
+    else remEl.textContent=credits+' credit'+(credits!==1?'s':'')+' remaining';
+  }
+  if(btn) btn.textContent=(rem<=0&&credits>0)?'✦ Get AI Feedback (1 credit)':'✦ Get AI Feedback';
+  if(wrap) wrap.style.display='inline-flex';
 }
 
 async function runAI(idx){
@@ -2476,6 +2504,33 @@ function showFeedback(score,fb){
     const btn=document.getElementById('k2ScoreDisclaimerBtn');
     if(btn) btn.innerHTML='About this score &#9660;';
   }
+}
+
+function maybeShowLeaderboardNudge(score){
+  if(currentMode!==MODE_CASPER) return;
+  if(!Key2MDAuth?.isLoggedIn()) return;
+  if(leaderboardSettings?.opt_in) return;
+  const fbEl=getAiFbEl();
+  if(!fbEl||fbEl.querySelector('#lbNudge')) return;
+  const isHigh=score>=7;
+  const n=document.createElement('div');
+  n.id='lbNudge';
+  n.style.cssText='background:linear-gradient(135deg,rgba(14,165,233,0.08),rgba(99,102,241,0.06));border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:14px 18px;margin-top:14px;font-size:0.82rem;line-height:1.55;';
+  n.innerHTML=`
+    <div style="font-weight:700;color:var(--navy);margin-bottom:5px;font-size:0.88rem;">
+      ${isHigh?'🏅 Nice score — want to see how you compare?':'📊 See how you compare with other students?'}
+    </div>
+    <div style="color:var(--gray600);margin-bottom:10px;">
+      ${isHigh
+        ?'Your score is above average. Sharing your daily AI average anonymously keeps everyone accountable — and might just push you to go again.'
+        :'Share your daily average anonymously with the leaderboard. Keeps you and other applicants on track. Always opt-in, always private until you say so.'}
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <button onclick="document.getElementById('lbShareWrap')?.scrollIntoView({behavior:'smooth',block:'center'})" style="background:var(--teal);color:#fff;border:none;border-radius:50px;padding:7px 16px;font-weight:700;font-size:0.78rem;cursor:pointer;font-family:inherit;">Join the leaderboard →</button>
+      <button onclick="this.closest('#lbNudge').remove()" style="background:none;border:none;color:var(--gray400);font-size:0.75rem;cursor:pointer;font-family:inherit;text-decoration:underline;">Maybe later</button>
+    </div>
+  `;
+  fbEl.appendChild(n);
 }
 
 function restoreFeedback(idx){
@@ -3267,13 +3322,13 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft'&&!prevBtn.disabled)prevBtn.click();
   if(e.key===' '){
     e.preventDefault();
-    // During MMI recording: spacebar reveals next prompt (sequential mode)
+    // During MMI recording: delegate spacebar to engine
     if(currentMode===MODE_MMI && phase==='writing' && webcamActive){
+      if(typeof mmiEngineSpacebar==='function' && mmiEngineSpacebar()) return;
+      // fallback for custom/sequential modes
       const bnr=$('btnRevealNext');
-      if(bnr && bnr.style.display!=='none' && !bnr.disabled){
-        mmiRevealNextPrompt();
-        return;
-      }
+      if(bnr && bnr.style.display!=='none' && !bnr.disabled){ mmiRevealNextPrompt(); return; }
+      return;
     }
     // Otherwise: skip reading
     if(!skipBtn.disabled) skipBtn.click();
