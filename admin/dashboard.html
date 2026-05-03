@@ -909,6 +909,22 @@
         </div>
       </div>
 
+      <!-- ── Per-user profit table ── -->
+      <div style="margin-bottom:20px;">
+        <div class="dash-card-title" style="padding:0 0 10px;display:flex;align-items:center;gap:10px;">
+          Profit by Student — MMI
+          <span style="font-size:0.7rem;font-weight:500;color:var(--muted);">Revenue − COGS · sorted by profit desc</span>
+          <span class="badge badge-default" id="mProfitCount">0</span>
+          <span style="margin-left:auto;font-size:0.72rem;color:var(--muted);">Total profit: <strong id="mProfitTotal" style="color:var(--green);">—</strong></span>
+        </div>
+        <div class="tbl-wrap">
+          <div class="tbl-scroller"><table><thead><tr>
+            <th>Student</th><th>Revenue</th><th>COGS</th><th>Profit</th><th>Margin</th><th>Reviews</th><th>Avg ¢/review</th><th>Tier</th>
+          </tr></thead><tbody id="mProfitBody"></tbody></table></div>
+          <div class="empty hidden" id="mProfitEmpty">No MMI payment data yet.</div>
+        </div>
+      </div>
+
       <!-- Parse failures -->
       <div style="margin-bottom:20px;">
         <div class="dash-card-title" style="padding:0 0 10px;">Parse Failures <span class="badge badge-default" id="mParseCount">0</span></div>
@@ -2066,6 +2082,45 @@ function renderMonitoring() {
         <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:99px;transition:width 0.4s;"></div>
       </div>
       <div style="font-size:0.8rem;color:var(--muted);">${m.slots_remaining} slot${m.slots_remaining===1?'':'s'} remaining · ${pct}% claimed</div>`;
+  }
+
+  // ── Profit-per-user table ──────────────────────────────────────────
+  // Cross-references S.revenue (payments) with m.profit_by_user (COGS per user from monitoring endpoint)
+  const profitData = m.profit_by_user || [];
+  const profitBody = document.getElementById('mProfitBody');
+  const profitEmpty = document.getElementById('mProfitEmpty');
+  const profitCount = document.getElementById('mProfitCount');
+  const profitTotal = document.getElementById('mProfitTotal');
+  if (profitBody) {
+    const sorted = [...profitData].sort((a,b) => b.profit_cents - a.profit_cents);
+    const totalProfit = sorted.reduce((s,r) => s + (r.profit_cents||0), 0);
+    if (profitCount) profitCount.textContent = sorted.length;
+    if (profitTotal) profitTotal.textContent = `$${(totalProfit/100).toFixed(2)}`;
+    if (profitEmpty) profitEmpty.classList.toggle('hidden', sorted.length > 0);
+    profitBody.innerHTML = sorted.map(r => {
+      const rev    = r.revenue_cents || 0;
+      const cogs   = r.cogs_cents || 0;
+      const profit = r.profit_cents || 0;
+      const margin = rev > 0 ? Math.round((profit/rev)*100) : 0;
+      const avgCogs = r.review_count > 0 ? Math.round(cogs/r.review_count) : 0;
+      const marginColor = margin >= 70 ? 'var(--green)' : margin >= 40 ? 'var(--amber)' : 'var(--red)';
+      const profitColor = profit >= 0 ? 'var(--green)' : 'var(--red)';
+      const tierBadge = r.mmi_pro_tier
+        ? `<span class="badge badge-pro" style="font-size:0.62rem;">${esc(r.mmi_pro_tier)}</span>`
+        : r.founding_member
+          ? `<span class="badge" style="background:var(--purple-dim);color:var(--purple);font-size:0.62rem;">founding</span>`
+          : `<span class="badge badge-default" style="font-size:0.62rem;">credits</span>`;
+      return `<tr class="data-row" onclick="composeToUser('${esc(r.email||'')}')">
+        <td><div class="cell-main">${esc(r.email||'—')}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
+        <td><span class="spend has">$${(rev/100).toFixed(2)}</span></td>
+        <td><span style="color:var(--red);font-size:0.82rem;font-weight:600;">¢${cogs}</span></td>
+        <td><span style="color:${profitColor};font-weight:700;">$${(profit/100).toFixed(2)}</span></td>
+        <td><span style="color:${marginColor};font-weight:600;">${margin}%</span></td>
+        <td style="text-align:center;">${r.review_count||0}</td>
+        <td style="text-align:center;color:var(--muted);">¢${avgCogs}</td>
+        <td>${tierBadge}</td>
+      </tr>`;
+    }).join('');
   }
 
   // Parse failures table
