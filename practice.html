@@ -1711,7 +1711,7 @@ function setMode(mode){
   const isCasper=mode===MODE_CASPER;
   $('modeCasper').className='mode-pill'+(isCasper?' active-casper':'');
   $('modeMMI').className='mode-pill'+(isCasper?'':' active-mmi');
-  $('casperCategoryCard').style.display=isCasper?'':' none';
+  $('casperCategoryCard').style.display=isCasper?'':'none';
   $('mmiCategoryCard').style.display=isCasper?'none':'';
   $('mmiOptionsCard').style.display=isCasper?'none':'';
   $('webcamPanel').className='webcam-panel'+(isCasper?'':' show');
@@ -1721,6 +1721,8 @@ function setMode(mode){
   $('idle-sub-text').textContent=isCasper
     ?'Choose a category and press Start Session to begin your CASPer practice simulation.'
     :'Choose a station type and press Start Session to begin your MMI simulation.';
+  const tmp=document.getElementById('timerModePicker');
+  if(tmp) tmp.style.display=isCasper?'':'none';
   // Update timer defaults
   if(!isCasper){
     $('readingSlider').min=30;$('readingSlider').max=180;$('readingSlider').value=120;
