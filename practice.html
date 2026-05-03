@@ -661,20 +661,42 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <div class="webcam-header">
           <div class="rec-dot" id="recDot" style="display:none;"></div>
           <span class="rec-label" id="recLabel" style="display:none;">REC</span>
-          <span class="webcam-header-title" id="webcamTitle">📷 Camera</span>
+          <span class="webcam-header-title" id="webcamTitle">Camera</span>
         </div>
         <div class="webcam-video-wrap">
           <video id="webcamLive" autoplay muted playsinline></video>
-          <video id="webcamPlayback" controls></video>
+          <video id="webcamPlayback" playsinline></video>
           <div class="webcam-overlay" id="webcamOverlay">
             <div class="webcam-permission-text">Enable camera to record your answer</div>
             <button class="btn-webcam-start" id="btnStartWebcam">Enable Camera</button>
           </div>
+          <div id="playbackPlayOverlay" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);cursor:pointer;" onclick="togglePlayback()">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;">
+              <span id="playOverlayIcon" style="font-size:1.2rem;margin-left:3px;">&#9654;</span>
+            </div>
+          </div>
         </div>
-        <div class="webcam-controls">
-          <span class="webcam-timer-display" id="webcamTimerDisp">—:——</span>
-          <button class="btn-webcam-restart" id="btnRestartRecording" disabled title="Restart this station">↺</button>
-          <button class="btn-webcam-dl" id="btnDownloadVideo" disabled title="Save recording — available anytime during or after recording">⬇ Save</button>
+        <div class="webcam-controls" id="recordingControls">
+          <span class="webcam-timer-display" id="webcamTimerDisp">0:00</span>
+          <span style="font-size:0.62rem;color:rgba(255,255,255,0.35);margin-right:auto;">elapsed</span>
+          <button class="btn-webcam-restart" id="btnRestartRecording" disabled title="Re-record (erases current recording)" onclick="confirmRestartRecording()">&#8635; Restart</button>
+          <button class="btn-webcam-dl" id="btnDownloadVideo" disabled title="Save recording to your device">&#11015; Save</button>
+        </div>
+        <div id="playbackControls" style="display:none;padding:8px 10px;background:rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.06);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
+            <span id="pbCurrentTime" style="font-size:0.7rem;font-weight:700;color:var(--teal2);font-variant-numeric:tabular-nums;min-width:32px;">0:00</span>
+            <div id="pbProgressTrack" style="flex:1;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;cursor:pointer;position:relative;" onclick="seekPlayback(event)">
+              <div id="pbProgressFill" style="height:100%;background:var(--teal);border-radius:2px;width:0%;"></div>
+            </div>
+            <span id="pbDuration" style="font-size:0.7rem;color:rgba(255,255,255,0.4);font-variant-numeric:tabular-nums;min-width:32px;text-align:right;">--:--</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button onclick="togglePlayback()" id="pbPlayBtn" style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:50px;background:rgba(14,165,233,0.15);color:var(--teal2);border:1px solid rgba(14,165,233,0.3);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;">&#9654; Play</button>
+            <button onclick="restartPlayback()" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:50px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.1);font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;">&#9198; Rewind</button>
+            <div style="flex:1;"></div>
+            <button class="btn-webcam-dl" id="btnDownloadVideo2" disabled title="Save video to device">&#11015; Save video</button>
+            <button class="btn-webcam-restart" id="btnReRecordBtn" disabled title="Re-record this station" onclick="confirmRestartRecording()">&#8635; Re-record</button>
+          </div>
         </div>
       </div>
     </div>
@@ -743,6 +765,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <button class="btn-reveal-next" id="btnRevealNext" style="display:none;" onclick="mmiRevealNextPrompt()">
           Reveal Next Prompt →
           <span class="reveal-counter" id="revealCounter">1 of 2</span>
+          <span style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-left:6px;">[Space]</span>
         </button>
       </div>
       <div class="answer-section" id="answerSection" style="display:none;">
@@ -1079,7 +1102,9 @@ function mmiOnRecordingStart() {
 
 function mmiOnRecordingStop() {
   clearInterval(mmiRecordingInterval);
-  mmiRecordingDurationSec = (Date.now() - mmiRecordingStartedAt) / 1000;
+  if(mmiRecordingStartedAt) {
+    mmiRecordingDurationSec = (Date.now() - mmiRecordingStartedAt) / 1000;
+  }
   const bnr = document.getElementById('btnRevealNext');
   if(bnr) bnr.style.display = 'none';
   const sb = document.getElementById('mmiRecordingStatus');
@@ -1107,10 +1132,18 @@ function mmiRevealNextPrompt() {
   if(mmiPromptsRevealedCount >= mmiCurrentPrompts.length) return;
   const elapsed = (Date.now() - mmiRecordingStartedAt) / 1000;
   mmiPromptRevealTimestamps.push({ prompt_index: mmiPromptsRevealedCount, revealed_at_recording_seconds: elapsed });
-  const idx = mmiPromptsRevealedCount;
-  const wrapEl = document.getElementById(`prompt${idx+1}Wrap`);
-  const textEl = document.getElementById(`prompt${idx+1}Text`);
-  if(wrapEl && textEl) { textEl.textContent = mmiCurrentPrompts[idx] || ''; wrapEl.style.display = 'block'; }
+  // mmiPromptsRevealedCount is 1-based after init (prompt 0 already shown)
+  // So to show the NEXT prompt we show wrap at index mmiPromptsRevealedCount
+  const wrapId = `prompt${mmiPromptsRevealedCount + 1}Wrap`; // prompt2Wrap, prompt3Wrap, etc.
+  const textId  = `prompt${mmiPromptsRevealedCount + 1}Text`;
+  const wrapEl = document.getElementById(wrapId);
+  const textEl = document.getElementById(textId);
+  if(wrapEl && textEl) {
+    textEl.textContent = mmiCurrentPrompts[mmiPromptsRevealedCount] || '';
+    wrapEl.style.display = 'block';
+    // Smooth scroll to newly revealed prompt
+    wrapEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
   mmiPromptsRevealedCount++;
   updateRevealButton();
 }
@@ -1131,14 +1164,24 @@ function updateRevealButton() {
 // ══ MMI SUBMIT ═══════════════════════════════════════════════════════
 
 async function submitMMIForFeedback() {
-  const uploadBlob = audioBlob || recordingBlob;
-  if(!uploadBlob) { alert('No recording found. Please record your response first.'); return; }
-
   const btn = document.getElementById('btnMMISubmit');
   const sw  = document.getElementById('mmiSubmitWrap');
   const feedbackWrap = document.getElementById('aiFeedbackWrapMMI');
   const isPremium = mmiPremiumMode;
   const tier = isPremium ? 'premium' : 'transcript';
+
+  // ── Wait briefly for audioRecorder.onstop to fire if it hasn't yet ──
+  // audioBlob is set asynchronously after stopRecording() — give it up to 800ms
+  if(!audioBlob && audioRecorder && audioRecorder.state === 'inactive' && audioChunks.length > 0) {
+    await new Promise(r => setTimeout(r, 400));
+  }
+
+  const uploadBlob = audioBlob || recordingBlob;
+  if(!uploadBlob) {
+    MMIFeedbackRender.renderError(feedbackWrap, { code: 'no_recording', message: 'No recording found. Please record your response first.' });
+    if(sw) sw.style.display = 'block';
+    return;
+  }
 
   if(btn) { btn.disabled = true; btn.textContent = isPremium ? '⏳ Preparing Premium analysis…' : 'Uploading…'; }
   if(sw) sw.style.display = 'none';
@@ -1168,8 +1211,10 @@ async function submitMMIForFeedback() {
   }
 
   // ── Build FormData ────────────────────────────────────────────
-  const audioFile = new File([uploadBlob], 'recording.webm', { type: uploadBlob.type || 'audio/webm' });
+  // Re-resolve uploadBlob at build time in case audioBlob arrived after initial check
   const buildFormData = () => {
+    const finalBlob = audioBlob || recordingBlob;
+    const audioFile = new File([finalBlob], 'recording.webm', { type: finalBlob.type || 'audio/webm' });
     const fd = new FormData();
     fd.append('audio', audioFile);
     fd.append('station_id', s.id || `mmi_${MMI_STATIONS.indexOf(s)}`);
@@ -1528,7 +1573,6 @@ function runTimer(secs,done){
     left--;
     if(left<0){clearTimer();done&&done();return;}
     timerNum.textContent=fmt(left);
-    const wcd=$('webcamTimerDisp');if(wcd&&phase==='writing')wcd.textContent=fmt(left);
     progressFill.style.width=Math.max(0,left/secs*100)+'%';
     const urg=left<=5;
     timerNum.classList.toggle('urgent',urg);progressFill.classList.toggle('urgent',urg);
@@ -1688,9 +1732,25 @@ function startRecording(){
   if(!webcamReady||!webcamStream)return;
   recordedChunks=[];recordingBlob=null;
   audioChunks=[];audioBlob=null;
+
+  // Switch to recording controls, hide playback controls
+  const rc=$('recordingControls');const pc=$('playbackControls');
+  if(rc)rc.style.display='flex';if(pc)pc.style.display='none';
+  const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='none';
+
   $('btnDownloadVideo').disabled=false;
   $('webcamPlayback').style.display='none';
   $('webcamLive').style.display='block';
+
+  // Elapsed timer
+  const wcd=$('webcamTimerDisp');
+  if(wcd){wcd.textContent='0:00';}
+  let elapsedSec=0;
+  if(window._elapsedInterval) clearInterval(window._elapsedInterval);
+  window._elapsedInterval=setInterval(()=>{
+    elapsedSec++;
+    if(wcd) wcd.textContent=fmt(elapsedSec);
+  },1000);
 
   // ── Video recorder (full quality, local playback only) ──
   const opts=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
@@ -1698,14 +1758,45 @@ function startRecording(){
   mediaRecorder=new MediaRecorder(webcamStream,opts);
   mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
   mediaRecorder.onstop=()=>{
+    if(window._elapsedInterval){clearInterval(window._elapsedInterval);window._elapsedInterval=null;}
     recordingBlob=new Blob(recordedChunks,{type:mediaRecorder.mimeType||'video/webm'});
     const url=URL.createObjectURL(recordingBlob);
-    const pv=$('webcamPlayback');pv.src=url;pv.style.display='block';
+    const pv=$('webcamPlayback');
+
+    // ── Fix WebM duration bug ──
+    // MediaRecorder WebM blobs have duration=Infinity. We fix this by
+    // seeking to a large time after load to force the browser to read the full index.
+    pv.src=url;
+    pv.style.display='block';
+    pv.onloadedmetadata=()=>{
+      if(pv.duration===Infinity||isNaN(pv.duration)){
+        pv.currentTime=1e10;
+        pv.ontimeupdate=()=>{
+          pv.ontimeupdate=null;
+          pv.currentTime=0;
+          initPlaybackUI(pv);
+        };
+      } else {
+        initPlaybackUI(pv);
+      }
+    };
+
     $('webcamLive').style.display='none';
+    $('recDot').style.display='none';$('recLabel').style.display='none';
+    $('webcamTitle').textContent='Review your response';
+
+    // Switch control bars
+    const rc=$('recordingControls');const pc=$('playbackControls');
+    if(rc)rc.style.display='none';if(pc)pc.style.display='block';
+    const ppo=$('playbackPlayOverlay');
+    if(ppo){ppo.style.display='flex';}
+
+    // Enable buttons in both panels
     $('btnDownloadVideo').disabled=false;
     $('btnRestartRecording').disabled=false;
-    $('recDot').style.display='none';$('recLabel').style.display='none';
-    $('webcamTitle').textContent='📹 Review your response — or restart below';
+    const dl2=$('btnDownloadVideo2');if(dl2)dl2.disabled=false;
+    const rr=$('btnReRecordBtn');if(rr)rr.disabled=false;
+
     if(currentMode===MODE_MMI) mmiOnRecordingStop();
   };
   mediaRecorder.start(1000);
@@ -1737,66 +1828,137 @@ function startRecording(){
   if(currentMode===MODE_MMI) mmiOnRecordingStart();
 }
 function stopRecording(){
+  if(window._elapsedInterval){clearInterval(window._elapsedInterval);window._elapsedInterval=null;}
   if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
   if(audioRecorder&&audioRecorder.state!=='inactive')audioRecorder.stop();
   webcamActive=false;
 }
+
+// ── Playback UI ──────────────────────────────────────────────────
+function initPlaybackUI(vid) {
+  const dur = vid.duration;
+  if(dur && isFinite(dur)){
+    $('pbDuration').textContent = fmt(Math.round(dur));
+  }
+  // Update progress on timeupdate
+  vid.addEventListener('timeupdate', updatePlaybackProgress);
+  vid.addEventListener('ended', ()=>{
+    const btn=$('pbPlayBtn');if(btn)btn.textContent='&#9654; Play';
+    const ppo=$('playbackPlayOverlay');if(ppo){ppo.style.display='flex';}
+    const icon=$('playOverlayIcon');if(icon)icon.innerHTML='&#9654;';
+  });
+  vid.addEventListener('play',()=>{
+    const btn=$('pbPlayBtn');if(btn)btn.textContent='&#9646;&#9646; Pause';
+    const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='none';
+  });
+  vid.addEventListener('pause',()=>{
+    const btn=$('pbPlayBtn');if(btn)btn.textContent='&#9654; Play';
+    if(!vid.ended){
+      const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='flex';
+    }
+  });
+}
+
+function updatePlaybackProgress() {
+  const vid=$('webcamPlayback');if(!vid)return;
+  const dur=vid.duration;
+  if(!dur||!isFinite(dur))return;
+  const pct=(vid.currentTime/dur)*100;
+  const fill=$('pbProgressFill');if(fill)fill.style.width=pct+'%';
+  const cur=$('pbCurrentTime');if(cur)cur.textContent=fmt(Math.round(vid.currentTime));
+}
+
+function togglePlayback() {
+  const vid=$('webcamPlayback');if(!vid||vid.style.display==='none')return;
+  if(vid.paused||vid.ended){vid.play();}else{vid.pause();}
+}
+
+function restartPlayback() {
+  const vid=$('webcamPlayback');if(!vid)return;
+  vid.currentTime=0;vid.play();
+}
+
+function seekPlayback(e) {
+  const vid=$('webcamPlayback');if(!vid||!vid.duration||!isFinite(vid.duration))return;
+  const track=$('pbProgressTrack');if(!track)return;
+  const rect=track.getBoundingClientRect();
+  const pct=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
+  vid.currentTime=pct*vid.duration;
+}
+
+function confirmRestartRecording() {
+  if(recordingBlob){
+    if(!confirm('Re-record this station? Your current recording will be erased.'))return;
+  }
+  // Trigger the restart logic
+  if(!sessionActive||currentMode!==MODE_MMI)return;
+  if(typeof mmiResetForRestart==='function') mmiResetForRestart();
+  stopRecording();
+  const pv=$('webcamPlayback');pv.src='';pv.style.display='none';
+  $('webcamLive').style.display='block';
+  // Reset control panels
+  const rc=$('recordingControls');const pc=$('playbackControls');
+  if(rc)rc.style.display='flex';if(pc)pc.style.display='none';
+  const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='none';
+  const wcd=$('webcamTimerDisp');if(wcd)wcd.textContent='0:00';
+  $('btnDownloadVideo').disabled=true;
+  $('btnRestartRecording').disabled=true;
+  const dl2=$('btnDownloadVideo2');if(dl2)dl2.disabled=true;
+  const rr=$('btnReRecordBtn');if(rr)rr.disabled=true;
+  recordedChunks=[];recordingBlob=null;
+  audioChunks=[];audioBlob=null;
+  clearTimer();
+  loadStation();
+}
 $('btnStartWebcam').addEventListener('click',async()=>{await initWebcam();});
-$('btnDownloadVideo').addEventListener('click',()=>{
-  // If still recording, snapshot what we have so far
+
+function downloadRecording() {
+  const s = pool[currentIdx];
+  const cat = s ? s.category.replace(/[^a-zA-Z0-9]/g,'-') : 'MMI';
+  const dateStr = new Date().toISOString().slice(0,10);
+  const filename = `Key2MD-MMI-${cat}-${dateStr}.webm`;
+
   if(mediaRecorder&&mediaRecorder.state==='recording'){
-    // Request data up to now, then download
     const snapChunks=[...recordedChunks];
-    mediaRecorder.requestData(); // flush latest chunk
+    mediaRecorder.requestData();
     setTimeout(()=>{
       const allChunks=[...snapChunks,...recordedChunks.slice(snapChunks.length)];
       const snapBlob=new Blob(allChunks,{type:mediaRecorder.mimeType||'video/webm'});
       const a=document.createElement('a');a.href=URL.createObjectURL(snapBlob);
-      a.download='MMI-response-Key2MD-'+Date.now()+'.webm';a.click();
+      a.download=filename;a.click();
     },300);
     return;
   }
   if(!recordingBlob)return;
   const a=document.createElement('a');a.href=URL.createObjectURL(recordingBlob);
-  a.download='MMI-response-Key2MD-'+Date.now()+'.webm';a.click();
-});
+  a.download=filename;a.click();
+}
 
-$('btnRestartRecording').addEventListener('click',()=>{
-  if(!sessionActive||currentMode!==MODE_MMI)return;
-  // Reset MMI state
-  if(typeof mmiResetForRestart==='function') mmiResetForRestart();
-  // Stop any active recording cleanly
-  stopRecording();
-  // Reset playback, re-show live feed
-  const pv=$('webcamPlayback');pv.src='';pv.style.display='none';
-  $('webcamLive').style.display='block';
-  $('btnDownloadVideo').disabled=true;
-  $('btnRestartRecording').disabled=true;
-  recordedChunks=[];recordingBlob=null;
-  audioChunks=[];audioBlob=null;
-  // Reload the station from scratch - resets timers and phase
-  clearTimer();
-  loadStation();
-});
+$('btnDownloadVideo').addEventListener('click', downloadRecording);
+const _dl2 = document.getElementById('btnDownloadVideo2');
+if(_dl2) _dl2.addEventListener('click', downloadRecording);
 
 // ══ DOWNLOAD RESPONSE ══
 $('btnDownloadResponse').addEventListener('click',()=>{
   if(!pool[currentIdx])return;
   const s=pool[currentIdx];
   const answer=answerTextarea.value.trim();
+  const cat = s.category ? s.category.replace(/[^a-zA-Z0-9]/g,'-') : 'CASPer';
+  const dateStr = new Date().toISOString().slice(0,10);
   const content=
-    'Key2MD — CASPer Practice\n'+
+    'Key2MD — CASPer Practice Response\n'+
     '═══════════════════════════════════════\n\n'+
+    'Date: '+new Date().toLocaleString('en-AU')+'\n'+
+    'Category: '+s.category+'\n\n'+
     'SCENARIO\n'+'-'.repeat(40)+'\n'+s.scenario+'\n\n'+
     'PROMPT 1\n'+'-'.repeat(40)+'\n'+s.prompt1+'\n\n'+
-    'PROMPT 2\n'+'-'.repeat(40)+'\n'+s.prompt2+'\n\n'+
+    'PROMPT 2\n'+'-'.repeat(40)+'\n'+(s.prompt2||'(none)')+'\n\n'+
     'YOUR RESPONSE\n'+'-'.repeat(40)+'\n'+(answer||'(no response recorded)')+'\n\n'+
     '═══════════════════════════════════════\n'+
-    'Downloaded from Key2MD Free Practice Tool\n'+
-    new Date().toLocaleString('en-AU');
+    'Downloaded from Key2MD Free Practice Tool — key2md.com';
   const blob=new Blob([content],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='CASPer-response-'+Date.now()+'.txt';a.click();
+  a.download=`Key2MD-CASPer-${cat}-${dateStr}.txt`;a.click();
 });
 
 // ══ SESSION ══
@@ -1876,12 +2038,39 @@ function startWriting(){
   beep(0.5,false); // soft single chime — reading time over
   const s=pool[currentIdx];
   const isMmi=currentMode===MODE_MMI;
-  // Always reveal prompts at writing phase
   promptsLocked.style.display='none';
-  prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
-  prompt1Wrap.style.display='block';prompt2Wrap.style.display='block';
 
   if(isMmi){
+    // ── MMI: populate prompts from mmiCurrentPrompts (set by mmiOnRecordingStart) ──
+    // We need to know prompts now so we can pre-populate all wraps before recording starts.
+    // mmiOnRecordingStart() will set mmiCurrentPrompts when startRecording() is called below.
+    // Pre-populate all wraps from the station using getPrompts() so reveal works correctly.
+    const cfg = getMMIConfig();
+    const allPrompts = getPrompts(s).slice(0, cfg.promptCount);
+    const isSequential = cfg.revealMode === 'sequential';
+
+    // Always show prompt 1
+    prompt1Text.textContent = allPrompts[0] || s.prompt1 || '';
+    prompt1Wrap.style.display = 'block';
+
+    // For sequential: hide remaining prompts — they reveal via button
+    // For all_at_once: show all prompts immediately
+    const promptWraps = ['prompt2Wrap','prompt3Wrap','prompt4Wrap'];
+    const promptTexts = ['prompt2Text','prompt3Text','prompt4Text'];
+    for(let i=0;i<3;i++){
+      const wrap=$(promptWraps[i]);
+      const text=$(promptTexts[i]);
+      if(wrap && text){
+        if(allPrompts[i+1]){
+          text.textContent = allPrompts[i+1];
+          wrap.style.display = isSequential ? 'none' : 'block';
+        } else {
+          wrap.style.display = 'none';
+        }
+      }
+    }
+    prompt2Wrap.style.display = (allPrompts[1] && !isSequential) ? 'block' : 'none';
+
     // MMI: show speaking area, start recording
     $('mmiSpeakingArea').classList.add('show');
     answerSection.style.display='none';
@@ -1890,6 +2079,9 @@ function startWriting(){
     setPhaseUI('writing');
     runTimer(wt,()=>finishStation());
   } else {
+    // CASPer: always show both prompts
+    prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
+    prompt1Wrap.style.display='block';prompt2Wrap.style.display='block';
     // CASPer: show text area
     answerSection.style.display='block';
     answerTextarea.focus();
@@ -3063,7 +3255,19 @@ document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
   if(e.key==='ArrowRight'&&!nextBtn.disabled)nextBtn.click();
   if(e.key==='ArrowLeft'&&!prevBtn.disabled)prevBtn.click();
-  if(e.key===' '&&!skipBtn.disabled){e.preventDefault();skipBtn.click();}
+  if(e.key===' '){
+    e.preventDefault();
+    // During MMI recording: spacebar reveals next prompt (sequential mode)
+    if(currentMode===MODE_MMI && phase==='writing' && webcamActive){
+      const bnr=$('btnRevealNext');
+      if(bnr && bnr.style.display!=='none' && !bnr.disabled){
+        mmiRevealNextPrompt();
+        return;
+      }
+    }
+    // Otherwise: skip reading
+    if(!skipBtn.disabled) skipBtn.click();
+  }
 });
 
 // ── Enquiry modal (matches live site) ──
