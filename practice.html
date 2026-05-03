@@ -2382,58 +2382,77 @@ function showFeedback(score,fb){
       <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);">Your Calibration Score</div>
       <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);">Based on ${cal.n} station${cal.n===1?'':'s'}</div>
     </div>
-    <div style="display:flex;align-items:center;gap:16px;">
-      <div style="text-align:center;flex-shrink:0;">
-        <div style="font-size:2rem;font-weight:800;color:${cal.color};line-height:1;">${cal.q}</div>
-        <div style="font-size:0.7rem;color:rgba(255,255,255,0.45);margin-top:2px;">avg ${cal.avg}/10</div>
-      </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+      <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1;">${cal.avg}</div>
       <div style="flex:1;">
-        <div style="display:flex;gap:4px;margin-bottom:6px;">
-          <div style="flex:1;height:6px;border-radius:3px;background:${cal.q==='Q1'?'#ef4444':'rgba(239,68,68,0.25)'};transition:all 0.4s;"></div>
-          <div style="flex:1;height:6px;border-radius:3px;background:${cal.q==='Q2'?'#f59e0b':'rgba(245,158,11,0.25)'};transition:all 0.4s;"></div>
-          <div style="flex:1;height:6px;border-radius:3px;background:${cal.q==='Q3'?'#0ea5e9':'rgba(14,165,233,0.25)'};transition:all 0.4s;"></div>
-          <div style="flex:1;height:6px;border-radius:3px;background:${cal.q==='Q4'?'#22c55e':'rgba(34,197,94,0.25)'};transition:all 0.4s;"></div>
+        <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${(cal.avg/10)*100}%;background:${cal.color};border-radius:3px;transition:width 0.6s ease;"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:rgba(255,255,255,0.3);font-weight:600;">
-          <span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span>
-        </div>
-        <div style="margin-top:8px;font-size:0.78rem;color:rgba(255,255,255,0.6);line-height:1.4;">${
-          cal.q==='Q4'?'Tracking Q4. Keep going — consistency is what gets you there.':
-          cal.q==='Q3'?`Tracking ${cal.q}. ${cal.n<5?'Do more stations to sharpen your calibration.':'A few more stations to confirm your trajectory.'}`:
-          cal.q==='Q2'?`Tracking ${cal.q}. Focus on the "Improve" notes — they\'re specific to your weak patterns.`:
-          `Tracking ${cal.q}. Don\'t panic — this is what a first session often looks like. It moves fast.`
-        }</div>
       </div>
     </div>
-    ${cal.n>=3&&cal.q!=='Q4'?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;gap:12px;"><div style="font-size:0.78rem;color:rgba(255,255,255,0.55);">Want to move to ${cal.q==='Q1'?'Q2':cal.q==='Q2'?'Q3':'Q4'}? Dan\'s 1:1 sessions are built around exactly this gap.</div><a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 16px;font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap;text-decoration:none;flex-shrink:0;" rel="noopener noreferrer">Book a Session →</a></div>`:''}
-  </div>`:'';
-
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      ${['Q1','Q2','Q3','Q4'].map(q=>`
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span style="font-size:0.72rem;font-weight:${qi.q===q?'800':'500'};color:${qi.q===q?qi.color:'rgba(255,255,255,0.25)'};">${q}</span>
+        </div>`).join('')}
+    </div>
+    <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:4px;">${
+      qi.q==='Q4'?'Top quartile. This is what medical schools want to see.':
+      qi.q==='Q3'?'Above median. Strong foundation — some refinement needed.':
+      qi.q==='Q2'?'Below median. The feedback below shows exactly where to focus.':
+      'Needs significant work. Read the improvement notes carefully.'
+    }</div>
+  </div>
+  `:'';
+  // Check if disclaimer has been permanently dismissed
+  const disclaimerDismissed = (() => { try { return localStorage.getItem('k2_score_disclaimer_dismissed') === '1'; } catch { return false; } })();
+  const disclaimerHtml = `
+  <div id="k2ScoreDisclaimerWrap" style="margin-bottom:10px;">
+    <button onclick="(function(btn){
+      var d=document.getElementById('k2ScoreDisclaimer');
+      if(!d)return;
+      var open=d.style.display==='block';
+      d.style.display=open?'none':'block';
+      btn.innerHTML=open?'About this score &#9658;':'About this score &#9660;';
+    })(this)" style="background:none;border:none;color:var(--gray400);font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;padding:0;line-height:1;display:inline-flex;align-items:center;gap:4px;" id="k2ScoreDisclaimerBtn">About this score &#9658;</button>
+    <div id="k2ScoreDisclaimer" style="display:${disclaimerDismissed?'none':'block'};margin-top:8px;padding:12px 16px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.22);border-radius:8px;font-size:0.8rem;color:var(--gray600);line-height:1.7;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+        <strong style="color:var(--gray700);font-size:0.82rem;">A note on how this score works — from Dan</strong>
+        <button onclick="(function(){
+          try{localStorage.setItem('k2_score_disclaimer_dismissed','1');}catch(e){}
+          var d=document.getElementById('k2ScoreDisclaimer');
+          if(d)d.style.display='none';
+          var btn=document.getElementById('k2ScoreDisclaimerBtn');
+          if(btn)btn.innerHTML='About this score &#9658;';
+        })()" style="background:none;border:none;color:var(--gray400);font-size:0.78rem;cursor:pointer;font-family:inherit;padding:0;flex-shrink:0;line-height:1;" title="Dismiss">✕</button>
+      </div>
+      The AI marking is built on my tutoring philosophy, not a formal grading system. In real sessions I never actually mark students out of 10 — that's not how CASPer works — so the 1–10 scale had to be improvised, and it's still being calibrated as more responses come through.<br><br>
+      The scoring also recently changed. It now compares your response against the Key2MD student pool — which skews right, because these are motivated, actively-preparing candidates. A 6 here is not the same as a 6 against a random cohort.<br><br>
+      <strong style="color:var(--gray700);">Don't be discouraged by a lower-than-expected score.</strong> It reflects a harder comparison group and a more honest calibration, not a verdict on your ability. Use it as a direction — the written feedback is what actually moves your performance.
+    </div>
+  </div>`;
   getAiFbEl().innerHTML=`
-  <div style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-radius:14px;padding:22px 24px;margin-bottom:14px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:${qi.color}18;pointer-events:none;"></div>
-    <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:12px;">This station — quartile estimate</div>
-    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-      <div style="flex-shrink:0;">
-        <div style="font-size:3.8rem;font-weight:800;color:${qi.color};line-height:1;letter-spacing:-2px;">${qi.q}</div>
-        <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);margin-top:4px;">${qi.q==='Q4'?'Excellent':'Q4'==='Q4'?'':(qi.q==='Q3'?'Good — above median':'Q2'==='Q2'?'Developing':'Needs work')} ${score}/10</div>
+  <div style="background:linear-gradient(135deg,#0a1628,#112240);border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.08);">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;">${score}<span style="font-size:1rem;color:rgba(255,255,255,0.4);font-weight:400;">/10</span></div>
+      <div style="flex:1;">
+        <div style="font-size:0.82rem;font-weight:700;color:${qi.color};">${qi.label}</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);margin-top:1px;">${qi.q}</div>
       </div>
-      <div style="flex:1;min-width:140px;">
-        <div style="display:flex;gap:5px;margin-bottom:6px;">
-          ${['Q1','Q2','Q3','Q4'].map((q,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
-            <div style="width:100%;height:8px;border-radius:4px;background:${qi.q===q?qi.color:'rgba(255,255,255,0.1)'};transition:all 0.4s;${qi.q===q?'box-shadow:0 0 8px '+qi.color+'66;':''}"></div>
-            <span style="font-size:0.6rem;font-weight:${qi.q===q?'800':'500'};color:${qi.q===q?qi.color:'rgba(255,255,255,0.25)'};">${q}</span>
-          </div>`).join('')}
-        </div>
-        <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:4px;">${
-          qi.q==='Q4'?'Top quartile. This is what medical schools want to see.':
-          qi.q==='Q3'?'Above median. Strong foundation — some refinement needed.':
-          qi.q==='Q2'?'Below median. The feedback below shows exactly where to focus.':
-          'Needs significant work. Read the improvement notes carefully.'
-        }</div>
-      </div>
+      <span style="font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:50px;background:${qi.color}22;color:${qi.color};border:1px solid ${qi.color}44;">${qi.q}</span>
     </div>
+    <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;">
+      <div style="height:100%;width:${score*10}%;background:${qi.color};border-radius:2px;transition:width 0.6s ease;"></div>
+    </div>
+    <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:8px;">${
+      qi.q==='Q4'?'Top quartile. This is what medical schools want to see.':
+      qi.q==='Q3'?'Above median. Strong foundation — some refinement needed.':
+      qi.q==='Q2'?'Below median. The feedback below shows exactly where to focus.':
+      'Needs significant work. Read the improvement notes carefully.'
+    }</div>
   </div>
   ${calHtml}
+  ${disclaimerHtml}
   <div class="ai-feedback">
     <div class="ai-feedback-header">
       <span class="ai-feedback-title">✦ AI Feedback</span>
@@ -2450,24 +2469,15 @@ function showFeedback(score,fb){
   </div>
   <div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;">
     <button id="retryStationBtn" onclick="retryStation()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:50px;border:1.5px solid var(--gray200);background:var(--white);color:var(--gray600);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--navy)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">↺ Retry this station</button>
-    <a href="https://www.key2md.com/history" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:50px;border:1.5px solid var(--gray200);background:var(--white);color:var(--gray600);font-size:0.82rem;font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--navy)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">📋 View history</a>
-  </div>
-  <div style="background:linear-gradient(135deg,#0a1628 0%,#0d2a52 100%);border-radius:12px;padding:16px 20px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
-    <div>
-      <div style="font-size:0.72rem;font-weight:700;color:#f59e0b;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px;">Want deeper feedback?</div>
-      <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);line-height:1.4;">Get Dan's expert marking — full written feedback, quartile estimate, and what a Q4 response looks like.</div>
-    </div>
-    <button onclick="openMarkingModal()" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:10px 20px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;">Submit to Dan — $35 →</button>
-  </div>
-  <div style="background:linear-gradient(135deg,rgba(14,165,233,0.08) 0%,rgba(14,165,233,0.04) 100%);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:14px 18px;margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-    <div>
-      <div style="font-size:0.72rem;font-weight:700;color:var(--teal3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:3px;">📅 Weekly Live Classes</div>
-      <div style="font-size:0.83rem;color:var(--gray800);font-weight:600;margin-bottom:2px;">CASPer Group Coaching — Fridays 6pm</div>
-      <div style="font-size:0.78rem;color:var(--gray400);">Walk-throughs · common traps · live Q&A · $120/person until June 11</div>
-    </div>
-    <a href="mailto:brittainmbbs@gmail.com?subject=CASPer Class EOI&body=Hi Dan,%0A%0AI'm interested in joining the weekly CASPer coaching class.%0A%0AName:%0AUniversity applying to:%0ACASPer date (if known):" style="background:var(--teal);color:#fff;border:none;border-radius:50px;padding:9px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;text-decoration:none;" onclick="event.preventDefault();openEnquiry('CASPer Group Session')">Express Interest →</a>
+    <a href="https://www.key2md.com/history" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:50px;border:1.5px solid var(--gray200);background:var(--white);color:var(--gray600);font-size:0.82rem;font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--navy)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">📊 View history</a>
   </div>`;
+  // Auto-expand disclaimer on first ever score (not dismissed yet)
+  if(!disclaimerDismissed){
+    const btn=document.getElementById('k2ScoreDisclaimerBtn');
+    if(btn) btn.innerHTML='About this score &#9660;';
+  }
 }
+
 function restoreFeedback(idx){
   const h=sessionHistory[idx];
   if(h&&h.feedback){
