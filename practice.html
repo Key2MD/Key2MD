@@ -2296,9 +2296,12 @@ function loadStation(){
       }
     }
   } else if(!mmiHidePrompts){
-    promptsLocked.style.display='none';
+    // CASPer: pre-load text but keep prompts hidden during reading phase.
+    // startWriting() will reveal them once reading time ends.
+    // Exception: timer-off mode reveals immediately (handled below).
     prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
-    prompt1Wrap.style.display='block';prompt2Wrap.style.display='block';
+    promptsLocked.style.display='flex';
+    prompt1Wrap.style.display='none';prompt2Wrap.style.display='none';
   } else {
     promptsLocked.style.display='flex';
     prompt1Wrap.style.display='none';prompt2Wrap.style.display='none';
