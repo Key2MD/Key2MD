@@ -610,9 +610,11 @@
         <div class="conv-list">
           <div class="conv-list-hd">
             <span class="conv-list-title">Conversations</span>
+            <button id="inboxRefreshBtn" class="btn" style="font-size:0.78rem;padding:4px 8px;" onclick="refreshInbox()" title="Refresh inbox">↻</button>
             <button class="btn blue" style="font-size:0.7rem;padding:4px 10px;" onclick="openNewCompose()">+ New</button>
           </div>
           <div class="conv-search"><input type="text" id="convSearch" placeholder="Search…" oninput="filterConvs()"></div>
+          <div id="inboxLastRefreshed" style="padding:4px 12px 6px;font-size:0.65rem;color:var(--muted2);">Refreshes every 30s</div>
           <div class="conv-items" id="convItems"><div class="conv-empty">Loading…</div></div>
         </div>
         <div class="thread-panel" id="threadPanel">
@@ -1100,7 +1102,12 @@ function nav(page) {
   const navEl = document.querySelector(`[data-page="${page}"]`);
   if (navEl) navEl.classList.add('active');
 
-  if (page==='inbox' && !S.conversations.length) loadInbox();
+  if (page==='inbox') {
+    if (!S.conversations.length) loadInbox();
+    startInboxPolling();
+  } else {
+    stopInboxPolling();
+  }
   if (page==='subscribers' && !S.subscribers.length) loadSubscribers();
   if (page==='enquiries' && !S.enquiries.length) loadEnquiries();
   if (page==='broadcast') updateBcStats();
@@ -1560,18 +1567,68 @@ function renderEnquiries() {
 // ══════════════════════════════════════════════════════
 // INBOX
 // ══════════════════════════════════════════════════════
-async function loadInbox() {
+let _inboxPollTimer = null;
+
+async function loadInbox(silent = false) {
   try {
     const res  = await api('/admin/inbox');
     const data = await res.json().catch(()=>({}));
     if (!res.ok) throw new Error(data?.error||'Failed');
-    S.conversations = data.conversations||[];
+
+    // Smart merge: preserve active conv selection and read state
+    const prevActive = S.activeConv;
+    const prevReadMap = new Map();
+    S.conversations.forEach(c => c.messages?.forEach(m => {
+      if (m.read) prevReadMap.set(m.id, true);
+    }));
+
+    S.conversations = (data.conversations||[]).map(c => ({
+      ...c,
+      messages: (c.messages||[]).map(m => ({
+        ...m,
+        read: m.read || prevReadMap.has(m.id)
+      }))
+    }));
     S.filteredConvs = [...S.conversations];
     renderConvList();
     updateDashboard();
+
+    // Re-render active conv if it got new messages
+    if (prevActive) {
+      const updated = S.conversations.find(c => c.email === prevActive);
+      if (updated) {
+        renderMsgs(updated.messages || []);
+      }
+    }
+
+    // Update refresh button + timestamp
+    const btn = document.getElementById('inboxRefreshBtn');
+    if (btn) { btn.textContent = '↻'; btn.disabled = false; }
+    const ts = document.getElementById('inboxLastRefreshed');
+    if (ts) { const now = new Date(); ts.textContent = `Last refreshed ${now.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`; }
+
   } catch(e) {
-    document.getElementById('convItems').innerHTML = `<div class="conv-empty">⚠️ ${esc(e.message)}</div>`;
+    if (!silent) {
+      document.getElementById('convItems').innerHTML = `<div class="conv-empty">⚠️ ${esc(e.message)}</div>`;
+    }
+    const btn = document.getElementById('inboxRefreshBtn');
+    if (btn) { btn.textContent = '↻'; btn.disabled = false; }
   }
+}
+
+function startInboxPolling() {
+  stopInboxPolling();
+  _inboxPollTimer = setInterval(() => loadInbox(true), 30000); // poll every 30s
+}
+
+function stopInboxPolling() {
+  if (_inboxPollTimer) { clearInterval(_inboxPollTimer); _inboxPollTimer = null; }
+}
+
+async function refreshInbox() {
+  const btn = document.getElementById('inboxRefreshBtn');
+  if (btn) { btn.textContent = '…'; btn.disabled = true; }
+  await loadInbox();
 }
 
 function renderConvList() {
