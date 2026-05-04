@@ -1104,6 +1104,12 @@ async function confirmCheckout() {
     let res, data;
     if (pendingAction === 'credits') {
       res = await fetch(`${API_BASE}/api/checkout/create`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({pack_id:selectedPackId,success_url:`${location.origin}/practice.html?payment=success`,cancel_url:`${location.origin}/plans.html`})});
+    } else if (pendingAction === 'mmi_pro') {
+      const body = { pro_tier: `transcript_${mmiProFreq}`, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
+      res = await fetch(`${API_BASE}/api/mmi/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(body)});
+    } else if (pendingAction === 'mmi_credits') {
+      const body = { pack_id: selectedMMIPackId, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
+      res = await fetch(`${API_BASE}/api/mmi/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(body)});
     } else {
       res = await fetch(`${API_BASE}/api/pro/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({success_url:`${location.origin}/practice.html?pro=success`,cancel_url:`${location.origin}/plans.html`})});
     }
@@ -1210,30 +1216,7 @@ function openMMIModal(title, sub, action) {
   document.getElementById('checkoutModal').classList.add('open');
 }
 
-// Extend confirmCheckout to handle MMI
-const _originalConfirmCheckout = confirmCheckout;
-async function confirmCheckout() {
-  if (pendingAction !== 'mmi_pro' && pendingAction !== 'mmi_credits') {
-    return _originalConfirmCheckout();
-  }
-  const btn = document.getElementById('modalConfirmBtn');
-  const al  = document.getElementById('modalAlert');
-  btn.disabled = true; btn.textContent = 'Redirecting…';
-  al.className = 'modal-alert';
-  try {
-    const token = Key2MDAuth.getToken();
-    const body = pendingAction === 'mmi_pro'
-      ? { pro_tier: `transcript_${mmiProFreq}`, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` }
-      : { pack_id: selectedMMIPackId, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
-    const res = await fetch(`${API_BASE}/api/mmi/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(body)});
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Checkout failed');
-    window.location.href = data.checkout_url;
-  } catch(e) {
-    al.className = 'modal-alert err'; al.textContent = e.message;
-    btn.disabled = false; btn.textContent = 'Continue to Payment →';
-  }
-}
+
 
 document.getElementById('checkoutModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
 document.getElementById('cancelModal').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
