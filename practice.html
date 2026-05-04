@@ -353,7 +353,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="mmi-cnt-all">—</span></button>
         <button class="cat-btn" data-cat="Motivation">Motivation <span class="cat-count" id="mmi-cnt-motivation">—</span></button>
         <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="mmi-cnt-ethics">—</span></button>
-        <button class="cat-btn" data-cat="Role-Play">Role-Play <span class="cat-count" id="mmi-cnt-roleplay">—</span></button>
         <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="mmi-cnt-conflict">—</span></button>
         <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">—</span></button>
       </div>
@@ -1604,12 +1603,11 @@ function updateCounts(){
   $('cnt-communication').textContent=c.Communication;
 }
 function updateMMICounts(){
-  const c={Motivation:0,Ethics:0,'Role-Play':0,'Conflict Resolution':0,Policy:0};
+  const c={Motivation:0,Ethics:0,'Conflict Resolution':0,Policy:0};
   MMI_STATIONS.forEach(s=>{if(c[s.category]!==undefined)c[s.category]++;});
   $('mmi-cnt-all').textContent=MMI_STATIONS.length;
   $('mmi-cnt-motivation').textContent=c.Motivation;
   $('mmi-cnt-ethics').textContent=c.Ethics;
-  $('mmi-cnt-roleplay').textContent=c['Role-Play'];
   $('mmi-cnt-conflict').textContent=c['Conflict Resolution'];
   $('mmi-cnt-policy').textContent=c.Policy;
 }
