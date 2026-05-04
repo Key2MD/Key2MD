@@ -311,9 +311,9 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <div class="mode-toggle-wrap">
       <div class="mode-toggle-label">Practice Mode</div>
       <div class="mode-pill-row" style="grid-template-columns:1fr 1fr 1fr;">
-        <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper')">💬 CASPer</button>
-        <button class="mode-pill" id="modeMMI" onclick="setMode('mmi')">🎤 MMI</button>
-        <button class="mode-pill" id="modeCircuit" onclick="setMode('circuit');MMICircuit.activateCircuitMode();" style="font-size:0.78rem;">🏃 Circuit</button>
+        <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper');var _cc=document.getElementById('casperCategoryCard');if(_cc)_cc.style.display='';">💬 CASPer</button>
+        <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');var _cc=document.getElementById('casperCategoryCard');if(_cc)_cc.style.display='none';">🎤 MMI</button>
+        <button class="mode-pill" id="modeCircuit" onclick="setMode('circuit');MMICircuit.activateCircuitMode();var _cc=document.getElementById('casperCategoryCard');if(_cc)_cc.style.display='none';" style="font-size:0.78rem;">🏃 Circuit</button>
       </div>
     </div>
 
