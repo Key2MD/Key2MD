@@ -557,6 +557,17 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <div class="mmi-card">
           <div class="mmi-card-badge">🎤 MMI Feedback</div>
 
+          <!-- Tier selector: Transcript vs Premium -->
+          <div style="display:flex;gap:6px;margin-bottom:18px;background:rgba(0,0,0,0.25);border-radius:50px;padding:4px;">
+            <button id="mmiTierTranscript" onclick="switchMMITier('transcript')" style="flex:1;padding:8px 10px;border-radius:46px;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;background:rgba(139,92,246,0.25);color:#c4b5fd;">🎤 Transcript</button>
+            <button id="mmiTierPremium" onclick="switchMMITier('premium')" style="flex:1;padding:8px 10px;border-radius:46px;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:rgba(255,255,255,0.45);">✨ Premium</button>
+          </div>
+
+          <!-- Tier badge -->
+          <div id="mmiTierBadge" style="margin-bottom:14px;padding:10px 14px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.5;">
+            <strong style="color:#c4b5fd;">Transcript</strong> — AI feedback from your spoken words. Transcription + 5-criterion analysis.
+          </div>
+
           <!-- Tab: Pro vs Credits -->
           <div class="mmi-pro-tab">
             <button class="mmi-pro-tab-btn active" id="mmiTabPro" onclick="switchMMITab('pro')">Pro (Unlimited)</button>
@@ -566,33 +577,30 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <!-- Pro panel -->
           <div id="mmiProPanel">
             <div style="display:flex;gap:10px;margin-bottom:14px;">
-              <button class="mmi-pro-tab-btn active" id="mmiFreqWeekly" onclick="switchMMIFreq('weekly')" style="background:rgba(139,92,246,0.2);color:#c4b5fd;border-radius:8px;flex:1;padding:10px;">Weekly<br><strong style="font-size:1.1rem;color:#fff;">$80</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/wk</span></button>
-              <button class="mmi-pro-tab-btn" id="mmiFreqMonthly" onclick="switchMMIFreq('monthly')" style="background:transparent;color:rgba(255,255,255,0.5);border-radius:8px;flex:1;padding:10px;border:1px solid rgba(255,255,255,0.1);">Monthly<br><strong style="font-size:1.1rem;color:rgba(255,255,255,0.7);">$240</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/mo</span></button>
+              <button id="mmiFreqWeekly" onclick="switchMMIFreq('weekly')" style="flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;text-align:center;background:rgba(139,92,246,0.2);color:#c4b5fd;">Weekly<br><strong id="mmiProPriceWeekly" style="font-size:1.1rem;color:#fff;">$80</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/wk</span></button>
+              <button id="mmiFreqMonthly" onclick="switchMMIFreq('monthly')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;font-family:inherit;transition:all 0.2s;text-align:center;background:transparent;color:rgba(255,255,255,0.5);">Monthly<br><strong id="mmiProPriceMonthly" style="font-size:1.1rem;color:rgba(255,255,255,0.7);">$240</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/mo</span></button>
             </div>
-            <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:16px;text-align:center;" id="mmiProNote">Save ~25% vs weekly · Cancel anytime</div>
-            <button class="btn-mmi-pro" id="mmiProBtn" onclick="handleMMIPro()">Start MMI Pro →</button>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:16px;text-align:center;" id="mmiProNote">Cancel anytime · Auto-renews weekly</div>
+            <button class="btn-mmi-pro" id="mmiProBtn" onclick="handleMMIPro()">Start MMI Transcript Pro →</button>
             <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:16px;">🔒 Secure checkout via Stripe · Cancel anytime</div>
-            <ul class="pro-list" style="color:rgba(255,255,255,0.7);">
+            <ul class="pro-list" id="mmiProFeatureList" style="color:rgba(255,255,255,0.7);">
               <li>Unlimited MMI Transcript reviews</li>
               <li>5-criterion feedback per prompt</li>
               <li>Polished Auditor Trap detection</li>
               <li>Specialist mode included</li>
               <li>All 60 MMI stations unlocked</li>
-              <li>Video playback for self-review</li>
-              <li class="dim">Premium (voice + visual) not included</li>
+              <li class="dim">Voice &amp; presentation metrics not included</li>
             </ul>
           </div>
 
           <!-- Credits panel -->
           <div id="mmiCreditsPanel" style="display:none;">
             <div class="mmi-credit-packs" id="mmiCreditPacks">
-              <div class="mmi-credit-pack" data-pack="mmi_transcript_1" onclick="selectMMIPack(this,'mmi_transcript_1')"><span class="mmi-pack-name">🎤 1 MMI review</span><div class="mmi-pack-right"><span class="mmi-pack-price">$5.00</span></div></div>
-              <div class="mmi-credit-pack" data-pack="mmi_transcript_5" onclick="selectMMIPack(this,'mmi_transcript_5')"><span class="mmi-pack-name">🎤 5 MMI reviews</span><div class="mmi-pack-right"><span class="mmi-pack-save">Save 10%</span><span class="mmi-pack-price">$22.50</span></div></div>
-              <div class="mmi-credit-pack" data-pack="mmi_transcript_10" onclick="selectMMIPack(this,'mmi_transcript_10')"><span class="mmi-pack-name">🎤 10 MMI reviews</span><div class="mmi-pack-right"><span class="mmi-pack-save">Save 20%</span><span class="mmi-pack-price">$40.00</span></div></div>
+              <!-- populated by switchMMITier() -->
             </div>
             <button class="btn-mmi-pro" id="mmiCreditsBtn" onclick="handleMMICredits()">Buy MMI Credits →</button>
             <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:16px;">Credits never expire · Use anytime</div>
-            <ul class="pro-list" style="color:rgba(255,255,255,0.7);">
+            <ul class="pro-list" id="mmiCreditFeatureList" style="color:rgba(255,255,255,0.7);">
               <li>Full 5-criterion feedback per response</li>
               <li>Polished Auditor Trap detection</li>
               <li>No subscription — pay as you go</li>
@@ -1044,6 +1052,7 @@ let pendingAction = null;
 document.addEventListener('DOMContentLoaded', () => {
   Key2MDAuth.init({ tool:'casper', apiBase:API_BASE, onAuthChange:updateUI });
   initFadeObserver();
+  renderMMICreditPacks('transcript');
 });
 
 function updateUI() {
@@ -1116,7 +1125,7 @@ async function confirmCheckout() {
     if (pendingAction === 'credits') {
       res = await fetch(`${API_BASE}/api/checkout/create`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({pack_id:selectedPackId,success_url:`${location.origin}/practice.html?payment=success`,cancel_url:`${location.origin}/plans.html`})});
     } else if (pendingAction === 'mmi_pro') {
-      const body = { pro_tier: `transcript_${mmiProFreq}`, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
+      const body = { pro_tier: `${mmiTier}_${mmiProFreq}`, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
       res = await fetch(`${API_BASE}/api/mmi/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(body)});
     } else if (pendingAction === 'mmi_credits') {
       const body = { pack_id: selectedMMIPackId, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
@@ -1170,12 +1179,133 @@ function initFadeObserver() {
 // ── MMI ──────────────────────────────────────────────
 let selectedMMIPackId = null;
 let mmiProFreq = 'weekly';
+let mmiTier = 'transcript'; // 'transcript' | 'premium'
+
+const MMI_PACKS = {
+  transcript: [
+    { id: 'mmi_transcript_1',  label: '🎤 1 Transcript review',   price: '$5.00',  save: null },
+    { id: 'mmi_transcript_5',  label: '🎤 5 Transcript reviews',  price: '$22.50', save: 'Save 10%' },
+    { id: 'mmi_transcript_10', label: '🎤 10 Transcript reviews', price: '$40.00', save: 'Save 20%' },
+  ],
+  premium: [
+    { id: 'mmi_premium_1',  label: '✨ 1 Premium review',   price: '$12.00', save: null },
+    { id: 'mmi_premium_5',  label: '✨ 5 Premium reviews',  price: '$54.00', save: 'Save 10%' },
+    { id: 'mmi_premium_10', label: '✨ 10 Premium reviews', price: '$96.00', save: 'Save 20%' },
+  ],
+};
+
+const MMI_PRO_PRICES = {
+  transcript: { weekly: '$80', monthly: '$240' },
+  premium:    { weekly: '$140', monthly: '$420' },
+};
+
+const MMI_CREDIT_LABELS = {
+  mmi_transcript_1: '1 Transcript Review — $5.00',
+  mmi_transcript_5: '5 Transcript Reviews — $22.50',
+  mmi_transcript_10: '10 Transcript Reviews — $40.00',
+  mmi_premium_1: '1 Premium Review — $12.00',
+  mmi_premium_5: '5 Premium Reviews — $54.00',
+  mmi_premium_10: '10 Premium Reviews — $96.00',
+};
+
+const MMI_CREDIT_PRICES = {
+  mmi_transcript_1: '$5.00', mmi_transcript_5: '$22.50', mmi_transcript_10: '$40.00',
+  mmi_premium_1: '$12.00', mmi_premium_5: '$54.00', mmi_premium_10: '$96.00',
+};
+
+function switchMMITier(tier) {
+  mmiTier = tier;
+  selectedMMIPackId = null;
+
+  // Tier selector buttons
+  const tBtn  = document.getElementById('mmiTierTranscript');
+  const pBtn  = document.getElementById('mmiTierPremium');
+  const badge = document.getElementById('mmiTierBadge');
+
+  if (tier === 'transcript') {
+    tBtn.style.background = 'rgba(139,92,246,0.25)'; tBtn.style.color = '#c4b5fd';
+    pBtn.style.background = 'transparent';            pBtn.style.color = 'rgba(255,255,255,0.45)';
+    badge.innerHTML = '<strong style="color:#c4b5fd;">Transcript</strong> — AI feedback from your spoken words. Transcription + 5-criterion analysis.';
+  } else {
+    pBtn.style.background = 'rgba(139,92,246,0.25)'; pBtn.style.color = '#c4b5fd';
+    tBtn.style.background = 'transparent';            tBtn.style.color = 'rgba(255,255,255,0.45)';
+    badge.innerHTML = '<strong style="color:#c4b5fd;">Premium</strong> — Transcript + <strong style="color:#fff;">voice pacing</strong> + <strong style="color:#fff;">presentation analysis</strong> via video frames.';
+  }
+
+  // Update Pro prices
+  const prices = MMI_PRO_PRICES[tier];
+  document.getElementById('mmiProPriceWeekly').textContent  = prices.weekly;
+  document.getElementById('mmiProPriceMonthly').textContent = prices.monthly;
+
+  // Update Pro button label & note
+  const tierLabel = tier === 'transcript' ? 'Transcript' : 'Premium';
+  document.getElementById('mmiProBtn').textContent = `Start MMI ${tierLabel} Pro →`;
+
+  // Update Pro features list
+  const proFeats = document.getElementById('mmiProFeatureList');
+  if (tier === 'transcript') {
+    proFeats.innerHTML = `
+      <li>Unlimited MMI Transcript reviews</li>
+      <li>5-criterion feedback per prompt</li>
+      <li>Polished Auditor Trap detection</li>
+      <li>Specialist mode included</li>
+      <li>All 60 MMI stations unlocked</li>
+      <li class="dim">Voice &amp; presentation metrics not included</li>`;
+  } else {
+    proFeats.innerHTML = `
+      <li>Unlimited MMI Premium reviews</li>
+      <li>Voice pacing + filler word analysis</li>
+      <li>Presentation &amp; composure analysis</li>
+      <li>5-criterion feedback per prompt</li>
+      <li>Polished Auditor Trap detection</li>
+      <li>Specialist mode included</li>`;
+  }
+
+  // Re-render credit packs
+  renderMMICreditPacks(tier);
+
+  // Reset credit button label
+  document.getElementById('mmiCreditsBtn').textContent = `Buy MMI ${tierLabel} Credits →`;
+
+  // Update credit features list
+  const creditFeats = document.getElementById('mmiCreditFeatureList');
+  if (tier === 'transcript') {
+    creditFeats.innerHTML = `
+      <li>Full 5-criterion feedback per response</li>
+      <li>Polished Auditor Trap detection</li>
+      <li>No subscription — pay as you go</li>
+      <li>Credits never expire</li>
+      <li class="dim">Pro is better value at volume</li>`;
+  } else {
+    creditFeats.innerHTML = `
+      <li>Everything in Transcript, plus:</li>
+      <li>Voice pacing + filler word analysis</li>
+      <li>Presentation &amp; composure analysis</li>
+      <li>Credits never expire</li>
+      <li class="dim">Pro is better value at volume</li>`;
+  }
+
+  // Sync freq note
+  switchMMIFreq(mmiProFreq);
+}
+
+function renderMMICreditPacks(tier) {
+  const container = document.getElementById('mmiCreditPacks');
+  container.innerHTML = MMI_PACKS[tier].map(pack => `
+    <div class="mmi-credit-pack" data-pack="${pack.id}" onclick="selectMMIPack(this,'${pack.id}')">
+      <span class="mmi-pack-name">${pack.label}</span>
+      <div class="mmi-pack-right">
+        ${pack.save ? `<span class="mmi-pack-save">${pack.save}</span>` : ''}
+        <span class="mmi-pack-price">${pack.price}</span>
+      </div>
+    </div>`).join('');
+}
 
 function switchMMITab(tab) {
-  document.getElementById('mmiProPanel').style.display    = tab==='pro' ? 'block' : 'none';
-  document.getElementById('mmiCreditsPanel').style.display = tab==='credits' ? 'block' : 'none';
-  document.getElementById('mmiTabPro').classList.toggle('active', tab==='pro');
-  document.getElementById('mmiTabCredits').classList.toggle('active', tab==='credits');
+  document.getElementById('mmiProPanel').style.display     = tab === 'pro'     ? 'block' : 'none';
+  document.getElementById('mmiCreditsPanel').style.display = tab === 'credits' ? 'block' : 'none';
+  document.getElementById('mmiTabPro').classList.toggle('active', tab === 'pro');
+  document.getElementById('mmiTabCredits').classList.toggle('active', tab === 'credits');
 }
 
 function switchMMIFreq(freq) {
@@ -1183,14 +1313,14 @@ function switchMMIFreq(freq) {
   const wBtn = document.getElementById('mmiFreqWeekly');
   const mBtn = document.getElementById('mmiFreqMonthly');
   const note = document.getElementById('mmiProNote');
-  if (freq==='weekly') {
-    wBtn.style.background='rgba(139,92,246,0.2)'; wBtn.style.color='#c4b5fd'; wBtn.style.border='none';
-    mBtn.style.background='transparent'; mBtn.style.color='rgba(255,255,255,0.5)'; mBtn.style.border='1px solid rgba(255,255,255,0.1)';
-    note.textContent='Cancel anytime · Auto-renews weekly';
+  if (freq === 'weekly') {
+    wBtn.style.background = 'rgba(139,92,246,0.2)'; wBtn.style.color = '#c4b5fd'; wBtn.style.border = 'none';
+    mBtn.style.background = 'transparent'; mBtn.style.color = 'rgba(255,255,255,0.5)'; mBtn.style.border = '1px solid rgba(255,255,255,0.1)';
+    note.textContent = 'Cancel anytime · Auto-renews weekly';
   } else {
-    mBtn.style.background='rgba(139,92,246,0.2)'; mBtn.style.color='#c4b5fd'; mBtn.style.border='none';
-    wBtn.style.background='transparent'; wBtn.style.color='rgba(255,255,255,0.5)'; wBtn.style.border='1px solid rgba(255,255,255,0.1)';
-    note.textContent='Save ~25% vs weekly · Cancel anytime';
+    mBtn.style.background = 'rgba(139,92,246,0.2)'; mBtn.style.color = '#c4b5fd'; mBtn.style.border = 'none';
+    wBtn.style.background = 'transparent'; wBtn.style.color = 'rgba(255,255,255,0.5)'; wBtn.style.border = '1px solid rgba(255,255,255,0.1)';
+    note.textContent = 'Save ~25% vs weekly · Cancel anytime';
   }
 }
 
@@ -1198,23 +1328,24 @@ function selectMMIPack(el, packId) {
   document.querySelectorAll('.mmi-credit-pack').forEach(p => p.classList.remove('selected'));
   el.classList.add('selected');
   selectedMMIPackId = packId;
-  const labels = {mmi_transcript_1:'1 MMI Review — $5.00', mmi_transcript_5:'5 MMI Reviews — $22.50', mmi_transcript_10:'10 MMI Reviews — $40.00'};
-  document.getElementById('mmiCreditsBtn').textContent = `Buy ${labels[packId]} →`;
+  document.getElementById('mmiCreditsBtn').textContent = `Buy ${MMI_CREDIT_LABELS[packId]} →`;
 }
 
 function handleMMIPro() {
   if (!Key2MDAuth.isLoggedIn()) { Key2MDAuth.showAuthModal('signup'); return; }
-  const label = mmiProFreq==='weekly' ? 'MMI Transcript Pro — Weekly' : 'MMI Transcript Pro — Monthly';
-  const price = mmiProFreq==='weekly' ? '$80.00 AUD/week' : '$240.00 AUD/month';
-  openMMIModal(label, `${price} · Unlimited MMI reviews · Cancel anytime`, 'mmi_pro');
+  const tierLabel = mmiTier === 'transcript' ? 'MMI Transcript Pro' : 'MMI Premium Pro';
+  const prices = MMI_PRO_PRICES[mmiTier];
+  const price   = mmiProFreq === 'weekly' ? `${prices.weekly} AUD/week` : `${prices.monthly} AUD/month`;
+  openMMIModal(`${tierLabel} — ${mmiProFreq.charAt(0).toUpperCase() + mmiProFreq.slice(1)}`,
+    `${price} · Unlimited MMI reviews · Cancel anytime`, 'mmi_pro');
 }
 
 function handleMMICredits() {
   if (!Key2MDAuth.isLoggedIn()) { Key2MDAuth.showAuthModal('signup'); return; }
   if (!selectedMMIPackId) { alert('Please select a credit pack first.'); return; }
-  const prices = {mmi_transcript_1:'$5.00', mmi_transcript_5:'$22.50', mmi_transcript_10:'$40.00'};
-  const labels = {mmi_transcript_1:'1 MMI Review', mmi_transcript_5:'5 MMI Reviews', mmi_transcript_10:'10 MMI Reviews'};
-  openMMIModal(`Buy ${labels[selectedMMIPackId]}`, `${prices[selectedMMIPackId]} · One-time · Credits never expire`, 'mmi_credits');
+  const price = MMI_CREDIT_PRICES[selectedMMIPackId];
+  const label = MMI_CREDIT_LABELS[selectedMMIPackId];
+  openMMIModal(`Buy ${label.split(' — ')[0]}`, `${price} · One-time · Credits never expire`, 'mmi_credits');
 }
 
 function openMMIModal(title, sub, action) {
@@ -1226,6 +1357,7 @@ function openMMIModal(title, sub, action) {
   pendingAction = action;
   document.getElementById('checkoutModal').classList.add('open');
 }
+
 
 
 
