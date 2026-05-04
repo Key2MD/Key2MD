@@ -313,7 +313,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="mode-pill-row" style="grid-template-columns:1fr 1fr 1fr;">
         <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper')">💬 CASPer</button>
         <button class="mode-pill" id="modeMMI" onclick="setMode('mmi')">🎤 MMI</button>
-        <button class="mode-pill" id="modeCircuit" onclick="MMICircuit.activateCircuitMode()" style="font-size:0.78rem;">🏃 Circuit</button>
+        <button class="mode-pill" id="modeCircuit" onclick="setMode('circuit');MMICircuit.activateCircuitMode();" style="font-size:0.78rem;">🏃 Circuit</button>
       </div>
     </div>
 
@@ -322,26 +322,40 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <!-- CASPer category filters -->
     <div class="sidebar-card" id="casperCategoryCard">
       <h3>Category</h3>
+      <!-- Library coverage bar (4.3) -->
+      <div id="casperCoverageWrap" style="margin-bottom:10px;">
+        <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
+          <div id="casperCoverageBar" style="height:100%;width:0%;background:var(--teal);border-radius:2px;transition:width 0.4s;"></div>
+        </div>
+        <div id="casperCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
+      </div>
       <div class="category-filters" id="categoryFilters">
-        <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="cnt-all">52</span></button>
-        <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="cnt-ethics">0</span></button>
-        <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="cnt-conflict">0</span></button>
-        <button class="cat-btn" data-cat="Personal">Personal <span class="cat-count" id="cnt-personal">0</span></button>
-        <button class="cat-btn" data-cat="Professionalism">Professionalism <span class="cat-count" id="cnt-professionalism">0</span></button>
-        <button class="cat-btn" data-cat="Communication">Communication <span class="cat-count" id="cnt-communication">0</span></button>
+        <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="cnt-all">—</span></button>
+        <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="cnt-ethics">—</span></button>
+        <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="cnt-conflict">—</span></button>
+        <button class="cat-btn" data-cat="Personal">Personal <span class="cat-count" id="cnt-personal">—</span></button>
+        <button class="cat-btn" data-cat="Professionalism">Professionalism <span class="cat-count" id="cnt-professionalism">—</span></button>
+        <button class="cat-btn" data-cat="Communication">Communication <span class="cat-count" id="cnt-communication">—</span></button>
       </div>
     </div>
 
     <!-- MMI category filters -->
     <div class="sidebar-card" id="mmiCategoryCard" style="display:none;">
       <h3>MMI Station Type</h3>
+      <!-- Library coverage bar (4.3) -->
+      <div id="mmiCoverageWrap" style="margin-bottom:10px;">
+        <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
+          <div id="mmiCoverageBar" style="height:100%;width:0%;background:#7c3aed;border-radius:2px;transition:width 0.4s;"></div>
+        </div>
+        <div id="mmiCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
+      </div>
       <div class="category-filters" id="mmiCategoryFilters">
-        <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="mmi-cnt-all">10</span></button>
-        <button class="cat-btn" data-cat="Motivation">Motivation <span class="cat-count" id="mmi-cnt-motivation">0</span></button>
-        <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="mmi-cnt-ethics">0</span></button>
-        <button class="cat-btn" data-cat="Role-Play">Role-Play <span class="cat-count" id="mmi-cnt-roleplay">0</span></button>
-        <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="mmi-cnt-conflict">0</span></button>
-        <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">0</span></button>
+        <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="mmi-cnt-all">—</span></button>
+        <button class="cat-btn" data-cat="Motivation">Motivation <span class="cat-count" id="mmi-cnt-motivation">—</span></button>
+        <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="mmi-cnt-ethics">—</span></button>
+        <button class="cat-btn" data-cat="Role-Play">Role-Play <span class="cat-count" id="mmi-cnt-roleplay">—</span></button>
+        <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="mmi-cnt-conflict">—</span></button>
+        <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">—</span></button>
       </div>
     </div>
 
@@ -660,6 +674,8 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <div class="station-header">
       <span class="station-num" id="stationNum">Station —</span>
       <span class="category-pill phase-idle" id="categoryPill">Select a category &amp; press Start</span>
+      <span id="seenBeforePill" style="display:none;"></span>
+      <button id="starBtn" onclick="toggleStarStation()" title="Star this station" style="display:none;background:none;border:none;font-size:1rem;cursor:pointer;padding:2px 4px;line-height:1;color:var(--gray400);transition:color 0.2s;" aria-label="Star station">☆</button>
       <div class="header-spacer"></div>
 <div id="lbRankBadge" style="display:none;align-items:center;gap:6px;padding:5px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:50px;font-size:0.78rem;font-weight:700;color:var(--teal3);">🏆 <span id="lbRankBadgeText">—</span></div>
       <div class="timer-display">
@@ -787,6 +803,14 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="answer-section" id="answerSection" style="display:none;">
         <div class="answer-label">Your response <span class="word-count" id="wordCount">0 words</span>
           <button class="btn-download" id="btnDownloadResponse" title="Download your response">⬇ Save Response</button>
+            <!-- Self-rating (4.2) -->
+            <span id="selfRatingWrap" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:0.72rem;color:var(--gray400);font-weight:500;">How'd you do?</span>
+              <button class="self-rate-btn" data-q="Q1" onclick="setSelfRating('Q1')" title="Q1 — Needs work">Q1</button>
+              <button class="self-rate-btn" data-q="Q2" onclick="setSelfRating('Q2')" title="Q2 — Developing">Q2</button>
+              <button class="self-rate-btn" data-q="Q3" onclick="setSelfRating('Q3')" title="Q3 — Good">Q3</button>
+              <button class="self-rate-btn" data-q="Q4" onclick="setSelfRating('Q4')" title="Q4 — Excellent">Q4</button>
+            </span>
             <span id="btnGetAIWrap" style="display:none;align-items:center;gap:8px;">
               <button class="btn-download" id="btnGetAI" onclick="manualRunAI()" title="Get AI feedback on your response" style="background:rgba(14,165,233,0.12);">✦ Get AI Feedback + Quartile</button>
               <span id="btnAIRemaining" style="font-size:0.75rem;color:var(--teal3);font-weight:700;white-space:nowrap;"></span>
@@ -841,6 +865,11 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <div class="chart-container"><canvas id="reviewCanvas"></canvas></div>
       </div>
       <div class="review-list">
+        <!-- Per-category breakdown (4.1) -->
+        <div id="reviewCatBreakdown" style="display:none;margin-bottom:20px;">
+          <h3>Category Breakdown</h3>
+          <div id="reviewCatChart" style="max-width:480px;"></div>
+        </div>
         <h3>Station Review</h3>
         <div class="review-filter-row">
           <button class="review-filter-btn active" data-filter="all">All</button>
@@ -989,6 +1018,7 @@ let mmiRandomWarnShown = false;
 let mmiCentralTimerInterval = null;
 
 function selectMMIPreset(preset) {
+  if(currentMode !== MODE_MMI) return; // guard: MMI only
   mmiActivePreset = preset;
   document.querySelectorAll('.preset-card').forEach(b => b.classList.remove('active'));
   const btn = document.querySelector(`[data-preset="${preset}"]`);
@@ -1356,7 +1386,98 @@ async function updateMMILimitsUI() {
 // ══ STATE ══
 const MODE_CASPER = 'casper';
 const MODE_MMI = 'mmi';
+const MODE_CIRCUIT = 'circuit';
 let currentMode = MODE_CASPER;
+
+// ══ STATION HISTORY (localStorage, spaced-rep) ══════════════════════════════
+const StationHistory = (() => {
+  const KEY = 'k2md_station_history_v1';
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY) || '{}'); }
+    catch(e) { console.warn('StationHistory read error:', e); return {}; }
+  }
+  function save(data) {
+    try { localStorage.setItem(KEY, JSON.stringify(data)); }
+    catch(e) { console.warn('StationHistory write error:', e); }
+  }
+  return {
+    get(stationId) {
+      try { const d = load(); return d[stationId] || null; }
+      catch(e) { console.warn('StationHistory.get error:', e); return null; }
+    },
+    record(stationId, score) {
+      try {
+        const d = load();
+        const existing = d[stationId] || { attemptCount: 0 };
+        d[stationId] = {
+          lastSeenAt: Date.now(),
+          attemptCount: (existing.attemptCount || 0) + 1,
+          lastScore: score != null ? score : (existing.lastScore != null ? existing.lastScore : null),
+          starred: existing.starred || false,
+        };
+        save(d);
+      } catch(e) { console.warn('StationHistory.record error:', e); }
+    },
+    toggleStar(stationId) {
+      try {
+        const d = load();
+        const existing = d[stationId] || { attemptCount: 0, lastSeenAt: null, lastScore: null, starred: false };
+        existing.starred = !existing.starred;
+        d[stationId] = existing;
+        save(d);
+        return existing.starred;
+      } catch(e) { console.warn('StationHistory.toggleStar error:', e); return false; }
+    },
+    getStarred() {
+      try {
+        const d = load();
+        return Object.keys(d).filter(id => d[id] && d[id].starred);
+      } catch(e) { console.warn('StationHistory.getStarred error:', e); return []; }
+    },
+    all() {
+      try { return load(); }
+      catch(e) { return {}; }
+    }
+  };
+})();
+
+// ══ WEIGHTED POOL (spaced-rep) ════════════════════════════════════════════════
+function buildWeightedPool(stations) {
+  const now = Date.now();
+  const DAY = 86400000;
+  const weighted = stations.map(s => {
+    const id = s.id || `mmi_${(typeof MMI_STATIONS !== 'undefined' ? MMI_STATIONS.indexOf(s) : -1)}`;
+    const h = StationHistory.get(id);
+    let w;
+    if (!h || !h.lastSeenAt) {
+      w = 10;
+    } else {
+      const daysSince = (now - h.lastSeenAt) / DAY;
+      if (daysSince >= 7)      w = 6;
+      else if (daysSince >= 3) w = 3;
+      else                     w = 1;
+      if (h.lastScore != null && h.lastScore < 6) w += 2;
+    }
+    return { station: s, weight: w };
+  });
+  const result = [];
+  const remaining = [...weighted];
+  while (remaining.length > 0) {
+    const total = remaining.reduce((sum, x) => sum + x.weight, 0);
+    let r = Math.random() * total;
+    let idx = 0;
+    for (let i = 0; i < remaining.length; i++) {
+      r -= remaining[i].weight;
+      if (r <= 0) { idx = i; break; }
+    }
+    result.push(remaining[idx].station);
+    remaining.splice(idx, 1);
+  }
+  return result;
+}
+
+// Track which stations have been recorded this session (avoid double-count)
+let _sessionRecordedIds = new Set();
 let pool=[],currentIdx=0,completed=0,sessionPool=[];
 // Expose these globals so mmi-engine.js can read them
 window.pool = pool; // updated by reference won't work for primitives — engine reads window.currentIdx
@@ -1495,6 +1616,8 @@ function updateMMICounts(){
 updateCounts();
 updateMMICounts();
 updateLimitUI();
+// Update library coverage on initial load
+document.addEventListener('DOMContentLoaded', function(){ updateLibraryCoverage(); updateStarredCategoryBtn(); });
 
 // Sliders
 $('readingSlider').addEventListener('input',function(){
@@ -1528,7 +1651,14 @@ $('mmiHidePrompts').addEventListener('change',()=>{mmiHidePrompts=$('mmiHideProm
 function updateAiStatus(){updateLimitUI();}
 
 // Utils
-function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
+function shuffle(a){
+  const r=[...a];
+  for(let i=r.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [r[i],r[j]]=[r[j],r[i]];
+  }
+  return r;
+}
 function fmt(s){const m=Math.floor(s/60);return m+':'+(s%60<10?'0':'')+(s%60);}
 function catClass(cat){return{Ethics:'cat-ethics','Conflict Resolution':'cat-conflict',Personal:'cat-personal',Professionalism:'cat-professional',Communication:'cat-communication',Motivation:'cat-personal','Role-Play':'cat-communication',Policy:'cat-ethics',MMI:'cat-mmi'}[cat]||'cat-ethics';}
 function clearTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
@@ -1706,32 +1836,60 @@ answerTextarea.addEventListener('input',()=>{
 });
 
 // ══ MODE SWITCHING ══
-function setMode(mode){
-  currentMode=mode;
-  const isCasper=mode===MODE_CASPER;
-  $('modeCasper').className='mode-pill'+(isCasper?' active-casper':'');
-  $('modeMMI').className='mode-pill'+(isCasper?'':' active-mmi');
-  $('casperCategoryCard').style.display=isCasper?'':'none';
-  $('mmiCategoryCard').style.display=isCasper?'none':'';
-  $('mmiOptionsCard').style.display=isCasper?'none':'';
-  $('webcamPanel').className='webcam-panel'+(isCasper?'':' show');
-  // Update title
-  document.getElementById('pageTitle').textContent=(isCasper?'CASPer':'MMI')+' Practice — Key2MD';
+function applyModeUI(mode) {
+  const isCasper  = mode === MODE_CASPER;
+  const isMMI     = mode === MODE_MMI;
+  const isCircuit = mode === MODE_CIRCUIT;
+
+  // Pills
+  const pillC = $('modeCasper'), pillM = $('modeMMI'), pillR = $('modeCircuit');
+  if (pillC) pillC.className = 'mode-pill' + (isCasper  ? ' active-casper'  : '');
+  if (pillM) pillM.className = 'mode-pill' + (isMMI     ? ' active-mmi'     : '');
+  if (pillR) pillR.className = 'mode-pill' + (isCircuit ? ' active-circuit' : '');
+
+  // Cards visibility (use style.display consistently)
+  const cc = $('casperCategoryCard'), mc = $('mmiCategoryCard'), mo = $('mmiOptionsCard');
+  if (cc) cc.style.display = isCasper           ? '' : 'none';
+  if (mc) mc.style.display = (isMMI||isCircuit) ? '' : 'none';
+  if (mo) mo.style.display = isMMI              ? '' : 'none';
+
+  // Webcam
+  const wp = $('webcamPanel');
+  if (wp) wp.className = 'webcam-panel' + (isCasper ? '' : ' show');
+
+  // Timer mode picker (only idle CASPer)
+  const tmp = $('timerModePicker');
+  if (tmp) tmp.style.display = (isCasper && phase === 'idle') ? '' : 'none';
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  applyModeUI(mode);
+
+  const isCasper  = mode === MODE_CASPER;
+  const isMMI     = mode === MODE_MMI;
+
+  // Update page title
+  const pt = document.getElementById('pageTitle');
+  if (pt) pt.textContent = (isCasper ? 'CASPer' : isMMI ? 'MMI' : 'Circuit') + ' Practice — Key2MD';
+
   // Update idle text
-  $('idle-sub-text').textContent=isCasper
-    ?'Choose a category and press Start Session to begin your CASPer practice simulation.'
-    :'Choose a station type and press Start Session to begin your MMI simulation.';
-  const tmp=document.getElementById('timerModePicker');
-  if(tmp) tmp.style.display=isCasper?'':'none';
+  const ist = $('idle-sub-text');
+  if (ist) ist.textContent = isCasper
+    ? 'Choose a category and press Start Session to begin your CASPer practice simulation.'
+    : isMMI
+    ? 'Choose a station type and press Start Session to begin your MMI simulation.'
+    : 'Configure your circuit below and press Start Circuit.';
+
   // Update timer defaults
-  if(!isCasper){
+  if (!isCasper) {
     $('readingSlider').min=30;$('readingSlider').max=180;$('readingSlider').value=120;
     $('writingSlider').min=60;$('writingSlider').max=600;$('writingSlider').value=300;
     $('readingVal').textContent='2:00';$('writingVal').textContent='5:00';
     mmiReadingTime=120;mmiAnswerTime=300;
-    // Reset category selection
     document.querySelectorAll('#mmiCategoryFilters .cat-btn').forEach(b=>b.classList.remove('active'));
-    $('mmiCategoryFilters').querySelector('.cat-btn').classList.add('active');
+    const firstMMI = $('mmiCategoryFilters')?.querySelector('.cat-btn');
+    if (firstMMI) firstMMI.classList.add('active');
     selectedCategory='All';
   } else {
     $('readingSlider').min=15;$('readingSlider').max=120;$('readingSlider').value=60;
@@ -1739,10 +1897,12 @@ function setMode(mode){
     $('readingVal').textContent='60s';$('writingVal').textContent='3:30';
     readingTime=60;writingTime=210;
     document.querySelectorAll('#categoryFilters .cat-btn').forEach(b=>b.classList.remove('active'));
-    $('categoryFilters').querySelector('.cat-btn').classList.add('active');
+    const firstCasper = $('categoryFilters')?.querySelector('.cat-btn');
+    if (firstCasper) firstCasper.classList.add('active');
     selectedCategory='All';
   }
-  // Reset session
+
+  // Reset session state
   clearTimer();sessionActive=false;phase='idle';
   scenarioIdle.style.display='';scenarioText.style.display='none';
   prompt1Wrap.style.display='none';prompt2Wrap.style.display='none';
@@ -1751,8 +1911,9 @@ function setMode(mode){
   setPhaseUI('idle');
   $('startBtn').classList.remove('running');$('startBtnText').textContent='Start Session';$('startBtnIcon').textContent='▶';
   reviewPanel.classList.remove('show');scenarioCard.style.display='';
-  updateLimitUI(); // Update AI sidebar for mode change
-  if(currentMode===MODE_MMI) updateMMILimitsUI();
+  updateLimitUI();
+  if (currentMode === MODE_MMI) updateMMILimitsUI();
+  updateLibraryCoverage();
 }
 
 // ══ WEBCAM ══
@@ -1996,8 +2157,17 @@ $('btnDownloadResponse').addEventListener('click',()=>{
 // ══ SESSION ══
 function startSession(){
   clearTimer();
+  _sessionRecordedIds = new Set(); // reset per-session recording tracker
   const stations=currentMode===MODE_CASPER?STATIONS:MMI_STATIONS;
-  pool=shuffle(selectedCategory==='All'?stations:stations.filter(s=>s.category===selectedCategory));
+  let filtered;
+  if(selectedCategory==='__starred'){
+    const starred=new Set(StationHistory.getStarred());
+    filtered=stations.filter(s=>starred.has(s.id||`mmi_${MMI_STATIONS.indexOf(s)}`));
+    if(!filtered.length){alert('No starred stations yet. Star some stations first!');return;}
+  } else {
+    filtered=selectedCategory==='All'?stations:stations.filter(s=>s.category===selectedCategory);
+  }
+  pool=buildWeightedPool(filtered);
   sessionPool=[...pool];currentIdx=0;completed=0;sessionHistory=[];
   sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
   $('startBtn').classList.add('running');$('startBtnText').textContent='Restart';$('startBtnIcon').textContent='↺';
@@ -2016,6 +2186,9 @@ function loadStation(){
   retryUsed=false;
   stationNum.textContent=`Station ${currentIdx+1}`;statCompleted.textContent=completed;
   categoryPill.className='category-pill '+catClass(s.category);categoryPill.textContent=s.category;
+  updateSeenPill(s);
+  updateStarBtn(s);
+  updateLibraryCoverage();
   scenarioIdle.style.display='none';scenarioText.style.display='';scenarioText.textContent=s.scenario;
 
   // Reset answer area
@@ -2029,6 +2202,8 @@ function loadStation(){
   aiFeedbackWrap.innerHTML='';
   $('aiFeedbackWrapMMI').innerHTML='';
   const _aw=$('btnGetAIWrap');if(_aw)_aw.style.display='none';
+  const _srw=document.getElementById('selfRatingWrap');if(_srw)_srw.style.display='none';
+  document.querySelectorAll('.self-rate-btn').forEach(b=>b.classList.remove('self-rate-active'));
 
   // Hide prompt3/4 wraps always on load
   const p3w=$('prompt3Wrap'),p4w=$('prompt4Wrap');
@@ -2115,6 +2290,10 @@ function startWriting(){
     // CASPer: show text area
     answerSection.style.display='block';
     answerTextarea.focus();
+    // Show self-rating row
+    const srw = document.getElementById('selfRatingWrap');
+    if(srw) srw.style.display = 'inline-flex';
+    document.querySelectorAll('.self-rate-btn').forEach(b=>b.classList.remove('self-rate-active'));
     setPhaseUI('writing');
     if(currentTimerMode==='off'){
       // No timer — user manually advances
@@ -2380,7 +2559,12 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
     h.score = fb.score;
     h.feedback = fb;
     h.aiSaved = true;
+    // Record attempt with AI score
+    const _sid = h.station?.id || `mmi_${(typeof MMI_STATIONS!=='undefined'?MMI_STATIONS.indexOf(h.station):-1)}`;
+    if(!_sessionRecordedIds.has(_sid)){_sessionRecordedIds.add(_sid);StationHistory.record(_sid,fb.score);}
     updateLimitUI();
+    updateLibraryCoverage();
+    if(pool[currentIdx]) { updateSeenPill(pool[currentIdx]); updateStarBtn(pool[currentIdx]); }
     showFeedback(fb.score,fb);updateTrend();updateAvgStat();
     refreshLeaderboardData({silent:true});
     try{ k2TrackCompletion(fb.score); }catch(e){}
@@ -2464,6 +2648,7 @@ function showFeedback(score,fb){
     </div>
   </div>`;
   getAiFbEl().innerHTML=`
+  ${getSelfRatingComparisonHtml(sessionHistory[currentIdx]?.selfRating, score)}
   <div style="background:linear-gradient(135deg,#0a1628,#112240);border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.08);">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
       <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;">${score}<span style="font-size:1rem;color:rgba(255,255,255,0.4);font-weight:400;">/10</span></div>
@@ -2557,6 +2742,194 @@ function updateTrend(){
   if(trendAvgLine)trendAvgLine.style.display='flex';if(trendAvgNum)trendAvgNum.textContent=(Math.round(avg*10)/10)+'/10';
 }
 function updateAvgStat(){const avg=avgScores();if(avg!==null){statAvg.textContent=avg+'/10';statAvg.style.color=avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';} updateLeaderboard(); updateCategoryHeatmap();}
+
+// ══ LIBRARY COVERAGE BAR (4.3) ═══════════════════════════════════════════════
+function updateLibraryCoverage() {
+  // CASPer
+  if(typeof STATIONS !== 'undefined') {
+    const total = STATIONS.length;
+    const seen = STATIONS.filter(s => {
+      const id = s.id || `casper_${STATIONS.indexOf(s)}`;
+      const h = StationHistory.get(id);
+      return h && h.attemptCount > 0;
+    }).length;
+    const pct = total > 0 ? Math.round(seen / total * 100) : 0;
+    const bar = document.getElementById('casperCoverageBar');
+    const lbl = document.getElementById('casperCoverageLabel');
+    if (bar) bar.style.width = pct + '%';
+    if (lbl) lbl.textContent = seen + ' of ' + total + ' stations seen';
+  }
+  // MMI
+  if(typeof MMI_STATIONS !== 'undefined') {
+    const total = MMI_STATIONS.length;
+    const seen = MMI_STATIONS.filter(s => {
+      const id = s.id || `mmi_${MMI_STATIONS.indexOf(s)}`;
+      const h = StationHistory.get(id);
+      return h && h.attemptCount > 0;
+    }).length;
+    const pct = total > 0 ? Math.round(seen / total * 100) : 0;
+    const bar = document.getElementById('mmiCoverageBar');
+    const lbl = document.getElementById('mmiCoverageLabel');
+    if (bar) bar.style.width = pct + '%';
+    if (lbl) lbl.textContent = seen + ' of ' + total + ' stations seen';
+  }
+  // Update starred button visibility
+  updateStarredCategoryBtn();
+}
+
+// ══ SEEN-BEFORE PILL (4.4) ════════════════════════════════════════════════════
+function updateSeenPill(station) {
+  const pill = document.getElementById('seenBeforePill');
+  if (!pill) return;
+  const id = station.id || (currentMode === MODE_MMI
+    ? `mmi_${(typeof MMI_STATIONS !== 'undefined' ? MMI_STATIONS.indexOf(station) : -1)}`
+    : `casper_${(typeof STATIONS !== 'undefined' ? STATIONS.indexOf(station) : -1)}`);
+  const h = StationHistory.get(id);
+  pill.style.display = '';
+  if (!h || !h.attemptCount) {
+    pill.innerHTML = '<span class="pill-new">✨ New</span>';
+  } else {
+    const daysAgo = h.lastSeenAt ? Math.floor((Date.now() - h.lastSeenAt) / 86400000) : null;
+    const qStr = h.lastScore != null ? ' · ' + getQuartile(h.lastScore).q : '';
+    const whenStr = daysAgo === 0 ? 'Today' : daysAgo === 1 ? '1d ago' : (daysAgo + 'd ago');
+    pill.innerHTML = `<span class="pill-reviewed">🔁 ${daysAgo === 0 ? 'Today' : 'Reviewed · ' + whenStr}${qStr}</span>`;
+  }
+}
+
+// ══ STAR BUTTON (4.5) ═════════════════════════════════════════════════════════
+function updateStarBtn(station) {
+  const btn = document.getElementById('starBtn');
+  if (!btn || !station) return;
+  btn.style.display = '';
+  const id = station.id || (currentMode === MODE_MMI
+    ? `mmi_${(typeof MMI_STATIONS !== 'undefined' ? MMI_STATIONS.indexOf(station) : -1)}`
+    : `casper_${(typeof STATIONS !== 'undefined' ? STATIONS.indexOf(station) : -1)}`);
+  const h = StationHistory.get(id);
+  btn.textContent = (h && h.starred) ? '★' : '☆';
+  btn.style.color = (h && h.starred) ? '#f59e0b' : 'var(--gray400)';
+  btn._stationId = id;
+}
+
+function toggleStarStation() {
+  const btn = document.getElementById('starBtn');
+  if (!btn || !btn._stationId) return;
+  const newState = StationHistory.toggleStar(btn._stationId);
+  btn.textContent = newState ? '★' : '☆';
+  btn.style.color = newState ? '#f59e0b' : 'var(--gray400)';
+  updateStarredCategoryBtn();
+  updateLibraryCoverage();
+}
+
+function updateStarredCategoryBtn() {
+  const starred = StationHistory.getStarred();
+  // CASPer starred btn
+  let cbtn = document.getElementById('cat-btn-starred-casper');
+  const cFilters = document.getElementById('categoryFilters');
+  if (cFilters) {
+    if (starred.length > 0) {
+      if (!cbtn) {
+        cbtn = document.createElement('button');
+        cbtn.className = 'cat-btn';
+        cbtn.id = 'cat-btn-starred-casper';
+        cbtn.setAttribute('data-cat', '__starred');
+        cbtn.innerHTML = '⭐ Starred <span class="cat-count" id="cnt-starred-casper">0</span>';
+        // Insert after the "All Stations" button
+        const allBtn = cFilters.querySelector('.cat-btn');
+        if (allBtn && allBtn.nextSibling) cFilters.insertBefore(cbtn, allBtn.nextSibling);
+        else cFilters.appendChild(cbtn);
+      }
+      const cntEl = document.getElementById('cnt-starred-casper');
+      // Count only CASPer starred
+      const casperStarred = starred.filter(id => !id.startsWith('mmi_'));
+      if(cntEl) cntEl.textContent = casperStarred.length;
+      cbtn.style.display = casperStarred.length > 0 ? '' : 'none';
+    } else if (cbtn) {
+      cbtn.style.display = 'none';
+    }
+  }
+  // MMI starred btn
+  let mbtn = document.getElementById('cat-btn-starred-mmi');
+  const mFilters = document.getElementById('mmiCategoryFilters');
+  if (mFilters) {
+    const mmiStarred = starred.filter(id => id.startsWith('mmi_'));
+    if (mmiStarred.length > 0) {
+      if (!mbtn) {
+        mbtn = document.createElement('button');
+        mbtn.className = 'cat-btn';
+        mbtn.id = 'cat-btn-starred-mmi';
+        mbtn.setAttribute('data-cat', '__starred');
+        mbtn.innerHTML = '⭐ Starred <span class="cat-count" id="cnt-starred-mmi">0</span>';
+        const allBtnM = mFilters.querySelector('.cat-btn');
+        if (allBtnM && allBtnM.nextSibling) mFilters.insertBefore(mbtn, allBtnM.nextSibling);
+        else mFilters.appendChild(mbtn);
+      }
+      const cntElM = document.getElementById('cnt-starred-mmi');
+      if(cntElM) cntElM.textContent = mmiStarred.length;
+      mbtn.style.display = '';
+    } else if (mbtn) {
+      mbtn.style.display = 'none';
+    }
+  }
+}
+
+// ══ SELF-RATING (4.2) ════════════════════════════════════════════════════════
+function setSelfRating(q) {
+  if (sessionHistory[currentIdx]) sessionHistory[currentIdx].selfRating = q;
+  // Update button active states
+  document.querySelectorAll('.self-rate-btn').forEach(b => {
+    b.classList.toggle('self-rate-active', b.getAttribute('data-q') === q);
+  });
+}
+
+function getSelfRatingComparisonHtml(selfRating, aiScore) {
+  if (!selfRating || aiScore == null) return '';
+  const aiQ = getQuartile(aiScore).q;
+  const qOrder = ['Q1','Q2','Q3','Q4'];
+  const selfIdx = qOrder.indexOf(selfRating);
+  const aiIdx   = qOrder.indexOf(aiQ);
+  const diff = selfIdx - aiIdx;
+  let msg;
+  if (diff === 0) {
+    msg = `Calibrated · you rated ${selfRating}, AI rated ${aiQ} — matched the AI's quartile.`;
+  } else if (diff > 0) {
+    msg = `You rated ${selfRating} · AI rated ${aiQ} · ${Math.abs(diff)} quartile${Math.abs(diff)>1?'s':''} higher than rated — slight overcalibration.`;
+  } else {
+    msg = `You rated ${selfRating} · AI rated ${aiQ} · ${Math.abs(diff)} quartile${Math.abs(diff)>1?'s':''} lower than rated — undercalibration.`;
+  }
+  const col = diff === 0 ? '#22c55e' : diff > 0 ? '#f59e0b' : '#0ea5e9';
+  return `<div style="font-size:0.78rem;font-weight:600;color:${col};background:${col}12;border:1px solid ${col}30;border-radius:8px;padding:8px 12px;margin-bottom:10px;">${msg}</div>`;
+}
+
+// ══ PER-CATEGORY Q1-Q4 BREAKDOWN (4.1) ═══════════════════════════════════════
+function buildCategoryBreakdown() {
+  const catScores = {};
+  sessionHistory.forEach(h => {
+    if (!h || h.score == null || !h.station) return;
+    const cat = h.station.category || 'Other';
+    if (!catScores[cat]) catScores[cat] = [];
+    catScores[cat].push(h.score);
+  });
+  const cats = Object.keys(catScores);
+  const wrap = document.getElementById('reviewCatBreakdown');
+  const chart = document.getElementById('reviewCatChart');
+  if (!wrap || !chart || !cats.length) { if(wrap) wrap.style.display='none'; return; }
+  wrap.style.display = '';
+  chart.innerHTML = cats.map(cat => {
+    const scores = catScores[cat];
+    const avg = scores.reduce((a,b)=>a+b,0) / scores.length;
+    const qi = getQuartile(avg);
+    const pct = Math.round(avg * 10);
+    return `<div style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <span class="category-pill ${catClass(cat)}" style="font-size:0.72rem;padding:2px 8px;">${cat}</span>
+        <span style="font-size:0.75rem;font-weight:700;color:${qi.color};">${avg.toFixed(1)} · ${qi.q}</span>
+      </div>
+      <div style="height:8px;background:var(--gray100);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:${qi.color};border-radius:4px;transition:width 0.5s;"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 function updateCategoryHeatmap(){
   // Build per-competency average from AI feedback. Older saved responses may not
@@ -3126,6 +3499,7 @@ const TIMER_MODES={
 };
 let currentTimerMode='standard';
 function setTimerMode(mode){
+  if(currentMode !== MODE_CASPER) return; // guard: CASPer only
   currentTimerMode=mode;
   const m=TIMER_MODES[mode];
   readingTime=m.read;writingTime=m.write;
@@ -3245,6 +3619,7 @@ function buildReview(){
   $('reviewSubtitle').textContent=avg!==null?`Session average: ${avg}/10 across ${sc.length} AI-marked station${sc.length!==1?'s':''}.`:`${completed} station${completed!==1?'s':''} completed.`;
   const rts=$('reviewTrendSection');
   if(sc.length>=2){rts.style.display='block';setTimeout(()=>drawChart($('reviewCanvas'),sc,140),50);}else rts.style.display='none';
+  buildCategoryBreakdown();
   renderList('all');
   document.querySelectorAll('.review-filter-btn').forEach(btn=>{
     btn.onclick=()=>{document.querySelectorAll('.review-filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderList(btn.dataset.filter);};
@@ -3305,6 +3680,15 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
     // Auto-save before advancing (CASPer only — MMI handled via submit button)
     // Auto-save before advancing — skip if AI already saved this station
     if(currentMode===MODE_CASPER && !sessionHistory[currentIdx]?.aiSaved) triggerAutoSave(currentIdx);
+    // Record attempt without AI score if response has substance but no AI feedback
+    const _advH = sessionHistory[currentIdx];
+    if(_advH && _advH.station){
+      const _advId = _advH.station.id || `mmi_${(typeof MMI_STATIONS!=='undefined'?MMI_STATIONS.indexOf(_advH.station):-1)}`;
+      if(!_sessionRecordedIds.has(_advId) && _advH.answer && _advH.answer.length>=50){
+        _sessionRecordedIds.add(_advId);
+        StationHistory.record(_advId, _advH.score!=null?_advH.score:null);
+      }
+    }
     // Unlock textarea for next station
     answerTextarea.readOnly=false;answerTextarea.classList.remove('locked','flash-expired');
     const _b=$('timeUpBanner');_b.classList.remove('show','open-mode','strict-mode');_b.textContent='';
@@ -3471,6 +3855,9 @@ function closeMarkingModal() {
 window.addEventListener('DOMContentLoaded',function(){
   var overlay=document.getElementById('markingModalOverlay');
   if(overlay)overlay.addEventListener('click',function(e){if(e.target===this)closeMarkingModal();});
+
+  // ── Enforce clean initial state (bug fix 2.1) ──
+  setMode(MODE_CASPER);
 
   // ── Initialize Auth ──
   Key2MDAuth.init({
@@ -3954,6 +4341,18 @@ document.addEventListener('DOMContentLoaded', function(){
 .circuit-debrief-step { font-size:0.75rem; font-weight:600; padding:5px 12px; border-radius:50px; border:1px solid var(--gray200); color:var(--gray400); background:#fff; transition:all 0.3s; }
 .circuit-debrief-step.active { color:#7c3aed; border-color:rgba(124,58,237,0.3); background:rgba(124,58,237,0.06); }
 @keyframes mmi-spin { to { transform:rotate(360deg); } }
+
+/* ── Seen-before pills (4.4) ── */
+.pill-new { display:inline-block; font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:50px; background:rgba(34,197,94,0.12); color:#16a34a; border:1px solid rgba(34,197,94,0.25); white-space:nowrap; }
+.pill-reviewed { display:inline-block; font-size:0.68rem; font-weight:600; padding:2px 8px; border-radius:50px; background:var(--gray100); color:var(--gray400); border:1px solid var(--gray200); white-space:nowrap; }
+
+/* ── Self-rating buttons (4.2) ── */
+.self-rate-btn { padding:2px 9px; border-radius:50px; border:1px solid var(--gray200); background:#fff; color:var(--gray500); font-size:0.72rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.15s; }
+.self-rate-btn:hover { border-color:var(--teal); color:var(--teal3); }
+.self-rate-btn.self-rate-active { background:var(--teal); color:#fff; border-color:var(--teal); }
+
+/* ── Station header pill row wrapping ── */
+.station-header { flex-wrap:wrap; gap:6px; }
 </style>
 
   <div style="display:none;" aria-hidden="true">
