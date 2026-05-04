@@ -570,7 +570,19 @@
     /* Hide initial state */
     .calc-initial-only { display: block; }
     .calc-hide-on-results .calc-initial-only { display: none; }
-  </style>
+  
+/* "More tools" dropdown */
+.k2-nav-links li.k2-dropdown{position:relative;}
+.k2-nav-links li.k2-dropdown > a{cursor:pointer;}
+.k2-nav-links li.k2-dropdown > a::after{content:' ▾';font-size:0.75em;opacity:0.7;margin-left:2px;}
+.k2-dropdown-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:#0a1628;border:1px solid rgba(14,165,233,0.25);border-radius:12px;padding:8px;box-shadow:0 12px 40px rgba(0,0,0,0.5);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity 0.18s,visibility 0.18s,transform 0.18s;list-style:none;margin:0;z-index:1001;}
+.k2-dropdown:hover > .k2-dropdown-menu,.k2-dropdown:focus-within > .k2-dropdown-menu,.k2-dropdown.open > .k2-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0);}
+.k2-dropdown-menu li{margin:0;}
+.k2-dropdown-menu a{display:block;padding:10px 14px;border-radius:8px;font-size:0.86rem;color:rgba(255,255,255,0.82);font-weight:500;white-space:nowrap;}
+.k2-dropdown-menu a:hover{background:rgba(14,165,233,0.12);color:#0ea5e9;}
+.k2-dropdown-menu a.k2-purple{color:#a78bfa;font-weight:700;}
+.k2-dropdown-menu a.k2-purple:hover{color:#c4b5fd;}
+</style>
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -594,36 +606,65 @@
 </head>
 <body>
 
-<!-- ═══ CANONICAL NAV ═══ -->
+<!-- ═══ KEY2MD CANONICAL NAV — do not edit per page ═══ -->
 <header class="k2-header" id="k2Header">
   <nav class="k2-nav">
     <a href="index.html" class="k2-logo">Key<span>2</span>MD</a>
     <ul class="k2-nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="testimonials.html">Results</a></li>
-      <li><a href="plans.html">Plans</a></li>
-      <li><a href="guide.html">Free Guide</a></li>
+      <li><a href="index.html" data-nav="home">Home</a></li>
+      <li><a href="testimonials.html" data-nav="results">Results</a></li>
+      <li><a href="plans.html" data-nav="plans">Plans</a></li>
       <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">📊 Chances</a></li>
-      <li><a href="practice.html" class="k2-gold">🎯 CASPer Practice</a></li>
-      <li><a href="gamsat-s2-practice.html" class="k2-purple">✍️ GAMSAT S2</a></li>
-      <li><a href="blog.html">Blog</a></li>
+      <li><a href="practice.html" class="k2-gold" data-nav="practice">🎯 Practice</a></li>
+      <li class="k2-dropdown" tabindex="0">
+        <a href="#" onclick="event.preventDefault();this.parentElement.classList.toggle('open');" data-nav="more">More tools</a>
+        <ul class="k2-dropdown-menu" role="menu">
+          <li><a href="guide.html" data-nav="guide">📖 Free Guide</a></li>
+          <li><a href="gamsat-s2-practice.html" class="k2-purple" data-nav="gamsat">✍️ GAMSAT S2 Practice</a></li>
+          <li><a href="about.html" data-nav="about">About Dan</a></li>
+          <li><a href="blog.html" data-nav="blog">Blog</a></li>
+        </ul>
+      </li>
       <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session →</a></li>
     </ul>
     <button class="k2-hamburger" id="k2Hamburger" aria-label="Toggle menu" type="button"><span></span><span></span><span></span></button>
   </nav>
   <nav class="k2-mobile-nav" id="k2MobileNav">
     <a href="index.html">Home</a>
-    <a href="about.html">About</a>
+    <a href="practice.html" class="k2-gold">🎯 CASPer &amp; MMI Practice</a>
+    <a href="medical-school-chances.html" class="k2-green">📊 Chances Calculator</a>
     <a href="testimonials.html">Results</a>
     <a href="plans.html">Plans &amp; Pricing</a>
     <a href="guide.html">📖 Free Guide</a>
-    <a href="medical-school-chances.html" class="k2-green">📊 Chances Calculator</a>
-    <a href="practice.html" class="k2-gold">🎯 CASPer Practice</a>
     <a href="gamsat-s2-practice.html" class="k2-purple">✍️ GAMSAT S2 Practice</a>
+    <a href="about.html">About Dan</a>
     <a href="blog.html">Blog</a>
     <a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session →</a>
   </nav>
 </header>
+<script>
+(function(){
+  var h = document.getElementById('k2Hamburger');
+  var m = document.getElementById('k2MobileNav');
+  var hdr = document.getElementById('k2Header');
+  if (h && m) {
+    h.addEventListener('click', function(){ h.classList.toggle('open'); m.classList.toggle('open'); });
+    m.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){ h.classList.remove('open'); m.classList.remove('open'); });
+    });
+  }
+  if (hdr) {
+    window.addEventListener('scroll', function(){ hdr.classList.toggle('scrolled', window.scrollY > 40); }, {passive:true});
+  }
+  // Close "More tools" dropdown on outside click
+  document.addEventListener('click', function(e){
+    document.querySelectorAll('.k2-dropdown.open').forEach(function(d){
+      if (!d.contains(e.target)) d.classList.remove('open');
+    });
+  });
+})();
+</script>
+<!-- ═══ END CANONICAL NAV ═══ -->
 
 <!-- ═══ HERO ═══ -->
 <section class="hero">
@@ -867,20 +908,8 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════
-//  NAV + BOOK MODAL
+//  BOOK MODAL  (nav/hamburger handled by canonical nav block)
 // ═══════════════════════════════════════════════════════════════════════
-(function(){
-  var h = document.getElementById('k2Hamburger');
-  var m = document.getElementById('k2MobileNav');
-  var hdr = document.getElementById('k2Header');
-  if (h && m) {
-    h.addEventListener('click', function(){ h.classList.toggle('open'); m.classList.toggle('open'); });
-    m.querySelectorAll('a').forEach(function(a){
-      a.addEventListener('click', function(){ h.classList.remove('open'); m.classList.remove('open'); });
-    });
-  }
-  if (hdr) window.addEventListener('scroll', function(){ hdr.classList.toggle('scrolled', window.scrollY > 40); }, {passive:true});
-})();
 function openBookModal(e){ if(e && e.preventDefault) e.preventDefault(); var m=document.getElementById('bookModal'); if(m){ m.style.display='flex'; document.body.style.overflow='hidden'; } }
 function closeBookModal(){ var m=document.getElementById('bookModal'); if(m){ m.style.display='none'; document.body.style.overflow=''; } }
 document.addEventListener('click', function(e){ var m=document.getElementById('bookModal'); if(m && e.target===m) closeBookModal(); });

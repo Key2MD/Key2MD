@@ -89,8 +89,11 @@ const MMICircuit = (() => {
     const circuitPill = document.getElementById('modeCircuit');
     if (circuitPill) circuitPill.classList.add('active-circuit');
 
-    // Hide normal practice panels
-    const panels = ['casperCategoryCard','mmiCategoryCard','mmiOptionsCard','webcamPanel','startBtn','scenarioCard'];
+    // Hide normal practice panels.
+    // 'categoryCard' is the unified outer wrapper; the inner aliases
+    // (casperCategoryCard / mmiCategoryCard) are kept here for safety so
+    // legacy callers continue to work even if the outer ID isn't present.
+    const panels = ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','webcamPanel','startBtn','scenarioCard'];
     panels.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
@@ -118,10 +121,14 @@ const MMICircuit = (() => {
     document.getElementById('circuitConfigPanel').style.display = 'none';
     const cma = document.getElementById('circuitMainArea');
     if (cma) cma.style.display = 'none';
-    // Restore normal panels
-    document.getElementById('startBtn').style.display = '';
-    document.getElementById('casperCategoryCard').style.display = '';
-    document.getElementById('scenarioCard').style.display = '';
+    // Restore non-mode-specific panels. The category card is intentionally
+    // NOT touched here — setMode()/applyModeUI() in practice.html owns that
+    // visibility and gets called by the mode pill's onclick. Doing it here
+    // too caused both CASPer and MMI category cards to be shown at once.
+    const sb = document.getElementById('startBtn');
+    if (sb) sb.style.display = '';
+    const sc = document.getElementById('scenarioCard');
+    if (sc) sc.style.display = '';
   }
 
   // ── Config panel (sidebar) ────────────────────────────────────
@@ -223,12 +230,20 @@ const MMICircuit = (() => {
   }
 
   function bindEvents() {
-    // Mode pill click
+    // Mode pill click — note: setMode() in practice.html (called from the
+    // pill's inline onclick) is the single source of truth for showing/hiding
+    // the regular practice panels. We only need to act here when leaving
+    // Circuit mode — and we must NOT touch panel visibility (setMode/applyModeUI
+    // does that). Otherwise we cause the "two category cards visible" race.
     document.addEventListener('click', e => {
-      if (e.target.id === 'modeCircuit') activateCircuitMode();
-      else if (e.target.id === 'modeCasper' || e.target.id === 'modeMMI') {
+      if (e.target.id === 'modeCircuit') {
+        activateCircuitMode();
+      } else if (e.target.id === 'modeCasper' || e.target.id === 'modeMMI') {
+        // Only deactivate if Circuit panels are actually showing.
+        const cp = document.getElementById('circuitConfigPanel');
+        const isCircuitVisible = cp && cp.style.display === 'block';
         if (circuitActive) abortCircuit();
-        deactivateCircuitMode();
+        if (isCircuitVisible) deactivateCircuitMode();
       }
     });
   }

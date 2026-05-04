@@ -11,14 +11,14 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Free CASPer Practice — 90+ Scenarios, AI Feedback | Key2MD</title>
-  <meta name="description" content="Free CASPer and MMI practice for Australian medical applicants. Timed stations, AI feedback, 90+ real-style scenarios. Built by a UniMelb MD.">
+  <title>Free CASPer &amp; MMI Practice — Timed Stations, AI Feedback | Key2MD</title>
+  <meta name="description" content="Free CASPer &amp; MMI practice for Australian medical applicants. Timed stations, AI feedback, 90+ CASPer scenarios and 40+ MMI stations including circuit mode. Built by a UniMelb MD.">
   <link rel="canonical" href="https://www.key2md.com/practice.html">
   <!-- Favicon (inline SVG, matches Key2MD brand) -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a1628'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' font-size='28' font-weight='800' fill='white'%3EK%3Ctspan fill='%230ea5e9'%3E2%3C/tspan%3E%3C/text%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%230a1628'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' font-size='80' font-weight='800' fill='white'%3EK%3Ctspan fill='%230ea5e9'%3E2%3C/tspan%3E%3C/text%3E%3C/svg%3E">
-  <meta property="og:title" content="Free CASPer Practice — 90+ Scenarios, AI Feedback">
-  <meta property="og:description" content="Timed stations, AI feedback, 90+ real-style scenarios. For Australian med applicants.">
+  <meta property="og:title" content="Free CASPer &amp; MMI Practice — Timed Stations, AI Feedback">
+  <meta property="og:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and circuit mode. For Australian med applicants.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.key2md.com/practice.html">
   <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
@@ -28,8 +28,8 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Key2MD — MMI, CASPer and GAMSAT Section II coaching.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Free CASPer Practice — 90+ Scenarios, AI Feedback">
-  <meta name="twitter:description" content="Timed stations, AI feedback, 90+ real-style scenarios. For Australian med applicants.">
+  <meta name="twitter:title" content="Free CASPer &amp; MMI Practice — Timed Stations, AI Feedback">
+  <meta name="twitter:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and circuit mode. For Australian med applicants.">
   <link rel="stylesheet" href="practice.css">
   <link rel="stylesheet" href="mmi-styles.css">
   <script type="application/ld+json">
@@ -189,6 +189,17 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
   .k2-hamburger{display:flex;}
   .k2-header{background:#0a1628!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;overflow:visible!important;}
 }
+/* "More tools" dropdown */
+.k2-nav-links li.k2-dropdown{position:relative;}
+.k2-nav-links li.k2-dropdown > a{cursor:pointer;}
+.k2-nav-links li.k2-dropdown > a::after{content:' ▾';font-size:0.75em;opacity:0.7;margin-left:2px;}
+.k2-dropdown-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:#0a1628;border:1px solid rgba(14,165,233,0.25);border-radius:12px;padding:8px;box-shadow:0 12px 40px rgba(0,0,0,0.5);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity 0.18s,visibility 0.18s,transform 0.18s;list-style:none;margin:0;z-index:1001;}
+.k2-dropdown:hover > .k2-dropdown-menu,.k2-dropdown:focus-within > .k2-dropdown-menu,.k2-dropdown.open > .k2-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0);}
+.k2-dropdown-menu li{margin:0;}
+.k2-dropdown-menu a{display:block;padding:10px 14px;border-radius:8px;font-size:0.86rem;color:rgba(255,255,255,0.82);font-weight:500;white-space:nowrap;}
+.k2-dropdown-menu a:hover{background:rgba(14,165,233,0.12);color:#0ea5e9;}
+.k2-dropdown-menu a.k2-purple{color:#a78bfa;font-weight:700;}
+.k2-dropdown-menu a.k2-purple:hover{color:#c4b5fd;}
 </style>
 </head>
 <body data-page="practice">
@@ -200,24 +211,30 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <li><a href="index.html" data-nav="home">Home</a></li>
       <li><a href="testimonials.html" data-nav="results">Results</a></li>
       <li><a href="plans.html" data-nav="plans">Plans</a></li>
-      <li><a href="guide.html" data-nav="guide">Free Guide</a></li>
       <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">📊 Chances</a></li>
-      <li><a href="practice.html" class="k2-gold" data-nav="practice">🎯 CASPer Practice</a></li>
-      <li><a href="gamsat-s2-practice.html" class="k2-purple" data-nav="gamsat">✍️ GAMSAT S2</a></li>
-      <li><a href="blog.html" data-nav="blog">Blog</a></li>
+      <li><a href="practice.html" class="k2-gold" data-nav="practice">🎯 Practice</a></li>
+      <li class="k2-dropdown" tabindex="0">
+        <a href="#" onclick="event.preventDefault();this.parentElement.classList.toggle('open');" data-nav="more">More tools</a>
+        <ul class="k2-dropdown-menu" role="menu">
+          <li><a href="guide.html" data-nav="guide">📖 Free Guide</a></li>
+          <li><a href="gamsat-s2-practice.html" class="k2-purple" data-nav="gamsat">✍️ GAMSAT S2 Practice</a></li>
+          <li><a href="about.html" data-nav="about">About Dan</a></li>
+          <li><a href="blog.html" data-nav="blog">Blog</a></li>
+        </ul>
+      </li>
       <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session →</a></li>
     </ul>
     <button class="k2-hamburger" id="k2Hamburger" aria-label="Toggle menu" type="button"><span></span><span></span><span></span></button>
   </nav>
   <nav class="k2-mobile-nav" id="k2MobileNav">
     <a href="index.html">Home</a>
-    <a href="about.html">About</a>
+    <a href="practice.html" class="k2-gold">🎯 CASPer &amp; MMI Practice</a>
+    <a href="medical-school-chances.html" class="k2-green">📊 Chances Calculator</a>
     <a href="testimonials.html">Results</a>
     <a href="plans.html">Plans &amp; Pricing</a>
     <a href="guide.html">📖 Free Guide</a>
-    <a href="medical-school-chances.html" class="k2-green">📊 Chances Calculator</a>
-    <a href="practice.html" class="k2-gold">🎯 CASPer Practice</a>
     <a href="gamsat-s2-practice.html" class="k2-purple">✍️ GAMSAT S2 Practice</a>
+    <a href="about.html">About Dan</a>
     <a href="blog.html">Blog</a>
     <a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session →</a>
   </nav>
@@ -236,6 +253,12 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
   if (hdr) {
     window.addEventListener('scroll', function(){ hdr.classList.toggle('scrolled', window.scrollY > 40); }, {passive:true});
   }
+  // Close "More tools" dropdown on outside click
+  document.addEventListener('click', function(e){
+    document.querySelectorAll('.k2-dropdown.open').forEach(function(d){
+      if (!d.contains(e.target)) d.classList.remove('open');
+    });
+  });
 })();
 </script>
 <!-- ═══ END CANONICAL NAV ═══ -->
@@ -311,50 +334,54 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <div class="mode-toggle-wrap">
       <div class="mode-toggle-label">Practice Mode</div>
       <div class="mode-pill-row" style="grid-template-columns:1fr 1fr 1fr;">
-        <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper');var _cc=document.getElementById('casperCategoryCard');if(_cc)_cc.style.display='';">💬 CASPer</button>
-        <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');var _cc=document.getElementById('casperCategoryCard');if(_cc)_cc.style.display='none';">🎤 MMI</button>
-        <button class="mode-pill" id="modeCircuit" onclick="setMode('circuit');MMICircuit.activateCircuitMode();var _cc=document.getElementById('casperCategoryCard');if(_cc)_cc.style.display='none';" style="font-size:0.78rem;">🏃 Circuit</button>
+        <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper');">💬 CASPer</button>
+        <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');">🎤 MMI</button>
+        <button class="mode-pill" id="modeCircuit" onclick="setMode('circuit');MMICircuit.activateCircuitMode();" style="font-size:0.78rem;">🏃 Circuit</button>
       </div>
     </div>
 
     <button class="btn-start" id="startBtn"><span id="startBtnIcon">▶</span><span id="startBtnText">Start Session</span></button>
 
-    <!-- CASPer category filters -->
-    <div class="sidebar-card" id="casperCategoryCard">
-      <h3>Category</h3>
-      <!-- Library coverage bar (4.3) -->
-      <div id="casperCoverageWrap" style="margin-bottom:10px;">
-        <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
-          <div id="casperCoverageBar" style="height:100%;width:0%;background:var(--teal);border-radius:2px;transition:width 0.4s;"></div>
-        </div>
-        <div id="casperCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
-      </div>
-      <div class="category-filters" id="categoryFilters">
-        <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="cnt-all">—</span></button>
-        <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="cnt-ethics">—</span></button>
-        <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="cnt-conflict">—</span></button>
-        <button class="cat-btn" data-cat="Personal">Personal <span class="cat-count" id="cnt-personal">—</span></button>
-        <button class="cat-btn" data-cat="Professionalism">Professionalism <span class="cat-count" id="cnt-professionalism">—</span></button>
-        <button class="cat-btn" data-cat="Communication">Communication <span class="cat-count" id="cnt-communication">—</span></button>
-      </div>
-    </div>
+    <!-- Unified category card — header + coverage + filters all swap based on mode.
+         Hidden ID aliases (casperCategoryCard, mmiCategoryCard) preserved on
+         inner blocks so legacy code (mmi-circuit.js, etc.) that targets them
+         keeps working without changes. -->
+    <div class="sidebar-card" id="categoryCard">
+      <h3 id="categoryCardHeader">Category</h3>
 
-    <!-- MMI category filters -->
-    <div class="sidebar-card" id="mmiCategoryCard" style="display:none;">
-      <h3>MMI Station Type</h3>
-      <!-- Library coverage bar (4.3) -->
-      <div id="mmiCoverageWrap" style="margin-bottom:10px;">
-        <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
-          <div id="mmiCoverageBar" style="height:100%;width:0%;background:#7c3aed;border-radius:2px;transition:width 0.4s;"></div>
+      <!-- CASPer block: header is shared above; this wraps coverage + filters -->
+      <div id="casperCategoryCard">
+        <div id="casperCoverageWrap" style="margin-bottom:10px;">
+          <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
+            <div id="casperCoverageBar" style="height:100%;width:0%;background:var(--teal);border-radius:2px;transition:width 0.4s;"></div>
+          </div>
+          <div id="casperCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
         </div>
-        <div id="mmiCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
+        <div class="category-filters" id="categoryFilters">
+          <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="cnt-all">—</span></button>
+          <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="cnt-ethics">—</span></button>
+          <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="cnt-conflict">—</span></button>
+          <button class="cat-btn" data-cat="Personal">Personal <span class="cat-count" id="cnt-personal">—</span></button>
+          <button class="cat-btn" data-cat="Professionalism">Professionalism <span class="cat-count" id="cnt-professionalism">—</span></button>
+          <button class="cat-btn" data-cat="Communication">Communication <span class="cat-count" id="cnt-communication">—</span></button>
+        </div>
       </div>
-      <div class="category-filters" id="mmiCategoryFilters">
-        <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="mmi-cnt-all">—</span></button>
-        <button class="cat-btn" data-cat="Motivation">Motivation <span class="cat-count" id="mmi-cnt-motivation">—</span></button>
-        <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="mmi-cnt-ethics">—</span></button>
-        <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="mmi-cnt-conflict">—</span></button>
-        <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">—</span></button>
+
+      <!-- MMI block -->
+      <div id="mmiCategoryCard" style="display:none;">
+        <div id="mmiCoverageWrap" style="margin-bottom:10px;">
+          <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
+            <div id="mmiCoverageBar" style="height:100%;width:0%;background:#7c3aed;border-radius:2px;transition:width 0.4s;"></div>
+          </div>
+          <div id="mmiCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
+        </div>
+        <div class="category-filters" id="mmiCategoryFilters">
+          <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="mmi-cnt-all">—</span></button>
+          <button class="cat-btn" data-cat="Motivation">Motivation <span class="cat-count" id="mmi-cnt-motivation">—</span></button>
+          <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="mmi-cnt-ethics">—</span></button>
+          <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="mmi-cnt-conflict">—</span></button>
+          <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">—</span></button>
+        </div>
       </div>
     </div>
 
@@ -1846,10 +1873,15 @@ function applyModeUI(mode) {
   if (pillR) pillR.className = 'mode-pill' + (isCircuit ? ' active-circuit' : '');
 
   // Cards visibility (use style.display consistently)
+  // The unified #categoryCard wraps both blocks; toggle the inner blocks only.
+  // Header text swaps with mode. mmiOptionsCard remains a separate card below.
   const cc = $('casperCategoryCard'), mc = $('mmiCategoryCard'), mo = $('mmiOptionsCard');
+  const ccard = $('categoryCard'), chdr = $('categoryCardHeader');
   if (cc) cc.style.display = isCasper           ? '' : 'none';
   if (mc) mc.style.display = (isMMI||isCircuit) ? '' : 'none';
   if (mo) mo.style.display = isMMI              ? '' : 'none';
+  if (ccard) ccard.style.display = '';   // outer card always visible (in non-circuit-takeover modes)
+  if (chdr)  chdr.textContent = isCasper ? 'Category' : 'MMI Station Type';
 
   // Webcam
   const wp = $('webcamPanel');
