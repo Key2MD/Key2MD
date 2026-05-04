@@ -20,6 +20,14 @@
     .sidebar { position:sticky; top:88px; display:flex; flex-direction:column; gap:16px; }
     .sidebar-card { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); padding:20px; }
     .sidebar-card h3 { font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal3); margin-bottom:14px; }
+
+    /* Bottom rail — promos and stats moved out of sidebar to keep it short.
+       3 columns on desktop wide enough, auto-fit collapses on narrower viewports
+       (and on mobile, where app-wrapper is already 1-column, this stacks too). */
+    .bottom-rail { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-top:24px; }
+    .bottom-rail-card { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius); padding:20px; display:flex; flex-direction:column; }
+    .bottom-rail-card h3 { font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal3); margin-bottom:14px; }
+    .bottom-rail-card-promo { background:linear-gradient(135deg,#0a1628 0%,#0d2a52 100%); border:1px solid rgba(14,165,233,0.25); }
     .category-filters { display:flex; flex-direction:column; gap:6px; }
     .cat-btn { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:8px; border:1px solid var(--gray200); background:var(--gray50); color:var(--gray600); font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s; font-family:inherit; width:100%; text-align:left; }
     .cat-btn:hover { border-color:var(--teal); color:var(--teal3); background:rgba(14,165,233,0.04); }

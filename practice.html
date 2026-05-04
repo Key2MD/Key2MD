@@ -484,7 +484,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <h3 style="margin:0;">🏆 Today's Leaderboard</h3>
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:0.68rem;font-weight:600;color:var(--teal3);background:rgba(14,165,233,0.1);padding:2px 8px;border-radius:50px;">Live</span>
-          <span id="lbCollapseIcon" style="font-size:0.72rem;color:var(--gray400);transition:transform 0.25s;display:inline-block;transform:rotate(180deg);">▼</span>
+          <span id="lbCollapseIcon" style="font-size:0.72rem;color:var(--gray400);transition:transform 0.25s;display:inline-block;">▼</span>
         </div>
       </div>
       <!-- Collapsed preview: always visible -->
@@ -502,8 +502,8 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           </div>
         </div>
       </div>
-      <!-- Expanded full board -->
-      <div id="lbExpanded" style="display:block;border-top:1px solid var(--gray100);padding:14px 16px;">
+      <!-- Expanded full board (collapsed by default — click header to open) -->
+      <div id="lbExpanded" style="display:none;border-top:1px solid var(--gray100);padding:14px 16px;">
         <div id="streakWrap" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;">
           <span style="font-size:1.2rem;">🔥</span>
           <div>
@@ -572,21 +572,40 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
     <!-- Timer settings hidden - now inside practice tool -->
 
-    <!-- Auth / Account -->
-    <div class="sidebar-card">
-      <div id="k2mdAuthBar"></div>
-    </div>
+    <!-- Account + AI Marking (merged, compact) -->
+    <div class="sidebar-card" id="aiMarkingCard">
+      <!-- Auth bar (filled by auth.js) -->
+      <div id="k2mdAuthBar" style="margin-bottom:12px;"></div>
 
-    <div class="sidebar-card">
+      <!-- Header strip: title + status -->
       <div class="ai-toggle-row">
         <span class="ai-toggle-label">✦ AI Marking</span>
         <span class="ai-status ok" id="aiStatusEl"><span class="sdot sdot-green"></span>1 free/day</span>
       </div>
 
-      <!-- Why our AI is different -->
-      <div style="margin-top:10px;">
-        <button onclick="document.getElementById('aiExplainer').style.display=document.getElementById('aiExplainer').style.display==='none'?'block':'none';this.textContent=document.getElementById('aiExplainer').style.display==='none'?'Why is this different from ChatGPT? ▸':'Why is this different from ChatGPT? ▾'" style="background:none;border:none;color:var(--teal3);font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;padding:0;text-align:left;">Why is this different from ChatGPT? ▸</button>
-        <div id="aiExplainer" style="display:none;margin-top:10px;padding:14px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.15);border-radius:10px;font-size:0.78rem;color:var(--gray600);line-height:1.65;">
+      <!-- Limits bar (always visible — small) -->
+      <div id="aiLimitWrap" style="margin-top:10px;">
+        <div class="ai-limit-bar">
+          <span class="ai-limit-label">Free daily review</span>
+          <span class="ai-limit-count" id="aiLimitCount">1 remaining</span>
+        </div>
+        <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
+
+        <!-- Credit balance (only shown if user has credits) -->
+        <div id="creditBalanceWrap" style="display:none;margin-top:8px;padding:8px 10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:6px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.75rem;color:var(--gray600);">Purchased credits</span>
+            <span style="font-size:0.82rem;font-weight:700;color:var(--gold);" id="creditCount">0</span>
+          </div>
+        </div>
+
+        <p class="api-note" style="margin-top:6px;" id="aiLimitNote">Create a free account to unlock AI reviews.</p>
+      </div>
+
+      <!-- "Why is this different from ChatGPT?" — collapsed by default, one-line link -->
+      <div style="margin-top:8px;">
+        <button id="aiExplainerToggle" onclick="(function(b){var e=document.getElementById('aiExplainer');var open=e.style.display!=='none';e.style.display=open?'none':'block';b.textContent=open?'▸ Why is this different from ChatGPT?':'▾ Why is this different from ChatGPT?';})(this)" style="background:none;border:none;color:var(--teal3);font-size:0.76rem;font-weight:600;cursor:pointer;font-family:inherit;padding:0;text-align:left;">▸ Why is this different from ChatGPT?</button>
+        <div id="aiExplainer" style="display:none;margin-top:10px;padding:12px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.15);border-radius:10px;font-size:0.76rem;color:var(--gray600);line-height:1.6;">
           <strong style="color:var(--navy);display:block;margin-bottom:6px;">This isn't generic AI feedback.</strong>
           Dan has spent 300+ hours developing the marking criteria, prompt architecture, and scoring rubrics that power this tool — drawing directly from his experience coaching 200+ students through CASPer and MMI.
           <br><br>
@@ -598,26 +617,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         </div>
       </div>
 
-      <!-- Limits + Credits -->
-      <div id="aiLimitWrap" style="margin-top:12px;">
-        <div class="ai-limit-bar">
-          <span class="ai-limit-label">Free daily review</span>
-          <span class="ai-limit-count" id="aiLimitCount">1 remaining</span>
-        </div>
-        <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
-
-        <!-- Credit balance -->
-        <div id="creditBalanceWrap" style="display:none;margin-top:8px;padding:8px 10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:6px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:0.75rem;color:var(--gray600);">Purchased credits</span>
-            <span style="font-size:0.82rem;font-weight:700;color:var(--gold);" id="creditCount">0</span>
-          </div>
-        </div>
-
-        <p class="api-note" style="margin-top:6px;" id="aiLimitNote">Create a free account to unlock AI reviews.</p>
-      </div>
-
-      <!-- Buy credits button -->
+      <!-- Buy credits + Pro upsell (only shown when limit hit — display set by JS) -->
       <div id="buyCreditsBtnWrap" style="display:none;margin-top:10px;">
         <button onclick="openCreditShop()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.08);color:var(--teal3);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='rgba(14,165,233,0.15)'" onmouseout="this.style.background='rgba(14,165,233,0.08)'">Buy More AI Reviews →</button>
         <!-- Pro upsell — shown when limit hit -->
@@ -631,7 +631,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         </div>
       </div>
 
-      <!-- MMI AI credits display -->
+      <!-- MMI AI credits display (only when in MMI mode — shown by JS) -->
       <div id="mmiAiNote" style="display:none;margin-top:10px;">
         <div style="font-size:0.75rem;color:var(--gray600);line-height:1.6;padding:10px 12px;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.18);border-radius:8px;margin-bottom:8px;">
           <strong style="color:#7c3aed;display:block;margin-bottom:4px;">MMI AI Feedback — Credits Required</strong>
@@ -647,52 +647,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       </div>
     </div>
 
-    <div class="sidebar-card">
-      <h3>Session Stats</h3>
-      <div class="stats-row">
-        <div class="stat-mini"><span class="stat-mini-num" id="statCompleted">0</span><span class="stat-mini-label">Completed</span></div>
-        <div class="stat-mini"><span class="stat-mini-num" id="statAvg" style="color:var(--gray400)">—</span><span class="stat-mini-label">Avg Score</span></div>
-      </div>
-    </div>
-
-    <!-- Competency Heatmap - Product #3 -->
-    <div class="sidebar-card" id="categoryHeatmapCard" style="display:none;">
-      <h3 style="margin-bottom:4px;">Competency Heatmap</h3>
-      <p style="font-size:0.72rem;color:var(--gray400);margin-bottom:12px;line-height:1.4;">Your average by Casper competency. Lower rows show where to focus.</p>
-      <div id="heatmapRows" style="display:flex;flex-direction:column;gap:6px;"></div>
-      <div id="heatmapWeakAlert" style="display:none;margin-top:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:10px 12px;">
-        <div style="font-size:0.72rem;font-weight:700;color:#dc2626;margin-bottom:4px;">Weakest competency: <span id="heatmapWeakLabel">—</span></div>
-        <div style="font-size:0.75rem;color:var(--gray600);line-height:1.4;margin-bottom:8px;">Dan's 1:1 sessions target your exact weak patterns — not generic frameworks.</div>
-        <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:700;text-decoration:none;" rel="noopener noreferrer">Book a Session →</a>
-      </div>
-    </div>
-    <div class="sidebar-card" style="background:linear-gradient(135deg,#0a1628 0%,#0d2a52 100%);border:1px solid rgba(14,165,233,0.25);">
-      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal2);margin-bottom:8px;">📅 Weekly Live Classes</div>
-      <div style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:8px;">CASPer Group Coaching with Dan</div>
-      <div style="font-size:0.78rem;color:rgba(255,255,255,0.65);line-height:1.6;margin-bottom:12px;">Every <strong style="color:rgba(255,255,255,0.9);">Friday 6pm</strong> via Zoom · Running until June 11<br>Real station walk-throughs, common traps, what examiners actually look for — and live Q&amp;A.</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div style="font-size:1.1rem;font-weight:800;color:var(--gold);">$120 <span style="font-size:0.72rem;font-weight:500;color:rgba(255,255,255,0.4);">per person</span></div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;">
-          <span style="font-size:0.65rem;font-weight:700;background:rgba(34,197,94,0.2);color:#4ade80;padding:2px 7px;border-radius:50px;">Small groups</span>
-          <span style="font-size:0.65rem;font-weight:700;background:rgba(14,165,233,0.2);color:var(--teal2);padding:2px 7px;border-radius:50px;">Live Zoom</span>
-        </div>
-      </div>
-      <button onclick="openEnquiry('CASPer Group Session')" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.85rem;font-weight:700;transition:all 0.2s;box-sizing:border-box;border:none;cursor:pointer;font-family:inherit;" onmouseover="this.style.background='#38bdf8'" onmouseout="this.style.background='var(--teal)'">Express Interest →</button>
-      <div style="font-size:0.63rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:8px;">Dan replies within 24 hours</div>
-    </div>
-
-    <!-- Mailing list -->
-    <div class="sidebar-card">
-      <h3>📬 Weekly Tips</h3>
-      <p style="font-size:0.78rem;color:var(--gray600);line-height:1.5;margin-bottom:10px;">Get Dan's weekly CASPer, MMI &amp; GAMSAT tips — scenario breakdowns, common mistakes, and what examiners look for.</p>
-      <div id="practiceEmailForm">
-        <input type="email" id="practiceEmailInput" placeholder="Your email" style="width:100%;padding:9px 12px;border:1px solid var(--gray200);border-radius:8px;font-size:0.82rem;font-family:inherit;color:var(--gray800);background:var(--gray50);outline:none;margin-bottom:8px;box-sizing:border-box;">
-        <button onclick="subscribePractice()" style="width:100%;padding:9px;border-radius:8px;border:none;background:var(--teal,#0ea5e9);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Subscribe Free →</button>
-      </div>
-      <div id="practiceEmailDone" style="display:none;font-size:0.82rem;color:#16a34a;font-weight:600;padding:8px 0;">✓ You're in! Check your inbox.</div>
-      <p style="font-size:0.68rem;color:var(--gray400);margin-top:6px;">No spam. Unsubscribe anytime.</p>
-    </div>
-
   </aside>
 
 
@@ -702,6 +656,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <span class="category-pill phase-idle" id="categoryPill">Select a category &amp; press Start</span>
       <span id="seenBeforePill" style="display:none;"></span>
       <button id="starBtn" onclick="toggleStarStation()" title="Star this station" style="display:none;background:none;border:none;font-size:1rem;cursor:pointer;padding:2px 4px;line-height:1;color:var(--gray400);transition:color 0.2s;" aria-label="Star station">☆</button>
+      <span id="starHint" style="display:none;font-size:0.7rem;color:var(--gray400);font-style:italic;line-height:1;align-self:center;margin-left:-2px;">← save tricky stations</span>
       <div class="header-spacer"></div>
 <div id="lbRankBadge" style="display:none;align-items:center;gap:6px;padding:5px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:50px;font-size:0.78rem;font-weight:700;color:var(--teal3);">🏆 <span id="lbRankBadgeText">—</span></div>
       <div class="timer-display">
@@ -923,6 +878,65 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     </div>
     <div id="historyLinkBar" style="display:none;text-align:center;padding:10px 0 2px;">
       <a href="history.html" style="display:inline-flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--gray400);font-weight:600;text-decoration:none;padding:6px 14px;border-radius:50px;border:1px solid var(--gray200);background:#fff;transition:all 0.18s;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal3)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray400)'">📋 View my practice history</a>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         BOTTOM RAIL — Session Stats, Competency Heatmap, Friday Classes,
+         Weekly Tips. These used to live in the sidebar but were demoted
+         here to keep the sidebar fitting in one viewport.
+         IDs are preserved (categoryHeatmapCard, statCompleted, statAvg,
+         heatmapRows etc.) so existing JS targeting them continues to work
+         with no changes. mmi-circuit.js hides this rail in Circuit mode.
+         ════════════════════════════════════════════════════════════════════ -->
+    <div class="bottom-rail" id="bottomRail">
+      <!-- Session Stats -->
+      <div class="bottom-rail-card">
+        <h3>Session Stats</h3>
+        <div class="stats-row">
+          <div class="stat-mini"><span class="stat-mini-num" id="statCompleted">0</span><span class="stat-mini-label">Completed</span></div>
+          <div class="stat-mini"><span class="stat-mini-num" id="statAvg" style="color:var(--gray400)">—</span><span class="stat-mini-label">Avg Score</span></div>
+        </div>
+      </div>
+
+      <!-- Competency Heatmap (auto-shown by JS once AI feedback exists) -->
+      <div class="bottom-rail-card" id="categoryHeatmapCard" style="display:none;">
+        <h3 style="margin-bottom:4px;">Competency Heatmap</h3>
+        <p style="font-size:0.72rem;color:var(--gray400);margin-bottom:12px;line-height:1.4;">Your average by Casper competency. Lower rows show where to focus.</p>
+        <div id="heatmapRows" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <div id="heatmapWeakAlert" style="display:none;margin-top:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:10px 12px;">
+          <div style="font-size:0.72rem;font-weight:700;color:#dc2626;margin-bottom:4px;">Weakest competency: <span id="heatmapWeakLabel">—</span></div>
+          <div style="font-size:0.75rem;color:var(--gray600);line-height:1.4;margin-bottom:8px;">Dan's 1:1 sessions target your exact weak patterns — not generic frameworks.</div>
+          <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:700;text-decoration:none;" rel="noopener noreferrer">Book a Session →</a>
+        </div>
+      </div>
+
+      <!-- Friday Classes promo (re-laid out for the rail's wider/shorter aspect ratio) -->
+      <div class="bottom-rail-card bottom-rail-card-promo">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal2);margin-bottom:6px;">📅 Weekly Live Classes</div>
+        <div style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:6px;">CASPer Group Coaching with Dan</div>
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:10px;">Every <strong style="color:rgba(255,255,255,0.9);">Friday 6pm</strong> via Zoom · Running until June 11. Real station walk-throughs and live Q&amp;A.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+          <div style="font-size:1rem;font-weight:800;color:var(--gold);">$120 <span style="font-size:0.7rem;font-weight:500;color:rgba(255,255,255,0.4);">/ person</span></div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <span style="font-size:0.62rem;font-weight:700;background:rgba(34,197,94,0.2);color:#4ade80;padding:2px 6px;border-radius:50px;">Small groups</span>
+            <span style="font-size:0.62rem;font-weight:700;background:rgba(14,165,233,0.2);color:var(--teal2);padding:2px 6px;border-radius:50px;">Live Zoom</span>
+          </div>
+        </div>
+        <button onclick="openEnquiry('CASPer Group Session')" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.82rem;font-weight:700;transition:all 0.2s;box-sizing:border-box;border:none;cursor:pointer;font-family:inherit;" onmouseover="this.style.background='#38bdf8'" onmouseout="this.style.background='var(--teal)'">Express Interest →</button>
+        <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:6px;">Dan replies within 24 hours</div>
+      </div>
+
+      <!-- Mailing list -->
+      <div class="bottom-rail-card">
+        <h3>📬 Weekly Tips</h3>
+        <p style="font-size:0.78rem;color:var(--gray600);line-height:1.5;margin-bottom:10px;">Get Dan's weekly CASPer, MMI &amp; GAMSAT tips — scenario breakdowns, common mistakes, and what examiners look for.</p>
+        <div id="practiceEmailForm">
+          <input type="email" id="practiceEmailInput" placeholder="Your email" style="width:100%;padding:9px 12px;border:1px solid var(--gray200);border-radius:8px;font-size:0.82rem;font-family:inherit;color:var(--gray800);background:var(--gray50);outline:none;margin-bottom:8px;box-sizing:border-box;">
+          <button onclick="subscribePractice()" style="width:100%;padding:9px;border-radius:8px;border:none;background:var(--teal,#0ea5e9);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Subscribe Free →</button>
+        </div>
+        <div id="practiceEmailDone" style="display:none;font-size:0.82rem;color:#16a34a;font-weight:600;padding:8px 0;">✓ You're in! Check your inbox.</div>
+        <p style="font-size:0.68rem;color:var(--gray400);margin-top:6px;">No spam. Unsubscribe anytime.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -2838,6 +2852,16 @@ function updateStarBtn(station) {
   btn.textContent = (h && h.starred) ? '★' : '☆';
   btn.style.color = (h && h.starred) ? '#f59e0b' : 'var(--gray400)';
   btn._stationId = id;
+
+  // Star hint — show only until the user has starred their first station ever.
+  // Once any station is starred, hide forever for this browser.
+  const hint = document.getElementById('starHint');
+  if (hint) {
+    const starredCount = (typeof StationHistory.getStarred === 'function')
+      ? (StationHistory.getStarred() || []).length
+      : 0;
+    hint.style.display = starredCount === 0 ? '' : 'none';
+  }
 }
 
 function toggleStarStation() {
@@ -2846,6 +2870,9 @@ function toggleStarStation() {
   const newState = StationHistory.toggleStar(btn._stationId);
   btn.textContent = newState ? '★' : '☆';
   btn.style.color = newState ? '#f59e0b' : 'var(--gray400)';
+  // Hide the onboarding hint as soon as the user stars anything for the first time.
+  const hint = document.getElementById('starHint');
+  if (hint && newState) hint.style.display = 'none';
   updateStarredCategoryBtn();
   updateLibraryCoverage();
 }
@@ -3511,7 +3538,7 @@ function triggerConfetti(){
 }
 
 // ── Leaderboard toggle ──
-let lbOpen=true;
+let lbOpen=false;
 function toggleLeaderboard(){
   lbOpen=!lbOpen;
   const exp=document.getElementById('lbExpanded');

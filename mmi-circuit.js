@@ -93,7 +93,9 @@ const MMICircuit = (() => {
     // 'categoryCard' is the unified outer wrapper; the inner aliases
     // (casperCategoryCard / mmiCategoryCard) are kept here for safety so
     // legacy callers continue to work even if the outer ID isn't present.
-    const panels = ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','webcamPanel','startBtn','scenarioCard'];
+    // 'bottomRail' is the new under-main-content rail (Stats, Heatmap,
+    // Friday Classes, Weekly Tips) — must be hidden during a circuit.
+    const panels = ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','webcamPanel','startBtn','scenarioCard','bottomRail'];
     panels.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
@@ -129,6 +131,9 @@ const MMICircuit = (() => {
     if (sb) sb.style.display = '';
     const sc = document.getElementById('scenarioCard');
     if (sc) sc.style.display = '';
+    // Restore the bottom rail (was hidden during circuit takeover).
+    const br = document.getElementById('bottomRail');
+    if (br) br.style.display = '';
   }
 
   // ── Config panel (sidebar) ────────────────────────────────────
