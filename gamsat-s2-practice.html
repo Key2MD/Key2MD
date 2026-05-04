@@ -1714,7 +1714,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="essay-actions">
         <button class="btn btn-save" onclick="saveEssay()">💾 Save / Download</button>
         <button class="btn btn-ai-feedback" id="aiFeedbackBtn" onclick="requestAIFeedback()">🔍 Get Free AI Feedback</button>
-        <span class="daily-limit-note" id="limitNote">1 free AI review per day</span>
+        <span class="daily-limit-note" id="limitNote">1 free AI review per week</span>
       </div>
     </div>
 
@@ -2591,7 +2591,7 @@ function updateLimitUI() {
   // Panel note
   if (noteEl) {
     if (rem > 0) {
-      noteEl.textContent = '1 free AI review per day. Buy credits for more.';
+      noteEl.textContent = '1 free AI review per week. Buy credits for more.';
     } else if (credits > 0) {
       noteEl.textContent = 'Using purchased credits. Buy more anytime.';
     } else {
@@ -2602,7 +2602,7 @@ function updateLimitUI() {
   // Main feedback button
   if (rem > 0 || credits > 0) {
     if (btn) { btn.disabled = false; btn.textContent = credits > 0 && rem <= 0 ? '🔍 Get AI Feedback (1 credit)' : '🔍 Get Free AI Feedback'; }
-    if (inlineNote) { inlineNote.textContent = rem > 0 ? rem + ' free AI review per day' : credits + ' credits remaining'; inlineNote.className = 'daily-limit-note'; }
+    if (inlineNote) { inlineNote.textContent = rem > 0 ? rem + ' free AI review per week' : credits + ' credits remaining'; inlineNote.className = 'daily-limit-note'; }
   } else {
     if (btn) { btn.disabled = true; btn.textContent = 'AI Review Used Today'; }
     if (inlineNote) { inlineNote.textContent = 'Buy credits or wait until midnight AEST.'; inlineNote.className = 'daily-limit-note used'; }
