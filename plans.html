@@ -1078,9 +1078,20 @@ function handleBuyCredits() {
   openModal(`Buy ${labels[selectedPackId]}`, `${prices[selectedPackId]} · One-time payment · Credits never expire`, 'credits');
 }
 
-function handleBuyPro() {
+async function handleBuyPro() {
   if (!Key2MDAuth.isLoggedIn()) { Key2MDAuth.showAuthModal('signup'); return; }
-  openModal('Start CASPer Pro', '$40.00 AUD/week · Cancel anytime · Billed automatically by Stripe', 'pro');
+  const btns = document.querySelectorAll('[onclick="handleBuyPro()"]');
+  btns.forEach(b => { b.disabled = true; b.textContent = 'Redirecting to Stripe…'; });
+  try {
+    const token = Key2MDAuth.getToken();
+    const res = await fetch(`${API_BASE}/api/pro/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({success_url:`${location.origin}/practice.html?pro=success`,cancel_url:`${location.origin}/plans.html`})});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Checkout failed');
+    window.location.href = data.checkout_url;
+  } catch(e) {
+    btns.forEach(b => { b.disabled = false; b.textContent = 'Start CASPer Pro →'; });
+    alert('Could not start checkout: ' + e.message);
+  }
 }
 
 function openModal(title, sub, action) {
