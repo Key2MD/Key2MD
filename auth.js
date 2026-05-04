@@ -243,8 +243,8 @@ if (toolLimits && toolLimits.remaining <= 0 && !toolLimits.credits) return { all
           <div class="k2md-auth-sub">Unlock AI-powered feedback on your responses</div>
           <div class="k2md-auth-perks">
             <div class="k2md-auth-perk">Server-saved practice history</div>
-            <div class="k2md-auth-perk">2 free AI reviews per day (CASPer)</div>
-            <div class="k2md-auth-perk">1 free AI review per day (GAMSAT S2)</div>
+            <div class="k2md-auth-perk">1 free AI reviews per day (CASPer)</div>
+            <div class="k2md-auth-perk">1 free AI review per week (GAMSAT S2)</div>
             <div class="k2md-auth-perk">Track your progress over time</div>
           </div>
           <div class="k2md-auth-error" id="k2mdSignupError"></div>
