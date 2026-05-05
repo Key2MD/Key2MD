@@ -310,14 +310,8 @@
       const data = await res.json();
 
       if (data.ok) {
-        if (data.removed) {
-          // Was on the list — successfully removed
-          document.getElementById('removedEmail').textContent = email.toLowerCase();
-          show('successState');
-        } else {
-          // Not on the list
-          show('alreadyState');
-        }
+        document.getElementById('removedEmail').textContent = email.toLowerCase();
+        show('successState');
       } else {
         throw new Error(data.error || 'Unknown error');
       }
