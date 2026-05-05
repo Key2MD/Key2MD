@@ -675,9 +675,10 @@
 
             <div class="form-row">
               <label class="form-lbl">Send to</label>
-              <select class="form-sel" id="bcList">
+              <select class="form-sel" id="bcList" onchange="onBcListChange()">
                 <optgroup label="🧪 Test">
                   <option value="test">Test — send to brittainmbbs@gmail.com only</option>
+                  <option value="custom">Custom email — enter address below</option>
                 </optgroup>
                 <optgroup label="📋 All">
                   <option value="subscribers">Newsletter subscribers only</option>
@@ -697,6 +698,11 @@
                   <option value="mmi_users">MMI users (at least 1 MMI review)</option>
                 </optgroup>
               </select>
+            </div>
+
+            <div class="form-row" id="bcCustomEmailRow" style="display:none;">
+              <label class="form-lbl">Custom recipient email</label>
+              <input class="form-in" id="bcCustomEmail" type="email" placeholder="e.g. student@gmail.com" oninput="updateBcPreview()">
             </div>
 
             <div class="form-row">
@@ -871,7 +877,7 @@
       <div class="tbl-wrap">
         <div class="tbl-toolbar"><span class="tbl-status" id="rvStatus">—</span></div>
         <div class="tbl-scroller"><table><thead><tr>
-          <th>Time</th><th>Student</th><th>Type</th><th>Amount</th><th>Status</th>
+          <th>Time</th><th>Student</th><th>Type</th><th>Amount</th><th>Status</th><th style="width:40px;"></th>
         </tr></thead><tbody id="rvBody"></tbody></table></div>
         <div class="empty hidden" id="rvEmpty">No transactions yet.</div>
       </div>
@@ -1864,6 +1870,7 @@ function updateBcPreview() {
 function getBcListLabel(list) {
   const labels = {
     test:       'TEST — brittainmbbs@gmail.com only',
+    custom:     'Custom email address',
     subscribers:'Newsletter subscribers',
     users:      'All registered users',
     both:       'Everyone (subscribers + users)',
@@ -1879,6 +1886,22 @@ function getBcListLabel(list) {
   return labels[list] || list;
 }
 
+function onBcListChange() {
+  const list = document.getElementById('bcList').value;
+  const row  = document.getElementById('bcCustomEmailRow');
+  row.style.display = list === 'custom' ? 'block' : 'none';
+  if (list === 'custom') document.getElementById('bcCustomEmail').focus();
+}
+
+function deleteRevenueRow(idx) {
+  const r = S.revenue[idx];
+  if (!r) return;
+  const label = `${r.email||'?'} · $${Number(r.amount_aud||0).toFixed(2)} · ${r.type||''}`;
+  if (!confirm(`Remove this transaction from your metrics?\n\n${label}\n\nThis only removes it from this view — it does NOT refund or alter Stripe.`)) return;
+  S.revenue.splice(idx, 1);
+  renderRevenue();
+}
+
 async function sendBroadcast() {
   const list  = document.getElementById('bcList').value;
   const subj  = document.getElementById('bcSubject').value.trim();
@@ -1887,19 +1910,32 @@ async function sendBroadcast() {
   const al    = document.getElementById('bcAlert');
   const btn   = document.getElementById('bcBtn');
   al.className='alert';
+
+  // Validate custom email
+  let customEmail = '';
+  if (list === 'custom') {
+    customEmail = (document.getElementById('bcCustomEmail')?.value||'').trim();
+    if (!customEmail || !customEmail.includes('@')) {
+      al.className='alert err'; al.textContent='Please enter a valid custom email address.'; return;
+    }
+  }
+
   if (!subj || !bodyText) { al.className='alert err'; al.textContent='Subject and message required.'; return; }
-  if (!confirm(`Send to: ${getBcListLabel(list)}\n\nSubject: ${subj}\n\nThis cannot be undone.`)) return;
+  const listLabel = list === 'custom' ? `custom: ${customEmail}` : getBcListLabel(list);
+  if (!confirm(`Send to: ${listLabel}\n\nSubject: ${subj}\n\nThis cannot be undone.`)) return;
   btn.disabled=true; btn.textContent='Sending…';
-  // In raw HTML mode, send the HTML exactly as-is (don't wrap in template)
   const finalHtml = bcMode === 'html' ? bodyHtml : buildBroadcastHtml(subj, bodyHtml);
   try {
-    const res = await api('/admin/inbox/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({list, subject:subj, body:bodyText, html:finalHtml})});
+    const payload = {list, subject:subj, body:bodyText, html:finalHtml};
+    if (list === 'custom') payload.custom_email = customEmail;
+    const res = await api('/admin/inbox/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const d   = await res.json().catch(()=>({}));
     if (!res.ok) throw new Error(d?.error||'Failed');
-    al.className='alert ok'; al.textContent=`✓ Sent to ${d.sent||'?'} recipients`;
+    al.className='alert ok'; al.textContent=`✓ Sent to ${d.sent||'?'} recipient${(d.sent||0)===1?'':'s'}`;
     document.getElementById('bcSubject').value='';
     document.getElementById('bcRichEditor').innerHTML='';
     document.getElementById('bcPlainBody').value='';
+    if (list === 'custom') document.getElementById('bcCustomEmail').value='';
     updateBcPreview();
   } catch(e) { al.className='alert err'; al.textContent=e.message; }
   finally { btn.disabled=false; btn.textContent='Send Broadcast →'; }
@@ -2075,14 +2111,16 @@ function renderRevenue() {
   document.getElementById('rvEmpty').classList.toggle('hidden', rows.length>0);
 
   const tbody = document.getElementById('rvBody');
-  tbody.innerHTML = rows.length ? rows.map(r => {
+  tbody.innerHTML = rows.length ? rows.map((r,i) => {
     const dt = fmtDate(r.created_at);
-    return `<tr class="data-row" onclick="composeToUser('${esc(r.email||'')}')">
-      <td><div class="cell-main">${dt?.date||'—'}</div><div class="cell-sub">${dt?.time||''}</div></td>
-      <td><div class="cell-main">${esc(r.email||'?')}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
-      <td><span class="badge badge-default" style="font-size:0.62rem;">${esc(r.type||'—')}</span></td>
-      <td><span class="spend has">$${Number(r.amount_aud||0).toFixed(2)}</span></td>
-      <td><span class="badge badge-yes">Completed</span></td>
+    const rawIdx = S.revenue.indexOf(r);
+    return `<tr class="data-row">
+      <td onclick="composeToUser('${esc(r.email||'')}')"><div class="cell-main">${dt?.date||'—'}</div><div class="cell-sub">${dt?.time||''}</div></td>
+      <td onclick="composeToUser('${esc(r.email||'')}')"><div class="cell-main">${esc(r.email||'?')}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
+      <td onclick="composeToUser('${esc(r.email||'')}')"><span class="badge badge-default" style="font-size:0.62rem;">${esc(r.type||'—')}</span></td>
+      <td onclick="composeToUser('${esc(r.email||'')}')"><span class="spend has">$${Number(r.amount_aud||0).toFixed(2)}</span></td>
+      <td onclick="composeToUser('${esc(r.email||'')}')"><span class="badge badge-yes">Completed</span></td>
+      <td><button onclick="deleteRevenueRow(${rawIdx})" title="Delete / void this transaction" style="background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:0.72rem;font-weight:700;" onmouseover="this.style.background='rgba(248,113,113,0.25)'" onmouseout="this.style.background='var(--red-dim)'">✕</button></td>
     </tr>`;
   }).join('') : '';
 }
