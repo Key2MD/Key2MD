@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en-AU">
 <head>
   <!-- Google tag (gtag.js) -->
@@ -265,7 +264,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 <!-- ═══ END CANONICAL NAV ═══ -->
 
 <!-- Hero (added for cold visitors landing from search) -->
-
 <section class="practice-hero">
   <div class="practice-hero-inner">
     <div class="practice-hero-eyebrow">✦ Free Practice Tool — Key2MD</div>
@@ -281,7 +279,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 </section>
 
 <!-- ═══ WHAT MAKES THIS DIFFERENT ═══ -->
-
 <section style="background:#fff;border-bottom:1px solid #e2e8f0;padding:48px 24px;">
   <div style="max-width:1080px;margin:0 auto;">
     <div style="text-align:center;margin-bottom:36px;">
@@ -316,7 +313,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 <div id="practice-app">
 
 <!-- DAN MARKING CTA -->
-
 <div style="max-width:1500px;margin:16px auto 0;padding:0 24px;">
   <div class="dan-marking-card">
     <div class="dan-marking-left">
@@ -344,321 +340,320 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       </div>
     </div>
 
-```
-<button class="btn-start" id="startBtn"><span id="startBtnIcon">▶</span><span id="startBtnText">Start Session</span></button>
+    <button class="btn-start" id="startBtn"><span id="startBtnIcon">▶</span><span id="startBtnText">Start Session</span></button>
 
-<!-- Unified category card — header + coverage + filters all swap based on mode.
-     Hidden ID aliases (casperCategoryCard, mmiCategoryCard) preserved on
-     inner blocks so legacy code (mmi-circuit.js, etc.) that targets them
-     keeps working without changes. -->
-<div class="sidebar-card" id="categoryCard">
-  <h3 id="categoryCardHeader">Category</h3>
+    <!-- Unified category card — header + coverage + filters all swap based on mode.
+         Hidden ID aliases (casperCategoryCard, mmiCategoryCard) preserved on
+         inner blocks so legacy code (mmi-circuit.js, etc.) that targets them
+         keeps working without changes. -->
+    <div class="sidebar-card" id="categoryCard">
+      <h3 id="categoryCardHeader">Category</h3>
 
-  <!-- CASPer block: header is shared above; this wraps coverage + filters -->
-  <div id="casperCategoryCard">
-    <div id="casperCoverageWrap" style="margin-bottom:10px;">
-      <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
-        <div id="casperCoverageBar" style="height:100%;width:0%;background:var(--teal);border-radius:2px;transition:width 0.4s;"></div>
-      </div>
-      <div id="casperCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
-    </div>
-    <div class="category-filters" id="categoryFilters">
-      <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="cnt-all">—</span></button>
-      <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="cnt-ethics">—</span></button>
-      <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="cnt-conflict">—</span></button>
-      <button class="cat-btn" data-cat="Personal">Personal <span class="cat-count" id="cnt-personal">—</span></button>
-      <button class="cat-btn" data-cat="Professionalism">Professionalism <span class="cat-count" id="cnt-professionalism">—</span></button>
-      <button class="cat-btn" data-cat="Communication">Communication <span class="cat-count" id="cnt-communication">—</span></button>
-    </div>
-  </div>
-
-  <!-- MMI block -->
-  <div id="mmiCategoryCard" style="display:none;">
-    <div id="mmiCoverageWrap" style="margin-bottom:10px;">
-      <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
-        <div id="mmiCoverageBar" style="height:100%;width:0%;background:#7c3aed;border-radius:2px;transition:width 0.4s;"></div>
-      </div>
-      <div id="mmiCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
-    </div>
-    <div class="category-filters" id="mmiCategoryFilters">
-      <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="mmi-cnt-all">—</span></button>
-      <button class="cat-btn" data-cat="Motivation">Motivation <span class="cat-count" id="mmi-cnt-motivation">—</span></button>
-      <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="mmi-cnt-ethics">—</span></button>
-      <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="mmi-cnt-conflict">—</span></button>
-      <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">—</span></button>
-    </div>
-  </div>
-</div>
-
-<!-- MMI options -->
-<div class="sidebar-card" id="mmiOptionsCard" style="display:none;">
-  <h3>MMI Setup</h3>
-
-  <!-- Timing Preset -->
-  <div class="mmi-config-section">
-    <label class="mmi-config-label">Timing Preset</label>
-    <div class="preset-grid" id="presetGrid">
-      <button class="preset-card active" data-preset="quickfire" onclick="selectMMIPreset('quickfire')">
-        <div class="preset-name">Quickfire</div>
-        <div class="preset-detail">45s read · 4 Qs · 15s read + 60s each</div>
-      </button>
-      <button class="preset-card" data-preset="standard" onclick="selectMMIPreset('standard')">
-        <div class="preset-name">Standard</div>
-        <div class="preset-detail">2 min read all · 3 Qs · 5 min speaking</div>
-      </button>
-      <button class="preset-card" data-preset="extended" onclick="selectMMIPreset('extended')">
-        <div class="preset-name">Extended</div>
-        <div class="preset-detail">2 min read · advance Qs freely · 8 min</div>
-      </button>
-      <button class="preset-card" data-preset="random" onclick="selectMMIPreset('random')">
-        <div class="preset-name">Random Probe</div>
-        <div class="preset-detail">2 min · hidden timer · random follow-ups</div>
-      </button>
-      <button class="preset-card" data-preset="custom" onclick="selectMMIPreset('custom')" style="grid-column:1/-1;">
-        <div class="preset-name">Custom</div>
-        <div class="preset-detail">Set your own timing and prompt count</div>
-      </button>
-    </div>
-    <div class="mmi-custom-config" id="mmiCustomConfig">
-      <label class="mmi-config-label" style="margin-top:0;">Reading Time (seconds, 0–300)</label>
-      <input type="number" id="customReadingTime" min="0" max="300" value="120">
-      <label class="mmi-config-label">Recording Time (seconds, max 600)</label>
-      <input type="number" id="customRecordingTime" min="60" max="600" value="300">
-      <label class="mmi-config-label">Number of Prompts (1–4)</label>
-      <input type="number" id="customPromptCount" min="1" max="4" value="2">
-    </div>
-  </div>
-
-  <!-- Hide prompts toggle -->
-  <div class="mmi-config-section">
-    <label class="mmi-config-label">Station Options</label>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-      <span style="font-size:0.8rem;color:var(--gray800);">Hide prompts during reading</span>
-      <label class="toggle-switch">
-        <input type="checkbox" id="mmiHidePrompts">
-        <span class="toggle-slider"></span>
-      </label>
-    </div>
-    <div style="font-size:0.7rem;color:var(--gray400);line-height:1.4;">Enable to simulate universities that reveal questions only when answering begins.</div>
-  </div>
-
-  <!-- Quickfire only: reveal all questions from start -->
-  <div id="quickfireRevealAllRow" style="display:none;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.15);border-radius:8px;margin-top:8px;">
-    <div>
-      <div style="font-size:0.8rem;font-weight:600;color:var(--gray800);">Show all questions from the start</div>
-      <div style="font-size:0.68rem;color:var(--gray400);margin-top:2px;">Still timed (15s read / 60s answer each). Helps you see the full picture while being guided through timing.</div>
-    </div>
-    <label class="toggle-switch">
-      <input type="checkbox" id="mmiRevealAllToggle">
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
-
-  <!-- Specialist mode -->
-  <div class="mmi-specialist-row" id="specialistModeRow">
-    <div>
-      <div class="mmi-specialist-label">Specialist Training Mode</div>
-      <div class="mmi-specialist-sub">Higher bar on all five criteria. For RACS, RANZCP, ACEM, ACRRM, etc.</div>
-    </div>
-    <label class="toggle-switch">
-      <input type="checkbox" id="specialistModeToggle" onchange="toggleSpecialistMode()">
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
-
-  <!-- Premium tier toggle -->
-  <div class="mmi-specialist-row" id="premiumModeRow" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.18);border-radius:10px;margin-top:8px;">
-    <div>
-      <div class="mmi-specialist-label" style="color:#7c3aed;">✦ Premium Analysis</div>
-      <div class="mmi-specialist-sub">Adds voice pacing + presentation feedback. Uses 1 Premium credit. <a href="plans.html#mmi-section" style="color:#7c3aed;font-weight:600;">Get credits →</a></div>
-    </div>
-    <label class="toggle-switch">
-      <input type="checkbox" id="premiumModeToggle" onchange="togglePremiumMode()">
-      <span class="toggle-slider" style="--toggle-active:#7c3aed;"></span>
-    </label>
-  </div>
-  <!-- ffmpeg disclaimer — shown only when premium is on -->
-  <div id="premiumDisclaimer" style="display:none;font-size:0.72rem;color:var(--gray400);line-height:1.5;padding:8px 12px;background:rgba(124,58,237,0.04);border-radius:8px;margin-top:4px;">
-    ⚡ Premium analysis reviews your video and thus will require your device's processor for 5-10 seconds during this analysis phase, to send the information to the AI to be reviewed. Your full video will not be stored permanently.
-  </div>
-</div>
-
-<!-- Leaderboard - collapsible -->
-<div class="sidebar-card" id="leaderboardCard" style="padding:0;overflow:hidden;">
-  <div onclick="toggleLeaderboard()" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;user-select:none;">
-    <h3 style="margin:0;">🏆 Today's Leaderboard</h3>
-    <span style="font-size:0.66rem;font-weight:600;color:var(--teal3);background:rgba(14,165,233,0.1);padding:2px 8px;border-radius:50px;">Live</span>
-  </div>
-  <!-- Collapsed preview: inline stat strip + navy expand bar -->
-  <div id="lbCollapsedPreview" style="padding:0 0 14px;border-top:1px solid var(--gray100);">
-    <div style="display:flex;align-items:center;gap:14px;padding:12px 18px 0;font-size:0.78rem;">
-      <div style="display:flex;align-items:baseline;gap:5px;">
-        <span style="font-size:0.62rem;color:var(--gray400);letter-spacing:0.04em;text-transform:uppercase;">You</span>
-        <span style="font-size:0.85rem;font-weight:700;color:var(--teal3);" id="lbYourRankNum">—</span>
-        <span style="display:none;" id="lbYourQPill"></span>
-      </div>
-      <div style="width:1px;height:12px;background:var(--gray200);"></div>
-      <div style="display:flex;align-items:baseline;gap:5px;">
-        <span style="font-size:0.62rem;color:var(--gray400);letter-spacing:0.04em;text-transform:uppercase;">Active today</span>
-        <span style="font-size:0.85rem;font-weight:700;color:var(--navy);" id="lbParticipantsPreview">—</span>
-      </div>
-    </div>
-    <!-- Navy expand bar — clearly clickable, with dynamic chip teasing what's inside -->
-    <button id="lbExpandBtn" type="button" onclick="toggleLeaderboard()" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:calc(100% - 24px);margin:11px 12px 0;padding:11px 14px;border-radius:10px;border:none;background:linear-gradient(135deg,#0a1628 0%,#0d2a52 100%);color:rgba(255,255,255,0.9);font-size:0.8rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;text-align:left;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 14px rgba(10,22,40,0.2)';" onmouseout="this.style.transform='';this.style.boxShadow='';">
-      <span style="display:flex;align-items:center;gap:8px;">
-        <span id="lbExpandLabel">See where students rank today</span>
-        <span id="lbExpandChip" style="display:none;font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:50px;background:rgba(245,158,11,0.18);color:#fbbf24;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;"></span>
-      </span>
-      <span id="lbCollapseIcon" style="font-size:0.7rem;color:rgba(255,255,255,0.5);transition:transform 0.25s;display:inline-block;">▾</span>
-    </button>
-  </div>
-  <!-- Expanded full board (collapsed by default — click header or expand bar to open) -->
-  <div id="lbExpanded" style="display:none;border-top:1px solid var(--gray100);padding:14px 16px;">
-    <div id="streakWrap" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;">
-      <span style="font-size:1.2rem;">🔥</span>
-      <div>
-        <div style="font-size:0.82rem;font-weight:700;color:var(--navy);" id="streakText">Start practising to build a streak</div>
-        <div style="font-size:0.7rem;color:var(--gray400);" id="streakSub">Complete at least 1 station per day</div>
-      </div>
-    </div>
-    <div id="lbShareWrap" style="padding:10px 12px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.16);border-radius:8px;margin-bottom:10px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <div>
-          <div style="font-size:0.78rem;color:var(--navy);font-weight:700;">Add my score to the cohort</div>
-          <div id="lbShareHint" style="font-size:0.68rem;color:var(--gray400);line-height:1.4;margin-top:2px;">Off by default. Only AI-rated scores are eligible.</div>
+      <!-- CASPer block: header is shared above; this wraps coverage + filters -->
+      <div id="casperCategoryCard">
+        <div id="casperCoverageWrap" style="margin-bottom:10px;">
+          <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
+            <div id="casperCoverageBar" style="height:100%;width:0%;background:var(--teal);border-radius:2px;transition:width 0.4s;"></div>
+          </div>
+          <div id="casperCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
         </div>
-        <label class="toggle-switch" title="Show your AI-rated daily average on the public leaderboard">
-          <input type="checkbox" id="lbShareToggle">
+        <div class="category-filters" id="categoryFilters">
+          <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="cnt-all">—</span></button>
+          <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="cnt-ethics">—</span></button>
+          <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="cnt-conflict">—</span></button>
+          <button class="cat-btn" data-cat="Personal">Personal <span class="cat-count" id="cnt-personal">—</span></button>
+          <button class="cat-btn" data-cat="Professionalism">Professionalism <span class="cat-count" id="cnt-professionalism">—</span></button>
+          <button class="cat-btn" data-cat="Communication">Communication <span class="cat-count" id="cnt-communication">—</span></button>
+        </div>
+      </div>
+
+      <!-- MMI block -->
+      <div id="mmiCategoryCard" style="display:none;">
+        <div id="mmiCoverageWrap" style="margin-bottom:10px;">
+          <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
+            <div id="mmiCoverageBar" style="height:100%;width:0%;background:#7c3aed;border-radius:2px;transition:width 0.4s;"></div>
+          </div>
+          <div id="mmiCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
+        </div>
+        <div class="category-filters" id="mmiCategoryFilters">
+          <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="mmi-cnt-all">—</span></button>
+          <button class="cat-btn" data-cat="Motivation">Motivation <span class="cat-count" id="mmi-cnt-motivation">—</span></button>
+          <button class="cat-btn" data-cat="Ethics">Ethics <span class="cat-count" id="mmi-cnt-ethics">—</span></button>
+          <button class="cat-btn" data-cat="Conflict Resolution">Conflict Resolution <span class="cat-count" id="mmi-cnt-conflict">—</span></button>
+          <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">—</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MMI options -->
+    <div class="sidebar-card" id="mmiOptionsCard" style="display:none;">
+      <h3>MMI Setup</h3>
+
+      <!-- Timing Preset -->
+      <div class="mmi-config-section">
+        <label class="mmi-config-label">Timing Preset</label>
+        <div class="preset-grid" id="presetGrid">
+          <button class="preset-card active" data-preset="quickfire" onclick="selectMMIPreset('quickfire')">
+            <div class="preset-name">Quickfire</div>
+            <div class="preset-detail">45s read · 4 Qs · 15s read + 60s each</div>
+          </button>
+          <button class="preset-card" data-preset="standard" onclick="selectMMIPreset('standard')">
+            <div class="preset-name">Standard</div>
+            <div class="preset-detail">2 min read all · 3 Qs · 5 min speaking</div>
+          </button>
+          <button class="preset-card" data-preset="extended" onclick="selectMMIPreset('extended')">
+            <div class="preset-name">Extended</div>
+            <div class="preset-detail">2 min read · advance Qs freely · 8 min</div>
+          </button>
+          <button class="preset-card" data-preset="random" onclick="selectMMIPreset('random')">
+            <div class="preset-name">Random Probe</div>
+            <div class="preset-detail">2 min · hidden timer · random follow-ups</div>
+          </button>
+          <button class="preset-card" data-preset="custom" onclick="selectMMIPreset('custom')" style="grid-column:1/-1;">
+            <div class="preset-name">Custom</div>
+            <div class="preset-detail">Set your own timing and prompt count</div>
+          </button>
+        </div>
+        <div class="mmi-custom-config" id="mmiCustomConfig">
+          <label class="mmi-config-label" style="margin-top:0;">Reading Time (seconds, 0–300)</label>
+          <input type="number" id="customReadingTime" min="0" max="300" value="120">
+          <label class="mmi-config-label">Recording Time (seconds, max 600)</label>
+          <input type="number" id="customRecordingTime" min="60" max="600" value="300">
+          <label class="mmi-config-label">Number of Prompts (1–4)</label>
+          <input type="number" id="customPromptCount" min="1" max="4" value="2">
+        </div>
+      </div>
+
+      <!-- Hide prompts toggle -->
+      <div class="mmi-config-section">
+        <label class="mmi-config-label">Station Options</label>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:0.8rem;color:var(--gray800);">Hide prompts during reading</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="mmiHidePrompts">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div style="font-size:0.7rem;color:var(--gray400);line-height:1.4;">Enable to simulate universities that reveal questions only when answering begins.</div>
+      </div>
+
+      <!-- Quickfire only: reveal all questions from start -->
+      <div id="quickfireRevealAllRow" style="display:none;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.15);border-radius:8px;margin-top:8px;">
+        <div>
+          <div style="font-size:0.8rem;font-weight:600;color:var(--gray800);">Show all questions from the start</div>
+          <div style="font-size:0.68rem;color:var(--gray400);margin-top:2px;">Still timed (15s read / 60s answer each). Helps you see the full picture while being guided through timing.</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="mmiRevealAllToggle">
           <span class="toggle-slider"></span>
         </label>
       </div>
-      <div id="lbNameRow" style="display:none;margin-top:10px;">
-        <input id="lbDisplayName" type="text" maxlength="24" placeholder="Choose a public name" autocomplete="nickname" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--gray200);border-radius:7px;background:#fff;color:var(--gray800);font-size:0.78rem;font-family:inherit;outline:none;">
-        <button id="lbSaveNameBtn" type="button" onclick="saveLeaderboardSettingsFromUI()" style="margin-top:7px;width:100%;padding:8px;border-radius:7px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.1);color:var(--teal3);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;">Save leaderboard settings</button>
-      </div>
-      <div id="lbShareStatus" style="font-size:0.68rem;color:var(--gray400);line-height:1.4;margin-top:7px;">Sign in to publish your daily average.</div>
-    </div>
 
-    <!-- Your quartile vs distribution -->
-    <div id="lbYourRank" style="display:none;padding:10px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:8px;margin-bottom:10px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
+      <!-- Specialist mode -->
+      <div class="mmi-specialist-row" id="specialistModeRow">
         <div>
-          <div style="font-size:0.78rem;color:var(--teal3);font-weight:700;">Your Quartile</div>
-          <div style="font-size:1.1rem;font-weight:800;color:var(--navy);" id="lbYourPos">—</div>
+          <div class="mmi-specialist-label">Specialist Training Mode</div>
+          <div class="mmi-specialist-sub">Higher bar on all five criteria. For RACS, RANZCP, ACEM, ACRRM, etc.</div>
         </div>
-        <div style="text-align:right;">
-          <div style="font-size:0.78rem;color:var(--gray400);">vs Key2MD cohort</div>
-          <div style="font-size:1rem;font-weight:800;" id="lbYourQ">—</div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="specialistModeToggle" onchange="toggleSpecialistMode()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- Premium tier toggle -->
+      <div class="mmi-specialist-row" id="premiumModeRow" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.18);border-radius:10px;margin-top:8px;">
+        <div>
+          <div class="mmi-specialist-label" style="color:#7c3aed;">✦ Premium Analysis</div>
+          <div class="mmi-specialist-sub">Adds voice pacing + presentation feedback. Uses 1 Premium credit. <a href="plans.html#mmi-section" style="color:#7c3aed;font-weight:600;">Get credits →</a></div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="premiumModeToggle" onchange="togglePremiumMode()">
+          <span class="toggle-slider" style="--toggle-active:#7c3aed;"></span>
+        </label>
+      </div>
+      <!-- ffmpeg disclaimer — shown only when premium is on -->
+      <div id="premiumDisclaimer" style="display:none;font-size:0.72rem;color:var(--gray400);line-height:1.5;padding:8px 12px;background:rgba(124,58,237,0.04);border-radius:8px;margin-top:4px;">
+        ⚡ Premium analysis reviews your video and thus will require your device's processor for 5-10 seconds during this analysis phase, to send the information to the AI to be reviewed. Your full video will not be stored permanently.
+      </div>
+    </div>
+
+    <!-- Leaderboard - collapsible -->
+    <div class="sidebar-card" id="leaderboardCard" style="padding:0;overflow:hidden;">
+      <div onclick="toggleLeaderboard()" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;user-select:none;">
+        <h3 style="margin:0;">🏆 Today's Leaderboard</h3>
+        <span style="font-size:0.66rem;font-weight:600;color:var(--teal3);background:rgba(14,165,233,0.1);padding:2px 8px;border-radius:50px;">Live</span>
+      </div>
+      <!-- Collapsed preview: inline stat strip + navy expand bar -->
+      <div id="lbCollapsedPreview" style="padding:0 0 14px;border-top:1px solid var(--gray100);">
+        <div style="display:flex;align-items:center;gap:14px;padding:12px 18px 0;font-size:0.78rem;">
+          <div style="display:flex;align-items:baseline;gap:5px;">
+            <span style="font-size:0.62rem;color:var(--gray400);letter-spacing:0.04em;text-transform:uppercase;">You</span>
+            <span style="font-size:0.85rem;font-weight:700;color:var(--teal3);" id="lbYourRankNum">—</span>
+            <span style="display:none;" id="lbYourQPill"></span>
+          </div>
+          <div style="width:1px;height:12px;background:var(--gray200);"></div>
+          <div style="display:flex;align-items:baseline;gap:5px;">
+            <span style="font-size:0.62rem;color:var(--gray400);letter-spacing:0.04em;text-transform:uppercase;">Active today</span>
+            <span style="font-size:0.85rem;font-weight:700;color:var(--navy);" id="lbParticipantsPreview">—</span>
+          </div>
+        </div>
+        <!-- Navy expand bar — clearly clickable, with dynamic chip teasing what's inside -->
+        <button id="lbExpandBtn" type="button" onclick="toggleLeaderboard()" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:calc(100% - 24px);margin:11px 12px 0;padding:11px 14px;border-radius:10px;border:none;background:linear-gradient(135deg,#0a1628 0%,#0d2a52 100%);color:rgba(255,255,255,0.9);font-size:0.8rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;text-align:left;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 14px rgba(10,22,40,0.2)';" onmouseout="this.style.transform='';this.style.boxShadow='';">
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span id="lbExpandLabel">See where students rank today</span>
+            <span id="lbExpandChip" style="display:none;font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:50px;background:rgba(245,158,11,0.18);color:#fbbf24;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;"></span>
+          </span>
+          <span id="lbCollapseIcon" style="font-size:0.7rem;color:rgba(255,255,255,0.5);transition:transform 0.25s;display:inline-block;">▾</span>
+        </button>
+      </div>
+      <!-- Expanded full board (collapsed by default — click header or expand bar to open) -->
+      <div id="lbExpanded" style="display:none;border-top:1px solid var(--gray100);padding:14px 16px;">
+        <div id="streakWrap" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;">
+          <span style="font-size:1.2rem;">🔥</span>
+          <div>
+            <div style="font-size:0.82rem;font-weight:700;color:var(--navy);" id="streakText">Start practising to build a streak</div>
+            <div style="font-size:0.7rem;color:var(--gray400);" id="streakSub">Complete at least 1 station per day</div>
+          </div>
+        </div>
+        <div id="lbShareWrap" style="padding:10px 12px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.16);border-radius:8px;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <div>
+              <div style="font-size:0.78rem;color:var(--navy);font-weight:700;">Add my score to the cohort</div>
+              <div id="lbShareHint" style="font-size:0.68rem;color:var(--gray400);line-height:1.4;margin-top:2px;">Off by default. Only AI-rated scores are eligible.</div>
+            </div>
+            <label class="toggle-switch" title="Show your AI-rated daily average on the public leaderboard">
+              <input type="checkbox" id="lbShareToggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div id="lbNameRow" style="display:none;margin-top:10px;">
+            <input id="lbDisplayName" type="text" maxlength="24" placeholder="Choose a public name" autocomplete="nickname" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--gray200);border-radius:7px;background:#fff;color:var(--gray800);font-size:0.78rem;font-family:inherit;outline:none;">
+            <button id="lbSaveNameBtn" type="button" onclick="saveLeaderboardSettingsFromUI()" style="margin-top:7px;width:100%;padding:8px;border-radius:7px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.1);color:var(--teal3);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;">Save leaderboard settings</button>
+          </div>
+          <div id="lbShareStatus" style="font-size:0.68rem;color:var(--gray400);line-height:1.4;margin-top:7px;">Sign in to publish your daily average.</div>
+        </div>
+
+        <!-- Your quartile vs distribution -->
+        <div id="lbYourRank" style="display:none;padding:10px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:8px;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:0.78rem;color:var(--teal3);font-weight:700;">Your Quartile</div>
+              <div style="font-size:1.1rem;font-weight:800;color:var(--navy);" id="lbYourPos">—</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.78rem;color:var(--gray400);">vs Key2MD cohort</div>
+              <div style="font-size:1rem;font-weight:800;" id="lbYourQ">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Opted-in student rows -->
+        <div style="display:flex;flex-direction:column;gap:4px;" id="lbRows">
+          <div style="font-size:0.72rem;color:var(--gray400);padding:0 4px 4px;display:flex;justify-content:space-between;"><span>Student</span><span>Avg Score</span></div>
+        </div>
+
+        <!-- Score distribution bar (standardised) -->
+        <div style="margin-top:12px;">
+          <div style="font-size:0.7rem;color:var(--gray400);margin-bottom:6px;">Key2MD Score Distribution</div>
+          <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;gap:1px;" id="lbDistBar">
+            <div style="flex:8;background:#ef4444;border-radius:3px 0 0 3px;" title="Q1 (~8%)"></div>
+            <div style="flex:22;background:#f59e0b;" title="Q2 (~22%)"></div>
+            <div style="flex:42;background:#0ea5e9;" title="Q3 (~42%)"></div>
+            <div style="flex:28;background:#22c55e;border-radius:0 3px 3px 0;" title="Q4 (~28%)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--gray400);margin-top:3px;"><span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span></div>
+        </div>
+
+        <!-- Participant count + disclaimer -->
+        <div style="font-size:0.68rem;color:var(--gray400);margin-top:10px;text-align:center;" id="lbParticipants">— students practising today</div>
+        <div style="font-size:0.64rem;color:var(--gray400);margin-top:6px;line-height:1.5;padding:8px 10px;background:var(--gray50);border-radius:6px;">
+          Leaderboard shows opted-in students only — participation is limited. Quartile estimates are based on Key2MD's standardised score distribution for self-selecting med applicants.
+          <br><br>
+          The leaderboard is sparse by design. Many students have chosen to keep their scores private, which we fully support — your data is yours. To those who opted out: apologies for the previous format. This one respects that.
         </div>
       </div>
     </div>
 
-    <!-- Opted-in student rows -->
-    <div style="display:flex;flex-direction:column;gap:4px;" id="lbRows">
-      <div style="font-size:0.72rem;color:var(--gray400);padding:0 4px 4px;display:flex;justify-content:space-between;"><span>Student</span><span>Avg Score</span></div>
-    </div>
+    <!-- Timer settings hidden - now inside practice tool -->
 
-    <!-- Score distribution bar (standardised) -->
-    <div style="margin-top:12px;">
-      <div style="font-size:0.7rem;color:var(--gray400);margin-bottom:6px;">Key2MD Score Distribution</div>
-      <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;gap:1px;" id="lbDistBar">
-        <div style="flex:8;background:#ef4444;border-radius:3px 0 0 3px;" title="Q1 (~8%)"></div>
-        <div style="flex:22;background:#f59e0b;" title="Q2 (~22%)"></div>
-        <div style="flex:42;background:#0ea5e9;" title="Q3 (~42%)"></div>
-        <div style="flex:28;background:#22c55e;border-radius:0 3px 3px 0;" title="Q4 (~28%)"></div>
+    <!-- Account + AI Marking (merged, compact) -->
+    <div class="sidebar-card" id="aiMarkingCard">
+      <!-- Auth bar (filled by auth.js) -->
+      <div id="k2mdAuthBar" style="margin-bottom:12px;"></div>
+
+      <!-- Header strip: title + status -->
+      <div class="ai-toggle-row">
+        <span class="ai-toggle-label">✦ AI Marking</span>
+        <span class="ai-status ok" id="aiStatusEl"><span class="sdot sdot-green"></span>1 free/day</span>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--gray400);margin-top:3px;"><span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span></div>
-    </div>
 
-    <!-- Participant count + disclaimer -->
-    <div style="font-size:0.68rem;color:var(--gray400);margin-top:10px;text-align:center;" id="lbParticipants">— students practising today</div>
-    <div style="font-size:0.64rem;color:var(--gray400);margin-top:6px;line-height:1.5;padding:8px 10px;background:var(--gray50);border-radius:6px;">
-      Leaderboard shows opted-in students only — participation is limited. Quartile estimates are based on Key2MD's standardised score distribution for self-selecting med applicants.
-      <br><br>
-      The leaderboard is sparse by design. Many students have chosen to keep their scores private, which we fully support — your data is yours. To those who opted out: apologies for the previous format. This one respects that.
-    </div>
-  </div>
-</div>
+      <!-- Limits bar (always visible — small) -->
+      <div id="aiLimitWrap" style="margin-top:10px;">
+        <div class="ai-limit-bar">
+          <span class="ai-limit-label">Free daily review</span>
+          <span class="ai-limit-count" id="aiLimitCount">1 remaining</span>
+        </div>
+        <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
 
-<!-- Timer settings hidden - now inside practice tool -->
+        <!-- Credit balance (only shown if user has credits) -->
+        <div id="creditBalanceWrap" style="display:none;margin-top:8px;padding:8px 10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:6px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.75rem;color:var(--gray600);">Purchased credits</span>
+            <span style="font-size:0.82rem;font-weight:700;color:var(--gold);" id="creditCount">0</span>
+          </div>
+        </div>
 
-<!-- Account + AI Marking (merged, compact) -->
-<div class="sidebar-card" id="aiMarkingCard">
-  <!-- Auth bar (filled by auth.js) -->
-  <div id="k2mdAuthBar" style="margin-bottom:12px;"></div>
-
-  <!-- Header strip: title + status -->
-  <div class="ai-toggle-row">
-    <span class="ai-toggle-label">✦ AI Marking</span>
-    <span class="ai-status ok" id="aiStatusEl"><span class="sdot sdot-green"></span>1 free/day</span>
-  </div>
-
-  <!-- Limits bar (always visible — small) -->
-  <div id="aiLimitWrap" style="margin-top:10px;">
-    <div class="ai-limit-bar">
-      <span class="ai-limit-label">Free daily review</span>
-      <span class="ai-limit-count" id="aiLimitCount">1 remaining</span>
-    </div>
-    <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
-
-    <!-- Credit balance (only shown if user has credits) -->
-    <div id="creditBalanceWrap" style="display:none;margin-top:8px;padding:8px 10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:6px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <span style="font-size:0.75rem;color:var(--gray600);">Purchased credits</span>
-        <span style="font-size:0.82rem;font-weight:700;color:var(--gold);" id="creditCount">0</span>
+        <p class="api-note" style="margin-top:6px;" id="aiLimitNote">Create a free account to unlock AI reviews.</p>
       </div>
-    </div>
 
-    <p class="api-note" style="margin-top:6px;" id="aiLimitNote">Create a free account to unlock AI reviews.</p>
-  </div>
-
-  <!-- "Why is this different from ChatGPT?" — collapsed by default, one-line link -->
-  <div style="margin-top:8px;">
-    <button id="aiExplainerToggle" onclick="(function(b){var e=document.getElementById('aiExplainer');var open=e.style.display!=='none';e.style.display=open?'none':'block';b.textContent=open?'▸ Why is this different from ChatGPT?':'▾ Why is this different from ChatGPT?';})(this)" style="background:none;border:none;color:var(--teal3);font-size:0.76rem;font-weight:600;cursor:pointer;font-family:inherit;padding:0;text-align:left;">▸ Why is this different from ChatGPT?</button>
-    <div id="aiExplainer" style="display:none;margin-top:10px;padding:12px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.15);border-radius:10px;font-size:0.76rem;color:var(--gray600);line-height:1.6;">
-      <strong style="color:var(--navy);display:block;margin-bottom:6px;">This isn't generic AI feedback.</strong>
-      Dan has spent 300+ hours developing the marking criteria, prompt architecture, and scoring rubrics that power this tool — drawing directly from his experience coaching 200+ students through CASPer and MMI.
-      <br><br>
-      Every response is assessed using <strong style="color:var(--navy);">Dan's Q1–Q4 framework</strong>, the same criteria he uses in live 1:1 sessions. The AI is specifically trained to penalise the exact mistakes Dan sees students make — robotic framework-speak, buzzword answers, lack of genuine empathy — things ChatGPT would happily praise.
-      <br><br>
-      <strong style="color:var(--navy);">Dan is generally sceptical of AI feedback.</strong> Most AI marking tools give vague, encouraging responses that don't actually help you improve. This one was built with the opposite philosophy: honest, specific, sometimes uncomfortable feedback — because that's what moves scores.
-      <br><br>
-      <span style="color:var(--teal3);font-weight:600;">Try it yourself — paste the same response into ChatGPT and compare. You'll see the difference immediately.</span>
-    </div>
-  </div>
-
-  <!-- Buy credits + Pro upsell (only shown when limit hit — display set by JS) -->
-  <div id="buyCreditsBtnWrap" style="display:none;margin-top:10px;">
-    <button onclick="openCreditShop()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.08);color:var(--teal3);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='rgba(14,165,233,0.15)'" onmouseout="this.style.background='rgba(14,165,233,0.08)'">Buy More AI Reviews →</button>
-    <!-- Pro upsell — shown when limit hit -->
-    <div style="margin-top:10px;padding:12px 14px;background:linear-gradient(135deg,rgba(10,22,40,0.95),rgba(13,31,60,0.95));border:1.5px solid rgba(14,165,233,0.3);border-radius:10px;">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
-        <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:linear-gradient(135deg,var(--teal),var(--teal3));color:#fff;padding:2px 8px;border-radius:50px;">Pro</span>
-        <span style="font-size:0.82rem;font-weight:700;color:#fff;">Unlimited reviews</span>
+      <!-- "Why is this different from ChatGPT?" — collapsed by default, one-line link -->
+      <div style="margin-top:8px;">
+        <button id="aiExplainerToggle" onclick="(function(b){var e=document.getElementById('aiExplainer');var open=e.style.display!=='none';e.style.display=open?'none':'block';b.textContent=open?'▸ Why is this different from ChatGPT?':'▾ Why is this different from ChatGPT?';})(this)" style="background:none;border:none;color:var(--teal3);font-size:0.76rem;font-weight:600;cursor:pointer;font-family:inherit;padding:0;text-align:left;">▸ Why is this different from ChatGPT?</button>
+        <div id="aiExplainer" style="display:none;margin-top:10px;padding:12px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.15);border-radius:10px;font-size:0.76rem;color:var(--gray600);line-height:1.6;">
+          <strong style="color:var(--navy);display:block;margin-bottom:6px;">This isn't generic AI feedback.</strong>
+          Dan has spent 300+ hours developing the marking criteria, prompt architecture, and scoring rubrics that power this tool — drawing directly from his experience coaching 200+ students through CASPer and MMI.
+          <br><br>
+          Every response is assessed using <strong style="color:var(--navy);">Dan's Q1–Q4 framework</strong>, the same criteria he uses in live 1:1 sessions. The AI is specifically trained to penalise the exact mistakes Dan sees students make — robotic framework-speak, buzzword answers, lack of genuine empathy — things ChatGPT would happily praise.
+          <br><br>
+          <strong style="color:var(--navy);">Dan is generally sceptical of AI feedback.</strong> Most AI marking tools give vague, encouraging responses that don't actually help you improve. This one was built with the opposite philosophy: honest, specific, sometimes uncomfortable feedback — because that's what moves scores.
+          <br><br>
+          <span style="color:var(--teal3);font-weight:600;">Try it yourself — paste the same response into ChatGPT and compare. You'll see the difference immediately.</span>
+        </div>
       </div>
-      <p style="font-size:0.75rem;color:rgba(255,255,255,0.55);line-height:1.5;margin-bottom:10px;">Remove the daily cap entirely. $40/week, cancel anytime.</p>
-      <a href="plans.html" style="display:block;width:100%;padding:9px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.8rem;font-weight:700;text-align:center;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='var(--teal2)'" onmouseout="this.style.background='var(--teal)'">Get CASPer Pro →</a>
-    </div>
-  </div>
 
-  <!-- MMI AI credits display (only when in MMI mode — shown by JS) -->
-  <div id="mmiAiNote" style="display:none;margin-top:10px;">
-    <div style="font-size:0.75rem;color:var(--gray600);line-height:1.6;padding:10px 12px;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.18);border-radius:8px;margin-bottom:8px;">
-      <strong style="color:#7c3aed;display:block;margin-bottom:4px;">MMI AI Feedback — Credits Required</strong>
-      We previously offered free daily MMI reviews. Unfortunately, due to significant account duplication and abuse, we've had to move MMI AI feedback behind a paywall. We're sorry to those who used it fairly — this was a difficult decision. MMI transcription and AI analysis is genuinely expensive to run, and the free tier wasn't sustainable.
-    </div>
-    <div class="mmi-credit-info">
-      <div class="mmi-credit-row">
-        <span class="mmi-credit-label">Your MMI credits</span>
-        <span class="mmi-credit-count" id="mmiCreditCount">0</span>
+      <!-- Buy credits + Pro upsell (only shown when limit hit — display set by JS) -->
+      <div id="buyCreditsBtnWrap" style="display:none;margin-top:10px;">
+        <button onclick="openCreditShop()" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.08);color:var(--teal3);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='rgba(14,165,233,0.15)'" onmouseout="this.style.background='rgba(14,165,233,0.08)'">Buy More AI Reviews →</button>
+        <!-- Pro upsell — shown when limit hit -->
+        <div style="margin-top:10px;padding:12px 14px;background:linear-gradient(135deg,rgba(10,22,40,0.95),rgba(13,31,60,0.95));border:1.5px solid rgba(14,165,233,0.3);border-radius:10px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+            <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:linear-gradient(135deg,var(--teal),var(--teal3));color:#fff;padding:2px 8px;border-radius:50px;">Pro</span>
+            <span style="font-size:0.82rem;font-weight:700;color:#fff;">Unlimited reviews</span>
+          </div>
+          <p style="font-size:0.75rem;color:rgba(255,255,255,0.55);line-height:1.5;margin-bottom:10px;">Remove the daily cap entirely. $40/week, cancel anytime.</p>
+          <a href="plans.html" style="display:block;width:100%;padding:9px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.8rem;font-weight:700;text-align:center;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='var(--teal2)'" onmouseout="this.style.background='var(--teal)'">Get CASPer Pro →</a>
+        </div>
+      </div>
+
+      <!-- MMI AI credits display (only when in MMI mode — shown by JS) -->
+      <div id="mmiAiNote" style="display:none;margin-top:10px;">
+        <div style="font-size:0.75rem;color:var(--gray600);line-height:1.6;padding:10px 12px;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.18);border-radius:8px;margin-bottom:8px;">
+          <strong style="color:#7c3aed;display:block;margin-bottom:4px;">MMI AI Feedback — Credits Required</strong>
+          We previously offered free daily MMI reviews. Unfortunately, due to significant account duplication and abuse, we've had to move MMI AI feedback behind a paywall. We're sorry to those who used it fairly — this was a difficult decision. MMI transcription and AI analysis is genuinely expensive to run, and the free tier wasn't sustainable.
+        </div>
+        <div class="mmi-credit-info">
+          <div class="mmi-credit-row">
+            <span class="mmi-credit-label">Your MMI credits</span>
+            <span class="mmi-credit-count" id="mmiCreditCount">0</span>
+          </div>
+        </div>
+        <a href="plans.html" style="display:block;margin-top:8px;padding:9px;border-radius:8px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#7c3aed;font-size:0.8rem;font-weight:700;text-align:center;text-decoration:none;transition:background 0.18s;" onmouseover="this.style.background='rgba(124,58,237,0.18)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'">Buy MMI Credits →</a>
       </div>
     </div>
-    <a href="plans.html" style="display:block;margin-top:8px;padding:9px;border-radius:8px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#7c3aed;font-size:0.8rem;font-weight:700;text-align:center;text-decoration:none;transition:background 0.18s;" onmouseover="this.style.background='rgba(124,58,237,0.18)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'">Buy MMI Credits →</a>
-  </div>
-</div>
-```
 
   </aside>
+
 
   <div class="main-content">
     <div class="station-header">
@@ -676,286 +671,282 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     </div>
     <div class="progress-outer"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
 
-```
-<div class="webcam-panel" id="webcamPanel">
-  <div class="webcam-float">
-    <div class="webcam-header">
-      <div class="rec-dot" id="recDot" style="display:none;"></div>
-      <span class="rec-label" id="recLabel" style="display:none;">REC</span>
-      <span class="webcam-header-title" id="webcamTitle">Camera</span>
-    </div>
-    <div class="webcam-video-wrap">
-      <video id="webcamLive" autoplay muted playsinline></video>
-      <video id="webcamPlayback" playsinline></video>
-      <div class="webcam-overlay" id="webcamOverlay">
-        <div class="webcam-permission-text">Enable camera to record your answer</div>
-        <button class="btn-webcam-start" id="btnStartWebcam">Enable Camera</button>
-      </div>
-      <div id="playbackPlayOverlay" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);cursor:pointer;" onclick="togglePlayback()">
-        <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;">
-          <span id="playOverlayIcon" style="font-size:1.2rem;margin-left:3px;">&#9654;</span>
+    <div class="webcam-panel" id="webcamPanel">
+      <div class="webcam-float">
+        <div class="webcam-header">
+          <div class="rec-dot" id="recDot" style="display:none;"></div>
+          <span class="rec-label" id="recLabel" style="display:none;">REC</span>
+          <span class="webcam-header-title" id="webcamTitle">Camera</span>
+        </div>
+        <div class="webcam-video-wrap">
+          <video id="webcamLive" autoplay muted playsinline></video>
+          <video id="webcamPlayback" playsinline></video>
+          <div class="webcam-overlay" id="webcamOverlay">
+            <div class="webcam-permission-text">Enable camera to record your answer</div>
+            <button class="btn-webcam-start" id="btnStartWebcam">Enable Camera</button>
+          </div>
+          <div id="playbackPlayOverlay" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);cursor:pointer;" onclick="togglePlayback()">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;">
+              <span id="playOverlayIcon" style="font-size:1.2rem;margin-left:3px;">&#9654;</span>
+            </div>
+          </div>
+        </div>
+        <div class="webcam-controls" id="recordingControls">
+          <button class="btn-webcam-restart" id="btnRestartRecording" disabled title="Re-record (erases current recording)" onclick="confirmRestartRecording()">&#8635; Restart</button>
+          <button class="btn-webcam-dl" id="btnDownloadVideo" disabled title="Save recording to your device">&#11015; Save</button>
+        </div>
+        <div id="playbackControls" style="display:none;padding:8px 10px;background:rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.06);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
+            <span id="pbCurrentTime" style="font-size:0.7rem;font-weight:700;color:var(--teal2);font-variant-numeric:tabular-nums;min-width:32px;">0:00</span>
+            <div id="pbProgressTrack" style="flex:1;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;cursor:pointer;position:relative;" onclick="seekPlayback(event)">
+              <div id="pbProgressFill" style="height:100%;background:var(--teal);border-radius:2px;width:0%;"></div>
+            </div>
+            <span id="pbDuration" style="font-size:0.7rem;color:rgba(255,255,255,0.4);font-variant-numeric:tabular-nums;min-width:32px;text-align:right;">--:--</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button onclick="togglePlayback()" id="pbPlayBtn" style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:50px;background:rgba(14,165,233,0.15);color:var(--teal2);border:1px solid rgba(14,165,233,0.3);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;">▶ Play</button>
+            <button onclick="restartPlayback()" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:50px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.1);font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;">&#9198; Rewind</button>
+            <div style="flex:1;"></div>
+            <button class="btn-webcam-dl" id="btnDownloadVideo2" disabled title="Save video to device">&#11015; Save video</button>
+            <button class="btn-webcam-restart" id="btnReRecordBtn" disabled title="Re-record this station" onclick="confirmRestartRecording()">&#8635; Re-record</button>
+          </div>
         </div>
       </div>
     </div>
-    <div class="webcam-controls" id="recordingControls">
-      <button class="btn-webcam-restart" id="btnRestartRecording" disabled title="Re-record (erases current recording)" onclick="confirmRestartRecording()">&#8635; Restart</button>
-      <button class="btn-webcam-dl" id="btnDownloadVideo" disabled title="Save recording to your device">&#11015; Save</button>
-    </div>
-    <div id="playbackControls" style="display:none;padding:8px 10px;background:rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.06);">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
-        <span id="pbCurrentTime" style="font-size:0.7rem;font-weight:700;color:var(--teal2);font-variant-numeric:tabular-nums;min-width:32px;">0:00</span>
-        <div id="pbProgressTrack" style="flex:1;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;cursor:pointer;position:relative;" onclick="seekPlayback(event)">
-          <div id="pbProgressFill" style="height:100%;background:var(--teal);border-radius:2px;width:0%;"></div>
+
+    <!-- Hidden timer sliders - still needed by JS -->
+    <input type="range" id="readingSlider" min="15" max="120" step="5" value="60" style="display:none;">
+    <input type="range" id="writingSlider" min="60" max="600" step="15" value="210" style="display:none;">
+    <span id="readingVal" style="display:none;">60s</span>
+    <span id="writingVal" style="display:none;">3:30</span>
+
+    <div class="scenario-card" id="scenarioCard">
+      <div class="scenario-top">
+        <div class="scenario-label">Scenario</div>
+        <div id="scenarioIdle" class="idle-hero">
+          <div class="idle-icon">🎤</div>
+          <div class="idle-title">Ready to practise?</div>
+          <div class="idle-sub" id="idle-sub-text">The closest thing to the real CASPer you'll find online — real timing, AI scoring on Dan's Q1–Q4 framework, and a calibration score that updates after every station.</div>
+          <!-- Timer mode picker — shown only when idle -->
+          <div id="timerModePicker" style="margin-top:28px;text-align:left;max-width:480px;margin-left:auto;margin-right:auto;">
+            <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">⏱ Timer Mode</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <label id="timerModeOff" class="timer-mode-card" onclick="setTimerMode('off')" style="cursor:pointer;">
+                <div class="tmc-icon">🔇</div>
+                <div class="tmc-name">No Timer</div>
+                <div class="tmc-desc">Write at your own pace. Good for first attempts.</div>
+              </label>
+              <label id="timerModeStandard" class="timer-mode-card timer-mode-active" onclick="setTimerMode('standard')" style="cursor:pointer;">
+                <div class="tmc-icon">🕐</div>
+                <div class="tmc-name">Standard</div>
+                <div class="tmc-desc">60s read · 3:30 write. Mirrors real CASPer conditions.</div>
+              </label>
+              <label id="timerModeRapid" class="timer-mode-card" onclick="setTimerMode('rapid')" style="cursor:pointer;">
+                <div class="tmc-icon">⚡</div>
+                <div class="tmc-name">Rapid Fire</div>
+                <div class="tmc-desc">30s read · 2:00 write. Forces instinctive thinking under pressure.</div>
+              </label>
+              <label id="timerModeDeep" class="timer-mode-card" onclick="setTimerMode('deep')" style="cursor:pointer;">
+                <div class="tmc-icon">🧘</div>
+                <div class="tmc-name">Deep Dive</div>
+                <div class="tmc-desc">90s read · 6:00 write. Space to develop ideas fully.</div>
+              </label>
+            </div>
+            <div id="timerModeHint" style="margin-top:10px;font-size:0.72rem;color:var(--gray400);text-align:center;line-height:1.5;">
+              💡 <strong style="color:var(--gray600);">Standard</strong> selected — mirrors real CASPer timing. Switch to <strong style="color:var(--gray600);">Rapid Fire</strong> once you're comfortable to simulate exam pressure.
+            </div>
+          </div>
         </div>
-        <span id="pbDuration" style="font-size:0.7rem;color:rgba(255,255,255,0.4);font-variant-numeric:tabular-nums;min-width:32px;text-align:right;">--:--</span>
+        <p class="scenario-text" id="scenarioText" style="display:none;"></p>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <button onclick="togglePlayback()" id="pbPlayBtn" style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:50px;background:rgba(14,165,233,0.15);color:var(--teal2);border:1px solid rgba(14,165,233,0.3);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;">▶ Play</button>
-        <button onclick="restartPlayback()" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:50px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.1);font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;">&#9198; Rewind</button>
-        <div style="flex:1;"></div>
-        <button class="btn-webcam-dl" id="btnDownloadVideo2" disabled title="Save video to device">&#11015; Save video</button>
-        <button class="btn-webcam-restart" id="btnReRecordBtn" disabled title="Re-record this station" onclick="confirmRestartRecording()">&#8635; Re-record</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Hidden timer sliders - still needed by JS -->
-<input type="range" id="readingSlider" min="15" max="120" step="5" value="60" style="display:none;">
-<input type="range" id="writingSlider" min="60" max="600" step="15" value="210" style="display:none;">
-<span id="readingVal" style="display:none;">60s</span>
-<span id="writingVal" style="display:none;">3:30</span>
-
-<div class="scenario-card" id="scenarioCard">
-  <div class="scenario-top">
-    <div class="scenario-label">Scenario</div>
-    <div id="scenarioIdle" class="idle-hero">
-      <div class="idle-icon">🎤</div>
-      <div class="idle-title">Ready to practise?</div>
-      <div class="idle-sub" id="idle-sub-text">The closest thing to the real CASPer you'll find online — real timing, AI scoring on Dan's Q1–Q4 framework, and a calibration score that updates after every station.</div>
-      <!-- Timer mode picker — shown only when idle -->
-      <div id="timerModePicker" style="margin-top:28px;text-align:left;max-width:480px;margin-left:auto;margin-right:auto;">
-        <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">⏱ Timer Mode</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <label id="timerModeOff" class="timer-mode-card" onclick="setTimerMode('off')" style="cursor:pointer;">
-            <div class="tmc-icon">🔇</div>
-            <div class="tmc-name">No Timer</div>
-            <div class="tmc-desc">Write at your own pace. Good for first attempts.</div>
-          </label>
-          <label id="timerModeStandard" class="timer-mode-card timer-mode-active" onclick="setTimerMode('standard')" style="cursor:pointer;">
-            <div class="tmc-icon">🕐</div>
-            <div class="tmc-name">Standard</div>
-            <div class="tmc-desc">60s read · 3:30 write. Mirrors real CASPer conditions.</div>
-          </label>
-          <label id="timerModeRapid" class="timer-mode-card" onclick="setTimerMode('rapid')" style="cursor:pointer;">
-            <div class="tmc-icon">⚡</div>
-            <div class="tmc-name">Rapid Fire</div>
-            <div class="tmc-desc">30s read · 2:00 write. Forces instinctive thinking under pressure.</div>
-          </label>
-          <label id="timerModeDeep" class="timer-mode-card" onclick="setTimerMode('deep')" style="cursor:pointer;">
-            <div class="tmc-icon">🧘</div>
-            <div class="tmc-name">Deep Dive</div>
-            <div class="tmc-desc">90s read · 6:00 write. Space to develop ideas fully.</div>
-          </label>
+      <div class="prompts-area" id="promptsArea">
+        <div id="mmiCentralTimer" style="display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 20px;background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.18);border-radius:12px;margin-bottom:14px;font-family:inherit;">
+          <span id="mmiCtLabel" style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--teal3);min-width:80px;"></span>
+          <span id="mmiCtNum" style="font-size:1.9rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;text-align:center;flex:1;"></span>
+          <span style="font-size:0.68rem;color:var(--gray400);font-weight:500;min-width:60px;text-align:right;">remaining</span>
         </div>
-        <div id="timerModeHint" style="margin-top:10px;font-size:0.72rem;color:var(--gray400);text-align:center;line-height:1.5;">
-          💡 <strong style="color:var(--gray600);">Standard</strong> selected — mirrors real CASPer timing. Switch to <strong style="color:var(--gray600);">Rapid Fire</strong> once you're comfortable to simulate exam pressure.
+        <div class="prompts-locked" id="promptsLocked">
+          <div class="lock-icon">🔒</div>Prompts revealed after reading time
+        </div>
+        <div id="prompt1Wrap" style="display:none;">
+          <div class="prompt-item"><div class="prompt-num">1</div><div class="prompt-text" id="prompt1Text"></div></div>
+        </div>
+        <div id="prompt2Wrap" style="display:none;">
+          <div class="prompt-item"><div class="prompt-num">2</div><div class="prompt-text" id="prompt2Text"></div></div>
+        </div>
+        <div id="prompt3Wrap" style="display:none;">
+          <div class="prompt-item"><div class="prompt-num">3</div><div class="prompt-text" id="prompt3Text"></div></div>
+        </div>
+        <div id="prompt4Wrap" style="display:none;">
+          <div class="prompt-item"><div class="prompt-num">4</div><div class="prompt-text" id="prompt4Text"></div></div>
+        </div>
+        <button class="btn-reveal-next" id="btnRevealNext" style="display:none;" onclick="mmiRevealNextPrompt()">
+          Reveal Next Prompt →
+          <span class="reveal-counter" id="revealCounter">1 of 2</span>
+          <span style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-left:6px;">[Space]</span>
+        </button>
+      </div>
+      <div class="answer-section" id="answerSection" style="display:none;">
+        <div class="answer-label">Your response <span class="word-count" id="wordCount">0 words</span>
+          <button class="btn-download" id="btnDownloadResponse" title="Download your response">⬇ Save Response</button>
+            <!-- Self-rating (4.2) -->
+            <span id="selfRatingWrap" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:0.72rem;color:var(--gray400);font-weight:500;">How'd you do?</span>
+              <button class="self-rate-btn" data-q="Q1" onclick="setSelfRating('Q1')" title="Q1 — Needs work">Q1</button>
+              <button class="self-rate-btn" data-q="Q2" onclick="setSelfRating('Q2')" title="Q2 — Developing">Q2</button>
+              <button class="self-rate-btn" data-q="Q3" onclick="setSelfRating('Q3')" title="Q3 — Good">Q3</button>
+              <button class="self-rate-btn" data-q="Q4" onclick="setSelfRating('Q4')" title="Q4 — Excellent">Q4</button>
+            </span>
+            <span id="btnGetAIWrap" style="display:none;align-items:center;gap:8px;">
+              <button class="btn-download" id="btnGetAI" onclick="manualRunAI()" title="Get AI feedback on your response" style="background:rgba(14,165,233,0.12);">✦ Get AI Feedback + Quartile</button>
+              <span id="btnAIRemaining" style="font-size:0.75rem;color:var(--teal3);font-weight:700;white-space:nowrap;"></span>
+            </span>
+        </div>
+        <!-- Strict timing toggle — small, unobtrusive -->
+        <div id="strictModeWrap" style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;">
+            <input type="checkbox" id="strictModeToggle" style="width:13px;height:13px;accent-color:var(--teal3);cursor:pointer;">
+            <span style="font-size:0.72rem;color:var(--gray400);font-weight:500;">Strict timing</span>
+          </label>
+          <span id="strictModeTooltipBtn" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--gray200);color:var(--gray600);font-size:0.6rem;font-weight:700;cursor:default;position:relative;" onmouseenter="document.getElementById('strictModeTip').style.display='block'" onmouseleave="document.getElementById('strictModeTip').style.display='none'">?
+            <div id="strictModeTip" style="display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.72rem;border-radius:8px;padding:8px 12px;width:220px;z-index:200;text-align:left;line-height:1.5;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.3);">Prevents typing after time expires — simulates real exam conditions. Off by default so you can finish your thought.<div style="position:absolute;bottom:-5px;left:50%;width:10px;height:10px;background:var(--navy);transform:translateX(-50%) rotate(45deg);"></div></div>
+          </span>
+        </div>
+        <div class="time-up-banner" id="timeUpBanner" style="margin-bottom:6px;"></div>
+        <textarea class="answer-textarea" id="answerTextarea" placeholder="Start typing your answer here… Speak as you would in the actual interview — empathy, structure, and authenticity matter."></textarea>
+        <div id="aiFeedbackWrap"></div>
+      </div>
+      <div class="mmi-speaking-area" id="mmiSpeakingArea">
+        <div class="speaking-instruction" id="speakingInstruction">
+          <strong>🎤 Speak your answer aloud</strong> — this is a spoken station. Use the camera above to record and review your response. Focus on structure, empathy, and authentic delivery.
+        </div>
+        <div class="mmi-recording-status" id="mmiRecordingStatus" style="display:none;">
+          <div class="mmi-rec-dot"></div>
+          <span class="mmi-recording-timer" id="mmiRecordingTimer">0:00</span>
+          <span class="mmi-recording-label" id="mmiRecordingLabel">Recording…</span>
+        </div>
+        <div id="mmiSubmitWrap" style="display:none;">
+          <button class="btn-mmi-submit" id="btnMMISubmit" onclick="submitMMIForFeedback()">
+            ✦ Get AI Feedback
+          </button>
+          <div style="font-size:0.7rem;color:var(--gray400);text-align:center;margin-top:6px;">Transcribes and analyses your spoken response (15–30 seconds)</div>
+        </div>
+        <div id="aiFeedbackWrapMMI"></div>
+      </div>
+    </div>
+
+    <div class="review-panel" id="reviewPanel">
+      <div class="review-header">
+        <h2>Session Complete</h2>
+        <p id="reviewSubtitle">Here's how you did.</p>
+      </div>
+      <div class="review-stat-row">
+        <div class="review-stat"><span class="review-stat-num" id="rCompleted">0</span><span class="review-stat-label">Stations done</span></div>
+        <div class="review-stat"><span class="review-stat-num" id="rCategory">All</span><span class="review-stat-label">Category</span></div>
+        <div class="review-stat"><span class="review-stat-num" id="rAvg" style="color:var(--gray400)">—</span><span class="review-stat-label">Avg AI score</span></div>
+        <div class="review-stat"><span class="review-stat-num" id="rTrend" style="color:var(--gray400)">—</span><span class="review-stat-label">Trend</span></div>
+      </div>
+      <div class="review-trend" id="reviewTrendSection" style="display:none;">
+        <h3>Score Over Time</h3>
+        <div class="chart-container"><canvas id="reviewCanvas"></canvas></div>
+      </div>
+      <div class="review-list">
+        <!-- Per-category breakdown (4.1) -->
+        <div id="reviewCatBreakdown" style="display:none;margin-bottom:20px;">
+          <h3>Category Breakdown</h3>
+          <div id="reviewCatChart" style="max-width:480px;"></div>
+        </div>
+        <h3>Station Review</h3>
+        <div class="review-filter-row">
+          <button class="review-filter-btn active" data-filter="all">All</button>
+          <button class="review-filter-btn" data-filter="below">Below Average</button>
+          <button class="review-filter-btn" data-filter="answered">With Answers</button>
+        </div>
+        <div id="stationReviewList"></div>
+      </div>
+      <div class="review-footer">
+        <button class="btn-restart" id="restartBtn">↺ New Session</button>
+        <button class="btn-restart btn-restart-outline" id="reviewAgainBtn">Redo Same Stations</button>
+      </div>
+    </div>
+
+    <div class="nav-controls">
+      <div class="kbd-hints">
+        <div class="kbd-hint"><kbd>←</kbd> Prev</div>
+        <div class="kbd-hint"><kbd>→</kbd> Next</div>
+        <div class="kbd-hint"><kbd>Space</kbd> Skip reading</div>
+      </div>
+      <div class="ctrl-spacer"></div>
+      <button class="btn-ctrl" id="prevBtn" disabled>← Previous</button>
+      <button class="btn-ctrl btn-ctrl-skip" id="skipReadingBtn" disabled>Skip Reading</button>
+      <button class="btn-ctrl btn-ctrl-primary" id="nextBtn" disabled>Next Station →</button>
+    </div>
+    <div id="historyLinkBar" style="display:none;text-align:center;padding:10px 0 2px;">
+      <a href="history.html" style="display:inline-flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--gray400);font-weight:600;text-decoration:none;padding:6px 14px;border-radius:50px;border:1px solid var(--gray200);background:#fff;transition:all 0.18s;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal3)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray400)'">📋 View my practice history</a>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         BOTTOM RAIL — Session Stats, Competency Heatmap, Friday Classes,
+         Weekly Tips. These used to live in the sidebar but were demoted
+         here to keep the sidebar fitting in one viewport.
+         IDs are preserved (categoryHeatmapCard, statCompleted, statAvg,
+         heatmapRows etc.) so existing JS targeting them continues to work
+         with no changes. mmi-circuit.js hides this rail in Circuit mode.
+         ════════════════════════════════════════════════════════════════════ -->
+    <div class="bottom-rail" id="bottomRail">
+      <!-- Session Stats -->
+      <div class="bottom-rail-card">
+        <h3>Session Stats</h3>
+        <div class="stats-row">
+          <div class="stat-mini"><span class="stat-mini-num" id="statCompleted">0</span><span class="stat-mini-label">Completed</span></div>
+          <div class="stat-mini"><span class="stat-mini-num" id="statAvg" style="color:var(--gray400)">—</span><span class="stat-mini-label">Avg Score</span></div>
         </div>
       </div>
-    </div>
-    <p class="scenario-text" id="scenarioText" style="display:none;"></p>
-  </div>
-  <div class="prompts-area" id="promptsArea">
-    <div id="mmiCentralTimer" style="display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 20px;background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.18);border-radius:12px;margin-bottom:14px;font-family:inherit;">
-      <span id="mmiCtLabel" style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--teal3);min-width:80px;"></span>
-      <span id="mmiCtNum" style="font-size:1.9rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;text-align:center;flex:1;"></span>
-      <span style="font-size:0.68rem;color:var(--gray400);font-weight:500;min-width:60px;text-align:right;">remaining</span>
-    </div>
-    <div class="prompts-locked" id="promptsLocked">
-      <div class="lock-icon">🔒</div>Prompts revealed after reading time
-    </div>
-    <div id="prompt1Wrap" style="display:none;">
-      <div class="prompt-item"><div class="prompt-num">1</div><div class="prompt-text" id="prompt1Text"></div></div>
-    </div>
-    <div id="prompt2Wrap" style="display:none;">
-      <div class="prompt-item"><div class="prompt-num">2</div><div class="prompt-text" id="prompt2Text"></div></div>
-    </div>
-    <div id="prompt3Wrap" style="display:none;">
-      <div class="prompt-item"><div class="prompt-num">3</div><div class="prompt-text" id="prompt3Text"></div></div>
-    </div>
-    <div id="prompt4Wrap" style="display:none;">
-      <div class="prompt-item"><div class="prompt-num">4</div><div class="prompt-text" id="prompt4Text"></div></div>
-    </div>
-    <button class="btn-reveal-next" id="btnRevealNext" style="display:none;" onclick="mmiRevealNextPrompt()">
-      Reveal Next Prompt →
-      <span class="reveal-counter" id="revealCounter">1 of 2</span>
-      <span style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-left:6px;">[Space]</span>
-    </button>
-  </div>
-  <div class="answer-section" id="answerSection" style="display:none;">
-    <div class="answer-label">Your response <span class="word-count" id="wordCount">0 words</span>
-      <button class="btn-download" id="btnDownloadResponse" title="Download your response">⬇ Save Response</button>
-        <!-- Self-rating (4.2) -->
-        <span id="selfRatingWrap" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span style="font-size:0.72rem;color:var(--gray400);font-weight:500;">How'd you do?</span>
-          <button class="self-rate-btn" data-q="Q1" onclick="setSelfRating('Q1')" title="Q1 — Needs work">Q1</button>
-          <button class="self-rate-btn" data-q="Q2" onclick="setSelfRating('Q2')" title="Q2 — Developing">Q2</button>
-          <button class="self-rate-btn" data-q="Q3" onclick="setSelfRating('Q3')" title="Q3 — Good">Q3</button>
-          <button class="self-rate-btn" data-q="Q4" onclick="setSelfRating('Q4')" title="Q4 — Excellent">Q4</button>
-        </span>
-        <span id="btnGetAIWrap" style="display:none;align-items:center;gap:8px;">
-          <button class="btn-download" id="btnGetAI" onclick="manualRunAI()" title="Get AI feedback on your response" style="background:rgba(14,165,233,0.12);">✦ Get AI Feedback + Quartile</button>
-          <span id="btnAIRemaining" style="font-size:0.75rem;color:var(--teal3);font-weight:700;white-space:nowrap;"></span>
-        </span>
-    </div>
-    <!-- Strict timing toggle — small, unobtrusive -->
-    <div id="strictModeWrap" style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
-      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;">
-        <input type="checkbox" id="strictModeToggle" style="width:13px;height:13px;accent-color:var(--teal3);cursor:pointer;">
-        <span style="font-size:0.72rem;color:var(--gray400);font-weight:500;">Strict timing</span>
-      </label>
-      <span id="strictModeTooltipBtn" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--gray200);color:var(--gray600);font-size:0.6rem;font-weight:700;cursor:default;position:relative;" onmouseenter="document.getElementById('strictModeTip').style.display='block'" onmouseleave="document.getElementById('strictModeTip').style.display='none'">?
-        <div id="strictModeTip" style="display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.72rem;border-radius:8px;padding:8px 12px;width:220px;z-index:200;text-align:left;line-height:1.5;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.3);">Prevents typing after time expires — simulates real exam conditions. Off by default so you can finish your thought.<div style="position:absolute;bottom:-5px;left:50%;width:10px;height:10px;background:var(--navy);transform:translateX(-50%) rotate(45deg);"></div></div>
-      </span>
-    </div>
-    <div class="time-up-banner" id="timeUpBanner" style="margin-bottom:6px;"></div>
-    <textarea class="answer-textarea" id="answerTextarea" placeholder="Start typing your answer here… Speak as you would in the actual interview — empathy, structure, and authenticity matter."></textarea>
-    <div id="aiFeedbackWrap"></div>
-  </div>
-  <div class="mmi-speaking-area" id="mmiSpeakingArea">
-    <div class="speaking-instruction" id="speakingInstruction">
-      <strong>🎤 Speak your answer aloud</strong> — this is a spoken station. Use the camera above to record and review your response. Focus on structure, empathy, and authentic delivery.
-    </div>
-    <div class="mmi-recording-status" id="mmiRecordingStatus" style="display:none;">
-      <div class="mmi-rec-dot"></div>
-      <span class="mmi-recording-timer" id="mmiRecordingTimer">0:00</span>
-      <span class="mmi-recording-label" id="mmiRecordingLabel">Recording…</span>
-    </div>
-    <div id="mmiSubmitWrap" style="display:none;">
-      <button class="btn-mmi-submit" id="btnMMISubmit" onclick="submitMMIForFeedback()">
-        ✦ Get AI Feedback
-      </button>
-      <div style="font-size:0.7rem;color:var(--gray400);text-align:center;margin-top:6px;">Transcribes and analyses your spoken response (15–30 seconds)</div>
-    </div>
-    <div id="aiFeedbackWrapMMI"></div>
-  </div>
-</div>
 
-<div class="review-panel" id="reviewPanel">
-  <div class="review-header">
-    <h2>Session Complete</h2>
-    <p id="reviewSubtitle">Here's how you did.</p>
-  </div>
-  <div class="review-stat-row">
-    <div class="review-stat"><span class="review-stat-num" id="rCompleted">0</span><span class="review-stat-label">Stations done</span></div>
-    <div class="review-stat"><span class="review-stat-num" id="rCategory">All</span><span class="review-stat-label">Category</span></div>
-    <div class="review-stat"><span class="review-stat-num" id="rAvg" style="color:var(--gray400)">—</span><span class="review-stat-label">Avg AI score</span></div>
-    <div class="review-stat"><span class="review-stat-num" id="rTrend" style="color:var(--gray400)">—</span><span class="review-stat-label">Trend</span></div>
-  </div>
-  <div class="review-trend" id="reviewTrendSection" style="display:none;">
-    <h3>Score Over Time</h3>
-    <div class="chart-container"><canvas id="reviewCanvas"></canvas></div>
-  </div>
-  <div class="review-list">
-    <!-- Per-category breakdown (4.1) -->
-    <div id="reviewCatBreakdown" style="display:none;margin-bottom:20px;">
-      <h3>Category Breakdown</h3>
-      <div id="reviewCatChart" style="max-width:480px;"></div>
-    </div>
-    <h3>Station Review</h3>
-    <div class="review-filter-row">
-      <button class="review-filter-btn active" data-filter="all">All</button>
-      <button class="review-filter-btn" data-filter="below">Below Average</button>
-      <button class="review-filter-btn" data-filter="answered">With Answers</button>
-    </div>
-    <div id="stationReviewList"></div>
-  </div>
-  <div class="review-footer">
-    <button class="btn-restart" id="restartBtn">↺ New Session</button>
-    <button class="btn-restart btn-restart-outline" id="reviewAgainBtn">Redo Same Stations</button>
-  </div>
-</div>
+      <!-- Competency Heatmap (auto-shown by JS once AI feedback exists) -->
+      <div class="bottom-rail-card" id="categoryHeatmapCard" style="display:none;">
+        <h3 style="margin-bottom:4px;">Competency Heatmap</h3>
+        <p style="font-size:0.72rem;color:var(--gray400);margin-bottom:12px;line-height:1.4;">Your average by Casper competency. Lower rows show where to focus.</p>
+        <div id="heatmapRows" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <div id="heatmapWeakAlert" style="display:none;margin-top:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:10px 12px;">
+          <div style="font-size:0.72rem;font-weight:700;color:#dc2626;margin-bottom:4px;">Weakest competency: <span id="heatmapWeakLabel">—</span></div>
+          <div style="font-size:0.75rem;color:var(--gray600);line-height:1.4;margin-bottom:8px;">Dan's 1:1 sessions target your exact weak patterns — not generic frameworks.</div>
+          <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:700;text-decoration:none;" rel="noopener noreferrer">Book a Session →</a>
+        </div>
+      </div>
 
-<div class="nav-controls">
-  <div class="kbd-hints">
-    <div class="kbd-hint"><kbd>←</kbd> Prev</div>
-    <div class="kbd-hint"><kbd>→</kbd> Next</div>
-    <div class="kbd-hint"><kbd>Space</kbd> Skip reading</div>
-  </div>
-  <div class="ctrl-spacer"></div>
-  <button class="btn-ctrl" id="prevBtn" disabled>← Previous</button>
-  <button class="btn-ctrl btn-ctrl-skip" id="skipReadingBtn" disabled>Skip Reading</button>
-  <button class="btn-ctrl btn-ctrl-primary" id="nextBtn" disabled>Next Station →</button>
-</div>
-<div id="historyLinkBar" style="display:none;text-align:center;padding:10px 0 2px;">
-  <a href="history.html" style="display:inline-flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--gray400);font-weight:600;text-decoration:none;padding:6px 14px;border-radius:50px;border:1px solid var(--gray200);background:#fff;transition:all 0.18s;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal3)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray400)'">📋 View my practice history</a>
-</div>
+      <!-- Friday Classes promo (re-laid out for the rail's wider/shorter aspect ratio) -->
+      <div class="bottom-rail-card bottom-rail-card-promo">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal2);margin-bottom:6px;">📅 Weekly Live Classes</div>
+        <div style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:6px;">CASPer Group Coaching with Dan</div>
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:10px;">Every <strong style="color:rgba(255,255,255,0.9);">Friday 6pm</strong> via Zoom · Running until June 11. Real station walk-throughs and live Q&amp;A.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+          <div style="font-size:1rem;font-weight:800;color:var(--gold);">$120 <span style="font-size:0.7rem;font-weight:500;color:rgba(255,255,255,0.4);">/ person</span></div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <span style="font-size:0.62rem;font-weight:700;background:rgba(34,197,94,0.2);color:#4ade80;padding:2px 6px;border-radius:50px;">Small groups</span>
+            <span style="font-size:0.62rem;font-weight:700;background:rgba(14,165,233,0.2);color:var(--teal2);padding:2px 6px;border-radius:50px;">Live Zoom</span>
+          </div>
+        </div>
+        <button onclick="openEnquiry('CASPer Group Session')" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.82rem;font-weight:700;transition:all 0.2s;box-sizing:border-box;border:none;cursor:pointer;font-family:inherit;" onmouseover="this.style.background='#38bdf8'" onmouseout="this.style.background='var(--teal)'">Express Interest →</button>
+        <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:6px;">Dan replies within 24 hours</div>
+      </div>
 
-<!-- ════════════════════════════════════════════════════════════════════
-     BOTTOM RAIL — Session Stats, Competency Heatmap, Friday Classes,
-     Weekly Tips. These used to live in the sidebar but were demoted
-     here to keep the sidebar fitting in one viewport.
-     IDs are preserved (categoryHeatmapCard, statCompleted, statAvg,
-     heatmapRows etc.) so existing JS targeting them continues to work
-     with no changes. mmi-circuit.js hides this rail in Circuit mode.
-     ════════════════════════════════════════════════════════════════════ -->
-<div class="bottom-rail" id="bottomRail">
-  <!-- Session Stats -->
-  <div class="bottom-rail-card">
-    <h3>Session Stats</h3>
-    <div class="stats-row">
-      <div class="stat-mini"><span class="stat-mini-num" id="statCompleted">0</span><span class="stat-mini-label">Completed</span></div>
-      <div class="stat-mini"><span class="stat-mini-num" id="statAvg" style="color:var(--gray400)">—</span><span class="stat-mini-label">Avg Score</span></div>
-    </div>
-  </div>
-
-  <!-- Competency Heatmap (auto-shown by JS once AI feedback exists) -->
-  <div class="bottom-rail-card" id="categoryHeatmapCard" style="display:none;">
-    <h3 style="margin-bottom:4px;">Competency Heatmap</h3>
-    <p style="font-size:0.72rem;color:var(--gray400);margin-bottom:12px;line-height:1.4;">Your average by Casper competency. Lower rows show where to focus.</p>
-    <div id="heatmapRows" style="display:flex;flex-direction:column;gap:6px;"></div>
-    <div id="heatmapWeakAlert" style="display:none;margin-top:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:10px 12px;">
-      <div style="font-size:0.72rem;font-weight:700;color:#dc2626;margin-bottom:4px;">Weakest competency: <span id="heatmapWeakLabel">—</span></div>
-      <div style="font-size:0.75rem;color:var(--gray600);line-height:1.4;margin-bottom:8px;">Dan's 1:1 sessions target your exact weak patterns — not generic frameworks.</div>
-      <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:700;text-decoration:none;" rel="noopener noreferrer">Book a Session →</a>
-    </div>
-  </div>
-
-  <!-- Friday Classes promo (re-laid out for the rail's wider/shorter aspect ratio) -->
-  <div class="bottom-rail-card bottom-rail-card-promo">
-    <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal2);margin-bottom:6px;">📅 Weekly Live Classes</div>
-    <div style="font-size:0.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:6px;">CASPer Group Coaching with Dan</div>
-    <div style="font-size:0.75rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:10px;">Every <strong style="color:rgba(255,255,255,0.9);">Friday 6pm</strong> via Zoom · Running until June 11. Real station walk-throughs and live Q&amp;A.</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-      <div style="font-size:1rem;font-weight:800;color:var(--gold);">$120 <span style="font-size:0.7rem;font-weight:500;color:rgba(255,255,255,0.4);">/ person</span></div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;">
-        <span style="font-size:0.62rem;font-weight:700;background:rgba(34,197,94,0.2);color:#4ade80;padding:2px 6px;border-radius:50px;">Small groups</span>
-        <span style="font-size:0.62rem;font-weight:700;background:rgba(14,165,233,0.2);color:var(--teal2);padding:2px 6px;border-radius:50px;">Live Zoom</span>
+      <!-- Mailing list -->
+      <div class="bottom-rail-card">
+        <h3>📬 Weekly Tips</h3>
+        <p style="font-size:0.78rem;color:var(--gray600);line-height:1.5;margin-bottom:10px;">Get Dan's weekly CASPer, MMI &amp; GAMSAT tips — scenario breakdowns, common mistakes, and what examiners look for.</p>
+        <div id="practiceEmailForm">
+          <input type="email" id="practiceEmailInput" placeholder="Your email" style="width:100%;padding:9px 12px;border:1px solid var(--gray200);border-radius:8px;font-size:0.82rem;font-family:inherit;color:var(--gray800);background:var(--gray50);outline:none;margin-bottom:8px;box-sizing:border-box;">
+          <button onclick="subscribePractice()" style="width:100%;padding:9px;border-radius:8px;border:none;background:var(--teal,#0ea5e9);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Subscribe Free →</button>
+        </div>
+        <div id="practiceEmailDone" style="display:none;font-size:0.82rem;color:#16a34a;font-weight:600;padding:8px 0;">✓ You're in! Check your inbox.</div>
+        <p style="font-size:0.68rem;color:var(--gray400);margin-top:6px;">No spam. Unsubscribe anytime.</p>
       </div>
     </div>
-    <button onclick="openEnquiry('CASPer Group Session')" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.82rem;font-weight:700;transition:all 0.2s;box-sizing:border-box;border:none;cursor:pointer;font-family:inherit;" onmouseover="this.style.background='#38bdf8'" onmouseout="this.style.background='var(--teal)'">Express Interest →</button>
-    <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:6px;">Dan replies within 24 hours</div>
-  </div>
-
-  <!-- Mailing list -->
-  <div class="bottom-rail-card">
-    <h3>📬 Weekly Tips</h3>
-    <p style="font-size:0.78rem;color:var(--gray600);line-height:1.5;margin-bottom:10px;">Get Dan's weekly CASPer, MMI &amp; GAMSAT tips — scenario breakdowns, common mistakes, and what examiners look for.</p>
-    <div id="practiceEmailForm">
-      <input type="email" id="practiceEmailInput" placeholder="Your email" style="width:100%;padding:9px 12px;border:1px solid var(--gray200);border-radius:8px;font-size:0.82rem;font-family:inherit;color:var(--gray800);background:var(--gray50);outline:none;margin-bottom:8px;box-sizing:border-box;">
-      <button onclick="subscribePractice()" style="width:100%;padding:9px;border-radius:8px;border:none;background:var(--teal,#0ea5e9);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Subscribe Free →</button>
-    </div>
-    <div id="practiceEmailDone" style="display:none;font-size:0.82rem;color:#16a34a;font-weight:600;padding:8px 0;">✓ You're in! Check your inbox.</div>
-    <p style="font-size:0.68rem;color:var(--gray400);margin-top:6px;">No spam. Unsubscribe anytime.</p>
-  </div>
-</div>
-```
-
   </div>
 </div>
 
 <!-- ENQUIRY MODAL (matches live site — used for class sign-up and bug reports) -->
-
 <div id="enquiryModal">
   <div class="enquiry-card">
     <button class="enquiry-close" onclick="closeEnquiry()">✕</button>
@@ -1016,7 +1007,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 </div>
 
 <!-- ANY ISSUES? FLOATING BUTTON -->
-
 <button id="bugBtn" onclick="openBugReport()" style="position:fixed;bottom:24px;right:24px;z-index:1200;background:var(--white);border:1.5px solid var(--gray200);border-radius:50px;padding:10px 18px;font-size:0.82rem;font-weight:600;color:var(--gray600);cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,0.1);display:flex;align-items:center;gap:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal3)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">
   🐛 Any issues?
 </button>
@@ -1037,16 +1027,12 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
   </div>
 </footer>
 
+
 <script src="practice-stations.js"></script>
-
 <script src="mmi-recording.js"></script>
-
 <script src="mmi-engine.js"></script>
-
 <script src="mmi-feedback-render.js"></script>
-
 <script src="mmi-circuit.js"></script>
-
 <script>
 // ══ MMI CONFIG & STATE ══════════════════════════════════════════════
 const MMI_PRESETS = {
@@ -1441,7 +1427,6 @@ async function updateMMILimitsUI() {
   } catch {}
 }
 </script>
-
 <script>
 // ══ STATE ══
 const MODE_CASPER = 'casper';
@@ -2621,10 +2606,21 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
     while(true){ const {done,value} = await reader.read(); if(done) break; buffer += decoder.decode(value,{stream:true}); }
     buffer += decoder.decode(); // flush any remaining buffered bytes
 
-    // Parse JSON — worker returns clean JSON text, just trim and parse
-    // Strip markdown code fences in case the API wraps the response
-    const rawJson = buffer.trim().replace(/^```json\s*/,'').replace(/\s*```$/,'');
-    const fb = JSON.parse(rawJson);
+    // Parse JSON — robustly extract from AI response.
+    // Handles clean JSON, ```json fences, plain fences, preamble/postamble text.
+    function extractCleanJson(text){
+      if(!text) return null;
+      const t=text.trim();
+      try{ JSON.parse(t); return t; }catch{}
+      const fm=t.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```\s*$/i);
+      if(fm){ try{ JSON.parse(fm[1].trim()); return fm[1].trim(); }catch{} }
+      const jm=t.match(/\{[\s\S]*\}/);
+      if(jm){ try{ JSON.parse(jm[0]); return jm[0]; }catch{} }
+      return null;
+    }
+    const cleanJson = extractCleanJson(buffer);
+    if(!cleanJson){ throw new Error('AI returned unreadable response format'); }
+    const fb = JSON.parse(cleanJson);
     fb.competencies = normalizeCompetencies(fb.competencies);
     h.score = fb.score;
     h.feedback = fb;
@@ -4358,108 +4354,100 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 <!-- DAN MARKING MODAL -->
-
 <div class="marking-modal-overlay" id="markingModalOverlay">
   <div class="marking-modal">
     <h3>Submit for Expert Marking</h3>
     <p class="msub">Dan will personally review your response with full written feedback, a quartile estimate, and exactly what a top response would include — within 48 hours.</p>
     <div class="marking-price-note"><strong>$35 per CASPer station</strong>Paid securely via Stripe. Dan replies to your email within 48 hours.</div>
 
-```
-<!-- Source toggle -->
-<div style="display:flex;gap:0;margin-bottom:16px;border:1.5px solid var(--gray200);border-radius:50px;overflow:hidden;">
-  <button id="markSrcCurrent" onclick="setMarkingSource('current')" style="flex:1;padding:10px;border:none;background:var(--navy);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;">Current Station</button>
-  <button id="markSrcPaste" onclick="setMarkingSource('paste')" style="flex:1;padding:10px;border:none;background:var(--gray50);color:var(--gray600);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">Paste Your Own</button>
-</div>
+    <!-- Source toggle -->
+    <div style="display:flex;gap:0;margin-bottom:16px;border:1.5px solid var(--gray200);border-radius:50px;overflow:hidden;">
+      <button id="markSrcCurrent" onclick="setMarkingSource('current')" style="flex:1;padding:10px;border:none;background:var(--navy);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;">Current Station</button>
+      <button id="markSrcPaste" onclick="setMarkingSource('paste')" style="flex:1;padding:10px;border:none;background:var(--gray50);color:var(--gray600);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">Paste Your Own</button>
+    </div>
 
-<!-- Current station preview -->
-<div id="markCurrentPreview" style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px 16px;margin-bottom:14px;max-height:180px;overflow-y:auto;">
-  <div style="font-size:0.72rem;font-weight:700;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Attached from current station</div>
-  <div id="markCurrentContent" style="font-size:0.82rem;color:var(--gray600);line-height:1.6;white-space:pre-wrap;">No station loaded yet. Start a station first, or switch to "Paste Your Own".</div>
-</div>
+    <!-- Current station preview -->
+    <div id="markCurrentPreview" style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px 16px;margin-bottom:14px;max-height:180px;overflow-y:auto;">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Attached from current station</div>
+      <div id="markCurrentContent" style="font-size:0.82rem;color:var(--gray600);line-height:1.6;white-space:pre-wrap;">No station loaded yet. Start a station first, or switch to "Paste Your Own".</div>
+    </div>
 
-<!-- Paste your own (hidden by default) -->
-<div id="markPasteWrap" style="display:none;">
-  <div class="mfield">
-    <label>Scenario / Question</label>
-    <textarea id="mPasteScenario" rows="3" placeholder="Paste the CASPer scenario or MMI prompt here..." style="width:100%;padding:9px 13px;border:1.5px solid var(--gray200);border-radius:8px;font-size:0.875rem;color:var(--gray800);outline:none;transition:border-color 0.2s;font-family:inherit;resize:vertical;"></textarea>
-  </div>
-  <div class="mfield">
-    <label>Your Response</label>
-    <textarea id="mPasteResponse" rows="4" placeholder="Paste your typed response here..." style="width:100%;padding:9px 13px;border:1.5px solid var(--gray200);border-radius:8px;font-size:0.875rem;color:var(--gray800);outline:none;transition:border-color 0.2s;font-family:inherit;resize:vertical;"></textarea>
-  </div>
-</div>
+    <!-- Paste your own (hidden by default) -->
+    <div id="markPasteWrap" style="display:none;">
+      <div class="mfield">
+        <label>Scenario / Question</label>
+        <textarea id="mPasteScenario" rows="3" placeholder="Paste the CASPer scenario or MMI prompt here..." style="width:100%;padding:9px 13px;border:1.5px solid var(--gray200);border-radius:8px;font-size:0.875rem;color:var(--gray800);outline:none;transition:border-color 0.2s;font-family:inherit;resize:vertical;"></textarea>
+      </div>
+      <div class="mfield">
+        <label>Your Response</label>
+        <textarea id="mPasteResponse" rows="4" placeholder="Paste your typed response here..." style="width:100%;padding:9px 13px;border:1.5px solid var(--gray200);border-radius:8px;font-size:0.875rem;color:var(--gray800);outline:none;transition:border-color 0.2s;font-family:inherit;resize:vertical;"></textarea>
+      </div>
+    </div>
 
-<div class="mfield"><label>Your Email (Dan will reply here)</label><input type="email" id="mEmail" placeholder="e.g. sarah@email.com"></div>
-<div class="mfield"><label>Anything else Dan should know? (optional)</label><textarea id="mNotes" rows="2" placeholder="e.g. CASPer exam date, target universities..."></textarea></div>
-<div class="mactions">
-  <button class="btn-mcancel" onclick="closeMarkingModal()">Cancel</button>
-  <button class="btn-msend" id="markPayBtn" onclick="submitMarkingPayment()">Pay $35 & Submit →</button>
-</div>
-```
-
+    <div class="mfield"><label>Your Email (Dan will reply here)</label><input type="email" id="mEmail" placeholder="e.g. sarah@email.com"></div>
+    <div class="mfield"><label>Anything else Dan should know? (optional)</label><textarea id="mNotes" rows="2" placeholder="e.g. CASPer exam date, target universities..."></textarea></div>
+    <div class="mactions">
+      <button class="btn-mcancel" onclick="closeMarkingModal()">Cancel</button>
+      <button class="btn-msend" id="markPayBtn" onclick="submitMarkingPayment()">Pay $35 & Submit →</button>
+    </div>
   </div>
 </div>
 
 <!-- CREDIT SHOP MODAL -->
-
 <div id="creditShopOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);z-index:2001;display:none;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:32px 28px;max-width:440px;width:92%;position:relative;max-height:90vh;overflow-y:auto;">
     <button onclick="closeCreditShop()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
 
-```
-<div id="creditShopMain">
-  <div style="font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:4px;">Buy AI Review Credits</div>
-  <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:20px;">Credits never expire. Use them anytime.</div>
+    <div id="creditShopMain">
+      <div style="font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:4px;">Buy AI Review Credits</div>
+      <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:20px;">Credits never expire. Use them anytime.</div>
 
-  <!-- CASPer packs -->
-  <div style="font-size:0.72rem;font-weight:700;color:#38bdf8;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">💬 CASPer Station Reviews</div>
-  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-    <button class="credit-pack-btn" onclick="selectPack('casper_1')" data-pack="casper_1">
-      <div><strong>1 station review</strong><span class="pack-price">$7.00</span></div>
-    </button>
-    <button class="credit-pack-btn" onclick="selectPack('casper_5')" data-pack="casper_5">
-      <div><strong>5 station reviews</strong><span class="pack-price">$31.50</span><span class="pack-save">Save 10%</span></div>
-    </button>
-    <button class="credit-pack-btn recommended" onclick="selectPack('casper_10')" data-pack="casper_10">
-      <div><strong>10 station reviews</strong><span class="pack-price">$56.00</span><span class="pack-save">Save 20%</span></div>
-      <span class="pack-rec">Best Value</span>
-    </button>
-  </div>
+      <!-- CASPer packs -->
+      <div style="font-size:0.72rem;font-weight:700;color:#38bdf8;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">💬 CASPer Station Reviews</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+        <button class="credit-pack-btn" onclick="selectPack('casper_1')" data-pack="casper_1">
+          <div><strong>1 station review</strong><span class="pack-price">$7.00</span></div>
+        </button>
+        <button class="credit-pack-btn" onclick="selectPack('casper_5')" data-pack="casper_5">
+          <div><strong>5 station reviews</strong><span class="pack-price">$31.50</span><span class="pack-save">Save 10%</span></div>
+        </button>
+        <button class="credit-pack-btn recommended" onclick="selectPack('casper_10')" data-pack="casper_10">
+          <div><strong>10 station reviews</strong><span class="pack-price">$56.00</span><span class="pack-save">Save 20%</span></div>
+          <span class="pack-rec">Best Value</span>
+        </button>
+      </div>
 
-  <!-- GAMSAT packs -->
-  <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">✍️ GAMSAT Essay Reviews</div>
-  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-    <button class="credit-pack-btn" onclick="selectPack('gamsat_1')" data-pack="gamsat_1">
-      <div><strong>1 essay review</strong><span class="pack-price">$12.00</span></div>
-    </button>
-    <button class="credit-pack-btn" onclick="selectPack('gamsat_5')" data-pack="gamsat_5">
-      <div><strong>5 essay reviews</strong><span class="pack-price">$54.00</span><span class="pack-save">Save 10%</span></div>
-    </button>
-    <button class="credit-pack-btn recommended" onclick="selectPack('gamsat_10')" data-pack="gamsat_10">
-      <div><strong>10 essay reviews</strong><span class="pack-price">$96.00</span><span class="pack-save">Save 20%</span></div>
-      <span class="pack-rec">Best Value</span>
-    </button>
-  </div>
+      <!-- GAMSAT packs -->
+      <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">✍️ GAMSAT Essay Reviews</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+        <button class="credit-pack-btn" onclick="selectPack('gamsat_1')" data-pack="gamsat_1">
+          <div><strong>1 essay review</strong><span class="pack-price">$12.00</span></div>
+        </button>
+        <button class="credit-pack-btn" onclick="selectPack('gamsat_5')" data-pack="gamsat_5">
+          <div><strong>5 essay reviews</strong><span class="pack-price">$54.00</span><span class="pack-save">Save 10%</span></div>
+        </button>
+        <button class="credit-pack-btn recommended" onclick="selectPack('gamsat_10')" data-pack="gamsat_10">
+          <div><strong>10 essay reviews</strong><span class="pack-price">$96.00</span><span class="pack-save">Save 20%</span></div>
+          <span class="pack-rec">Best Value</span>
+        </button>
+      </div>
 
-  <!-- Purchase button -->
-  <button id="creditBuyBtn" onclick="purchaseCredits()" disabled style="width:100%;padding:14px;border-radius:50px;border:none;background:var(--teal,#0ea5e9);color:#fff;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;opacity:0.5;">Select a pack to continue</button>
+      <!-- Purchase button -->
+      <button id="creditBuyBtn" onclick="purchaseCredits()" disabled style="width:100%;padding:14px;border-radius:50px;border:none;background:var(--teal,#0ea5e9);color:#fff;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;opacity:0.5;">Select a pack to continue</button>
 
-  <!-- No refunds -->
-  <div style="font-size:0.68rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:12px;line-height:1.5;">
-    By purchasing, you agree that all credit purchases are final and non-refundable.<br>Credits are tied to your account and cannot be transferred. Unused credits do not expire.
-  </div>
-</div>
+      <!-- No refunds -->
+      <div style="font-size:0.68rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:12px;line-height:1.5;">
+        By purchasing, you agree that all credit purchases are final and non-refundable.<br>Credits are tied to your account and cannot be transferred. Unused credits do not expire.
+      </div>
+    </div>
 
-<!-- Purchase success -->
-<div id="creditShopSuccess" style="display:none;text-align:center;padding:20px 0;">
-  <div style="font-size:2.5rem;margin-bottom:12px;">✅</div>
-  <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:6px;">Credits added!</div>
-  <div style="font-size:0.85rem;color:rgba(255,255,255,0.5);" id="creditSuccessMsg">Your credits are ready to use.</div>
-  <button onclick="closeCreditShop()" style="margin-top:20px;width:100%;padding:12px;border-radius:50px;border:none;background:#0ea5e9;color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;">Start Practising →</button>
-</div>
-```
-
+    <!-- Purchase success -->
+    <div id="creditShopSuccess" style="display:none;text-align:center;padding:20px 0;">
+      <div style="font-size:2.5rem;margin-bottom:12px;">✅</div>
+      <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:6px;">Credits added!</div>
+      <div style="font-size:0.85rem;color:rgba(255,255,255,0.5);" id="creditSuccessMsg">Your credits are ready to use.</div>
+      <button onclick="closeCreditShop()" style="margin-top:20px;width:100%;padding:12px;border-radius:50px;border:none;background:#0ea5e9;color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;">Start Practising →</button>
+    </div>
   </div>
 </div>
 
