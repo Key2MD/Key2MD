@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register – CASPer Live Class · Key2MD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --navy:#0a1628;--teal:#0ea5e9;--teal2:#38bdf8;--gold:#f59e0b;--gold2:#fbbf24;--green:#22c55e;--white:#ffffff; }
+  html { scroll-behavior: smooth; }
+  body { font-family:'DM Sans',system-ui,sans-serif;background:var(--navy);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased;background-image:radial-gradient(ellipse 55% 40% at 80% 0%,rgba(14,165,233,0.12) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 10% 90%,rgba(245,158,11,0.07) 0%,transparent 55%); }
+  .nav { padding:20px 32px;display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto; }
+  .logo { font-family:'DM Sans',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.04em;color:var(--white);text-decoration:none; }
+  .logo span { color:var(--teal); }
+  .nav-back { font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none;transition:color 0.2s; }
+  .nav-back:hover { color:var(--teal2); }
+  .page { max-width:560px;margin:0 auto;padding:32px 24px 80px; }
+  .badge { display:inline-flex;align-items:center;gap:6px;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.3);border-radius:100px;padding:6px 16px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal2);margin-bottom:24px; }
+  .badge::before { content:'●';font-size:8px;color:var(--green);animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.2} }
+  h1 { font-family:'DM Serif Display',Georgia,serif;font-size:46px;line-height:1.05;color:var(--white);margin-bottom:14px; }
+  h1 em { font-style:italic;color:var(--teal2); }
+  .subtitle { font-size:16px;color:rgba(255,255,255,0.5);line-height:1.65;margin-bottom:36px; }
+  .session-info { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:24px 28px;margin-bottom:24px;display:flex;flex-direction:column;gap:14px; }
+  .info-row { display:flex;align-items:center;gap:14px;font-size:15px; }
+  .info-icon { font-size:18px;width:36px;height:36px;background:rgba(14,165,233,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+  .info-label { font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.35);font-weight:600; }
+  .info-val { font-size:15px;font-weight:600;color:var(--white); }
+  .spot-banner { background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:10px;font-size:14px;color:var(--gold2);margin-bottom:24px; }
+  .form-card { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:36px 32px;margin-bottom:24px; }
+  .form-title { font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px; }
+  .form-sub { font-size:14px;color:rgba(255,255,255,0.38);margin-bottom:28px;line-height:1.5; }
+  .field { margin-bottom:18px; }
+  label { display:block;font-size:12px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px; }
+  input, textarea { width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--white);transition:border-color 0.2s,background 0.2s;outline:none;resize:vertical; }
+  input::placeholder, textarea::placeholder { color:rgba(255,255,255,0.2); }
+  input:focus, textarea:focus { border-color:var(--teal);background:rgba(14,165,233,0.06); }
+  .err { font-size:12px;color:#f87171;margin-top:5px;display:none; }
+  .submit-btn { width:100%;background:var(--teal);color:var(--white);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;padding:17px;border-radius:100px;border:none;cursor:pointer;transition:background 0.2s,transform 0.15s;margin-top:6px; }
+  .submit-btn:hover { background:var(--teal2);transform:translateY(-1px); }
+  .submit-btn:active { transform:translateY(0); }
+  .submit-btn:disabled { opacity:0.55;cursor:not-allowed;transform:none; }
+  .privacy-note { font-size:12px;color:rgba(255,255,255,0.2);text-align:center;margin-top:14px;line-height:1.5; }
+  .success-card { display:none;text-align:center;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:20px;padding:52px 36px;margin-bottom:24px; }
+  .success-icon { font-size:52px;margin-bottom:20px;display:block; }
+  .success-title { font-family:'DM Serif Display',Georgia,serif;font-size:32px;color:var(--white);margin-bottom:12px; }
+  .success-msg { font-size:15px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:24px; }
+  .success-zoom { background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:18px 22px;font-size:14px;color:var(--teal2);line-height:1.65;text-align:left; }
+  .footer { text-align:center;font-size:12px;color:rgba(255,255,255,0.18);padding-top:8px;line-height:1.7; }
+  .footer a { color:rgba(255,255,255,0.3);text-decoration:underline; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="logo" href="https://key2md.com">Key<span>2</span>MD</a>
+  <a class="nav-back" href="https://key2md.com">← key2md.com</a>
+</nav>
+
+<div class="page">
+
+  <div class="badge">Live Session · This Friday</div>
+  <h1>CASPer<br><em>Live Class</em></h1>
+  <p class="subtitle">Drop your email below — Dan will send the Zoom link just before 6pm this Friday.</p>
+
+  <div class="session-info">
+    <div class="info-row">
+      <div class="info-icon">📅</div>
+      <div>
+        <div class="info-label">Date</div>
+        <div class="info-val">Friday 8th May 2026</div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon">⏰</div>
+      <div>
+        <div class="info-label">Time</div>
+        <div class="info-val">6:00 PM AEST</div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon">🎥</div>
+      <div>
+        <div class="info-label">Format</div>
+        <div class="info-val">Zoom · link emailed just before 6pm</div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon">💰</div>
+      <div>
+        <div class="info-label">Price</div>
+        <div class="info-val">$120 AUD</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spot-banner">
+    🔥 <span><strong>Spots are limited</strong> — session is kept small so feedback stays specific.</span>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card" id="formCard">
+    <div class="form-title">Register your spot</div>
+    <div class="form-sub">Drop your email and Dan will send you the Zoom link just before 6pm Friday.</div>
+
+    <div class="field">
+      <label for="nameInput">Full Name</label>
+      <input type="text" id="nameInput" placeholder="e.g. Jamie Chen" autocomplete="name">
+      <div class="err" id="nameErr">Please enter your name.</div>
+    </div>
+
+    <div class="field">
+      <label for="emailInput">Email Address</label>
+      <input type="email" id="emailInput" placeholder="you@email.com" autocomplete="email">
+      <div class="err" id="emailErr">Please enter a valid email address.</div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">
+      Register →
+    </button>
+
+    <p class="privacy-note">Your email goes directly to Dan. No spam, ever.</p>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-card" id="successCard">
+    <span class="success-icon">🎉</span>
+    <div class="success-title">You're registered!</div>
+    <p class="success-msg">
+      You're on the list. The Zoom link will arrive at your email just before 6pm this Friday.
+    </p>
+    <div class="success-zoom">
+      🔗 Zoom link → <strong id="registeredEmail"></strong><br>
+      <span style="font-size:12px;opacity:0.6;margin-top:6px;display:block;">Check spam if it doesn't arrive by 5:55pm. Reply to any Key2MD email — it goes straight to Dan.</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    Key2MD · <a href="https://key2md.com">key2md.com</a> · © 2026<br>
+    <a href="https://key2md.com/unsubscribe">Unsubscribe</a> from Key2MD emails
+  </div>
+
+</div>
+
+<script>
+  const API = 'https://key2md-api.brittainmbbs.workers.dev';
+
+  function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+  async function handleSubmit() {
+    const name  = document.getElementById('nameInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+    let valid = true;
+
+    if (!name) {
+      document.getElementById('nameErr').style.display = 'block';
+      document.getElementById('nameInput').style.borderColor = '#f87171';
+      valid = false;
+    } else {
+      document.getElementById('nameErr').style.display = 'none';
+      document.getElementById('nameInput').style.borderColor = '';
+    }
+
+    if (!validateEmail(email)) {
+      document.getElementById('emailErr').style.display = 'block';
+      document.getElementById('emailInput').style.borderColor = '#f87171';
+      valid = false;
+    } else {
+      document.getElementById('emailErr').style.display = 'none';
+      document.getElementById('emailInput').style.borderColor = '';
+    }
+
+    if (!valid) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Registering…';
+
+    const payload = {
+      name,
+      email,
+      type: 'CASPer Classes — Friday Signup',
+      universities: '',
+      exam_date: '',
+      notes: '⭐ FRIDAY CASPER CLASS — 8th May 6pm · $120',
+    };
+
+    try {
+      const res = await fetch(`${API}/api/enquiry`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`${res.status}`);
+      showSuccess(email);
+    } catch (err) {
+      // Fallback: mailto — no registration lost
+      console.warn('API failed, using mailto fallback:', err);
+      const sub = encodeURIComponent('⭐ Friday CASPer Class — ' + name);
+      const bod = encodeURIComponent(
+        'Friday CASPer Class Registration\n\nName: ' + name +
+        '\nEmail: ' + email + '\nDate: 8th May 6pm · $120' +
+        (notes ? '\nNotes: ' + notes : '')
+      );
+      window.open('mailto:brittainmbbs@gmail.com?subject=' + sub + '&body=' + bod);
+      showSuccess(email);
+    }
+  }
+
+  function showSuccess(email) {
+    document.getElementById('registeredEmail').textContent = email;
+    document.getElementById('formCard').style.display = 'none';
+    document.getElementById('successCard').style.display = 'block';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
+    });
+  });
+</script>
+</body>
+</html>
