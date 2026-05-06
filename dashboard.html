@@ -678,7 +678,7 @@
               <select class="form-sel" id="bcList" onchange="onBcListChange()">
                 <optgroup label="🧪 Test">
                   <option value="test">Test — send to brittainmbbs@gmail.com only</option>
-                  <option value="custom">Custom email — enter address below</option>
+                  <option value="custom">📩 Custom — enter a single email address</option>
                 </optgroup>
                 <optgroup label="📋 All">
                   <option value="subscribers">Newsletter subscribers only</option>
@@ -700,9 +700,10 @@
               </select>
             </div>
 
-            <div class="form-row" id="bcCustomEmailRow" style="display:none;">
-              <label class="form-lbl">Custom recipient email</label>
-              <input class="form-in" id="bcCustomEmail" type="email" placeholder="e.g. student@gmail.com" oninput="updateBcPreview()">
+            <!-- Custom email input — shown only when "custom" selected -->
+            <div class="form-row" id="bcCustomRow" style="display:none;">
+              <label class="form-lbl">Recipient email address</label>
+              <input class="form-in" id="bcCustomEmail" type="email" placeholder="e.g. student@gmail.com">
             </div>
 
             <div class="form-row">
@@ -783,9 +784,9 @@
         <button class="btn" onclick="loadSubscribers()">↺ Refresh</button>
       </div>
       <div class="tbl-wrap">
-        <div class="tbl-toolbar"><span class="tbl-status" id="subStatus">—</span></div>
+        <div class="tbl-toolbar"><span class="tbl-status" id="subStatus">—</span><span id="subRemovedNote" style="font-size:0.72rem;color:var(--amber);margin-left:12px;display:none;"></span></div>
         <div class="tbl-scroller"><table><thead><tr>
-          <th>Email</th><th>Subscribed</th><th>Action</th>
+          <th>Email</th><th>Subscribed</th><th style="width:180px;text-align:center;">Actions</th>
         </tr></thead><tbody id="subBody"></tbody></table></div>
       </div>
     </div>
@@ -877,7 +878,7 @@
       <div class="tbl-wrap">
         <div class="tbl-toolbar"><span class="tbl-status" id="rvStatus">—</span></div>
         <div class="tbl-scroller"><table><thead><tr>
-          <th>Time</th><th>Student</th><th>Type</th><th>Amount</th><th>Status</th><th style="width:40px;"></th>
+          <th>Time</th><th>Student</th><th>Type</th><th>Amount</th><th>Status</th><th style="width:80px;text-align:center;">Actions</th>
         </tr></thead><tbody id="rvBody"></tbody></table></div>
         <div class="empty hidden" id="rvEmpty">No transactions yet.</div>
       </div>
@@ -1867,6 +1868,13 @@ function updateBcPreview() {
   frame.srcdoc = bcMode === 'html' ? bodyHtml : buildBroadcastHtml(subj, bodyHtml);
 }
 
+function onBcListChange() {
+  const val = document.getElementById('bcList').value;
+  const customRow = document.getElementById('bcCustomRow');
+  if (customRow) customRow.style.display = val === 'custom' ? 'block' : 'none';
+  if (val === 'custom') document.getElementById('bcCustomEmail')?.focus();
+}
+
 function getBcListLabel(list) {
   const labels = {
     test:       'TEST — brittainmbbs@gmail.com only',
@@ -1886,22 +1894,6 @@ function getBcListLabel(list) {
   return labels[list] || list;
 }
 
-function onBcListChange() {
-  const list = document.getElementById('bcList').value;
-  const row  = document.getElementById('bcCustomEmailRow');
-  row.style.display = list === 'custom' ? 'block' : 'none';
-  if (list === 'custom') document.getElementById('bcCustomEmail').focus();
-}
-
-function deleteRevenueRow(idx) {
-  const r = S.revenue[idx];
-  if (!r) return;
-  const label = `${r.email||'?'} · $${Number(r.amount_aud||0).toFixed(2)} · ${r.type||''}`;
-  if (!confirm(`Remove this transaction from your metrics?\n\n${label}\n\nThis only removes it from this view — it does NOT refund or alter Stripe.`)) return;
-  S.revenue.splice(idx, 1);
-  renderRevenue();
-}
-
 async function sendBroadcast() {
   const list  = document.getElementById('bcList').value;
   const subj  = document.getElementById('bcSubject').value.trim();
@@ -1909,36 +1901,51 @@ async function sendBroadcast() {
   const bodyText = getBcBodyText().trim();
   const al    = document.getElementById('bcAlert');
   const btn   = document.getElementById('bcBtn');
-  al.className='alert';
+  al.className = 'alert';
 
-  // Validate custom email
+  // Validate custom email if needed
   let customEmail = '';
   if (list === 'custom') {
     customEmail = (document.getElementById('bcCustomEmail')?.value||'').trim();
-    if (!customEmail || !customEmail.includes('@')) {
-      al.className='alert err'; al.textContent='Please enter a valid custom email address.'; return;
+    if (!customEmail || !customEmail.includes('@') || !customEmail.includes('.')) {
+      al.className='alert err'; al.textContent='Please enter a valid email address for custom send.'; return;
     }
   }
 
   if (!subj || !bodyText) { al.className='alert err'; al.textContent='Subject and message required.'; return; }
-  const listLabel = list === 'custom' ? `custom: ${customEmail}` : getBcListLabel(list);
-  if (!confirm(`Send to: ${listLabel}\n\nSubject: ${subj}\n\nThis cannot be undone.`)) return;
-  btn.disabled=true; btn.textContent='Sending…';
+
+  const toLabel = list === 'custom' ? customEmail : getBcListLabel(list);
+  if (!confirm(`Send to: ${toLabel}\n\nSubject: ${subj}\n\nThis cannot be undone. Continue?`)) return;
+
+  btn.disabled = true; btn.textContent = 'Sending…';
   const finalHtml = bcMode === 'html' ? bodyHtml : buildBroadcastHtml(subj, bodyHtml);
+
   try {
-    const payload = {list, subject:subj, body:bodyText, html:finalHtml};
+    const payload = { list, subject: subj, body: bodyText, html: finalHtml };
     if (list === 'custom') payload.custom_email = customEmail;
-    const res = await api('/admin/inbox/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    const d   = await res.json().catch(()=>({}));
-    if (!res.ok) throw new Error(d?.error||'Failed');
-    al.className='alert ok'; al.textContent=`✓ Sent to ${d.sent||'?'} recipient${(d.sent||0)===1?'':'s'}`;
-    document.getElementById('bcSubject').value='';
-    document.getElementById('bcRichEditor').innerHTML='';
-    document.getElementById('bcPlainBody').value='';
-    if (list === 'custom') document.getElementById('bcCustomEmail').value='';
+
+    const res = await api('/admin/inbox/broadcast', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const d = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d?.error||'Broadcast failed');
+
+    al.className = 'alert ok';
+    al.textContent = `✓ Sent to ${d.sent||1} recipient${(d.sent||1)===1?'':'s'}`;
+    document.getElementById('bcSubject').value = '';
+    document.getElementById('bcRichEditor').innerHTML = '';
+    document.getElementById('bcPlainBody').value = '';
+    if (list === 'custom' && document.getElementById('bcCustomEmail')) {
+      document.getElementById('bcCustomEmail').value = '';
+    }
     updateBcPreview();
-  } catch(e) { al.className='alert err'; al.textContent=e.message; }
-  finally { btn.disabled=false; btn.textContent='Send Broadcast →'; }
+  } catch(e) {
+    al.className = 'alert err'; al.textContent = e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send Broadcast →';
+  }
 }
 
 // ══════════════════════════════════════════════════════
@@ -1960,12 +1967,41 @@ function renderSubscribers() {
   const rows = q ? S.subscribers.filter(s=>s.email.toLowerCase().includes(q)) : S.subscribers;
   document.getElementById('subStatus').textContent = `${rows.length} subscriber${rows.length===1?'':'s'}`;
   document.getElementById('subBody').innerHTML = rows.length
-    ? rows.map(s=>`<tr>
-        <td>${esc(s.email)}</td>
-        <td>${fmtDate(s.created_at)?.date||'—'}</td>
-        <td><button class="btn blue" style="font-size:0.7rem;padding:4px 9px;" onclick="composeToUser('${esc(s.email)}')">✉ Email</button></td>
-      </tr>`).join('')
+    ? rows.map((s,i) => {
+        const sIdx = S.subscribers.indexOf(s);
+        return `<tr>
+          <td><div class="cell-main">${esc(s.email)}</div></td>
+          <td><div class="cell-sub">${fmtDate(s.created_at)?.date||'—'}</div></td>
+          <td style="text-align:center;">
+            <div style="display:flex;gap:4px;justify-content:center;">
+              <button class="btn blue" style="font-size:0.7rem;padding:4px 9px;" onclick="composeToUser('${esc(s.email)}')">✉ Email</button>
+              <button class="btn" style="font-size:0.7rem;padding:4px 9px;background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);" onclick="unsubscribeRow(${sIdx},'${esc(s.email)}')">✕ Remove</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('')
     : '<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted2);">No subscribers yet.</td></tr>';
+}
+
+async function unsubscribeRow(idx, email) {
+  if (!confirm(`Remove ${email} from newsletter?\n\nThis will unsubscribe them permanently.`)) return;
+  // Optimistically remove from local state
+  S.subscribers.splice(idx, 1);
+  renderSubscribers();
+  const note = document.getElementById('subRemovedNote');
+  if (note) { note.textContent = `Removed ${email}`; note.style.display='inline'; setTimeout(()=>{note.style.display='none';},4000); }
+  // Call API
+  try {
+    const res = await api('/admin/subscribers/remove', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email})
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(()=>({}));
+      console.warn('Unsubscribe API error:', d?.error||'Unknown');
+    }
+  } catch(e) { console.warn('Unsubscribe error:', e.message); }
 }
 
 // ══════════════════════════════════════════════════════
@@ -2091,7 +2127,7 @@ function renderRevenue() {
     return sm&&tm;
   });
 
-  // Stats
+  // Stats — use S.revenue (full set) for totals, not filtered
   const total   = S.revenue.reduce((s,r)=>s+Number(r.amount_aud||0),0);
   const pro     = S.users.filter(u=>(u.tier||'').toLowerCase()==='pro').length;
   const mrr     = pro * 40 * 4.33;
@@ -2111,18 +2147,41 @@ function renderRevenue() {
   document.getElementById('rvEmpty').classList.toggle('hidden', rows.length>0);
 
   const tbody = document.getElementById('rvBody');
-  tbody.innerHTML = rows.length ? rows.map((r,i) => {
+  tbody.innerHTML = rows.length ? rows.map(r => {
     const dt = fmtDate(r.created_at);
-    const rawIdx = S.revenue.indexOf(r);
+    // Store index into S.revenue for deletion
+    const sIdx = S.revenue.indexOf(r);
     return `<tr class="data-row">
-      <td onclick="composeToUser('${esc(r.email||'')}')"><div class="cell-main">${dt?.date||'—'}</div><div class="cell-sub">${dt?.time||''}</div></td>
-      <td onclick="composeToUser('${esc(r.email||'')}')"><div class="cell-main">${esc(r.email||'?')}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
-      <td onclick="composeToUser('${esc(r.email||'')}')"><span class="badge badge-default" style="font-size:0.62rem;">${esc(r.type||'—')}</span></td>
-      <td onclick="composeToUser('${esc(r.email||'')}')"><span class="spend has">$${Number(r.amount_aud||0).toFixed(2)}</span></td>
-      <td onclick="composeToUser('${esc(r.email||'')}')"><span class="badge badge-yes">Completed</span></td>
-      <td><button onclick="deleteRevenueRow(${rawIdx})" title="Delete / void this transaction" style="background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:0.72rem;font-weight:700;" onmouseover="this.style.background='rgba(248,113,113,0.25)'" onmouseout="this.style.background='var(--red-dim)'">✕</button></td>
+      <td><div class="cell-main">${dt?.date||'—'}</div><div class="cell-sub">${dt?.time||''}</div></td>
+      <td><div class="cell-main">${esc(r.email||'?')}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
+      <td><span class="badge badge-default" style="font-size:0.62rem;">${esc(r.type||'—')}</span></td>
+      <td><span class="spend has">$${Number(r.amount_aud||0).toFixed(2)}</span></td>
+      <td><span class="badge badge-yes">Completed</span></td>
+      <td style="text-align:center;">
+        <div style="display:flex;gap:4px;justify-content:center;">
+          <button class="btn" style="font-size:0.68rem;padding:3px 8px;" title="View user profile" onclick="event.stopPropagation();viewUserByEmail('${esc(r.email||'')}')">👤</button>
+          <button class="btn blue" style="font-size:0.68rem;padding:3px 8px;" title="Email this student" onclick="event.stopPropagation();composeToUser('${esc(r.email||'')}')">✉</button>
+          <button onclick="event.stopPropagation();deleteRevenueRow(${sIdx})" title="Remove from view (refund/void)" style="background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);border-radius:6px;padding:3px 7px;cursor:pointer;font-size:0.72rem;font-weight:700;">✕</button>
+        </div>
+      </td>
     </tr>`;
   }).join('') : '';
+}
+
+function deleteRevenueRow(idx) {
+  const r = S.revenue[idx];
+  if (!r) return;
+  const label = `${r.email||'?'}  ·  $${Number(r.amount_aud||0).toFixed(2)}  ·  ${r.type||''}`;
+  if (!confirm(`Remove this transaction from your metrics?\n\n${label}\n\n⚠️ This only hides it from this view — it does NOT affect Stripe or issue a refund.`)) return;
+  S.revenue.splice(idx, 1);
+  renderRevenue();
+}
+
+function viewUserByEmail(email) {
+  // Navigate to users page and search for this email
+  nav('users');
+  const searchEl = document.getElementById('usrSearch');
+  if (searchEl) { searchEl.value = email; renderUsers(); }
 }
 
 // ══════════════════════════════════════════════════════
