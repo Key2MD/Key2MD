@@ -14,7 +14,7 @@
 
   <!-- ═══ SEO META ═══ -->
   <title>Medical School Chances Calculator 2026 — All AU Schools | Key2MD</title>
-  <meta name="description" content="Free GPA + GAMSAT calculator. See your interview chances at 10 Australian medical schools using real 2026 intake data from submitted scores.">
+  <meta name="description" content="Free GPA + weighted/unweighted GAMSAT calculator. See your interview chances at 10 Australian medical schools using 2026 submitted-score data.">
   <link rel="canonical" href="https://www.key2md.com/medical-school-chances.html">
   <meta name="robots" content="index, follow">
 
@@ -26,7 +26,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <!-- OG / Twitter -->
   <meta property="og:title" content="Medical School Chances Calculator 2026 — All AU Schools">
-  <meta property="og:description" content="See your interview chances at 10 Australian medical schools based on real 2026 student data. Built by a UniMelb MD.">
+  <meta property="og:description" content="See your interview chances at 10 Australian medical schools using GPA, weighted/unweighted GAMSAT and real 2026 student data.">
   <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -35,7 +35,7 @@
   <meta property="og:url" content="https://www.key2md.com/medical-school-chances.html">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Medical School Chances Calculator 2026 — All AU Schools">
-  <meta name="twitter:description" content="See your interview chances at 10 Australian medical schools based on real 2026 student data.">
+  <meta name="twitter:description" content="See your interview chances at 10 Australian medical schools using GPA, weighted/unweighted GAMSAT and real 2026 student data.">
   <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
   <meta name="twitter:image:alt" content="Key2MD — MMI, CASPer and GAMSAT Section II coaching.">
   <meta name="author" content="Key2MD - Dan — University of Melbourne MD">
@@ -53,11 +53,11 @@
     "browserRequirements": "Requires JavaScript and a modern browser",
     "isAccessibleForFree": true,
     "inLanguage": "en-AU",
-    "description": "Free tool that estimates interview chances at 10 Australian medical schools based on GPA, GAMSAT score and rural status, using 2026 intake data from student-submitted scores.",
+    "description": "Free tool that estimates interview chances at 10 Australian medical schools based on GPA, weighted and unweighted GAMSAT score, and rural status, using 2026 intake data from student-submitted scores.",
     "learningResourceType": ["Calculator", "Tool", "Reference"],
     "educationalLevel": "Higher Education",
     "educationalUse": ["Self-assessment", "Application planning"],
-    "teaches": "GEMSAS combo score calculation, Australian medical school interview cutoffs, GPA and GAMSAT weighting at Deakin, ANU, UQ, Griffith, UWA, UoM, Macquarie, UNDF and UNDS",
+    "teaches": "GEMSAS combo score calculation, Australian medical school interview cutoffs, GPA and weighted versus unweighted GAMSAT rules at Deakin, ANU, UQ, Griffith, UWA, UoM, Macquarie, UNDF and UNDS",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "AUD", "availability": "https://schema.org/InStock" },
     "author": {
       "@type": "Person",
@@ -93,7 +93,7 @@
         "name": "How is the combo score calculated for Australian medical schools?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Most GEMSAS-consortium medical schools rank applicants on a combo score equal to GPA/7 + GAMSAT/100. Some universities weight the two components differently (UoM applies the GAM), and a few use separate hurdles (UoW) or heavily weight CASPer (Notre Dame)."
+          "text": "Most GEMSAS-consortium medical schools rank applicants using a combo score based on GPA/7 + the relevant GAMSAT/100. Deakin, ANU, Griffith, UWA and Macquarie use the ACER overall GAMSAT score; UoM, UQ, UNDS and UNDF use the unweighted average of Sections 1, 2 and 3; UoW uses GPA and GAMSAT as hurdles rather than ranking by combo."
         }
       },
       {
@@ -109,7 +109,7 @@
         "name": "Is a GAMSAT score of 70+ enough for Australian medical school?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "A 70+ GAMSAT with a GPA of 6.5 gives a combo of ~1.63 — enough for interviews at Macquarie, UWA, Notre Dame, and often UQ, but typically below cutoff for Deakin, ANU, and UoM. GPA and GAMSAT are weighted equally, so a stronger GPA compensates."
+          "text": "A 70+ GAMSAT with a GPA of 6.5 gives a combo of about 1.63 when the relevant GAMSAT score is 70. That can be competitive at some schools, but outcomes depend on whether the school uses weighted or unweighted GAMSAT, rural/category status, CASPer where relevant, and annual cohort strength."
         }
       },
       {
@@ -117,7 +117,7 @@
         "name": "How accurate is this medical school chances calculator?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "It uses 2026 intake data from student-submitted scores (reddit/r/GAMSAT community). These are self-reported, include outliers, and do not capture every admission factor (portfolio, priority status, section-specific minimums, year-to-year variation). Treat results as a loose guide, not a prediction."
+          "text": "It uses 2026 intake data from student-submitted scores (reddit/r/GAMSAT community). These are self-reported, include outliers, and do not capture every admission factor such as preference order, priority status, CASPer scaling, bonuses, section-specific minimums, or year-to-year variation. Treat results as a loose guide, not a prediction."
         }
       }
     ]
@@ -293,6 +293,34 @@
     .input-wrap input[aria-invalid="true"] { border-color: var(--red); }
     .input-error { color: var(--red); font-size: 0.82rem; margin-top: 6px; display: none; font-weight: 500; }
     .input-error.show { display: block; }
+
+    .gamsat-card {
+      background: var(--gray50); border: 1px solid var(--gray200); border-radius: 14px;
+      padding: 16px; height: 100%;
+    }
+    .gamsat-card-title { font-size: 0.82rem; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
+    .gamsat-card-sub { font-size: 0.76rem; color: var(--gray500); line-height: 1.45; margin-bottom: 12px; }
+    .score-mode-toggle { margin-bottom: 14px; }
+    .score-mode-toggle button { font-size: 0.82rem; padding: 10px 8px; }
+    .score-mode-panel[hidden] { display: none; }
+    .section-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .score-preview {
+      margin-top: 12px; padding: 11px 12px; border-radius: 10px;
+      background: #fff; border: 1px dashed var(--gray200);
+      font-size: 0.78rem; color: var(--gray600); line-height: 1.55;
+    }
+    .score-warning {
+      margin-top: 10px; padding: 10px 12px; border-radius: 10px;
+      background: #fffbeb; border: 1px solid #fde68a; color: #92400e;
+      font-size: 0.78rem; line-height: 1.5;
+    }
+    .score-method-badge {
+      display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+      padding:4px 9px;border-radius:999px;background:rgba(14,165,233,0.09);
+      color:#075985;border:1px solid rgba(14,165,233,0.22);
+      font-size:0.72rem;font-weight:800;
+    }
+    @media(max-width:560px){ .section-grid{ grid-template-columns: 1fr; } }
 
     .rural-toggle {
       display: flex; gap: 8px; padding: 4px;
@@ -672,7 +700,7 @@
   <div class="hero-inner">
     <div class="hero-eyebrow">✦ Built on 2026 intake data · Free tool</div>
     <h1>Your medical school<br><span class="accent">chances, calculated.</span></h1>
-    <p class="hero-sub">Enter your GPA and GAMSAT score and see where you sit against the 2026 interview cohort at every major Australian medical school. Built by a UniMelb MD student from real student-reported data.</p>
+    <p class="hero-sub">Enter your GPA and either your GAMSAT sections or overall scores, then see where you sit against the 2026 interview cohort at every major Australian medical school. Built by a UniMelb MD student from real student-reported data.</p>
     <div class="hero-stats">
       <div class="hero-stat">
         <span class="hero-stat-num">10</span>
@@ -700,7 +728,7 @@
   <div class="calc-wrap">
     <div class="calc-card" id="calcCard">
       <h2>Calculate your combo score</h2>
-      <p class="calc-sub">Your combo = GPA/7 + GAMSAT/100. This is what most Australian medical schools rank on.</p>
+      <p class="calc-sub">Your combo = GPA/7 + relevant GAMSAT/100, using the GAMSAT version each medical school actually uses: weighted overall for most schools, unweighted section average for UoM, UQ and Notre Dame.</p>
 
       <!-- Inputs -->
       <div class="calc-grid calc-initial-only">
@@ -713,12 +741,50 @@
           <div class="input-error" id="gpaErr">Enter a GPA between 4.0 and 7.0.</div>
         </div>
         <div class="field">
-          <label for="gamsatInput">GAMSAT (overall score)</label>
-          <div class="input-wrap">
-            <input type="number" id="gamsatInput" step="1" min="40" max="100" placeholder="e.g. 68" inputmode="decimal" autocomplete="off">
+          <label>GAMSAT score</label>
+          <div class="gamsat-card">
+            <div class="gamsat-card-title">Enter the score format you know</div>
+            <div class="gamsat-card-sub">UoM, UQ, UNDS and UNDF use the unweighted section average. Most other GEMSAS schools use the ACER overall score.</div>
+            <div class="rural-toggle score-mode-toggle" role="tablist" aria-label="GAMSAT input mode">
+              <button type="button" id="scoreModeOverall" class="active" role="tab" aria-selected="true">Overall scores</button>
+              <button type="button" id="scoreModeSections" role="tab" aria-selected="false">Use my sections</button>
+            </div>
+
+            <div id="overallScorePanel" class="score-mode-panel">
+              <div class="field" style="margin-bottom:12px;">
+                <label for="gamsatWeightedInput">ACER overall / weighted</label>
+                <div class="input-wrap">
+                  <input type="number" id="gamsatWeightedInput" step="0.1" min="0" max="100" placeholder="e.g. 68" inputmode="decimal" autocomplete="off">
+                </div>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label for="gamsatUnweightedInput">Unweighted average (optional)</label>
+                <div class="input-wrap">
+                  <input type="number" id="gamsatUnweightedInput" step="0.1" min="0" max="100" placeholder="e.g. 66.7" inputmode="decimal" autocomplete="off">
+                </div>
+                <div class="field-hint">If you leave this blank, UoM/UQ/Notre Dame results are estimated from your weighted score.</div>
+              </div>
+            </div>
+
+            <div id="sectionScorePanel" class="score-mode-panel" hidden>
+              <div class="section-grid">
+                <div class="field" style="margin-bottom:0;">
+                  <label for="gamsatS1Input">Section 1</label>
+                  <div class="input-wrap"><input type="number" id="gamsatS1Input" step="1" min="0" max="100" placeholder="S1" inputmode="decimal" autocomplete="off"></div>
+                </div>
+                <div class="field" style="margin-bottom:0;">
+                  <label for="gamsatS2Input">Section 2</label>
+                  <div class="input-wrap"><input type="number" id="gamsatS2Input" step="1" min="0" max="100" placeholder="S2" inputmode="decimal" autocomplete="off"></div>
+                </div>
+                <div class="field" style="margin-bottom:0;">
+                  <label for="gamsatS3Input">Section 3</label>
+                  <div class="input-wrap"><input type="number" id="gamsatS3Input" step="1" min="0" max="100" placeholder="S3" inputmode="decimal" autocomplete="off"></div>
+                </div>
+              </div>
+              <div class="score-preview" id="sectionScorePreview">Enter S1, S2 and S3 to calculate weighted and unweighted GAMSAT automatically.</div>
+            </div>
           </div>
-          <div class="field-hint">Overall weighted GAMSAT score.</div>
-          <div class="input-error" id="gamsatErr">Enter a GAMSAT between 40 and 100.</div>
+          <div class="input-error" id="gamsatErr">Enter a valid GAMSAT score between 0 and 100, or enter all three section scores.</div>
         </div>
       </div>
 
@@ -750,7 +816,7 @@
       <div class="combo-display" id="comboDisplay">
         <div class="combo-display-grid">
           <div>
-            <div class="combo-label">Your Combo Score</div>
+            <div class="combo-label" id="comboLabel">Weighted Combo</div>
             <div class="combo-num" id="comboNum">—</div>
           </div>
           <div class="combo-breakdown" id="comboBreakdown"></div>
@@ -789,7 +855,9 @@
 <section class="explainer" id="how-it-works">
   <div class="explainer-wrap">
     <h2>How this calculator works</h2>
-    <p>Most GEMSAS-consortium medical schools in Australia rank applicants for interview on a <strong>combo score</strong>: <code>GPA ÷ 7 + GAMSAT ÷ 100</code>. A GPA of 6.5 and GAMSAT of 70 gives a combo of 1.629. Universities then set a cutoff — applicants above it are invited to interview, the rest aren't.</p>
+    <p>Most GEMSAS-consortium medical schools in Australia rank applicants for interview on a <strong>combo score</strong>: <code>GPA ÷ 7 + relevant GAMSAT ÷ 100</code>. The important detail is that the relevant GAMSAT score is not identical for every university.</p>
+
+    <p>Deakin, ANU, Griffith, UWA and Macquarie use the ACER overall GAMSAT score. UoM, UQ, UNDS and UNDF use the unweighted average of Sections 1, 2 and 3. UoW does not rank on combo; it uses GPA/GAMSAT as hurdles alongside CASPer and bonuses.</p>
 
     <p>This tool compares your combo score against the actual 2026 interview and rejection cohorts at ten Australian medical schools, using distributions calculated from student-submitted data. The range bars show where your score sits relative to <strong>median and ±1 standard deviation</strong> of students who <em>were offered an interview</em> at each school — not the rejected cohort.</p>
 
@@ -798,9 +866,10 @@
 
     <h3>Schools with special rules</h3>
     <ul>
-      <li><strong>University of Notre Dame (Fremantle &amp; Sydney)</strong> — Uses CASPer heavily alongside combo. A student with a modest combo but a high CASPer (Q4) can still get interviewed, and vice versa.</li>
-      <li><strong>University of Wollongong (UoW)</strong> — Doesn't rank on combo. Uses GPA and GAMSAT hurdles (≥5.5 GPA, ≥55 GAMSAT in all sections) plus CASPer and bonuses.</li>
-      <li><strong>University of Melbourne</strong> — Applies a "GAM" (Graduate Academic Marker) adjustment that can modify your raw combo. The lowest observed interview combo may or may not reflect GAM application.</li>
+      <li><strong>University of Melbourne, University of Queensland, Notre Dame Fremantle and Notre Dame Sydney</strong> — Use the unweighted GAMSAT section average rather than the ACER overall weighted score.</li>
+      <li><strong>University of Notre Dame (Fremantle &amp; Sydney)</strong> — Uses CASPer heavily alongside GPA and unweighted GAMSAT. A student with a modest combo but a high CASPer (Q4) can still get interviewed, and vice versa.</li>
+      <li><strong>University of Wollongong (UoW)</strong> — Doesn't rank on combo. Uses GPA and GAMSAT hurdles (≥5.5 GPA, ≥50 overall GAMSAT and ≥50 in each section) plus CASPer and bonuses.</li>
+      <li><strong>University of Melbourne</strong> — Applies a "GAM" (Graduate Academic Marker) adjustment that can modify your raw ranking. The lowest observed interview combo may or may not reflect GAM application.</li>
     </ul>
 
     <h3>Rural / priority category</h3>
@@ -810,7 +879,7 @@
 
     <details class="faq-item">
       <summary>How is the combo score calculated?</summary>
-      <p>Combo = <code>GPA ÷ 7 + GAMSAT ÷ 100</code>. GPA is the GEMSAS-calculated GPA (not your university's raw GPA — they're often different). GAMSAT is the overall weighted score. Both are scaled to a roughly 0–2 range before being summed.</p>
+      <p>Combo = <code>GPA ÷ 7 + relevant GAMSAT ÷ 100</code>. GPA is the GEMSAS-calculated GPA (not your university's raw GPA — they're often different). The calculator uses ACER overall GAMSAT for weighted-score schools and the S1/S2/S3 average for UoM, UQ, UNDS and UNDF.</p>
     </details>
 
     <details class="faq-item">
@@ -820,7 +889,7 @@
 
     <details class="faq-item">
       <summary>Is a GAMSAT of 65 enough for medical school in Australia?</summary>
-      <p>A GAMSAT of 65 combined with a GPA of 6.5 gives a combo of ~1.58 — below most non-rural cutoffs except UNDS / UNDF. A 65 with a GPA of 7.0 gives a combo of ~1.65 — enough for most schools. GPA and GAMSAT are weighted equally, so a stronger GPA compensates for a lower GAMSAT.</p>
+      <p>A relevant GAMSAT score of 65 combined with a GPA of 6.5 gives a combo of ~1.58 — below most non-rural cutoffs except UNDS / UNDF. A 65 with a GPA of 7.0 gives a combo of ~1.65 — enough for many schools. For UoM, UQ and Notre Dame, use your unweighted section average rather than your ACER overall score.</p>
     </details>
 
     <details class="faq-item">
@@ -835,7 +904,7 @@
 
     <details class="faq-item">
       <summary>How accurate is this calculator?</summary>
-      <p>It's built on self-reported student data from publicly available sources (primarily r/GAMSAT Reddit submissions). The data includes obvious outliers, is self-selecting (students who choose to share results), and does not capture: portfolio/structured assessments, category-specific quotas, interview year-to-year variation, preference order effects, or post-offer rejections. Treat it as informational only.</p>
+      <p>It's built on self-reported student data from publicly available sources (primarily r/GAMSAT Reddit submissions). The data includes obvious outliers, is self-selecting (students who choose to share results), and does not capture: structured application components, school-specific bonuses, category-specific quotas, interview year-to-year variation, preference order effects, or post-offer rejections. Treat it as informational only.</p>
     </details>
 
     <details class="faq-item">
@@ -855,7 +924,7 @@
       <p>Data is drawn from <strong>publicly available, self-reported student submissions</strong> for the 2026 intake cycle (primarily community sources such as r/GAMSAT). The data is <strong>self-selecting, unverified, may include errors or outliers, and does not represent the full applicant population</strong> at any university. Sample sizes vary (11–120 students per university / category). Rural category data is particularly sparse.</p>
 
       <h4>Factors this tool does NOT account for</h4>
-      <p>Actual admission decisions depend on many factors this tool cannot model, including but not limited to: portfolio assessments, structured applications, preference order, category-specific quotas, international vs domestic status, GAM (Graduate Academic Marker) adjustments, post-CASPer scaling, year-to-year cutoff variation, medical school-specific weighting changes, and interview performance itself.</p>
+      <p>Actual admission decisions depend on many factors this tool cannot model, including but not limited to: structured applications, bonuses, preference order, category-specific quotas, international vs domestic status, GAM (Graduate Academic Marker) adjustments, post-CASPer scaling, year-to-year cutoff variation, medical school-specific weighting changes, and interview performance itself.</p>
 
       <h4>Accuracy</h4>
       <p>No guarantee, warranty, or representation is made as to the accuracy, completeness, or reliability of results. <strong>Use at your own risk.</strong> Users are strongly advised to consult official sources — <a href="https://www.gemsas.edu.au/" target="_blank" rel="noopener">GEMSAS</a>, individual medical school admissions offices, and professional advisors — before making any application, enrolment, or financial decisions.</p>
@@ -918,34 +987,35 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=do
 
 // ═══════════════════════════════════════════════════════════════════════
 //  UNIVERSITY DATA (2026 intake, extracted from student-submitted data)
-//  Final Combo values are what universities rank on.
+//  Combo values use each university's published GAMSAT method where applicable.
 // ═══════════════════════════════════════════════════════════════════════
 const UNIS = [
-  { id:'deakin',    name:'Deakin University',                   short:'Deakin',    nInt:40, nRej:81,  interview:{med:1.74311, std:0.03590}, cutoffNR:1.7081, cutoffR:1.411,  casper:false, uow:false,
+  { id:'deakin',    name:'Deakin University',                   short:'Deakin',    gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 }, nInt:40, nRej:81,  interview:{med:1.74311, std:0.03590}, cutoffNR:1.7081, cutoffR:1.411,  casper:false, uow:false,
     noteRural:'Rural cut-off shown is the minimum observed (1.411) — safer target is 1.5+.' },
-  { id:'anu',       name:'Australian National University',      short:'ANU',       nInt:19, nRej:54,  interview:{med:1.72526, std:0.03263}, cutoffNR:1.6910, cutoffR:1.49,   casper:false, uow:false },
-  { id:'uom',       name:'The University of Melbourne',         short:'UoM',       nInt:87, nRej:120, interview:{med:1.70544, std:0.03160}, cutoffNR:1.66,   cutoffR:1.52,   casper:false, uow:false,
-    noteNR:'Unclear whether the GAM (Graduate Academic Marker) adjustment was applied to the lowest observed interview combo.' },
-  { id:'uq',        name:'The University of Queensland',        short:'UQ',        nInt:57, nRej:53,  interview:{med:1.67759, std:0.03521}, cutoffNR:1.65,   cutoffR:1.58,   casper:false, uow:false },
-  { id:'griffith',  name:'Griffith University',                 short:'Griffith',  nInt:24, nRej:72,  interview:{med:1.68007, std:0.02136}, cutoffNR:1.659,  cutoffR:1.42,   casper:false, uow:false,
+  { id:'anu',       name:'Australian National University',      short:'ANU',       gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 }, nInt:19, nRej:54,  interview:{med:1.72526, std:0.03263}, cutoffNR:1.6910, cutoffR:1.49,   casper:false, uow:false },
+  { id:'uom',       name:'The University of Melbourne',         short:'UoM',       gamsatMode:'unweighted', gamsatHurdle:{ sectionMin:50 }, nInt:87, nRej:120, interview:{med:1.70544, std:0.03160}, cutoffNR:1.66,   cutoffR:1.52,   casper:false, uow:false,
+    noteNR:'UoM uses the unweighted GAMSAT average. Unclear whether the GAM (Graduate Academic Marker) adjustment was applied to the lowest observed interview combo.' },
+  { id:'uq',        name:'The University of Queensland',        short:'UQ',        gamsatMode:'unweighted', gamsatHurdle:{ sectionMin:50 }, nInt:57, nRej:53,  interview:{med:1.67759, std:0.03521}, cutoffNR:1.65,   cutoffR:1.58,   casper:false, uow:false,
+    noteNR:'UQ uses the unweighted average GAMSAT score rounded to six decimal places.' },
+  { id:'griffith',  name:'Griffith University',                 short:'Griffith',  gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 }, nInt:24, nRej:72,  interview:{med:1.68007, std:0.02136}, cutoffNR:1.659,  cutoffR:1.42,   casper:false, uow:false,
     noteNR:'Cut-off shown is the minimum observed interview combo in the 2026 dataset.' },
-  { id:'uwa',       name:'The University of Western Australia', short:'UWA',       nInt:41, nRej:25,  interview:{med:1.65250, std:0.03051}, cutoffNR:1.625,  cutoffR:1.48,   casper:false, uow:false },
-  { id:'unds',      name:'The University of Notre Dame Sydney', short:'UNDS',      nInt:84, nRej:60,  interview:{med:1.65065, std:0.04852}, cutoffNR:1.56,   cutoffR:1.48,   casper:true,  uow:false,
-    noteNR:'UNDS weights CASPer heavily. A Q4 typically required to compete at this combo range.',
+  { id:'uwa',       name:'The University of Western Australia', short:'UWA',       gamsatMode:'weighted', gamsatHurdle:{ scoreMin:55, sectionMin:50 }, nInt:41, nRej:25,  interview:{med:1.65250, std:0.03051}, cutoffNR:1.625,  cutoffR:1.48,   casper:false, uow:false },
+  { id:'unds',      name:'The University of Notre Dame Sydney', short:'UNDS',      gamsatMode:'unweighted', gamsatHurdle:{ scoreMin:52, sectionMin:50 }, nInt:84, nRej:60,  interview:{med:1.65065, std:0.04852}, cutoffNR:1.56,   cutoffR:1.48,   casper:true,  uow:false,
+    noteNR:'UNDS uses unweighted GAMSAT and weights CASPer heavily. A Q4 typically required to compete at this combo range.',
     noteCasperRural:'Rural applicants usually need at least a Q2 CASPer.' },
-  { id:'macquarie', name:'Macquarie University',                short:'Macquarie', nInt:24, nRej:11,  interview:{med:1.64036, std:0.03503}, cutoffNR:1.6150, cutoffR:null,   casper:false, uow:false,
+  { id:'macquarie', name:'Macquarie University',                short:'Macquarie', gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 }, nInt:24, nRej:11,  interview:{med:1.64036, std:0.03503}, cutoffNR:1.6150, cutoffR:null,   casper:false, uow:false,
     noteRural:'Rural cut-off not provided in available data.' },
-  { id:'undf',      name:'The University of Notre Dame Fremantle', short:'UNDF',   nInt:44, nRej:22,  interview:{med:1.60658, std:0.03229}, cutoffNR:1.56,   cutoffR:1.51,   casper:true,  uow:false,
-    noteNR:'UNDF weights CASPer heavily. A Q4 typically required to compete at this combo range.',
+  { id:'undf',      name:'The University of Notre Dame Fremantle', short:'UNDF',   gamsatMode:'unweighted', gamsatHurdle:{ scoreMin:52, sectionMin:50 }, nInt:44, nRej:22,  interview:{med:1.60658, std:0.03229}, cutoffNR:1.56,   cutoffR:1.51,   casper:true,  uow:false,
+    noteNR:'UNDF uses unweighted GAMSAT and weights CASPer heavily. A Q4 typically required to compete at this combo range.',
     noteCasperRural:'Rural applicants usually need at least a Q2 CASPer.' },
-  { id:'uow',       name:'The University of Wollongong',        short:'UoW',       nInt:40, nRej:59,  interview:null, cutoffNR:null, cutoffR:null, casper:true, uow:true,
-    hurdles:{ gpaMin:5.5, gamsatMin:55, casperReq:'Q4 typically', bonusReq:'At least one bonus (rural, first-in-family, regional study, etc.)' } },
+  { id:'uow',       name:'The University of Wollongong',        short:'UoW',       gamsatMode:'hurdle', nInt:40, nRej:59,  interview:null, cutoffNR:null, cutoffR:null, casper:true, uow:true,
+    hurdles:{ gpaMin:5.5, gamsatMin:50, sectionMin:50, casperReq:'Q4 typically', bonusReq:'At least one bonus (rural, first-in-family, regional study, etc.)' } },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════════════════
-let state = { rural: false, casper: '' };
+let state = { rural: false, casper: '', scoreMode: 'overall' };
 
 // UI: rural toggle
 document.getElementById('toggleNonRural').addEventListener('click', () => {
@@ -974,18 +1044,100 @@ document.querySelectorAll('.casper-pill').forEach(p => {
 // Default: Unknown pill active
 document.querySelector('.casper-pill[data-c=""]').classList.add('active');
 
+// UI: GAMSAT score input mode
+function setScoreMode(mode) {
+  state.scoreMode = mode === 'sections' ? 'sections' : 'overall';
+  const overallBtn = document.getElementById('scoreModeOverall');
+  const sectionsBtn = document.getElementById('scoreModeSections');
+  const overallPanel = document.getElementById('overallScorePanel');
+  const sectionPanel = document.getElementById('sectionScorePanel');
+  overallBtn.classList.toggle('active', state.scoreMode === 'overall');
+  sectionsBtn.classList.toggle('active', state.scoreMode === 'sections');
+  overallBtn.setAttribute('aria-selected', state.scoreMode === 'overall' ? 'true' : 'false');
+  sectionsBtn.setAttribute('aria-selected', state.scoreMode === 'sections' ? 'true' : 'false');
+  overallPanel.hidden = state.scoreMode !== 'overall';
+  sectionPanel.hidden = state.scoreMode !== 'sections';
+  [gamWeightedIn, gamUnweightedIn, gamS1In, gamS2In, gamS3In].forEach(input => markInvalid(input, false));
+  document.getElementById('gamsatErr').classList.remove('show');
+}
+document.getElementById('scoreModeOverall').addEventListener('click', () => setScoreMode('overall'));
+document.getElementById('scoreModeSections').addEventListener('click', () => setScoreMode('sections'));
+
 // ═══════════════════════════════════════════════════════════════════════
 //  CALCULATE
 // ═══════════════════════════════════════════════════════════════════════
 const calcBtn = document.getElementById('calcBtn');
 const recalcBtn = document.getElementById('recalcBtn');
 const gpaIn = document.getElementById('gpaInput');
-const gamIn = document.getElementById('gamsatInput');
+const gamWeightedIn = document.getElementById('gamsatWeightedInput');
+const gamUnweightedIn = document.getElementById('gamsatUnweightedInput');
+const gamS1In = document.getElementById('gamsatS1Input');
+const gamS2In = document.getElementById('gamsatS2Input');
+const gamS3In = document.getElementById('gamsatS3Input');
+
+function parseScore(input) {
+  const n = parseFloat(input.value);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+function markInvalid(input, invalid) {
+  if (!input) return;
+  if (invalid) input.setAttribute('aria-invalid', 'true');
+  else input.removeAttribute('aria-invalid');
+}
+
+function validScore(n) {
+  return Number.isFinite(n) && n >= 0 && n <= 100;
+}
+
+function roundScore(n) {
+  return Math.round(n * 1000) / 1000;
+}
+
+function updateSectionScorePreview() {
+  const preview = document.getElementById('sectionScorePreview');
+  const s1 = parseScore(gamS1In);
+  const s2 = parseScore(gamS2In);
+  const s3 = parseScore(gamS3In);
+  if (![s1, s2, s3].every(validScore)) {
+    preview.textContent = 'Enter S1, S2 and S3 to calculate weighted and unweighted GAMSAT automatically.';
+    return;
+  }
+  const weighted = roundScore((s1 + s2 + (2 * s3)) / 4);
+  const unweighted = roundScore((s1 + s2 + s3) / 3);
+  preview.innerHTML = `<strong>Calculated scores:</strong> ACER weighted ${weighted.toFixed(1)} · unweighted average ${unweighted.toFixed(1)}.`;
+}
+[gamS1In, gamS2In, gamS3In].forEach(input => input.addEventListener('input', updateSectionScorePreview));
+
+function getGamsatScores() {
+  if (state.scoreMode === 'sections') {
+    const s1 = parseScore(gamS1In);
+    const s2 = parseScore(gamS2In);
+    const s3 = parseScore(gamS3In);
+    return {
+      mode: 'sections',
+      weighted: roundScore((s1 + s2 + (2 * s3)) / 4),
+      unweighted: roundScore((s1 + s2 + s3) / 3),
+      sections: { s1, s2, s3 },
+      unweightedEstimated: false,
+    };
+  }
+  const weighted = parseScore(gamWeightedIn);
+  const unweightedRaw = parseScore(gamUnweightedIn);
+  const hasUnweighted = validScore(unweightedRaw);
+  return {
+    mode: 'overall',
+    weighted,
+    unweighted: hasUnweighted ? unweightedRaw : weighted,
+    sections: null,
+    unweightedEstimated: !hasUnweighted,
+  };
+}
 
 function validate(){
   let ok = true;
+  let gamsatOk = true;
   const gpa = parseFloat(gpaIn.value);
-  const gam = parseFloat(gamIn.value);
   if (isNaN(gpa) || gpa < 4 || gpa > 7) {
     gpaIn.setAttribute('aria-invalid', 'true');
     document.getElementById('gpaErr').classList.add('show');
@@ -994,21 +1146,36 @@ function validate(){
     gpaIn.removeAttribute('aria-invalid');
     document.getElementById('gpaErr').classList.remove('show');
   }
-  if (isNaN(gam) || gam < 40 || gam > 100) {
-    gamIn.setAttribute('aria-invalid', 'true');
-    document.getElementById('gamsatErr').classList.add('show');
-    ok = false;
+
+  const scores = getGamsatScores();
+  if (state.scoreMode === 'sections') {
+    const sectionScores = [scores.sections?.s1, scores.sections?.s2, scores.sections?.s3];
+    const bad = sectionScores.map(s => !validScore(s));
+    [gamS1In, gamS2In, gamS3In].forEach((input, i) => markInvalid(input, bad[i]));
+    if (bad.some(Boolean)) {
+      ok = false;
+      gamsatOk = false;
+    }
   } else {
-    gamIn.removeAttribute('aria-invalid');
-    document.getElementById('gamsatErr').classList.remove('show');
+    const weightedBad = !validScore(scores.weighted);
+    const unweightedValue = parseScore(gamUnweightedIn);
+    const unweightedBad = gamUnweightedIn.value.trim() !== '' && !validScore(unweightedValue);
+    markInvalid(gamWeightedIn, weightedBad);
+    markInvalid(gamUnweightedIn, unweightedBad);
+    if (weightedBad || unweightedBad) {
+      ok = false;
+      gamsatOk = false;
+    }
   }
-  return ok ? { gpa, gam } : null;
+
+  document.getElementById('gamsatErr').classList.toggle('show', !gamsatOk);
+  return ok ? { gpa, scores } : null;
 }
 
 calcBtn.addEventListener('click', () => {
   const v = validate();
   if (!v) return;
-  calculate(v.gpa, v.gam);
+  calculate(v.gpa, v.scores);
 });
 
 recalcBtn.addEventListener('click', () => {
@@ -1020,19 +1187,25 @@ recalcBtn.addEventListener('click', () => {
   document.getElementById('calcCard').scrollIntoView({behavior:'smooth', block:'start'});
 });
 
-function calculate(gpa, gam) {
-  const combo = (gpa / 7) + (gam / 100);
-  const comboRounded = Math.round(combo * 10000) / 10000;
+function calculate(gpa, scores) {
+  const weightedCombo = (gpa / 7) + (scores.weighted / 100);
+  const unweightedCombo = (gpa / 7) + (scores.unweighted / 100);
+  const sameCombo = !scores.unweightedEstimated && Math.abs(weightedCombo - unweightedCombo) < 0.00005;
 
   // Display combo
-  document.getElementById('comboNum').textContent = combo.toFixed(4);
+  document.getElementById('comboLabel').textContent = sameCombo ? 'Your Combo' : 'Weighted Combo';
+  document.getElementById('comboNum').textContent = weightedCombo.toFixed(4);
   document.getElementById('comboBreakdown').innerHTML = `
     <div style="margin-bottom:4px;"><strong>GPA ${gpa.toFixed(2)}</strong> ÷ 7 = ${(gpa/7).toFixed(4)}</div>
-    <div style="margin-bottom:4px;"><strong>GAMSAT ${gam.toFixed(0)}</strong> ÷ 100 = ${(gam/100).toFixed(4)}</div>
+    <div style="margin-bottom:4px;"><strong>Weighted GAMSAT ${scores.weighted.toFixed(1)}</strong> ÷ 100 = ${(scores.weighted/100).toFixed(4)}</div>
+    <div style="margin-bottom:4px;"><strong>Unweighted GAMSAT ${scores.unweighted.toFixed(1)}</strong> ÷ 100 = ${(scores.unweighted/100).toFixed(4)}</div>
     <div style="padding-top:8px;border-top:1px solid rgba(255,255,255,0.15);margin-top:8px;">
-      Combo = <strong>${combo.toFixed(4)}</strong>
+      Weighted-school combo = <strong>${weightedCombo.toFixed(4)}</strong><br>
+      Unweighted-school combo = <strong>${unweightedCombo.toFixed(4)}</strong>
       <span style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-left:8px;">${state.rural ? '(rural)' : '(non-rural)'}</span>
     </div>
+    ${scores.unweightedEstimated ? `<div class="score-warning" style="margin-top:12px;background:rgba(245,158,11,0.16);border-color:rgba(245,158,11,0.32);color:#fde68a;">Unweighted score is estimated from your weighted overall because no section scores or unweighted average were entered. For UoM, UQ and Notre Dame, enter S1/S2/S3 for a more accurate result.</div>` : ''}
+    ${scores.mode === 'overall' ? `<div class="score-warning" style="margin-top:10px;background:rgba(14,165,233,0.14);border-color:rgba(14,165,233,0.3);color:#bae6fd;">Section minimums are not checked from overall scores alone. Use S1/S2/S3 if any section may be close to 50.</div>` : ''}
   `;
 
   // Hide inputs, show results (except keep recalc button visible inside unisWrap)
@@ -1040,7 +1213,7 @@ function calculate(gpa, gam) {
   document.getElementById('comboDisplay').classList.add('show');
 
   // Render unis
-  renderUnis(combo);
+  renderUnis(gpa, scores);
   document.getElementById('unisWrap').classList.add('show');
   document.getElementById('postResult').classList.add('show');
 
@@ -1054,12 +1227,12 @@ function calculate(gpa, gam) {
     gtag('event', 'calculate_chances', {
       event_category: 'calculator',
       event_label: state.rural ? 'rural' : 'non_rural',
-      value: Math.round(combo * 10000),
+      value: Math.round(weightedCombo * 10000),
     });
   }
 }
 
-function renderUnis(combo) {
+function renderUnis(gpa, scores) {
   const list = document.getElementById('uniList');
   list.innerHTML = '';
 
@@ -1072,24 +1245,89 @@ function renderUnis(combo) {
   document.getElementById('ruralDisclaimer').style.display = state.rural ? 'block' : 'none';
 
   UNIS.forEach(u => {
-    list.appendChild(renderUni(u, combo));
+    list.appendChild(renderUni(u, gpa, scores));
   });
 }
 
-function renderUni(u, combo) {
+function getScoreForUni(u, scores) {
+  if (u.gamsatMode === 'unweighted') {
+    return {
+      score: scores.unweighted,
+      label: 'unweighted average',
+      estimated: scores.unweightedEstimated,
+    };
+  }
+  if (u.gamsatMode === 'hurdle') {
+    return {
+      score: scores.weighted,
+      label: 'overall weighted hurdle score',
+      estimated: false,
+    };
+  }
+  return {
+    score: scores.weighted,
+    label: 'ACER overall weighted',
+    estimated: false,
+  };
+}
+
+function comboForUni(gpa, u, scores) {
+  const scoreInfo = getScoreForUni(u, scores);
+  return (gpa / 7) + (scoreInfo.score / 100);
+}
+
+function getGamsatHurdleStatus(u, scores) {
+  const h = u.gamsatHurdle;
+  if (!h) return { failed: false, messages: [] };
+
+  const info = getScoreForUni(u, scores);
+  const messages = [];
+
+  if (h.scoreMin !== undefined && h.scoreMin !== null && !info.estimated && info.score < h.scoreMin) {
+    messages.push(`${info.label} must be at least ${h.scoreMin}`);
+  }
+
+  if (h.sectionMin !== undefined && h.sectionMin !== null && scores.sections) {
+    const lowSections = [
+      ['S1', scores.sections.s1],
+      ['S2', scores.sections.s2],
+      ['S3', scores.sections.s3],
+    ].filter(([, score]) => score < h.sectionMin);
+
+    if (lowSections.length) {
+      messages.push(`each section must be at least ${h.sectionMin} (${lowSections.map(([label, score]) => `${label} ${score.toFixed(0)}`).join(', ')})`);
+    }
+  }
+
+  return { failed: messages.length > 0, messages };
+}
+
+function renderScoreMethodBadge(u, scores) {
+  const info = getScoreForUni(u, scores);
+  const warning = info.estimated ? ' · estimated' : '';
+  return `<div class="score-method-badge">GAMSAT used: ${info.label} ${info.score.toFixed(1)}${warning}</div>`;
+}
+
+function renderUni(u, gpa, scores) {
   const card = document.createElement('div');
   card.className = 'uni-card';
+  const combo = comboForUni(gpa, u, scores);
 
   if (u.uow) {
-    card.innerHTML = renderUoWCard(u, combo);
+    card.innerHTML = renderUoWCard(u, gpa, scores);
     return card;
   }
 
   const cutoff = state.rural ? u.cutoffR : u.cutoffNR;
   const iv = u.interview;
+  const hurdleStatus = getGamsatHurdleStatus(u, scores);
   let verdict, verdictClass, verdictDetail;
 
-  if (cutoff === null || cutoff === undefined) {
+  if (hurdleStatus.failed) {
+    verdict = 'Hurdle not met';
+    verdictClass = 'red';
+    verdictDetail = `Published GAMSAT eligibility hurdle appears not met: ${hurdleStatus.messages.join('; ')}. This would usually make the school ineligible even if the combo looks competitive.`;
+  } else if (cutoff === null || cutoff === undefined) {
     verdict = 'Data unavailable';
     verdictClass = 'gray';
     verdictDetail = 'Not enough data for this category to form a useful benchmark.';
@@ -1159,6 +1397,8 @@ function renderUni(u, combo) {
       </div>
     </div>
 
+    ${renderScoreMethodBadge(u, scores)}
+    ${getScoreForUni(u, scores).estimated ? `<div class="uni-notes">Because you did not enter section scores or an unweighted average, this school's result uses your weighted overall score as a placeholder. Enter S1/S2/S3 for the accurate UoM/UQ/Notre Dame calculation.</div>` : ''}
     ${casperBadge}
     ${noteHtml.length ? `<div class="uni-notes">${noteHtml.join(' ')}</div>` : ''}
   `;
@@ -1185,21 +1425,24 @@ function renderCasperBadge(u) {
   return `<div class="uni-casper-badge">⚠ CASPer-critical · ${txt}</div>`;
 }
 
-function renderUoWCard(u, combo) {
-  const gpa = parseFloat(gpaIn.value);
-  const gam = parseFloat(gamIn.value);
+function renderUoWCard(u, gpa, scores) {
+  const gam = scores.weighted;
   const hurdles = u.hurdles;
 
   const gpaMet = gpa >= hurdles.gpaMin;
   const gamMet = gam >= hurdles.gamsatMin;
+  const sectionKnown = !!scores.sections;
+  const sectionMet = sectionKnown
+    ? [scores.sections.s1, scores.sections.s2, scores.sections.s3].every(score => score >= hurdles.sectionMin)
+    : null;
   const casperStatus = state.casper
     ? (state.casper === 'Q4' ? 'met' : (state.casper === 'Q3' && state.rural ? 'met' : 'likely-not'))
     : 'unknown';
 
-  const allMet = gpaMet && gamMet && (casperStatus === 'met');
+  const allMet = gpaMet && gamMet && sectionMet !== false && (casperStatus === 'met');
 
   let verdict, verdictClass, verdictDetail;
-  if (!gpaMet || !gamMet) {
+  if (!gpaMet || !gamMet || sectionMet === false) {
     verdict = 'Hurdle not met';
     verdictClass = 'red';
     verdictDetail = 'UoW requires minimum GPA and GAMSAT hurdles regardless of combo. Your current inputs do not meet the basic thresholds.';
@@ -1230,12 +1473,13 @@ function renderUoWCard(u, combo) {
       <strong>Your hurdle status:</strong>
       <ul>
         <li class="${gpaMet ? 'hurdle-met' : 'hurdle-miss'}">GPA ≥ ${hurdles.gpaMin}: <strong>${gpaMet ? '✓ Met' : '✗ Not met'}</strong> (${gpa.toFixed(2)})</li>
-        <li class="${gamMet ? 'hurdle-met' : 'hurdle-miss'}">GAMSAT overall ≥ ${hurdles.gamsatMin}: <strong>${gamMet ? '✓ Met' : '✗ Not met'}</strong> (${gam.toFixed(0)})</li>
+        <li class="${gamMet ? 'hurdle-met' : 'hurdle-miss'}">GAMSAT overall ≥ ${hurdles.gamsatMin}: <strong>${gamMet ? '✓ Met' : '✗ Not met'}</strong> (${gam.toFixed(1)})</li>
+        <li class="${sectionMet === true ? 'hurdle-met' : (sectionMet === false ? 'hurdle-miss' : 'hurdle-unknown')}">GAMSAT sections ≥ ${hurdles.sectionMin}: <strong>${sectionKnown ? (sectionMet ? '✓ Met' : '✗ Not met') : 'Unknown'}</strong>${sectionKnown ? ` (S1 ${scores.sections.s1.toFixed(0)}, S2 ${scores.sections.s2.toFixed(0)}, S3 ${scores.sections.s3.toFixed(0)})` : ' — enter section scores to check exactly'}</li>
         <li class="${casperStatus === 'met' ? 'hurdle-met' : (casperStatus === 'likely-not' ? 'hurdle-miss' : 'hurdle-unknown')}">CASPer: <strong>${state.casper || 'Not specified'}</strong> — ${hurdles.casperReq} required</li>
         <li class="hurdle-unknown">Bonus: ${hurdles.bonusReq}</li>
       </ul>
     </div>
-    <div class="uni-notes">UoW also requires section minimums in GAMSAT (check current requirements directly with the university).</div>
+    <div class="uni-notes">UoW uses GAMSAT as a hurdle, not as a combo rank. Current GEMSAS guidance lists minimum overall 50 and minimum 50 in each section.</div>
   `;
 }
 
