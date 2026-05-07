@@ -111,7 +111,7 @@
           {
             "@type": "Question",
             "name": "How does the timer work?",
-            "acceptedAnswer": {"@type": "Answer", "text": "The practice tool offers four timer modes. Standard mode uses a 60-second reading period followed by a 3:30 typed response, mirroring real CASPer conditions. Rapid Fire (30s read, 2:00 write) trains instinctive thinking. Deep Dive (90s read, 6:00 write) gives room to fully develop a response. Off mode disables the timer entirely for first attempts. Most users practise in Standard mode."}
+            "acceptedAnswer": {"@type": "Answer", "text": "The practice tool offers four CASPer timer modes, plus optional Special Accommodations at 1.5x or 2.0x timing. Standard mode uses a 60-second reading period followed by a 3:30 typed response, mirroring real CASPer conditions. Rapid Fire (30s read, 2:00 write) trains instinctive thinking. Deep Dive (90s read, 6:00 write) gives room to fully develop a response. Off mode disables the timer entirely for first attempts. Most users practise in Standard mode."}
           },
           {
             "@type": "Question",
@@ -383,6 +383,13 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">—</span></button>
         </div>
       </div>
+    </div>
+
+    <div class="sidebar-card" id="starredQueueCard" style="display:none;">
+      <h3 style="display:flex;align-items:center;justify-content:space-between;gap:8px;">Revision Queue <span id="starredQueueCount" style="font-size:0.72rem;color:var(--gold);font-weight:800;">0</span></h3>
+      <p style="font-size:0.72rem;color:var(--gray400);line-height:1.45;margin:0 0 10px;">Star tricky stations while practising, then run them as a targeted revision block.</p>
+      <div id="starredQueueList" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;"></div>
+      <button id="startStarredQueueBtn" onclick="startStarredRevisionQueue()" style="width:100%;border:none;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid rgba(245,158,11,0.25);border-radius:9px;padding:9px 10px;font-size:0.78rem;font-weight:800;cursor:pointer;font-family:inherit;">Revise starred stations →</button>
     </div>
 
     <!-- MMI options -->
@@ -752,6 +759,19 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
                 <div class="tmc-desc">90s read · 6:00 write. Space to develop ideas fully.</div>
               </label>
             </div>
+            <div id="specialAccommodationPicker" style="margin-top:12px;padding:12px;border-radius:14px;background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.16);">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
+                <div>
+                  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);">Special Accommodations</div>
+                  <div id="specialAccommodationSummary" style="font-size:0.72rem;color:var(--gray500);line-height:1.45;margin-top:2px;">Standard timing selected.</div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:7px;">
+                <button type="button" id="accommodation1x" onclick="setAccommodationMultiplier(1)" style="padding:8px 10px;border-radius:999px;border:1.5px solid rgba(14,165,233,0.18);background:#fff;color:var(--gray700);font-size:0.76rem;font-weight:800;cursor:pointer;font-family:inherit;">Default</button>
+                <button type="button" id="accommodation15x" onclick="setAccommodationMultiplier(1.5)" style="padding:8px 10px;border-radius:999px;border:1.5px solid rgba(14,165,233,0.18);background:#fff;color:var(--gray700);font-size:0.76rem;font-weight:800;cursor:pointer;font-family:inherit;">1.5x time</button>
+                <button type="button" id="accommodation2x" onclick="setAccommodationMultiplier(2)" style="padding:8px 10px;border-radius:999px;border:1.5px solid rgba(14,165,233,0.18);background:#fff;color:var(--gray700);font-size:0.76rem;font-weight:800;cursor:pointer;font-family:inherit;">2.0x time</button>
+              </div>
+            </div>
             <div id="timerModeHint" style="margin-top:10px;font-size:0.72rem;color:var(--gray400);text-align:center;line-height:1.5;">
               💡 <strong style="color:var(--gray600);">Standard</strong> selected — mirrors real CASPer timing. Switch to <strong style="color:var(--gray600);">Rapid Fire</strong> once you're comfortable to simulate exam pressure.
             </div>
@@ -814,6 +834,10 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         </div>
         <div class="time-up-banner" id="timeUpBanner" style="margin-bottom:6px;"></div>
         <textarea class="answer-textarea" id="answerTextarea" placeholder="Start typing your answer here… Speak as you would in the actual interview — empathy, structure, and authenticity matter."></textarea>
+        <div id="stationReflectionWrap" style="display:none;margin-top:10px;border:1px solid rgba(14,165,233,0.16);background:rgba(14,165,233,0.035);border-radius:12px;padding:12px 14px;">
+          <label for="stationReflection" style="display:block;font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal3);margin-bottom:6px;">Post-station reflection</label>
+          <textarea id="stationReflection" rows="2" placeholder="What would you change next time? One specific improvement is enough." style="width:100%;border:1.5px solid var(--gray200);border-radius:9px;padding:9px 11px;font-size:0.84rem;color:var(--gray800);resize:vertical;outline:none;font-family:inherit;line-height:1.55;background:#fff;"></textarea>
+        </div>
         <div id="aiFeedbackWrap"></div>
       </div>
       <div class="mmi-speaking-area" id="mmiSpeakingArea">
@@ -849,6 +873,11 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="review-trend" id="reviewTrendSection" style="display:none;">
         <h3>Score Over Time</h3>
         <div class="chart-container"><canvas id="reviewCanvas"></canvas></div>
+      </div>
+      <div class="review-trend" id="reviewCompetencyProgress" style="display:none;">
+        <h3>Competency Progress</h3>
+        <p style="font-size:0.78rem;color:var(--gray400);line-height:1.5;margin:0 0 12px;">Tracks how each Casper competency changed across AI-marked stations in this session.</p>
+        <div id="reviewCompetencyRows" style="display:flex;flex-direction:column;gap:9px;"></div>
       </div>
       <div class="review-list">
         <!-- Per-category breakdown (4.1) -->
@@ -913,6 +942,12 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <div style="font-size:0.75rem;color:var(--gray600);line-height:1.4;margin-bottom:8px;">Dan's 1:1 sessions target your exact weak patterns — not generic frameworks.</div>
           <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:50px;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:700;text-decoration:none;" rel="noopener noreferrer">Book a Session →</a>
         </div>
+      </div>
+
+      <div class="bottom-rail-card" id="competencyProgressCard" style="display:none;">
+        <h3 style="margin-bottom:4px;">Competency Progress</h3>
+        <p id="competencyProgressSub" style="font-size:0.72rem;color:var(--gray400);margin-bottom:12px;line-height:1.4;">Long-term trend from AI-marked CASPer stations on this browser.</p>
+        <div id="competencyProgressRows" style="display:flex;flex-direction:column;gap:7px;"></div>
       </div>
 
       <!-- Friday Classes promo (re-laid out for the rail's wider/shorter aspect ratio) -->
@@ -1633,6 +1668,7 @@ const promptsLocked=$('promptsLocked'),categoryPill=$('categoryPill'),stationNum
 const statCompleted=$('statCompleted'),statAvg=$('statAvg');
 const answerSection=$('answerSection'),answerTextarea=$('answerTextarea'),wordCountEl=$('wordCount');
 const aiFeedbackWrap=$('aiFeedbackWrap'),scenarioCard=$('scenarioCard'),reviewPanel=$('reviewPanel');
+const stationReflectionWrap=$('stationReflectionWrap'),stationReflection=$('stationReflection');
 const aiStatusEl=$('aiStatusEl');
 const trendWrap=$('trendWrap'),trendEmpty=$('trendEmpty'),trendCanvas=$('trendCanvas'),trendAvgLine=$('trendAvgLine'),trendAvgNum=$('trendAvgNum');
 
@@ -1661,7 +1697,7 @@ updateCounts();
 updateMMICounts();
 updateLimitUI();
 // Update library coverage on initial load
-document.addEventListener('DOMContentLoaded', function(){ updateLibraryCoverage(); updateStarredCategoryBtn(); });
+document.addEventListener('DOMContentLoaded', function(){ updateLibraryCoverage(); updateStarredCategoryBtn(); updatePersistentCompetencyProgress(); });
 
 // Sliders
 $('readingSlider').addEventListener('input',function(){
@@ -1833,6 +1869,7 @@ function setPhaseUI(p){
   else if(p==='writing'){phaseBadge.classList.add('phase-writing');phaseBadge.textContent='✍️ Writing';progressFill.classList.add('writing');}
   else if(p==='done'){phaseBadge.classList.add('phase-done');phaseBadge.textContent='✓ Done';}
   else{phaseBadge.classList.add('phase-idle');phaseBadge.textContent='Idle';}
+  updateReflectionUI();
   updateBtns();
 }
 function updateBtns(){
@@ -1879,6 +1916,20 @@ answerTextarea.addEventListener('input',()=>{
   if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;
 });
 
+function updateReflectionUI(){
+  if(!stationReflectionWrap||!stationReflection)return;
+  const isCasper=currentMode===MODE_CASPER;
+  const show=isCasper&&sessionActive&&(phase==='done'||(sessionHistory[currentIdx]&&sessionHistory[currentIdx].score!=null));
+  stationReflectionWrap.style.display=show?'block':'none';
+  if(show&&sessionHistory[currentIdx]) stationReflection.value=sessionHistory[currentIdx].reflection||'';
+}
+
+if(stationReflection){
+  stationReflection.addEventListener('input',()=>{
+    if(sessionHistory[currentIdx])sessionHistory[currentIdx].reflection=stationReflection.value;
+  });
+}
+
 // ══ MODE SWITCHING ══
 function applyModeUI(mode) {
   const isCasper  = mode === MODE_CASPER;
@@ -1896,9 +1947,11 @@ function applyModeUI(mode) {
   // Header text swaps with mode. mmiOptionsCard remains a separate card below.
   const cc = $('casperCategoryCard'), mc = $('mmiCategoryCard'), mo = $('mmiOptionsCard');
   const ccard = $('categoryCard'), chdr = $('categoryCardHeader');
+  const sq = $('starredQueueCard');
   if (cc) cc.style.display = isCasper           ? '' : 'none';
   if (mc) mc.style.display = (isMMI||isCircuit) ? '' : 'none';
   if (mo) mo.style.display = isMMI              ? '' : 'none';
+  if (sq) sq.style.display = isCasper ? '' : 'none';
   if (ccard) ccard.style.display = '';   // outer card always visible (in non-circuit-takeover modes)
   if (chdr)  chdr.textContent = isCasper ? 'Category' : 'MMI Station Type';
 
@@ -1941,10 +1994,9 @@ function setMode(mode) {
     if (firstMMI) firstMMI.classList.add('active');
     selectedCategory='All';
   } else {
-    $('readingSlider').min=15;$('readingSlider').max=120;$('readingSlider').value=60;
-    $('writingSlider').min=60;$('writingSlider').max=600;$('writingSlider').value=210;
-    $('readingVal').textContent='60s';$('writingVal').textContent='3:30';
-    readingTime=60;writingTime=210;
+    $('readingSlider').min=15;$('writingSlider').min=60;
+    applyCasperTiming();
+    setTimerMode(currentTimerMode);
     document.querySelectorAll('#categoryFilters .cat-btn').forEach(b=>b.classList.remove('active'));
     const firstCasper = $('categoryFilters')?.querySelector('.cat-btn');
     if (firstCasper) firstCasper.classList.add('active');
@@ -1963,6 +2015,8 @@ function setMode(mode) {
   updateLimitUI();
   if (currentMode === MODE_MMI) updateMMILimitsUI();
   updateLibraryCoverage();
+  renderStarredRevisionQueue();
+  updatePersistentCompetencyProgress();
 }
 
 // ══ WEBCAM ══
@@ -2250,6 +2304,8 @@ function loadStation(){
   wordCountEl.textContent=wc(answerTextarea.value)+' words';
   aiFeedbackWrap.innerHTML='';
   $('aiFeedbackWrapMMI').innerHTML='';
+  if(stationReflectionWrap)stationReflectionWrap.style.display='none';
+  if(stationReflection)stationReflection.value=sessionHistory[currentIdx].reflection||'';
   const _aw=$('btnGetAIWrap');if(_aw)_aw.style.display='none';
   const _srw=document.getElementById('selfRatingWrap');if(_srw)_srw.style.display='none';
   document.querySelectorAll('.self-rate-btn').forEach(b=>b.classList.remove('self-rate-active'));
@@ -2353,6 +2409,7 @@ function startWriting(){
     } else {
       runTimer(writingTime,()=>finishStation());
     }
+    updateReflectionUI();
   }
 }
 
@@ -2625,13 +2682,14 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
     h.score = fb.score;
     h.feedback = fb;
     h.aiSaved = true;
+    recordCompetencyProgress(h.station,fb);
     // Record attempt with AI score
     const _sid = h.station?.id || `mmi_${(typeof MMI_STATIONS!=='undefined'?MMI_STATIONS.indexOf(h.station):-1)}`;
     if(!_sessionRecordedIds.has(_sid)){_sessionRecordedIds.add(_sid);StationHistory.record(_sid,fb.score);}
     updateLimitUI();
     updateLibraryCoverage();
     if(pool[currentIdx]) { updateSeenPill(pool[currentIdx]); updateStarBtn(pool[currentIdx]); }
-    showFeedback(fb.score,fb);updateTrend();updateAvgStat();
+    showFeedback(fb.score,fb);updateTrend();updateAvgStat();updatePersistentCompetencyProgress();
     refreshLeaderboardData({silent:true});
     try{ k2TrackCompletion(fb.score); }catch(e){}
 
@@ -2750,6 +2808,7 @@ function showFeedback(score,fb){
       ${competencyRowsHtml(fb.competencies,false)}
     </div>
   </div>
+  ${recommendedStationCardHtml()}
   <div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;">
     <button id="retryStationBtn" onclick="retryStation()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:50px;border:1.5px solid var(--gray200);background:var(--white);color:var(--gray600);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--navy)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">↺ Retry this station</button>
     <a href="https://www.key2md.com/history" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:50px;border:1.5px solid var(--gray200);background:var(--white);color:var(--gray600);font-size:0.82rem;font-weight:600;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--navy)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">📊 View history</a>
@@ -2949,6 +3008,57 @@ function updateStarredCategoryBtn() {
       mbtn.style.display = 'none';
     }
   }
+  renderStarredRevisionQueue();
+}
+
+function getCasperStarredStations(){
+  if(typeof STATIONS==='undefined')return [];
+  const starred=new Set(StationHistory.getStarred().filter(id=>!id.startsWith('mmi_')));
+  return STATIONS.map((s,idx)=>({station:s,id:s.id||`casper_${idx}`,history:StationHistory.get(s.id||`casper_${idx}`)}))
+    .filter(x=>starred.has(x.id));
+}
+
+function renderStarredRevisionQueue(){
+  const card=$('starredQueueCard'),list=$('starredQueueList'),countEl=$('starredQueueCount'),btn=$('startStarredQueueBtn');
+  if(!card||!list||!countEl)return;
+  const rows=getCasperStarredStations();
+  countEl.textContent=rows.length;
+  card.style.display=(currentMode===MODE_CASPER&&rows.length>0)?'':'none';
+  if(btn)btn.disabled=!rows.length;
+  if(!rows.length){list.innerHTML='';return;}
+  list.innerHTML=rows.slice(0,4).map(x=>{
+    const score=x.history&&x.history.lastScore!=null?`${x.history.lastScore}/10`:'unscored';
+    return `<div style="border:1px solid rgba(245,158,11,0.16);background:rgba(245,158,11,0.055);border-radius:9px;padding:8px 9px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px;">
+        <span style="font-size:0.74rem;font-weight:800;color:var(--gray800);">${escInline(x.station.category||'CASPer')}</span>
+        <span style="font-size:0.68rem;color:var(--gray400);">${escInline(score)}</span>
+      </div>
+      <div style="font-size:0.7rem;color:var(--gray500);line-height:1.35;margin-bottom:6px;">${escInline((x.station.scenario||'').slice(0,82))}${(x.station.scenario||'').length>82?'…':''}</div>
+      <button onclick="startSingleStarredStation('${escInline(x.id)}')" style="border:none;background:#fff;color:#b45309;border-radius:50px;padding:5px 10px;font-size:0.68rem;font-weight:800;cursor:pointer;font-family:inherit;">Practise this</button>
+    </div>`;
+  }).join('')+(rows.length>4?`<div style="font-size:0.68rem;color:var(--gray400);text-align:center;">+ ${rows.length-4} more starred</div>`:'');
+}
+
+function startStarredRevisionQueue(){
+  const rows=getCasperStarredStations();
+  if(!rows.length){alert('No starred CASPer stations yet. Star tricky stations as you practise.');return;}
+  currentMode=MODE_CASPER;applyModeUI(MODE_CASPER);
+  selectedCategory='__starred';
+  document.querySelectorAll('#categoryFilters .cat-btn').forEach(b=>b.classList.toggle('active',b.getAttribute('data-cat')==='__starred'));
+  startSession();
+}
+
+function startSingleStarredStation(stationId){
+  if(typeof STATIONS==='undefined')return;
+  const station=STATIONS.find((s,idx)=>(s.id||`casper_${idx}`)===stationId);
+  if(!station)return;
+  currentMode=MODE_CASPER;applyModeUI(MODE_CASPER);
+  selectedCategory='__starred';
+  pool=[station];sessionPool=[station];currentIdx=0;completed=0;sessionHistory=[];
+  sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
+  $('startBtn').classList.add('running');$('startBtnText').textContent='Restart';$('startBtnIcon').textContent='↺';
+  statAvg.textContent='—';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
+  loadStation();
 }
 
 // ══ SELF-RATING (4.2) ════════════════════════════════════════════════════════
@@ -3057,6 +3167,248 @@ function updateCategoryHeatmap(){
   } else {
     alertEl.style.display='none';
   }
+}
+
+function collectCompetencySeries(){
+  const series={};
+  sessionHistory.forEach((h,idx)=>{
+    if(!h||!h.feedback)return;
+    normalizeCompetencies(h.feedback.competencies).forEach(c=>{
+      if(!series[c.name])series[c.name]=[];
+      series[c.name].push({idx,score:c.score,improve:c.improve||'',evidence:c.evidence||''});
+    });
+  });
+  return series;
+}
+
+const COMPETENCY_PROGRESS_KEY='k2md_casper_competency_progress_v1';
+function loadCompetencyProgress(){
+  try{
+    const rows=JSON.parse(localStorage.getItem(COMPETENCY_PROGRESS_KEY)||'[]');
+    return Array.isArray(rows)?rows:[];
+  }catch(e){return [];}
+}
+function saveCompetencyProgress(rows){
+  try{localStorage.setItem(COMPETENCY_PROGRESS_KEY,JSON.stringify(rows.slice(-120)));}catch(e){}
+}
+function recordCompetencyProgress(station,fb){
+  const comps=normalizeCompetencies(fb&&fb.competencies);
+  if(!comps.length)return;
+  const rows=loadCompetencyProgress();
+  rows.push({
+    id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+'_'+Math.random().toString(16).slice(2),
+    at:new Date().toISOString(),
+    station_id:getStationId(station),
+    category:station&&station.category||'CASPer',
+    overall_score:Number(fb.score)||null,
+    competencies:comps.map(c=>({name:c.name,score:c.score,improve:c.improve||'',evidence:c.evidence||''}))
+  });
+  saveCompetencyProgress(rows);
+}
+function persistentCompetencySeries(){
+  const series={};
+  loadCompetencyProgress().forEach((row,idx)=>{
+    (row.competencies||[]).forEach(c=>{
+      const name=normalizeCompetencyName(c.name);
+      const score=Number(c.score);
+      if(!name||!Number.isFinite(score))return;
+      if(!series[name])series[name]=[];
+      series[name].push({idx,score,at:row.at,improve:c.improve||'',category:row.category||''});
+    });
+  });
+  return series;
+}
+function updatePersistentCompetencyProgress(){
+  const card=$('competencyProgressCard'),rowsEl=$('competencyProgressRows'),sub=$('competencyProgressSub');
+  if(!card||!rowsEl)return;
+  const series=persistentCompetencySeries();
+  const names=Object.keys(series);
+  const attempts=loadCompetencyProgress().length;
+  if(!names.length){card.style.display='none';rowsEl.innerHTML='';return;}
+  card.style.display=currentMode===MODE_CASPER?'':'none';
+  if(sub)sub.textContent=`Long-term trend from ${attempts} AI-marked CASPer station${attempts===1?'':'s'} on this browser.`;
+  const rows=names.map(name=>{
+    const pts=series[name].slice(-10);
+    const scores=pts.map(p=>p.score);
+    const avg=scores.reduce((a,b)=>a+b,0)/scores.length;
+    const delta=scores.length>1?scores[scores.length-1]-scores[0]:0;
+    const qi=getQuartile(avg);
+    const trend=delta>0.5?{label:`+${delta.toFixed(1)}`,color:'var(--green)'}
+      :delta<-0.5?{label:delta.toFixed(1),color:'var(--red)'}
+      :{label:'steady',color:'var(--gray400)'};
+    const latest=pts.slice().reverse().find(p=>p.improve)?.improve||'';
+    return {name,avg,html:`<div style="border:1px solid rgba(14,165,233,0.12);background:rgba(14,165,233,0.035);border-radius:9px;padding:9px 10px;">
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;">
+        <div>
+          <div style="font-size:0.76rem;font-weight:800;color:var(--gray800);">${escInline(name)}</div>
+          <div style="height:5px;background:var(--gray100);border-radius:3px;overflow:hidden;margin-top:5px;">
+            <div style="height:100%;width:${Math.round((avg/10)*100)}%;background:${qi.color};border-radius:3px;"></div>
+          </div>
+        </div>
+        ${miniCompetencySparkline(pts)}
+        <div style="text-align:right;">
+          <div style="font-size:0.76rem;font-weight:900;color:${qi.color};">${avg.toFixed(1)}</div>
+          <div style="font-size:0.64rem;font-weight:800;color:${trend.color};">${trend.label}</div>
+        </div>
+      </div>
+      ${latest?`<div style="font-size:0.66rem;color:var(--gray400);line-height:1.35;margin-top:6px;">${escInline(latest)}</div>`:''}
+    </div>`};
+  }).sort((a,b)=>a.avg-b.avg);
+  rowsEl.innerHTML=rows.map(r=>r.html).join('');
+}
+
+function miniCompetencySparkline(points){
+  if(!points.length)return '';
+  const vals=points.map(p=>p.score);
+  const cells=vals.map(v=>{
+    const qi=getQuartile(v);
+    const h=Math.max(10,Math.round((v/10)*34));
+    return `<span title="${v}/10" style="display:inline-block;width:7px;height:${h}px;border-radius:4px;background:${qi.color};opacity:0.9;"></span>`;
+  }).join('');
+  return `<div style="display:flex;align-items:flex-end;gap:3px;height:36px;min-width:54px;">${cells}</div>`;
+}
+
+function buildCompetencyProgress(){
+  const wrap=$('reviewCompetencyProgress');
+  const rowsEl=$('reviewCompetencyRows');
+  if(!wrap||!rowsEl)return;
+  const series=collectCompetencySeries();
+  const names=Object.keys(series).filter(name=>series[name].length>0);
+  if(!names.length){wrap.style.display='none';rowsEl.innerHTML='';return;}
+  wrap.style.display='block';
+  const rows=names.map(name=>{
+    const pts=series[name];
+    const scores=pts.map(p=>p.score);
+    const avg=scores.reduce((a,b)=>a+b,0)/scores.length;
+    const first=scores[0],last=scores[scores.length-1];
+    const delta=scores.length>1?last-first:0;
+    const qi=getQuartile(avg);
+    const trend=delta>0.5?{label:`+${delta.toFixed(1)}`,color:'var(--green)',text:'Improving'}
+      :delta<-0.5?{label:delta.toFixed(1),color:'var(--red)',text:'Dropping'}
+      :{label:'0.0',color:'var(--gray400)',text:'Steady'};
+    const latestImprove=pts.slice().reverse().find(p=>p.improve)?.improve||'';
+    return {name,avg,qi,trend,latestImprove,html:`<div style="display:grid;grid-template-columns:minmax(130px,1fr) auto minmax(80px,auto);gap:12px;align-items:center;border:1px solid rgba(14,165,233,0.12);background:rgba(14,165,233,0.035);border-radius:10px;padding:10px 12px;">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;">
+          <span style="font-size:0.82rem;font-weight:800;color:var(--gray800);">${escInline(name)}</span>
+          <span style="font-size:0.72rem;font-weight:800;color:${qi.color};">${avg.toFixed(1)} · ${qi.q}</span>
+        </div>
+        <div style="height:6px;background:var(--gray100);border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:${Math.round((avg/10)*100)}%;background:${qi.color};border-radius:4px;"></div>
+        </div>
+        ${latestImprove?`<div style="font-size:0.68rem;color:var(--gray400);line-height:1.35;margin-top:5px;">${escInline(latestImprove)}</div>`:''}
+      </div>
+      ${miniCompetencySparkline(pts)}
+      <div style="text-align:right;">
+        <div style="font-size:0.82rem;font-weight:900;color:${trend.color};">${trend.label}</div>
+        <div style="font-size:0.66rem;color:var(--gray400);font-weight:700;">${trend.text}</div>
+      </div>
+    </div>`};
+  }).sort((a,b)=>a.avg-b.avg);
+  rowsEl.innerHTML=rows.map(r=>r.html).join('');
+}
+
+function getWeakestCompetency(){
+  const compData={};
+  sessionHistory.forEach(h=>{
+    if(!h||!h.feedback)return;
+    normalizeCompetencies(h.feedback.competencies).forEach(c=>{
+      if(!compData[c.name])compData[c.name]={sum:0,n:0};
+      compData[c.name].sum+=c.score;
+      compData[c.name].n++;
+    });
+  });
+  const ranked=Object.keys(compData).map(name=>({name,avg:compData[name].sum/compData[name].n,n:compData[name].n}))
+    .sort((a,b)=>a.avg-b.avg);
+  return ranked[0]||null;
+}
+
+const COMPETENCY_STATION_HINTS={
+  Collaboration:['team','group','colleague','peer','partner','committee','work together','classmate'],
+  Communication:['communicat','misunderstanding','explain','feedback','conversation','message','discuss','complaint'],
+  Empathy:['upset','distress','grief','anxious','crying','family','patient','friend','support','worried'],
+  Fairness:['fair','equity','bias','discrimination','allocation','advantage','access','justice'],
+  Ethics:['confidential','consent','cheat','dishonest','truth','privacy','report','professional','ethical'],
+  Motivation:['motivation','medicine','career','volunteer','commitment','goal','why','purpose'],
+  'Problem Solving':['policy','resource','limited','plan','solve','organise','prioritise','shortage','decision'],
+  Resilience:['stress','failure','burnout','pressure','setback','mistake','cope','overwhelmed'],
+  'Self-Awareness':['mistake','feedback','reflect','bias','weakness','apologise','learn','self']
+};
+const COMPETENCY_CATEGORY_HINTS={
+  Collaboration:['Conflict Resolution','Communication','Professionalism'],
+  Communication:['Communication','Conflict Resolution'],
+  Empathy:['Communication','Conflict Resolution','Personal'],
+  Fairness:['Ethics','Professionalism'],
+  Ethics:['Ethics','Professionalism'],
+  Motivation:['Personal'],
+  'Problem Solving':['Ethics','Professionalism','Conflict Resolution'],
+  Resilience:['Personal','Professionalism'],
+  'Self-Awareness':['Personal','Professionalism']
+};
+
+function getStationId(station){
+  if(!station)return '';
+  if(station.id)return station.id;
+  const idx=(typeof STATIONS!=='undefined')?STATIONS.indexOf(station):-1;
+  return `casper_${idx}`;
+}
+
+function recommendStationForCompetency(compName){
+  if(!compName||typeof STATIONS==='undefined')return null;
+  const attempted=new Set(sessionHistory.filter(h=>h&&h.station).map(h=>getStationId(h.station)));
+  const hints=COMPETENCY_STATION_HINTS[compName]||[];
+  const catHints=COMPETENCY_CATEGORY_HINTS[compName]||[];
+  const scored=STATIONS.map((s,idx)=>{
+    const id=s.id||`casper_${idx}`;
+    const text=`${s.category||''} ${s.scenario||''} ${s.prompt1||''} ${s.prompt2||''}`.toLowerCase();
+    let score=0;
+    if(catHints.includes(s.category))score+=8;
+    hints.forEach(k=>{if(text.includes(k.toLowerCase()))score+=3;});
+    const hist=StationHistory.get(id);
+    if(!hist||!hist.attemptCount)score+=4;
+    if(hist&&hist.starred)score+=1;
+    if(attempted.has(id))score-=12;
+    return {station:s,id,score};
+  }).sort((a,b)=>b.score-a.score);
+  return scored.find(x=>x.score>0)||scored[0]||null;
+}
+
+function getRecommendedNextStation(){
+  const weak=getWeakestCompetency();
+  if(!weak)return null;
+  const rec=recommendStationForCompetency(weak.name);
+  return rec?{...rec,weak}:null;
+}
+
+function recommendedStationCardHtml(){
+  if(currentMode!==MODE_CASPER)return '';
+  const rec=getRecommendedNextStation();
+  if(!rec||!rec.station)return '';
+  return `<div id="recommendedNextCard" style="margin-top:14px;border:1px solid rgba(14,165,233,0.18);background:linear-gradient(135deg,rgba(14,165,233,0.075),rgba(34,197,94,0.055));border-radius:12px;padding:14px 16px;">
+    <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal3);margin-bottom:5px;">Recommended next station</div>
+    <div style="font-size:0.9rem;font-weight:800;color:var(--navy);line-height:1.35;margin-bottom:5px;">Train ${escInline(rec.weak.name)}</div>
+    <div style="font-size:0.8rem;color:var(--gray600);line-height:1.55;margin-bottom:10px;">Your current average for ${escInline(rec.weak.name)} is ${rec.weak.avg.toFixed(1)}/10. Suggested station: <strong>${escInline(rec.station.category||'CASPer')}</strong> — ${escInline((rec.station.scenario||'').slice(0,120))}${(rec.station.scenario||'').length>120?'…':''}</div>
+    <button onclick="useRecommendedStation('${escInline(rec.id)}')" style="border:none;background:var(--teal);color:#fff;border-radius:50px;padding:8px 16px;font-size:0.78rem;font-weight:800;cursor:pointer;font-family:inherit;">Do this next →</button>
+  </div>`;
+}
+
+function useRecommendedStation(stationId){
+  if(typeof STATIONS==='undefined')return;
+  const station=STATIONS.find((s,idx)=>(s.id||`casper_${idx}`)===stationId);
+  if(!station)return;
+  const insertAt=Math.min(currentIdx+1,pool.length);
+  if(sessionActive&&currentMode===MODE_CASPER){
+    pool.splice(insertAt,0,station);
+    sessionPool.splice(insertAt,0,station);
+    alert('Recommended station added next.');
+    return;
+  }
+  currentMode=MODE_CASPER;
+  applyModeUI(MODE_CASPER);
+  pool=[station];sessionPool=[station];currentIdx=0;completed=0;sessionHistory=[];
+  sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
+  $('startBtn').classList.add('running');$('startBtnText').textContent='Restart';$('startBtnIcon').textContent='↺';
+  loadStation();
 }
 
 // ══════════════════════════════════════
@@ -3623,25 +3975,89 @@ const TIMER_MODES={
   deep:{read:90,write:360,hint:'🧘 Deep Dive — 90s read, 6:00 write. Room to fully develop your ideas. Great for studying what a complete answer looks like.'}
 };
 let currentTimerMode='standard';
+const ACCOMMODATION_KEY='k2md_casper_accommodation_multiplier';
+let currentAccommodationMultiplier=1;
+try{currentAccommodationMultiplier=Number(localStorage.getItem(ACCOMMODATION_KEY)||'1')||1;}catch(e){}
+if(![1,1.5,2].includes(currentAccommodationMultiplier)) currentAccommodationMultiplier=1;
+
+function applyCasperTiming(){
+  const base=TIMER_MODES[currentTimerMode]||TIMER_MODES.standard;
+  const mult=currentTimerMode==='off'?1:currentAccommodationMultiplier;
+  readingTime=Math.round(base.read*mult);
+  writingTime=Math.round(base.write*mult);
+  const rs=$('readingSlider'),ws=$('writingSlider');
+  if(rs){rs.min=base.read===0?0:15;rs.max=Math.max(120,readingTime);rs.value=readingTime;}
+  if(ws){ws.min=base.write===0?0:60;ws.max=Math.max(600,writingTime);ws.value=writingTime;}
+  const rv=$('readingVal'),wv=$('writingVal');
+  if(rv)rv.textContent=readingTime?fmt(readingTime):'Off';
+  if(wv)wv.textContent=writingTime?fmt(writingTime):'Off';
+}
+
+function setAccommodationMultiplier(mult,opts={}){
+  if(currentMode !== MODE_CASPER) return;
+  const next=Number(mult);
+  currentAccommodationMultiplier=[1,1.5,2].includes(next)?next:1;
+  if(opts.persist!==false){
+    try{localStorage.setItem(ACCOMMODATION_KEY,String(currentAccommodationMultiplier));}catch(e){}
+  }
+  applyCasperTiming();
+  updateAccommodationUI();
+  updateTimerModeHint();
+}
+
+function updateAccommodationUI(){
+  const buttons=[
+    {id:'accommodation1x',value:1},
+    {id:'accommodation15x',value:1.5},
+    {id:'accommodation2x',value:2}
+  ];
+  buttons.forEach(({id,value})=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const active=value===currentAccommodationMultiplier;
+    el.style.background=active?'var(--teal)':'#fff';
+    el.style.color=active?'#fff':'var(--gray700)';
+    el.style.borderColor=active?'var(--teal)':'rgba(14,165,233,0.18)';
+    el.style.boxShadow=active?'0 8px 20px rgba(14,165,233,0.22)':'none';
+  });
+  const summary=document.getElementById('specialAccommodationSummary');
+  if(summary){
+    if(currentAccommodationMultiplier===1){
+      summary.textContent='Standard timing selected.';
+    } else if(currentTimerMode==='off'){
+      summary.textContent='No timer is selected, so accommodations do not change this station.';
+    } else {
+      summary.textContent=`${currentAccommodationMultiplier}x timing active: ${fmt(readingTime)} reading · ${fmt(writingTime)} writing.`;
+    }
+  }
+}
+
+function updateTimerModeHint(){
+  const hint=document.getElementById('timerModeHint');
+  if(!hint)return;
+  const m=TIMER_MODES[currentTimerMode]||TIMER_MODES.standard;
+  const names={off:'No Timer',standard:'Standard',rapid:'Rapid Fire ⚡',deep:'Deep Dive 🧘'};
+  const accom=currentAccommodationMultiplier===1||currentTimerMode==='off'
+    ? ''
+    : ` <span style="color:var(--teal3);font-weight:700;">Special Accommodations ${currentAccommodationMultiplier}x:</span> ${fmt(readingTime)} read · ${fmt(writingTime)} write.`;
+  hint.innerHTML=`💡 <strong style="color:var(--gray600);">${names[currentTimerMode]}</strong> — ${m.hint}${accom}`;
+}
+
 function setTimerMode(mode){
   if(currentMode !== MODE_CASPER) return; // guard: CASPer only
   currentTimerMode=mode;
-  const m=TIMER_MODES[mode];
-  readingTime=m.read;writingTime=m.write;
-  // Update slider values for JS compatibility
-  const rs=$('readingSlider'),ws=$('writingSlider');
-  if(rs)rs.value=m.read;if(ws)ws.value=m.write;
+  applyCasperTiming();
   // Update UI
   ['off','standard','rapid','deep'].forEach(k=>{
     const el=document.getElementById('timerMode'+k.charAt(0).toUpperCase()+k.slice(1));
     if(el)el.className='timer-mode-card'+(k===mode?' timer-mode-active':'');
   });
-  const hint=document.getElementById('timerModeHint');
-  if(hint){
-    const names={off:'No Timer',standard:'Standard',rapid:'Rapid Fire ⚡',deep:'Deep Dive 🧘'};
-    hint.innerHTML=`💡 <strong style="color:var(--gray600);">${names[mode]}</strong> — ${m.hint}`;
-  }
+  updateAccommodationUI();
+  updateTimerModeHint();
 }
+
+setTimerMode(currentTimerMode);
+setAccommodationMultiplier(currentAccommodationMultiplier,{persist:false});
 
 
 const STREAK_KEY='k2md_streak';
@@ -3747,6 +4163,7 @@ function buildReview(){
   const rts=$('reviewTrendSection');
   if(sc.length>=2){rts.style.display='block';setTimeout(()=>drawChart($('reviewCanvas'),sc,140),50);}else rts.style.display='none';
   buildCategoryBreakdown();
+  buildCompetencyProgress();
   renderList('all');
   document.querySelectorAll('.review-filter-btn').forEach(btn=>{
     btn.onclick=()=>{document.querySelectorAll('.review-filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderList(btn.dataset.filter);};
@@ -3767,8 +4184,9 @@ function renderList(filter){
     const comps=h.feedback&&normalizeCompetencies(h.feedback.competencies).length?`<div class="src-section-label">Competencies</div><div class="src-feedback-text">${competencyRowsHtml(h.feedback.competencies,true)}</div>`:'';
     const fb=h.feedback?`<div class="src-section-label">AI Feedback</div><div class="src-feedback-text"><strong>Strengths:</strong> ${h.feedback.strengths}<br><strong>Improve:</strong> ${h.feedback.improvements}<br><strong>Empathy:</strong> ${h.feedback.empathy}${h.feedback.missed&&h.feedback.missed!=='None'?`<br><strong>Missed:</strong> ${h.feedback.missed}`:''}</div>${comps}`:'';
     const ans=h.answer&&h.answer.trim()?`<div class="src-section-label">Your Response</div><div class="src-answer-text">${h.answer.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`:`<div class="src-section-label" style="color:var(--gray400)">No response recorded</div>`;
+    const reflection=h.reflection&&h.reflection.trim()?`<div class="src-section-label">Reflection</div><div class="src-feedback-text">${escInline(h.reflection)}</div>`:'';
     const n=items.indexOf(h)+1;
-    return`<div class="station-review-card"><div class="src-header" onclick="this.nextElementSibling.classList.toggle('open')"><span class="src-num">${n}</span><span class="src-scenario">${h.station.scenario.substring(0,110)}…</span>${sb}</div><div class="src-body"><div class="src-section-label">Prompts</div><div class="src-feedback-text">1. ${h.station.prompt1}<br>2. ${h.station.prompt2}</div>${ans}${fb}</div></div>`;
+    return`<div class="station-review-card"><div class="src-header" onclick="this.nextElementSibling.classList.toggle('open')"><span class="src-num">${n}</span><span class="src-scenario">${h.station.scenario.substring(0,110)}…</span>${sb}</div><div class="src-body"><div class="src-section-label">Prompts</div><div class="src-feedback-text">1. ${h.station.prompt1}<br>2. ${h.station.prompt2}</div>${ans}${reflection}${fb}</div></div>`;
   }).join('');
 }
 
