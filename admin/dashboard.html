@@ -225,6 +225,21 @@
     .signal-chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:999px;border:1px solid var(--border);font-size:0.62rem;font-weight:750;color:var(--muted);background:rgba(255,255,255,0.04);}
     .signal-chip.low{color:var(--red);border-color:var(--red-border);background:var(--red-dim);}
     .signal-chip.high{color:var(--green);border-color:var(--green-border);background:var(--green-dim);}
+    .admin-note{border:1px solid var(--border);background:rgba(255,255,255,0.035);border-radius:10px;padding:10px 12px;color:var(--muted);font-size:0.76rem;line-height:1.55;}
+    .admin-note strong{color:var(--text);}
+    .admin-note.blue{border-color:var(--blue-border);background:var(--blue-dim);}
+    .admin-note.amber{border-color:var(--amber-border);background:var(--amber-dim);}
+    .mock-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+    .mock-admin-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+    .mock-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);}
+    .mock-panel-title{font-size:0.78rem;font-weight:850;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
+    .mock-panel-sub{font-size:0.72rem;color:var(--muted2);margin-top:3px;line-height:1.45;}
+    .mock-action-row{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;}
+    .broadcast-audience{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:10px 0 14px;padding:11px 12px;border:1px solid var(--blue-border);background:var(--blue-dim);border-radius:10px;}
+    .broadcast-audience-main{font-size:0.82rem;font-weight:800;color:var(--text);}
+    .broadcast-audience-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;line-height:1.45;}
+    .broadcast-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+    .template-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
 
     /* ══ CONTROLS ══ */
     .controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
@@ -390,7 +405,7 @@
     <div class="sidebar-section">Students</div>
     <button class="nav-item" data-page="reviews" onclick="nav('reviews')"><span class="icon">📋</span> CASPer Reviews</button>
     <button class="nav-item" data-page="mmi" onclick="nav('mmi')"><span class="icon">🎤</span> MMI Reviews <span class="nav-badge" id="mmiBadge">0</span></button>
-    <a class="nav-item" href="../mock-reader.html" target="_blank" rel="noopener"><span class="icon">🧪</span> Mock Reader</a>
+    <button class="nav-item" data-page="mocks" onclick="nav('mocks')"><span class="icon">M</span> Mock Exams <span class="nav-badge" id="mockBadge">0</span></button>
     <button class="nav-item" data-page="users" onclick="nav('users')"><span class="icon">👥</span> Users</button>
     <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')"><span class="icon">📩</span> Enquiries <span class="nav-badge" id="enqBadge">0</span></button>
 
@@ -644,7 +659,7 @@
               </div>
               <textarea class="compose-textarea" id="composeBody" placeholder="Write your reply…"></textarea>
               <div class="compose-footer">
-                <span class="compose-hint">Sent from dan@key2md.net</span>
+                <span class="compose-hint" id="replyStatus">Sent from dan@key2md.net</span>
                 <button class="btn-send" id="sendBtn" onclick="sendReply()">
                   <span class="spinner" id="sendSpinner"></span>Send ↗
                 </button>
@@ -707,6 +722,14 @@
               <input class="form-in" id="bcCustomEmail" type="email" placeholder="e.g. student@gmail.com">
             </div>
 
+            <div class="broadcast-audience" id="bcAudienceBox">
+              <div>
+                <div class="broadcast-audience-main" id="bcAudienceMain">Choose an audience</div>
+                <div class="broadcast-audience-sub" id="bcAudienceSub">Use preview before sending anything larger than a test.</div>
+              </div>
+              <button class="btn blue" onclick="refreshBroadcastAudience()">Preview audience</button>
+            </div>
+
             <div class="form-row">
               <label class="form-lbl">Subject line</label>
               <input class="form-in" id="bcSubject" type="text" placeholder="e.g. CASPer tips this week…" oninput="updateBcPreview()">
@@ -752,7 +775,10 @@
               💡 <strong style="color:var(--text);">Tip:</strong> Replies from students go directly to <strong style="color:var(--blue);">dan@key2md.net</strong> and appear in your Inbox tab.
             </div>
 
-            <button class="btn primary" id="bcBtn" onclick="sendBroadcast()" style="width:100%;padding:11px;border-radius:50px;font-size:0.88rem;">Send Broadcast →</button>
+            <div class="broadcast-actions">
+              <button class="btn" id="bcTestBtn" onclick="sendTestBroadcast()" style="padding:11px;border-radius:50px;font-size:0.86rem;">Send test only</button>
+              <button class="btn primary" id="bcBtn" onclick="sendBroadcast()" style="padding:11px;border-radius:50px;font-size:0.88rem;">Send Broadcast →</button>
+            </div>
             <div class="alert" id="bcAlert"></div>
           </div>
         </div>
@@ -793,6 +819,59 @@
     </div>
 
     <!-- ── MMI REVIEWS ── -->
+    <!-- MOCK EXAMS -->
+    <div id="pageMocks" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Full CASPer Mock Exams</div>
+          <div class="page-sub">Admin-only view of saved mocks and paid manual review requests. Students can only access their own attempts.</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn blue" onclick="loadMockAdmin()">Refresh mocks</button>
+          <button class="btn" onclick="openMockReader()">Open full reader</button>
+        </div>
+      </div>
+      <div class="admin-note blue" style="margin-bottom:14px;">
+        <strong>Privacy guard:</strong> this page only uses admin-protected mock endpoints. Use the reader buttons to inspect an individual attempt with the same admin session.
+      </div>
+      <div class="controls">
+        <input class="ctrl-in" id="mockSearch" type="text" placeholder="Filter by email, name, status..." oninput="renderMockAdmin()">
+        <select class="ctrl-sel" id="mockScope" onchange="renderMockAdmin()">
+          <option value="all">All saved mocks</option>
+          <option value="manual">Paid manual reviews</option>
+          <option value="pending">Manual pending/in review</option>
+          <option value="premium">Premium mocks</option>
+          <option value="transcript">Transcript mocks</option>
+        </select>
+      </div>
+      <div class="mock-admin-grid">
+        <section class="mock-admin-panel">
+          <div class="mock-panel-head">
+            <div>
+              <div class="mock-panel-title">Manual Review Queue</div>
+              <div class="mock-panel-sub" id="mockManualStatus">Loading...</div>
+            </div>
+            <button class="btn amber" onclick="document.getElementById('mockScope').value='manual';renderMockAdmin()">Show paid</button>
+          </div>
+          <div class="tbl-scroller"><table><thead><tr>
+            <th>Student</th><th>Tier</th><th>Status</th><th>Paid</th><th style="width:170px;text-align:center;">Actions</th>
+          </tr></thead><tbody id="mockManualBody"></tbody></table></div>
+        </section>
+        <section class="mock-admin-panel">
+          <div class="mock-panel-head">
+            <div>
+              <div class="mock-panel-title">Saved Attempts</div>
+              <div class="mock-panel-sub" id="mockStatus">Loading...</div>
+            </div>
+            <button class="btn" onclick="openMockReader()">Reader</button>
+          </div>
+          <div class="tbl-scroller"><table><thead><tr>
+            <th>Student</th><th>Tier</th><th>Status</th><th>Completed</th><th style="width:170px;text-align:center;">Actions</th>
+          </tr></thead><tbody id="mockBody"></tbody></table></div>
+        </section>
+      </div>
+    </div>
+
     <div id="pageMmi" class="page">
       <div class="page-header">
         <div>
@@ -1001,6 +1080,11 @@
     <div class="form-row"><label class="form-lbl">To</label><input class="form-in" type="email" id="ncTo" placeholder="student@email.com"></div>
     <div class="form-row"><label class="form-lbl">Subject</label><input class="form-in" type="text" id="ncSubject" placeholder="Re: your CASPer prep…"></div>
     <div class="form-row"><label class="form-lbl">Message</label><textarea class="form-ta" id="ncBody" style="min-height:140px;" placeholder="Write your message…"></textarea></div>
+    <div class="template-row">
+      <button class="btn" onclick="insertEmailTemplate('enquiry')">Enquiry follow-up</button>
+      <button class="btn" onclick="insertEmailTemplate('mock')">Mock review</button>
+      <button class="btn" onclick="insertEmailTemplate('support')">Support reply</button>
+    </div>
     <div class="modal-alert" id="ncAlert"></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeNewCompose()">Cancel</button>
@@ -1020,7 +1104,7 @@ const S = {
   token: null,
   reviews: [], users: [], enquiries: [], subscribers: [],
   conversations: [], filteredConvs: [],
-  mmiReviews: [], revenue: [], monitoring: null,
+  mmiReviews: [], mockAttempts: [], mockManualReviews: [], revenue: [], monitoring: null,
   activeConv: null,
   detailCache: new Map(),
   creditModalUserId: null,
@@ -1032,7 +1116,7 @@ const S = {
 // INIT — restore session from sessionStorage
 // ══════════════════════════════════════════════════════
 (async () => {
-  const saved = sessionStorage.getItem(SS_KEY);
+  const saved = sessionStorage.getItem(SS_KEY) || localStorage.getItem(SS_KEY);
   if (saved) {
     S.token = saved;
     try {
@@ -1068,6 +1152,7 @@ async function doLogin() {
     if (!res.ok) throw new Error(data?.error||'Sign in failed');
     S.token = data.token;
     sessionStorage.setItem(SS_KEY, S.token);
+    localStorage.setItem(SS_KEY, S.token);
     showApp(data.email||email);
     bootLoad();
   } catch(e) {
@@ -1087,6 +1172,7 @@ function showApp(email) {
 async function doLogout() {
   try { await api('/admin/logout', {method:'POST'}); } catch {}
   sessionStorage.removeItem(SS_KEY);
+  localStorage.removeItem(SS_KEY);
   S.token = null;
   location.reload();
 }
@@ -1103,7 +1189,7 @@ async function api(path, opts={}) {
 // ══════════════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════════════
-const ADMIN_PAGES = new Set(['dashboard','reviews','mmi','users','enquiries','revenue','monitoring','inbox','broadcast','subscribers']);
+const ADMIN_PAGES = new Set(['dashboard','reviews','mmi','mocks','users','enquiries','revenue','monitoring','inbox','broadcast','subscribers']);
 
 function normalisePage(page) {
   const key = String(page || 'dashboard').replace(/^#/, '').trim().toLowerCase();
@@ -1147,6 +1233,7 @@ function nav(page, opts={}) {
     stopInboxPolling();
   }
   if (target==='subscribers' && !S.subscribers.length) loadSubscribers();
+  if (target==='mocks' && !S.mockAttempts.length && !S.mockManualReviews.length) loadMockAdmin();
   if (target==='enquiries' && !S.enquiries.length) loadEnquiries();
   if (target==='broadcast') updateBcStats();
   if (target==='mmi' && !S.mmiReviews.length) loadMMI();
@@ -1166,7 +1253,7 @@ window.addEventListener('hashchange', () => {
 async function bootLoad() {
   await Promise.all([
     loadReviews(), loadUsers(), loadEnquiries(),
-    loadSubscribers(), loadInbox(), loadMMI(), loadRevenue(), loadMonitoring(),
+    loadSubscribers(), loadInbox(), loadMMI(), loadMockAdmin(), loadRevenue(), loadMonitoring(),
   ]);
   const lu = document.getElementById('lastUpdated');
   if (lu) lu.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
@@ -1188,6 +1275,8 @@ function updateDashboard() {
   const enqs    = S.enquiries;
   const subs    = S.subscribers;
   const mmi     = S.mmiReviews;
+  const mocks   = S.mockAttempts;
+  const manualMocks = S.mockManualReviews;
 
   const paying  = users.filter(u=>Number(u.total_spend_aud||0)>0).length;
   const credits = users.reduce((s,u)=>s+Number(u.casper_balance||0)+Number(u.gamsat_balance||0),0);
@@ -1204,6 +1293,7 @@ function updateDashboard() {
   const noReviews = users.filter(u=>Number(u.review_count||0)===0).length;
   const freeToday = users.filter(u=>u.usage_today?.casper?.used_free_today||u.usage_today?.gamsat?.used_free_today).length;
   const mmiCreditsHeld = mmi.reduce((s,r)=>s+(r.mmi_transcript_balance||0),0);
+  const manualPending = manualMocks.filter(r=>['pending_review','in_review'].includes(String(r.manual_review_status||''))).length;
   const conversion = (paying/Math.max(users.length,1))*100;
 
   document.getElementById('dUsers').textContent     = users.length;
@@ -1225,11 +1315,11 @@ function updateDashboard() {
   document.getElementById('dTodayReviews').textContent = todayReviews;
   document.getElementById('dAvgScore').textContent = avgScore ? avgScore.toFixed(1) : '—';
   document.getElementById('dUnread').textContent = unread;
-  document.getElementById('dashHeadline').textContent = `${todayReviews} reviews today · ${mmi.filter(r=>isToday(r.created_at)).length} MMI sessions · ${unread} unread message${unread===1?'':'s'}`;
+  document.getElementById('dashHeadline').textContent = `${todayReviews} reviews today · ${mmi.filter(r=>isToday(r.created_at)).length} MMI sessions · ${manualPending} mock review${manualPending===1?'':'s'} pending · ${unread} unread message${unread===1?'':'s'}`;
   document.getElementById('dashBrief').textContent =
-    `${users.length} registered students · ${paying} paying customers · ${pro} CASPer Pro · ${mmi.length} MMI sessions total · ${enqs7} enquiries in the last 7 days`;
+    `${users.length} registered students · ${paying} paying customers · ${pro} CASPer Pro · ${mmi.length} MMI sessions total · ${mocks.length} saved mock exams · ${enqs7} enquiries in the last 7 days`;
 
-  renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length});
+  renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length,manualPending});
   renderBusinessInsights({conversion,pro,paying,users,credits,reviews,todayReviews,signups7,enqs7,avgScore,mmi});
   renderActivityFeed();
   renderReviewQuality();
@@ -1237,6 +1327,8 @@ function updateDashboard() {
   // MMI badge
   const mb = document.getElementById('mmiBadge');
   if (mb) { mb.textContent = mmi.length; mb.classList.toggle('show', mmi.length>0); }
+  const mockBadge = document.getElementById('mockBadge');
+  if (mockBadge) { mockBadge.textContent = manualPending || mocks.length; mockBadge.classList.toggle('show', manualPending>0 || mocks.length>0); }
 
   const enqEl = document.getElementById('dashRecentEnq');
   enqEl.innerHTML = enqs.slice(0,5).map(e=>`
@@ -1260,6 +1352,7 @@ function updateDashboard() {
 
 function renderActionQueue(m) {
   const items = [
+    {icon:'M', title:`${m.manualPending||0} mock review${m.manualPending===1?'':'s'} pending`, sub:'Open the saved full mock and update manual notes/status.', page:'mocks', show:(m.manualPending||0)>0, tone:'amber'},
     {icon:'!', title:`${m.unread} unread inbox thread${m.unread===1?'':'s'}`, sub:'Reply quickly to keep coaching leads warm.', page:'inbox', show:m.unread>0, tone:'red'},
     {icon:'$', title:`${m.enqs7} fresh enquir${m.enqs7===1?'y':'ies'} this week`, sub:'Follow up while intent is highest.', page:'enquiries', show:m.enqs7>0, tone:'amber'},
     {icon:'AI', title:`${m.freeToday} student${m.freeToday===1?'':'s'} used free reviews today`, sub:'Good moment to invite credit purchase or Pro.', page:'users', show:m.freeToday>0, tone:'blue'},
@@ -1720,6 +1813,8 @@ function openConv(email) {
   const lastIn = [...(conv.messages||[])].reverse().find(m=>m.direction==='inbound');
   document.getElementById('composeSubj').value = lastIn?.subject ? (lastIn.subject.startsWith('Re:')?lastIn.subject:`Re: ${lastIn.subject}`) : '';
   document.getElementById('composeBody').value = '';
+  const replyStatus = document.getElementById('replyStatus');
+  if (replyStatus) replyStatus.textContent = 'Sent from dan@key2md.net';
   renderMsgs(conv.messages||[]);
   markRead();
 }
@@ -1746,6 +1841,8 @@ async function sendReply() {
   if (!to||!body) return;
   const btn = document.getElementById('sendBtn');
   const sp  = document.getElementById('sendSpinner');
+  const status = document.getElementById('replyStatus');
+  if (status) status.textContent = 'Sending...';
   btn.disabled=true; sp.style.display='inline-block';
   try {
     const res = await api('/admin/inbox/send', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({to,subject:subj||'Message from Key2MD',body}) });
@@ -1754,7 +1851,10 @@ async function sendReply() {
     const conv = S.conversations.find(c=>c.email===to);
     if (conv) { conv.messages=(conv.messages||[]); conv.messages.push({direction:'outbound',subject:subj,body,created_at:new Date().toISOString(),from_email:'dan@key2md.net'}); renderMsgs(conv.messages); }
     document.getElementById('composeBody').value='';
-  } catch(e) { alert('Send failed: '+e.message); }
+    if (status) status.textContent = 'Sent.';
+  } catch(e) {
+    if (status) status.textContent = `Send failed: ${e.message}`;
+  }
   finally { btn.disabled=false; sp.style.display='none'; }
 }
 
@@ -1770,6 +1870,29 @@ async function markRead() {
 // ══════════════════════════════════════════════════════
 // NEW COMPOSE MODAL
 // ══════════════════════════════════════════════════════
+function insertEmailTemplate(kind) {
+  const templates = {
+    enquiry: {
+      subject: 'Re: your Key2MD enquiry',
+      body: `Hi there,\n\nThanks for reaching out. I can definitely help with this.\n\nThe best next step is to tell me your target schools, current timeline, and what part of the process feels most uncertain right now. I can then point you toward the most useful prep option rather than giving you a generic plan.\n\n- Dan`,
+    },
+    mock: {
+      subject: 'Re: your Full CASPer Mock',
+      body: `Hi there,\n\nThanks for completing the Full CASPer Mock. I will review the whole attempt as a single exam, not just isolated stations, so I can look for repeated patterns across your typed and video responses.\n\nI will focus on the highest-yield change first, then the station-specific details.\n\n- Dan`,
+    },
+    support: {
+      subject: 'Re: Key2MD support',
+      body: `Hi there,\n\nThanks for flagging this. I am looking into it now.\n\nIf you can send me the email on your account, what page you were on, and what happened immediately before the issue, I can usually fix it much faster.\n\n- Dan`,
+    },
+  };
+  const t = templates[kind];
+  if (!t) return;
+  const subj = document.getElementById('ncSubject');
+  const body = document.getElementById('ncBody');
+  if (subj && !subj.value.trim()) subj.value = t.subject;
+  if (body) body.value = body.value.trim() ? `${body.value.trim()}\n\n${t.body}` : t.body;
+}
+
 function openNewCompose() { document.getElementById('ncModal').classList.add('open'); document.getElementById('ncTo').focus(); }
 function closeNewCompose() { document.getElementById('ncModal').classList.remove('open'); document.getElementById('ncAlert').className='modal-alert'; }
 function composeToUser(email) {
@@ -1807,12 +1930,15 @@ async function sendNewEmail() {
 async function updateBcStats() {
   document.getElementById('bcSubs').textContent = S.subscribers.length||'—';
   document.getElementById('bcUsers').textContent = S.users.length||'—';
+  refreshBroadcastAudience(false);
 }
 
 // ══════════════════════════════════════════════════════
 // BROADCAST
 // ══════════════════════════════════════════════════════
-let bcMode = 'rich'; // 'rich' | 'plain'
+const BC_DRAFT_KEY = 'k2md_broadcast_draft_v2';
+let bcMode = 'rich'; // 'rich' | 'plain' | 'html'
+let bcAudienceCache = null;
 
 function setBcMode(mode) {
   bcMode = mode;
@@ -1825,6 +1951,7 @@ function setBcMode(mode) {
   document.getElementById('bcHtmlBody').style.display    = mode==='html' ? 'block' : 'none';
   document.getElementById('bcHtmlHint').style.display    = mode==='html' ? 'block' : 'none';
   updateBcPreview();
+  saveBroadcastDraft();
 }
 
 function bcFormat(cmd) {
@@ -1899,10 +2026,12 @@ function updateBcPreview() {
   const bodyHtml = getBcBodyHtml();
   if (!bodyHtml.trim()) {
     frame.srcdoc = "<p style='color:#aaa;text-align:center;padding:40px;font-family:sans-serif;'>Start typing to see a preview…</p>";
+    saveBroadcastDraft();
     return;
   }
   // In raw HTML mode, preview the HTML exactly as-is (it's a complete email)
   frame.srcdoc = bcMode === 'html' ? bodyHtml : buildBroadcastHtml(subj, bodyHtml);
+  saveBroadcastDraft();
 }
 
 function onBcListChange() {
@@ -1910,6 +2039,9 @@ function onBcListChange() {
   const customRow = document.getElementById('bcCustomRow');
   if (customRow) customRow.style.display = val === 'custom' ? 'block' : 'none';
   if (val === 'custom') document.getElementById('bcCustomEmail')?.focus();
+  bcAudienceCache = null;
+  refreshBroadcastAudience(false);
+  saveBroadcastDraft();
 }
 
 function getBcListLabel(list) {
@@ -1929,6 +2061,122 @@ function getBcListLabel(list) {
     mmi_users:  'MMI users',
   };
   return labels[list] || list;
+}
+
+function saveBroadcastDraft() {
+  try {
+    const draft = {
+      list: document.getElementById('bcList')?.value || 'test',
+      custom: document.getElementById('bcCustomEmail')?.value || '',
+      subject: document.getElementById('bcSubject')?.value || '',
+      mode: bcMode,
+      rich: document.getElementById('bcRichEditor')?.innerHTML || '',
+      plain: document.getElementById('bcPlainBody')?.value || '',
+      html: document.getElementById('bcHtmlBody')?.value || '',
+      saved_at: Date.now(),
+    };
+    localStorage.setItem(BC_DRAFT_KEY, JSON.stringify(draft));
+  } catch {}
+}
+
+function restoreBroadcastDraft() {
+  try {
+    const raw = localStorage.getItem(BC_DRAFT_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.list && document.getElementById('bcList')) document.getElementById('bcList').value = d.list;
+    if (d.custom && document.getElementById('bcCustomEmail')) document.getElementById('bcCustomEmail').value = d.custom;
+    if (d.subject && document.getElementById('bcSubject')) document.getElementById('bcSubject').value = d.subject;
+    if (d.rich && document.getElementById('bcRichEditor')) document.getElementById('bcRichEditor').innerHTML = d.rich;
+    if (d.plain && document.getElementById('bcPlainBody')) document.getElementById('bcPlainBody').value = d.plain;
+    if (d.html && document.getElementById('bcHtmlBody')) document.getElementById('bcHtmlBody').value = d.html;
+    setBcMode(['rich','plain','html'].includes(d.mode) ? d.mode : 'rich');
+    onBcListChange();
+    updateBcPreview();
+  } catch {}
+}
+
+function clearBroadcastDraft() {
+  try { localStorage.removeItem(BC_DRAFT_KEY); } catch {}
+}
+
+function getLocalAudienceEstimate(list, customEmail = '') {
+  const set = new Set();
+  if (list === 'test') set.add('brittainmbbs@gmail.com');
+  if (list === 'custom' && customEmail) set.add(customEmail.toLowerCase());
+  if (list === 'subscribers' || list === 'both') S.subscribers.forEach(s=>s.email&&set.add(s.email.toLowerCase()));
+  if (list === 'users' || list === 'both') S.users.forEach(u=>u.email&&set.add(u.email.toLowerCase()));
+  if (list === 'paying') S.users.filter(u=>Number(u.total_spend_aud||0)>0).forEach(u=>u.email&&set.add(u.email.toLowerCase()));
+  if (list === 'non_paying') S.users.filter(u=>Number(u.total_spend_aud||0)<=0).forEach(u=>u.email&&set.add(u.email.toLowerCase()));
+  if (list === 'pro') S.users.filter(u=>String(u.tier||'').toLowerCase()==='pro').forEach(u=>u.email&&set.add(u.email.toLowerCase()));
+  if (list === 'no_reviews') S.users.filter(u=>Number(u.review_count||0)===0).forEach(u=>u.email&&set.add(u.email.toLowerCase()));
+  if (list === 'mmi_users') S.mmiReviews.forEach(r=>r.email&&set.add(r.email.toLowerCase()));
+  if (list === 'active') S.reviews.filter(r=>withinDays(r.created_at,14)).forEach(r=>r.email&&set.add(r.email.toLowerCase()));
+  if (list === 'inactive') S.users.filter(u=>Number(u.review_count||0)===0).forEach(u=>u.email&&set.add(u.email.toLowerCase()));
+  return { count: set.size, sample: Array.from(set).slice(0,5), exact: false };
+}
+
+async function refreshBroadcastAudience(showLoading = true, overrideList = null) {
+  const list = overrideList || document.getElementById('bcList')?.value || 'test';
+  const customEmail = (document.getElementById('bcCustomEmail')?.value || '').trim();
+  const main = document.getElementById('bcAudienceMain');
+  const sub = document.getElementById('bcAudienceSub');
+  if (showLoading && main) main.textContent = 'Checking audience...';
+  if (list === 'custom' && (!customEmail || !customEmail.includes('@'))) {
+    if (main) main.textContent = 'Custom send';
+    if (sub) sub.textContent = 'Enter a valid email address before previewing.';
+    return null;
+  }
+  try {
+    const res = await api('/admin/inbox/broadcast/preview', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ list, custom_email: customEmail })
+    });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error || 'Preview unavailable');
+    bcAudienceCache = data;
+    if (main) main.textContent = `${data.count || 0} recipient${data.count===1?'':'s'} · ${getBcListLabel(list)}`;
+    if (sub) sub.textContent = (data.sample || []).length ? `Sample: ${(data.sample || []).join(', ')}` : 'No matching recipients found.';
+    return data;
+  } catch {
+    const fallback = getLocalAudienceEstimate(list, customEmail);
+    bcAudienceCache = fallback;
+    if (main) main.textContent = `${fallback.count} recipient${fallback.count===1?'':'s'} estimated · ${getBcListLabel(list)}`;
+    if (sub) sub.textContent = fallback.sample.length ? `Local estimate only. Sample: ${fallback.sample.join(', ')}` : 'No matching recipients found in loaded dashboard data.';
+    return fallback;
+  }
+}
+
+function buildBroadcastPayload(forceList = null) {
+  const list = forceList || document.getElementById('bcList').value;
+  const subj = document.getElementById('bcSubject').value.trim();
+  const bodyHtml = getBcBodyHtml();
+  const bodyText = getBcBodyText().trim();
+  const customEmail = (document.getElementById('bcCustomEmail')?.value || '').trim();
+  const finalHtml = bcMode === 'html' ? bodyHtml : buildBroadcastHtml(subj, bodyHtml);
+  const payload = { list, subject: subj, body: bodyText, html: finalHtml };
+  if (list === 'custom') payload.custom_email = customEmail;
+  return { payload, list, subj, bodyText, customEmail };
+}
+
+async function sendTestBroadcast() {
+  const { payload, subj, bodyText } = buildBroadcastPayload('test');
+  const al = document.getElementById('bcAlert');
+  const btn = document.getElementById('bcTestBtn');
+  al.className = 'alert';
+  if (!subj || !bodyText) { al.className='alert err'; al.textContent='Subject and message required before sending a test.'; return; }
+  btn.disabled = true; btn.textContent = 'Sending test...';
+  try {
+    const res = await api('/admin/inbox/broadcast', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    const d = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(d?.error || 'Test send failed');
+    al.className = 'alert ok'; al.textContent = 'Test sent to brittainmbbs@gmail.com.';
+  } catch(e) {
+    al.className = 'alert err'; al.textContent = e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send test only';
+  }
 }
 
 async function sendBroadcast() {
@@ -1951,8 +2199,11 @@ async function sendBroadcast() {
 
   if (!subj || !bodyText) { al.className='alert err'; al.textContent='Subject and message required.'; return; }
 
+  const preview = await refreshBroadcastAudience(true, list);
+  const count = Number(preview?.count || 0);
+  if (!count) { al.className='alert err'; al.textContent='No recipients found for this audience.'; return; }
   const toLabel = list === 'custom' ? customEmail : getBcListLabel(list);
-  if (!confirm(`Send to: ${toLabel}\n\nSubject: ${subj}\n\nThis cannot be undone. Continue?`)) return;
+  if (!confirm(`Send to: ${toLabel}\nRecipients: ${count}\n\nSubject: ${subj}\n\nThis cannot be undone. Continue?`)) return;
 
   btn.disabled = true; btn.textContent = 'Sending…';
   const finalHtml = bcMode === 'html' ? bodyHtml : buildBroadcastHtml(subj, bodyHtml);
@@ -1974,10 +2225,13 @@ async function sendBroadcast() {
     document.getElementById('bcSubject').value = '';
     document.getElementById('bcRichEditor').innerHTML = '';
     document.getElementById('bcPlainBody').value = '';
+    document.getElementById('bcHtmlBody').value = '';
     if (list === 'custom' && document.getElementById('bcCustomEmail')) {
       document.getElementById('bcCustomEmail').value = '';
     }
+    clearBroadcastDraft();
     updateBcPreview();
+    refreshBroadcastAudience(false);
   } catch(e) {
     al.className = 'alert err'; al.textContent = e.message;
   } finally {
@@ -2044,6 +2298,101 @@ async function unsubscribeRow(idx, email) {
 // ══════════════════════════════════════════════════════
 // MMI REVIEWS
 // ══════════════════════════════════════════════════════
+// MOCK EXAMS
+async function loadMockAdmin() {
+  try {
+    const [attemptRes, manualRes] = await Promise.all([
+      api('/api/admin/casper-mock/attempts?limit=250'),
+      api('/api/admin/casper-mock/manual-reviews'),
+    ]);
+    const attemptData = await attemptRes.json().catch(()=>({}));
+    const manualData = await manualRes.json().catch(()=>({}));
+    if (!attemptRes.ok) throw new Error(attemptData?.error || 'Could not load mock attempts');
+    if (!manualRes.ok) throw new Error(manualData?.error || 'Could not load manual review queue');
+    S.mockAttempts = attemptData.rows || [];
+    S.mockManualReviews = manualData.rows || [];
+    renderMockAdmin();
+    updateDashboard();
+  } catch(e) {
+    const status = document.getElementById('mockStatus');
+    const manual = document.getElementById('mockManualStatus');
+    if (status) status.textContent = e.message;
+    if (manual) manual.textContent = e.message;
+    console.error('Mock admin load error:', e);
+  }
+}
+
+function filterMockRows(rows) {
+  const q = (document.getElementById('mockSearch')?.value || '').toLowerCase();
+  const scope = document.getElementById('mockScope')?.value || 'all';
+  return (rows || []).filter(r => {
+    const hay = [r.user_email, r.user_name, r.tier, r.manual_review_status, r.id].join(' ').toLowerCase();
+    const matchesQ = !q || hay.includes(q);
+    const matchesScope =
+      scope === 'all' ||
+      (scope === 'manual' && r.manual_review_paid) ||
+      (scope === 'pending' && ['pending_review','in_review'].includes(String(r.manual_review_status||''))) ||
+      (scope === 'premium' && r.tier === 'premium') ||
+      (scope === 'transcript' && r.tier === 'transcript');
+    return matchesQ && matchesScope;
+  });
+}
+
+function renderMockAdmin() {
+  const manualRows = filterMockRows(S.mockManualReviews);
+  const attemptRows = filterMockRows(S.mockAttempts);
+  const pending = S.mockManualReviews.filter(r=>['pending_review','in_review'].includes(String(r.manual_review_status||''))).length;
+  const manualStatus = document.getElementById('mockManualStatus');
+  const status = document.getElementById('mockStatus');
+  if (manualStatus) manualStatus.textContent = `${manualRows.length} shown · ${pending} pending`;
+  if (status) status.textContent = `${attemptRows.length} shown · ${S.mockAttempts.length} saved total`;
+  renderMockRows('mockManualBody', manualRows, true);
+  renderMockRows('mockBody', attemptRows, false);
+}
+
+function renderMockRows(targetId, rows, manualOnly) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = rows.length ? rows.map(r => {
+    const dt = fmtDate(r.completed_at || r.manual_review_paid_at);
+    const status = r.manual_review_status || (r.manual_review_paid ? 'pending_review' : 'not_requested');
+    return `<tr>
+      <td><div class="cell-main">${esc(r.user_name || r.user_email || 'Student')}</div><div class="cell-sub">${esc(r.user_email || r.id || '')}</div></td>
+      <td>${tierBadge(r.tier)}</td>
+      <td>${mockStatusBadge(status)}</td>
+      <td><div class="cell-main">${manualOnly ? (r.manual_review_paid ? 'Yes' : 'No') : (dt?.date || '—')}</div><div class="cell-sub">${manualOnly ? (fmtDate(r.manual_review_paid_at)?.date || '—') : (dt?.time || '')}</div></td>
+      <td><div class="mock-action-row"><button class="btn blue" onclick="openMockReader('${esc(r.id)}')">Reader</button><button class="btn" onclick="copyMockId('${esc(r.id)}')">Copy ID</button></div></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="5" style="text-align:center;padding:22px;color:var(--muted2);">${manualOnly ? 'No manual review requests match this filter.' : 'No saved mock attempts match this filter.'}</td></tr>`;
+}
+
+function mockStatusBadge(status) {
+  const s = String(status || 'not_requested');
+  const cls = s === 'completed' ? 'badge-yes' : s === 'pending_review' || s === 'in_review' ? 'badge-paid' : 'badge-default';
+  return `<span class="badge ${cls}">${esc(s.replace(/_/g,' '))}</span>`;
+}
+
+function openMockReader(attemptId = '') {
+  if (S.token) {
+    try { localStorage.setItem(SS_KEY, S.token); } catch {}
+  }
+  const params = new URLSearchParams();
+  if (attemptId) params.set('attempt_id', attemptId);
+  if (S.token) params.set('admin_token', S.token);
+  const url = `../mock-reader.html${params.toString() ? '?' + params.toString() : ''}`;
+  window.open(url, '_blank', 'noopener');
+}
+
+async function copyMockId(id) {
+  try {
+    await navigator.clipboard.writeText(id);
+    const note = document.getElementById('mockStatus');
+    if (note) note.textContent = `Copied attempt ID ${id}`;
+  } catch {
+    alert(id);
+  }
+}
+
 async function loadMMI() {
   const limit = document.getElementById('mmiLimit')?.value||'50';
   try {
@@ -2418,6 +2767,8 @@ async function exportCsv(type) {
 // ══════════════════════════════════════════════════════
 // MODAL BACKDROPS
 // ══════════════════════════════════════════════════════
+restoreBroadcastDraft();
+
 document.getElementById('creditModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCreditModal();});
 document.getElementById('tierModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeTierModal();});
 document.getElementById('ncModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeNewCompose();});
