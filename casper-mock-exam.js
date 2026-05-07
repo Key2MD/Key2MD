@@ -61,8 +61,11 @@ window.FullCasperMock = (() => {
   }
 
   async function checkoutMock(tier = config.tier) {
-    if (!window.Key2MDAuth?.isLoggedIn()) {
-      window.Key2MDAuth?.showAuthModal('signup');
+    if (!window.Key2MDAuth) {
+      throw new Error('The login system is still loading. Please refresh the page and try again.');
+    }
+    if (!window.Key2MDAuth.isLoggedIn()) {
+      window.Key2MDAuth.showAuthModal?.('signup');
       return;
     }
     const token = window.Key2MDAuth.getToken();
@@ -75,11 +78,24 @@ window.FullCasperMock = (() => {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || 'Could not start mock checkout');
+    if (!data.checkout_url) throw new Error('Checkout did not return a Stripe link. Make sure the patched worker is deployed.');
     window.location.href = data.checkout_url;
   }
 
   function tierLabel(tier = config.tier) {
     return tier === 'premium' ? 'Premium' : 'Transcript';
+  }
+
+  function setCheckoutState(isBusy, message = '') {
+    document.querySelectorAll('.mock-checkout-btn').forEach(btn => {
+      btn.disabled = isBusy;
+      btn.style.opacity = isBusy ? '0.72' : '1';
+      btn.textContent = isBusy ? 'Redirecting to Stripe...' : 'Buy & Start Full Mock';
+    });
+    document.querySelectorAll('.mock-checkout-status').forEach(status => {
+      status.textContent = message;
+      status.style.display = message ? 'block' : 'none';
+    });
   }
 
   function renderPriceLine(tier = config.tier) {
@@ -146,10 +162,18 @@ window.FullCasperMock = (() => {
     }
 
     document.addEventListener('click', event => {
+      const checkoutBtn = event.target?.closest?.('.mock-checkout-btn');
+      if (checkoutBtn) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        startMock();
+        return;
+      }
+
       if (event.target?.id === 'modeCasper' || event.target?.id === 'modeMMI') {
         if (active) deactivateMockMode();
       }
-    });
+    }, true);
   }
 
   function renderConfigPanel() {
@@ -159,6 +183,9 @@ window.FullCasperMock = (() => {
     const panel = document.createElement('div');
     panel.id = 'casperMockConfigPanel';
     panel.style.display = 'none';
+    panel.style.position = 'relative';
+    panel.style.zIndex = '80';
+    panel.style.pointerEvents = 'auto';
     panel.innerHTML = `
       <div class="sidebar-card" style="border-color:rgba(14,165,233,0.25);background:linear-gradient(180deg,rgba(14,165,233,0.06),#fff);">
         <h3>Full CASPer Mock</h3>
@@ -186,9 +213,10 @@ window.FullCasperMock = (() => {
           <div style="font-size:1rem;font-weight:800;color:var(--navy);">65-85 minutes</div>
         </div>
 
-        <button onclick="FullCasperMock.startMock()" style="width:100%;padding:13px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.92rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(10,22,40,0.25);">
+        <button type="button" class="mock-checkout-btn" style="position:relative;z-index:81;pointer-events:auto;width:100%;padding:13px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.92rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(10,22,40,0.25);">
           Buy & Start Full Mock
         </button>
+        <div class="mock-checkout-status" style="display:none;margin-top:9px;font-size:0.72rem;color:var(--gray500);line-height:1.45;text-align:center;"></div>
       </div>
     `;
     sidebar.appendChild(panel);
@@ -266,6 +294,9 @@ window.FullCasperMock = (() => {
       main.appendChild(area);
     }
     area.style.display = 'block';
+    area.style.position = 'relative';
+    area.style.zIndex = '80';
+    area.style.pointerEvents = 'auto';
     return area;
   }
 
@@ -303,29 +334,41 @@ window.FullCasperMock = (() => {
             <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;margin-top:6px;">7 written markings + 4 premium video analyses. $97 credit-equivalent value.</div>
           </div>
         </div>
-        <button onclick="FullCasperMock.startMock()" style="padding:13px 30px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.94rem;font-weight:800;cursor:pointer;font-family:inherit;">Buy & Start Full Mock</button>
+        <button type="button" class="mock-checkout-btn" style="position:relative;z-index:81;pointer-events:auto;padding:13px 30px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.94rem;font-weight:800;cursor:pointer;font-family:inherit;">Buy & Start Full Mock</button>
+        <div class="mock-checkout-status" style="display:none;margin-top:10px;font-size:0.78rem;color:var(--gray500);line-height:1.45;"></div>
       </div>
     `;
   }
 
   function startMock() {
     active = true;
-    if (!window.Key2MDAuth?.isLoggedIn()) {
-      window.Key2MDAuth?.showAuthModal('signup');
+    if (!window.Key2MDAuth) {
+      setCheckoutState(false, 'The login system is still loading. Please refresh the page and try again.');
+      alert('The login system is still loading. Please refresh the page and try again.');
+      return;
+    }
+    if (!window.Key2MDAuth.isLoggedIn()) {
+      if (typeof window.Key2MDAuth.showAuthModal === 'function') {
+        window.Key2MDAuth.showAuthModal('signup');
+      } else {
+        setCheckoutState(false, 'Please log in or create an account before starting the mock.');
+        alert('Please log in or create an account before starting the mock.');
+      }
+      return;
+    }
+
+    if (!hasMockPass(config.tier)) {
+      setCheckoutState(true, `Opening secure checkout for the ${tierLabel(config.tier)} Full CASPer Mock...`);
+      checkoutMock(config.tier).catch(err => {
+        setCheckoutState(false, err.message || 'Could not start checkout. Please try again.');
+        alert(err.message || 'Could not start checkout. Please try again.');
+      });
       return;
     }
 
     const casperPool = window.STATIONS || [];
     if (casperPool.length < VIDEO_COUNT + TYPED_COUNT) {
       alert('Not enough stations are available to build a full CASPer mock.');
-      return;
-    }
-
-    if (!hasMockPass(config.tier)) {
-      const selectedPrice = priceForTier(config.tier);
-      const confirmCopy = `Buy the ${tierLabel(config.tier)} Full CASPer Mock Exam pass for $${selectedPrice}${isCasperPro() ? ' with your CASPer Pro discount' : ''}?\n\nThis includes 7 written CASPer AI markings plus 4 CASPer video analyses.`;
-      if (!window.confirm(confirmCopy)) return;
-      checkoutMock(config.tier).catch(err => alert(err.message));
       return;
     }
 
