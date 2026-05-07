@@ -28,6 +28,8 @@ window.FullCasperMock = (() => {
   let originalSubmitMMI = null;
   let breakTimer = null;
   let breakLeft = 0;
+  let stationToken = 0;
+  let advancing = false;
 
   function byId(id) {
     return document.getElementById(id);
@@ -53,16 +55,53 @@ window.FullCasperMock = (() => {
     return isCasperPro() ? prices.pro : prices.standard;
   }
 
-  function hasMockPass(tier = config.tier) {
+  function returnedFromCheckout(tier = config.tier) {
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get('mock_payment') === 'success' && (params.get('mock_tier') || tier) === tier) {
-        sessionStorage.setItem(`k2md_mock_pass_${tier}`, '1');
+        return true;
       }
-      return sessionStorage.getItem(`k2md_mock_pass_${tier}`) === '1';
     } catch {
       return false;
     }
+    return false;
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function hasFullMockPass(status, tier = config.tier) {
+    return !!status?.active
+      && status.tier === tier
+      && Number(status.video_remaining || 0) >= VIDEO_COUNT
+      && Number(status.typed_remaining || 0) >= TYPED_COUNT;
+  }
+
+  async function fetchMockPassStatus() {
+    const auth = getAuth();
+    const token = auth?.getToken?.();
+    if (!token) return null;
+    const res = await fetch(`${window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev'}/api/casper-mock/status`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!res.ok) return null;
+    return await res.json().catch(() => null);
+  }
+
+  async function hasMockPass(tier = config.tier) {
+    const justReturned = returnedFromCheckout(tier);
+    const attempts = justReturned ? 6 : 1;
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      const status = await fetchMockPassStatus();
+      if (hasFullMockPass(status, tier)) return true;
+      if (justReturned && attempt < attempts - 1) await sleep(1200);
+    }
+    if (justReturned) {
+      throw new Error('Your payment was successful, but Stripe is still activating your mock pass. Wait a few seconds, then press Start again.');
+    }
+    return false;
   }
 
   async function checkoutMock(tier = config.tier) {
@@ -96,11 +135,11 @@ window.FullCasperMock = (() => {
     return `Buy ${tierLabel(config.tier)} Mock`;
   }
 
-  function setCheckoutState(isBusy, message = '') {
+  function setCheckoutState(isBusy, message = '', busyLabel = 'Redirecting to Stripe...') {
     document.querySelectorAll('.mock-checkout-btn').forEach(btn => {
       btn.disabled = isBusy;
       btn.style.opacity = isBusy ? '0.72' : '1';
-      btn.textContent = isBusy ? 'Redirecting to Stripe...' : checkoutButtonText();
+      btn.textContent = isBusy ? busyLabel : checkoutButtonText();
     });
     document.querySelectorAll('.mock-checkout-status').forEach(status => {
       status.textContent = message;
@@ -259,6 +298,10 @@ window.FullCasperMock = (() => {
     setCheckoutState(false);
   }
 
+  function refreshPricing() {
+    setTier(config.tier);
+  }
+
   function activateMockMode() {
     active = true;
     document.querySelectorAll('.mode-pill').forEach(pill => pill.classList.remove('active-casper', 'active-mmi', 'active-mock'));
@@ -273,6 +316,8 @@ window.FullCasperMock = (() => {
   function deactivateMockMode() {
     active = false;
     started = false;
+    advancing = false;
+    stationToken += 1;
     window.K2_ACTIVE_CASPER_MOCK = null;
     restoreSubmit();
     clearInterval(breakTimer);
@@ -293,6 +338,12 @@ window.FullCasperMock = (() => {
     document.querySelectorAll('.station-header,.nav-controls,#historyLinkBar').forEach(el => {
       el.style.display = show ? '' : 'none';
     });
+  }
+
+  function keepMockModeChrome() {
+    byId('modeCasper')?.classList.remove('active-casper');
+    byId('modeMMI')?.classList.remove('active-mmi');
+    byId('modeMock')?.classList.add('active-mock');
   }
 
   function hideNormalPanels() {
@@ -326,12 +377,12 @@ window.FullCasperMock = (() => {
     area.innerHTML = `
       <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:34px 32px;text-align:center;">
         <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Full CASPer Mock Exam</div>
-        <h2 style="font-size:1.7rem;line-height:1.2;color:var(--navy);margin:0 0 10px;">Train the whole test, not just isolated stations.</h2>
-        <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">This mock follows the current official sequence: 4 video scenarios first, then 7 typed scenarios. Use it once you have warmed up with single stations and want realistic pacing, fatigue, and format pressure.</p>
+        <h2 style="font-size:1.7rem;line-height:1.2;color:var(--navy);margin:0 0 10px;">Practise the full sequence in one sitting.</h2>
+        <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with the optional breaks built in. Use it once you want realistic pacing, fatigue, and format pressure.</p>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:720px;margin:0 auto 26px;text-align:left;">
           <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
             <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">4 video stations</div>
-            <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">Two questions per scenario, shown one at a time, one minute per answer.</div>
+            <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">Camera check first, then two questions per scenario, one minute per answer.</div>
           </div>
           <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
             <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">7 typed stations</div>
@@ -371,7 +422,7 @@ window.FullCasperMock = (() => {
     setTier(config.tier);
   }
 
-  function startMock() {
+  async function startMock() {
     active = true;
     const auth = getAuth();
     if (!auth) {
@@ -389,7 +440,16 @@ window.FullCasperMock = (() => {
       return;
     }
 
-    if (!hasMockPass(config.tier)) {
+    setCheckoutState(true, 'Checking your mock exam pass...', 'Checking pass...');
+    let passReady = false;
+    try {
+      passReady = await hasMockPass(config.tier);
+    } catch (err) {
+      setCheckoutState(false, err.message || 'Could not confirm your mock pass. Please try again.');
+      return;
+    }
+
+    if (!passReady) {
       setCheckoutState(true, `Opening secure checkout for the ${tierLabel(config.tier)} Full CASPer Mock...`);
       checkoutMock(config.tier).catch(err => {
         setCheckoutState(false, err.message || 'Could not start checkout. Please try again.');
@@ -397,6 +457,7 @@ window.FullCasperMock = (() => {
       });
       return;
     }
+    setCheckoutState(false);
 
     const casperPool = window.STATIONS || [];
     if (casperPool.length < VIDEO_COUNT + TYPED_COUNT) {
@@ -412,6 +473,8 @@ window.FullCasperMock = (() => {
     sequence = [...videos, ...typed];
     results = [];
     index = 0;
+    stationToken = 0;
+    advancing = false;
     started = true;
     window.K2_ACTIVE_CASPER_MOCK = { tier: config.tier };
     byId('casperMockMainArea')?.style.setProperty('display', 'none');
@@ -425,6 +488,8 @@ window.FullCasperMock = (() => {
       return;
     }
 
+    stationToken += 1;
+    advancing = false;
     clearInterval(breakTimer);
     hideNormalPanels();
     setStationChrome(true);
@@ -436,16 +501,11 @@ window.FullCasperMock = (() => {
     if (!bridge) return;
 
     if (item.type === 'video') {
-      patchSubmitForVideo();
-      bridge.setupSingleStation(item.station, 'mmi', {
-        preset: VIDEO_PRESET,
-        premium: config.tier === 'premium',
-        specialist: false,
-      });
-      const instruction = byId('speakingInstruction');
-      if (instruction) {
-        instruction.innerHTML = '<strong>CASPer video response</strong> - answer each question aloud. This mock uses one minute per response, matching the current video section.';
+      if (!window.webcamReady) {
+        renderCameraGate();
+        return;
       }
+      beginVideoStation(item, bridge);
     } else {
       restoreSubmit();
       bridge.setupSingleStation(item.station, 'casper', {
@@ -453,9 +513,79 @@ window.FullCasperMock = (() => {
         readingTime: CASPER_REFLECTION_SECONDS,
         writingTime: CASPER_TYPED_SECONDS,
       });
+      keepMockModeChrome();
     }
     hideNormalPanelsExceptStation();
     renderProgress();
+  }
+
+  function renderCameraGate() {
+    restoreSubmit();
+    setStationChrome(false);
+    byId('scenarioCard')?.style.setProperty('display', 'none');
+    byId('webcamPanel')?.style.setProperty('display', 'none');
+    const area = ensureMainArea();
+    if (!area) return;
+    area.style.display = 'block';
+    const label = `Video station ${Math.min(index + 1, VIDEO_COUNT)} of ${VIDEO_COUNT}`;
+    area.innerHTML = `
+      <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:34px 32px;text-align:center;">
+        <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Camera check</div>
+        <h2 style="font-size:1.55rem;line-height:1.25;color:var(--navy);margin:0 0 10px;">Ready for ${esc(label)}?</h2>
+        <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;max-width:620px;margin:0 auto 22px;">The video timer will not start until your camera and microphone are available. Allow browser access, then begin the station.</p>
+        <button type="button" id="mockCameraStartBtn" onclick="FullCasperMock.enableCameraAndStartVideoStation()" style="padding:13px 26px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.9rem;font-weight:850;cursor:pointer;font-family:inherit;">Enable camera & start station</button>
+        <div id="mockCameraGateStatus" style="display:none;margin-top:12px;font-size:0.78rem;color:var(--gray500);line-height:1.55;"></div>
+      </div>
+    `;
+    renderProgress();
+  }
+
+  async function enableCameraAndStartVideoStation() {
+    const status = byId('mockCameraGateStatus');
+    const btn = byId('mockCameraStartBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.style.opacity = '0.72';
+      btn.textContent = 'Checking camera...';
+    }
+    if (status) {
+      status.style.display = 'block';
+      status.textContent = 'If your browser asks, choose Allow for camera and microphone.';
+    }
+    const ok = typeof window.initWebcam === 'function' ? await window.initWebcam() : !!window.webcamReady;
+    if (ok || window.webcamReady) {
+      byId('casperMockMainArea')?.style.setProperty('display', 'none');
+      launchCurrent();
+      return;
+    }
+    if (status) {
+      status.style.color = '#dc2626';
+      status.textContent = 'Camera access was not available. Check browser permissions, then try again.';
+    }
+    if (btn) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = 'Try camera again';
+    }
+  }
+
+  function beginVideoStation(item, bridge) {
+    patchSubmitForVideo();
+    bridge.setupSingleStation(item.station, 'mmi', {
+      preset: VIDEO_PRESET,
+      premium: config.tier === 'premium',
+      specialist: false,
+    });
+    keepMockModeChrome();
+    const webcam = byId('webcamPanel');
+    if (webcam) {
+      webcam.classList.add('show');
+      webcam.style.display = '';
+    }
+    const instruction = byId('speakingInstruction');
+    if (instruction) {
+      instruction.innerHTML = '<strong>CASPer video response</strong> - answer each question aloud. This mock uses one minute per response, matching the current video section.';
+    }
   }
 
   function hideNormalPanelsExceptStation() {
@@ -508,11 +638,12 @@ window.FullCasperMock = (() => {
       if (after && after !== before) {
         const wrap = byId('aiFeedbackWrapMMI');
         if (wrap && !byId('mockContinueVideoBtn')) {
+          const token = stationToken;
           const btn = document.createElement('button');
           btn.id = 'mockContinueVideoBtn';
           btn.textContent = 'Continue mock';
           btn.style.cssText = 'margin-top:14px;padding:11px 22px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.86rem;font-weight:800;cursor:pointer;font-family:inherit;';
-          btn.onclick = () => completeAndAdvance(after);
+          btn.onclick = () => completeAndAdvance(after, token);
           wrap.appendChild(btn);
         }
       }
@@ -551,7 +682,7 @@ window.FullCasperMock = (() => {
           wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
           return true;
         }
-        completeAndAdvance(window._lastMMIFeedback || null);
+        completeAndAdvance(window._lastMMIFeedback || null, stationToken);
       }
       return true;
     }
@@ -569,14 +700,21 @@ window.FullCasperMock = (() => {
     }
     if (phase === 'done') {
       bridge.saveAnswer();
-      completeAndAdvance(bridge.getCurrentHistory());
+      completeAndAdvance(bridge.getCurrentHistory(), stationToken);
     }
     return true;
   }
 
-  function completeAndAdvance(payload) {
+  function completeAndAdvance(payload, token = stationToken) {
+    if (token !== stationToken || advancing) return;
+    advancing = true;
+    stationToken += 1;
     const bridge = window.K2PracticeBridge;
     const item = sequence[index];
+    if (!item) {
+      advancing = false;
+      return;
+    }
     const current = bridge?.getCurrentHistory?.();
     results.push({
       type: item.type,
@@ -590,15 +728,18 @@ window.FullCasperMock = (() => {
 
     const nextIndex = index + 1;
     if (nextIndex === VIDEO_COUNT) {
+      advancing = false;
       renderBreak(VIDEO_BREAK_SECONDS, 'Video section complete', 'Take the optional 10-minute break before the typed section, just like the real test.');
       return;
     }
     if (nextIndex === VIDEO_COUNT + 4) {
+      advancing = false;
       renderBreak(TYPED_BREAK_SECONDS, 'Typed station 4 complete', 'Take the optional 5-minute break before the final typed stations.');
       return;
     }
 
     index = nextIndex;
+    advancing = false;
     launchCurrent();
   }
 
@@ -631,6 +772,7 @@ window.FullCasperMock = (() => {
 
   function skipBreak() {
     clearInterval(breakTimer);
+    advancing = false;
     byId('casperMockMainArea')?.style.setProperty('display', 'none');
     if (index + 1 === VIDEO_COUNT || index + 1 === VIDEO_COUNT + 4) index++;
     launchCurrent();
@@ -1315,7 +1457,9 @@ window.FullCasperMock = (() => {
     deactivateMockMode,
     startMock,
     setTier,
+    refreshPricing,
     checkoutMock,
+    enableCameraAndStartVideoStation,
     skipBreak,
   };
 })();

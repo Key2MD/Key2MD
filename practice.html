@@ -333,10 +333,10 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <!-- Mode Toggle -->
     <div class="mode-toggle-wrap">
       <div class="mode-toggle-label">Practice Mode</div>
-      <div class="mode-pill-row" style="grid-template-columns:1fr 1fr 1fr;">
-        <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper');">💬 CASPer</button>
-        <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');">🎤 MMI</button>
-        <button class="mode-pill" id="modeMock" onclick="setMode('mock');FullCasperMock.activateMockMode();" style="font-size:0.72rem;">Full Mock</button>
+      <div class="mode-pill-row practice-mode-grid">
+        <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper');" aria-label="CASPer practice">CASPer</button>
+        <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');" aria-label="MMI practice">MMI</button>
+        <button class="mode-pill mode-pill-mock" id="modeMock" onclick="setMode('mock');FullCasperMock.activateMockMode();" aria-label="Full CASPer mock exam">Mock Exam</button>
       </div>
     </div>
 
@@ -1659,6 +1659,7 @@ window.K2PracticeBridge = {
     aiFeedbackWrap.innerHTML = '';
     const mmiWrap = document.getElementById('aiFeedbackWrapMMI');
     if (mmiWrap) mmiWrap.innerHTML = '';
+    if (mode === MODE_MMI && !webcamReady && typeof initWebcam === 'function') initWebcam();
     answerTextarea.readOnly = false;
     answerTextarea.classList.remove('locked','flash-expired');
     const banner = document.getElementById('timeUpBanner');
@@ -2070,7 +2071,10 @@ function applyModeUI(mode) {
 
   // Webcam
   const wp = $('webcamPanel');
-  if (wp) wp.className = 'webcam-panel' + (isCasper ? '' : ' show');
+  if (wp) {
+    wp.className = 'webcam-panel' + (isMMI ? ' show' : '');
+    wp.style.display = isMMI ? '' : 'none';
+  }
 
   // Timer mode picker (only idle CASPer)
   const tmp = $('timerModePicker');
@@ -4532,6 +4536,7 @@ window.addEventListener('DOMContentLoaded',function(){
     apiBase: API_BASE,
     onAuthChange: function(user) {
       updateLimitUI();
+      window.FullCasperMock?.refreshPricing?.();
       loadLeaderboardSettings();
       refreshLeaderboardData({silent:true});
       var hlb = document.getElementById('historyLinkBar');
@@ -5003,8 +5008,8 @@ document.addEventListener('DOMContentLoaded', function(){
 .pack-rec { font-size:0.68rem; font-weight:700; color:#fbbf24; background:rgba(245,158,11,0.15); padding:3px 10px; border-radius:50px; white-space:nowrap; }
 
 /* ── Full Mock Mode ── */
-.mode-pill.active-mock { border-color:#7c3aed; background:rgba(124,58,237,0.1); color:#7c3aed; }
-.mode-pill.active-mock:hover { border-color:#7c3aed; color:#7c3aed; }
+.mode-pill.active-mock { border-color:var(--navy); background:var(--navy); color:#fff; box-shadow:inset 0 -3px 0 var(--teal); }
+.mode-pill.active-mock:hover { border-color:var(--navy); color:#fff; }
 @keyframes mmi-spin { to { transform:rotate(360deg); } }
 
 /* ── Seen-before pills (4.4) ── */
