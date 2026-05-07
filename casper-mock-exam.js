@@ -82,6 +82,17 @@ window.FullCasperMock = (() => {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  function apiBase() {
+    return window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+  }
+
+  function authTokenOrThrow() {
+    const auth = getAuth();
+    const token = auth?.getToken?.();
+    if (!token) throw new Error('Please log in before starting the mock.');
+    return token;
+  }
+
   function clearDoneMonitor() {
     clearInterval(doneMonitorTimer);
     doneMonitorTimer = null;
@@ -112,7 +123,7 @@ window.FullCasperMock = (() => {
     const auth = getAuth();
     const token = auth?.getToken?.();
     if (!token) return null;
-    const res = await fetch(`${window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev'}/api/casper-mock/status`, {
+    const res = await fetch(`${apiBase()}/api/casper-mock/status`, {
       method: 'GET',
       headers: { 'Authorization': `Bearer ${token}` },
     });
@@ -146,7 +157,7 @@ window.FullCasperMock = (() => {
     const token = auth.getToken();
     const successUrl = `${window.location.origin}${window.location.pathname}?tab=mock&mock_payment=success&mock_tier=${encodeURIComponent(tier)}`;
     const cancelUrl = `${window.location.origin}${window.location.pathname}?tab=mock&mock_payment=cancelled`;
-    const res = await fetch(`${window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev'}/api/casper-mock/checkout`, {
+    const res = await fetch(`${apiBase()}/api/casper-mock/checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ tier, success_url: successUrl, cancel_url: cancelUrl }),
@@ -155,6 +166,41 @@ window.FullCasperMock = (() => {
     if (!res.ok) throw new Error(data.error || 'Could not start mock checkout');
     if (!data.checkout_url) throw new Error('Checkout did not return a Stripe link. Make sure the patched worker is deployed.');
     window.location.href = data.checkout_url;
+  }
+
+  async function startPrivateMockAttempt() {
+    const token = authTokenOrThrow();
+    const res = await fetch(`${apiBase()}/api/casper-mock/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ tier: config.tier, mock_slug: 'full-casper-mock-1' }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || data.error || 'Could not prepare the private mock stations.');
+    if (!data.attempt_id || !Array.isArray(data.sequence) || data.sequence.length < VIDEO_COUNT + TYPED_COUNT) {
+      throw new Error('The private mock bank is not ready yet. Check the D1 seed import.');
+    }
+    return data;
+  }
+
+  async function loadPrivateMockStation(item) {
+    if (!item || item.station) return item?.station || null;
+    const token = authTokenOrThrow();
+    const params = new URLSearchParams({
+      attempt_id: mockAttemptId,
+      station_order: String(item.order || index + 1),
+    });
+    const res = await fetch(`${apiBase()}/api/casper-mock/station?${params.toString()}`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || data.error || 'Could not load the next private mock station.');
+    if (!data.station?.scenario || !data.station?.prompt1) throw new Error('The private mock station is incomplete.');
+    item.station = data.station;
+    item.type = data.type === 'video' ? 'video' : 'typed';
+    item.order = Number(data.order || item.order || index + 1);
+    return item.station;
   }
 
   function tierLabel(tier = config.tier) {
@@ -499,31 +545,30 @@ window.FullCasperMock = (() => {
       return;
     }
 
-    beginMockExam();
+    beginMockExam().catch(err => {
+      setCheckoutState(false, err.message || 'Could not start the mock.');
+      alert(err.message || 'Could not start the mock.');
+    });
   }
 
-  function beginMockExam() {
-    const casperPool = window.STATIONS || [];
-    if (casperPool.length < VIDEO_COUNT + TYPED_COUNT) {
-      alert('Not enough stations are available to build a full CASPer mock.');
-      return;
-    }
-
-    const selected = balancedPick(casperPool, VIDEO_COUNT + TYPED_COUNT);
-    const videoStations = selected.slice(0, VIDEO_COUNT);
-    const typedStations = selected.slice(VIDEO_COUNT);
-    const videos = videoStations.map(station => ({ type: 'video', station }));
-    const typed = typedStations.map(station => ({ type: 'typed', station }));
-    sequence = [...videos, ...typed];
+  async function beginMockExam() {
+    setCheckoutState(true, 'Preparing your private mock stations...', 'Preparing...');
+    const mock = await startPrivateMockAttempt();
+    sequence = mock.sequence.slice(0, VIDEO_COUNT + TYPED_COUNT).map((entry, i) => ({
+      type: entry.type === 'video' ? 'video' : 'typed',
+      order: Number(entry.order || i + 1),
+      station: null,
+    }));
     results = [];
     index = 0;
-    mockAttemptId = (crypto.randomUUID ? crypto.randomUUID() : `mock_${Date.now()}_${Math.random().toString(16).slice(2)}`);
+    mockAttemptId = mock.attempt_id;
     savedAttemptId = null;
     latestReport = null;
     stationToken = 0;
     advancing = false;
     started = true;
-    window.K2_ACTIVE_CASPER_MOCK = { tier: config.tier };
+    window.K2_ACTIVE_CASPER_MOCK = { tier: config.tier, attempt_id: mockAttemptId };
+    setCheckoutState(false);
     byId('casperMockMainArea')?.style.setProperty('display', 'none');
     launchCurrent();
   }
@@ -633,7 +678,7 @@ window.FullCasperMock = (() => {
     const auth = getAuth();
     const token = auth?.getToken?.();
     if (!token || !mockAttemptId) throw new Error('Sign in required to save this mock attempt.');
-    const res = await fetch(`${window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev'}/api/casper-mock/attempts`, {
+    const res = await fetch(`${apiBase()}/api/casper-mock/attempts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({
@@ -665,7 +710,7 @@ window.FullCasperMock = (() => {
       if (status) status.textContent = 'Opening secure Stripe checkout for $300 AUD...';
       const successUrl = `${window.location.origin}${window.location.pathname}?tab=mock&manual_review=success&attempt_id=${encodeURIComponent(attemptId)}`;
       const cancelUrl = `${window.location.origin}${window.location.pathname}?tab=mock&manual_review=cancelled&attempt_id=${encodeURIComponent(attemptId)}`;
-      const res = await fetch(`${window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev'}/api/casper-mock/manual-review/checkout`, {
+      const res = await fetch(`${apiBase()}/api/casper-mock/manual-review/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ attempt_id: attemptId, success_url: successUrl, cancel_url: cancelUrl }),
@@ -690,14 +735,60 @@ window.FullCasperMock = (() => {
 
   function proceedAfterRules() {
     rulesAccepted = true;
-    beginMockExam();
+    beginMockExam().catch(err => {
+      setCheckoutState(false, err.message || 'Could not start the mock.');
+      alert(err.message || 'Could not start the mock.');
+    });
   }
 
-  function launchCurrent() {
+  function renderStationLoading() {
+    setStationChrome(false);
+    byId('scenarioCard')?.style.setProperty('display', 'none');
+    const area = ensureMainArea();
+    if (!area) return;
+    area.style.display = 'block';
+    area.innerHTML = `
+      <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:34px 32px;text-align:center;">
+        <div style="width:30px;height:30px;border:3px solid var(--gray200);border-top-color:var(--teal);border-radius:50%;animation:mmi-spin 0.8s linear infinite;margin:0 auto 14px;"></div>
+        <div style="font-size:0.72rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:8px;">Private station bank</div>
+        <h2 style="font-size:1.35rem;color:var(--navy);line-height:1.25;margin:0 0 8px;">Loading the next station.</h2>
+        <p style="font-size:0.86rem;color:var(--gray500);line-height:1.6;margin:0;">Only this station is being sent to your browser.</p>
+      </div>
+    `;
+  }
+
+  function renderStationLoadError(message) {
+    setStationChrome(false);
+    byId('scenarioCard')?.style.setProperty('display', 'none');
+    const area = ensureMainArea();
+    if (!area) return;
+    area.style.display = 'block';
+    area.innerHTML = `
+      <div style="background:#fff;border:1px solid rgba(220,38,38,0.22);border-radius:16px;padding:34px 32px;text-align:center;">
+        <div style="font-size:0.72rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:#dc2626;margin-bottom:8px;">Station unavailable</div>
+        <h2 style="font-size:1.35rem;color:var(--navy);line-height:1.25;margin:0 0 8px;">Could not load this station.</h2>
+        <p style="font-size:0.86rem;color:var(--gray600);line-height:1.6;margin:0 auto 18px;max-width:560px;">${esc(message || 'Please refresh and try again. Your mock pass remains on your account.')}</p>
+        <button type="button" onclick="FullCasperMock.activateMockMode()" style="padding:11px 20px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.86rem;font-weight:800;cursor:pointer;font-family:inherit;">Back to mock start</button>
+      </div>
+    `;
+  }
+
+  async function launchCurrent() {
     const item = sequence[index];
     if (!item) {
       renderDebrief();
       return;
+    }
+
+    if (!item.station) {
+      renderStationLoading();
+      try {
+        await loadPrivateMockStation(item);
+      } catch (err) {
+        renderStationLoadError(err.message);
+        return;
+      }
+      byId('casperMockMainArea')?.style.setProperty('display', 'none');
     }
 
     stationToken += 1;
