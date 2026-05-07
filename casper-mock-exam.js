@@ -30,6 +30,7 @@ window.FullCasperMock = (() => {
   let breakLeft = 0;
   let stationToken = 0;
   let advancing = false;
+  let rulesAccepted = false;
 
   function byId(id) {
     return document.getElementById(id);
@@ -132,7 +133,7 @@ window.FullCasperMock = (() => {
   }
 
   function checkoutButtonText() {
-    return `Buy ${tierLabel(config.tier)} Mock`;
+    return `Buy & Enter ${tierLabel(config.tier)} Mock`;
   }
 
   function setCheckoutState(isBusy, message = '', busyLabel = 'Redirecting to Stripe...') {
@@ -273,6 +274,7 @@ window.FullCasperMock = (() => {
 
   function setTier(tier) {
     config.tier = tier === 'premium' ? 'premium' : 'transcript';
+    rulesAccepted = false;
     document.querySelectorAll('[data-mock-tier]').forEach(btn => {
       const selected = btn.dataset.mockTier === config.tier;
       btn.classList.toggle('active', selected);
@@ -317,6 +319,7 @@ window.FullCasperMock = (() => {
     active = false;
     started = false;
     advancing = false;
+    rulesAccepted = false;
     stationToken += 1;
     window.K2_ACTIVE_CASPER_MOCK = null;
     restoreSubmit();
@@ -450,6 +453,7 @@ window.FullCasperMock = (() => {
     }
 
     if (!passReady) {
+      rulesAccepted = false;
       setCheckoutState(true, `Opening secure checkout for the ${tierLabel(config.tier)} Full CASPer Mock...`);
       checkoutMock(config.tier).catch(err => {
         setCheckoutState(false, err.message || 'Could not start checkout. Please try again.');
@@ -459,6 +463,15 @@ window.FullCasperMock = (() => {
     }
     setCheckoutState(false);
 
+    if (!rulesAccepted) {
+      renderRulesGate();
+      return;
+    }
+
+    beginMockExam();
+  }
+
+  function beginMockExam() {
     const casperPool = window.STATIONS || [];
     if (casperPool.length < VIDEO_COUNT + TYPED_COUNT) {
       alert('Not enough stations are available to build a full CASPer mock.');
@@ -479,6 +492,55 @@ window.FullCasperMock = (() => {
     window.K2_ACTIVE_CASPER_MOCK = { tier: config.tier };
     byId('casperMockMainArea')?.style.setProperty('display', 'none');
     launchCurrent();
+  }
+
+  function renderRulesGate() {
+    hideNormalPanels();
+    setStationChrome(false);
+    byId('casperMockConfigPanel')?.style.setProperty('display', 'block');
+    const area = ensureMainArea();
+    if (!area) return;
+    area.style.display = 'block';
+    area.innerHTML = `
+      <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;overflow:hidden;">
+        <div style="background:var(--navy);padding:26px 30px;color:#fff;">
+          <div style="font-size:0.7rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:8px;">Before you begin</div>
+          <h2 style="font-size:1.55rem;line-height:1.25;margin:0 0 8px;">Full CASPer Mock Exam rules</h2>
+          <p style="font-size:0.9rem;color:rgba(255,255,255,0.68);line-height:1.6;margin:0;max-width:720px;">Your mock pass is active. Read this once, then proceed when you are ready to start the first video station.</p>
+        </div>
+        <div style="padding:26px 30px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:20px;">
+            ${ruleCard('Sequence', '4 video-response scenarios first, then an optional 10-minute break, then 7 typed-response scenarios.')}
+            ${ruleCard('Video section', 'Camera and microphone are required. The video timer starts only after the camera check, so permission issues will not burn exam time.')}
+            ${ruleCard('Typed section', 'Each typed scenario gives a short reflection period, then 3:30 total writing time for two prompts.')}
+            ${ruleCard('Breaks', 'You can take the built-in 10-minute and 5-minute breaks, or continue early. Leaving the page may interrupt the mock.')}
+            ${ruleCard('Feedback', config.tier === 'premium' ? 'Premium includes transcript, voice, pacing, and presentation analysis for video stations.' : 'Transcript mock analyses what you said in video stations without voice or presentation scoring.')}
+            ${ruleCard('Report', 'The final report compares your performance against the Key2MD cohort of serious, actively preparing applicants. It is a practice estimate, not an official Acuity result.')}
+          </div>
+          <div style="background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:14px 16px;font-size:0.82rem;color:var(--gray600);line-height:1.6;margin-bottom:18px;">
+            Best setup: quiet room, charger plugged in, browser tab kept open, camera permission allowed, and no page refresh once the exam starts.
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap;">
+            <button type="button" onclick="FullCasperMock.activateMockMode()" style="padding:11px 18px;border-radius:50px;border:1px solid var(--gray200);background:#fff;color:var(--gray600);font-size:0.84rem;font-weight:800;cursor:pointer;font-family:inherit;">Back</button>
+            <button type="button" onclick="FullCasperMock.proceedAfterRules()" style="padding:12px 24px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.9rem;font-weight:850;cursor:pointer;font-family:inherit;">I understand - proceed</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function ruleCard(title, body) {
+    return `
+      <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px 15px;">
+        <div style="font-size:0.72rem;font-weight:900;color:var(--navy);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">${esc(title)}</div>
+        <div style="font-size:0.78rem;color:var(--gray500);line-height:1.5;">${esc(body)}</div>
+      </div>
+    `;
+  }
+
+  function proceedAfterRules() {
+    rulesAccepted = true;
+    beginMockExam();
   }
 
   function launchCurrent() {
@@ -1190,6 +1252,7 @@ window.FullCasperMock = (() => {
 
   function renderDebrief() {
     started = false;
+    rulesAccepted = false;
     restoreSubmit();
     window.K2_ACTIVE_CASPER_MOCK = null;
     window.K2PracticeBridge?.hardStopSession?.();
@@ -1459,6 +1522,7 @@ window.FullCasperMock = (() => {
     setTier,
     refreshPricing,
     checkoutMock,
+    proceedAfterRules,
     enableCameraAndStartVideoStation,
     skipBreak,
   };
