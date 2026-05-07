@@ -92,11 +92,15 @@ window.FullCasperMock = (() => {
     return tier === 'premium' ? 'Premium' : 'Transcript';
   }
 
+  function checkoutButtonText() {
+    return `Buy ${tierLabel(config.tier)} Mock`;
+  }
+
   function setCheckoutState(isBusy, message = '') {
     document.querySelectorAll('.mock-checkout-btn').forEach(btn => {
       btn.disabled = isBusy;
       btn.style.opacity = isBusy ? '0.72' : '1';
-      btn.textContent = isBusy ? 'Redirecting to Stripe...' : 'Buy & Start Full Mock';
+      btn.textContent = isBusy ? 'Redirecting to Stripe...' : checkoutButtonText();
     });
     document.querySelectorAll('.mock-checkout-status').forEach(status => {
       status.textContent = message;
@@ -202,15 +206,15 @@ window.FullCasperMock = (() => {
         <div style="margin-bottom:14px;">
           <div style="font-size:0.72rem;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Video feedback tier</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-            <button class="mock-tier-btn active" data-tier="transcript" onclick="FullCasperMock.setTier('transcript')" style="padding:9px 6px;border-radius:8px;border:1px solid rgba(14,165,233,0.45);background:rgba(14,165,233,0.09);color:var(--teal3);font-size:0.78rem;font-weight:800;cursor:pointer;font-family:inherit;">Transcript</button>
-            <button class="mock-tier-btn" data-tier="premium" onclick="FullCasperMock.setTier('premium')" style="padding:9px 6px;border-radius:8px;border:1px solid var(--gray200);background:var(--gray50);color:var(--gray600);font-size:0.78rem;font-weight:800;cursor:pointer;font-family:inherit;">Premium</button>
+            <button class="mock-tier-btn active" data-mock-tier="transcript" onclick="FullCasperMock.setTier('transcript')" style="padding:9px 6px;border-radius:8px;border:1px solid rgba(14,165,233,0.45);background:rgba(14,165,233,0.09);color:var(--teal3);font-size:0.78rem;font-weight:800;cursor:pointer;font-family:inherit;">Transcript</button>
+            <button class="mock-tier-btn" data-mock-tier="premium" onclick="FullCasperMock.setTier('premium')" style="padding:9px 6px;border-radius:8px;border:1px solid var(--gray200);background:var(--gray50);color:var(--gray600);font-size:0.78rem;font-weight:800;cursor:pointer;font-family:inherit;">Premium</button>
           </div>
-          <div id="mockTierCopy" style="font-size:0.7rem;color:var(--gray400);line-height:1.45;margin-top:8px;">Transcript analysis reviews the substance of what you said. Premium adds voice and presentation analysis.</div>
+          <div id="mockTierCopy" data-mock-tier-copy="sidebar" style="font-size:0.7rem;color:var(--gray400);line-height:1.45;margin-top:8px;">Transcript analysis reviews the substance of what you said. Premium adds voice and presentation analysis.</div>
         </div>
 
         <div style="background:#fff;border:1px solid rgba(14,165,233,0.24);border-radius:10px;padding:12px;margin-bottom:14px;">
           <div style="font-size:0.68rem;font-weight:800;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Mock exam pass</div>
-          <div id="mockPriceLine" style="font-size:0.86rem;color:var(--navy);line-height:1.45;">${renderPriceLine('transcript')}</div>
+          <div id="mockPriceLine" data-mock-price-line style="font-size:0.86rem;color:var(--navy);line-height:1.45;">${renderPriceLine('transcript')}</div>
           <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes 7 written CASPer AI markings and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
         </div>
 
@@ -220,7 +224,7 @@ window.FullCasperMock = (() => {
         </div>
 
         <button type="button" class="mock-checkout-btn" style="position:relative;z-index:81;pointer-events:auto;width:100%;padding:13px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.92rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(10,22,40,0.25);">
-          Buy & Start Full Mock
+          ${checkoutButtonText()}
         </button>
         <div class="mock-checkout-status" style="display:none;margin-top:9px;font-size:0.72rem;color:var(--gray500);line-height:1.45;text-align:center;"></div>
       </div>
@@ -230,19 +234,29 @@ window.FullCasperMock = (() => {
 
   function setTier(tier) {
     config.tier = tier === 'premium' ? 'premium' : 'transcript';
-    document.querySelectorAll('.mock-tier-btn').forEach(btn => {
-      const selected = btn.dataset.tier === config.tier;
+    document.querySelectorAll('[data-mock-tier]').forEach(btn => {
+      const selected = btn.dataset.mockTier === config.tier;
       btn.classList.toggle('active', selected);
+      btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
       btn.style.border = selected ? '1px solid rgba(14,165,233,0.45)' : '1px solid var(--gray200)';
       btn.style.background = selected ? 'rgba(14,165,233,0.09)' : 'var(--gray50)';
       btn.style.color = selected ? 'var(--teal3)' : 'var(--gray600)';
     });
-    const copy = byId('mockTierCopy');
-    if (copy) copy.textContent = config.tier === 'premium'
-      ? 'Premium uses the current video analysis flow: transcript, voice pacing, and presentation signals.'
-      : 'Transcript analysis reviews the substance of what you said, without sending visual snapshots.';
-    const price = byId('mockPriceLine');
-    if (price) price.innerHTML = renderPriceLine(config.tier);
+    document.querySelectorAll('[data-mock-tier-copy]').forEach(copy => {
+      if (copy.dataset.mockTierCopy === 'short') {
+        copy.innerHTML = config.tier === 'premium'
+          ? 'Premium adds voice, pacing, and presentation feedback to the video stations. <a href="plans.html#mock" style="color:var(--teal3);font-weight:800;text-decoration:none;">See full details</a>.'
+          : 'Transcript analyses what you said in the video stations, without voice or presentation review. <a href="plans.html#mock" style="color:var(--teal3);font-weight:800;text-decoration:none;">See full details</a>.';
+      } else {
+        copy.textContent = config.tier === 'premium'
+          ? 'Premium uses the current video analysis flow: transcript, voice pacing, and presentation signals.'
+          : 'Transcript analysis reviews the substance of what you said, without sending visual snapshots.';
+      }
+    });
+    document.querySelectorAll('[data-mock-price-line]').forEach(price => {
+      price.innerHTML = renderPriceLine(config.tier);
+    });
+    setCheckoutState(false);
   }
 
   function activateMockMode() {
@@ -328,22 +342,33 @@ window.FullCasperMock = (() => {
             <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">Optional 10-minute and 5-minute breaks built into the flow.</div>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:640px;margin:0 auto 24px;text-align:left;">
-          <div style="border:1px solid rgba(14,165,233,0.22);background:rgba(14,165,233,0.05);border-radius:12px;padding:15px;">
-            <div style="font-size:0.72rem;font-weight:800;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Transcript Mock</div>
-            <div style="font-size:1.35rem;font-weight:900;color:var(--navy);">$59 <span style="font-size:0.8rem;color:var(--gray400);font-weight:700;">or $41 Pro</span></div>
-            <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;margin-top:6px;">7 written markings + 4 transcript video analyses. $69 credit-equivalent value.</div>
-          </div>
-          <div style="border:1px solid rgba(124,58,237,0.24);background:rgba(124,58,237,0.06);border-radius:12px;padding:15px;">
-            <div style="font-size:0.72rem;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Premium Mock</div>
-            <div style="font-size:1.35rem;font-weight:900;color:var(--navy);">$79 <span style="font-size:0.8rem;color:var(--gray400);font-weight:700;">or $55 Pro</span></div>
-            <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;margin-top:6px;">7 written markings + 4 premium video analyses. $97 credit-equivalent value.</div>
+        <div style="max-width:680px;margin:0 auto 18px;text-align:left;">
+          <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:9px;text-align:center;">Choose your mock</div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
+            <button type="button" data-mock-tier="transcript" onclick="FullCasperMock.setTier('transcript')" aria-pressed="true" style="text-align:left;border:1px solid rgba(14,165,233,0.45);background:rgba(14,165,233,0.09);border-radius:12px;padding:15px;cursor:pointer;font-family:inherit;color:var(--teal3);">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;">
+                <div style="font-size:0.72rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;">Transcript Mock</div>
+                <div style="font-size:0.66rem;font-weight:900;background:#fff;border:1px solid rgba(14,165,233,0.22);border-radius:50px;padding:3px 8px;white-space:nowrap;">Best value</div>
+              </div>
+              <div style="font-size:1.35rem;font-weight:900;color:var(--navy);">$59 <span style="font-size:0.8rem;color:var(--gray400);font-weight:700;">or $41 Pro</span></div>
+              <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;margin-top:6px;">Written feedback plus transcript-based video analysis.</div>
+            </button>
+            <button type="button" data-mock-tier="premium" onclick="FullCasperMock.setTier('premium')" aria-pressed="false" style="text-align:left;border:1px solid var(--gray200);background:var(--gray50);border-radius:12px;padding:15px;cursor:pointer;font-family:inherit;color:var(--gray600);">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;">
+                <div style="font-size:0.72rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;">Premium Mock</div>
+                <div style="font-size:0.66rem;font-weight:900;background:#fff;border:1px solid rgba(124,58,237,0.18);border-radius:50px;padding:3px 8px;white-space:nowrap;">Full video</div>
+              </div>
+              <div style="font-size:1.35rem;font-weight:900;color:var(--navy);">$79 <span style="font-size:0.8rem;color:var(--gray400);font-weight:700;">or $55 Pro</span></div>
+              <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;margin-top:6px;">Adds voice, pacing, and presentation analysis.</div>
+            </button>
           </div>
         </div>
-        <button type="button" class="mock-checkout-btn" style="position:relative;z-index:81;pointer-events:auto;padding:13px 30px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.94rem;font-weight:800;cursor:pointer;font-family:inherit;">Buy & Start Full Mock</button>
+        <button type="button" class="mock-checkout-btn" style="position:relative;z-index:81;pointer-events:auto;padding:13px 30px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.94rem;font-weight:800;cursor:pointer;font-family:inherit;">${checkoutButtonText()}</button>
         <div class="mock-checkout-status" style="display:none;margin-top:10px;font-size:0.78rem;color:var(--gray500);line-height:1.45;"></div>
+        <div data-mock-tier-copy="short" style="max-width:620px;margin:13px auto 0;font-size:0.78rem;color:var(--gray500);line-height:1.55;">Transcript analyses what you said in the video stations, without voice or presentation review. <a href="plans.html#mock" style="color:var(--teal3);font-weight:800;text-decoration:none;">See full details</a>.</div>
       </div>
     `;
+    setTier(config.tier);
   }
 
   function startMock() {
