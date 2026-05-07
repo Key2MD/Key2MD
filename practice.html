@@ -12,13 +12,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Free CASPer &amp; MMI Practice — Timed Stations, AI Feedback | Key2MD</title>
-  <meta name="description" content="Free CASPer &amp; MMI practice for Australian medical applicants. Timed stations, AI feedback, 90+ CASPer scenarios and 40+ MMI stations including circuit mode. Built by a UniMelb MD.">
+  <meta name="description" content="Free CASPer &amp; MMI practice for Australian medical applicants. Timed stations, AI feedback, 90+ CASPer scenarios, 40+ MMI stations, and a full CASPer mock exam. Built by a UniMelb MD.">
   <link rel="canonical" href="https://www.key2md.com/practice.html">
   <!-- Favicon (inline SVG, matches Key2MD brand) -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a1628'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' font-size='28' font-weight='800' fill='white'%3EK%3Ctspan fill='%230ea5e9'%3E2%3C/tspan%3E%3C/text%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%230a1628'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' font-size='80' font-weight='800' fill='white'%3EK%3Ctspan fill='%230ea5e9'%3E2%3C/tspan%3E%3C/text%3E%3C/svg%3E">
   <meta property="og:title" content="Free CASPer &amp; MMI Practice — Timed Stations, AI Feedback">
-  <meta property="og:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and circuit mode. For Australian med applicants.">
+  <meta property="og:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and a full CASPer mock exam. For Australian med applicants.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.key2md.com/practice.html">
   <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
@@ -29,7 +29,7 @@
   <meta property="og:image:alt" content="Key2MD — MMI, CASPer and GAMSAT Section II coaching.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Free CASPer &amp; MMI Practice — Timed Stations, AI Feedback">
-  <meta name="twitter:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and circuit mode. For Australian med applicants.">
+  <meta name="twitter:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and a full CASPer mock exam. For Australian med applicants.">
   <link rel="stylesheet" href="practice.css">
   <link rel="stylesheet" href="mmi-styles.css">
   <script type="application/ld+json">
@@ -336,7 +336,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="mode-pill-row" style="grid-template-columns:1fr 1fr 1fr;">
         <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper');">💬 CASPer</button>
         <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');">🎤 MMI</button>
-        <button class="mode-pill" id="modeCircuit" onclick="setMode('circuit');MMICircuit.activateCircuitMode();" style="font-size:0.78rem;">🏃 Circuit</button>
+        <button class="mode-pill" id="modeMock" onclick="setMode('mock');FullCasperMock.activateMockMode();" style="font-size:0.72rem;">Full Mock</button>
       </div>
     </div>
 
@@ -344,7 +344,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
     <!-- Unified category card — header + coverage + filters all swap based on mode.
          Hidden ID aliases (casperCategoryCard, mmiCategoryCard) preserved on
-         inner blocks so legacy code (mmi-circuit.js, etc.) that targets them
+         inner blocks so legacy code that targets them
          keeps working without changes. -->
     <div class="sidebar-card" id="categoryCard">
       <h3 id="categoryCardHeader">Category</h3>
@@ -759,17 +759,17 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
                 <div class="tmc-desc">90s read · 6:00 write. Space to develop ideas fully.</div>
               </label>
             </div>
-            <div id="specialAccommodationPicker" style="margin-top:12px;padding:12px;border-radius:14px;background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.16);">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
-                <div>
-                  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);">Special Accommodations</div>
-                  <div id="specialAccommodationSummary" style="font-size:0.72rem;color:var(--gray500);line-height:1.45;margin-top:2px;">Standard timing selected.</div>
+            <div id="specialAccommodationPicker" style="margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(14,165,233,0.035);border:1px solid rgba(14,165,233,0.12);">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                <div style="min-width:115px;flex:1;">
+                  <div style="font-size:0.62rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal3);line-height:1.2;">Special accommodations</div>
+                  <div id="specialAccommodationSummary" style="font-size:0.64rem;color:var(--gray400);line-height:1.25;margin-top:1px;">Standard timing</div>
                 </div>
-              </div>
-              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:7px;">
-                <button type="button" id="accommodation1x" onclick="setAccommodationMultiplier(1)" style="padding:8px 10px;border-radius:999px;border:1.5px solid rgba(14,165,233,0.18);background:#fff;color:var(--gray700);font-size:0.76rem;font-weight:800;cursor:pointer;font-family:inherit;">Default</button>
-                <button type="button" id="accommodation15x" onclick="setAccommodationMultiplier(1.5)" style="padding:8px 10px;border-radius:999px;border:1.5px solid rgba(14,165,233,0.18);background:#fff;color:var(--gray700);font-size:0.76rem;font-weight:800;cursor:pointer;font-family:inherit;">1.5x time</button>
-                <button type="button" id="accommodation2x" onclick="setAccommodationMultiplier(2)" style="padding:8px 10px;border-radius:999px;border:1.5px solid rgba(14,165,233,0.18);background:#fff;color:var(--gray700);font-size:0.76rem;font-weight:800;cursor:pointer;font-family:inherit;">2.0x time</button>
+                <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                  <button type="button" id="accommodation1x" onclick="setAccommodationMultiplier(1)" style="padding:4px 8px;border-radius:999px;border:1px solid rgba(14,165,233,0.18);background:#fff;color:var(--gray700);font-size:0.66rem;font-weight:800;cursor:pointer;font-family:inherit;line-height:1.1;">1x</button>
+                  <button type="button" id="accommodation15x" onclick="setAccommodationMultiplier(1.5)" style="padding:4px 8px;border-radius:999px;border:1px solid rgba(14,165,233,0.18);background:#fff;color:var(--gray700);font-size:0.66rem;font-weight:800;cursor:pointer;font-family:inherit;line-height:1.1;">1.5x</button>
+                  <button type="button" id="accommodation2x" onclick="setAccommodationMultiplier(2)" style="padding:4px 8px;border-radius:999px;border:1px solid rgba(14,165,233,0.18);background:#fff;color:var(--gray700);font-size:0.66rem;font-weight:800;cursor:pointer;font-family:inherit;line-height:1.1;">2x</button>
+                </div>
               </div>
             </div>
             <div id="timerModeHint" style="margin-top:10px;font-size:0.72rem;color:var(--gray400);text-align:center;line-height:1.5;">
@@ -920,7 +920,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
          here to keep the sidebar fitting in one viewport.
          IDs are preserved (categoryHeatmapCard, statCompleted, statAvg,
          heatmapRows etc.) so existing JS targeting them continues to work
-         with no changes. mmi-circuit.js hides this rail in Circuit mode.
+         with no changes. Full mock mode hides this rail during the exam.
          ════════════════════════════════════════════════════════════════════ -->
     <div class="bottom-rail" id="bottomRail">
       <!-- Session Stats -->
@@ -1067,11 +1067,14 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 <script src="mmi-recording.js"></script>
 <script src="mmi-engine.js"></script>
 <script src="mmi-feedback-render.js"></script>
-<script src="mmi-circuit.js"></script>
+<script src="casper-mock-exam.js"></script>
 <script>
+window.STATIONS = STATIONS;
+window.MMI_STATIONS = MMI_STATIONS;
 // ══ MMI CONFIG & STATE ══════════════════════════════════════════════
 const MMI_PRESETS = {
   quickfire: { readingTime:45,  recordingTime:300, promptCount:4, revealMode:'quickfire',            perPromptRead:15, perPromptAnswer:60 },
+  casperVideo:{ readingTime:30,  recordingTime:120, promptCount:2, revealMode:'quickfire',            perPromptRead:10, perPromptAnswer:60 },
   standard:  { readingTime:120, recordingTime:300, promptCount:3, revealMode:'all_at_once' },
   extended:  { readingTime:120, recordingTime:480, promptCount:4, revealMode:'extended_sequential' },
   random:    { readingTime:120, recordingTime:420, promptCount:3, revealMode:'random',               followUpMin:1, followUpMax:2 },
@@ -1357,7 +1360,10 @@ async function submitMMIForFeedback() {
     const audioFile = new File([finalBlob], 'recording.webm', { type: finalBlob.type || 'audio/webm' });
     const fd = new FormData();
     fd.append('audio', audioFile);
-    fd.append('station_id', s.id || `mmi_${MMI_STATIONS.indexOf(s)}`);
+    const mmiStationIdx = MMI_STATIONS.indexOf(s);
+    const casperStationIdx = typeof STATIONS !== 'undefined' ? STATIONS.indexOf(s) : -1;
+    const stationId = s.id || (mmiStationIdx >= 0 ? `mmi_${mmiStationIdx}` : casperStationIdx >= 0 ? `casper_video_${casperStationIdx}` : 'casper_video_mock');
+    fd.append('station_id', stationId);
     fd.append('station_category', s.category || '');
     fd.append('station_scenario', s.scenario || '');
     fd.append('prompts', JSON.stringify(mmiCurrentPrompts));
@@ -1368,6 +1374,10 @@ async function submitMMIForFeedback() {
     fd.append('tier', tier);
     fd.append('specialist_mode', mmiSpecialistMode ? '1' : '0');
     fd.append('use_credit', '1');
+    if (window.K2_ACTIVE_CASPER_MOCK) {
+      fd.append('mock_exam', '1');
+      fd.append('mock_tier', window.K2_ACTIVE_CASPER_MOCK.tier || tier);
+    }
     fd.append('visual_degraded', visualDegraded ? '1' : '0');
     // Append frames for Premium
     frames.forEach((frame, i) => fd.append(`frame_${i}`, frame, `frame_${i}.jpg`));
@@ -1466,7 +1476,7 @@ async function updateMMILimitsUI() {
 // ══ STATE ══
 const MODE_CASPER = 'casper';
 const MODE_MMI = 'mmi';
-const MODE_CIRCUIT = 'circuit';
+const MODE_MOCK = 'mock';
 let currentMode = MODE_CASPER;
 
 // ══ STATION HISTORY (localStorage, spaced-rep) ══════════════════════════════
@@ -1570,6 +1580,88 @@ Object.defineProperty(window,'mmiRecordingStartedAt',{get:()=>mmiRecordingStarte
 let timerInterval=null,phase='idle',sessionActive=false;
 let selectedCategory='All',readingTime=60,writingTime=210;
 let mmiReadingTime=120,mmiAnswerTime=300;
+window.K2PracticeBridge = {
+  getMode: () => currentMode,
+  getPhase: () => phase,
+  setMode: mode => setMode(mode),
+  setPhase: p => setPhaseUI(p),
+  clearTimer: () => clearTimer(),
+  startWriting: () => startWriting(),
+  stopRecording: () => stopRecording(),
+  saveAnswer: () => saveAnswer(),
+  getCurrentHistory: () => sessionHistory[currentIdx] || null,
+  getSessionHistory: () => sessionHistory,
+  setupSingleStation(station, mode, options = {}) {
+    setMode(mode);
+    if (mode === MODE_MMI) {
+      if (options.preset && typeof selectMMIPreset === 'function') selectMMIPreset(options.preset);
+      if (typeof options.premium === 'boolean') {
+        mmiPremiumMode = options.premium;
+        const premiumToggle = document.getElementById('premiumModeToggle');
+        if (premiumToggle) premiumToggle.checked = mmiPremiumMode;
+        const disclaimer = document.getElementById('premiumDisclaimer');
+        if (disclaimer) disclaimer.style.display = mmiPremiumMode ? 'block' : 'none';
+        if (mmiPremiumMode && !ffmpegLoaded && !ffmpegLoading) loadFFmpeg();
+      }
+      if (typeof options.specialist === 'boolean') {
+        mmiSpecialistMode = options.specialist;
+        const specialistToggle = document.getElementById('specialistModeToggle');
+        if (specialistToggle) specialistToggle.checked = mmiSpecialistMode;
+      }
+    } else if (mode === MODE_CASPER) {
+      if (options.timerMode) currentTimerMode = options.timerMode;
+      if (Number.isFinite(options.readingTime)) {
+        readingTime = options.readingTime;
+        const rs = document.getElementById('readingSlider');
+        const rv = document.getElementById('readingVal');
+        if (rs) rs.value = readingTime;
+        if (rv) rv.textContent = readingTime ? fmt(readingTime) : 'Off';
+      }
+      if (Number.isFinite(options.writingTime)) {
+        writingTime = options.writingTime;
+        const ws = document.getElementById('writingSlider');
+        const wv = document.getElementById('writingVal');
+        if (ws) ws.value = writingTime;
+        if (wv) wv.textContent = writingTime ? fmt(writingTime) : 'Off';
+      }
+    }
+    pool = [station];
+    sessionPool = [station];
+    currentIdx = 0;
+    completed = 0;
+    sessionHistory = [{ station, answer: '', score: null, feedback: null }];
+    sessionActive = true;
+    reviewPanel.classList.remove('show');
+    scenarioCard.style.display = '';
+    statCompleted.textContent = '0';
+    statAvg.textContent = '—';
+    statAvg.style.color = 'var(--gray400)';
+    aiFeedbackWrap.innerHTML = '';
+    const mmiWrap = document.getElementById('aiFeedbackWrapMMI');
+    if (mmiWrap) mmiWrap.innerHTML = '';
+    answerTextarea.readOnly = false;
+    answerTextarea.classList.remove('locked','flash-expired');
+    const banner = document.getElementById('timeUpBanner');
+    if (banner) {
+      banner.classList.remove('show','open-mode','strict-mode');
+      banner.textContent = '';
+    }
+    loadStation();
+  },
+  completeCurrentStation() {
+    const h = sessionHistory[currentIdx] || null;
+    completed++;
+    statCompleted.textContent = completed;
+    try { recordPractice(); } catch(e) {}
+    return h;
+  },
+  hardStopSession() {
+    clearTimer();
+    sessionActive = false;
+    phase = 'idle';
+    setPhaseUI('idle');
+  }
+};
 // ── API ENDPOINT (handled by Key2MDAuth module) ──
 // IMPORTANT: Update this to your deployed worker URL or domain route
 const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev'; // Change if using workers.dev URL
@@ -1934,13 +2026,13 @@ if(stationReflection){
 function applyModeUI(mode) {
   const isCasper  = mode === MODE_CASPER;
   const isMMI     = mode === MODE_MMI;
-  const isCircuit = mode === MODE_CIRCUIT;
+  const isMock = mode === MODE_MOCK;
 
   // Pills
-  const pillC = $('modeCasper'), pillM = $('modeMMI'), pillR = $('modeCircuit');
+  const pillC = $('modeCasper'), pillM = $('modeMMI'), pillR = $('modeMock');
   if (pillC) pillC.className = 'mode-pill' + (isCasper  ? ' active-casper'  : '');
   if (pillM) pillM.className = 'mode-pill' + (isMMI     ? ' active-mmi'     : '');
-  if (pillR) pillR.className = 'mode-pill' + (isCircuit ? ' active-circuit' : '');
+  if (pillR) pillR.className = 'mode-pill' + (isMock ? ' active-mock' : '');
 
   // Cards visibility (use style.display consistently)
   // The unified #categoryCard wraps both blocks; toggle the inner blocks only.
@@ -1949,10 +2041,10 @@ function applyModeUI(mode) {
   const ccard = $('categoryCard'), chdr = $('categoryCardHeader');
   const sq = $('starredQueueCard');
   if (cc) cc.style.display = isCasper           ? '' : 'none';
-  if (mc) mc.style.display = (isMMI||isCircuit) ? '' : 'none';
+  if (mc) mc.style.display = (isMMI||isMock) ? '' : 'none';
   if (mo) mo.style.display = isMMI              ? '' : 'none';
   if (sq) sq.style.display = isCasper ? '' : 'none';
-  if (ccard) ccard.style.display = '';   // outer card always visible (in non-circuit-takeover modes)
+  if (ccard) ccard.style.display = '';   // outer card always visible in regular modes
   if (chdr)  chdr.textContent = isCasper ? 'Category' : 'MMI Station Type';
 
   // Webcam
@@ -1973,7 +2065,7 @@ function setMode(mode) {
 
   // Update page title
   const pt = document.getElementById('pageTitle');
-  if (pt) pt.textContent = (isCasper ? 'CASPer' : isMMI ? 'MMI' : 'Circuit') + ' Practice — Key2MD';
+  if (pt) pt.textContent = (isCasper ? 'CASPer Practice' : isMMI ? 'MMI Practice' : 'Full CASPer Mock Exam') + ' — Key2MD';
 
   // Update idle text
   const ist = $('idle-sub-text');
@@ -1981,14 +2073,16 @@ function setMode(mode) {
     ? 'Choose a category and press Start Session to begin your CASPer practice simulation.'
     : isMMI
     ? 'Choose a station type and press Start Session to begin your MMI simulation.'
-    : 'Configure your circuit below and press Start Circuit.';
+    : 'Configure your full CASPer mock exam below.';
 
   // Update timer defaults
   if (!isCasper) {
+    if (isMMI && mmiActivePreset === 'casperVideo') mmiActivePreset = 'quickfire';
     $('readingSlider').min=30;$('readingSlider').max=180;$('readingSlider').value=120;
     $('writingSlider').min=60;$('writingSlider').max=600;$('writingSlider').value=300;
     $('readingVal').textContent='2:00';$('writingVal').textContent='5:00';
     mmiReadingTime=120;mmiAnswerTime=300;
+    if (isMMI && typeof selectMMIPreset === 'function') selectMMIPreset(mmiActivePreset);
     document.querySelectorAll('#mmiCategoryFilters .cat-btn').forEach(b=>b.classList.remove('active'));
     const firstMMI = $('mmiCategoryFilters')?.querySelector('.cat-btn');
     if (firstMMI) firstMMI.classList.add('active');
@@ -2340,7 +2434,7 @@ function loadStation(){
         const hint=document.createElement('div');
         hint.id='qfReadingHint';
         hint.style.cssText='background:rgba(14,165,233,0.06);border:1px dashed rgba(14,165,233,0.25);border-radius:10px;padding:10px 16px;font-size:0.78rem;color:var(--teal3);font-weight:600;text-align:center;margin-top:8px;';
-        hint.textContent=`⚡ ${allPrompts.length} questions will appear one at a time — 15s to read each, 60s to answer.`;
+        hint.textContent=`${allPrompts.length} questions will appear one at a time — ${cfg.perPromptRead || 15}s to read each, ${cfg.perPromptAnswer || 60}s to answer.`;
         const pa=$('promptsArea');
         if(pa && !$('qfReadingHint')) pa.appendChild(hint);
       } else if(cfg.revealMode==='all_at_once'){
@@ -2635,6 +2729,8 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
         messages: [{role:'user',content:p}],
         question_context: `SCENARIO: ${s.scenario}\n\nPROMPT 1: ${s.prompt1}\n\nPROMPT 2: ${s.prompt2}`,
         user_response: h.answer,
+        mock_exam: !!window.K2_ACTIVE_CASPER_MOCK,
+        mock_tier: window.K2_ACTIVE_CASPER_MOCK?.tier || 'transcript',
       }),
     });
 
@@ -4018,16 +4114,16 @@ function updateAccommodationUI(){
     el.style.background=active?'var(--teal)':'#fff';
     el.style.color=active?'#fff':'var(--gray700)';
     el.style.borderColor=active?'var(--teal)':'rgba(14,165,233,0.18)';
-    el.style.boxShadow=active?'0 8px 20px rgba(14,165,233,0.22)':'none';
+    el.style.boxShadow=active?'0 3px 8px rgba(14,165,233,0.18)':'none';
   });
   const summary=document.getElementById('specialAccommodationSummary');
   if(summary){
     if(currentAccommodationMultiplier===1){
-      summary.textContent='Standard timing selected.';
+      summary.textContent='Standard timing';
     } else if(currentTimerMode==='off'){
-      summary.textContent='No timer is selected, so accommodations do not change this station.';
+      summary.textContent='No timer selected';
     } else {
-      summary.textContent=`${currentAccommodationMultiplier}x timing active: ${fmt(readingTime)} reading · ${fmt(writingTime)} writing.`;
+      summary.textContent=`${currentAccommodationMultiplier}x: ${fmt(readingTime)} read · ${fmt(writingTime)} write`;
     }
   }
 }
@@ -4880,11 +4976,9 @@ document.addEventListener('DOMContentLoaded', function(){
 .pack-save { margin-left:8px; font-size:0.72rem; font-weight:700; color:#22c55e; background:rgba(34,197,94,0.15); padding:2px 8px; border-radius:50px; }
 .pack-rec { font-size:0.68rem; font-weight:700; color:#fbbf24; background:rgba(245,158,11,0.15); padding:3px 10px; border-radius:50px; white-space:nowrap; }
 
-/* ── Circuit Mode ── */
-.mode-pill.active-circuit { border-color:#7c3aed; background:rgba(124,58,237,0.1); color:#7c3aed; }
-.mode-pill.active-circuit:hover { border-color:#7c3aed; color:#7c3aed; }
-.circuit-debrief-step { font-size:0.75rem; font-weight:600; padding:5px 12px; border-radius:50px; border:1px solid var(--gray200); color:var(--gray400); background:#fff; transition:all 0.3s; }
-.circuit-debrief-step.active { color:#7c3aed; border-color:rgba(124,58,237,0.3); background:rgba(124,58,237,0.06); }
+/* ── Full Mock Mode ── */
+.mode-pill.active-mock { border-color:#7c3aed; background:rgba(124,58,237,0.1); color:#7c3aed; }
+.mode-pill.active-mock:hover { border-color:#7c3aed; color:#7c3aed; }
 @keyframes mmi-spin { to { transform:rotate(360deg); } }
 
 /* ── Seen-before pills (4.4) ── */
