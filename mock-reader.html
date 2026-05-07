@@ -47,7 +47,7 @@
       <h1>Key2MD Mock Reader</h1>
       <div class="muted" style="color:rgba(255,255,255,.68)">Admin-only access to saved Full CASPer Mock attempts and paid manual reviews.</div>
     </div>
-    <a class="header-link" href="admin/dashboard.html">Admin Dashboard</a>
+    <a class="header-link" href="admin/dashboard.html#mocks">Admin Dashboard</a>
   </header>
   <main>
     <section id="loginCard" class="card">
@@ -82,10 +82,22 @@
   </main>
   <script>
     const API_BASE = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
-    let adminToken = localStorage.getItem('k2md_admin_token') || '';
+    const qs = new URLSearchParams(window.location.search);
+    let adminToken = qs.get('admin_token') || sessionStorage.getItem('k2md_admin_token') || localStorage.getItem('k2md_admin_token') || '';
+    let initialAttemptId = qs.get('attempt_id') || '';
     let currentAttempt = null;
     let currentStation = 0;
-    let listScope = localStorage.getItem('k2md_mock_reader_scope') || 'all';
+    let listScope = qs.get('scope') || localStorage.getItem('k2md_mock_reader_scope') || 'all';
+    if (adminToken) {
+      sessionStorage.setItem('k2md_admin_token', adminToken);
+      localStorage.setItem('k2md_admin_token', adminToken);
+      if (qs.get('admin_token')) {
+        const clean = new URLSearchParams(window.location.search);
+        clean.delete('admin_token');
+        const next = `${window.location.pathname}${clean.toString() ? '?' + clean.toString() : ''}`;
+        history.replaceState(null, '', next);
+      }
+    }
 
     function esc(v){return String(v ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
     function authHeaders(){return {'Authorization':'Bearer '+adminToken};}
@@ -96,14 +108,20 @@
       const res=await fetch(API_BASE+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:adminEmail.value,password:adminPassword.value})});
       const data=await res.json().catch(()=>({}));
       if(!res.ok){status.textContent=data.error||'Login failed';return;}
-      adminToken=data.token; localStorage.setItem('k2md_admin_token',adminToken);
+      adminToken=data.token; sessionStorage.setItem('k2md_admin_token',adminToken); localStorage.setItem('k2md_admin_token',adminToken);
       showApp();
     }
 
     function showApp(){
       document.getElementById('loginCard').style.display='none';
       document.getElementById('readerApp').style.display='block';
-      loadList();
+      loadList().then(()=>{
+        if(initialAttemptId){
+          const id = initialAttemptId;
+          initialAttemptId = '';
+          openAttempt(id);
+        }
+      });
     }
 
     function setScope(scope){
@@ -132,6 +150,7 @@
           <div class="muted">${esc(r.completed_at||'')}</div>
         </button>
       `).join(''):(listScope === 'paid' ? 'No paid manual reviews yet.' : 'No saved mock attempts yet.');
+      return rows;
     }
 
     async function openAttempt(id){
