@@ -623,6 +623,7 @@ window.FullCasperMock = (() => {
       transcript: row.transcript || '',
       review_id: row.reviewId || row.rawFeedback?.review_id || null,
       recording_key: row.recordingKey || row.rawFeedback?.recording_url || null,
+      duration_sec: row.durationSec || row.duration_sec || row.rawFeedback?.durationSec || null,
       tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
       processing_error: row.processingError || null,
     }));
@@ -1647,7 +1648,10 @@ window.FullCasperMock = (() => {
       btn.style.border = activeTab ? '1px solid var(--navy)' : '1px solid var(--gray200)';
     });
     const panel = byId('mockStationReviewPanel');
-    if (panel) panel.innerHTML = stationReviewHtml(row);
+    if (panel) {
+      panel.innerHTML = stationReviewHtml(row);
+      if (row?.type === 'video') setTimeout(() => initMockVideoPlayer('mockStationVideoPlayer'), 0);
+    }
   }
 
   function stationReviewHtml(row) {
@@ -1672,12 +1676,103 @@ window.FullCasperMock = (() => {
     `;
   }
 
+  function mockVideoDuration(row) {
+    const candidates = [
+      row?.durationSec,
+      row?.duration_sec,
+      row?.rawFeedback?.durationSec,
+      row?.rawFeedback?.recording_duration_seconds,
+      row?.feedback?.durationSec,
+    ];
+    const found = candidates.map(Number).find(v => Number.isFinite(v) && v > 0);
+    return found || 0;
+  }
+
+  function mockTime(seconds) {
+    const total = Math.max(0, Math.round(Number(seconds) || 0));
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  function mockVideoPlayerHtml(row, id = 'mockStationVideoPlayer') {
+    const src = row?.recordingUrl || '';
+    const duration = mockVideoDuration(row);
+    return `
+      <div id="${id}Shell" style="background:#07111f;border:1px solid rgba(10,22,40,0.18);border-radius:14px;overflow:hidden;box-shadow:0 10px 28px rgba(10,22,40,0.12);">
+        <video id="${id}" playsinline preload="metadata" src="${esc(src)}" data-duration="${duration || ''}" style="width:100%;aspect-ratio:16/9;background:#000;display:block;cursor:pointer;"></video>
+        <div style="padding:11px 12px 12px;background:linear-gradient(180deg,#0a1628,#07111f);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button type="button" id="${id}Btn" aria-label="Play recording" style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-size:0.82rem;font-weight:900;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0;">▶</button>
+            <div style="position:relative;height:18px;flex:1;display:flex;align-items:center;">
+              <div style="position:absolute;left:0;right:0;height:5px;border-radius:999px;background:rgba(255,255,255,0.18);overflow:hidden;">
+                <div id="${id}Fill" style="height:100%;width:0%;background:#0ea5e9;border-radius:999px;"></div>
+              </div>
+              <input id="${id}Range" type="range" min="0" max="1000" value="0" aria-label="Seek recording" style="position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;">
+            </div>
+            <div id="${id}Time" style="min-width:74px;text-align:right;color:rgba(255,255,255,0.72);font-size:0.72rem;font-weight:800;font-variant-numeric:tabular-nums;">0:00 / ${duration ? mockTime(duration) : '--:--'}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function initMockVideoPlayer(id = 'mockStationVideoPlayer') {
+    const video = byId(id);
+    const btn = byId(`${id}Btn`);
+    const range = byId(`${id}Range`);
+    const fill = byId(`${id}Fill`);
+    const time = byId(`${id}Time`);
+    if (!video || !btn || !range || !fill || !time) return;
+
+    const durationHint = () => {
+      const hint = Number(video.dataset.duration || 0);
+      return Number.isFinite(hint) && hint > 0 ? hint : 0;
+    };
+    const usableDuration = () => {
+      const d = Number(video.duration);
+      if (Number.isFinite(d) && d > 0 && d < 86400) return d;
+      return durationHint();
+    };
+    const update = () => {
+      const d = usableDuration();
+      const current = Math.max(0, Number(video.currentTime) || 0);
+      const pct = d ? Math.max(0, Math.min(1, current / d)) : 0;
+      range.value = String(Math.round(pct * 1000));
+      fill.style.width = `${pct * 100}%`;
+      time.textContent = `${mockTime(current)} / ${d ? mockTime(d) : '--:--'}`;
+      btn.textContent = video.paused || video.ended ? '▶' : '❚❚';
+    };
+    const seek = () => {
+      const d = usableDuration();
+      if (!d) return;
+      video.currentTime = (Number(range.value) / 1000) * d;
+      update();
+    };
+    const toggle = () => {
+      if (!video.getAttribute('src')) return;
+      if (video.paused || video.ended) video.play().catch(() => {});
+      else video.pause();
+    };
+
+    if (!video.dataset.mockPlayerBound) {
+      video.dataset.mockPlayerBound = '1';
+      btn.addEventListener('click', toggle);
+      video.addEventListener('click', toggle);
+      range.addEventListener('input', seek);
+      ['loadedmetadata', 'durationchange', 'timeupdate', 'play', 'pause', 'ended', 'seeked'].forEach(eventName => {
+        video.addEventListener(eventName, update);
+      });
+    }
+    update();
+  }
+
   function videoStationReviewHtml(row) {
     const presentation = row.feedback?.presentation;
     return `
       <div style="display:grid;grid-template-columns:minmax(min(100%,320px),0.9fr) minmax(0,1.1fr);gap:20px;align-items:start;">
         <div>
-          <video controls playsinline src="${esc(row.recordingUrl || '')}" style="width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;display:block;"></video>
+          ${mockVideoPlayerHtml(row, 'mockStationVideoPlayer')}
           <div style="font-size:0.76rem;color:var(--gray400);line-height:1.45;margin-top:8px;">${esc(rowScoreLabel(row))} - ${esc(row.station?.category || 'Video station')}</div>
           ${row.transcript ? `<div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:12px;margin-top:12px;"><div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Transcript</div><div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;max-height:190px;overflow:auto;">${esc(row.transcript)}</div></div>` : ''}
         </div>
@@ -1779,7 +1874,7 @@ window.FullCasperMock = (() => {
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px;align-items:start;">
           <div>
-            <video id="mockRecordingPlayer" controls playsinline style="width:100%;aspect-ratio:16/9;background:#000;border-radius:10px;display:block;"></video>
+            ${mockVideoPlayerHtml(videos[0], 'mockRecordingPlayer')}
             <div id="mockRecordingMeta" style="font-size:0.75rem;color:var(--gray400);line-height:1.45;margin-top:8px;"></div>
           </div>
           <div id="mockRecordingFeedback">${videoFeedbackHtml(videos[0])}</div>
@@ -1852,9 +1947,14 @@ window.FullCasperMock = (() => {
     });
     const player = byId('mockRecordingPlayer');
     if (player && row?.recordingUrl) {
-      if (player.src !== row.recordingUrl) player.src = row.recordingUrl;
+      if (player.getAttribute('src') !== row.recordingUrl) {
+        player.src = row.recordingUrl;
+        player.load();
+      }
+      player.dataset.duration = mockVideoDuration(row) || '';
     } else if (player) {
       player.removeAttribute('src');
+      player.dataset.duration = '';
       player.load();
     }
     const meta = byId('mockRecordingMeta');
@@ -1863,6 +1963,7 @@ window.FullCasperMock = (() => {
     }
     const feedback = byId('mockRecordingFeedback');
     if (feedback) feedback.innerHTML = videoFeedbackHtml(row);
+    initMockVideoPlayer('mockRecordingPlayer');
   }
 
   function renderInterpretation(report) {

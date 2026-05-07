@@ -24,7 +24,16 @@
     .tabs button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
     .station-grid{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr);gap:18px}
     pre{white-space:pre-wrap;background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:12px;line-height:1.55;max-height:440px;overflow:auto}
-    video{width:100%;aspect-ratio:16/9;background:#000;border-radius:12px}
+    video{width:100%;aspect-ratio:16/9;background:#000}
+    .mock-video-shell{background:#07111f;border:1px solid rgba(10,22,40,.18);border-radius:14px;overflow:hidden;box-shadow:0 10px 28px rgba(10,22,40,.12)}
+    .mock-video-bar{padding:11px 12px 12px;background:linear-gradient(180deg,#0a1628,#07111f)}
+    .mock-video-row{display:flex;align-items:center;gap:10px}
+    .mock-video-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;padding:0;font-size:.82rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .mock-video-track{position:relative;height:18px;flex:1;display:flex;align-items:center}
+    .mock-video-bg{position:absolute;left:0;right:0;height:5px;border-radius:999px;background:rgba(255,255,255,.18);overflow:hidden}
+    .mock-video-fill{height:100%;width:0;background:var(--teal);border-radius:999px}
+    .mock-video-range{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}
+    .mock-video-time{min-width:74px;text-align:right;color:rgba(255,255,255,.72);font-size:.72rem;font-weight:800;font-variant-numeric:tabular-nums}
     .pill{display:inline-block;border-radius:999px;background:rgba(14,165,233,.1);color:#0369a1;padding:4px 9px;font-size:.72rem;font-weight:800}
     @media(max-width:900px){.grid,.station-grid{grid-template-columns:1fr}}
   </style>
@@ -150,6 +159,60 @@
           <div id="saveStatus" class="muted" style="margin-top:8px"></div>
         </div>
       `;
+      if(rows[currentStation]?.type==='video') setTimeout(()=>initVideoPlayer('adminVideoPlayer'),0);
+    }
+
+    function fmtTime(seconds){
+      const total=Math.max(0,Math.round(Number(seconds)||0));
+      const m=Math.floor(total/60), s=total%60;
+      return `${m}:${String(s).padStart(2,'0')}`;
+    }
+
+    function rowDuration(r){
+      const candidates=[r?.duration_sec,r?.durationSec,r?.rawFeedback?.durationSec,r?.feedback?.durationSec];
+      const found=candidates.map(Number).find(v=>Number.isFinite(v)&&v>0);
+      return found||0;
+    }
+
+    function videoPlayerHtml(src,r,id='adminVideoPlayer'){
+      const duration=rowDuration(r);
+      return `<div class="mock-video-shell">
+        <video id="${id}" playsinline preload="metadata" src="${esc(src||'')}" data-duration="${duration||''}" style="display:block;cursor:pointer"></video>
+        <div class="mock-video-bar">
+          <div class="mock-video-row">
+            <button type="button" id="${id}Btn" class="mock-video-btn" aria-label="Play recording">▶</button>
+            <div class="mock-video-track">
+              <div class="mock-video-bg"><div id="${id}Fill" class="mock-video-fill"></div></div>
+              <input id="${id}Range" class="mock-video-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording">
+            </div>
+            <div id="${id}Time" class="mock-video-time">0:00 / ${duration?fmtTime(duration):'--:--'}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function initVideoPlayer(id='adminVideoPlayer'){
+      const video=document.getElementById(id), btn=document.getElementById(id+'Btn'), range=document.getElementById(id+'Range'), fill=document.getElementById(id+'Fill'), time=document.getElementById(id+'Time');
+      if(!video||!btn||!range||!fill||!time)return;
+      const hint=()=>{const n=Number(video.dataset.duration||0);return Number.isFinite(n)&&n>0?n:0;};
+      const dur=()=>{const d=Number(video.duration);return Number.isFinite(d)&&d>0&&d<86400?d:hint();};
+      const update=()=>{
+        const d=dur(), cur=Math.max(0,Number(video.currentTime)||0), pct=d?Math.max(0,Math.min(1,cur/d)):0;
+        range.value=String(Math.round(pct*1000));
+        fill.style.width=(pct*100)+'%';
+        time.textContent=`${fmtTime(cur)} / ${d?fmtTime(d):'--:--'}`;
+        btn.textContent=video.paused||video.ended?'▶':'❚❚';
+      };
+      const seek=()=>{const d=dur();if(!d)return;video.currentTime=(Number(range.value)/1000)*d;update();};
+      const toggle=()=>{if(!video.getAttribute('src'))return;if(video.paused||video.ended)video.play().catch(()=>{});else video.pause();};
+      if(!video.dataset.bound){
+        video.dataset.bound='1';
+        btn.addEventListener('click',toggle);
+        video.addEventListener('click',toggle);
+        range.addEventListener('input',seek);
+        ['loadedmetadata','durationchange','timeupdate','play','pause','ended','seeked'].forEach(ev=>video.addEventListener(ev,update));
+      }
+      update();
     }
 
     function stationHtml(r){
@@ -159,7 +222,7 @@
       if(r.type==='video'){
         const key=r.recording_key;
         const src=key?`${API_BASE}/api/admin/casper-mock/recording?key=${encodeURIComponent(key)}&admin_token=${encodeURIComponent(adminToken)}`:'';
-        return `<div class="station-grid"><div><video controls src="${src}"></video><pre>${esc(r.transcript||'No transcript')}</pre></div><div>${scenario}${feedbackHtml(fb)}</div></div>`;
+        return `<div class="station-grid"><div>${videoPlayerHtml(src,r)}<pre>${esc(r.transcript||'No transcript')}</pre></div><div>${scenario}${feedbackHtml(fb)}</div></div>`;
       }
       return `<div class="station-grid"><div>${scenario}<h3>Typed answer</h3><pre>${esc(r.answer||'No answer')}</pre></div><div>${feedbackHtml(fb)}</div></div>`;
     }
