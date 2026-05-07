@@ -31,6 +31,7 @@ window.FullCasperMock = (() => {
   let stationToken = 0;
   let advancing = false;
   let rulesAccepted = false;
+  let finalVideoRows = [];
 
   function byId(id) {
     return document.getElementById(id);
@@ -529,6 +530,52 @@ window.FullCasperMock = (() => {
     `;
   }
 
+  function renderProcessingScreen() {
+    const pending = results.filter(r => r.feedbackTask).length;
+    return `
+      <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:38px 32px;text-align:center;">
+        <div style="width:34px;height:34px;border:3px solid var(--gray200);border-top-color:var(--teal);border-radius:50%;animation:mmi-spin 0.8s linear infinite;margin:0 auto 16px;"></div>
+        <div style="font-size:0.72rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:8px;">Building your debrief</div>
+        <h2 style="font-size:1.45rem;color:var(--navy);line-height:1.25;margin:0 0 8px;">Analysing the full mock together.</h2>
+        <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;max-width:620px;margin:0 auto;">Your station feedback has been submitted in the background. Keep this tab open while the final report pulls together video, typed responses, stamina, and cross-station patterns.</p>
+        <div style="font-size:0.78rem;color:var(--gray400);margin-top:14px;">${pending} analysis task${pending === 1 ? '' : 's'} finalising</div>
+      </div>
+    `;
+  }
+
+  function withAnalysisTimeout(promise, row) {
+    const label = `${row.type === 'video' ? 'Video' : 'Typed'} ${stationShort(row)}`;
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        setTimeout(() => reject(new Error(`${label} analysis is taking too long. This report is shown with the completed analyses so far.`)), 8 * 60 * 1000);
+      }),
+    ]);
+  }
+
+  async function settleMockFeedbackTasks() {
+    const tasks = results
+      .map((row, idx) => ({ row, idx }))
+      .filter(item => item.row.feedbackTask && !item.row.feedbackSettled);
+    await Promise.all(tasks.map(async ({ row }) => {
+      try {
+        const data = await withAnalysisTimeout(row.feedbackTask, row);
+        row.feedbackSettled = true;
+        if (row.type === 'video') {
+          row.feedback = data?.feedback || null;
+          row.transcript = data?.transcript || '';
+          row.rawFeedback = data || null;
+        } else {
+          row.score = Number.isFinite(Number(data?.score)) ? Number(data.score) : null;
+          row.feedback = data?.feedback || null;
+        }
+      } catch (err) {
+        row.feedbackSettled = true;
+        row.processingError = err.message || 'Feedback processing failed.';
+      }
+    }));
+  }
+
   function ruleCard(title, body) {
     return `
       <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px 15px;">
@@ -694,20 +741,9 @@ window.FullCasperMock = (() => {
     if (originalSubmitMMI || typeof window.submitMMIForFeedback !== 'function') return;
     originalSubmitMMI = window.submitMMIForFeedback;
     window.submitMMIForFeedback = async function patchedMockSubmit() {
-      const before = window._lastMMIFeedback;
-      await originalSubmitMMI.apply(this, arguments);
-      const after = window._lastMMIFeedback;
-      if (after && after !== before) {
-        const wrap = byId('aiFeedbackWrapMMI');
-        if (wrap && !byId('mockContinueVideoBtn')) {
-          const token = stationToken;
-          const btn = document.createElement('button');
-          btn.id = 'mockContinueVideoBtn';
-          btn.textContent = 'Continue mock';
-          btn.style.cssText = 'margin-top:14px;padding:11px 22px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.86rem;font-weight:800;cursor:pointer;font-family:inherit;';
-          btn.onclick = () => completeAndAdvance(after, token);
-          wrap.appendChild(btn);
-        }
+      const wrap = byId('aiFeedbackWrapMMI');
+      if (wrap) {
+        wrap.innerHTML = `<div style="background:#eff6ff;border:1px solid rgba(14,165,233,0.28);border-radius:10px;padding:13px 15px;font-size:0.82rem;color:#075985;margin-top:10px;"><strong>Mock mode saves feedback for the end.</strong><br>Finish the station and continue. Your AI analysis runs in the background.</div>`;
       }
     };
   }
@@ -735,16 +771,24 @@ window.FullCasperMock = (() => {
         bridge.clearTimer();
         bridge.stopRecording();
         bridge.setPhase('done');
+        byId('mmiSubmitWrap')?.style.setProperty('display', 'none');
+        const wrap = byId('aiFeedbackWrapMMI');
+        if (wrap) {
+          wrap.innerHTML = `<div style="background:#eff6ff;border:1px solid rgba(14,165,233,0.28);border-radius:10px;padding:13px 15px;font-size:0.82rem;color:#075985;margin-top:10px;"><strong>Recording saved for the final report.</strong><br>Continue when you are ready. Your AI feedback will be shown after the full mock.</div>`;
+        }
         return true;
       }
       if (phase === 'done') {
-        const wrap = byId('aiFeedbackWrapMMI');
-        if (wrap && !wrap.querySelector('.mmi-feedback')) {
-          wrap.innerHTML = `<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:13px 15px;font-size:0.82rem;color:#78350f;margin-top:10px;"><strong>Video feedback required for mock scoring.</strong><br>Choose transcript or premium in the sidebar, then submit this recording for analysis before continuing.</div>` + wrap.innerHTML;
-          wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return true;
+        try {
+          const submission = bridge.submitMockVideoReview?.();
+          completeAndAdvance(submission || null, stationToken);
+        } catch (err) {
+          const wrap = byId('aiFeedbackWrapMMI');
+          if (wrap) {
+            wrap.innerHTML = `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:13px 15px;font-size:0.82rem;color:#991b1b;margin-top:10px;"><strong>Recording could not be saved.</strong><br>${esc(err.message || 'Please re-record this station before continuing.')}</div>`;
+            wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
         }
-        completeAndAdvance(window._lastMMIFeedback || null, stationToken);
       }
       return true;
     }
@@ -758,11 +802,13 @@ window.FullCasperMock = (() => {
       bridge.clearTimer();
       bridge.saveAnswer();
       bridge.setPhase('done');
+      byId('btnGetAIWrap')?.style.setProperty('display', 'none');
       return true;
     }
     if (phase === 'done') {
       bridge.saveAnswer();
-      completeAndAdvance(bridge.getCurrentHistory(), stationToken);
+      const submission = bridge.submitMockWrittenReview?.() || bridge.getCurrentHistory();
+      completeAndAdvance(submission, stationToken);
     }
     return true;
   }
@@ -778,12 +824,17 @@ window.FullCasperMock = (() => {
       return;
     }
     const current = bridge?.getCurrentHistory?.();
+    const isVideoSubmission = payload?.kind === 'mock_video_submission';
+    const isWrittenSubmission = payload?.kind === 'mock_written_submission';
     results.push({
       type: item.type,
       station: item.station,
-      answer: current?.answer || '',
-      score: current?.score ?? null,
-      feedback: item.type === 'video' ? payload : current?.feedback || null,
+      answer: isWrittenSubmission ? payload.answer || '' : current?.answer || '',
+      score: isWrittenSubmission ? null : current?.score ?? null,
+      feedback: null,
+      feedbackTask: isVideoSubmission || isWrittenSubmission ? payload.promise : null,
+      recordingUrl: isVideoSubmission ? payload.recordingUrl : null,
+      processingError: null,
       tier: item.type === 'video' ? config.tier : 'typed',
     });
     bridge?.completeCurrentStation?.();
@@ -1250,7 +1301,7 @@ window.FullCasperMock = (() => {
     return report;
   }
 
-  function renderDebrief() {
+  async function renderDebrief() {
     started = false;
     rulesAccepted = false;
     restoreSubmit();
@@ -1264,16 +1315,22 @@ window.FullCasperMock = (() => {
     const area = ensureMainArea();
     if (!area) return;
     area.style.display = 'block';
+    area.innerHTML = renderProcessingScreen();
+
+    await settleMockFeedbackTasks();
 
     const rows = buildRows();
     const typed = rows.filter(r => r.type === 'typed');
     const videos = rows.filter(r => r.type === 'video');
+    finalVideoRows = videos;
     const typedScores = typed.map(r => Number(r.score)).filter(Number.isFinite);
     const videoScores = videos.map(r => videoScore(r.feedback)).filter(Number.isFinite);
     const typedAvg = typedScores.length ? round1(average(typedScores)) : '-';
     const videoAvg = videoScores.length ? round1(average(videoScores)) : '-';
     const answeredTyped = typed.filter(r => r.answer && r.answer.trim().length > 30).length;
     const report = buildMockReport(rows);
+    const completedAnalyses = rows.filter(r => Number.isFinite(r.score10)).length;
+    const failedAnalyses = rows.filter(r => r.processingError).length;
 
     area.innerHTML = `
       <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;overflow:hidden;">
@@ -1288,8 +1345,11 @@ window.FullCasperMock = (() => {
           <div class="stat-mini"><span class="stat-mini-num">${videoAvg}</span><span class="stat-mini-label">Video avg /5</span></div>
           <div class="stat-mini"><span class="stat-mini-num">${typedAvg}</span><span class="stat-mini-label">Typed avg /10</span></div>
           <div class="stat-mini"><span class="stat-mini-num">${answeredTyped}/7</span><span class="stat-mini-label">Typed answered</span></div>
+          <div class="stat-mini"><span class="stat-mini-num">${completedAnalyses}/${rows.length}</span><span class="stat-mini-label">AI analysed</span></div>
         </div>
         <div style="padding:24px 32px;">
+          ${failedAnalyses ? renderPartialReportNotice(rows) : ''}
+          ${renderVideoPlaybackPanel(videos)}
           ${renderInterpretation(report)}
           ${renderOneThing(report.oneThing)}
 
@@ -1316,6 +1376,7 @@ window.FullCasperMock = (() => {
         </div>
       </div>
     `;
+    setTimeout(() => showRecording(0), 0);
   }
 
   function card(title, body, extra = '') {
@@ -1326,6 +1387,122 @@ window.FullCasperMock = (() => {
         ${extra}
       </div>
     `;
+  }
+
+  function renderPartialReportNotice(rows) {
+    const failed = rows
+      .filter(row => row.processingError)
+      .map(row => `${stationShort(row)}: ${row.processingError}`)
+      .join(' | ');
+    return `
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;margin-bottom:18px;">
+        <div style="font-size:0.78rem;font-weight:900;color:#9a3412;margin-bottom:5px;">Partial analysis warning</div>
+        <div style="font-size:0.82rem;color:#7c2d12;line-height:1.55;">Some station analyses did not finish in time, so the overall estimate is based only on completed AI feedback. You can still review the recordings and responses captured in the mock.</div>
+        <div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-top:7px;">${esc(failed)}</div>
+      </div>
+    `;
+  }
+
+  function renderVideoPlaybackPanel(videos) {
+    if (!videos.length) return '';
+    const buttons = videos.map((row, i) => `
+      <button type="button" onclick="FullCasperMock.showRecording(${i})" data-mock-video-tab="${i}" style="padding:8px 12px;border-radius:50px;border:1px solid ${i === 0 ? 'var(--navy)' : 'var(--gray200)'};background:${i === 0 ? 'var(--navy)' : '#fff'};color:${i === 0 ? '#fff' : 'var(--gray600)'};font-size:0.76rem;font-weight:850;cursor:pointer;font-family:inherit;">Video ${i + 1}</button>
+    `).join('');
+    return `
+      <div style="border:1px solid rgba(14,165,233,0.22);background:#fff;border-radius:14px;padding:20px 22px;margin-bottom:22px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
+          <div>
+            <div style="font-size:0.66rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:6px;">Your video stations</div>
+            <div style="font-size:1.05rem;font-weight:900;color:var(--navy);line-height:1.3;">Watch your recordings with the AI feedback below.</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">${buttons}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px;align-items:start;">
+          <div>
+            <video id="mockRecordingPlayer" controls playsinline style="width:100%;aspect-ratio:16/9;background:#000;border-radius:10px;display:block;"></video>
+            <div id="mockRecordingMeta" style="font-size:0.75rem;color:var(--gray400);line-height:1.45;margin-top:8px;"></div>
+          </div>
+          <div id="mockRecordingFeedback">${videoFeedbackHtml(videos[0])}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function videoFeedbackHtml(row) {
+    if (!row) return '<div style="font-size:0.84rem;color:var(--gray400);">No video selected.</div>';
+    if (row.processingError) {
+      return `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:13px 15px;font-size:0.82rem;color:#991b1b;"><strong>Analysis failed.</strong><br>${esc(row.processingError)}</div>`;
+    }
+    const fb = row.feedback || {};
+    const overall = fb.overall || {};
+    const prompts = Array.isArray(fb.per_prompt) ? fb.per_prompt : [];
+    const promptHtml = prompts.map((prompt, i) => `
+      <div style="padding:10px 0;border-top:1px solid var(--gray100);">
+        <div style="font-size:0.76rem;font-weight:850;color:var(--navy);margin-bottom:4px;">Prompt ${i + 1}</div>
+        ${videoPromptCriteriaHtml(prompt)}
+      </div>
+    `).join('');
+    return `
+      <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:15px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">
+          <div style="font-size:0.78rem;font-weight:900;color:var(--navy);">${esc(row.station?.category || 'Video station')}</div>
+          <div style="font-size:0.82rem;font-weight:900;color:var(--teal3);white-space:nowrap;">${Number.isFinite(Number(overall.score)) ? `${overall.score}/5 ${overall.label ? `- ${esc(overall.label)}` : ''}` : 'Processing complete'}</div>
+        </div>
+        <div style="font-size:0.78rem;color:var(--gray600);line-height:1.6;"><strong>Strength:</strong> ${esc(overall.biggest_strength || 'Review the prompt feedback below.')}</div>
+        <div style="font-size:0.78rem;color:var(--gray600);line-height:1.6;margin-top:6px;"><strong>Improve:</strong> ${esc(overall.biggest_improvement || 'No specific improvement returned.')}</div>
+        ${overall.excellent_version ? `<div style="font-size:0.78rem;color:var(--gray600);line-height:1.6;margin-top:6px;"><strong>Excellent response would add:</strong> ${esc(overall.excellent_version)}</div>` : ''}
+        ${row.transcript ? `<div style="font-size:0.72rem;color:var(--gray400);line-height:1.5;margin-top:9px;"><strong>Transcript excerpt:</strong> ${esc(String(row.transcript).slice(0, 260))}${String(row.transcript).length > 260 ? '...' : ''}</div>` : ''}
+        ${promptHtml}
+      </div>
+    `;
+  }
+
+  function videoPromptCriteriaHtml(prompt) {
+    const scores = prompt?.scores || {};
+    const order = ['empathy', 'communication', 'reasoning', 'reflection', 'real_world_awareness'];
+    const labels = {
+      empathy: 'Empathy',
+      communication: 'Communication',
+      reasoning: 'Reasoning',
+      reflection: 'Reflection',
+      real_world_awareness: 'Real-world judgement',
+    };
+    const rows = order.map(key => {
+      const crit = scores[key];
+      if (!crit) return '';
+      const score = Number(crit.score);
+      const color = score >= 4 ? '#16a34a' : score >= 3 ? '#0ea5e9' : score >= 2 ? '#d97706' : '#dc2626';
+      return `
+        <div style="display:grid;grid-template-columns:minmax(92px,0.45fr) minmax(0,1fr);gap:8px;padding:7px 0;border-top:1px solid rgba(226,232,240,0.7);">
+          <div style="font-size:0.72rem;font-weight:850;color:${color};">${esc(labels[key] || key)} ${Number.isFinite(score) ? `${score}/5` : ''}</div>
+          <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;">${esc(crit.comment || crit.label || '')}</div>
+        </div>
+      `;
+    }).join('');
+    return rows || `<div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;">${esc(prompt?.summary || 'Feedback captured for this prompt.')}</div>`;
+  }
+
+  function showRecording(i = 0) {
+    const row = finalVideoRows[i];
+    document.querySelectorAll('[data-mock-video-tab]').forEach(btn => {
+      const activeTab = Number(btn.dataset.mockVideoTab) === i;
+      btn.style.background = activeTab ? 'var(--navy)' : '#fff';
+      btn.style.color = activeTab ? '#fff' : 'var(--gray600)';
+      btn.style.border = activeTab ? '1px solid var(--navy)' : '1px solid var(--gray200)';
+    });
+    const player = byId('mockRecordingPlayer');
+    if (player && row?.recordingUrl) {
+      if (player.src !== row.recordingUrl) player.src = row.recordingUrl;
+    } else if (player) {
+      player.removeAttribute('src');
+      player.load();
+    }
+    const meta = byId('mockRecordingMeta');
+    if (meta) {
+      meta.textContent = row ? `Video ${i + 1} - ${row.station?.category || 'CASPer'} - ${rowScoreLabel(row)}` : '';
+    }
+    const feedback = byId('mockRecordingFeedback');
+    if (feedback) feedback.innerHTML = videoFeedbackHtml(row);
   }
 
   function renderInterpretation(report) {
@@ -1524,6 +1701,7 @@ window.FullCasperMock = (() => {
     checkoutMock,
     proceedAfterRules,
     enableCameraAndStartVideoStation,
+    showRecording,
     skipBreak,
   };
 })();

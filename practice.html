@@ -1257,7 +1257,7 @@ function mmiOnRecordingStop() {
   const sb = document.getElementById('mmiRecordingStatus');
   if(sb) sb.style.display = 'none';
   const sw = document.getElementById('mmiSubmitWrap');
-  if(sw) sw.style.display = 'block';
+  if(sw) sw.style.display = window.K2_ACTIVE_CASPER_MOCK ? 'none' : 'block';
 }
 
 function mmiResetForRestart() {
@@ -1480,6 +1480,201 @@ async function submitMMIForFeedback() {
   }
 }
 
+function createMMIMockReviewSnapshot() {
+  const isPremium = mmiPremiumMode;
+  const tier = isPremium ? 'premium' : 'transcript';
+  const requireVideoUpload = !!window.K2_ACTIVE_CASPER_MOCK && isPremium;
+  const snapshotRecordingBlob = recordingBlob || (recordedChunks.length ? new Blob(recordedChunks, { type: mediaRecorder?.mimeType || 'video/webm' }) : null);
+  const snapshotAudioBlob = audioBlob || (audioChunks.length ? new Blob(audioChunks, { type: audioRecorder?.mimeType || 'audio/webm' }) : null);
+  const uploadBlob = requireVideoUpload ? snapshotRecordingBlob : (snapshotAudioBlob || snapshotRecordingBlob);
+  if(!uploadBlob) throw new Error(requireVideoUpload ? 'No video recording was captured for this mock station.' : 'No recording was captured for this mock station.');
+
+  const cfg = { ...getMMIConfig() };
+  const s = pool[currentIdx] || {};
+  const prompts = [...mmiCurrentPrompts];
+  const revealTimestamps = mmiPromptRevealTimestamps.map(x => ({ ...x }));
+  const durationSec = Math.round(mmiRecordingDurationSec || 0);
+  const mmiStationIdx = MMI_STATIONS.indexOf(s);
+  const casperStationIdx = typeof STATIONS !== 'undefined' ? STATIONS.indexOf(s) : -1;
+  const stationId = s.id || (mmiStationIdx >= 0 ? `mmi_${mmiStationIdx}` : casperStationIdx >= 0 ? `casper_video_${casperStationIdx}` : 'casper_video_mock');
+  const recordingUrl = snapshotRecordingBlob ? URL.createObjectURL(snapshotRecordingBlob) : null;
+
+  return {
+    station: s,
+    tier,
+    isPremium,
+    requireVideoUpload,
+    uploadBlob,
+    recordingBlob: snapshotRecordingBlob,
+    recordingUrl,
+    cfg,
+    prompts,
+    revealTimestamps,
+    durationSec,
+    stationId,
+  };
+}
+
+function buildMMIMockFormData(snapshot, frames, visualDegraded) {
+  const fileName = snapshot.requireVideoUpload ? 'recording-video.webm' : 'recording.webm';
+  const audioFile = new File([snapshot.uploadBlob], fileName, {
+    type: snapshot.uploadBlob.type || (snapshot.requireVideoUpload ? 'video/webm' : 'audio/webm')
+  });
+  const fd = new FormData();
+  fd.append('audio', audioFile);
+  fd.append('media_kind', snapshot.requireVideoUpload ? 'video' : 'audio');
+  fd.append('station_id', snapshot.stationId);
+  fd.append('station_category', snapshot.station.category || '');
+  fd.append('station_scenario', snapshot.station.scenario || '');
+  fd.append('prompts', JSON.stringify(snapshot.prompts));
+  fd.append('prompt_reveal_timestamps', JSON.stringify(snapshot.revealTimestamps));
+  fd.append('timing_preset', snapshot.cfg.preset);
+  fd.append('reveal_mode', snapshot.cfg.revealMode);
+  fd.append('recording_duration_seconds', String(snapshot.durationSec));
+  fd.append('tier', snapshot.tier);
+  fd.append('specialist_mode', '0');
+  fd.append('use_credit', '1');
+  fd.append('mock_exam', '1');
+  fd.append('mock_tier', window.K2_ACTIVE_CASPER_MOCK?.tier || snapshot.tier);
+  fd.append('visual_degraded', visualDegraded ? '1' : '0');
+  frames.forEach((frame, i) => fd.append(`frame_${i}`, frame, `frame_${i}.jpg`));
+  return fd;
+}
+
+function submitMMIMockReviewSilently() {
+  const snapshot = createMMIMockReviewSnapshot();
+  const promise = (async () => {
+    if(!Key2MDAuth.isLoggedIn()) throw new Error('Sign in required for mock video analysis.');
+    let frames = [];
+    let visualDegraded = false;
+    if(snapshot.isPremium && snapshot.recordingBlob) {
+      frames = await extractVideoFrames(snapshot.recordingBlob, 30);
+      if(frames.length === 0) visualDegraded = true;
+    }
+    const token = Key2MDAuth.getToken();
+    let lastError = null;
+    for(let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        if(attempt > 1) await new Promise(r => setTimeout(r, 1500 * attempt));
+        const res = await fetch(API_BASE + '/api/mmi-review', {
+          method: 'POST',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+          body: buildMMIMockFormData(snapshot, frames, visualDegraded),
+        });
+        const data = await res.json().catch(() => ({}));
+        if(!res.ok) {
+          lastError = data.message || data.error || `Video analysis failed (${res.status})`;
+          if(res.status >= 500 && attempt < 3) continue;
+          throw new Error(lastError);
+        }
+        return {
+          ...data,
+          feedback: data.feedback,
+          visual_degraded: visualDegraded || !!data.visual_degraded,
+          durationSec: snapshot.durationSec,
+          stationCategory: snapshot.station.category || '',
+        };
+      } catch(err) {
+        lastError = err.message;
+        if(attempt >= 3) throw new Error(lastError || 'Video analysis failed.');
+      }
+    }
+    throw new Error(lastError || 'Video analysis failed.');
+  })();
+  return {
+    kind: 'mock_video_submission',
+    tier: snapshot.tier,
+    station: snapshot.station,
+    recordingUrl: snapshot.recordingUrl,
+    durationSec: snapshot.durationSec,
+    promise,
+  };
+}
+
+function buildCasperReviewPrompt(station, answer) {
+  const competencyList = CASPER_COMPETENCIES.join(', ');
+  return `You are an expert CASPer assessor for Australian medical school admissions. You use Dan's Q1-Q4 framework. Evaluate this student response honestly.
+
+SCENARIO: ${station.scenario}
+PROMPT 1: ${station.prompt1}
+PROMPT 2: ${station.prompt2}
+STUDENT RESPONSE: ${answer}
+
+Assess these nine Casper competencies: ${competencyList}.
+
+Respond ONLY with a raw JSON object (no markdown, no backticks):
+{"score":<integer 1-10>,"strengths":"<2-3 sentences>","improvements":"<2-3 sentences>","empathy":"<1-2 sentences>","missed":"<key missed point or None>","competencies":[{"name":"Collaboration","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Communication","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Empathy","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Fairness","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Ethics","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Motivation","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Problem Solving","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Resilience","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"},{"name":"Self-Awareness","score":<integer 1-10>,"evidence":"<short evidence from response or what was absent>","improve":"<one specific next step>"}]}
+
+Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs significant work Q1. Be honest and specific. Penalise framework-speak. Score competencies independently.`;
+}
+
+function extractCleanJsonFromAI(text) {
+  if(!text) return null;
+  const t = text.trim();
+  try { JSON.parse(t); return t; } catch {}
+  const fm = t.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```\s*$/i);
+  if(fm) { try { JSON.parse(fm[1].trim()); return fm[1].trim(); } catch {} }
+  const jm = t.match(/\{[\s\S]*\}/);
+  if(jm) { try { JSON.parse(jm[0]); return jm[0]; } catch {} }
+  return null;
+}
+
+function submitWrittenMockReviewSilently(idx) {
+  const h = sessionHistory[idx];
+  const station = h?.station;
+  const answer = String(h?.answer || '').trim();
+  if(!station || !answer) {
+    return { kind: 'mock_written_submission', promise: Promise.resolve({ score: null, feedback: null, skipped: true }) };
+  }
+  const promise = (async () => {
+    if(!Key2MDAuth.isLoggedIn()) throw new Error('Sign in required for mock written analysis.');
+    const token = Key2MDAuth.getToken();
+    const prompt = buildCasperReviewPrompt(station, answer);
+    const res = await fetch(`${API_BASE}/api/review/stream`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({
+        tool: 'casper',
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1500,
+        use_credit: true,
+        messages: [{ role: 'user', content: prompt }],
+        question_context: `SCENARIO: ${station.scenario}\n\nPROMPT 1: ${station.prompt1}\n\nPROMPT 2: ${station.prompt2}`,
+        user_response: answer,
+        mock_exam: true,
+        mock_tier: window.K2_ACTIVE_CASPER_MOCK?.tier || 'transcript',
+      }),
+    });
+    if(!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d.message || d.error || `Written analysis failed (${res.status})`);
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    while(true) {
+      const { done, value } = await reader.read();
+      if(done) break;
+      buffer += decoder.decode(value, { stream: true });
+    }
+    buffer += decoder.decode();
+    const cleanJson = extractCleanJsonFromAI(buffer);
+    if(!cleanJson) throw new Error('AI returned unreadable written feedback.');
+    const fb = JSON.parse(cleanJson);
+    fb.competencies = normalizeCompetencies(fb.competencies);
+    h.score = fb.score;
+    h.feedback = fb;
+    h.aiSaved = true;
+    return { score: fb.score, feedback: fb };
+  })();
+  return {
+    kind: 'mock_written_submission',
+    station,
+    answer,
+    promise,
+  };
+}
+
 async function updateMMILimitsUI() {
   const token = Key2MDAuth.getToken();
   if(!token) return;
@@ -1609,6 +1804,8 @@ window.K2PracticeBridge = {
   startWriting: () => startWriting(),
   stopRecording: () => stopRecording(),
   saveAnswer: () => saveAnswer(),
+  submitMockVideoReview: () => submitMMIMockReviewSilently(),
+  submitMockWrittenReview: () => submitWrittenMockReviewSilently(currentIdx),
   getCurrentHistory: () => sessionHistory[currentIdx] || null,
   getSessionHistory: () => sessionHistory,
   setupSingleStation(station, mode, options = {}) {
@@ -2004,7 +2201,7 @@ answerTextarea.addEventListener('input',()=>{
     // Show while writing OR after time expires (done phase with textarea still open).
     // Hide once this station has already been AI-marked.
     const alreadyMarked = sessionHistory[currentIdx] && sessionHistory[currentIdx].score != null;
-    const show=(n>20 && (phase==='writing' || phase==='done') && !alreadyMarked);
+    const show=(!window.K2_ACTIVE_CASPER_MOCK && n>20 && (phase==='writing' || phase==='done') && !alreadyMarked);
     aiwrap.style.display=show?'inline-flex':'none';
     const limits = Key2MDAuth.getLimits();
     const toolLimits = limits?.casper;
@@ -2571,7 +2768,7 @@ async function finishStation(){
     if(aiwrap){
       const n=wc(answerTextarea.value);
       const alreadyMarked = sessionHistory[currentIdx] && sessionHistory[currentIdx].score != null;
-      aiwrap.style.display = (n>20 && !alreadyMarked) ? 'inline-flex' : 'none';
+      aiwrap.style.display = (!window.K2_ACTIVE_CASPER_MOCK && n>20 && !alreadyMarked) ? 'inline-flex' : 'none';
     }
   }
 }
