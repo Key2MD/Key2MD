@@ -964,6 +964,11 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         </div>
         <button onclick="openEnquiry('CASPer Group Session')" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.82rem;font-weight:700;transition:all 0.2s;box-sizing:border-box;border:none;cursor:pointer;font-family:inherit;" onmouseover="this.style.background='#38bdf8'" onmouseout="this.style.background='var(--teal)'">Express Interest →</button>
         <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:6px;">Dan replies within 24 hours</div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.12);">
+          <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#c4b5fd;margin-bottom:5px;">Full CASPer Mock</div>
+          <div style="font-size:0.74rem;color:rgba(255,255,255,0.6);line-height:1.45;margin-bottom:8px;">4 video + 7 written stations in the official sequence. From $59, Pro saves about 30%.</div>
+          <button onclick="setMode('mock');FullCasperMock.activateMockMode();" style="width:100%;padding:8px 10px;border-radius:50px;border:1px solid rgba(196,181,253,0.35);background:rgba(124,58,237,0.18);color:#ddd6fe;font-size:0.76rem;font-weight:800;cursor:pointer;font-family:inherit;">View Full Mock →</button>
+        </div>
       </div>
 
       <!-- Mailing list -->
@@ -1665,6 +1670,7 @@ window.K2PracticeBridge = {
 // ── API ENDPOINT (handled by Key2MDAuth module) ──
 // IMPORTANT: Update this to your deployed worker URL or domain route
 const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev'; // Change if using workers.dev URL
+window.API_BASE = API_BASE;
 const AI_LIMIT_MAX = 1;
 let aiEnabled=true;
 function updateLimitUI(){
