@@ -1908,9 +1908,10 @@ function updateLimitUI(){
   // Defensive: auth.js is loaded with `defer`, but this script is inline and runs first.
   // Bail out gracefully on the initial top-level call; Key2MDAuth.init() will trigger
   // updateLimitUI again via onAuthChange/onLimitsLoaded once auth.js has loaded.
-  if(typeof Key2MDAuth === 'undefined') return;
+  const auth = getK2Auth();
+  if(!auth) return;
   const limits = auth.getLimits();
-  const loggedIn = Key2MDAuth.isLoggedIn();
+  const loggedIn = auth.isLoggedIn();
   const el = document.getElementById('aiLimitCount');
   const fill = document.getElementById('aiLimitFill');
   const noteEl = document.getElementById('aiLimitNote');
@@ -2270,7 +2271,7 @@ if(stationReflection){
 function applyModeUI(mode) {
   const isCasper  = mode === MODE_CASPER;
   const isMMI     = mode === MODE_MMI;
-  const isMock = mode === MODE_MOCK;
+  const isMock    = mode === MODE_MOCK;
 
   // Pills
   const pillC = $('modeCasper'), pillM = $('modeMMI'), pillR = $('modeMock');
@@ -2309,6 +2310,7 @@ function setMode(mode) {
 
   const isCasper  = mode === MODE_CASPER;
   const isMMI     = mode === MODE_MMI;
+  const isMock    = mode === MODE_MOCK;
 
   // Update page title
   const pt = document.getElementById('pageTitle');
