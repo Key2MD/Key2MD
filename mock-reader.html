@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key2MD Mock Reader</title>
+  <style>
+    :root{--navy:#0a1628;--teal:#0ea5e9;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray500:#64748b;--gray700:#334155}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--gray50);color:var(--navy)}
+    header{background:var(--navy);color:#fff;padding:22px 28px}
+    header h1{margin:0;font-size:1.35rem}
+    main{max-width:1240px;margin:0 auto;padding:24px}
+    .card{background:#fff;border:1px solid var(--gray200);border-radius:14px;padding:18px;margin-bottom:16px}
+    .muted{color:var(--gray500);font-size:.86rem;line-height:1.55}
+    input,textarea,select{width:100%;border:1px solid var(--gray200);border-radius:10px;padding:10px 12px;font:inherit}
+    button{border:0;border-radius:999px;background:var(--navy);color:#fff;padding:10px 16px;font-weight:800;cursor:pointer}
+    button.secondary{background:#fff;color:var(--gray700);border:1px solid var(--gray200)}
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:start}
+    .list-item{width:100%;text-align:left;background:#fff;color:var(--navy);border:1px solid var(--gray200);border-radius:12px;padding:12px;margin-bottom:10px}
+    .list-item.active{border-color:var(--teal);background:rgba(14,165,233,.06)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .tabs button{background:#fff;color:var(--gray700);border:1px solid var(--gray200);padding:8px 12px;font-size:.78rem}
+    .tabs button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .station-grid{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr);gap:18px}
+    pre{white-space:pre-wrap;background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:12px;line-height:1.55;max-height:440px;overflow:auto}
+    video{width:100%;aspect-ratio:16/9;background:#000;border-radius:12px}
+    .pill{display:inline-block;border-radius:999px;background:rgba(14,165,233,.1);color:#0369a1;padding:4px 9px;font-size:.72rem;font-weight:800}
+    @media(max-width:900px){.grid,.station-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Key2MD Mock Reader</h1>
+    <div class="muted" style="color:rgba(255,255,255,.68)">Admin-only access to saved Full CASPer Mock attempts and paid manual reviews.</div>
+  </header>
+  <main>
+    <section id="loginCard" class="card">
+      <h2>Admin Login</h2>
+      <div class="muted">Use the same temporary admin credentials as the dashboard.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin-top:12px">
+        <input id="adminEmail" placeholder="Admin email">
+        <input id="adminPassword" type="password" placeholder="Password">
+        <button onclick="login()">Log in</button>
+      </div>
+      <div id="loginStatus" class="muted" style="margin-top:8px"></div>
+    </section>
+
+    <section id="readerApp" style="display:none">
+      <div class="grid">
+        <aside class="card">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px">
+            <h2 style="margin:0;font-size:1rem">Mock Attempts</h2>
+            <button class="secondary" onclick="loadList()">Refresh</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+            <button id="scopeAllBtn" class="secondary" onclick="setScope('all')">All saved</button>
+            <button id="scopePaidBtn" class="secondary" onclick="setScope('paid')">Paid reviews</button>
+          </div>
+          <div id="reviewList" class="muted">Loading...</div>
+        </aside>
+        <section id="attemptPanel" class="card">
+          <div class="muted">Select a paid mock review request.</div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script>
+    const API_BASE = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+    let adminToken = localStorage.getItem('k2md_admin_token') || '';
+    let currentAttempt = null;
+    let currentStation = 0;
+    let listScope = localStorage.getItem('k2md_mock_reader_scope') || 'all';
+
+    function esc(v){return String(v ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+    function authHeaders(){return {'Authorization':'Bearer '+adminToken};}
+
+    async function login(){
+      const status=document.getElementById('loginStatus');
+      status.textContent='Checking...';
+      const res=await fetch(API_BASE+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:adminEmail.value,password:adminPassword.value})});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok){status.textContent=data.error||'Login failed';return;}
+      adminToken=data.token; localStorage.setItem('k2md_admin_token',adminToken);
+      showApp();
+    }
+
+    function showApp(){
+      document.getElementById('loginCard').style.display='none';
+      document.getElementById('readerApp').style.display='block';
+      loadList();
+    }
+
+    function setScope(scope){
+      listScope = scope === 'paid' ? 'paid' : 'all';
+      localStorage.setItem('k2md_mock_reader_scope', listScope);
+      loadList();
+    }
+
+    async function loadList(){
+      const list=document.getElementById('reviewList');
+      list.textContent='Loading...';
+      const allBtn=document.getElementById('scopeAllBtn'), paidBtn=document.getElementById('scopePaidBtn');
+      if(allBtn&&paidBtn){
+        allBtn.style.background=listScope==='all'?'var(--navy)':'#fff'; allBtn.style.color=listScope==='all'?'#fff':'var(--gray700)';
+        paidBtn.style.background=listScope==='paid'?'var(--navy)':'#fff'; paidBtn.style.color=listScope==='paid'?'#fff':'var(--gray700)';
+      }
+      const endpoint = listScope === 'paid' ? '/api/admin/casper-mock/manual-reviews' : '/api/admin/casper-mock/attempts';
+      const res=await fetch(API_BASE+endpoint,{headers:authHeaders()});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok){list.textContent=data.error||'Could not load reviews';return;}
+      const rows=data.rows||[];
+      list.innerHTML=rows.length?rows.map(r=>`
+        <button class="list-item" onclick="openAttempt('${esc(r.id)}')">
+          <div style="font-weight:900">${esc(r.user_name||r.user_email||'Student')}</div>
+          <div class="muted">${esc(r.user_email||'')}<br>${esc(r.tier||'mock')} - ${r.manual_review_paid ? 'paid manual review' : 'saved mock only'} - ${esc(r.manual_review_status||'not_requested')}</div>
+          <div class="muted">${esc(r.completed_at||'')}</div>
+        </button>
+      `).join(''):(listScope === 'paid' ? 'No paid manual reviews yet.' : 'No saved mock attempts yet.');
+    }
+
+    async function openAttempt(id){
+      const panel=document.getElementById('attemptPanel');
+      panel.innerHTML='<div class="muted">Loading attempt...</div>';
+      const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(id),{headers:authHeaders()});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok){panel.innerHTML='<div class="muted">'+esc(data.error||'Could not load attempt')+'</div>';return;}
+      currentAttempt=data.attempt; currentStation=0; renderAttempt();
+    }
+
+    function renderAttempt(){
+      const a=currentAttempt, rows=a.rows||[];
+      const tabs=rows.map((r,i)=>`<button class="${i===currentStation?'active':''}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}</button>`).join('');
+      document.getElementById('attemptPanel').innerHTML=`
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+          <div>
+            <h2 style="margin:0">${esc(a.user_name||a.user_email||'Student')}</h2>
+            <div class="muted">${esc(a.user_email||'')} - <span class="pill">${esc(a.tier)}</span> - ${esc(a.manual_review_status||'pending_review')}</div>
+          </div>
+          <button class="secondary" onclick="saveNotes()">Save notes</button>
+        </div>
+        <div class="tabs">${tabs}</div>
+        <div>${stationHtml(rows[currentStation])}</div>
+        <div class="card" style="margin-top:16px">
+          <h3>Admin notes</h3>
+          <select id="reviewStatus" style="max-width:240px;margin-bottom:10px">
+            ${['pending_review','in_review','completed'].map(s=>`<option value="${s}" ${a.manual_review_status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+          <textarea id="adminNotes" rows="7" placeholder="Overall notes, station-specific notes, final recommendation...">${esc(a.admin_notes||'')}</textarea>
+          <div id="saveStatus" class="muted" style="margin-top:8px"></div>
+        </div>
+      `;
+    }
+
+    function stationHtml(r){
+      if(!r)return '<div class="muted">No station selected.</div>';
+      const station=r.station||{}, fb=r.feedback||{};
+      const scenario=`<div class="card"><h3>Scenario</h3><div class="muted">${esc(station.scenario||'')}</div><h4>Prompts</h4><ol><li>${esc(station.prompt1||'')}</li><li>${esc(station.prompt2||'')}</li></ol></div>`;
+      if(r.type==='video'){
+        const key=r.recording_key;
+        const src=key?`${API_BASE}/api/admin/casper-mock/recording?key=${encodeURIComponent(key)}&admin_token=${encodeURIComponent(adminToken)}`:'';
+        return `<div class="station-grid"><div><video controls src="${src}"></video><pre>${esc(r.transcript||'No transcript')}</pre></div><div>${scenario}${feedbackHtml(fb)}</div></div>`;
+      }
+      return `<div class="station-grid"><div>${scenario}<h3>Typed answer</h3><pre>${esc(r.answer||'No answer')}</pre></div><div>${feedbackHtml(fb)}</div></div>`;
+    }
+
+    function feedbackHtml(fb){
+      const overall=fb.overall||{};
+      const comps=Array.isArray(fb.competencies)?fb.competencies:[];
+      const prompts=Array.isArray(fb.per_prompt)?fb.per_prompt:[];
+      return `<div class="card"><h3>AI Feedback</h3>
+        <div class="pill">${esc(overall.score||fb.score||'')}/10 ${esc(overall.label||'')}</div>
+        <p><strong>Strength:</strong> ${esc(overall.biggest_strength||fb.strengths||'')}</p>
+        <p><strong>Improve:</strong> ${esc(overall.biggest_improvement||fb.improvements||'')}</p>
+        ${fb.presentation?`<h4>Presentation</h4><pre>${esc(JSON.stringify(fb.presentation,null,2))}</pre>`:''}
+        ${comps.length?`<h4>Competencies</h4><pre>${esc(JSON.stringify(comps,null,2))}</pre>`:''}
+        ${prompts.length?`<h4>Prompt feedback</h4><pre>${esc(JSON.stringify(prompts,null,2))}</pre>`:''}
+      </div>`;
+    }
+
+    async function saveNotes(){
+      const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/notes',{method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({status:reviewStatus.value,notes:adminNotes.value})});
+      const data=await res.json().catch(()=>({}));
+      document.getElementById('saveStatus').textContent=res.ok?'Saved.':(data.error||'Save failed');
+    }
+
+    if(adminToken) showApp();
+  </script>
+</body>
+</html>
