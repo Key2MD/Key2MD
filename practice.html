@@ -12,13 +12,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Free CASPer &amp; MMI Practice — Timed Stations, AI Feedback | Key2MD</title>
-  <meta name="description" content="Free CASPer &amp; MMI practice for Australian medical applicants. Timed stations, AI feedback, 90+ CASPer scenarios, 40+ MMI stations, and a full CASPer mock exam. Built by a UniMelb MD.">
+  <meta name="description" content="Free CASPer &amp; MMI practice for Australian medical applicants. Timed stations, AI feedback, 90+ CASPer scenarios, 40+ MMI stations, and a full CASPer mock exam with completely new stations handwritten by Dan.">
   <link rel="canonical" href="https://www.key2md.com/practice.html">
   <!-- Favicon (inline SVG, matches Key2MD brand) -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a1628'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' font-size='28' font-weight='800' fill='white'%3EK%3Ctspan fill='%230ea5e9'%3E2%3C/tspan%3E%3C/text%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%230a1628'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' font-size='80' font-weight='800' fill='white'%3EK%3Ctspan fill='%230ea5e9'%3E2%3C/tspan%3E%3C/text%3E%3C/svg%3E">
   <meta property="og:title" content="Free CASPer &amp; MMI Practice — Timed Stations, AI Feedback">
-  <meta property="og:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and a full CASPer mock exam. For Australian med applicants.">
+  <meta property="og:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and a full CASPer mock exam with new stations handwritten by Dan.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.key2md.com/practice.html">
   <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
@@ -29,7 +29,7 @@
   <meta property="og:image:alt" content="Key2MD — MMI, CASPer and GAMSAT Section II coaching.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Free CASPer &amp; MMI Practice — Timed Stations, AI Feedback">
-  <meta name="twitter:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and a full CASPer mock exam. For Australian med applicants.">
+  <meta name="twitter:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and a full CASPer mock exam with new stations handwritten by Dan.">
   <link rel="stylesheet" href="practice.css">
   <link rel="stylesheet" href="mmi-styles.css">
   <script type="application/ld+json">
@@ -336,8 +336,9 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="mode-pill-row practice-mode-grid">
         <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper');" aria-label="CASPer practice">CASPer</button>
         <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');" aria-label="MMI practice">MMI</button>
-        <button class="mode-pill mode-pill-mock" id="modeMock" onclick="setMode('mock');FullCasperMock.activateMockMode();" aria-label="Full CASPer mock exam">Mock Exam</button>
+        <button class="mode-pill mode-pill-mock" id="modeMock" onclick="setMode('mock');FullCasperMock.activateMockMode();" aria-label="Full CASPer mock exam"><span class="mock-pill-kicker">New</span><span>Full Mock</span></button>
       </div>
+      <div class="mock-pill-helper">11 new stations handwritten by Dan</div>
     </div>
 
     <button class="btn-start" id="startBtn"><span id="startBtnIcon">▶</span><span id="startBtnText">Start Session</span></button>
@@ -966,7 +967,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:6px;">Dan replies within 24 hours</div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.12);">
           <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#c4b5fd;margin-bottom:5px;">Full CASPer Mock</div>
-          <div style="font-size:0.74rem;color:rgba(255,255,255,0.6);line-height:1.45;margin-bottom:8px;">4 video + 7 written stations in the official sequence. From $59, Pro saves about 30%.</div>
+          <div style="font-size:0.74rem;color:rgba(255,255,255,0.6);line-height:1.45;margin-bottom:8px;">4 video + 7 written stations in the official sequence. Completely new stations, handwritten by Dan.</div>
           <button onclick="setMode('mock');FullCasperMock.activateMockMode();" style="width:100%;padding:8px 10px;border-radius:50px;border:1px solid rgba(196,181,253,0.35);background:rgba(124,58,237,0.18);color:#ddd6fe;font-size:0.76rem;font-weight:800;cursor:pointer;font-family:inherit;">View Full Mock →</button>
         </div>
       </div>
@@ -2229,6 +2230,10 @@ answerTextarea.addEventListener('input',()=>{
 
 function updateReflectionUI(){
   if(!stationReflectionWrap||!stationReflection)return;
+  if(window.K2_ACTIVE_CASPER_MOCK){
+    stationReflectionWrap.style.display='none';
+    return;
+  }
   const isCasper=currentMode===MODE_CASPER;
   const show=isCasper&&sessionActive&&(phase==='done'||(sessionHistory[currentIdx]&&sessionHistory[currentIdx].score!=null));
   stationReflectionWrap.style.display=show?'block':'none';
@@ -2251,7 +2256,7 @@ function applyModeUI(mode) {
   const pillC = $('modeCasper'), pillM = $('modeMMI'), pillR = $('modeMock');
   if (pillC) pillC.className = 'mode-pill' + (isCasper  ? ' active-casper'  : '');
   if (pillM) pillM.className = 'mode-pill' + (isMMI     ? ' active-mmi'     : '');
-  if (pillR) pillR.className = 'mode-pill' + (isMock ? ' active-mock' : '');
+  if (pillR) pillR.className = 'mode-pill mode-pill-mock' + (isMock ? ' active-mock' : '');
 
   // Cards visibility (use style.display consistently)
   // The unified #categoryCard wraps both blocks; toggle the inner blocks only.
@@ -2287,7 +2292,7 @@ function setMode(mode) {
 
   // Update page title
   const pt = document.getElementById('pageTitle');
-  if (pt) pt.textContent = (isCasper ? 'CASPer Practice' : isMMI ? 'MMI Practice' : 'Full CASPer Mock Exam') + ' — Key2MD';
+  if (pt) pt.textContent = (isCasper ? 'CASPer Practice' : isMMI ? 'MMI Practice' : 'Full CASPer Mock Exam: new stations handwritten by Dan') + ' — Key2MD';
 
   // Update idle text
   const ist = $('idle-sub-text');
@@ -2295,7 +2300,7 @@ function setMode(mode) {
     ? 'Choose a category and press Start Session to begin your CASPer practice simulation.'
     : isMMI
     ? 'Choose a station type and press Start Session to begin your MMI simulation.'
-    : 'Configure your full CASPer mock exam below.';
+    : 'Configure your full CASPer mock exam below: 11 completely new stations handwritten by Dan.';
 
   // Update timer defaults
   if (!isCasper) {
@@ -5205,7 +5210,49 @@ document.addEventListener('DOMContentLoaded', function(){
 .pack-rec { font-size:0.68rem; font-weight:700; color:#fbbf24; background:rgba(245,158,11,0.15); padding:3px 10px; border-radius:50px; white-space:nowrap; }
 
 /* ── Full Mock Mode ── */
-.mode-pill.active-mock { border-color:var(--navy); background:var(--navy); color:#fff; box-shadow:inset 0 -3px 0 var(--teal); }
+.mode-pill-mock {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:1px;
+  min-height:46px;
+  border-color:rgba(14,165,233,0.5)!important;
+  background:linear-gradient(135deg,rgba(14,165,233,0.12),rgba(255,255,255,1));
+  color:var(--navy)!important;
+  box-shadow:0 6px 18px rgba(14,165,233,0.12);
+}
+.mode-pill-mock::after {
+  content:'';
+  position:absolute;
+  inset:-2px;
+  border-radius:10px;
+  border:1px solid rgba(14,165,233,0.22);
+  pointer-events:none;
+}
+.mock-pill-kicker {
+  font-size:0.52rem;
+  font-weight:900;
+  line-height:1;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--teal3);
+}
+.mock-pill-helper {
+  margin-top:8px;
+  padding:7px 9px;
+  border:1px solid rgba(14,165,233,0.18);
+  border-radius:8px;
+  background:rgba(240,249,255,0.74);
+  color:#075985;
+  font-size:0.68rem;
+  font-weight:850;
+  line-height:1.25;
+  text-align:center;
+}
+.mode-pill.active-mock { border-color:var(--navy)!important; background:linear-gradient(135deg,var(--navy),#0f2a44); color:#fff!important; box-shadow:0 10px 24px rgba(10,22,40,0.26), inset 0 -3px 0 var(--teal); }
+.mode-pill.active-mock .mock-pill-kicker { color:#7dd3fc; }
 .mode-pill.active-mock:hover { border-color:var(--navy); color:#fff; }
 @keyframes mmi-spin { to { transform:rotate(360deg); } }
 

@@ -13,6 +13,7 @@ window.FullCasperMock = (() => {
   const VIDEO_PRESET = 'casperVideo';
   const VIDEO_BREAK_SECONDS = 10 * 60;
   const TYPED_BREAK_SECONDS = 5 * 60;
+  const STATION_TRANSITION_SECONDS = 10;
   const CASPER_REFLECTION_SECONDS = 30;
   const CASPER_TYPED_SECONDS = 210;
   const MOCK_PRICES = {
@@ -32,6 +33,14 @@ window.FullCasperMock = (() => {
   let advancing = false;
   let rulesAccepted = false;
   let finalVideoRows = [];
+  let finalReviewRows = [];
+  let doneMonitorTimer = null;
+  let transitionTimer = null;
+  let transitionActive = false;
+  let transitionNextIndex = null;
+  let mockAttemptId = null;
+  let savedAttemptId = null;
+  let latestReport = null;
 
   function byId(id) {
     return document.getElementById(id);
@@ -71,6 +80,25 @@ window.FullCasperMock = (() => {
 
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function clearDoneMonitor() {
+    clearInterval(doneMonitorTimer);
+    doneMonitorTimer = null;
+  }
+
+  function clearTransitionTimer() {
+    clearInterval(transitionTimer);
+    transitionTimer = null;
+    transitionActive = false;
+    transitionNextIndex = null;
+  }
+
+  function hideStationReflection() {
+    ['stationReflectionWrap', 'stationReflection'].forEach(id => {
+      const el = byId(id);
+      if (el) el.style.display = 'none';
+    });
   }
 
   function hasFullMockPass(status, tier = config.tier) {
@@ -241,7 +269,7 @@ window.FullCasperMock = (() => {
       <div class="sidebar-card" style="border-color:rgba(14,165,233,0.25);background:linear-gradient(180deg,rgba(14,165,233,0.06),#fff);">
         <h3>Full CASPer Mock</h3>
         <div style="font-size:0.82rem;color:var(--gray600);line-height:1.55;margin-bottom:14px;">
-          Official current sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4.
+          Official current sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. All 11 stations are completely new and handwritten by Dan.
         </div>
 
         <div style="margin-bottom:14px;">
@@ -256,7 +284,7 @@ window.FullCasperMock = (() => {
         <div style="background:#fff;border:1px solid rgba(14,165,233,0.24);border-radius:10px;padding:12px;margin-bottom:14px;">
           <div style="font-size:0.68rem;font-weight:800;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Mock exam pass</div>
           <div id="mockPriceLine" data-mock-price-line style="font-size:0.86rem;color:var(--navy);line-height:1.45;">${renderPriceLine('transcript')}</div>
-          <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes 7 written CASPer AI markings and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
+          <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes 11 new handwritten stations by Dan, 7 written CASPer AI markings, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
         </div>
 
         <div style="background:rgba(10,22,40,0.04);border:1px solid var(--gray200);border-radius:10px;padding:11px 12px;margin-bottom:14px;">
@@ -324,6 +352,8 @@ window.FullCasperMock = (() => {
     stationToken += 1;
     window.K2_ACTIVE_CASPER_MOCK = null;
     restoreSubmit();
+    clearDoneMonitor();
+    clearTransitionTimer();
     clearInterval(breakTimer);
     byId('casperMockConfigPanel')?.style.setProperty('display', 'none');
     const area = byId('casperMockMainArea');
@@ -382,7 +412,7 @@ window.FullCasperMock = (() => {
       <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:34px 32px;text-align:center;">
         <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Full CASPer Mock Exam</div>
         <h2 style="font-size:1.7rem;line-height:1.2;color:var(--navy);margin:0 0 10px;">Practise the full sequence in one sitting.</h2>
-        <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with the optional breaks built in. Use it once you want realistic pacing, fatigue, and format pressure.</p>
+        <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with the optional breaks built in. The stations are completely new and handwritten by Dan, so it feels like a fresh exam rather than recycled practice.</p>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:720px;margin:0 auto 26px;text-align:left;">
           <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
             <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">4 video stations</div>
@@ -487,6 +517,9 @@ window.FullCasperMock = (() => {
     sequence = [...videos, ...typed];
     results = [];
     index = 0;
+    mockAttemptId = (crypto.randomUUID ? crypto.randomUUID() : `mock_${Date.now()}_${Math.random().toString(16).slice(2)}`);
+    savedAttemptId = null;
+    latestReport = null;
     stationToken = 0;
     advancing = false;
     started = true;
@@ -507,7 +540,7 @@ window.FullCasperMock = (() => {
         <div style="background:var(--navy);padding:26px 30px;color:#fff;">
           <div style="font-size:0.7rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:8px;">Before you begin</div>
           <h2 style="font-size:1.55rem;line-height:1.25;margin:0 0 8px;">Full CASPer Mock Exam rules</h2>
-          <p style="font-size:0.9rem;color:rgba(255,255,255,0.68);line-height:1.6;margin:0;max-width:720px;">Your mock pass is active. Read this once, then proceed when you are ready to start the first video station.</p>
+          <p style="font-size:0.9rem;color:rgba(255,255,255,0.68);line-height:1.6;margin:0;max-width:720px;">Your mock pass is active. You are about to begin 11 completely new CASPer stations handwritten by Dan. Read this once, then proceed when you are ready to start the first video station.</p>
         </div>
         <div style="padding:26px 30px;">
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:20px;">
@@ -565,6 +598,8 @@ window.FullCasperMock = (() => {
           row.feedback = data?.feedback || null;
           row.transcript = data?.transcript || '';
           row.rawFeedback = data || null;
+          row.reviewId = data?.review_id || null;
+          row.recordingKey = data?.recording_url || null;
         } else {
           row.score = Number.isFinite(Number(data?.score)) ? Number(data.score) : null;
           row.feedback = data?.feedback || null;
@@ -574,6 +609,73 @@ window.FullCasperMock = (() => {
         row.processingError = err.message || 'Feedback processing failed.';
       }
     }));
+  }
+
+  function serialiseAttemptRows(rows = buildRows()) {
+    return rows.map(row => ({
+      type: row.type,
+      order: row.order,
+      localIndex: row.localIndex,
+      station: row.station,
+      answer: row.answer || '',
+      score: row.score10,
+      feedback: row.feedback || null,
+      transcript: row.transcript || '',
+      review_id: row.reviewId || row.rawFeedback?.review_id || null,
+      recording_key: row.recordingKey || row.rawFeedback?.recording_url || null,
+      tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
+      processing_error: row.processingError || null,
+    }));
+  }
+
+  async function saveMockAttempt(rows = buildRows(), report = latestReport) {
+    const auth = getAuth();
+    const token = auth?.getToken?.();
+    if (!token || !mockAttemptId) throw new Error('Sign in required to save this mock attempt.');
+    const res = await fetch(`${window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev'}/api/casper-mock/attempts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({
+        attempt_id: mockAttemptId,
+        tier: config.tier,
+        completed_at: new Date().toISOString(),
+        rows: serialiseAttemptRows(rows),
+        report,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || data.error || 'Could not save mock attempt.');
+    savedAttemptId = data.attempt_id || mockAttemptId;
+    return savedAttemptId;
+  }
+
+  async function requestManualReview() {
+    const status = byId('mockManualReviewStatus');
+    const btn = byId('mockManualReviewBtn');
+    try {
+      if (btn) { btn.disabled = true; btn.textContent = 'Saving mock...'; }
+      if (status) status.textContent = 'Saving your full mock securely...';
+      const rows = buildRows();
+      const attemptId = savedAttemptId || await saveMockAttempt(rows, latestReport);
+      const auth = getAuth();
+      const token = auth?.getToken?.();
+      if (!token) throw new Error('Please sign in before requesting manual review.');
+      if (btn) btn.textContent = 'Opening Stripe...';
+      if (status) status.textContent = 'Opening secure Stripe checkout for $300 AUD...';
+      const successUrl = `${window.location.origin}${window.location.pathname}?tab=mock&manual_review=success&attempt_id=${encodeURIComponent(attemptId)}`;
+      const cancelUrl = `${window.location.origin}${window.location.pathname}?tab=mock&manual_review=cancelled&attempt_id=${encodeURIComponent(attemptId)}`;
+      const res = await fetch(`${window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev'}/api/casper-mock/manual-review/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ attempt_id: attemptId, success_url: successUrl, cancel_url: cancelUrl }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.checkout_url) throw new Error(data.message || data.error || 'Could not start manual review checkout.');
+      window.location.href = data.checkout_url;
+    } catch (err) {
+      if (btn) { btn.disabled = false; btn.textContent = "Request Dan's manual review - $300 AUD"; }
+      if (status) status.textContent = err.message || 'Could not start manual review checkout.';
+    }
   }
 
   function ruleCard(title, body) {
@@ -599,6 +701,9 @@ window.FullCasperMock = (() => {
 
     stationToken += 1;
     advancing = false;
+    transitionActive = false;
+    clearDoneMonitor();
+    clearTransitionTimer();
     clearInterval(breakTimer);
     hideNormalPanels();
     setStationChrome(true);
@@ -623,9 +728,11 @@ window.FullCasperMock = (() => {
         writingTime: CASPER_TYPED_SECONDS,
       });
       keepMockModeChrome();
+      hideStationReflection();
     }
     hideNormalPanelsExceptStation();
     renderProgress();
+    startDoneMonitor(stationToken);
   }
 
   function renderCameraGate() {
@@ -737,6 +844,17 @@ window.FullCasperMock = (() => {
     `;
   }
 
+  function startDoneMonitor(token) {
+    clearDoneMonitor();
+    doneMonitorTimer = setInterval(() => {
+      if (!active || !started || token !== stationToken || transitionActive) return;
+      hideStationReflection();
+      const bridge = window.K2PracticeBridge;
+      if (!bridge || bridge.getPhase?.() !== 'done') return;
+      beginStationTransition(token);
+    }, 500);
+  }
+
   function patchSubmitForVideo() {
     if (originalSubmitMMI || typeof window.submitMMIForFeedback !== 'function') return;
     originalSubmitMMI = window.submitMMIForFeedback;
@@ -776,19 +894,11 @@ window.FullCasperMock = (() => {
         if (wrap) {
           wrap.innerHTML = `<div style="background:#eff6ff;border:1px solid rgba(14,165,233,0.28);border-radius:10px;padding:13px 15px;font-size:0.82rem;color:#075985;margin-top:10px;"><strong>Recording saved for the final report.</strong><br>Continue when you are ready. Your AI feedback will be shown after the full mock.</div>`;
         }
+        beginStationTransition(stationToken);
         return true;
       }
       if (phase === 'done') {
-        try {
-          const submission = bridge.submitMockVideoReview?.();
-          completeAndAdvance(submission || null, stationToken);
-        } catch (err) {
-          const wrap = byId('aiFeedbackWrapMMI');
-          if (wrap) {
-            wrap.innerHTML = `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:13px 15px;font-size:0.82rem;color:#991b1b;margin-top:10px;"><strong>Recording could not be saved.</strong><br>${esc(err.message || 'Please re-record this station before continuing.')}</div>`;
-            wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }
+        beginStationTransition(stationToken);
       }
       return true;
     }
@@ -803,20 +913,51 @@ window.FullCasperMock = (() => {
       bridge.saveAnswer();
       bridge.setPhase('done');
       byId('btnGetAIWrap')?.style.setProperty('display', 'none');
+      hideStationReflection();
+      beginStationTransition(stationToken);
       return true;
     }
     if (phase === 'done') {
-      bridge.saveAnswer();
-      const submission = bridge.submitMockWrittenReview?.() || bridge.getCurrentHistory();
-      completeAndAdvance(submission, stationToken);
+      beginStationTransition(stationToken);
     }
     return true;
+  }
+
+  async function beginStationTransition(token = stationToken) {
+    if (token !== stationToken || transitionActive || advancing) return;
+    const bridge = window.K2PracticeBridge;
+    const item = sequence[index];
+    if (!bridge || !item) return;
+    transitionActive = true;
+    clearDoneMonitor();
+    bridge.clearTimer?.();
+    hideStationReflection();
+    try {
+      let submission = null;
+      if (item.type === 'video') {
+        bridge.stopRecording?.();
+        await sleep(650);
+        submission = bridge.submitMockVideoReview?.() || null;
+      } else {
+        bridge.saveAnswer?.();
+        submission = bridge.submitMockWrittenReview?.() || bridge.getCurrentHistory?.();
+      }
+      completeAndAdvance(submission, token);
+    } catch (err) {
+      transitionActive = false;
+      const wrap = item.type === 'video' ? byId('aiFeedbackWrapMMI') : byId('aiFeedbackWrap');
+      if (wrap) {
+        wrap.innerHTML = `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:13px 15px;font-size:0.82rem;color:#991b1b;margin-top:10px;"><strong>Station could not be saved.</strong><br>${esc(err.message || 'Please try again before continuing.')}</div>`;
+        wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
   }
 
   function completeAndAdvance(payload, token = stationToken) {
     if (token !== stationToken || advancing) return;
     advancing = true;
     stationToken += 1;
+    clearDoneMonitor();
     const bridge = window.K2PracticeBridge;
     const item = sequence[index];
     if (!item) {
@@ -834,12 +975,18 @@ window.FullCasperMock = (() => {
       feedback: null,
       feedbackTask: isVideoSubmission || isWrittenSubmission ? payload.promise : null,
       recordingUrl: isVideoSubmission ? payload.recordingUrl : null,
+      durationSec: isVideoSubmission ? payload.durationSec : null,
       processingError: null,
       tier: item.type === 'video' ? config.tier : 'typed',
     });
     bridge?.completeCurrentStation?.();
 
     const nextIndex = index + 1;
+    renderStationTransition(nextIndex, item.type);
+  }
+
+  function advanceAfterTransition(nextIndex) {
+    clearTransitionTimer();
     if (nextIndex === VIDEO_COUNT) {
       advancing = false;
       renderBreak(VIDEO_BREAK_SECONDS, 'Video section complete', 'Take the optional 10-minute break before the typed section, just like the real test.');
@@ -854,6 +1001,55 @@ window.FullCasperMock = (() => {
     index = nextIndex;
     advancing = false;
     launchCurrent();
+  }
+
+  function continueAfterStation() {
+    if (transitionNextIndex == null) return;
+    advanceAfterTransition(transitionNextIndex);
+  }
+
+  function renderStationTransition(nextIndex, completedType) {
+    restoreSubmit();
+    window.K2PracticeBridge?.hardStopSession?.();
+    setStationChrome(false);
+    hideStationReflection();
+    byId('webcamPanel')?.style.setProperty('display', 'none');
+    byId('scenarioCard')?.style.setProperty('display', 'none');
+    renderProgress();
+    const area = ensureMainArea();
+    if (!area) {
+      advanceAfterTransition(nextIndex);
+      return;
+    }
+    area.style.display = 'block';
+    let left = STATION_TRANSITION_SECONDS;
+    transitionNextIndex = nextIndex;
+    const nextItem = sequence[nextIndex];
+    const nextLabel = nextItem
+      ? `${nextItem.type === 'video' ? 'video' : 'typed'} station ${nextIndex + 1}`
+      : 'your final report';
+    const sectionCopy = completedType === 'video'
+      ? 'Your recording has been saved and queued for background analysis.'
+      : 'Your typed response has been saved and queued for background analysis.';
+    const render = () => {
+      area.innerHTML = `
+        <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:36px 32px;text-align:center;">
+          <div style="font-size:0.72rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:8px;">Station saved</div>
+          <h2 style="font-size:1.45rem;color:var(--navy);line-height:1.25;margin:0 0 8px;">Next: ${esc(nextLabel)}</h2>
+          <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;max-width:560px;margin:0 auto 18px;">${esc(sectionCopy)} The exam will continue automatically.</p>
+          <div id="mockTransitionCountdown" style="font-size:3.2rem;font-weight:900;color:var(--navy);font-variant-numeric:tabular-nums;margin-bottom:18px;">${left}</div>
+          <button type="button" onclick="FullCasperMock.continueAfterStation()" style="padding:11px 24px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.86rem;font-weight:800;cursor:pointer;font-family:inherit;">Continue now</button>
+        </div>
+      `;
+    };
+    render();
+    clearInterval(transitionTimer);
+    transitionTimer = setInterval(() => {
+      left -= 1;
+      const el = byId('mockTransitionCountdown');
+      if (el) el.textContent = String(Math.max(0, left));
+      if (left <= 0) advanceAfterTransition(nextIndex);
+    }, 1000);
   }
 
   function renderBreak(seconds, title, copy) {
@@ -899,7 +1095,7 @@ window.FullCasperMock = (() => {
 
   function videoScore(feedback) {
     const score = Number(feedback?.overall?.score);
-    return Number.isFinite(score) ? score : null;
+    return Number.isFinite(score) ? Math.max(1, Math.min(10, round1(score))) : null;
   }
 
   const CRITERION_DEFS = [
@@ -1013,7 +1209,7 @@ window.FullCasperMock = (() => {
   function score10(row) {
     if (row.type === 'video') {
       const score = videoScore(row.feedback);
-      return Number.isFinite(score) ? score * 2 : null;
+      return Number.isFinite(score) ? score : null;
     }
     const score = Number(row.score);
     return Number.isFinite(score) ? Math.max(1, Math.min(10, score)) : null;
@@ -1022,7 +1218,7 @@ window.FullCasperMock = (() => {
   function rowScoreLabel(row) {
     if (row.type === 'video') {
       const score = videoScore(row.feedback);
-      return Number.isFinite(score) ? `${score}/5` : 'No score';
+      return Number.isFinite(score) ? `${score}/10` : 'No score';
     }
     const score = Number(row.score);
     return Number.isFinite(score) ? `${round1(score)}/10` : 'No score';
@@ -1048,7 +1244,7 @@ window.FullCasperMock = (() => {
       def.video.forEach(key => {
         const crit = prompt?.scores?.[key];
         const score = Number(crit?.score);
-        if (Number.isFinite(score)) scores.push(Math.max(1, Math.min(5, score)) * 2);
+        if (Number.isFinite(score)) scores.push(Math.max(1, Math.min(10, score)));
         if (crit?.comment) comments.push(String(crit.comment));
       });
     });
@@ -1323,12 +1519,22 @@ window.FullCasperMock = (() => {
     const typed = rows.filter(r => r.type === 'typed');
     const videos = rows.filter(r => r.type === 'video');
     finalVideoRows = videos;
+    finalReviewRows = rows;
     const typedScores = typed.map(r => Number(r.score)).filter(Number.isFinite);
     const videoScores = videos.map(r => videoScore(r.feedback)).filter(Number.isFinite);
     const typedAvg = typedScores.length ? round1(average(typedScores)) : '-';
     const videoAvg = videoScores.length ? round1(average(videoScores)) : '-';
     const answeredTyped = typed.filter(r => r.answer && r.answer.trim().length > 30).length;
     const report = buildMockReport(rows);
+    latestReport = {
+      overallAvg: report.overallAvg,
+      criteria: report.criteria,
+      stamina: report.stamina,
+      patterns: report.patterns,
+      categories: report.categories,
+      interpretation: report.interpretation,
+      oneThing: report.oneThing,
+    };
     const completedAnalyses = rows.filter(r => Number.isFinite(r.score10)).length;
     const failedAnalyses = rows.filter(r => r.processingError).length;
 
@@ -1342,14 +1548,13 @@ window.FullCasperMock = (() => {
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;padding:24px 32px;border-bottom:1px solid var(--gray100);">
           <div class="stat-mini"><span class="stat-mini-num">${results.length}</span><span class="stat-mini-label">Stations done</span></div>
           <div class="stat-mini"><span class="stat-mini-num">${report.overallAvg ?? '-'}</span><span class="stat-mini-label">Overall /10</span></div>
-          <div class="stat-mini"><span class="stat-mini-num">${videoAvg}</span><span class="stat-mini-label">Video avg /5</span></div>
+          <div class="stat-mini"><span class="stat-mini-num">${videoAvg}</span><span class="stat-mini-label">Video avg /10</span></div>
           <div class="stat-mini"><span class="stat-mini-num">${typedAvg}</span><span class="stat-mini-label">Typed avg /10</span></div>
           <div class="stat-mini"><span class="stat-mini-num">${answeredTyped}/7</span><span class="stat-mini-label">Typed answered</span></div>
           <div class="stat-mini"><span class="stat-mini-num">${completedAnalyses}/${rows.length}</span><span class="stat-mini-label">AI analysed</span></div>
         </div>
         <div style="padding:24px 32px;">
           ${failedAnalyses ? renderPartialReportNotice(rows) : ''}
-          ${renderVideoPlaybackPanel(videos)}
           ${renderInterpretation(report)}
           ${renderOneThing(report.oneThing)}
 
@@ -1363,20 +1568,27 @@ window.FullCasperMock = (() => {
             ${renderCategoryReport(report.categories)}
           </div>
 
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:22px;">
-            ${sectionSummary('Video section', videos, 'video')}
-            ${sectionSummary('Typed section', typed, 'typed')}
+          ${renderStationExplorer(rows)}
+
+          <div style="background:#f8fafc;border:1px solid var(--gray200);border-radius:14px;padding:16px 18px;margin-bottom:16px;">
+            <div style="font-size:0.72rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal3);margin-bottom:6px;">Optional manual review</div>
+            <div style="font-size:0.86rem;color:var(--gray600);line-height:1.6;margin-bottom:12px;">Dan will review your full mock, including typed answers, video responses, transcripts, AI feedback, and overall patterns. Available for both Transcript and Premium mock attempts. Mock data is retained for 30 days.</div>
+            <button id="mockManualReviewBtn" onclick="FullCasperMock.requestManualReview()" class="btn-restart">Request Dan's manual review - $300 AUD</button>
+            <div id="mockManualReviewStatus" style="font-size:0.76rem;color:var(--gray500);line-height:1.45;margin-top:9px;"></div>
           </div>
 
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <button onclick="FullCasperMock.startMock()" class="btn-restart">Start another mock</button>
             <button onclick="setMode('casper');FullCasperMock.deactivateMockMode();" class="btn-restart btn-restart-outline">Return to practice</button>
-            <button onclick="openEnquiry('CASPer Full Mock Review')" class="btn-restart btn-restart-outline">Ask Dan to review this</button>
           </div>
         </div>
       </div>
     `;
-    setTimeout(() => showRecording(0), 0);
+    setTimeout(() => showReviewStation(0), 0);
+    saveMockAttempt(rows, latestReport).catch(err => {
+      const status = byId('mockManualReviewStatus');
+      if (status) status.textContent = `Mock report visible. Manual review checkout will retry saving if needed: ${err.message}`;
+    });
   }
 
   function card(title, body, extra = '') {
@@ -1399,6 +1611,154 @@ window.FullCasperMock = (() => {
         <div style="font-size:0.78rem;font-weight:900;color:#9a3412;margin-bottom:5px;">Partial analysis warning</div>
         <div style="font-size:0.82rem;color:#7c2d12;line-height:1.55;">Some station analyses did not finish in time, so the overall estimate is based only on completed AI feedback. You can still review the recordings and responses captured in the mock.</div>
         <div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-top:7px;">${esc(failed)}</div>
+      </div>
+    `;
+  }
+
+  function renderStationExplorer(rows) {
+    if (!rows.length) return '';
+    const tabs = rows.map((row, i) => {
+      const label = row.type === 'video' ? `Video ${row.localIndex}` : `Typed ${row.localIndex}`;
+      return `
+        <button type="button" onclick="FullCasperMock.showReviewStation(${i})" data-mock-review-tab="${i}" style="padding:9px 13px;border-radius:50px;border:1px solid ${i === 0 ? 'var(--navy)' : 'var(--gray200)'};background:${i === 0 ? 'var(--navy)' : '#fff'};color:${i === 0 ? '#fff' : 'var(--gray600)'};font-size:0.76rem;font-weight:850;cursor:pointer;font-family:inherit;">${esc(label)}</button>
+      `;
+    }).join('');
+    return `
+      <div style="border:1px solid rgba(10,22,40,0.12);background:#fff;border-radius:16px;padding:22px 24px;margin-bottom:22px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+          <div>
+            <div style="font-size:0.66rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:6px;">Station explorer</div>
+            <div style="font-size:1.12rem;font-weight:900;color:var(--navy);line-height:1.3;">Review each answer in detail.</div>
+            <div style="font-size:0.8rem;color:var(--gray500);line-height:1.55;margin-top:4px;">Open any station to see the scenario, your response, AI feedback, and next-step advice.</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;max-width:620px;justify-content:flex-end;">${tabs}</div>
+        </div>
+        <div id="mockStationReviewPanel">${stationReviewHtml(rows[0])}</div>
+      </div>
+    `;
+  }
+
+  function showReviewStation(i = 0) {
+    const row = finalReviewRows[i];
+    document.querySelectorAll('[data-mock-review-tab]').forEach(btn => {
+      const activeTab = Number(btn.dataset.mockReviewTab) === i;
+      btn.style.background = activeTab ? 'var(--navy)' : '#fff';
+      btn.style.color = activeTab ? '#fff' : 'var(--gray600)';
+      btn.style.border = activeTab ? '1px solid var(--navy)' : '1px solid var(--gray200)';
+    });
+    const panel = byId('mockStationReviewPanel');
+    if (panel) panel.innerHTML = stationReviewHtml(row);
+  }
+
+  function stationReviewHtml(row) {
+    if (!row) return '<div style="font-size:0.84rem;color:var(--gray400);">No station selected.</div>';
+    return row.type === 'video' ? videoStationReviewHtml(row) : typedStationReviewHtml(row);
+  }
+
+  function scenarioPromptHtml(row) {
+    const station = row.station || {};
+    const prompts = [station.prompt1, station.prompt2].filter(Boolean).map((prompt, i) => `
+      <div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:11px 12px;">
+        <div style="font-size:0.66rem;font-weight:850;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;">Prompt ${i + 1}</div>
+        <div style="font-size:0.82rem;color:var(--navy);line-height:1.5;">${esc(prompt)}</div>
+      </div>
+    `).join('');
+    return `
+      <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:12px;padding:14px 15px;">
+        <div style="font-size:0.66rem;font-weight:850;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px;">Scenario</div>
+        <div style="font-size:0.86rem;color:var(--gray700);line-height:1.65;margin-bottom:12px;">${esc(station.scenario || '')}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px;">${prompts}</div>
+      </div>
+    `;
+  }
+
+  function videoStationReviewHtml(row) {
+    const presentation = row.feedback?.presentation;
+    return `
+      <div style="display:grid;grid-template-columns:minmax(min(100%,320px),0.9fr) minmax(0,1.1fr);gap:20px;align-items:start;">
+        <div>
+          <video controls playsinline src="${esc(row.recordingUrl || '')}" style="width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;display:block;"></video>
+          <div style="font-size:0.76rem;color:var(--gray400);line-height:1.45;margin-top:8px;">${esc(rowScoreLabel(row))} - ${esc(row.station?.category || 'Video station')}</div>
+          ${row.transcript ? `<div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:12px;margin-top:12px;"><div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Transcript</div><div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;max-height:190px;overflow:auto;">${esc(row.transcript)}</div></div>` : ''}
+        </div>
+        <div style="display:grid;gap:14px;">
+          ${scenarioPromptHtml(row)}
+          ${videoFeedbackHtml(row)}
+          ${presentation ? renderPresentationFeedback(presentation, row.rawFeedback?.visual_degraded) : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderPresentationFeedback(presentation, visualDegraded) {
+    return `
+      <div style="background:#f8fafc;border:1px solid rgba(124,58,237,0.18);border-radius:12px;padding:14px 15px;">
+        <div style="font-size:0.7rem;font-weight:900;color:#6d28d9;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Presentation feedback</div>
+        ${visualDegraded ? '<div style="font-size:0.76rem;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:9px 10px;line-height:1.45;margin-bottom:9px;">Camera-based feedback was limited, but voice and transcript feedback were still analysed.</div>' : ''}
+        ${presentationLine('Pace', presentation.pace)}
+        ${presentationLine('Clarity', presentation.clarity)}
+        ${presentationLine('Confidence', presentation.confidence)}
+        ${presentationLine('Visual presence', presentation.visual_presence)}
+        ${presentationLine('One improvement', presentation.one_improvement)}
+      </div>
+    `;
+  }
+
+  function presentationLine(label, value) {
+    if (!value) return '';
+    return `<div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;margin-top:6px;"><strong>${esc(label)}:</strong> ${esc(value)}</div>`;
+  }
+
+  function typedStationReviewHtml(row) {
+    const fb = row.feedback || {};
+    return `
+      <div style="display:grid;grid-template-columns:minmax(min(100%,330px),0.95fr) minmax(0,1.05fr);gap:20px;align-items:start;">
+        <div style="display:grid;gap:14px;">
+          ${scenarioPromptHtml(row)}
+          <div style="background:#fff;border:1px solid var(--gray200);border-radius:12px;padding:15px;">
+            <div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px;">Your typed answer</div>
+            <div style="font-size:0.84rem;color:var(--gray700);line-height:1.7;white-space:pre-wrap;max-height:420px;overflow:auto;">${esc(row.answer || 'No typed response captured.')}</div>
+          </div>
+        </div>
+        <div style="display:grid;gap:14px;">
+          <div style="background:linear-gradient(135deg,rgba(14,165,233,0.08),#fff);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:15px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">
+              <div style="font-size:0.78rem;font-weight:900;color:var(--navy);">${esc(row.station?.category || 'Typed station')}</div>
+              <div style="font-size:0.9rem;font-weight:900;color:var(--teal3);">${esc(rowScoreLabel(row))}</div>
+            </div>
+            ${typedFeedbackLine('Strengths', fb.strengths)}
+            ${typedFeedbackLine('Improve', fb.improvements)}
+            ${typedFeedbackLine('Empathy', fb.empathy)}
+            ${fb.missed && fb.missed !== 'None' ? typedFeedbackLine('Missed point', fb.missed) : ''}
+          </div>
+          ${typedCompetencyReviewHtml(row)}
+        </div>
+      </div>
+    `;
+  }
+
+  function typedFeedbackLine(label, value) {
+    return value ? `<div style="font-size:0.8rem;color:var(--gray600);line-height:1.6;margin-top:7px;"><strong>${esc(label)}:</strong> ${esc(value)}</div>` : '';
+  }
+
+  function typedCompetencyReviewHtml(row) {
+    const comps = typedCompetencies(row).sort((a, b) => a.score - b.score);
+    if (!comps.length) return '';
+    return `
+      <div style="background:#fff;border:1px solid var(--gray200);border-radius:12px;padding:15px;">
+        <div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Competency breakdown</div>
+        ${comps.map(comp => {
+          const color = comp.score >= 7 ? '#16a34a' : comp.score >= 5.5 ? '#0ea5e9' : comp.score >= 4.5 ? '#d97706' : '#dc2626';
+          return `
+            <div style="padding:9px 0;border-top:1px solid var(--gray100);">
+              <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:4px;">
+                <div style="font-size:0.78rem;font-weight:900;color:var(--navy);">${esc(comp.name)}</div>
+                <div style="font-size:0.78rem;font-weight:900;color:${color};">${round1(comp.score)}/10</div>
+              </div>
+              <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">${esc(comp.improve || comp.evidence || 'No specific note returned.')}</div>
+            </div>
+          `;
+        }).join('')}
       </div>
     `;
   }
@@ -1446,7 +1806,7 @@ window.FullCasperMock = (() => {
       <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:15px 16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">
           <div style="font-size:0.78rem;font-weight:900;color:var(--navy);">${esc(row.station?.category || 'Video station')}</div>
-          <div style="font-size:0.82rem;font-weight:900;color:var(--teal3);white-space:nowrap;">${Number.isFinite(Number(overall.score)) ? `${overall.score}/5 ${overall.label ? `- ${esc(overall.label)}` : ''}` : 'Processing complete'}</div>
+          <div style="font-size:0.82rem;font-weight:900;color:var(--teal3);white-space:nowrap;">${Number.isFinite(Number(overall.score)) ? `${round1(Number(overall.score))}/10 ${overall.label ? `- ${esc(overall.label)}` : ''}` : 'Processing complete'}</div>
         </div>
         <div style="font-size:0.78rem;color:var(--gray600);line-height:1.6;"><strong>Strength:</strong> ${esc(overall.biggest_strength || 'Review the prompt feedback below.')}</div>
         <div style="font-size:0.78rem;color:var(--gray600);line-height:1.6;margin-top:6px;"><strong>Improve:</strong> ${esc(overall.biggest_improvement || 'No specific improvement returned.')}</div>
@@ -1471,10 +1831,10 @@ window.FullCasperMock = (() => {
       const crit = scores[key];
       if (!crit) return '';
       const score = Number(crit.score);
-      const color = score >= 4 ? '#16a34a' : score >= 3 ? '#0ea5e9' : score >= 2 ? '#d97706' : '#dc2626';
+      const color = score >= 7 ? '#16a34a' : score >= 5.5 ? '#0ea5e9' : score >= 4.5 ? '#d97706' : '#dc2626';
       return `
         <div style="display:grid;grid-template-columns:minmax(92px,0.45fr) minmax(0,1fr);gap:8px;padding:7px 0;border-top:1px solid rgba(226,232,240,0.7);">
-          <div style="font-size:0.72rem;font-weight:850;color:${color};">${esc(labels[key] || key)} ${Number.isFinite(score) ? `${score}/5` : ''}</div>
+          <div style="font-size:0.72rem;font-weight:850;color:${color};">${esc(labels[key] || key)} ${Number.isFinite(score) ? `${round1(score)}/10` : ''}</div>
           <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;">${esc(crit.comment || crit.label || '')}</div>
         </div>
       `;
@@ -1680,7 +2040,7 @@ window.FullCasperMock = (() => {
       <div style="background:#fff;border-radius:18px;max-width:520px;width:100%;padding:28px 30px;box-shadow:0 20px 70px rgba(0,0,0,0.28);">
         <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">You have done ${threshold}+ practice stations</div>
         <h3 style="font-size:1.35rem;color:var(--navy);line-height:1.25;margin:0 0 8px;">Time to test the whole format?</h3>
-        <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;margin:0 0 18px;">Single stations build skill. The full mock tests the thing students underestimate: switching from video to typed responses while tired.</p>
+        <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;margin:0 0 18px;">Single stations build skill. The full mock gives you 11 completely new stations handwritten by Dan, then tests the thing students underestimate: switching from video to typed responses while tired.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
           <button onclick="document.getElementById('mockNudgeOverlay')?.remove();setMode('mock');FullCasperMock.activateMockMode();" style="flex:1;min-width:180px;padding:12px 18px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.88rem;font-weight:800;cursor:pointer;font-family:inherit;">Start full mock</button>
           <button onclick="document.getElementById('mockNudgeOverlay')?.remove();" style="padding:12px 18px;border-radius:50px;border:1px solid var(--gray200);background:#fff;color:var(--gray600);font-size:0.88rem;font-weight:750;cursor:pointer;font-family:inherit;">Keep practising</button>
@@ -1700,7 +2060,10 @@ window.FullCasperMock = (() => {
     refreshPricing,
     checkoutMock,
     proceedAfterRules,
+    continueAfterStation,
     enableCameraAndStartVideoStation,
+    requestManualReview,
+    showReviewStation,
     showRecording,
     skipBreak,
   };
