@@ -96,6 +96,9 @@
     .sidebar-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid var(--border);}
     .btn-logout{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:left;}
     .btn-logout:hover{color:var(--red);border-color:var(--red-border);}
+    .btn-command{width:100%;margin-bottom:8px;padding:10px 11px;border-radius:10px;border:1px solid rgba(56,189,248,0.28);background:rgba(56,189,248,0.08);color:var(--text);font-size:0.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:all 0.18s;}
+    .btn-command:hover{border-color:rgba(56,189,248,0.55);background:rgba(56,189,248,0.14);}
+    .btn-command kbd{font-size:0.62rem;color:var(--muted);border:1px solid var(--border2);border-radius:5px;padding:2px 5px;background:rgba(255,255,255,0.04);}
 
     /* ══ MAIN CONTENT ══ */
     .main{flex:1;overflow-y:auto;min-width:0;}
@@ -353,6 +356,52 @@
     /* ══ NEW COMPOSE MODAL ══ */
     .nc-modal .modal-card{max-width:520px;}
 
+    /* ══ QUICK SEARCH ══ */
+    .cmd-ov{align-items:flex-start;padding-top:8vh;}
+    .cmd-modal-card{width:min(760px,calc(100vw - 28px));padding:0;overflow:hidden;}
+    .cmd-search{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.03);}
+    .cmd-search span{font-size:1.05rem;color:var(--blue);font-weight:800;}
+    .cmd-search input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:1rem;font-weight:650;}
+    .cmd-body{max-height:min(60vh,560px);overflow:auto;padding:8px;}
+    .cmd-result{display:grid;grid-template-columns:68px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 12px;border-radius:10px;cursor:pointer;border:1px solid transparent;}
+    .cmd-result:hover,.cmd-result.active{background:rgba(56,189,248,0.09);border-color:rgba(56,189,248,0.22);}
+    .cmd-kind{font-size:0.62rem;font-weight:850;letter-spacing:0.08em;text-transform:uppercase;color:var(--blue);}
+    .cmd-title{font-size:0.88rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .cmd-sub{font-size:0.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+    .cmd-action{font-size:0.68rem;color:var(--muted2);font-weight:700;}
+    .cmd-empty{padding:30px;text-align:center;color:var(--muted2);font-size:0.84rem;}
+    .cmd-foot{display:flex;justify-content:space-between;gap:10px;padding:9px 14px;border-top:1px solid var(--border);color:var(--muted2);font-size:0.68rem;background:rgba(255,255,255,0.02);}
+    .cmd-foot kbd{border:1px solid var(--border2);border-radius:5px;padding:1px 5px;color:var(--muted);background:rgba(255,255,255,0.04);}
+    .action-mini-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:6px;}
+    .action-mini-row .btn{font-size:0.66rem;padding:3px 7px;}
+
+    /* == STUDENT REPORTS == */
+    .report-modal{align-items:flex-start;padding-top:4vh;}
+    .report-modal .modal-card{width:min(940px,calc(100vw - 28px));max-height:90vh;padding:0;overflow:hidden;display:flex;flex-direction:column;}
+    .report-head{padding:18px 20px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(56,189,248,0.1),rgba(34,197,94,0.05));}
+    .report-title-row{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;}
+    .report-title{font-size:1.05rem;font-weight:900;margin-bottom:4px;}
+    .report-sub{font-size:0.76rem;color:var(--muted);line-height:1.6;}
+    .report-tabs{display:inline-flex;gap:4px;padding:4px;background:rgba(0,0,0,0.18);border:1px solid var(--border);border-radius:999px;margin-top:14px;}
+    .report-tab{border:none;border-radius:999px;padding:7px 12px;background:transparent;color:var(--muted);font-size:0.72rem;font-weight:850;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;}
+    .report-tab.active{background:var(--blue);color:#04111f;}
+    .report-body{padding:18px 20px;overflow:auto;}
+    .report-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+    .report-kpi{background:rgba(255,255,255,0.035);border:1px solid var(--border);border-radius:10px;padding:11px;}
+    .report-kpi span{display:block;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted2);font-weight:850;margin-bottom:4px;}
+    .report-kpi strong{font-size:1.12rem;}
+    .report-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:12px;}
+    .report-section{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
+    .report-section h3{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);margin-bottom:8px;}
+    .report-section p{font-size:0.84rem;color:var(--muted);line-height:1.75;margin-bottom:8px;}
+    .report-list{display:flex;flex-direction:column;gap:7px;}
+    .report-list li{font-size:0.82rem;color:var(--muted);line-height:1.65;margin-left:18px;}
+    .report-pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+    .report-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.22);color:var(--blue);font-size:0.68rem;font-weight:800;}
+    .report-quote{font-size:0.8rem;color:var(--muted);line-height:1.7;border-left:3px solid var(--blue);padding-left:10px;margin:8px 0;}
+    .report-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--border);background:rgba(255,255,255,0.02);}
+    @media(max-width:900px){.report-grid,.report-kpis{grid-template-columns:1fr;}.report-title-row{display:block;}.report-tabs{width:100%;}.report-tab{flex:1;}}
+
     /* ══ RESPONSIVE ══ */
     @media(max-width:900px){
       .sidebar{display:none;}
@@ -419,6 +468,7 @@
     <button class="nav-item" data-page="subscribers" onclick="nav('subscribers')"><span class="icon">👥</span> Subscribers</button>
 
     <div class="sidebar-bottom">
+      <button class="btn-command" onclick="openCommandPalette()">Quick search <kbd>Ctrl K</kbd></button>
       <button class="btn-logout" onclick="doLogout()">↩ Log out</button>
     </div>
   </aside>
@@ -445,6 +495,7 @@
           <div class="command-copy" id="dashBrief">Pulling reviews, accounts, enquiries and inbox state from the Worker.</div>
         </div>
         <div class="command-actions">
+          <button class="btn" onclick="openCommandPalette()">Quick search</button>
           <button class="btn blue" onclick="nav('reviews')">Review latest feedback</button>
           <button class="btn green" onclick="nav('users')">Manage students</button>
           <button class="btn amber" onclick="nav('inbox')">Open inbox</button>
@@ -929,6 +980,8 @@
           <div class="page-sub">All transactions, MRR, and financial breakdown</div>
         </div>
         <div class="page-actions">
+          <span class="refresh-note" id="rvReconcileStatus"></span>
+          <button class="btn amber" onclick="reconcileSubscriptionPayments()">Reconcile renewals</button>
           <button class="btn" onclick="loadRevenue()">↺ Refresh</button>
         </div>
       </div>
@@ -1093,6 +1146,51 @@
   </div>
 </div>
 
+<!-- QUICK SEARCH MODAL -->
+<div class="modal-ov cmd-ov" id="cmdModal">
+  <div class="modal-card cmd-modal-card">
+    <div class="cmd-search">
+      <span>Search</span>
+      <input id="cmdInput" type="text" autocomplete="off" placeholder="Find a student, mock, enquiry, payment, review..." oninput="renderCommandResults()">
+    </div>
+    <div class="cmd-body" id="cmdResults">
+      <div class="cmd-empty">Start typing to search the admin workspace.</div>
+    </div>
+    <div class="cmd-foot">
+      <span><kbd>Enter</kbd> open selected</span>
+      <span><kbd>Esc</kbd> close</span>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT REPORT MODAL -->
+<div class="modal-ov report-modal" id="studentReportModal">
+  <div class="modal-card">
+    <div class="report-head">
+      <div class="report-title-row">
+        <div>
+          <div class="report-title" id="srTitle">Student report</div>
+          <div class="report-sub" id="srSub">Performance summary and next-session coaching notes.</div>
+        </div>
+        <button class="btn" onclick="closeStudentReport()">Close</button>
+      </div>
+      <div class="report-tabs">
+        <button class="report-tab active" id="srTutorTab" onclick="setStudentReportMode('tutor')">Tutor brief</button>
+        <button class="report-tab" id="srStudentTab" onclick="setStudentReportMode('student')">Student report</button>
+      </div>
+    </div>
+    <div class="report-body">
+      <div class="report-kpis" id="srKpis"></div>
+      <div id="studentReportBody"></div>
+    </div>
+    <div class="report-actions">
+      <button class="btn" onclick="copyStudentReport()">Copy text</button>
+      <button class="btn blue" onclick="emailStudentReport()">Open as email</button>
+      <button class="btn" onclick="closeStudentReport()">Done</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════════════════════════
 // CONFIG + STATE
@@ -1107,9 +1205,13 @@ const S = {
   mmiReviews: [], mockAttempts: [], mockManualReviews: [], revenue: [], monitoring: null,
   activeConv: null,
   detailCache: new Map(),
+  studentReportDetail: null,
+  studentReportMode: 'tutor',
   creditModalUserId: null,
   tierModalUserId: null,
   userSegment: 'all',
+  commandItems: [],
+  commandIndex: 0,
 };
 
 // ══════════════════════════════════════════════════════
@@ -1250,6 +1352,186 @@ window.addEventListener('hashchange', () => {
 // ══════════════════════════════════════════════════════
 // BOOT — load all data in parallel on login
 // ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// QUICK SEARCH / COMMAND PALETTE
+// ══════════════════════════════════════════════════════
+function isTypingTarget(el) {
+  if (!el) return false;
+  return ['INPUT','TEXTAREA','SELECT'].includes(el.tagName) || el.isContentEditable;
+}
+
+function openCommandPalette(prefill = '') {
+  if (!S.token) return;
+  const modal = document.getElementById('cmdModal');
+  const input = document.getElementById('cmdInput');
+  if (!modal || !input) return;
+  modal.classList.add('open');
+  input.value = prefill || '';
+  S.commandIndex = 0;
+  renderCommandResults();
+  setTimeout(()=>input.focus(), 20);
+}
+
+function closeCommandPalette() {
+  document.getElementById('cmdModal')?.classList.remove('open');
+}
+
+function commandHay(item) {
+  return [item.kind,item.title,item.sub,item.keywords].join(' ').toLowerCase();
+}
+
+function buildCommandItems() {
+  const items = [
+    {kind:'Page', title:'Dashboard', sub:'Owner priorities, revenue, workload, and activity', action:()=>nav('dashboard'), hint:'Open'},
+    {kind:'Page', title:'Users', sub:'Search students, adjust credits, and change tiers', action:()=>nav('users'), hint:'Open'},
+    {kind:'Page', title:'Inbox', sub:'Student conversations and replies', action:()=>nav('inbox'), hint:'Open'},
+    {kind:'Page', title:'Broadcast', sub:'Send segmented emails with preview', action:()=>nav('broadcast'), hint:'Open'},
+    {kind:'Page', title:'Mock Exams', sub:'Saved full CASPer mocks and manual review queue', action:()=>nav('mocks'), hint:'Open'},
+    {kind:'Page', title:'Monitoring', sub:'AI parse failures, Whisper failures, and margin checks', action:()=>nav('monitoring'), hint:'Open'},
+  ];
+
+  S.users.forEach(u => items.push({
+    kind:'User',
+    title:u.email || u.name || 'Student',
+    sub:`${u.name || 'No name'} · ${u.tier || 'free'} · ${Number(u.review_count||0)} reviews · ${fmtMoney(u.total_spend_aud||0)} spend`,
+    keywords:[u.id,u.name,u.email,u.tier].join(' '),
+    action:()=>viewUserByEmail(u.email || ''),
+    hint:'Open user',
+  }));
+
+  S.enquiries.forEach(e => items.push({
+    kind:'Lead',
+    title:e.email || e.name || 'Enquiry',
+    sub:`${e.name || 'No name'} · ${e.type || 'General'} · ${e.universities || 'No universities'} · ${relTime(e.created_at)}`,
+    keywords:[e.id,e.name,e.email,e.type,e.notes,e.universities].join(' '),
+    action:()=>replyToEnquiry(e.id || e.email),
+    hint:'Reply',
+  }));
+
+  S.conversations.forEach(c => {
+    const unread = c.messages?.some(m=>m.direction==='inbound' && !m.read);
+    items.push({
+      kind:unread ? 'Unread' : 'Inbox',
+      title:c.email || c.name || 'Conversation',
+      sub:`${c.name || 'Conversation'} · ${(c.messages||[]).length} message${(c.messages||[]).length===1?'':'s'}`,
+      keywords:[c.email,c.name,...(c.messages||[]).slice(-3).map(m=>`${m.subject||''} ${m.body||''}`)].join(' '),
+      action:()=>openInboxCommand(c.email),
+      hint:'Open thread',
+    });
+  });
+
+  const seenMocks = new Set();
+  [...S.mockManualReviews, ...S.mockAttempts].forEach(m => {
+    if (!m.id || seenMocks.has(m.id)) return;
+    seenMocks.add(m.id);
+    items.push({
+      kind:m.manual_review_paid ? 'Mock due' : 'Mock',
+      title:m.user_email || m.user_name || m.id,
+      sub:`${m.tier || 'mock'} · ${(m.manual_review_status || 'saved').replace(/_/g,' ')} · ${relTime(m.completed_at || m.manual_review_paid_at)}`,
+      keywords:[m.id,m.user_email,m.user_name,m.tier,m.manual_review_status].join(' '),
+      action:()=>openMockReader(m.id),
+      hint:'Reader',
+    });
+  });
+
+  S.revenue.slice(0,200).forEach(p => items.push({
+    kind:'Payment',
+    title:p.email || p.name || p.stripe_session_id || 'Payment',
+    sub:`${fmtMoney(p.amount_aud || 0)} · ${p.type || 'payment'} · ${relTime(p.created_at)}`,
+    keywords:[p.email,p.name,p.type,p.stripe_session_id,p.user_id].join(' '),
+    action:()=>openRevenueCommand(p.email || p.type || ''),
+    hint:'View',
+  }));
+
+  S.reviews.slice(0,250).forEach(r => items.push({
+    kind:'Review',
+    title:r.email || r.name || 'CASPer review',
+    sub:`${r.tool || 'review'} · ${parseFb(r.ai_feedback)?.score ? `${parseFb(r.ai_feedback).score}/10` : 'no score'} · ${relTime(r.created_at)}`,
+    keywords:[r.email,r.name,r.tool,r.question_text,r.response_text].join(' '),
+    action:()=>openReviewCommand(r.email || r.name || ''),
+    hint:'Find',
+  }));
+
+  return items;
+}
+
+function renderCommandResults() {
+  const input = document.getElementById('cmdInput');
+  const el = document.getElementById('cmdResults');
+  if (!input || !el) return;
+  const q = input.value.trim().toLowerCase();
+  const terms = q.split(/\s+/).filter(Boolean);
+  const rows = buildCommandItems()
+    .filter(item => !terms.length || terms.every(t=>commandHay(item).includes(t)))
+    .slice(0, 60);
+  S.commandItems = rows;
+  S.commandIndex = Math.min(S.commandIndex || 0, Math.max(rows.length - 1, 0));
+  if (!rows.length) {
+    el.innerHTML = '<div class="cmd-empty">No match yet. Try an email, name, mock ID, payment type, or page name.</div>';
+    return;
+  }
+  el.innerHTML = rows.map((item,i)=>`
+    <div class="cmd-result${i===S.commandIndex?' active':''}" onclick="runCommand(${i})">
+      <div class="cmd-kind">${esc(item.kind)}</div>
+      <div><div class="cmd-title">${esc(item.title)}</div><div class="cmd-sub">${esc(item.sub || '')}</div></div>
+      <div class="cmd-action">${esc(item.hint || 'Open')}</div>
+    </div>`).join('');
+}
+
+function setCommandIndex(next) {
+  const total = S.commandItems.length;
+  if (!total) return;
+  S.commandIndex = (next + total) % total;
+  document.querySelectorAll('.cmd-result').forEach((el,i)=>el.classList.toggle('active', i===S.commandIndex));
+  document.querySelector('.cmd-result.active')?.scrollIntoView?.({block:'nearest'});
+}
+
+function runCommand(index = S.commandIndex) {
+  const item = S.commandItems[index];
+  if (!item) return;
+  closeCommandPalette();
+  item.action?.();
+}
+
+function openInboxCommand(email) {
+  nav('inbox');
+  const search = document.getElementById('convSearch');
+  if (search) search.value = email || '';
+  filterConvs();
+  if (email && S.conversations.some(c=>c.email===email)) openConv(email);
+}
+
+function openRevenueCommand(query) {
+  nav('revenue');
+  const search = document.getElementById('rvSearch');
+  if (search) { search.value = query || ''; renderRevenue(); }
+}
+
+function openReviewCommand(query) {
+  nav('reviews');
+  const search = document.getElementById('revSearch');
+  if (search) { search.value = query || ''; renderReviews(); }
+}
+
+document.addEventListener('keydown', e => {
+  const cmdOpen = document.getElementById('cmdModal')?.classList.contains('open');
+  const reportOpen = document.getElementById('studentReportModal')?.classList.contains('open');
+  if (reportOpen && e.key === 'Escape') { e.preventDefault(); closeStudentReport(); return; }
+  if (cmdOpen) {
+    if (e.key === 'Escape') { e.preventDefault(); closeCommandPalette(); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setCommandIndex((S.commandIndex||0)+1); return; }
+    if (e.key === 'ArrowUp') { e.preventDefault(); setCommandIndex((S.commandIndex||0)-1); return; }
+    if (e.key === 'Enter') { e.preventDefault(); runCommand(); return; }
+  }
+  const appVisible = !document.getElementById('appWrap')?.classList.contains('hidden');
+  if (!appVisible || !S.token) return;
+  const wantsCommand = ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') || (e.key === '/' && !isTypingTarget(e.target));
+  if (wantsCommand) {
+    e.preventDefault();
+    openCommandPalette();
+  }
+});
+
 async function bootLoad() {
   await Promise.all([
     loadReviews(), loadUsers(), loadEnquiries(),
@@ -1294,6 +1576,10 @@ function updateDashboard() {
   const freeToday = users.filter(u=>u.usage_today?.casper?.used_free_today||u.usage_today?.gamsat?.used_free_today).length;
   const mmiCreditsHeld = mmi.reduce((s,r)=>s+(r.mmi_transcript_balance||0),0);
   const manualPending = manualMocks.filter(r=>['pending_review','in_review'].includes(String(r.manual_review_status||''))).length;
+  const manualAging = manualMocks.filter(r=>['pending_review','in_review'].includes(String(r.manual_review_status||'')) && (r.manual_review_paid_at || r.completed_at) && !withinHours(r.manual_review_paid_at || r.completed_at, 24)).length;
+  const parseFailures = S.monitoring?.parse_failures?.length || 0;
+  const whisperFailures = S.monitoring?.whisper_failures?.length || 0;
+  const paying7 = S.revenue.filter(p=>withinDays(p.created_at,7)).length;
   const conversion = (paying/Math.max(users.length,1))*100;
 
   document.getElementById('dUsers').textContent     = users.length;
@@ -1319,7 +1605,7 @@ function updateDashboard() {
   document.getElementById('dashBrief').textContent =
     `${users.length} registered students · ${paying} paying customers · ${pro} CASPer Pro · ${mmi.length} MMI sessions total · ${mocks.length} saved mock exams · ${enqs7} enquiries in the last 7 days`;
 
-  renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length,manualPending});
+  renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length,manualPending,manualAging,parseFailures,whisperFailures,paying7});
   renderBusinessInsights({conversion,pro,paying,users,credits,reviews,todayReviews,signups7,enqs7,avgScore,mmi});
   renderActivityFeed();
   renderReviewQuality();
@@ -1352,12 +1638,15 @@ function updateDashboard() {
 
 function renderActionQueue(m) {
   const items = [
+    {icon:'24h', title:`${m.manualAging||0} mock review${m.manualAging===1?'':'s'} waiting over 24h`, sub:'Prioritise these first so paid manual reviews feel premium.', page:'mocks', show:(m.manualAging||0)>0, tone:'red'},
     {icon:'M', title:`${m.manualPending||0} mock review${m.manualPending===1?'':'s'} pending`, sub:'Open the saved full mock and update manual notes/status.', page:'mocks', show:(m.manualPending||0)>0, tone:'amber'},
+    {icon:'ERR', title:`${(m.parseFailures||0)+(m.whisperFailures||0)} AI processing issue${((m.parseFailures||0)+(m.whisperFailures||0))===1?'':'s'}`, sub:'Check parse/Whisper failures before they become student-facing friction.', page:'monitoring', show:((m.parseFailures||0)+(m.whisperFailures||0))>0, tone:'red'},
     {icon:'!', title:`${m.unread} unread inbox thread${m.unread===1?'':'s'}`, sub:'Reply quickly to keep coaching leads warm.', page:'inbox', show:m.unread>0, tone:'red'},
+    {icon:'$', title:`${m.paying7||0} payment${m.paying7===1?'':'s'} in 7 days`, sub:'Good moment to check onboarding and post-purchase experience.', page:'revenue', show:(m.paying7||0)>0, tone:'green'},
     {icon:'$', title:`${m.enqs7} fresh enquir${m.enqs7===1?'y':'ies'} this week`, sub:'Follow up while intent is highest.', page:'enquiries', show:m.enqs7>0, tone:'amber'},
     {icon:'AI', title:`${m.freeToday} student${m.freeToday===1?'':'s'} used free reviews today`, sub:'Good moment to invite credit purchase or Pro.', page:'users', show:m.freeToday>0, tone:'blue'},
     {icon:'0', title:`${m.noReviews} account${m.noReviews===1?'':'s'} with no reviews`, sub:'Candidates for onboarding or activation email.', page:'users', show:m.noReviews>0, tone:'amber'},
-  ].filter(item=>item.show).slice(0,4);
+  ].filter(item=>item.show).slice(0,5);
   if (!items.length) items.push({icon:'OK', title:'No urgent owner actions', sub:'Inbox, enquiries, and student usage look calm.', page:'dashboard', show:true, tone:'green'});
   document.getElementById('dashQueueCount').textContent = `${items.length}`;
   document.getElementById('dashActionQueue').innerHTML = items.map(item=>`
@@ -1590,6 +1879,7 @@ function renderUserDetail(det) {
   const credits  = det.credits||[];
   const payments = det.payments||[];
   const reviews  = det.reviews||[];
+  const mmiReviews = det.mmi_reviews||[];
   const totalSpend = payments.filter(p=>p.status==='completed').reduce((s,p)=>s+Number(p.amount_aud||0),0);
   const scored = reviews.map(r=>Number(parseFb(r.ai_feedback)?.score)).filter(Number.isFinite);
   const avgScore = scored.length ? scored.reduce((a,b)=>a+b,0)/scored.length : null;
@@ -1600,7 +1890,7 @@ function renderUserDetail(det) {
       <div class="detail-box-hd">Account</div>
       <div class="mini-metric-row">
         <div class="mini-metric"><div>Spend</div><div>${fmtMoney(totalSpend)}</div></div>
-        <div class="mini-metric"><div>Reviews</div><div>${reviews.length}</div></div>
+        <div class="mini-metric"><div>Reviews</div><div>${reviews.length + mmiReviews.length}</div></div>
         <div class="mini-metric"><div>Avg score</div><div>${avgScore ? avgScore.toFixed(1) : '—'}</div></div>
       </div>
       <div class="detail-box-row"><strong>${esc(u.email||'—')}</strong></div>
@@ -1612,6 +1902,8 @@ function renderUserDetail(det) {
       <div class="detail-box-row">CASPer free today: ${u.usage_today?.casper?.used||0}/${u.usage_today?.casper?.limit||1}</div>
       <div class="detail-box-row">GAMSAT free today: ${u.usage_today?.gamsat?.used||0}/${u.usage_today?.gamsat?.limit||1}</div>
       <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn green" onclick="openStudentReportForUser('${esc(u.id)}','tutor')">Tutor Brief</button>
+        <button class="btn blue" onclick="openStudentReportForUser('${esc(u.id)}','student')">Student Report</button>
         <button class="btn blue" onclick="openCreditModal('${esc(u.id)}','${esc(u.email)}',${credits.find(c=>c.tool==='casper')?.balance||0},${credits.find(c=>c.tool==='gamsat')?.balance||0},${credits.find(c=>c.tool==='mmi_transcript')?.balance||0},${credits.find(c=>c.tool==='mmi_premium')?.balance||0})">💳 Credits</button>
         <button class="btn amber" onclick="openTierModal('${esc(u.id)}','${esc(u.email)}','${esc(u.tier||'free')}')">⭐ Tier</button>
         <button class="btn" onclick="composeToUser('${esc(u.email)}')">✉ Email</button>
@@ -1627,10 +1919,11 @@ function renderUserDetail(det) {
       </tbody></table>
     </div>
     <div class="detail-box">
-      <div class="detail-box-hd">Recent Reviews (${reviews.length})</div>
+      <div class="detail-box-hd">Recent Reviews (${reviews.length}${mmiReviews.length ? ` + ${mmiReviews.length} MMI` : ''})</div>
       ${weakest.length ? `<div class="competency-list" style="margin-bottom:10px;">${weakest.map(c=>competencyRow(c.name,c.avg)).join('')}</div>` : ''}
       <table class="subtbl"><thead><tr><th>Tool</th><th>Score</th><th>Source</th><th>Time</th></tr></thead><tbody>
-        ${reviews.length?reviews.map(r=>{const fb=parseFb(r.ai_feedback);return`<tr><td>${toolBadge(r.tool)}</td><td>${fb?.score||'—'}</td><td>${esc(r.credit_source||'—')}</td><td>${relTime(r.created_at)}</td></tr>`;}).join(''):'<tr><td colspan="4" style="color:var(--muted2);">No reviews</td></tr>'}
+        ${reviews.length?reviews.map(r=>{const fb=parseFb(r.ai_feedback);return`<tr><td>${toolBadge(r.tool)}</td><td>${fb?.score||'—'}</td><td>${esc(r.credit_source||'—')}</td><td>${relTime(r.created_at)}</td></tr>`;}).join(''):(!mmiReviews.length?'<tr><td colspan="4" style="color:var(--muted2);">No reviews</td></tr>':'')}
+        ${mmiReviews.slice(0,6).map(r=>{const fb=parseMMIFb(r.ai_feedback_json);return`<tr><td>${toolBadge('mmi')}</td><td>${fb?.overall?.score ? `${esc(fb.overall.score)}/5` : '—'}</td><td>${esc(r.tier||'—')}</td><td>${relTime(r.created_at)}</td></tr>`;}).join('')}
       </tbody></table>
     </div>
   </div>`;
@@ -1639,6 +1932,308 @@ function renderUserDetail(det) {
 // ══════════════════════════════════════════════════════
 // ENQUIRIES
 // ══════════════════════════════════════════════════════
+function openStudentReportForUser(userId, mode = 'tutor') {
+  const det = S.detailCache.get(userId);
+  if (!det) { alert('Open the student row first, then try again.'); return; }
+  S.studentReportDetail = det;
+  S.studentReportMode = mode === 'student' ? 'student' : 'tutor';
+  renderStudentReportModal();
+  document.getElementById('studentReportModal')?.classList.add('open');
+}
+
+function closeStudentReport() {
+  document.getElementById('studentReportModal')?.classList.remove('open');
+}
+
+function setStudentReportMode(mode) {
+  S.studentReportMode = mode === 'student' ? 'student' : 'tutor';
+  renderStudentReportModal();
+}
+
+function renderStudentReportModal() {
+  if (!S.studentReportDetail) return;
+  const p = buildStudentPerformanceProfile(S.studentReportDetail);
+  const mode = S.studentReportMode || 'tutor';
+  document.getElementById('srTutorTab')?.classList.toggle('active', mode === 'tutor');
+  document.getElementById('srStudentTab')?.classList.toggle('active', mode === 'student');
+  document.getElementById('srTitle').textContent = mode === 'tutor' ? `Tutor brief - ${p.displayName}` : `Student report - ${p.displayName}`;
+  document.getElementById('srSub').textContent = mode === 'tutor'
+    ? 'Private prep notes for the next coaching session.'
+    : 'Shareable performance summary written for the student.';
+  document.getElementById('srKpis').innerHTML = `
+    <div class="report-kpi"><span>CASPer reviews</span><strong>${p.casperCount}</strong></div>
+    <div class="report-kpi"><span>CASPer average</span><strong>${p.avgScoreText}</strong></div>
+    <div class="report-kpi"><span>Recent trend</span><strong>${p.trendText}</strong></div>
+    <div class="report-kpi"><span>Total spend</span><strong>${fmtMoney(p.totalSpend)}</strong></div>`;
+  document.getElementById('studentReportBody').innerHTML = mode === 'tutor' ? buildTutorBriefHtml(p) : buildStudentReportHtml(p);
+}
+
+function buildStudentPerformanceProfile(det) {
+  const u = det.user || {};
+  const reviews = det.reviews || [];
+  const mmiReviews = det.mmi_reviews || [];
+  const credits = det.credits || [];
+  const payments = det.payments || [];
+  const displayName = u.name || u.email || 'Student';
+  const firstName = String(u.name || u.email || 'Student').split(/\s+/)[0].split('@')[0] || 'there';
+  const totalSpend = payments.filter(p=>p.status==='completed').reduce((s,p)=>s+Number(p.amount_aud||0),0);
+  const casperReviews = reviews.filter(r => String(r.tool || '').toLowerCase() === 'casper');
+  const pool = casperReviews.length ? casperReviews : reviews;
+  const scored = pool.map(r => {
+    const fb = parseFb(r.ai_feedback);
+    const score = Number(fb?.score);
+    return { row:r, fb, score };
+  }).filter(x => Number.isFinite(x.score));
+  const avgScore = average(scored.map(x=>x.score));
+  const recentAvg = average(scored.slice(0, 3).map(x=>x.score));
+  const earlierAvg = average(scored.slice(-3).map(x=>x.score));
+  const trendDelta = Number.isFinite(recentAvg) && Number.isFinite(earlierAvg) && scored.length >= 4 ? recentAvg - earlierAvg : null;
+  const fbs = scored.map(x=>x.fb).filter(Boolean);
+  const comps = aggregateCompetencies(fbs);
+  const weakest = comps.slice().sort((a,b)=>a.avg-b.avg).slice(0,3);
+  const strongest = comps.slice().sort((a,b)=>b.avg-a.avg).slice(0,3);
+  const mmiScored = mmiReviews.map(r => ({ row:r, fb:parseMMIFb(r.ai_feedback_json) }))
+    .map(x => ({ ...x, score:Number(x.fb?.overall?.score) }))
+    .filter(x => Number.isFinite(x.score));
+  const topStrength = firstUsefulText(fbs, ['strengths','biggest_strength','summary'], 'No clear strength pattern yet.');
+  const topImprovement = firstUsefulText(fbs, ['improvements','biggest_improvement','missed'], 'No repeated improvement pattern yet.');
+  const focusAreas = buildCoachingFocus({ scored, weakest, topImprovement, mmiScored, totalSpend, credits });
+  const nextSteps = buildStudentNextSteps({ scored, weakest, recentAvg });
+  const agenda = buildTutorAgenda({ scored, weakest, topImprovement, mmiScored });
+  const risks = buildStudentRiskFlags({ scored, trendDelta, totalSpend, mmiScored, payments });
+  return {
+    user:u, displayName, firstName, email:u.email || '', totalSpend,
+    casperCount: pool.length, mmiCount:mmiReviews.length,
+    avgScore, avgScoreText:Number.isFinite(avgScore) ? avgScore.toFixed(1) : '-',
+    recentAvg, recentAvgText:Number.isFinite(recentAvg) ? recentAvg.toFixed(1) : '-',
+    trendDelta, trendText: trendDelta === null ? 'Not enough data' : `${trendDelta >= 0 ? '+' : ''}${trendDelta.toFixed(1)}`,
+    band: performanceBand(avgScore),
+    weakest, strongest, topStrength, topImprovement,
+    focusAreas, nextSteps, agenda, risks,
+    latestAt: scored[0]?.row?.created_at || mmiReviews[0]?.created_at || null,
+    mmiAvg: average(mmiScored.map(x=>x.score)),
+    mmiScored,
+  };
+}
+
+function buildTutorBriefHtml(p) {
+  return `<div class="report-grid">
+    <div>
+      <div class="report-section">
+        <h3>Session priority</h3>
+        <p><strong style="color:var(--text);">${esc(primaryFocusSentence(p))}</strong></p>
+        <div class="report-quote">${esc(p.topImprovement)}</div>
+      </div>
+      <div class="report-section">
+        <h3>Suggested coaching agenda</h3>
+        ${reportList(p.agenda)}
+      </div>
+      <div class="report-section">
+        <h3>What to tutor next</h3>
+        ${reportList(p.focusAreas)}
+      </div>
+    </div>
+    <div>
+      <div class="report-section">
+        <h3>Performance read</h3>
+        <p>${esc(p.band)}</p>
+        <div class="report-pill-row">
+          ${p.weakest.map(c=>`<span class="report-pill">Low: ${esc(c.name)} ${c.avg.toFixed(1)}</span>`).join('')}
+          ${p.strongest.slice(0,1).map(c=>`<span class="report-pill">High: ${esc(c.name)} ${c.avg.toFixed(1)}</span>`).join('')}
+        </div>
+      </div>
+      <div class="report-section">
+        <h3>Watch-outs</h3>
+        ${p.risks.length ? reportList(p.risks) : '<p>No major admin or performance watch-outs from the available data.</p>'}
+      </div>
+      <div class="report-section">
+        <h3>MMI signal</h3>
+        <p>${p.mmiCount ? `${p.mmiCount} MMI review${p.mmiCount===1?'':'s'} on file${Number.isFinite(p.mmiAvg) ? `, average ${p.mmiAvg.toFixed(1)}/5` : ''}.` : 'No MMI review data in this student profile yet.'}</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildStudentReportHtml(p) {
+  return `<div class="report-grid">
+    <div>
+      <div class="report-section">
+        <h3>Overall interpretation</h3>
+        <p>Hi ${esc(p.firstName)} - based on your Key2MD practice history, your current CASPer average is <strong style="color:var(--text);">${esc(p.avgScoreText)}/10</strong>. ${esc(p.band)}</p>
+        <p>This is benchmarked against the Key2MD practice cohort, which is a competitive group of students actively preparing, so high scores are deliberately hard to earn.</p>
+      </div>
+      <div class="report-section">
+        <h3>Main strength</h3>
+        <p>${esc(p.topStrength)}</p>
+      </div>
+      <div class="report-section">
+        <h3>One priority to fix</h3>
+        <p><strong style="color:var(--text);">${esc(primaryFocusSentence(p))}</strong></p>
+        <div class="report-quote">${esc(p.topImprovement)}</div>
+      </div>
+    </div>
+    <div>
+      <div class="report-section">
+        <h3>Next practice plan</h3>
+        ${reportList(p.nextSteps)}
+      </div>
+      <div class="report-section">
+        <h3>Score pattern</h3>
+        <p>Recent average: <strong style="color:var(--text);">${esc(p.recentAvgText)}/10</strong>. Trend: <strong style="color:var(--text);">${esc(p.trendText)}</strong>.</p>
+        ${p.weakest.length ? `<div class="competency-list">${p.weakest.map(c=>competencyRow(c.name,c.avg)).join('')}</div>` : '<p>More marked stations will make the competency pattern clearer.</p>'}
+      </div>
+      <div class="report-section">
+        <h3>How to use this</h3>
+        <p>Do the next few stations with one goal only: make the human impact specific before you move into action. That is usually the fastest way to lift a CASPer answer.</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function primaryFocusSentence(p) {
+  if (!p.casperCount) return 'Start by getting 3-5 CASPer responses marked so the pattern becomes real rather than guessed.';
+  if (p.weakest[0]) return `The next session should focus on ${p.weakest[0].name.toLowerCase()} - making that skill visible in every answer, not just implied.`;
+  if (Number.isFinite(p.avgScore) && p.avgScore < 5.5) return 'The next session should rebuild answer structure so empathy, reasoning, and action are all explicit.';
+  return 'The next session should turn generally good answers into more specific, examiner-visible judgement.';
+}
+
+function buildCoachingFocus({ scored, weakest, topImprovement, mmiScored, totalSpend }) {
+  const out = [];
+  if (!scored.length) out.push('Get a baseline: ask the student to complete 3 CASPer stations before the session so you can coach from real answers.');
+  if (weakest[0]) out.push(`Drill ${weakest[0].name}: make them state the human consequence, then the practical action, then the reason.`);
+  if (weakest[1]) out.push(`Secondary focus: ${weakest[1].name}. Use one repeated station type until the issue improves.`);
+  if (/empath|listen|feel|person|impact/i.test(topImprovement || '')) out.push('Push empathy from generic to specific: name what the person may be feeling and why it matters in this exact scenario.');
+  if (scored.length >= 6) out.push('Compare early vs recent answers live; look for a plateau, not just isolated low scores.');
+  if (mmiScored.length) out.push('Blend MMI/video learning into CASPer: check whether spoken reasoning is stronger or weaker than typed reasoning.');
+  if (totalSpend > 100 && scored.length < 3) out.push('They have paid but have not generated much performance data - nudge them into a concrete practice schedule.');
+  return unique(out).slice(0,5);
+}
+
+function buildStudentNextSteps({ scored, weakest, recentAvg }) {
+  const out = [];
+  if (!scored.length) {
+    return ['Complete 3 marked CASPer stations this week.', 'After each one, rewrite only the weakest paragraph rather than redoing the whole answer.', 'Book a coaching session once there is enough data to see a pattern.'];
+  }
+  if (weakest[0]) out.push(`For the next 3 stations, deliberately practise ${weakest[0].name.toLowerCase()} in the first half of the answer.`);
+  out.push('Before each response, write one sentence that names the person most affected and what they may be feeling.');
+  out.push('After feedback, rewrite only the one weakest sentence into a more specific version.');
+  if (Number.isFinite(recentAvg) && recentAvg >= 6.5) out.push('Move into mixed timed practice; the goal now is consistency under fatigue, not learning a new structure.');
+  else out.push('Repeat the same category twice before switching topics; variety too early can hide the real issue.');
+  return unique(out).slice(0,4);
+}
+
+function buildTutorAgenda({ scored, weakest, topImprovement, mmiScored }) {
+  const out = [];
+  out.push('First 5 min: ask the student what they think their main weakness is, then compare it to the data.');
+  if (weakest[0]) out.push(`Next 15 min: live rewrite focused only on ${weakest[0].name}.`);
+  out.push('Next 15 min: timed station, then stop after the answer and identify the one sentence that would most improve the mark.');
+  if (topImprovement && topImprovement !== 'No repeated improvement pattern yet.') out.push('Use their own feedback theme as the session anchor: ' + topImprovement.slice(0, 160));
+  if (mmiScored.length) out.push('Final 5 min: compare typed vs spoken performance and decide whether they need more video practice.');
+  else out.push('Final 5 min: set a 3-station homework block and require one rewritten answer.');
+  return unique(out).slice(0,5);
+}
+
+function buildStudentRiskFlags({ scored, trendDelta, totalSpend, mmiScored, payments }) {
+  const out = [];
+  if (scored.length >= 4 && trendDelta !== null && trendDelta < -0.4) out.push('Recent scores are lower than earlier scores - check fatigue, rushing, or whether harder station types are appearing.');
+  if (scored.length >= 5 && Math.max(...scored.map(x=>x.score)) - Math.min(...scored.map(x=>x.score)) >= 3) out.push('Large score spread - likely inconsistent station-type recognition rather than simple knowledge gap.');
+  if (totalSpend > 100 && scored.length < 3) out.push('High spend but low practice volume - likely needs accountability more than content.');
+  if (payments.some(p=>/mock/i.test(p.type||'')) && !mmiScored.length) out.push('Mock purchase/payment exists, but no MMI/video review signal is visible in this user detail yet.');
+  return out;
+}
+
+function firstUsefulText(feedbacks, fields, fallback) {
+  for (const fb of feedbacks) {
+    for (const f of fields) {
+      const v = f.includes('.') ? f.split('.').reduce((o,k)=>o?.[k], fb) : fb?.[f] ?? fb?.overall?.[f];
+      if (typeof v === 'string' && v.trim().length > 18) return v.trim();
+    }
+  }
+  return fallback;
+}
+
+function performanceBand(score) {
+  if (!Number.isFinite(score)) return 'There is not enough marked CASPer data yet to interpret performance confidently.';
+  if (score >= 6.5) return 'This is a strong Key2MD practice score and is likely consistent with a competitive CASPer performance if it is repeatable under exam conditions.';
+  if (score >= 5.5) return 'This is a developing-to-solid range. It often means the structure is present, but the answer needs more specificity, empathy, or sharper judgement to reliably push higher.';
+  if (score >= 4) return 'This suggests the student is engaging with the scenarios, but important examiner-visible elements are probably still missing.';
+  return 'This is an early-warning range. The student likely needs fundamentals rebuilt before doing too much volume.';
+}
+
+function reportList(items) {
+  return `<ul class="report-list">${(items && items.length ? items : ['No specific items yet.']).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+}
+
+function average(values) {
+  const nums = values.map(Number).filter(Number.isFinite);
+  return nums.length ? nums.reduce((a,b)=>a+b,0)/nums.length : null;
+}
+
+function unique(items) {
+  const seen = new Set();
+  return (items || []).filter(item => {
+    const key = String(item || '').trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function copyStudentReport() {
+  if (!S.studentReportDetail) return;
+  const p = buildStudentPerformanceProfile(S.studentReportDetail);
+  copyText(studentReportPlainText(p, S.studentReportMode), 'Report copied');
+}
+
+function emailStudentReport() {
+  if (!S.studentReportDetail) return;
+  const p = buildStudentPerformanceProfile(S.studentReportDetail);
+  closeStudentReport();
+  composeToUser(p.email, 'Your Key2MD practice report', studentReportPlainText(p, 'student'));
+}
+
+function studentReportPlainText(p, mode) {
+  if (mode === 'tutor') {
+    return [
+      `Tutor brief - ${p.displayName}`,
+      `CASPer reviews: ${p.casperCount}`,
+      `Average: ${p.avgScoreText}/10`,
+      `Trend: ${p.trendText}`,
+      '',
+      `Session priority: ${primaryFocusSentence(p)}`,
+      '',
+      'Suggested agenda:',
+      ...p.agenda.map(x=>`- ${x}`),
+      '',
+      'What to tutor next:',
+      ...p.focusAreas.map(x=>`- ${x}`),
+      '',
+      p.risks.length ? 'Watch-outs:' : '',
+      ...p.risks.map(x=>`- ${x}`),
+    ].filter(Boolean).join('\n');
+  }
+  return [
+    `Hi ${p.firstName},`,
+    '',
+    `Based on your Key2MD practice history, your current CASPer average is ${p.avgScoreText}/10.`,
+    p.band,
+    '',
+    'Main strength:',
+    p.topStrength,
+    '',
+    'One priority to fix:',
+    primaryFocusSentence(p),
+    p.topImprovement,
+    '',
+    'Next practice plan:',
+    ...p.nextSteps.map(x=>`- ${x}`),
+    '',
+    'This is benchmarked against the Key2MD practice cohort, which is a competitive group of students actively preparing, so high scores are deliberately hard to earn.',
+    '',
+    '- Dan',
+  ].join('\n');
+}
+
 async function loadEnquiries() {
   const limit = document.getElementById('enqLimit')?.value||'50';
   try {
@@ -1673,7 +2268,11 @@ function renderEnquiries() {
       <td><div class="cell-main">${esc(row.name||'—')}</div></td>
       <td>
         <div class="cell-main">${esc(row.email||'—')}</div>
-        <button class="btn blue" style="font-size:0.68rem;padding:2px 8px;margin-top:3px;" onclick="event.stopPropagation();composeToUser('${esc(row.email)}')">✉ Email</button>
+        <div class="action-mini-row">
+          <button class="btn blue" onclick="event.stopPropagation();replyToEnquiry('${esc(row.id||'')}')">Reply</button>
+          <button class="btn" onclick="event.stopPropagation();copyText('${esc(row.email||'')}','Email copied')">Copy</button>
+          <button class="btn" onclick="event.stopPropagation();viewUserByEmail('${esc(row.email||'')}')">User</button>
+        </div>
       </td>
       <td><span class="enq-type">${esc(row.type||'General')}</span></td>
       <td><div class="trunc">${esc(row.universities||'—')}</div></td>
@@ -1689,7 +2288,8 @@ function renderEnquiries() {
         <div class="detail-box-row">Exam date: <strong>${esc(row.exam_date||'—')}</strong></div>
         <div class="detail-box-row">Submitted: ${esc(row.created_at?.slice(0,16).replace('T',' ')||'—')}</div>
         <div style="margin-top:8px;">
-          <button class="btn blue" onclick="composeToUser('${esc(row.email)}')">✉ Reply via Email</button>
+          <button class="btn blue" onclick="replyToEnquiry('${esc(row.id||'')}')">Reply with context</button>
+          <button class="btn" onclick="copyText('${esc(row.email||'')}','Email copied')">Copy email</button>
         </div>
       </div>
       <div class="detail-box"><div class="detail-box-hd">Notes</div>
@@ -1895,12 +2495,25 @@ function insertEmailTemplate(kind) {
 
 function openNewCompose() { document.getElementById('ncModal').classList.add('open'); document.getElementById('ncTo').focus(); }
 function closeNewCompose() { document.getElementById('ncModal').classList.remove('open'); document.getElementById('ncAlert').className='modal-alert'; }
-function composeToUser(email) {
+function composeToUser(email, subject = '', body = '') {
   document.getElementById('ncTo').value = email;
-  document.getElementById('ncSubject').value = '';
-  document.getElementById('ncBody').value = '';
+  document.getElementById('ncSubject').value = subject || '';
+  document.getElementById('ncBody').value = body || '';
   openNewCompose();
   nav('inbox');
+}
+
+function replyToEnquiry(id) {
+  const row = S.enquiries.find(e=>String(e.id||'')===String(id)) || S.enquiries.find(e=>String(e.email||'')===String(id));
+  if (!row) return;
+  const first = String(row.name||'').trim().split(/\s+/)[0] || 'there';
+  const context = [
+    row.type ? `Enquiry type: ${row.type}` : '',
+    row.universities ? `Universities: ${row.universities}` : '',
+    row.exam_date ? `Exam date: ${row.exam_date}` : '',
+  ].filter(Boolean).join('\n');
+  const body = `Hi ${first},\n\nThanks for reaching out. I can help with this.\n\n${context ? `${context}\n\n` : ''}The most useful next step is to tell me where you feel least confident at the moment, and I can point you toward the prep option that fits best rather than giving you generic advice.\n\n- Dan`;
+  composeToUser(row.email || '', `Re: your ${row.type || 'Key2MD'} enquiry`, body);
 }
 async function sendNewEmail() {
   const to   = document.getElementById('ncTo').value.trim();
@@ -2356,10 +2969,11 @@ function renderMockRows(targetId, rows, manualOnly) {
   el.innerHTML = rows.length ? rows.map(r => {
     const dt = fmtDate(r.completed_at || r.manual_review_paid_at);
     const status = r.manual_review_status || (r.manual_review_paid ? 'pending_review' : 'not_requested');
+    const statusActions = r.manual_review_paid ? `<div class="action-mini-row"><button class="btn amber" onclick="quickMockStatus('${esc(r.id)}','in_review')">In review</button><button class="btn green" onclick="quickMockStatus('${esc(r.id)}','completed')">Complete</button></div>` : '';
     return `<tr>
       <td><div class="cell-main">${esc(r.user_name || r.user_email || 'Student')}</div><div class="cell-sub">${esc(r.user_email || r.id || '')}</div></td>
       <td>${tierBadge(r.tier)}</td>
-      <td>${mockStatusBadge(status)}</td>
+      <td>${mockStatusBadge(status)}${statusActions}</td>
       <td><div class="cell-main">${manualOnly ? (r.manual_review_paid ? 'Yes' : 'No') : (dt?.date || '—')}</div><div class="cell-sub">${manualOnly ? (fmtDate(r.manual_review_paid_at)?.date || '—') : (dt?.time || '')}</div></td>
       <td><div class="mock-action-row"><button class="btn blue" onclick="openMockReader('${esc(r.id)}')">Reader</button><button class="btn" onclick="copyMockId('${esc(r.id)}')">Copy ID</button></div></td>
     </tr>`;
@@ -2390,6 +3004,29 @@ async function copyMockId(id) {
     if (note) note.textContent = `Copied attempt ID ${id}`;
   } catch {
     alert(id);
+  }
+}
+
+async function quickMockStatus(id, status) {
+  const note = document.getElementById('mockManualStatus') || document.getElementById('mockStatus');
+  try {
+    if (note) note.textContent = 'Updating mock status...';
+    const getRes = await api(`/api/admin/casper-mock/attempt/${encodeURIComponent(id)}`);
+    const getData = await getRes.json().catch(()=>({}));
+    if (!getRes.ok) throw new Error(getData?.error || 'Could not load mock attempt');
+    const attempt = getData.attempt || {};
+    const res = await api(`/api/admin/casper-mock/attempt/${encodeURIComponent(id)}/notes`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ status, notes: attempt.admin_notes || '' })
+    });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error || 'Could not update mock status');
+    await loadMockAdmin();
+    if (note) note.textContent = `Mock marked ${status.replace(/_/g,' ')}`;
+  } catch(e) {
+    if (note) note.textContent = e.message;
+    alert(e.message);
   }
 }
 
@@ -2502,6 +3139,23 @@ async function loadRevenue() {
     S.revenue = data.rows||[];
     renderRevenue();
   } catch(e) { console.error('Revenue load error:', e); }
+}
+
+async function reconcileSubscriptionPayments() {
+  const status = document.getElementById('rvReconcileStatus');
+  if (!confirm('Reconcile paid Stripe subscription renewal invoices now?\\n\\nThis can safely be run more than once. It will add missing renewal payments only.')) return;
+  if (status) status.textContent = 'Reconciling renewals...';
+  try {
+    const res = await api('/admin/payments/reconcile-subscriptions', {method:'POST'});
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.error || 'Reconcile failed');
+    if (status) status.textContent = `Added ${data.renewal_payments_added||0} renewal payment${data.renewal_payments_added===1?'':'s'} from ${data.invoices_checked||0} invoices`;
+    await Promise.all([loadRevenue(), loadUsers()]);
+    updateDashboard();
+  } catch(e) {
+    if (status) status.textContent = e.message;
+    alert(e.message);
+  }
 }
 
 function renderRevenue() {
@@ -2772,6 +3426,8 @@ restoreBroadcastDraft();
 document.getElementById('creditModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCreditModal();});
 document.getElementById('tierModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeTierModal();});
 document.getElementById('ncModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeNewCompose();});
+document.getElementById('cmdModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCommandPalette();});
+document.getElementById('studentReportModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStudentReport();});
 
 // ══════════════════════════════════════════════════════
 // HELPERS
@@ -2817,6 +3473,24 @@ function withinDays(iso, days) {
   if (!iso) return false;
   const t = new Date(iso).getTime();
   return Number.isFinite(t) && (Date.now()-t) <= days*86400000;
+}
+function withinHours(iso, hours) {
+  if (!iso) return false;
+  const t = new Date(iso).getTime();
+  return Number.isFinite(t) && (Date.now()-t) <= hours*3600000;
+}
+async function copyText(value, label = 'Copied') {
+  try {
+    await navigator.clipboard.writeText(String(value || ''));
+    const note = document.getElementById('lastUpdated') || document.getElementById('mockStatus');
+    if (note) {
+      const previous = note.textContent;
+      note.textContent = label;
+      setTimeout(()=>{ note.textContent = previous; }, 1800);
+    }
+  } catch {
+    alert(String(value || ''));
+  }
 }
 function getCompetencies(fb) {
   if (!fb) return [];
