@@ -39,8 +39,13 @@ window.FullCasperMock = (() => {
     }[ch]));
   }
 
+  function getAuth() {
+    if (typeof Key2MDAuth !== 'undefined') return Key2MDAuth;
+    return window.Key2MDAuth || null;
+  }
+
   function isCasperPro() {
-    return !!window.Key2MDAuth?.isPro?.();
+    return !!getAuth()?.isPro?.();
   }
 
   function priceForTier(tier = config.tier) {
@@ -61,14 +66,15 @@ window.FullCasperMock = (() => {
   }
 
   async function checkoutMock(tier = config.tier) {
-    if (!window.Key2MDAuth) {
+    const auth = getAuth();
+    if (!auth) {
       throw new Error('The login system is still loading. Please refresh the page and try again.');
     }
-    if (!window.Key2MDAuth.isLoggedIn()) {
-      window.Key2MDAuth.showAuthModal?.('signup');
+    if (!auth.isLoggedIn()) {
+      auth.showAuthModal?.('signup');
       return;
     }
-    const token = window.Key2MDAuth.getToken();
+    const token = auth.getToken();
     const successUrl = `${window.location.origin}${window.location.pathname}?tab=mock&mock_payment=success&mock_tier=${encodeURIComponent(tier)}`;
     const cancelUrl = `${window.location.origin}${window.location.pathname}?tab=mock&mock_payment=cancelled`;
     const res = await fetch(`${window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev'}/api/casper-mock/checkout`, {
@@ -342,14 +348,15 @@ window.FullCasperMock = (() => {
 
   function startMock() {
     active = true;
-    if (!window.Key2MDAuth) {
+    const auth = getAuth();
+    if (!auth) {
       setCheckoutState(false, 'The login system is still loading. Please refresh the page and try again.');
       alert('The login system is still loading. Please refresh the page and try again.');
       return;
     }
-    if (!window.Key2MDAuth.isLoggedIn()) {
-      if (typeof window.Key2MDAuth.showAuthModal === 'function') {
-        window.Key2MDAuth.showAuthModal('signup');
+    if (!auth.isLoggedIn()) {
+      if (typeof auth.showAuthModal === 'function') {
+        auth.showAuthModal('signup');
       } else {
         setCheckoutState(false, 'Please log in or create an account before starting the mock.');
         alert('Please log in or create an account before starting the mock.');
