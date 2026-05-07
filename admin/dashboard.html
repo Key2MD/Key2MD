@@ -1081,6 +1081,7 @@ function showApp(email) {
   document.getElementById('loginWrap').classList.add('hidden');
   document.getElementById('appWrap').classList.remove('hidden');
   document.getElementById('sidebarAdmin').textContent = email;
+  nav(currentHashPage(), { replace: true, scroll: false });
 }
 
 async function doLogout() {
@@ -1102,27 +1103,62 @@ async function api(path, opts={}) {
 // ══════════════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════════════
-function nav(page) {
+const ADMIN_PAGES = new Set(['dashboard','reviews','mmi','users','enquiries','revenue','monitoring','inbox','broadcast','subscribers']);
+
+function normalisePage(page) {
+  const key = String(page || 'dashboard').replace(/^#/, '').trim().toLowerCase();
+  return ADMIN_PAGES.has(key) ? key : 'dashboard';
+}
+
+function currentHashPage() {
+  return normalisePage(window.location.hash || 'dashboard');
+}
+
+function nav(page, opts={}) {
+  const target = normalisePage(page);
+  const pageEl = document.getElementById(`page${target.charAt(0).toUpperCase()+target.slice(1)}`);
+  if (!pageEl) {
+    return target === 'dashboard' ? null : nav('dashboard', { replace: true });
+  }
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  const pageEl = document.getElementById(`page${page.charAt(0).toUpperCase()+page.slice(1)}`);
-  if (pageEl) pageEl.classList.add('active');
-  const navEl = document.querySelector(`[data-page="${page}"]`);
+  pageEl.classList.add('active');
+  const navEl = document.querySelector(`[data-page="${target}"]`);
   if (navEl) navEl.classList.add('active');
 
-  if (page==='inbox') {
+  if (opts.updateHash !== false) {
+    const nextHash = `#${target}`;
+    if (window.location.hash !== nextHash) {
+      const method = opts.replace ? 'replaceState' : 'pushState';
+      if (history[method]) history[method](null, '', nextHash);
+    }
+  }
+
+  if (opts.scroll !== false) {
+    document.querySelector('.main')?.scrollTo?.({ top: 0, behavior: 'smooth' });
+    window.scrollTo?.({ top: 0, behavior: 'smooth' });
+  }
+
+  if (target==='inbox') {
     if (!S.conversations.length) loadInbox();
     startInboxPolling();
   } else {
     stopInboxPolling();
   }
-  if (page==='subscribers' && !S.subscribers.length) loadSubscribers();
-  if (page==='enquiries' && !S.enquiries.length) loadEnquiries();
-  if (page==='broadcast') updateBcStats();
-  if (page==='mmi' && !S.mmiReviews.length) loadMMI();
-  if (page==='revenue' && !S.revenue.length) loadRevenue();
-  if (page==='monitoring') loadMonitoring();
+  if (target==='subscribers' && !S.subscribers.length) loadSubscribers();
+  if (target==='enquiries' && !S.enquiries.length) loadEnquiries();
+  if (target==='broadcast') updateBcStats();
+  if (target==='mmi' && !S.mmiReviews.length) loadMMI();
+  if (target==='revenue' && !S.revenue.length) loadRevenue();
+  if (target==='monitoring') loadMonitoring();
 }
+
+window.addEventListener('hashchange', () => {
+  if (!document.getElementById('appWrap')?.classList.contains('hidden')) {
+    nav(currentHashPage(), { updateHash: false, scroll: false });
+  }
+});
 
 // ══════════════════════════════════════════════════════
 // BOOT — load all data in parallel on login
