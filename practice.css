@@ -283,6 +283,19 @@
       line-height:1.25;
       text-align:center;
     }
+    .mock-pill-helper a {
+      color:#0369a1;
+      text-decoration:underline;
+      text-underline-offset:2px;
+    }
+    .mode-pill.active-mock {
+      border-color:var(--navy);
+      background:linear-gradient(135deg,var(--navy),#0f2a44);
+      color:#fff;
+      box-shadow:0 10px 24px rgba(10,22,40,0.26), inset 0 -3px 0 var(--teal);
+    }
+    .mode-pill.active-mock .mock-pill-kicker { color:#7dd3fc; }
+    .mode-pill.active-mock:hover { border-color:var(--navy); color:#fff; }
 
     /* ── MMI sidebar options ── */
     .mmi-options { display:flex; flex-direction:column; gap:8px; }
