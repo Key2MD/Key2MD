@@ -689,7 +689,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <video id="webcamLive" autoplay muted playsinline></video>
           <video id="webcamPlayback" playsinline></video>
           <div class="webcam-overlay" id="webcamOverlay">
-            <div class="webcam-permission-text">Enable camera to record your answer</div>
+          <div class="webcam-permission-text" id="webcamPermissionText">Enable camera to record your answer</div>
             <button class="btn-webcam-start" id="btnStartWebcam">Enable Camera</button>
           </div>
           <div id="playbackPlayOverlay" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);cursor:pointer;" onclick="togglePlayback()">
@@ -1317,16 +1317,28 @@ async function submitMMIForFeedback() {
   const feedbackWrap = document.getElementById('aiFeedbackWrapMMI');
   const isPremium = mmiPremiumMode;
   const tier = isPremium ? 'premium' : 'transcript';
+  const isCasperMockReview = !!window.K2_ACTIVE_CASPER_MOCK;
+  const requireVideoUpload = isCasperMockReview && isPremium;
 
   // ── Wait briefly for audioRecorder.onstop to fire if it hasn't yet ──
   // audioBlob is set asynchronously after stopRecording() — give it up to 800ms
   if(!audioBlob && audioRecorder && audioRecorder.state === 'inactive' && audioChunks.length > 0) {
     await new Promise(r => setTimeout(r, 400));
   }
+  // Premium CASPer mock video stations should submit the actual webcam video
+  // recording, not only the lightweight audio-only blob used for transcript.
+  if(!recordingBlob && mediaRecorder && mediaRecorder.state === 'inactive' && recordedChunks.length > 0) {
+    await new Promise(r => setTimeout(r, 400));
+  }
 
-  const uploadBlob = audioBlob || recordingBlob;
+  const uploadBlob = requireVideoUpload ? recordingBlob : (audioBlob || recordingBlob);
   if(!uploadBlob) {
-    MMIFeedbackRender.renderError(feedbackWrap, { code: 'no_recording', message: 'No recording found. Please record your response first.' });
+    MMIFeedbackRender.renderError(feedbackWrap, {
+      code: 'no_recording',
+      message: requireVideoUpload
+        ? 'No video recording found. Please record with your camera enabled before submitting Premium mock feedback.'
+        : 'No recording found. Please record your response first.'
+    });
     if(sw) sw.style.display = 'block';
     return;
   }
@@ -1359,12 +1371,15 @@ async function submitMMIForFeedback() {
   }
 
   // ── Build FormData ────────────────────────────────────────────
-  // Re-resolve uploadBlob at build time in case audioBlob arrived after initial check
+  // Re-resolve uploadBlob at build time in case audioBlob arrived after initial check.
+  // Premium CASPer mock stations send the full webcam recording for video analysis.
   const buildFormData = () => {
-    const finalBlob = audioBlob || recordingBlob;
-    const audioFile = new File([finalBlob], 'recording.webm', { type: finalBlob.type || 'audio/webm' });
+    const finalBlob = requireVideoUpload ? recordingBlob : (audioBlob || recordingBlob);
+    const fileName = requireVideoUpload ? 'recording-video.webm' : 'recording.webm';
+    const audioFile = new File([finalBlob], fileName, { type: finalBlob.type || (requireVideoUpload ? 'video/webm' : 'audio/webm') });
     const fd = new FormData();
     fd.append('audio', audioFile);
+    fd.append('media_kind', requireVideoUpload ? 'video' : 'audio');
     const mmiStationIdx = MMI_STATIONS.indexOf(s);
     const casperStationIdx = typeof STATIONS !== 'undefined' ? STATIONS.indexOf(s) : -1;
     const stationId = s.id || (mmiStationIdx >= 0 ? `mmi_${mmiStationIdx}` : casperStationIdx >= 0 ? `casper_video_${casperStationIdx}` : 'casper_video_mock');
@@ -1379,7 +1394,7 @@ async function submitMMIForFeedback() {
     fd.append('tier', tier);
     fd.append('specialist_mode', mmiSpecialistMode ? '1' : '0');
     fd.append('use_credit', '1');
-    if (window.K2_ACTIVE_CASPER_MOCK) {
+    if (isCasperMockReview) {
       fd.append('mock_exam', '1');
       fd.append('mock_tier', window.K2_ACTIVE_CASPER_MOCK.tier || tier);
     }
@@ -2151,7 +2166,12 @@ function startRecording(){
   // ── Video recorder (full quality, local playback only) ──
   const opts=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
               MediaRecorder.isTypeSupported('video/webm')?{mimeType:'video/webm'}:{};
-  mediaRecorder=new MediaRecorder(webcamStream,opts);
+  const recorderOpts = { ...opts };
+  if (window.K2_ACTIVE_CASPER_MOCK && mmiPremiumMode) {
+    recorderOpts.videoBitsPerSecond = 850000;
+    recorderOpts.audioBitsPerSecond = 96000;
+  }
+  mediaRecorder=new MediaRecorder(webcamStream,recorderOpts);
   mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
   mediaRecorder.onstop=()=>{
     if(window._elapsedInterval){clearInterval(window._elapsedInterval);window._elapsedInterval=null;}
