@@ -336,7 +336,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="mode-pill-row practice-mode-grid">
         <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper');" aria-label="CASPer practice">CASPer</button>
         <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');" aria-label="MMI practice">MMI</button>
-        <button class="mode-pill mode-pill-mock" id="modeMock" onclick="setMode('mock');FullCasperMock.activateMockMode();" aria-label="Full CASPer mock exam"><span class="mock-pill-kicker">New</span><span>Full Mock</span></button>
+        <button class="mode-pill mode-pill-mock" id="modeMock" onclick="setMode('mock');window.FullCasperMock?.activateMockMode?.();" aria-label="Full CASPer mock exam"><span class="mock-pill-kicker">New</span><span>Full Mock</span></button>
       </div>
       <div class="mock-pill-helper">11 new stations handwritten by Dan · <a href="full-casper-mock-exam.html">details</a></div>
     </div>
@@ -968,7 +968,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.12);">
           <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#c4b5fd;margin-bottom:5px;">Full CASPer Mock</div>
           <div style="font-size:0.74rem;color:rgba(255,255,255,0.6);line-height:1.45;margin-bottom:8px;">4 video + 7 written stations in the official sequence. Completely new stations, handwritten by Dan.</div>
-          <button onclick="setMode('mock');FullCasperMock.activateMockMode();" style="width:100%;padding:8px 10px;border-radius:50px;border:1px solid rgba(196,181,253,0.35);background:rgba(124,58,237,0.18);color:#ddd6fe;font-size:0.76rem;font-weight:800;cursor:pointer;font-family:inherit;">View Full Mock →</button>
+          <button onclick="setMode('mock');window.FullCasperMock?.activateMockMode?.();" style="width:100%;padding:8px 10px;border-radius:50px;border:1px solid rgba(196,181,253,0.35);background:rgba(124,58,237,0.18);color:#ddd6fe;font-size:0.76rem;font-weight:800;cursor:pointer;font-family:inherit;">View Full Mock →</button>
         </div>
       </div>
 
@@ -1504,7 +1504,9 @@ function createMMIMockReviewSnapshot() {
   const durationSec = Math.round(mmiRecordingDurationSec || 0);
   const mmiStationIdx = MMI_STATIONS.indexOf(s);
   const casperStationIdx = typeof STATIONS !== 'undefined' ? STATIONS.indexOf(s) : -1;
-  const stationId = s.id || (mmiStationIdx >= 0 ? `mmi_${mmiStationIdx}` : casperStationIdx >= 0 ? `casper_video_${casperStationIdx}` : 'casper_video_mock');
+  const stationId = window.K2_ACTIVE_CASPER_MOCK
+    ? `casper_video_${currentIdx + 1}_${String(s.id || 'private').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 48)}`
+    : (s.id || (mmiStationIdx >= 0 ? `mmi_${mmiStationIdx}` : casperStationIdx >= 0 ? `casper_video_${casperStationIdx}` : 'casper_video_mock'));
   const recordingUrl = snapshotRecordingBlob ? URL.createObjectURL(snapshotRecordingBlob) : null;
 
   return {
@@ -2282,12 +2284,12 @@ function applyModeUI(mode) {
   const cc = $('casperCategoryCard'), mc = $('mmiCategoryCard'), mo = $('mmiOptionsCard');
   const ccard = $('categoryCard'), chdr = $('categoryCardHeader');
   const sq = $('starredQueueCard');
-  if (cc) cc.style.display = isCasper           ? '' : 'none';
-  if (mc) mc.style.display = (isMMI||isMock) ? '' : 'none';
+  if (cc) cc.style.display = isCasper ? '' : 'none';
+  if (mc) mc.style.display = isMMI ? '' : 'none';
   if (mo) mo.style.display = isMMI              ? '' : 'none';
   if (sq) sq.style.display = isCasper ? '' : 'none';
-  if (ccard) ccard.style.display = '';   // outer card always visible in regular modes
-  if (chdr)  chdr.textContent = isCasper ? 'Category' : 'MMI Station Type';
+  if (ccard) ccard.style.display = isMock ? 'none' : '';   // the mock has its own dedicated setup card
+  if (chdr)  chdr.textContent = isCasper ? 'Category' : isMMI ? 'MMI Station Type' : 'Full Mock';
 
   // Webcam
   const wp = $('webcamPanel');
@@ -2356,6 +2358,9 @@ function setMode(mode) {
   updateLibraryCoverage();
   renderStarredRevisionQueue();
   updatePersistentCompetencyProgress();
+  if (isMock && window.FullCasperMock?.activateMockMode) {
+    window.FullCasperMock.activateMockMode();
+  }
 }
 
 // ══ WEBCAM ══
@@ -2605,6 +2610,15 @@ $('btnDownloadResponse').addEventListener('click',()=>{
 // ══ SESSION ══
 function startSession(){
   clearTimer();
+  if(currentMode===MODE_MOCK){
+    if(window.FullCasperMock?.activateMockMode) window.FullCasperMock.activateMockMode();
+    if(window.FullCasperMock?.startMock) {
+      window.FullCasperMock.startMock();
+    } else {
+      alert('The Full CASPer Mock is still loading. Please refresh the page and try again.');
+    }
+    return;
+  }
   _sessionRecordedIds = new Set(); // reset per-session recording tracker
   const stations=currentMode===MODE_CASPER?STATIONS:MMI_STATIONS;
   let filtered;

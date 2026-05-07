@@ -78,6 +78,13 @@ window.FullCasperMock = (() => {
     return false;
   }
 
+  function applyTierFromUrl() {
+    try {
+      const tier = new URLSearchParams(window.location.search).get('mock_tier');
+      if (tier === 'premium' || tier === 'transcript') config.tier = tier;
+    } catch {}
+  }
+
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -264,7 +271,9 @@ window.FullCasperMock = (() => {
   }
 
   function init() {
+    applyTierFromUrl();
     renderConfigPanel();
+    setTier(config.tier);
     bindNavigation();
     bindPracticeNudge();
     if (window.location.search.includes('tab=mock') || window.location.hash === '#full-casper-mock') {
@@ -302,7 +311,7 @@ window.FullCasperMock = (() => {
   }
 
   function renderConfigPanel() {
-    const sidebar = document.querySelector('aside.sidebar');
+    const sidebar = document.querySelector('aside.sidebar') || document.querySelector('.sidebar');
     if (!sidebar || byId('casperMockConfigPanel')) return;
 
     const panel = document.createElement('div');
@@ -381,6 +390,8 @@ window.FullCasperMock = (() => {
 
   function activateMockMode() {
     active = true;
+    renderConfigPanel();
+    setTier(config.tier);
     document.querySelectorAll('.mode-pill').forEach(pill => pill.classList.remove('active-casper', 'active-mmi', 'active-mock'));
     byId('modeMock')?.classList.add('active-mock');
     hideNormalPanels();
@@ -2242,7 +2253,11 @@ window.FullCasperMock = (() => {
     document.body.appendChild(overlay);
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
 
   return {
     activateMockMode,
