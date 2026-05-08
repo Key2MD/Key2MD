@@ -1386,6 +1386,7 @@ function nav(page, opts={}) {
   if (target==='subscribers' && !S.subscribers.length) loadSubscribers();
   if (target==='mocks' && !S.mockAttempts.length && !S.mockManualReviews.length) loadMockAdmin();
   if (target==='enquiries' && !S.enquiries.length) loadEnquiries();
+  if (target==='users' && !S.users.length) loadUsers();
   if (target==='broadcast') updateBcStats();
   if (target==='mmi' && !S.mmiReviews.length) loadMMI();
   if (target==='revenue' && !S.revenue.length) loadRevenue();
@@ -1827,6 +1828,11 @@ async function loadUsers() {
   const limit = document.getElementById('usrLimit')?.value||'50';
   const tier  = document.getElementById('usrTier')?.value||'';
   const q     = (document.getElementById('usrSearch')?.value||'').trim();
+  const status = document.getElementById('usrStatus');
+  const tbody = document.getElementById('usrBody');
+  const empty = document.getElementById('usrEmpty');
+  if (status) status.textContent = 'Loading users...';
+  if (empty) empty.classList.add('hidden');
   let url = `/admin/users?limit=${limit}`;
   if (tier) url += `&tier=${tier}`;
   if (q) url += `&q=${encodeURIComponent(q)}`;
@@ -1834,10 +1840,15 @@ async function loadUsers() {
     const res  = await api(url);
     const data = await res.json().catch(()=>({}));
     if (!res.ok) throw new Error(data?.error||'Failed');
-    S.users = data.rows||[];
+    S.users = data.rows || data.users || data.data || [];
     renderUsers();
     updateDashboard();
-  } catch(e) { console.error('Users load error:', e); }
+  } catch(e) {
+    console.error('Users load error:', e);
+    if (status) status.textContent = `Users failed to load: ${e.message}`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="11" style="padding:18px;color:var(--red);font-size:0.82rem;">${esc(e.message)}. Refresh after redeploying the latest Worker if this appeared after an admin update.</td></tr>`;
+    if (empty) empty.classList.add('hidden');
+  }
 }
 
 function queueUserSearch() {
