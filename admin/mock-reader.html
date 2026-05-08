@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key2MD Mock Reader</title>
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+  <meta name="referrer" content="no-referrer">
+  <style>
+    :root{--navy:#0a1628;--teal:#0ea5e9;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray500:#64748b;--gray700:#334155}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--gray50);color:var(--navy)}
+    header{background:var(--navy);color:#fff;padding:22px 28px;display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+    header h1{margin:0;font-size:1.35rem}
+    .header-link{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.22);border-radius:999px;color:#fff;text-decoration:none;padding:9px 14px;font-weight:800;font-size:.82rem;background:rgba(255,255,255,.08)}
+    .header-link:hover{background:rgba(255,255,255,.14)}
+    main{max-width:1240px;margin:0 auto;padding:24px}
+    .card{background:#fff;border:1px solid var(--gray200);border-radius:14px;padding:18px;margin-bottom:16px}
+    .muted{color:var(--gray500);font-size:.86rem;line-height:1.55}
+    input,textarea,select{width:100%;border:1px solid var(--gray200);border-radius:10px;padding:10px 12px;font:inherit}
+    button{border:0;border-radius:999px;background:var(--navy);color:#fff;padding:10px 16px;font-weight:800;cursor:pointer}
+    button.secondary{background:#fff;color:var(--gray700);border:1px solid var(--gray200)}
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:start}
+    .list-item{width:100%;text-align:left;background:#fff;color:var(--navy);border:1px solid var(--gray200);border-radius:12px;padding:12px;margin-bottom:10px}
+    .list-item.active{border-color:var(--teal);background:rgba(14,165,233,.06)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .tabs button{background:#fff;color:var(--gray700);border:1px solid var(--gray200);padding:8px 12px;font-size:.78rem}
+    .tabs button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .station-grid{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr);gap:18px}
+    pre{white-space:pre-wrap;background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:12px;line-height:1.55;max-height:440px;overflow:auto}
+    video{width:100%;aspect-ratio:16/9;background:#000}
+    .mock-video-shell{background:#07111f;border:1px solid rgba(10,22,40,.18);border-radius:14px;overflow:hidden;box-shadow:0 10px 28px rgba(10,22,40,.12)}
+    .mock-video-bar{padding:11px 12px 12px;background:linear-gradient(180deg,#0a1628,#07111f)}
+    .mock-video-row{display:flex;align-items:center;gap:10px}
+    .mock-video-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;padding:0;font-size:.82rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .mock-video-track{position:relative;height:18px;flex:1;display:flex;align-items:center}
+    .mock-video-bg{position:absolute;left:0;right:0;height:5px;border-radius:999px;background:rgba(255,255,255,.18);overflow:hidden}
+    .mock-video-fill{height:100%;width:0;background:var(--teal);border-radius:999px}
+    .mock-video-range{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}
+    .mock-video-time{min-width:74px;text-align:right;color:rgba(255,255,255,.72);font-size:.72rem;font-weight:800;font-variant-numeric:tabular-nums}
+    .pill{display:inline-block;border-radius:999px;background:rgba(14,165,233,.1);color:#0369a1;padding:4px 9px;font-size:.72rem;font-weight:800}
+    @media(max-width:900px){.grid,.station-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Key2MD Mock Reader</h1>
+      <div class="muted" style="color:rgba(255,255,255,.68)">Admin-only access to saved Full CASPer Mock attempts and paid manual reviews.</div>
+    </div>
+    <a class="header-link" href="dashboard.html#mocks">Admin Dashboard</a>
+  </header>
+  <main>
+    <section id="loginCard" class="card">
+      <h2>Admin Login</h2>
+      <div class="muted">Use the same temporary admin credentials as the dashboard.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin-top:12px">
+        <input id="adminEmail" placeholder="Admin email">
+        <input id="adminPassword" type="password" placeholder="Password">
+        <button onclick="login()">Log in</button>
+      </div>
+      <div id="loginStatus" class="muted" style="margin-top:8px"></div>
+    </section>
+
+    <section id="readerApp" style="display:none">
+      <div class="grid">
+        <aside class="card">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px">
+            <h2 style="margin:0;font-size:1rem">Mock Attempts</h2>
+            <button class="secondary" onclick="loadList()">Refresh</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+            <button id="scopeAllBtn" class="secondary" onclick="setScope('all')">All saved</button>
+            <button id="scopePaidBtn" class="secondary" onclick="setScope('paid')">Paid reviews</button>
+          </div>
+          <div id="reviewList" class="muted">Loading...</div>
+        </aside>
+        <section id="attemptPanel" class="card">
+          <div class="muted">Select a paid mock review request.</div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script>
+    const API_BASE = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+    const qs = new URLSearchParams(window.location.search);
+    const TOKEN_KEY = 'k2md_admin_token';
+    const LEGACY_HANDOFF_KEY = 'k2md_admin_token_handoff';
+    const MOCK_READER_CHANNEL_PREFIX = 'k2md_mock_reader_handoff_';
+    const handoffId = qs.get('handoff') || '';
+    let adminToken = sessionStorage.getItem(TOKEN_KEY) || '';
+    let initialAttemptId = qs.get('attempt_id') || '';
+    let currentAttempt = null;
+    let currentStation = 0;
+    let listScope = qs.get('scope') || localStorage.getItem('k2md_mock_reader_scope') || 'all';
+    if (qs.get('admin_token') || qs.get('handoff')) {
+      const clean = new URLSearchParams(window.location.search);
+      clean.delete('admin_token');
+      clean.delete('handoff');
+      const next = `${window.location.pathname}${clean.toString() ? '?' + clean.toString() : ''}`;
+      history.replaceState(null, '', next);
+    }
+
+    function clearLegacyAdminStorage(){
+      localStorage.removeItem(LEGACY_HANDOFF_KEY);
+      localStorage.removeItem(TOKEN_KEY);
+    }
+
+    function storeAdminToken(token){
+      adminToken = String(token || '');
+      if(!adminToken)return false;
+      sessionStorage.setItem(TOKEN_KEY, adminToken);
+      clearLegacyAdminStorage();
+      return true;
+    }
+
+    function esc(v){return String(v ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+    function authHeaders(){return adminToken ? {'Authorization':'Bearer '+adminToken} : {};}
+
+    function startAdminHandoff(){
+      if(adminToken || !handoffId || !('BroadcastChannel' in window))return;
+      const channel = new BroadcastChannel(MOCK_READER_CHANNEL_PREFIX + handoffId);
+      const ready = () => channel.postMessage({type:'ready'});
+      channel.onmessage = event => {
+        const message = event.data || {};
+        if(message.type === 'admin-token' && storeAdminToken(message.token)){
+          channel.close();
+          showApp();
+        }
+      };
+      ready();
+      setTimeout(ready, 250);
+      setTimeout(ready, 1000);
+      setTimeout(() => channel.close(), 10000);
+    }
+
+    async function login(){
+      const status=document.getElementById('loginStatus');
+      status.textContent='Checking...';
+      const res=await fetch(API_BASE+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:adminEmail.value,password:adminPassword.value})});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok){status.textContent=data.error||'Login failed';return;}
+      storeAdminToken(data.token);
+      showApp();
+    }
+
+    function showApp(){
+      document.getElementById('loginCard').style.display='none';
+      document.getElementById('readerApp').style.display='block';
+      loadList().then(()=>{
+        if(initialAttemptId){
+          const id = initialAttemptId;
+          initialAttemptId = '';
+          openAttempt(id);
+        }
+      });
+    }
+
+    function setScope(scope){
+      listScope = scope === 'paid' ? 'paid' : 'all';
+      localStorage.setItem('k2md_mock_reader_scope', listScope);
+      loadList();
+    }
+
+    async function loadList(){
+      const list=document.getElementById('reviewList');
+      list.textContent='Loading...';
+      const allBtn=document.getElementById('scopeAllBtn'), paidBtn=document.getElementById('scopePaidBtn');
+      if(allBtn&&paidBtn){
+        allBtn.style.background=listScope==='all'?'var(--navy)':'#fff'; allBtn.style.color=listScope==='all'?'#fff':'var(--gray700)';
+        paidBtn.style.background=listScope==='paid'?'var(--navy)':'#fff'; paidBtn.style.color=listScope==='paid'?'#fff':'var(--gray700)';
+      }
+      const endpoint = listScope === 'paid' ? '/api/admin/casper-mock/manual-reviews' : '/api/admin/casper-mock/attempts';
+      const res=await fetch(API_BASE+endpoint,{headers:authHeaders()});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok){list.textContent=data.error||'Could not load reviews';return;}
+      const rows=data.rows||[];
+      list.innerHTML=rows.length?rows.map(r=>`
+        <button class="list-item" onclick="openAttempt('${esc(r.id)}')">
+          <div style="font-weight:900">${esc(r.user_name||r.user_email||'Student')}</div>
+          <div class="muted">${esc(r.user_email||'')}<br>${esc(r.tier||'mock')} - ${r.manual_review_paid ? 'paid manual review' : 'saved mock only'} - ${esc(r.manual_review_status||'not_requested')}</div>
+          <div class="muted">${esc(r.completed_at||'')}</div>
+        </button>
+      `).join(''):(listScope === 'paid' ? 'No paid manual reviews yet.' : 'No saved mock attempts yet.');
+      return rows;
+    }
+
+    async function openAttempt(id){
+      const panel=document.getElementById('attemptPanel');
+      panel.innerHTML='<div class="muted">Loading attempt...</div>';
+      const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(id),{headers:authHeaders()});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok){panel.innerHTML='<div class="muted">'+esc(data.error||'Could not load attempt')+'</div>';return;}
+      currentAttempt=data.attempt; currentStation=0; renderAttempt();
+    }
+
+    function renderAttempt(){
+      const a=currentAttempt, rows=a.rows||[];
+      const tabs=rows.map((r,i)=>`<button class="${i===currentStation?'active':''}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}</button>`).join('');
+      document.getElementById('attemptPanel').innerHTML=`
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+          <div>
+            <h2 style="margin:0">${esc(a.user_name||a.user_email||'Student')}</h2>
+            <div class="muted">${esc(a.user_email||'')} - <span class="pill">${esc(a.tier)}</span> - ${esc(a.manual_review_status||'pending_review')}</div>
+          </div>
+          <button class="secondary" onclick="saveNotes()">Save notes</button>
+        </div>
+        <div class="tabs">${tabs}</div>
+        <div>${stationHtml(rows[currentStation])}</div>
+        <div class="card" style="margin-top:16px">
+          <h3>Admin notes</h3>
+          <select id="reviewStatus" style="max-width:240px;margin-bottom:10px">
+            ${['pending_review','in_review','completed'].map(s=>`<option value="${s}" ${a.manual_review_status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+          <textarea id="adminNotes" rows="7" placeholder="Overall notes, station-specific notes, final recommendation...">${esc(a.admin_notes||'')}</textarea>
+          <div id="saveStatus" class="muted" style="margin-top:8px"></div>
+        </div>
+      `;
+      if(rows[currentStation]?.type==='video') setTimeout(()=>loadAdminRecording('adminVideoPlayer'),0);
+    }
+
+    function fmtTime(seconds){
+      const total=Math.max(0,Math.round(Number(seconds)||0));
+      const m=Math.floor(total/60), s=total%60;
+      return `${m}:${String(s).padStart(2,'0')}`;
+    }
+
+    function rowDuration(r){
+      const candidates=[r?.duration_sec,r?.durationSec,r?.rawFeedback?.durationSec,r?.feedback?.durationSec];
+      const found=candidates.map(Number).find(v=>Number.isFinite(v)&&v>0);
+      return found||0;
+    }
+
+    function videoPlayerHtml(recordingKey,r,id='adminVideoPlayer'){
+      const duration=rowDuration(r);
+      const keyAttr = recordingKey ? ` data-recording-key="${esc(recordingKey)}"` : '';
+      return `<div class="mock-video-shell">
+        <video id="${id}" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="display:block;cursor:pointer"></video>
+        <div class="mock-video-bar">
+          <div class="mock-video-row">
+            <button type="button" id="${id}Btn" class="mock-video-btn" aria-label="Play recording">▶</button>
+            <div class="mock-video-track">
+              <div class="mock-video-bg"><div id="${id}Fill" class="mock-video-fill"></div></div>
+              <input id="${id}Range" class="mock-video-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording">
+            </div>
+            <div id="${id}Time" class="mock-video-time">0:00 / ${duration?fmtTime(duration):'--:--'}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    async function loadAdminRecording(id='adminVideoPlayer'){
+      const video=document.getElementById(id);
+      if(!video)return;
+      const key=video.dataset.recordingKey||'';
+      if(!key){initVideoPlayer(id);return;}
+      try{
+        const res=await fetch(API_BASE+'/api/admin/casper-mock/recording?key='+encodeURIComponent(key),{headers:authHeaders()});
+        if(!res.ok)throw new Error('Recording unavailable');
+        const blob=await res.blob();
+        if(video.dataset.blobUrl)URL.revokeObjectURL(video.dataset.blobUrl);
+        const url=URL.createObjectURL(blob);
+        video.dataset.blobUrl=url;
+        video.src=url;
+      }catch(e){
+        video.removeAttribute('src');
+        video.insertAdjacentHTML('afterend','<div class="muted" style="padding:12px;background:#fff;border:1px solid var(--gray200);border-radius:10px;margin:10px;">Recording could not be loaded with this admin session.</div>');
+      }
+      initVideoPlayer(id);
+    }
+
+    function initVideoPlayer(id='adminVideoPlayer'){
+      const video=document.getElementById(id), btn=document.getElementById(id+'Btn'), range=document.getElementById(id+'Range'), fill=document.getElementById(id+'Fill'), time=document.getElementById(id+'Time');
+      if(!video||!btn||!range||!fill||!time)return;
+      const hint=()=>{const n=Number(video.dataset.duration||0);return Number.isFinite(n)&&n>0?n:0;};
+      const dur=()=>{const d=Number(video.duration);return Number.isFinite(d)&&d>0&&d<86400?d:hint();};
+      const update=()=>{
+        const d=dur(), cur=Math.max(0,Number(video.currentTime)||0), pct=d?Math.max(0,Math.min(1,cur/d)):0;
+        range.value=String(Math.round(pct*1000));
+        fill.style.width=(pct*100)+'%';
+        time.textContent=`${fmtTime(cur)} / ${d?fmtTime(d):'--:--'}`;
+        btn.textContent=video.paused||video.ended?'▶':'❚❚';
+      };
+      const seek=()=>{const d=dur();if(!d)return;video.currentTime=(Number(range.value)/1000)*d;update();};
+      const toggle=()=>{if(!video.getAttribute('src'))return;if(video.paused||video.ended)video.play().catch(()=>{});else video.pause();};
+      if(!video.dataset.bound){
+        video.dataset.bound='1';
+        btn.addEventListener('click',toggle);
+        video.addEventListener('click',toggle);
+        range.addEventListener('input',seek);
+        ['loadedmetadata','durationchange','timeupdate','play','pause','ended','seeked'].forEach(ev=>video.addEventListener(ev,update));
+      }
+      update();
+    }
+
+    function stationHtml(r){
+      if(!r)return '<div class="muted">No station selected.</div>';
+      const station=r.station||{}, fb=r.feedback||{};
+      const scenario=`<div class="card"><h3>Scenario</h3><div class="muted">${esc(station.scenario||'')}</div><h4>Prompts</h4><ol><li>${esc(station.prompt1||'')}</li><li>${esc(station.prompt2||'')}</li></ol></div>`;
+      if(r.type==='video'){
+        const key=r.recording_key;
+        return `<div class="station-grid"><div>${videoPlayerHtml(key,r)}<pre>${esc(r.transcript||'No transcript')}</pre></div><div>${scenario}${feedbackHtml(fb)}</div></div>`;
+      }
+      return `<div class="station-grid"><div>${scenario}<h3>Typed answer</h3><pre>${esc(r.answer||'No answer')}</pre></div><div>${feedbackHtml(fb)}</div></div>`;
+    }
+
+    function feedbackHtml(fb){
+      const overall=fb.overall||{};
+      const comps=Array.isArray(fb.competencies)?fb.competencies:[];
+      const prompts=Array.isArray(fb.per_prompt)?fb.per_prompt:[];
+      return `<div class="card"><h3>AI Feedback</h3>
+        <div class="pill">${esc(overall.score||fb.score||'')}/10 ${esc(overall.label||'')}</div>
+        <p><strong>Strength:</strong> ${esc(overall.biggest_strength||fb.strengths||'')}</p>
+        <p><strong>Improve:</strong> ${esc(overall.biggest_improvement||fb.improvements||'')}</p>
+        ${fb.presentation?`<h4>Presentation</h4><pre>${esc(JSON.stringify(fb.presentation,null,2))}</pre>`:''}
+        ${comps.length?`<h4>Competencies</h4><pre>${esc(JSON.stringify(comps,null,2))}</pre>`:''}
+        ${prompts.length?`<h4>Prompt feedback</h4><pre>${esc(JSON.stringify(prompts,null,2))}</pre>`:''}
+      </div>`;
+    }
+
+    async function saveNotes(){
+      const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/notes',{method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({status:reviewStatus.value,notes:adminNotes.value})});
+      const data=await res.json().catch(()=>({}));
+      document.getElementById('saveStatus').textContent=res.ok?'Saved.':(data.error||'Save failed');
+    }
+
+    if(adminToken) {
+      storeAdminToken(adminToken);
+      showApp();
+    } else {
+      startAdminHandoff();
+    }
+  </script>
+</body>
+</html>
