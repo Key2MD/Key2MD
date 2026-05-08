@@ -914,18 +914,18 @@
       <p class="calc-sub">Choose undergraduate UCAT/ATAR or graduate GPA/GAMSAT. The calculator keeps official eligibility rules separate from community estimates, then gives a university-by-university read.</p>
 
       <div class="entry-mode-toggle calc-initial-only" role="tablist" aria-label="Choose entry pathway">
-        <button type="button" id="modeUndergrad" class="active" role="tab" aria-selected="true">
+        <button type="button" id="modeUndergrad" role="tab" aria-selected="false">
           Undergraduate / UCAT
           <span>ATAR, UCAT, rural/local pathways</span>
         </button>
-        <button type="button" id="modeGraduate" role="tab" aria-selected="false">
+        <button type="button" id="modeGraduate" class="active" role="tab" aria-selected="true">
           Graduate / GAMSAT
           <span>GPA, GAMSAT, CASPer and bonuses</span>
         </button>
       </div>
 
       <!-- Inputs -->
-      <div id="graduateCalculatorPanel" class="entry-panel" hidden>
+      <div id="graduateCalculatorPanel" class="entry-panel">
       <div class="calc-grid calc-initial-only">
         <div class="field">
           <label for="gpaInput">GEMSAS GPA (out of 7)</label>
@@ -1019,7 +1019,7 @@
       </div>
       </div>
 
-      <div id="undergradCalculatorPanel" class="entry-panel">
+      <div id="undergradCalculatorPanel" class="entry-panel" hidden>
         <div class="calc-grid calc-initial-only">
           <div class="field">
             <label for="atarInput">ATAR / selection rank</label>
@@ -1122,7 +1122,7 @@
         </div>
       </div>
 
-      <button class="calc-btn calc-initial-only" id="calcBtn">Calculate my UCAT chances →</button>
+      <button class="calc-btn calc-initial-only" id="calcBtn">Calculate my GAMSAT chances →</button>
 
       <!-- Results appear here -->
       <div class="combo-display" id="comboDisplay">
@@ -1757,7 +1757,7 @@ const UNDERGRAD_SCHOOLS = [
   },
 ];
 
-let state = { entryMode: 'undergrad', rural: false, casper: '', scoreMode: 'overall', activeBonusUni: 'deakin', bonuses: {} };
+let state = { entryMode: 'graduate', rural: false, casper: '', scoreMode: 'overall', activeBonusUni: 'deakin', bonuses: {} };
 let latestCalculatorPlan = null;
 
 const DUPLICATE_RURAL_BONUS_IDS = {
@@ -2043,7 +2043,7 @@ function setEntryMode(mode) {
 
 modeUndergradBtn.addEventListener('click', () => setEntryMode('undergrad'));
 modeGraduateBtn.addEventListener('click', () => setEntryMode('graduate'));
-setEntryMode('undergrad');
+setEntryMode('graduate');
 
 function parseScore(input) {
   const n = parseFloat(input.value);
