@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Key2MD Mock Reader</title>
   <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+  <meta name="referrer" content="no-referrer">
   <style>
     :root{--navy:#0a1628;--teal:#0ea5e9;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray500:#64748b;--gray700:#334155}
     *{box-sizing:border-box}
@@ -83,24 +84,55 @@
   <script>
     const API_BASE = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
     const qs = new URLSearchParams(window.location.search);
-    let adminToken = qs.get('admin_token') || sessionStorage.getItem('k2md_admin_token') || localStorage.getItem('k2md_admin_token') || '';
+    const TOKEN_KEY = 'k2md_admin_token';
+    const LEGACY_HANDOFF_KEY = 'k2md_admin_token_handoff';
+    const MOCK_READER_CHANNEL_PREFIX = 'k2md_mock_reader_handoff_';
+    const handoffId = qs.get('handoff') || '';
+    let adminToken = sessionStorage.getItem(TOKEN_KEY) || '';
     let initialAttemptId = qs.get('attempt_id') || '';
     let currentAttempt = null;
     let currentStation = 0;
     let listScope = qs.get('scope') || localStorage.getItem('k2md_mock_reader_scope') || 'all';
-    if (adminToken) {
-      sessionStorage.setItem('k2md_admin_token', adminToken);
-      localStorage.setItem('k2md_admin_token', adminToken);
-      if (qs.get('admin_token')) {
-        const clean = new URLSearchParams(window.location.search);
-        clean.delete('admin_token');
-        const next = `${window.location.pathname}${clean.toString() ? '?' + clean.toString() : ''}`;
-        history.replaceState(null, '', next);
-      }
+    if (qs.get('admin_token') || qs.get('handoff')) {
+      const clean = new URLSearchParams(window.location.search);
+      clean.delete('admin_token');
+      clean.delete('handoff');
+      const next = `${window.location.pathname}${clean.toString() ? '?' + clean.toString() : ''}`;
+      history.replaceState(null, '', next);
+    }
+
+    function clearLegacyAdminStorage(){
+      localStorage.removeItem(LEGACY_HANDOFF_KEY);
+      localStorage.removeItem(TOKEN_KEY);
+    }
+
+    function storeAdminToken(token){
+      adminToken = String(token || '');
+      if(!adminToken)return false;
+      sessionStorage.setItem(TOKEN_KEY, adminToken);
+      clearLegacyAdminStorage();
+      return true;
     }
 
     function esc(v){return String(v ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
-    function authHeaders(){return {'Authorization':'Bearer '+adminToken};}
+    function authHeaders(){return adminToken ? {'Authorization':'Bearer '+adminToken} : {};}
+
+    function startAdminHandoff(){
+      if(adminToken || !handoffId || !('BroadcastChannel' in window))return;
+      const channel = new BroadcastChannel(MOCK_READER_CHANNEL_PREFIX + handoffId);
+      const ready = () => channel.postMessage({type:'ready'});
+      channel.onmessage = event => {
+        const message = event.data || {};
+        if(message.type === 'admin-token' && storeAdminToken(message.token)){
+          channel.close();
+          showApp();
+        }
+      };
+      ready();
+      setTimeout(ready, 250);
+      setTimeout(ready, 1000);
+      setTimeout(() => channel.close(), 10000);
+    }
 
     async function login(){
       const status=document.getElementById('loginStatus');
@@ -108,7 +140,7 @@
       const res=await fetch(API_BASE+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:adminEmail.value,password:adminPassword.value})});
       const data=await res.json().catch(()=>({}));
       if(!res.ok){status.textContent=data.error||'Login failed';return;}
-      adminToken=data.token; sessionStorage.setItem('k2md_admin_token',adminToken); localStorage.setItem('k2md_admin_token',adminToken);
+      storeAdminToken(data.token);
       showApp();
     }
 
@@ -184,7 +216,7 @@
           <div id="saveStatus" class="muted" style="margin-top:8px"></div>
         </div>
       `;
-      if(rows[currentStation]?.type==='video') setTimeout(()=>initVideoPlayer('adminVideoPlayer'),0);
+      if(rows[currentStation]?.type==='video') setTimeout(()=>loadAdminRecording('adminVideoPlayer'),0);
     }
 
     function fmtTime(seconds){
@@ -199,10 +231,11 @@
       return found||0;
     }
 
-    function videoPlayerHtml(src,r,id='adminVideoPlayer'){
+    function videoPlayerHtml(recordingKey,r,id='adminVideoPlayer'){
       const duration=rowDuration(r);
+      const keyAttr = recordingKey ? ` data-recording-key="${esc(recordingKey)}"` : '';
       return `<div class="mock-video-shell">
-        <video id="${id}" playsinline preload="metadata" src="${esc(src||'')}" data-duration="${duration||''}" style="display:block;cursor:pointer"></video>
+        <video id="${id}" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="display:block;cursor:pointer"></video>
         <div class="mock-video-bar">
           <div class="mock-video-row">
             <button type="button" id="${id}Btn" class="mock-video-btn" aria-label="Play recording">▶</button>
@@ -214,6 +247,26 @@
           </div>
         </div>
       </div>`;
+    }
+
+    async function loadAdminRecording(id='adminVideoPlayer'){
+      const video=document.getElementById(id);
+      if(!video)return;
+      const key=video.dataset.recordingKey||'';
+      if(!key){initVideoPlayer(id);return;}
+      try{
+        const res=await fetch(API_BASE+'/api/admin/casper-mock/recording?key='+encodeURIComponent(key),{headers:authHeaders()});
+        if(!res.ok)throw new Error('Recording unavailable');
+        const blob=await res.blob();
+        if(video.dataset.blobUrl)URL.revokeObjectURL(video.dataset.blobUrl);
+        const url=URL.createObjectURL(blob);
+        video.dataset.blobUrl=url;
+        video.src=url;
+      }catch(e){
+        video.removeAttribute('src');
+        video.insertAdjacentHTML('afterend','<div class="muted" style="padding:12px;background:#fff;border:1px solid var(--gray200);border-radius:10px;margin:10px;">Recording could not be loaded with this admin session.</div>');
+      }
+      initVideoPlayer(id);
     }
 
     function initVideoPlayer(id='adminVideoPlayer'){
@@ -246,8 +299,7 @@
       const scenario=`<div class="card"><h3>Scenario</h3><div class="muted">${esc(station.scenario||'')}</div><h4>Prompts</h4><ol><li>${esc(station.prompt1||'')}</li><li>${esc(station.prompt2||'')}</li></ol></div>`;
       if(r.type==='video'){
         const key=r.recording_key;
-        const src=key?`${API_BASE}/api/admin/casper-mock/recording?key=${encodeURIComponent(key)}&admin_token=${encodeURIComponent(adminToken)}`:'';
-        return `<div class="station-grid"><div>${videoPlayerHtml(src,r)}<pre>${esc(r.transcript||'No transcript')}</pre></div><div>${scenario}${feedbackHtml(fb)}</div></div>`;
+        return `<div class="station-grid"><div>${videoPlayerHtml(key,r)}<pre>${esc(r.transcript||'No transcript')}</pre></div><div>${scenario}${feedbackHtml(fb)}</div></div>`;
       }
       return `<div class="station-grid"><div>${scenario}<h3>Typed answer</h3><pre>${esc(r.answer||'No answer')}</pre></div><div>${feedbackHtml(fb)}</div></div>`;
     }
@@ -272,7 +324,12 @@
       document.getElementById('saveStatus').textContent=res.ok?'Saved.':(data.error||'Save failed');
     }
 
-    if(adminToken) showApp();
+    if(adminToken) {
+      storeAdminToken(adminToken);
+      showApp();
+    } else {
+      startAdminHandoff();
+    }
   </script>
 </body>
 </html>

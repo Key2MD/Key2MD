@@ -1,837 +1,101 @@
 <!DOCTYPE html>
 <html lang="en-AU">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CASPer Live Class · Key2MD</title>
-<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
-
-<!--
-╔══════════════════════════════════════════════════════════════╗
-║           KEY2MD CASPER CLASS — STRIPE PAYMENT PAGE          ║
-║                                                              ║
-║  SETUP INSTRUCTIONS:                                         ║
-║                                                              ║
-║  1. Go to: https://dashboard.stripe.com/products             ║
-║     → Create a new product (e.g. "CASPer Live Class")        ║
-║     → Set the price (e.g. $15 AUD one-time)                  ║
-║     → Copy the Price ID (starts with price_...)              ║
-║                                                              ║
-║  2. Replace STRIPE_PRICE_ID on line ~120 below               ║
-║     const STRIPE_PRICE_ID = 'price_XXXXXXXXXXXXXXXXXX';      ║
-║                                                              ║
-║  3. Go to: https://dashboard.stripe.com/developers/apikeys   ║
-║     → Copy your Publishable Key (starts with pk_live_...)    ║
-║     → Replace STRIPE_PUBLISHABLE_KEY on line ~121            ║
-║                                                              ║
-║  4. Set up a Stripe webhook (for paid confirmation):         ║
-║     → In Stripe Dashboard > Webhooks > Add endpoint          ║
-║     → Point to your backend endpoint or use Stripe's         ║
-║       built-in hosted success redirect (easiest option)      ║
-║                                                              ║
-║  5. Update SUCCESS_URL and CANCEL_URL to your real domain    ║
-║                                                              ║
-║  VIEWING PAID REGISTRATIONS:                                 ║
-║  → Open this page and add ?admin=1 to the URL                ║
-║  → OR go to Stripe Dashboard > Payments to see all paid      ║
-║  → Customer emails are in Stripe Dashboard automatically     ║
-║  → For a local list: Stripe Dashboard > Customers > Export   ║
-║                                                              ║
-║  DATE: Update SESSION_DATE, SESSION_TIME below               ║
-╚══════════════════════════════════════════════════════════════╝
--->
-
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --navy: #0a1628;
-    --navy2: #0d1f3c;
-    --teal: #0ea5e9;
-    --teal2: #38bdf8;
-    --gold: #f59e0b;
-    --gold2: #fbbf24;
-    --green: #22c55e;
-    --white: #ffffff;
-    --gray400: #94a3b8;
-    --gray600: #475569;
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: 'DM Sans', system-ui, sans-serif;
-    background: var(--navy);
-    color: var(--white);
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-    background-image:
-      radial-gradient(ellipse 55% 40% at 80% 0%, rgba(14,165,233,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 30% at 10% 90%, rgba(245,158,11,0.07) 0%, transparent 55%);
-  }
-
-  .nav {
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 960px;
-    margin: 0 auto;
-  }
-
-  .logo {
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 800;
-    font-size: 20px;
-    letter-spacing: -0.04em;
-    color: var(--white);
-    text-decoration: none;
-  }
-  .logo span { color: var(--teal); }
-
-  /* ── LAYOUT ── */
-  .page {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 32px 24px 80px;
-    display: grid;
-    grid-template-columns: 1fr 420px;
-    gap: 48px;
-    align-items: start;
-  }
-
-  @media (max-width: 768px) {
-    .page { grid-template-columns: 1fr; gap: 32px; }
-  }
-
-  /* ── LEFT SIDE ── */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(14,165,233,0.12);
-    border: 1px solid rgba(14,165,233,0.3);
-    border-radius: 100px;
-    padding: 6px 16px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--teal2);
-    margin-bottom: 24px;
-  }
-
-  .badge::before {
-    content: '●';
-    font-size: 8px;
-    color: var(--green);
-    animation: pulse 1.5s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  h1 {
-    font-family: 'DM Serif Display', Georgia, serif;
-    font-size: 48px;
-    line-height: 1.05;
-    color: var(--white);
-    margin-bottom: 16px;
-  }
-
-  h1 em { font-style: italic; color: var(--teal2); }
-
-  .desc {
-    font-size: 16px;
-    color: rgba(255,255,255,0.5);
-    line-height: 1.7;
-    margin-bottom: 36px;
-    font-weight: 400;
-  }
-
-  .session-info {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px;
-    padding: 22px 26px;
-    margin-bottom: 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .info-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .info-icon {
-    font-size: 18px;
-    width: 36px; height: 36px;
-    background: rgba(14,165,233,0.1);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .info-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: rgba(255,255,255,0.35);
-    font-weight: 600;
-  }
-
-  .info-val {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--white);
-  }
-
-  /* WHAT YOU GET */
-  .what-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .what-list li {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    font-size: 15px;
-    color: rgba(255,255,255,0.6);
-    line-height: 1.5;
-  }
-
-  .check {
-    color: var(--green);
-    font-size: 16px;
-    margin-top: 1px;
-    flex-shrink: 0;
-  }
-
-  .what-list strong { color: var(--white); font-weight: 600; }
-
-  /* ── RIGHT SIDE — PAYMENT CARD ── */
-  .payment-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 24px;
-    padding: 36px 32px;
-    position: sticky;
-    top: 24px;
-  }
-
-  .price-display {
-    text-align: center;
-    margin-bottom: 28px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-
-  .price-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 8px;
-    font-weight: 600;
-  }
-
-  .price-amount {
-    font-family: 'DM Serif Display', Georgia, serif;
-    font-size: 52px;
-    color: var(--white);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .price-amount sup {
-    font-size: 24px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 700;
-    vertical-align: super;
-  }
-
-  .price-note {
-    font-size: 13px;
-    color: rgba(255,255,255,0.35);
-  }
-
-  .card-title {
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--white);
-    margin-bottom: 6px;
-  }
-
-  .card-subtitle {
-    font-size: 13px;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 24px;
-    line-height: 1.5;
-  }
-
-  .field {
-    margin-bottom: 16px;
-  }
-
-  label {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0.06em;
-    margin-bottom: 7px;
-    text-transform: uppercase;
-  }
-
-  input {
-    width: 100%;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    padding: 13px 14px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    color: var(--white);
-    outline: none;
-    transition: border-color 0.2s, background 0.2s;
-  }
-
-  input::placeholder { color: rgba(255,255,255,0.2); }
-  input:focus { border-color: var(--teal); background: rgba(14,165,233,0.06); }
-
-  .err { font-size: 12px; color: #f87171; margin-top: 5px; display: none; }
-
-  .pay-btn {
-    width: 100%;
-    background: var(--teal);
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 17px;
-    border-radius: 100px;
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-    margin-top: 8px;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .pay-btn:hover { background: var(--teal2); transform: translateY(-1px); }
-  .pay-btn:active { transform: translateY(0); }
-  .pay-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-
-  .secure-note {
-    text-align: center;
-    font-size: 12px;
-    color: rgba(255,255,255,0.25);
-    line-height: 1.5;
-  }
-
-  .stripe-logo {
-    display: inline-block;
-    font-weight: 700;
-    color: rgba(255,255,255,0.35);
-    font-size: 12px;
-  }
-
-  /* ── SUCCESS ── */
-  #successPanel {
-    display: none;
-    text-align: center;
-  }
-
-  .success-icon { font-size: 52px; margin-bottom: 20px; display: block; }
-
-  .success-title {
-    font-family: 'DM Serif Display', Georgia, serif;
-    font-size: 28px;
-    color: var(--white);
-    margin-bottom: 12px;
-  }
-
-  .success-msg {
-    font-size: 14px;
-    color: rgba(255,255,255,0.5);
-    line-height: 1.65;
-    margin-bottom: 20px;
-  }
-
-  .success-box {
-    background: rgba(14,165,233,0.1);
-    border: 1px solid rgba(14,165,233,0.2);
-    border-radius: 12px;
-    padding: 16px;
-    font-size: 14px;
-    color: var(--teal2);
-    line-height: 1.6;
-  }
-
-  /* ── ADMIN PANEL ── */
-  #adminPanel {
-    display: none;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-  }
-
-  .admin-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-  }
-
-  .admin-title {
-    font-family: 'DM Serif Display', Georgia, serif;
-    font-size: 32px;
-    color: var(--white);
-  }
-
-  .export-btn {
-    background: rgba(34,197,94,0.12);
-    border: 1px solid rgba(34,197,94,0.3);
-    color: var(--green);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 10px 20px;
-    border-radius: 100px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-
-  .export-btn:hover { background: rgba(34,197,94,0.2); }
-
-  .admin-note {
-    background: rgba(245,158,11,0.08);
-    border: 1px solid rgba(245,158,11,0.2);
-    border-radius: 12px;
-    padding: 16px 20px;
-    font-size: 14px;
-    color: var(--gold2);
-    margin-bottom: 24px;
-    line-height: 1.6;
-  }
-
-  .reg-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: rgba(255,255,255,0.03);
-    border-radius: 14px;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.07);
-  }
-
-  .reg-table th {
-    background: rgba(255,255,255,0.05);
-    padding: 13px 18px;
-    text-align: left;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: rgba(255,255,255,0.4);
-    font-weight: 700;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-  }
-
-  .reg-table td {
-    padding: 14px 18px;
-    font-size: 14px;
-    color: rgba(255,255,255,0.8);
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-
-  .reg-table tr:last-child td { border-bottom: none; }
-  .reg-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-  .paid-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(34,197,94,0.12);
-    border: 1px solid rgba(34,197,94,0.25);
-    color: var(--green);
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 100px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: rgba(255,255,255,0.3);
-    font-size: 15px;
-  }
-
-  .back-link {
-    font-size: 13px;
-    color: var(--teal2);
-    text-decoration: underline;
-    cursor: pointer;
-    margin-top: 12px;
-    display: inline-block;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CASPer Live Class | Key2MD</title>
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+  <meta name="referrer" content="no-referrer">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #0a1628;
+      background: #f8fafc;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    main {
+      width: min(100%, 640px);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(10, 22, 40, 0.08);
+    }
+    .logo {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 2px;
+      margin-bottom: 34px;
+      color: #0a1628;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+    .logo span { color: #0ea5e9; }
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #0369a1;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      max-width: 520px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+    p {
+      margin: 16px 0 0;
+      color: #475569;
+      font-size: 1rem;
+      line-height: 1.65;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      border-radius: 999px;
+      padding: 0 18px;
+      font-size: 0.92rem;
+      font-weight: 900;
+      text-decoration: none;
+      border: 1px solid #0a1628;
+      background: #0a1628;
+      color: #ffffff;
+    }
+    .button.secondary {
+      background: #ffffff;
+      color: #0a1628;
+      border-color: #cbd5e1;
+    }
+  </style>
 </head>
 <body>
-
-<nav class="nav">
-  <a class="logo" href="https://key2md.com">Key<span>2</span>MD</a>
-  <a href="https://key2md.com" style="font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none;">← key2md.com</a>
-</nav>
-
-<!-- ══════════════════════════════ MAIN PAGE ══════════════════════════════ -->
-<div class="page" id="mainPage">
-
-  <!-- LEFT -->
-  <div class="left">
-    <div class="badge">Weekly Live Class</div>
-    <h1>CASPer<br><em>Live Class</em></h1>
-    <p class="desc">
-      Real scenarios. Real feedback. Dan reads your answers live and tells you exactly where you stand — no scripts, no vague advice.
-    </p>
-
-    <div class="session-info">
-      <div class="info-row">
-        <div class="info-icon">📅</div>
-        <div>
-          <div class="info-label">Date</div>
-          <div class="info-val" id="sessionDate">Friday — see email for date</div>
-        </div>
-      </div>
-      <div class="info-row">
-        <div class="info-icon">⏰</div>
-        <div>
-          <div class="info-label">Time</div>
-          <div class="info-val">6:00 PM AEST</div>
-        </div>
-      </div>
-      <div class="info-row">
-        <div class="info-icon">🎥</div>
-        <div>
-          <div class="info-label">Format</div>
-          <div class="info-val">Zoom · link emailed just before 6pm</div>
-        </div>
-      </div>
-      <div class="info-row">
-        <div class="info-icon">💰</div>
-        <div>
-          <div class="info-label">Price</div>
-          <div class="info-val" id="displayPrice">Loading…</div>
-        </div>
-      </div>
+  <main>
+    <a class="logo" href="index.html">Key<span>2</span>MD</a>
+    <p class="eyebrow">Class payment page</p>
+    <h1>This checkout page is currently closed.</h1>
+    <p>For current CASPer class availability or tutoring options, use the main booking pages.</p>
+    <div class="actions">
+      <a class="button" href="casper-class.html">View CASPer classes</a>
+      <a class="button secondary" href="index.html">Back to Key2MD</a>
     </div>
-
-    <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.3);font-weight:700;margin-bottom:16px;">What's included</p>
-    <ul class="what-list">
-      <li><span class="check">✓</span><div><strong>CASPer framework</strong> — a clear, repeatable structure for any scenario</div></li>
-      <li><span class="check">✓</span><div><strong>Live written practice</strong> — real prompts, timed, in-session</div></li>
-      <li><span class="check">✓</span><div><strong>Direct feedback from Dan</strong> — your actual answers, no sugar-coating</div></li>
-      <li><span class="check">✓</span><div><strong>Peer comparison</strong> — see where you stand relative to the group</div></li>
-      <li><span class="check">✓</span><div><strong>Key patterns</strong> — what separated strong vs weak answers, and why</div></li>
-    </ul>
-  </div>
-
-  <!-- RIGHT — PAYMENT -->
-  <div class="payment-card">
-
-    <!-- BEFORE PAYMENT -->
-    <div id="paymentForm">
-      <div class="price-display">
-        <div class="price-label">Session price</div>
-        <div class="price-amount" id="priceDisplay"><sup>$</sup>??</div>
-        <div class="price-note" id="priceNote">Loading…</div>
-      </div>
-
-      <div class="card-title">Secure your spot</div>
-      <div class="card-subtitle">Once payment is confirmed, your email is on the list. Zoom link arrives just before 6pm.</div>
-
-      <div class="field">
-        <label for="nameIn">Full Name</label>
-        <input type="text" id="nameIn" placeholder="e.g. Jamie Chen" autocomplete="name">
-        <div class="err" id="nameErr">Please enter your name.</div>
-      </div>
-
-      <div class="field">
-        <label for="emailIn">Email Address</label>
-        <input type="email" id="emailIn" placeholder="you@email.com" autocomplete="email">
-        <div class="err" id="emailErr">Please enter a valid email.</div>
-      </div>
-
-      <button class="pay-btn" id="payBtn" onclick="startCheckout()">
-        🔒 Pay & Reserve Spot
-      </button>
-
-      <p class="secure-note">
-        Powered by <span class="stripe-logo">Stripe</span> · 256-bit SSL encryption<br>
-        Your card details never touch our servers.
-      </p>
-    </div>
-
-    <!-- SUCCESS STATE (shown after Stripe redirect back) -->
-    <div id="successPanel">
-      <span class="success-icon">✅</span>
-      <div class="success-title">You're in!</div>
-      <p class="success-msg">Payment confirmed. Your spot is secured.<br>The Zoom link will arrive just before 6pm.</p>
-      <div class="success-box">
-        🔗 Link → <strong id="confirmedEmail"></strong><br>
-        <span style="font-size:12px;opacity:0.7;">Check spam if it hasn't arrived by 5:55pm.</span>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ══════════════════════════════ ADMIN PANEL ══════════════════════════════ -->
-<div id="adminPanel">
-  <div class="admin-header">
-    <div class="admin-title">Paid Registrations</div>
-    <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
-  </div>
-
-  <div class="admin-note">
-    ⚠️ <strong>Note:</strong> This local list shows registrations from <em>this browser only</em> (localStorage).
-    For the authoritative paid list, go to <strong>Stripe Dashboard → Payments</strong> — all paid customers
-    and their emails are there. Use the Stripe export for sending Zoom links.
-    <br><br>
-    <strong>Better option:</strong> In Stripe Dashboard, go to <em>Customers</em> → export to CSV.
-    Every paying customer's email is there, ready to paste into Zoom invite.
-  </div>
-
-  <div id="regTableWrap"></div>
-  <span class="back-link" onclick="window.location.href=window.location.pathname">← Back to payment page</span>
-</div>
-
-<script src="https://js.stripe.com/v3/"></script>
-<script>
-
-// ════════════════════════════════════════════════════════════
-//  ✏️  CONFIGURE THESE TWO VALUES — everything else is automatic
-// ════════════════════════════════════════════════════════════
-const STRIPE_PUBLISHABLE_KEY = 'pk_live_REPLACE_WITH_YOUR_KEY';   // From Stripe Dashboard > Developers > API Keys
-const STRIPE_PRICE_ID        = 'price_REPLACE_WITH_YOUR_PRICE_ID'; // From Stripe Dashboard > Products > [Your Product] > Price ID
-
-// These update automatically — change if needed
-const SESSION_DATE = 'Friday 15th May 2026';   // ← UPDATE each week
-const SESSION_PRICE_DISPLAY = '$15 AUD';        // ← UPDATE to match your Stripe price
-const SESSION_PRICE_NOTE = 'One-time · AUD';    // ← UPDATE currency if needed
-
-// Redirect URLs — update to your real domain
-const SUCCESS_URL = window.location.origin + window.location.pathname + '?payment=success&email={CHECKOUT_SESSION_ID}';
-const CANCEL_URL  = window.location.origin + window.location.pathname + '?payment=cancelled';
-// ════════════════════════════════════════════════════════════
-
-const STORAGE_KEY = 'casper_paid_regs';
-
-document.getElementById('sessionDate').textContent = SESSION_DATE;
-document.getElementById('displayPrice').textContent = SESSION_PRICE_DISPLAY;
-document.getElementById('priceDisplay').innerHTML = SESSION_PRICE_DISPLAY.replace('$', '<sup>$</sup>').replace(' AUD','');
-document.getElementById('priceNote').textContent = SESSION_PRICE_NOTE;
-
-// ── Check URL params on load ──
-(function init() {
-  const params = new URLSearchParams(window.location.search);
-
-  // Admin mode: ?admin=1
-  if (params.get('admin') === '1') {
-    document.getElementById('mainPage').style.display = 'none';
-    showAdmin();
-    return;
-  }
-
-  // Stripe success redirect
-  if (params.get('payment') === 'success') {
-    const email = params.get('email') || '';
-    // Store local record
-    storeLocalReg(document.getElementById('nameIn')?.value || 'Customer', email);
-    showSuccess(email);
-    return;
-  }
-
-  // Cancelled
-  if (params.get('payment') === 'cancelled') {
-    // Just show the form normally — nothing to do
-  }
-})();
-
-function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-
-async function startCheckout() {
-  const name  = document.getElementById('nameIn').value.trim();
-  const email = document.getElementById('emailIn').value.trim();
-
-  let valid = true;
-  if (!name) { showErr('nameErr', 'nameIn'); valid = false; } else { hideErr('nameErr', 'nameIn'); }
-  if (!validateEmail(email)) { showErr('emailErr', 'emailIn'); valid = false; } else { hideErr('emailErr', 'emailIn'); }
-  if (!valid) return;
-
-  const btn = document.getElementById('payBtn');
-  btn.disabled = true;
-  btn.textContent = 'Redirecting to Stripe…';
-
-  // Store email in sessionStorage so we can display it after redirect
-  sessionStorage.setItem('checkout_name', name);
-  sessionStorage.setItem('checkout_email', email);
-
-  try {
-    const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-
-    await stripe.redirectToCheckout({
-      lineItems: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
-      mode: 'payment',
-      customerEmail: email,
-      successUrl: window.location.origin + window.location.pathname + '?payment=success&reg_email=' + encodeURIComponent(email) + '&reg_name=' + encodeURIComponent(name),
-      cancelUrl: CANCEL_URL,
-    });
-  } catch (err) {
-    console.error('Stripe error:', err);
-    btn.disabled = false;
-    btn.innerHTML = '🔒 Pay & Reserve Spot';
-    alert('Something went wrong with payment. Please try again or contact Dan.');
-  }
-}
-
-function showSuccess(email) {
-  // Try to get email from URL params (more reliable than sessionStorage after redirect)
-  const params = new URLSearchParams(window.location.search);
-  const regEmail = params.get('reg_email') || email;
-  const regName  = params.get('reg_name') || '';
-
-  storeLocalReg(regName, regEmail);
-
-  document.getElementById('paymentForm').style.display = 'none';
-  document.getElementById('successPanel').style.display = 'block';
-  document.getElementById('confirmedEmail').textContent = regEmail;
-}
-
-// ── Storage + API log (Stripe is source of truth for payments) ──
-async function storeLocalReg(name, email) {
-  if (!email) return;
-  // Log to Key2MD admin dashboard
-  try {
-    await fetch('https://key2md-api.brittainmbbs.workers.dev/api/enquiry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: name || 'Stripe Customer',
-        email,
-        type: 'CASPer Classes — Friday Signup',
-        universities: '',
-        exam_date: '',
-        notes: '✅ PAID via Stripe — Friday CASPer Class · ' + SESSION_DATE,
-      }),
-    });
-  } catch(e) { console.warn('API log failed (non-critical):', e); }
-  // Also store locally
-  try {
-    const regs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    if (!regs.some(r => r.email.toLowerCase() === email.toLowerCase())) {
-      regs.push({ name, email, ts: new Date().toISOString(), paid: true });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(regs));
-    }
-  } catch(e) {}
-}
-
-function getLocalRegs() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  catch { return []; }
-}
-
-// ── Admin panel ──
-function showAdmin() {
-  document.getElementById('adminPanel').style.display = 'block';
-  const regs = getLocalRegs();
-  const wrap = document.getElementById('regTableWrap');
-
-  if (regs.length === 0) {
-    wrap.innerHTML = '<div class="empty-state">No local registrations yet.<br><br>Check <strong>Stripe Dashboard → Payments</strong> for all paid customers.</div>';
-    return;
-  }
-
-  const rows = regs.map((r, i) => `
-    <tr>
-      <td>${i+1}</td>
-      <td>${esc(r.name) || '—'}</td>
-      <td>${esc(r.email)}</td>
-      <td>${new Date(r.ts).toLocaleString('en-AU', {dateStyle:'short', timeStyle:'short'})}</td>
-      <td><span class="paid-badge">✓ Paid</span></td>
-    </tr>
-  `).join('');
-
-  wrap.innerHTML = `
-    <table class="reg-table">
-      <thead>
-        <tr>
-          <th>#</th><th>Name</th><th>Email</th><th>Registered</th><th>Status</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <p style="margin-top:16px;font-size:13px;color:rgba(255,255,255,0.35);">
-      Showing ${regs.length} local record${regs.length !== 1 ? 's' : ''}.
-      This list may be incomplete if customers paid on different browsers/devices.
-      Always use <strong>Stripe Dashboard</strong> as the authoritative source.
-    </p>
-  `;
-}
-
-function exportCSV() {
-  const regs = getLocalRegs();
-  if (!regs.length) { alert('No local registrations to export.'); return; }
-  const header = 'Name,Email,Registered At,Status\n';
-  const rows = regs.map(r => `"${r.name}","${r.email}","${r.ts}","Paid"`).join('\n');
-  const blob = new Blob([header + rows], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'casper-class-registrations.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function esc(str) {
-  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function showErr(errId, inputId) {
-  document.getElementById(errId).style.display = 'block';
-  document.getElementById(inputId).style.borderColor = '#f87171';
-}
-
-function hideErr(errId, inputId) {
-  document.getElementById(errId).style.display = 'none';
-  document.getElementById(inputId).style.borderColor = '';
-}
-
-// Enter key support
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('input').forEach(inp => {
-    inp.addEventListener('keydown', e => { if (e.key === 'Enter') startCheckout(); });
-  });
-});
-</script>
-
+  </main>
 </body>
 </html>
