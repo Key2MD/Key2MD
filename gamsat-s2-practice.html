@@ -1745,7 +1745,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <!-- Limit banner -->
     <div class="limit-banner" id="limitBanner">
       <h4>You’ve used your free AI review for today</h4>
-      <p>Your daily limit resets at midnight AEST. Buy credits for instant access, or submit your essay to Dan for expert human marking and a precise band score within 48 hours.</p>
+  <p>Your daily limit resets at midnight AEST. Buy credits for instant access, or submit your essay to Dan for expert human marking and an estimated band score within 48 hours.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="buy-credits-btn" style="width:auto;margin:0;padding:10px 20px;" onclick="openCreditShop()">Buy AI Credits →</button>
         <button class="btn-marking" onclick="openMarkingModal()">Submit to Dan — $50 →</button>
@@ -1811,7 +1811,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 <div class="modal-overlay" id="markingModal">
   <div class="modal">
     <h3>Submit for Expert Marking</h3>
-    <p class="modal-sub">Dan will personally mark your essay with full written feedback, a band score, and prioritised recommendations within 48 hours.</p>
+  <p class="modal-sub">Dan will personally mark your essay with full written feedback, an estimated band score, and prioritised recommendations within 48 hours.</p>
     <div class="modal-price-note">
       <strong>$50 per essay</strong>
       Paid securely via Stripe. Dan replies to your email within 48 hours.
@@ -1948,7 +1948,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
     <h3>How to use this GAMSAT Section II practice tool</h3>
     <p>Select Task A or Task B, then choose a stimulus from the dropdown or hit Random. Start the 30-minute timer when you're ready to write — this mirrors actual exam conditions. Aim for approximately 600 words (two pages of handwritten A4). When finished, use the AI feedback feature to get an examiner-lens analysis, band score estimate, and Band 70 thematic hints.</p>
-    <p>For genuine improvement, submit your essay to Dan for expert human marking. Unlike AI, Dan will give you the specific, personalised feedback that actually moves your band score.</p>
+<p>For genuine improvement, submit your essay to Dan for expert human marking. Unlike AI, Dan gives specific, personalised feedback designed to improve your writing.</p>
 
     <h3>What examiners look for in GAMSAT Section II</h3>
     <p>ACER assesses two criteria: <strong>Thought and Content</strong> (the quality and insightfulness of what you say) and <strong>Organisation and Expression</strong> (structure and language effectiveness). The major emphasis is on Thought and Content — which is why generic essay frameworks without genuine insight will plateau your score.</p>
@@ -1976,7 +1976,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <a href="https://www.key2md.com/blog.html">Blog</a>
     <a href="https://calendly.com/brittainmbbs/30min">Book a Session</a>
   </div>
-  <p>© 2025–2026 Key2MD. All rights reserved. · StudentVIP Verified Tutor · r/GAMSAT Community Endorsed</p>
+  <p>© 2025–2026 Key2MD. All rights reserved. · StudentVIP Verified Tutor · r/GAMSAT community mentioned</p>
 </footer>
 
 <script>
@@ -3219,9 +3219,9 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookMo
       <!-- Purchase button -->
       <button id="creditBuyBtn" onclick="purchaseCredits()" disabled style="width:100%;padding:14px;border-radius:50px;border:none;background:var(--accent,#2563eb);color:#fff;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;opacity:0.5;">Select a pack to continue</button>
 
-      <!-- No refunds -->
+      <!-- Refund policy -->
       <div style="font-size:0.68rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:12px;line-height:1.5;">
-        By purchasing, you agree that all credit purchases are final and non-refundable.<br>Credits are tied to your account and cannot be transferred. Unused credits do not expire.
+        Credits are generally non-refundable once purchased or used, except where required by Australian Consumer Law or approved for a technical or billing issue.<br>Credits are tied to your account and cannot be transferred. Unused credits do not expire.
       </div>
     </div>
 
@@ -3414,5 +3414,6 @@ document.addEventListener('click', function(e){ var m=document.getElementById('b
 document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=document.getElementById('bookModal'); if(m && m.style.display==='flex') closeBookModal(); } });
 </script>
 <!-- ═══ END CANONICAL BOOK MODAL ═══ -->
+<script src="key2md-tracking.js" defer></script>
 </body>
 </html>

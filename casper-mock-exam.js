@@ -2,7 +2,7 @@
  * casper-mock-exam.js - Key2MD Full CASPer Mock Exam
  *
  * Uses the existing written CASPer engine and MMI recording/feedback engine,
- * but wraps them in the official current CASPer sequence:
+ * but wraps them in a CASPer-style sequence:
  * 4 video-response scenarios, optional 10-minute break, 7 typed scenarios,
  * optional 5-minute break after typed station 4.
  */
@@ -324,7 +324,7 @@ window.FullCasperMock = (() => {
       <div class="sidebar-card" style="border-color:rgba(14,165,233,0.25);background:linear-gradient(180deg,rgba(14,165,233,0.06),#fff);">
         <h3>Full CASPer Mock</h3>
         <div style="font-size:0.82rem;color:var(--gray600);line-height:1.55;margin-bottom:14px;">
-          Official current sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. All 11 stations are completely new and handwritten by Dan.
+          CASPer-style sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. All 11 stations are completely new and handwritten by Dan.
         </div>
 
         <div style="margin-bottom:14px;">

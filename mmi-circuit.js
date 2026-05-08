@@ -241,7 +241,7 @@ const MMICircuit = (() => {
     // Circuit mode — and we must NOT touch panel visibility (setMode/applyModeUI
     // does that). Otherwise we cause the "two category cards visible" race.
     document.addEventListener('click', e => {
-      if (e.target.id === 'modeCircuit') {
+      if (e.target.id === 'modeCircuit' && e.target.dataset.tool === 'mmi-circuit') {
         activateCircuitMode();
       } else if (e.target.id === 'modeCasper' || e.target.id === 'modeMMI') {
         // Only deactivate if Circuit panels are actually showing.

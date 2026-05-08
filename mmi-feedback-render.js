@@ -126,6 +126,7 @@ const MMIFeedbackRender = (() => {
   }
 
 
+  function renderPromptCard(pp, index) {
     const criteria = ['empathy','communication','reasoning','reflection','real_world_awareness'];
     const criteriaRows = criteria.map(k => {
       const crit = pp.scores?.[k];
@@ -244,6 +245,7 @@ const MMIFeedbackRender = (() => {
       </div>`;
 
     container.innerHTML = html;
+    window._lastMMIFeedback = feedback;
     container.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
