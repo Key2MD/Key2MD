@@ -144,7 +144,7 @@
 .k2-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,22,40,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s,box-shadow 0.3s;overflow:visible;}
 .k2-header.scrolled{background:rgba(10,22,40,0.98);box-shadow:0 2px 24px rgba(0,0,0,0.4);}
 .k2-nav{display:flex;align-items:center;justify-content:space-between;height:68px;max-width:1200px;margin:0 auto;padding:0 24px;}
-.k2-logo{font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-0.5px;text-decoration:none;flex-shrink:0;font-family:'DM Sans',system-ui,sans-serif;}
+.k2-logo{font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:0;text-decoration:none;flex-shrink:0;font-family:'DM Sans',system-ui,sans-serif;}
 .k2-logo span{color:#0ea5e9;}
 .k2-nav-links{display:flex;align-items:center;gap:22px;list-style:none;margin:0;padding:0;}
 .k2-nav-links a{color:rgba(255,255,255,0.78);font-size:0.88rem;font-weight:500;transition:color 0.2s;text-decoration:none;white-space:nowrap;font-family:'DM Sans',system-ui,sans-serif;}
@@ -283,7 +283,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
   <div style="max-width:1080px;margin:0 auto;">
     <div style="text-align:center;margin-bottom:36px;">
       <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#0284c7;margin-bottom:10px;">Why this isn't another CASPer practice site</p>
-      <h2 style="font-size:1.6rem;font-weight:800;color:#0a1628;letter-spacing:-0.02em;line-height:1.25;max-width:620px;margin:0 auto;">Built by a UniMelb MD student. Designed for CASPer-style practice. Free where it counts.</h2>
+      <h2 style="font-size:1.6rem;font-weight:800;color:#0a1628;letter-spacing:0;line-height:1.25;max-width:620px;margin:0 auto;">Built by a UniMelb MD student. Designed for CASPer-style practice. Free where it counts.</h2>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;">
       <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:22px 20px;">
@@ -313,7 +313,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 <div id="practice-app">
 
 <!-- DAN MARKING CTA -->
-<div style="max-width:1500px;margin:16px auto 0;padding:0 24px;">
+<div style="max-width:1360px;margin:16px auto 0;padding:0 24px;">
   <div class="dan-marking-card">
     <div class="dan-marking-left">
       <div class="dan-marking-label">Expert Human Marking</div>
@@ -586,7 +586,15 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <!-- Timer settings hidden - now inside practice tool -->
 
     <!-- Account + AI Marking (merged, compact) -->
-    <div class="sidebar-card" id="aiMarkingCard">
+    <div class="sidebar-card account-card" id="aiMarkingCard">
+      <div class="account-card-head">
+        <div>
+          <div class="account-card-kicker">Account</div>
+          <div class="account-card-title" id="accountCardTitle">Log in to save progress</div>
+        </div>
+        <span class="account-card-badge" id="accountCardBadge">Free</span>
+      </div>
+      <p class="account-card-copy" id="accountCardCopy">Save your history, unlock daily AI feedback, and keep your leaderboard settings across devices.</p>
       <!-- Auth bar (filled by auth.js) -->
       <div id="k2mdAuthBar" style="margin-bottom:12px;"></div>
 
@@ -1978,6 +1986,38 @@ function updateLimitUI(){
     }
   }
 }
+
+function syncPracticeSidebarOrder(){
+  const category = document.getElementById('categoryCard');
+  if(!category) return;
+  let anchor = category;
+  [
+    document.getElementById('aiMarkingCard'),
+    document.getElementById('leaderboardCard'),
+    document.getElementById('starredQueueCard'),
+    document.getElementById('mmiOptionsCard')
+  ].forEach(function(card){
+    if(!card) return;
+    if(card.previousElementSibling !== anchor) anchor.insertAdjacentElement('afterend', card);
+    anchor = card;
+  });
+}
+
+function updateAccountCardState(user){
+  const title = document.getElementById('accountCardTitle');
+  const badge = document.getElementById('accountCardBadge');
+  const copy = document.getElementById('accountCardCopy');
+  if(!title || !badge || !copy) return;
+  if(user){
+    title.textContent = 'Progress is being saved';
+    badge.textContent = user.tier === 'pro' ? 'Pro' : 'Signed in';
+    copy.textContent = 'Your history, AI feedback access, and leaderboard settings are connected to this account.';
+  } else {
+    title.textContent = 'Log in to save progress';
+    badge.textContent = 'Free';
+    copy.textContent = 'Save your history, unlock daily AI feedback, and keep your leaderboard settings across devices.';
+  }
+}
 let sessionHistory=[];
 let mmiHidePrompts=false;
 
@@ -2027,7 +2067,13 @@ updateCounts();
 updateMMICounts();
 updateLimitUI();
 // Update library coverage on initial load
-document.addEventListener('DOMContentLoaded', function(){ updateLibraryCoverage(); updateStarredCategoryBtn(); updatePersistentCompetencyProgress(); });
+document.addEventListener('DOMContentLoaded', function(){
+  syncPracticeSidebarOrder();
+  updateAccountCardState(null);
+  updateLibraryCoverage();
+  updateStarredCategoryBtn();
+  updatePersistentCompetencyProgress();
+});
 
 // Sliders
 $('readingSlider').addEventListener('input',function(){
@@ -4808,6 +4854,7 @@ window.addEventListener('DOMContentLoaded',function(){
     apiBase: API_BASE,
     onAuthChange: function(user) {
       updateLimitUI();
+      updateAccountCardState(user);
       window.FullCasperMock?.refreshPricing?.();
       loadLeaderboardSettings();
       refreshLeaderboardData({silent:true});
