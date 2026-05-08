@@ -3024,7 +3024,7 @@ function openMockReader(attemptId = '') {
   const params = new URLSearchParams();
   if (attemptId) params.set('attempt_id', attemptId);
   if (handoffId) params.set('handoff', handoffId);
-  const url = `../mock-reader.html${params.toString() ? '?' + params.toString() : ''}`;
+  const url = `mock-reader.html${params.toString() ? '?' + params.toString() : ''}`;
   if (handoffId) {
     const channel = new BroadcastChannel(MOCK_READER_CHANNEL_PREFIX + handoffId);
     const sendToken = () => channel.postMessage({ type: 'admin-token', token: S.token });
