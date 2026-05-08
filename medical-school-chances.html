@@ -93,7 +93,7 @@
         "name": "How is the combo score calculated for Australian medical schools?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Most GEMSAS-consortium medical schools rank applicants using a combo score based on GPA/7 + the relevant GAMSAT/100. Deakin, ANU, Griffith, UWA and Macquarie use the ACER overall GAMSAT score; UoM, UQ, UNDS and UNDF use the unweighted average of Sections 1, 2 and 3; UoW uses GPA and GAMSAT as hurdles rather than ranking by combo."
+          "text": "Most GEMSAS-consortium medical schools rank applicants using a combo score based on GPA/7 + the relevant GAMSAT/100. Deakin, ANU, Griffith, UWA and Macquarie use the ACER overall GAMSAT score; UoM, UQ, UNDS and UNDF use the unweighted average of Sections 1, 2 and 3; UoW uses GPA and GAMSAT as hurdles, then ranks on Casper and bonuses rather than combo."
         }
       },
       {
@@ -117,7 +117,7 @@
         "name": "How accurate is this medical school chances calculator?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "It uses 2026 intake data from student-submitted scores (reddit/r/GAMSAT community). These are self-reported, include outliers, and do not capture every admission factor such as preference order, priority status, CASPer scaling, bonuses, section-specific minimums, or year-to-year variation. Treat results as a loose guide, not a prediction."
+          "text": "It uses 2026 intake data from student-submitted scores (reddit/r/GAMSAT community). These are self-reported, include outliers, and cannot fully capture every admission factor such as preference order, priority status, CASPer scaling, unpublished bonus conversions, section-specific minimums, or year-to-year variation. Treat results as a loose guide, not a prediction."
         }
       }
     ]
@@ -320,6 +320,12 @@
       color:#075985;border:1px solid rgba(14,165,233,0.22);
       font-size:0.72rem;font-weight:800;
     }
+    .bonus-adjustment-badge {
+      display:inline-flex;align-items:center;gap:6px;margin-top:10px;margin-left:6px;
+      padding:4px 9px;border-radius:999px;background:rgba(34,197,94,0.1);
+      color:#166534;border:1px solid rgba(34,197,94,0.25);
+      font-size:0.72rem;font-weight:800;
+    }
     @media(max-width:560px){ .section-grid{ grid-template-columns: 1fr; } }
 
     .rural-toggle {
@@ -348,6 +354,74 @@
     }
     .casper-pill:hover { border-color: var(--teal); color: var(--teal3); }
     .casper-pill.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+    .bonus-panel {
+      background: var(--gray50); border: 1px solid var(--gray200); border-radius: 12px;
+      padding: 18px; margin-bottom: 24px;
+    }
+    .bonus-panel-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 18px; margin-bottom: 14px;
+    }
+    .bonus-panel-title { font-size: 0.9rem; font-weight: 800; color: var(--navy); }
+    .bonus-panel-sub { font-size: 0.78rem; color: var(--gray500); margin-top: 4px; line-height: 1.45; }
+    .bonus-school-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .bonus-school-pill {
+      border: 1.5px solid var(--gray200); background: #fff; color: var(--gray600);
+      border-radius: 50px; padding: 7px 12px; font-size: 0.8rem; font-weight: 700;
+      transition: all 0.15s;
+    }
+    .bonus-school-pill:hover { border-color: var(--teal); color: var(--teal3); }
+    .bonus-school-pill.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .bonus-school-note {
+      background: #fff; border: 1px dashed var(--gray200); border-radius: 10px;
+      padding: 11px 12px; font-size: 0.78rem; color: var(--gray600); line-height: 1.55;
+      margin-bottom: 12px;
+    }
+    .bonus-check-list { display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .bonus-check {
+      display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start;
+      background: #fff; border: 1px solid var(--gray200); border-radius: 10px;
+      padding: 11px 12px; cursor: pointer;
+    }
+    .bonus-check:hover { border-color: rgba(14,165,233,0.45); }
+    .bonus-check input { width: 16px; height: 16px; margin-top: 3px; accent-color: var(--teal3); }
+    .bonus-check strong { display: block; color: var(--navy); font-size: 0.82rem; line-height: 1.35; }
+    .bonus-check-detail { display: block; color: var(--gray500); font-size: 0.76rem; line-height: 1.45; margin-top: 3px; }
+    .bonus-check-meta { color: var(--teal3); font-weight: 800; }
+    .bonus-panel-foot {
+      margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--gray200);
+      font-size: 0.76rem; color: var(--gray500); line-height: 1.5;
+    }
+    .bonus-result {
+      font-size: 0.82rem; color: var(--gray600); line-height: 1.55;
+      background: #f0fdf4; border-left: 3px solid var(--green);
+      padding: 10px 14px; border-radius: 6px; margin-top: 14px;
+    }
+    .bonus-result.qualitative { background: #eff6ff; border-left-color: var(--teal); }
+    .bonus-result strong { color: var(--navy); }
+    .bonus-chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .bonus-chip {
+      display: inline-flex; align-items: center; border-radius: 50px;
+      background: rgba(255,255,255,0.85); border: 1px solid rgba(100,116,139,0.18);
+      padding: 3px 8px; color: var(--gray600); font-size: 0.7rem; font-weight: 700;
+    }
+    .smart-insights {
+      position: relative; margin-top: 22px; padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.14);
+      display: grid; gap: 8px;
+    }
+    .smart-insight {
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: 10px 12px; color: rgba(255,255,255,0.78);
+      font-size: 0.82rem; line-height: 1.5;
+    }
+    .smart-insight strong { color: var(--teal2); }
+    @media(max-width:700px){
+      .bonus-panel-head { display: block; }
+      .bonus-school-pills { margin-top: 12px; }
+      .bonus-school-pill { flex: 1 1 calc(33.333% - 6px); }
+    }
 
     .calc-btn {
       width: 100%; padding: 16px; border-radius: 50px; border: none;
@@ -728,7 +802,7 @@
   <div class="calc-wrap">
     <div class="calc-card" id="calcCard">
       <h2>Calculate your combo score</h2>
-      <p class="calc-sub">Your combo = GPA/7 + relevant GAMSAT/100, using the GAMSAT version each medical school actually uses: weighted overall for most schools, unweighted section average for UoM, UQ and Notre Dame.</p>
+      <p class="calc-sub">Your combo = GPA/7 + relevant GAMSAT/100, using the GAMSAT version each medical school actually uses. Then select school-specific bonuses, GPA overrides and pathway flags for a fairer university-by-university read.</p>
 
       <!-- Inputs -->
       <div class="calc-grid calc-initial-only">
@@ -810,6 +884,19 @@
         </div>
       </div>
 
+      <div class="bonus-panel calc-initial-only" id="bonusPanel">
+        <div class="bonus-panel-head">
+          <div>
+            <div class="bonus-panel-title">University bonuses and GPA rules</div>
+            <div class="bonus-panel-sub">Pick a university, then tick the adjustments you qualify for. Numeric bonuses only affect that university's result.</div>
+          </div>
+        </div>
+        <div class="bonus-school-pills" id="bonusSchoolPills" aria-label="Choose university for bonus options"></div>
+        <div class="bonus-school-note" id="bonusSchoolNote"></div>
+        <div class="bonus-check-list" id="bonusChecklist"></div>
+        <div class="bonus-panel-foot" id="bonusPanelFoot"></div>
+      </div>
+
       <button class="calc-btn calc-initial-only" id="calcBtn">Calculate my chances →</button>
 
       <!-- Results appear here -->
@@ -821,6 +908,7 @@
           </div>
           <div class="combo-breakdown" id="comboBreakdown"></div>
         </div>
+        <div class="smart-insights" id="smartInsights"></div>
       </div>
 
       <div class="unis-wrap" id="unisWrap">
@@ -857,7 +945,7 @@
     <h2>How this calculator works</h2>
     <p>Most GEMSAS-consortium medical schools in Australia rank applicants for interview on a <strong>combo score</strong>: <code>GPA ÷ 7 + relevant GAMSAT ÷ 100</code>. The important detail is that the relevant GAMSAT score is not identical for every university.</p>
 
-    <p>Deakin, ANU, Griffith, UWA and Macquarie use the ACER overall GAMSAT score. UoM, UQ, UNDS and UNDF use the unweighted average of Sections 1, 2 and 3. UoW does not rank on combo; it uses GPA/GAMSAT as hurdles alongside CASPer and bonuses.</p>
+    <p>Deakin, ANU, Griffith, UWA and Macquarie use the ACER overall GAMSAT score. UoM, UQ, UNDS and UNDF use the unweighted average of Sections 1, 2 and 3. UoW does not rank on combo; it uses GPA/GAMSAT as hurdles, then ranks interview offers using Casper and UOW bonuses.</p>
 
     <p>This tool compares your combo score against the actual 2026 interview and rejection cohorts at ten Australian medical schools, using distributions calculated from student-submitted data. The range bars show where your score sits relative to <strong>median and ±1 standard deviation</strong> of students who <em>were offered an interview</em> at each school — not the rejected cohort.</p>
 
@@ -868,9 +956,11 @@
     <ul>
       <li><strong>University of Melbourne, University of Queensland, Notre Dame Fremantle and Notre Dame Sydney</strong> — Use the unweighted GAMSAT section average rather than the ACER overall weighted score.</li>
       <li><strong>University of Notre Dame (Fremantle &amp; Sydney)</strong> — Uses CASPer heavily alongside GPA and unweighted GAMSAT. A student with a modest combo but a high CASPer (Q4) can still get interviewed, and vice versa.</li>
-      <li><strong>University of Wollongong (UoW)</strong> — Doesn't rank on combo. Uses GPA and GAMSAT hurdles (≥5.5 GPA, ≥50 overall GAMSAT and ≥50 in each section) plus CASPer and bonuses.</li>
+      <li><strong>University of Wollongong (UoW)</strong> — Doesn't rank on combo. Uses GPA and GAMSAT hurdles, then a 50% Casper / 50% bonus ranking. With 12 equal bonuses, each selected bonus is about 4.17 points on the bonus half.</li>
       <li><strong>University of Melbourne</strong> — Applies a "GAM" (Graduate Academic Marker) adjustment that can modify your raw ranking. The lowest observed interview combo may or may not reflect GAM application.</li>
     </ul>
+
+    <p>Where official formulas are published, this calculator now applies school-specific bonus handling: Deakin and ANU percentage adjustments, UQ/UWA/Griffith GPA overrides, Macquarie's capped GPA bonus, and UOW's 50% Casper / 50% bonus ranking estimate. Where formulas are not published, the option is kept as a qualitative flag rather than an invented number.</p>
 
     <h3>Rural / priority category</h3>
     <p>Australian medical schools reserve a proportion of places for applicants from rural, regional, and remote backgrounds. Cutoffs for rural applicants are typically <strong>0.08 to 0.20 combo points lower</strong> than non-rural cutoffs. The data for rural applicants is much sparser than for non-rural — treat rural results as a very loose guide and expect wider variation year-to-year.</p>
@@ -904,7 +994,7 @@
 
     <details class="faq-item">
       <summary>How accurate is this calculator?</summary>
-      <p>It's built on self-reported student data from publicly available sources (primarily r/GAMSAT Reddit submissions). The data includes obvious outliers, is self-selecting (students who choose to share results), and does not capture: structured application components, school-specific bonuses, category-specific quotas, interview year-to-year variation, preference order effects, or post-offer rejections. Treat it as informational only.</p>
+      <p>It's built on self-reported student data from publicly available sources (primarily r/GAMSAT Reddit submissions). The data includes obvious outliers, is self-selecting (students who choose to share results), and cannot fully capture structured applications, unpublished bonus-point conversions, category-specific quotas, interview year-to-year variation, preference order effects, or post-offer rejections. Treat it as informational only.</p>
     </details>
 
     <details class="faq-item">
@@ -924,7 +1014,7 @@
       <p>Data is drawn from <strong>publicly available, self-reported student submissions</strong> for the 2026 intake cycle (primarily community sources such as r/GAMSAT). The data is <strong>self-selecting, unverified, may include errors or outliers, and does not represent the full applicant population</strong> at any university. Sample sizes vary (11–120 students per university / category). Rural category data is particularly sparse.</p>
 
       <h4>Factors this tool does NOT account for</h4>
-      <p>Actual admission decisions depend on many factors this tool cannot model, including but not limited to: structured applications, bonuses, preference order, category-specific quotas, international vs domestic status, GAM (Graduate Academic Marker) adjustments, post-CASPer scaling, year-to-year cutoff variation, medical school-specific weighting changes, and interview performance itself.</p>
+      <p>Actual admission decisions depend on many factors this tool cannot fully model, including but not limited to: structured applications, unpublished bonus conversions, preference order, category-specific quotas, international vs domestic status, GAM (Graduate Academic Marker) adjustments, post-CASPer scaling, year-to-year cutoff variation, medical school-specific weighting changes, and interview performance itself.</p>
 
       <h4>Accuracy</h4>
       <p>No guarantee, warranty, or representation is made as to the accuracy, completeness, or reliability of results. <strong>Use at your own risk.</strong> Users are strongly advised to consult official sources — <a href="https://www.gemsas.edu.au/" target="_blank" rel="noopener">GEMSAS</a>, individual medical school admissions offices, and professional advisors — before making any application, enrolment, or financial decisions.</p>
@@ -1009,13 +1099,217 @@ const UNIS = [
     noteNR:'UNDF uses unweighted GAMSAT and weights CASPer heavily. A Q4 typically required to compete at this combo range.',
     noteCasperRural:'Rural applicants usually need at least a Q2 CASPer.' },
   { id:'uow',       name:'The University of Wollongong',        short:'UoW',       gamsatMode:'hurdle', nInt:40, nRej:59,  interview:null, cutoffNR:null, cutoffR:null, casper:true, uow:true,
-    hurdles:{ gpaMin:5.5, gamsatMin:50, sectionMin:50, casperReq:'Q4 typically', bonusReq:'At least one bonus (rural, first-in-family, regional study, etc.)' } },
+    hurdles:{ gpaMin:5.5, gamsatMin:50, sectionMin:50, casperReq:'Q4 typically', bonusReq:'UOW bonuses are weighted equally and combined with Casper for interview ranking' } },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════════════════
-let state = { rural: false, casper: '', scoreMode: 'overall' };
+const BONUS_ORDER = ['deakin','uow','uq','anu','uwa','macquarie','griffith','uom','unds','undf'];
+
+const BONUS_RULES = {
+  deakin: {
+    summary: 'Deakin publishes percentage adjustments to the combined GPA/GAMSAT aggregate. This calculator multiplies Deakin only by the selected percentage total.',
+    foot: 'Clinical experience and general work experience are mutually exclusive. Geelong/MM2 and MM3-MM7 rurality are mutually exclusive. Deakin states there is no cap on additional points.',
+    items: [
+      { id:'financial', label:'Financial disadvantage', value:0.02, type:'comboPercent', meta:'+2%', detail:'Eligible income-support or similar financial disadvantage during undergraduate/postgraduate study.' },
+      { id:'clinical', label:'Prior clinical experience in a health discipline', value:0.04, type:'comboPercent', meta:'+4%', group:'work', detail:'At least 12 months full-time equivalent clinical practice as an eligible registered health professional, speech pathologist, or dietitian.' },
+      { id:'work', label:'Work experience', value:0.02, type:'comboPercent', meta:'+2%', group:'work', detail:'At least two years full-time equivalent paid work, either consecutive or cumulative over four years.' },
+      { id:'deakinStudy', label:'Deakin study', value:0.04, type:'comboPercent', meta:'+4%', detail:'Completed or completing an eligible Deakin degree with at least two thirds completed at Deakin.' },
+      { id:'geelongMm1Mm2', label:'Geelong MM1 or MM2 residence', value:0.04, type:'comboPercent', meta:'+4%', group:'deakinRural', detail:'Geelong MM1 or MM2 rural/regional residency meeting Deakin criteria.' },
+      { id:'mm3Mm7', label:'MM3-MM7 rural/regional residence', value:0.08, type:'comboPercent', meta:'+8%', group:'deakinRural', detail:'MM3-MM7 rural/regional residency meeting Deakin criteria.' },
+    ],
+  },
+  uow: {
+    summary: 'UOW uses GPA and GAMSAT as hurdles, then ranks interview offers using 50% Casper and 50% admissions bonuses. With 12 equal bonuses, each selected bonus is worth about 4.17 points on the bonus half.',
+    foot: 'A useful historical calibration: last year, the average MMI offer profile was around Q4 Casper plus about 3.5 bonuses. The exact Casper percentile is not visible from quartiles, so this is a guide, not a prediction.',
+    items: [
+      { id:'firstPreference', label:'UOW first preference applicant', type:'uowBonus', meta:'+1 bonus', detail:'You list UOW MD as your first GEMSAS preference.' },
+      { id:'registeredHealth', label:'Registered health professional', type:'uowBonus', meta:'+1 bonus', detail:'Current practising registration/accreditation in an eligible health profession.' },
+      { id:'service', label:'Service commitment', type:'uowBonus', meta:'+1 bonus', detail:'Two or more consecutive years of eligible volunteer, emergency service, or Defence service.' },
+      { id:'work', label:'Sustained work experience', type:'uowBonus', meta:'+1 bonus', detail:'Two or more consecutive years of sustained paid employment in any industry.' },
+      { id:'ruralWork', label:'Rural work experience', type:'uowBonus', meta:'+1 bonus', detail:'Two or more consecutive years of paid employment while living and working in MM2-MM7.' },
+      { id:'ruralHighSchool', label:'Rural high school education', type:'uowBonus', meta:'+1 bonus', detail:'Four or more years at an Australian rural high school while residing rurally.' },
+      { id:'illawarra', label:'Illawarra local resident MM1', type:'uowBonus', meta:'+1 bonus', detail:'Currently live in the MM1 Wollongong area and lived there for at least five consecutive years immediately before applying.' },
+      { id:'nswRural', label:'NSW rural resident MM2-MM7', type:'uowBonus', meta:'+1 bonus', detail:'Rural NSW residence for at least five consecutive or ten cumulative years.' },
+      { id:'uowGraduate', label:'UOW graduate', type:'uowBonus', meta:'+1 bonus', detail:'Eligible UOW undergraduate or postgraduate graduate.' },
+      { id:'uowGraduateExcellence', label:'UOW graduate plus academic excellence', type:'uowBonus', meta:'+1 bonus', detail:'Eligible UOW graduate with overall weighted GPA of 6.5 or higher.' },
+      { id:'indigenousHealth', label:'Indigenous Health graduate', type:'uowBonus', meta:'+1 bonus', detail:'Completed eligible postgraduate qualification specialising in Indigenous Health.' },
+      { id:'financial', label:'Financial disadvantage', type:'uowBonus', meta:'+1 bonus', detail:'Eligible Centrelink income support for the qualifying period within the past five years.' },
+    ],
+  },
+  uq: {
+    summary: 'UQ uses the key degree GPA and unweighted GAMSAT. Some key degrees override GPA rather than adding a percentage bonus.',
+    foot: 'Only select an override if the relevant qualification is the key degree UQ will assess.',
+    items: [
+      { id:'honoursI', label:'Honours Class I key degree', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'uqGpa', detail:'UQ deems Honours Class I to have GPA 7.00.' },
+      { id:'honoursIIA', label:'Honours Class IIA key degree', value:6, type:'gpaOverride', meta:'GPA 6.0', group:'uqGpa', detail:'UQ deems Honours Class IIA to have GPA 6.00.' },
+      { id:'honoursIIB', label:'Honours Class IIB key degree', value:5, type:'gpaOverride', meta:'GPA 5.0', group:'uqGpa', detail:'UQ deems Honours Class IIB to have GPA 5.00.' },
+      { id:'honoursIII', label:'Honours Class III key degree', value:4, type:'gpaOverride', meta:'GPA 4.0', group:'uqGpa', detail:'UQ deems Honours Class III to have GPA 4.00.' },
+      { id:'aqf10', label:'AQF Level 10 research masters or doctoral key degree', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'uqGpa', detail:'UQ deems AQF Level 10 research masters or doctoral degrees to have GPA 7.00.' },
+      { id:'ruralAdjustments', label:'Rural background GAMSAT adjustments', type:'qualitative', meta:'qualitative', detail:'UQ says rural-background applicants receive two adjustments to the unweighted GAMSAT score, but does not publish a clean combo value here.' },
+    ],
+  },
+  anu: {
+    summary: 'ANU applies the highest eligible higher-degree percentage bonus to the combined GPA/GAMSAT score. These do not stack.',
+    foot: 'The calculator applies only the highest selected ANU percentage, matching the published non-cumulative rule.',
+    items: [
+      { id:'standaloneHonours', label:'Standalone Honours degree', value:0.02, type:'bestComboPercent', meta:'+2%', detail:'Standalone Honours only; embedded/professional honours do not receive this percentage bonus.' },
+      { id:'mastersResearch', label:'Masters by Research complete before application', value:0.02, type:'bestComboPercent', meta:'+2%', detail:'Completed prior to the application date.' },
+      { id:'phd', label:'PhD complete before application', value:0.04, type:'bestComboPercent', meta:'+4%', detail:'Completed prior to the application date.' },
+    ],
+  },
+  uwa: {
+    summary: 'UWA has GPA effects for completed research degrees rather than a broad combo multiplier.',
+    foot: 'The Masters by Research adjustment is capped at GPA 7.0 in this calculator so the displayed combo remains on the normal GPA scale.',
+    items: [
+      { id:'phd', label:'Completed PhD', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'uwaGpa', detail:'Completed PhD from a recognised institution by the time of application.' },
+      { id:'uwaDmd', label:'Completed UWA Doctor of Dental Medicine', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'uwaGpa', detail:'Completed UWA DMD by the time of application.' },
+      { id:'mastersResearch', label:'Completed Masters by Research', value:0.2, type:'gpaAdd', meta:'+0.2 GPA', detail:'Completed Masters by Research by 31 July; UWA adds a small 0.2 GPA bonus.' },
+    ],
+  },
+  macquarie: {
+    summary: 'Macquarie applies a 3% bonus to weighted GPA for each listed cohort, capped at 5% total.',
+    foot: 'Macquarie also reserves interview places for Bachelor of Clinical Science graduates/final-year students; this calculator only models the published GPA bonus.',
+    items: [
+      { id:'atsi', label:'Aboriginal and/or Torres Strait Islander applicant', value:0.03, type:'gpaPercentCapped', meta:'+3%', detail:'Applied to weighted GPA.' },
+      { id:'rural', label:'Rural applicant', value:0.03, type:'gpaPercentCapped', meta:'+3%', detail:'Applied to weighted GPA.' },
+      { id:'clinicalScience', label:'Macquarie Bachelor of Clinical Science applicant', value:0.03, type:'gpaPercentCapped', meta:'+3%', detail:'Applied to weighted GPA.' },
+    ],
+  },
+  griffith: {
+    summary: 'Griffith has several degree-specific GPA treatments. Completed PhDs receive an overall GPA of 7.0.',
+    foot: 'Masters by Research handling depends on FTE and graded/research components, so it is shown as a note rather than a fake exact combo.',
+    items: [
+      { id:'phd', label:'Completed PhD by 31 July', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'griffithGpa', detail:'Griffith states completed PhDs receive an overall GPA of 7.0.' },
+      { id:'mastersResearch', label:'Completed Masters by Research', type:'qualitative', meta:'component GPA 7', detail:'Research components may receive GPA 7.0 for their equivalent full-time study, but the full effect depends on the degree structure.' },
+      { id:'honoursBest', label:'Completed Honours classification may help', type:'qualitative', meta:'GPA rule', detail:'Griffith may use the honours classification or subject results, whichever gives the better final-year GPA.' },
+    ],
+  },
+  uom: {
+    summary: 'Melbourne has important reranking and access schemes, but they are not published as a clean combo percentage.',
+    foot: 'These are shown as strategic flags so students do not miss them, but the calculator keeps Melbourne numeric results on the published GPA/GAMSAT combo scale.',
+    items: [
+      { id:'gam', label:'Graduate Access Melbourne (GAM)', type:'qualitative', meta:'rerank', detail:'Eligible sustained disadvantage may lead to reranking based on level of disadvantage.' },
+      { id:'phdCognate', label:'High-performing cognate PhD', type:'qualitative', meta:'limited rerank', detail:'A small number of applicants with high-level performance in a recent cognate PhD may be reranked in their favour.' },
+      { id:'mdRural', label:'MD Rural Pathway / rural priority', type:'qualitative', meta:'pathway', detail:'Rural applicants may access a dedicated rural pathway or rural-background priority rules.' },
+    ],
+  },
+  unds: {
+    summary: 'Notre Dame Sydney ranks GPA, GAMSAT, Casper, and bonus points in a 30:30:30:10 interview formula. Exact bonus point values are not published on the GEMSAS page.',
+    foot: 'These flags are still worth surfacing because Casper and bonuses can materially change Notre Dame competitiveness.',
+    items: [
+      { id:'rural', label:'Demonstrated rural background', type:'qualitative', meta:'bonus points', detail:'Rural background applicants receive bonus points.' },
+      { id:'hdr', label:'Masters by Research or Doctoral degree complete by 31 July', type:'qualitative', meta:'bonus points', detail:'Notre Dame awards bonus points for completed HDR qualifications.' },
+      { id:'fipUnda', label:'Facilitated interview pathway graduate', type:'qualitative', meta:'pathway', detail:'UNDA undergraduate and Graduate Diploma of Health and Medical Sciences graduates may have a facilitated interview pathway.' },
+      { id:'fipAcu', label:'ACU Bachelor of Biomedical Science graduate', type:'qualitative', meta:'pathway', detail:'Sydney lists ACU Bachelor of Biomedical Science graduates as eligible for a facilitated interview pathway.' },
+    ],
+  },
+  undf: {
+    summary: 'Notre Dame Fremantle ranks GPA, GAMSAT, Casper, and bonus points in a 30:30:30:10 interview formula. Exact bonus point values are not published on the GEMSAS page.',
+    foot: 'Fremantle also considers WA residency and has KCRMT/Broome-related pathways, which are not reducible to a combo multiplier.',
+    items: [
+      { id:'rural', label:'Demonstrated rural background', type:'qualitative', meta:'bonus points', detail:'Rural background applicants receive bonus points.' },
+      { id:'waResidency', label:'Western Australian residency', type:'qualitative', meta:'bonus points', detail:'Cumulative WA residency of 10 years or more may receive bonus points.' },
+      { id:'hdr', label:'Masters by Research or Doctoral degree complete by 31 July', type:'qualitative', meta:'bonus points', detail:'Notre Dame awards bonus points for completed HDR qualifications.' },
+      { id:'fipUnda', label:'Facilitated interview pathway graduate', type:'qualitative', meta:'pathway', detail:'UNDA undergraduate, Graduate Diploma of Health and Medical Sciences, and Pre-Medicine Certificate graduates may have a facilitated interview pathway.' },
+    ],
+  },
+};
+
+let state = { rural: false, casper: '', scoreMode: 'overall', activeBonusUni: 'deakin', bonuses: {} };
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[ch]));
+}
+
+function schoolById(id) {
+  return UNIS.find(u => u.id === id);
+}
+
+function getSelectedBonusIds(schoolId) {
+  return state.bonuses[schoolId] || [];
+}
+
+function getSelectedBonusItems(schoolId) {
+  const rule = BONUS_RULES[schoolId];
+  if (!rule) return [];
+  const selected = new Set(getSelectedBonusIds(schoolId));
+  return rule.items.filter(item => selected.has(item.id));
+}
+
+function initBonusPicker() {
+  const wrap = document.getElementById('bonusSchoolPills');
+  if (!wrap) return;
+  wrap.innerHTML = BONUS_ORDER.map(id => {
+    const school = schoolById(id);
+    return `<button type="button" class="bonus-school-pill" data-school="${id}">${school ? school.short : id}</button>`;
+  }).join('');
+  wrap.addEventListener('click', event => {
+    const btn = event.target.closest('.bonus-school-pill');
+    if (!btn) return;
+    state.activeBonusUni = btn.dataset.school;
+    renderBonusPicker();
+  });
+  document.getElementById('bonusChecklist').addEventListener('change', event => {
+    const input = event.target.closest('input[type="checkbox"][data-bonus-id]');
+    if (!input) return;
+    toggleBonus(state.activeBonusUni, input.dataset.bonusId, input.checked);
+  });
+  renderBonusPicker();
+}
+
+function toggleBonus(schoolId, itemId, checked) {
+  const rule = BONUS_RULES[schoolId];
+  if (!rule) return;
+  const item = rule.items.find(entry => entry.id === itemId);
+  if (!item) return;
+  const selected = new Set(getSelectedBonusIds(schoolId));
+  if (checked && item.group) {
+    rule.items
+      .filter(entry => entry.group === item.group && entry.id !== item.id)
+      .forEach(entry => selected.delete(entry.id));
+  }
+  if (checked) selected.add(itemId);
+  else selected.delete(itemId);
+  state.bonuses[schoolId] = Array.from(selected);
+  renderBonusPicker();
+}
+
+function renderBonusPicker() {
+  const activeId = state.activeBonusUni;
+  const rule = BONUS_RULES[activeId];
+  const note = document.getElementById('bonusSchoolNote');
+  const list = document.getElementById('bonusChecklist');
+  const foot = document.getElementById('bonusPanelFoot');
+  document.querySelectorAll('.bonus-school-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.school === activeId);
+    btn.setAttribute('aria-pressed', btn.dataset.school === activeId ? 'true' : 'false');
+  });
+  if (!rule) return;
+  const school = schoolById(activeId);
+  const selected = new Set(getSelectedBonusIds(activeId));
+  note.innerHTML = `<strong>${escapeHtml(school ? school.name : activeId)}:</strong> ${escapeHtml(rule.summary)}`;
+  list.innerHTML = rule.items.map(item => `
+    <label class="bonus-check">
+      <input type="checkbox" data-bonus-id="${escapeHtml(item.id)}" ${selected.has(item.id) ? 'checked' : ''}>
+      <span>
+        <strong>${escapeHtml(item.label)} <span class="bonus-check-meta">${escapeHtml(item.meta || '')}</span></strong>
+        <span class="bonus-check-detail">${escapeHtml(item.detail)}</span>
+      </span>
+    </label>
+  `).join('');
+  const totalSelected = Object.values(state.bonuses).reduce((sum, ids) => sum + ids.length, 0);
+  foot.textContent = `${rule.foot || ''} ${totalSelected ? `${totalSelected} adjustment option${totalSelected === 1 ? '' : 's'} selected across all schools.` : 'No adjustments selected yet.'}`.trim();
+}
+
+initBonusPicker();
 
 // UI: rural toggle
 document.getElementById('toggleNonRural').addEventListener('click', () => {
@@ -1193,7 +1487,7 @@ function calculate(gpa, scores) {
   const sameCombo = !scores.unweightedEstimated && Math.abs(weightedCombo - unweightedCombo) < 0.00005;
 
   // Display combo
-  document.getElementById('comboLabel').textContent = sameCombo ? 'Your Combo' : 'Weighted Combo';
+  document.getElementById('comboLabel').textContent = sameCombo ? 'Base Combo' : 'Base Weighted Combo';
   document.getElementById('comboNum').textContent = weightedCombo.toFixed(4);
   document.getElementById('comboBreakdown').innerHTML = `
     <div style="margin-bottom:4px;"><strong>GPA ${gpa.toFixed(2)}</strong> ÷ 7 = ${(gpa/7).toFixed(4)}</div>
@@ -1203,10 +1497,12 @@ function calculate(gpa, scores) {
       Weighted-school combo = <strong>${weightedCombo.toFixed(4)}</strong><br>
       Unweighted-school combo = <strong>${unweightedCombo.toFixed(4)}</strong>
       <span style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-left:8px;">${state.rural ? '(rural)' : '(non-rural)'}</span>
+      <div style="margin-top:6px;color:rgba(255,255,255,0.58);font-size:0.8rem;">School-specific bonuses and GPA overrides are applied in the university cards below.</div>
     </div>
     ${scores.unweightedEstimated ? `<div class="score-warning" style="margin-top:12px;background:rgba(245,158,11,0.16);border-color:rgba(245,158,11,0.32);color:#fde68a;">Unweighted score is estimated from your weighted overall because no section scores or unweighted average were entered. For UoM, UQ and Notre Dame, enter S1/S2/S3 for a more accurate result.</div>` : ''}
     ${scores.mode === 'overall' ? `<div class="score-warning" style="margin-top:10px;background:rgba(14,165,233,0.14);border-color:rgba(14,165,233,0.3);color:#bae6fd;">Section minimums are not checked from overall scores alone. Use S1/S2/S3 if any section may be close to 50.</div>` : ''}
   `;
+  document.getElementById('smartInsights').innerHTML = renderSmartInsights(gpa, scores);
 
   // Hide inputs, show results (except keep recalc button visible inside unisWrap)
   document.getElementById('calcCard').classList.add('calc-hide-on-results');
@@ -1249,6 +1545,54 @@ function renderUnis(gpa, scores) {
   });
 }
 
+function renderSmartInsights(gpa, scores) {
+  const insights = [];
+  const margins = UNIS
+    .filter(u => !u.uow)
+    .map(u => {
+      const cutoff = state.rural ? u.cutoffR : u.cutoffNR;
+      const hurdleStatus = getGamsatHurdleStatus(u, scores);
+      if (cutoff === null || cutoff === undefined || hurdleStatus.failed) return null;
+      const impact = getBonusImpact(u, gpa, scores);
+      return {
+        short: u.short,
+        margin: impact.adjustedCombo - cutoff,
+        adjusted: impact.applied,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.margin - a.margin);
+
+  if (margins.length) {
+    const top = margins.slice(0, 3).map(item => {
+      const sign = item.margin >= 0 ? '+' : '';
+      return `${item.short} ${sign}${item.margin.toFixed(3)}${item.adjusted ? ' adjusted' : ''}`;
+    }).join(' | ');
+    insights.push(`<div class="smart-insight"><strong>Closest fits:</strong> ${escapeHtml(top)} versus the observed cutoffs in this dataset.</div>`);
+  }
+
+  const uowBonusCount = getSelectedBonusItems('uow').filter(item => item.type === 'uowBonus').length;
+  if (uowBonusCount || state.casper) {
+    const casperText = state.casper ? state.casper : 'unknown Casper';
+    insights.push(`<div class="smart-insight"><strong>UOW lens:</strong> ${escapeHtml(casperText)} plus ${uowBonusCount} selected bonus${uowBonusCount === 1 ? '' : 'es'}. Last year's MMI-offer average was about Q4 plus 3.5 bonuses.</div>`);
+  }
+
+  if (scores.unweightedEstimated) {
+    insights.push('<div class="smart-insight"><strong>Improve accuracy:</strong> enter S1, S2 and S3 for exact UoM, UQ and Notre Dame scoring.</div>');
+  }
+
+  if (scores.mode === 'overall') {
+    insights.push('<div class="smart-insight"><strong>Check section hurdles:</strong> several schools need every GAMSAT section to clear 50, and UWA generally needs a 55 overall.</div>');
+  }
+
+  const selectedSchools = BONUS_ORDER.filter(id => getSelectedBonusIds(id).length);
+  if (selectedSchools.length) {
+    insights.push(`<div class="smart-insight"><strong>Bonus-aware:</strong> selected adjustments are applied school by school only: ${escapeHtml(selectedSchools.map(id => schoolById(id)?.short || id).join(', '))}.</div>`);
+  }
+
+  return insights.join('');
+}
+
 function getScoreForUni(u, scores) {
   if (u.gamsatMode === 'unweighted') {
     return {
@@ -1274,6 +1618,102 @@ function getScoreForUni(u, scores) {
 function comboForUni(gpa, u, scores) {
   const scoreInfo = getScoreForUni(u, scores);
   return (gpa / 7) + (scoreInfo.score / 100);
+}
+
+function capGpa(gpa) {
+  return Math.max(0, Math.min(7, gpa));
+}
+
+function comboForGpa(gpa, u, scores) {
+  const scoreInfo = getScoreForUni(u, scores);
+  return (capGpa(gpa) / 7) + (scoreInfo.score / 100);
+}
+
+function getBonusImpact(u, gpa, scores) {
+  const selected = getSelectedBonusItems(u.id);
+  const baseCombo = comboForUni(gpa, u, scores);
+  const qualitative = selected.filter(item => item.type === 'qualitative');
+  const impact = {
+    selected,
+    qualitative,
+    baseCombo,
+    adjustedCombo: baseCombo,
+    adjustedGpa: gpa,
+    applied: false,
+    badge: '',
+    detail: '',
+  };
+
+  if (!selected.length) return impact;
+
+  const comboPct = selected
+    .filter(item => item.type === 'comboPercent')
+    .reduce((sum, item) => sum + (item.value || 0), 0);
+  if (comboPct > 0) {
+    impact.adjustedCombo = baseCombo * (1 + comboPct);
+    impact.applied = true;
+    impact.badge = `+${(comboPct * 100).toFixed(0)}% adjustment`;
+    impact.detail = `Selected percentage adjustments lift this school's displayed score from ${baseCombo.toFixed(4)} to ${impact.adjustedCombo.toFixed(4)}.`;
+    return impact;
+  }
+
+  const bestComboPct = Math.max(0, ...selected
+    .filter(item => item.type === 'bestComboPercent')
+    .map(item => item.value || 0));
+  if (bestComboPct > 0) {
+    impact.adjustedCombo = baseCombo * (1 + bestComboPct);
+    impact.applied = true;
+    impact.badge = `+${(bestComboPct * 100).toFixed(0)}% highest bonus`;
+    impact.detail = `Only the highest selected ANU percentage applies, lifting this school's displayed score from ${baseCombo.toFixed(4)} to ${impact.adjustedCombo.toFixed(4)}.`;
+    return impact;
+  }
+
+  const gpaPctRaw = selected
+    .filter(item => item.type === 'gpaPercentCapped')
+    .reduce((sum, item) => sum + (item.value || 0), 0);
+  if (gpaPctRaw > 0) {
+    const gpaPct = Math.min(gpaPctRaw, 0.05);
+    impact.adjustedGpa = capGpa(gpa * (1 + gpaPct));
+    impact.adjustedCombo = comboForGpa(impact.adjustedGpa, u, scores);
+    impact.applied = true;
+    impact.badge = `GPA +${(gpaPct * 100).toFixed(0)}%`;
+    impact.detail = `Macquarie's selected GPA bonus changes the GPA used here from ${gpa.toFixed(2)} to ${impact.adjustedGpa.toFixed(2)}, lifting the displayed combo from ${baseCombo.toFixed(4)} to ${impact.adjustedCombo.toFixed(4)}.`;
+    return impact;
+  }
+
+  const override = selected.find(item => item.type === 'gpaOverride');
+  const gpaAdd = selected
+    .filter(item => item.type === 'gpaAdd')
+    .reduce((sum, item) => sum + (item.value || 0), 0);
+  if (override || gpaAdd > 0) {
+    const startingGpa = override ? override.value : gpa;
+    impact.adjustedGpa = capGpa(startingGpa + gpaAdd);
+    impact.adjustedCombo = comboForGpa(impact.adjustedGpa, u, scores);
+    impact.applied = true;
+    impact.badge = `GPA ${impact.adjustedGpa.toFixed(2)}`;
+    impact.detail = `The selected GPA rule changes the GPA used for this school from ${gpa.toFixed(2)} to ${impact.adjustedGpa.toFixed(2)}, changing the displayed combo from ${baseCombo.toFixed(4)} to ${impact.adjustedCombo.toFixed(4)}.`;
+  }
+
+  return impact;
+}
+
+function renderBonusImpact(impact) {
+  if (!impact.selected.length) return '';
+  const chips = impact.selected
+    .map(item => `<span class="bonus-chip">${escapeHtml(item.label)}</span>`)
+    .join('');
+  const qualitativeText = impact.qualitative.length
+    ? ' Some selected items are qualitative/pathway flags because the school does not publish an exact combo conversion for them.'
+    : '';
+  const detail = impact.applied
+    ? impact.detail
+    : 'Selected items for this school are important, but they are not published as a clean numeric adjustment. They are shown as strategic flags only.';
+  return `
+    <div class="bonus-result${impact.applied ? '' : ' qualitative'}">
+      <strong>Bonus-aware read:</strong> ${escapeHtml(detail)}${escapeHtml(qualitativeText)}
+      <div class="bonus-chip-row">${chips}</div>
+    </div>
+  `;
 }
 
 function getGamsatHurdleStatus(u, scores) {
@@ -1311,13 +1751,15 @@ function renderScoreMethodBadge(u, scores) {
 function renderUni(u, gpa, scores) {
   const card = document.createElement('div');
   card.className = 'uni-card';
-  const combo = comboForUni(gpa, u, scores);
 
   if (u.uow) {
     card.innerHTML = renderUoWCard(u, gpa, scores);
     return card;
   }
 
+  const impact = getBonusImpact(u, gpa, scores);
+  const combo = impact.adjustedCombo;
+  const baseCombo = impact.baseCombo;
   const cutoff = state.rural ? u.cutoffR : u.cutoffNR;
   const iv = u.interview;
   const hurdleStatus = getGamsatHurdleStatus(u, scores);
@@ -1355,12 +1797,41 @@ function renderUni(u, gpa, scores) {
 
   // Build range bar — map combo score to 0-100% position on bar
   // Domain: [cutoff - 2*std, median + 2*std] roughly captures the interview cohort
-  const low = cutoff - 2 * iv.std;
-  const high = iv.med + 2 * iv.std;
-  const pctOf = v => Math.max(0, Math.min(100, ((v - low) / (high - low)) * 100));
-  const youPct = pctOf(combo);
-  const medPct = pctOf(iv.med);
-  const cutoffPct = pctOf(cutoff);
+  let rangeHtml = '';
+  let low = (cutoff === null || cutoff === undefined ? iv.med : cutoff) - 2 * iv.std;
+  let high = iv.med + 2 * iv.std;
+  let pctOf = v => Math.max(0, Math.min(100, ((v - low) / (high - low)) * 100));
+  let youPct = pctOf(combo);
+  let medPct = pctOf(iv.med);
+  let cutoffPct = pctOf(cutoff === null || cutoff === undefined ? low : cutoff);
+  if (cutoff !== null && cutoff !== undefined) {
+    const low = cutoff - 2 * iv.std;
+    const high = iv.med + 2 * iv.std;
+    const pctOf = v => Math.max(0, Math.min(100, ((v - low) / (high - low)) * 100));
+    const youPct = pctOf(combo);
+    const medPct = pctOf(iv.med);
+    const cutoffPct = pctOf(cutoff);
+    const youLabel = impact.applied ? 'You adjusted' : 'You';
+    rangeHtml = `
+      <div class="range-bar-wrap">
+        <div class="range-bar-title">Position vs 2026 interview cohort</div>
+        <div class="range-bar-ticks-top">
+          <span>${low.toFixed(3)}</span>
+          <span>${high.toFixed(3)}</span>
+        </div>
+        <div class="range-bar">
+          <div class="range-bar-cutoff${cutoffPct < 10 ? ' at-left' : (cutoffPct > 90 ? ' at-right' : '')}" style="left:${cutoffPct.toFixed(2)}%;"></div>
+          <div class="range-bar-median" style="left:${medPct.toFixed(2)}%;"></div>
+          <div class="range-bar-you${youPct < 10 ? ' at-left' : (youPct > 90 ? ' at-right' : '')}" style="left:${youPct.toFixed(2)}%;"></div>
+        </div>
+        <div class="range-bar-legend">
+          <span class="l-you">${youLabel} (${combo.toFixed(3)})</span>
+          <span class="l-median">Median interviewee (${iv.med.toFixed(3)})</span>
+          <span class="l-cutoff">Cut-off (${cutoff.toFixed(3)})</span>
+        </div>
+      </div>
+    `;
+  }
 
   // Notes
   const noteHtml = [];
@@ -1398,6 +1869,8 @@ function renderUni(u, gpa, scores) {
     </div>
 
     ${renderScoreMethodBadge(u, scores)}
+    ${impact.applied ? `<div class="bonus-adjustment-badge">${escapeHtml(impact.badge)} applied to ${escapeHtml(u.short)}</div>` : ''}
+    ${renderBonusImpact(impact)}
     ${getScoreForUni(u, scores).estimated ? `<div class="uni-notes">Because you did not enter section scores or an unweighted average, this school's result uses your weighted overall score as a placeholder. Enter S1/S2/S3 for the accurate UoM/UQ/Notre Dame calculation.</div>` : ''}
     ${casperBadge}
     ${noteHtml.length ? `<div class="uni-notes">${noteHtml.join(' ')}</div>` : ''}
@@ -1436,8 +1909,18 @@ function renderUoWCard(u, gpa, scores) {
     ? [scores.sections.s1, scores.sections.s2, scores.sections.s3].every(score => score >= hurdles.sectionMin)
     : null;
   const casperStatus = state.casper
-    ? (state.casper === 'Q4' ? 'met' : (state.casper === 'Q3' && state.rural ? 'met' : 'likely-not'))
+    ? (state.casper === 'Q4' ? 'met' : 'likely-not')
     : 'unknown';
+  const uowBonusItems = getSelectedBonusItems('uow').filter(item => item.type === 'uowBonus');
+  const uowBonusCount = uowBonusItems.length;
+  const uowBonusPoints = uowBonusCount * (50 / 12);
+  const casperMidpoints = { Q1: 6.25, Q2: 18.75, Q3: 31.25, Q4: 43.75 };
+  const casperEstimate = state.casper ? casperMidpoints[state.casper] : null;
+  const uowRankEstimate = casperEstimate === null ? null : casperEstimate + uowBonusPoints;
+  const uowBonusBenchmark = 3.5;
+  const uowBonusChips = uowBonusItems
+    .map(item => `<span class="bonus-chip">${escapeHtml(item.label)}</span>`)
+    .join('');
 
   const allMet = gpaMet && gamMet && sectionMet !== false && (casperStatus === 'met');
 
@@ -1447,17 +1930,27 @@ function renderUoWCard(u, gpa, scores) {
     verdictClass = 'red';
     verdictDetail = 'UoW requires minimum GPA and GAMSAT hurdles regardless of combo. Your current inputs do not meet the basic thresholds.';
   } else if (casperStatus === 'met' && allMet) {
-    verdict = 'Hurdles cleared';
-    verdictClass = 'green';
-    verdictDetail = 'You meet the published hurdles. Selection from here depends heavily on CASPer quartile, bonuses (rural, first-in-family, regional study), and demonstrated commitment.';
+    if (uowBonusCount >= 4) {
+      verdict = 'Strong UOW profile';
+      verdictClass = 'green';
+      verdictDetail = 'You meet the published hurdles, report Q4 Casper, and have a bonus count above the recent MMI-offer average.';
+    } else if (uowBonusCount >= 3) {
+      verdict = 'Competitive UOW profile';
+      verdictClass = 'green';
+      verdictDetail = 'You meet the published hurdles and sit near the recent UOW MMI-offer benchmark of Q4 Casper plus about 3.5 bonuses.';
+    } else {
+      verdict = 'Bonus-light';
+      verdictClass = 'amber';
+      verdictDetail = 'You meet the published hurdles and report Q4 Casper, but your selected UOW bonus count is below the recent average MMI-offer profile.';
+    }
   } else if (casperStatus === 'likely-not') {
     verdict = 'CASPer likely too low';
     verdictClass = 'amber';
-    verdictDetail = 'Hurdles cleared for GPA/GAMSAT, but CASPer is used to rank — UoW typically requires Q4 (Q3 acceptable for rural applicants with other strengths).';
+    verdictDetail = 'Hurdles cleared for GPA/GAMSAT, but Casper is half of UOW interview ranking. Extra bonuses help, but last year still appeared to have a Q4 minimum for MMI offers.';
   } else {
     verdict = 'CASPer dependent';
     verdictClass = 'amber';
-    verdictDetail = `You meet the GPA and GAMSAT hurdles. UoW ranks on CASPer — outcomes depend entirely on your quartile ${state.casper ? '' : '(please select above)'}.`;
+    verdictDetail = 'You meet the GPA and GAMSAT hurdles. UOW ranks interview offers on Casper plus bonuses, so select a Casper quartile and any UOW bonuses above to sharpen this read.';
   }
 
   return `
@@ -1478,6 +1971,10 @@ function renderUoWCard(u, gpa, scores) {
         <li class="${casperStatus === 'met' ? 'hurdle-met' : (casperStatus === 'likely-not' ? 'hurdle-miss' : 'hurdle-unknown')}">CASPer: <strong>${state.casper || 'Not specified'}</strong> — ${hurdles.casperReq} required</li>
         <li class="hurdle-unknown">Bonus: ${hurdles.bonusReq}</li>
       </ul>
+    </div>
+    <div class="bonus-result">
+      <strong>UOW bonus rank estimate:</strong> ${uowBonusCount}/12 selected bonuses = ${uowBonusPoints.toFixed(1)} of the 50 bonus-side points. ${uowRankEstimate === null ? 'Select a Casper quartile for an approximate 100-point ranking estimate.' : `Using the midpoint of ${state.casper}, the rough combined ranking estimate is ${uowRankEstimate.toFixed(1)}/100.`} Recent MMI offers averaged about ${uowBonusBenchmark.toFixed(1)} bonuses with Q4 Casper.
+      ${uowBonusChips ? `<div class="bonus-chip-row">${uowBonusChips}</div>` : ''}
     </div>
     <div class="uni-notes">UoW uses GAMSAT as a hurdle, not as a combo rank. Current GEMSAS guidance lists minimum overall 50 and minimum 50 in each section.</div>
   `;
