@@ -611,7 +611,7 @@
         <button class="seg" data-segment="high_value" onclick="setUserSegment('high_value')">High value</button>
       </div>
       <div class="controls">
-        <input class="ctrl-in" id="usrSearch" type="text" placeholder="🔍 Search email or name…" oninput="renderUsers()">
+        <input class="ctrl-in" id="usrSearch" type="text" placeholder="🔍 Search email or name…" oninput="queueUserSearch()">
         <select class="ctrl-sel" id="usrTier" onchange="loadUsers()">
           <option value="">All tiers</option>
           <option value="free">Free</option>
@@ -1223,6 +1223,7 @@ const S = {
   tierModalUserId: null,
   mockPassModalUserId: null,
   userSegment: 'all',
+  userSearchTimer: null,
   commandItems: [],
   commandIndex: 0,
 };
@@ -1788,8 +1789,10 @@ function renderReviews() {
 async function loadUsers() {
   const limit = document.getElementById('usrLimit')?.value||'50';
   const tier  = document.getElementById('usrTier')?.value||'';
+  const q     = (document.getElementById('usrSearch')?.value||'').trim();
   let url = `/admin/users?limit=${limit}`;
   if (tier) url += `&tier=${tier}`;
+  if (q) url += `&q=${encodeURIComponent(q)}`;
   try {
     const res  = await api(url);
     const data = await res.json().catch(()=>({}));
@@ -1798,6 +1801,11 @@ async function loadUsers() {
     renderUsers();
     updateDashboard();
   } catch(e) { console.error('Users load error:', e); }
+}
+
+function queueUserSearch() {
+  clearTimeout(S.userSearchTimer);
+  S.userSearchTimer = setTimeout(loadUsers, 250);
 }
 
 function setUserSegment(segment) {
@@ -3236,7 +3244,7 @@ function viewUserByEmail(email) {
   // Navigate to users page and search for this email
   nav('users');
   const searchEl = document.getElementById('usrSearch');
-  if (searchEl) { searchEl.value = email; renderUsers(); }
+  if (searchEl) { searchEl.value = email; loadUsers(); }
 }
 
 // ══════════════════════════════════════════════════════
