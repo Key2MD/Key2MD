@@ -4,6 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="robots" content="noindex,nofollow,noarchive,nosnippet"/>
+  <meta name="referrer" content="no-referrer"/>
   <title>Key2MD Admin</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -1209,6 +1210,8 @@
 // ══════════════════════════════════════════════════════
 const API = 'https://key2md-api.brittainmbbs.workers.dev';
 const SS_KEY = 'k2md_admin_token';
+const LEGACY_HANDOFF_KEY = 'k2md_admin_token_handoff';
+const MOCK_READER_CHANNEL_PREFIX = 'k2md_mock_reader_handoff_';
 
 const S = {
   token: null,
@@ -1232,7 +1235,7 @@ const S = {
 // INIT — restore session from sessionStorage
 // ══════════════════════════════════════════════════════
 (async () => {
-  const saved = sessionStorage.getItem(SS_KEY) || localStorage.getItem(SS_KEY);
+  const saved = sessionStorage.getItem(SS_KEY);
   if (saved) {
     S.token = saved;
     try {
@@ -1245,6 +1248,8 @@ const S = {
       }
     } catch {}
     sessionStorage.removeItem(SS_KEY);
+    localStorage.removeItem(SS_KEY);
+    localStorage.removeItem(LEGACY_HANDOFF_KEY);
     S.token = null;
   }
 })();
@@ -1268,7 +1273,8 @@ async function doLogin() {
     if (!res.ok) throw new Error(data?.error||'Sign in failed');
     S.token = data.token;
     sessionStorage.setItem(SS_KEY, S.token);
-    localStorage.setItem(SS_KEY, S.token);
+    localStorage.removeItem(SS_KEY);
+    localStorage.removeItem(LEGACY_HANDOFF_KEY);
     showApp(data.email||email);
     bootLoad();
   } catch(e) {
@@ -1289,6 +1295,7 @@ async function doLogout() {
   try { await api('/admin/logout', {method:'POST'}); } catch {}
   sessionStorage.removeItem(SS_KEY);
   localStorage.removeItem(SS_KEY);
+  localStorage.removeItem(LEGACY_HANDOFF_KEY);
   S.token = null;
   location.reload();
 }
@@ -3010,13 +3017,24 @@ function mockStatusBadge(status) {
 }
 
 function openMockReader(attemptId = '') {
-  if (S.token) {
-    try { localStorage.setItem(SS_KEY, S.token); } catch {}
-  }
+  const canHandoff = !!(S.token && 'BroadcastChannel' in window);
+  const handoffId = canHandoff
+    ? (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`)
+    : '';
   const params = new URLSearchParams();
   if (attemptId) params.set('attempt_id', attemptId);
-  if (S.token) params.set('admin_token', S.token);
+  if (handoffId) params.set('handoff', handoffId);
   const url = `../mock-reader.html${params.toString() ? '?' + params.toString() : ''}`;
+  if (handoffId) {
+    const channel = new BroadcastChannel(MOCK_READER_CHANNEL_PREFIX + handoffId);
+    const sendToken = () => channel.postMessage({ type: 'admin-token', token: S.token });
+    channel.onmessage = event => {
+      if (event.data?.type === 'ready') sendToken();
+    };
+    setTimeout(sendToken, 300);
+    setTimeout(sendToken, 1200);
+    setTimeout(() => channel.close(), 10000);
+  }
   window.open(url, '_blank', 'noopener');
 }
 
