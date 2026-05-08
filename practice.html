@@ -1767,11 +1767,22 @@ const StationHistory = (() => {
 })();
 
 // ══ WEIGHTED POOL (spaced-rep) ════════════════════════════════════════════════
+function getStationHistoryId(station, mode = currentMode) {
+  if (!station) return '';
+  if (station.id) return station.id;
+  const casperIdx = (typeof STATIONS !== 'undefined') ? STATIONS.indexOf(station) : -1;
+  const mmiIdx = (typeof MMI_STATIONS !== 'undefined') ? MMI_STATIONS.indexOf(station) : -1;
+  if (mode === MODE_MMI || (mmiIdx >= 0 && casperIdx < 0)) return `mmi_${mmiIdx}`;
+  if (casperIdx >= 0) return `casper_${casperIdx}`;
+  if (mmiIdx >= 0) return `mmi_${mmiIdx}`;
+  return '';
+}
+
 function buildWeightedPool(stations) {
   const now = Date.now();
   const DAY = 86400000;
   const weighted = stations.map(s => {
-    const id = s.id || `mmi_${(typeof MMI_STATIONS !== 'undefined' ? MMI_STATIONS.indexOf(s) : -1)}`;
+    const id = getStationHistoryId(s, currentMode);
     const h = StationHistory.get(id);
     let w;
     if (!h || !h.lastSeenAt) {
@@ -2672,7 +2683,7 @@ function startSession(){
   let filtered;
   if(selectedCategory==='__starred'){
     const starred=new Set(StationHistory.getStarred());
-    filtered=stations.filter(s=>starred.has(s.id||`mmi_${MMI_STATIONS.indexOf(s)}`));
+    filtered=stations.filter(s=>starred.has(getStationHistoryId(s, currentMode)));
     if(!filtered.length){alert('No starred stations yet. Star some stations first!');return;}
   } else {
     filtered=selectedCategory==='All'?stations:stations.filter(s=>s.category===selectedCategory);
@@ -3123,7 +3134,7 @@ Score guide: 8-10=excellent Q4, 6-7=good Q3, 4-5=developing Q2, 1-3=needs signif
     h.aiSaved = true;
     recordCompetencyProgress(h.station,fb);
     // Record attempt with AI score
-    const _sid = h.station?.id || `mmi_${(typeof MMI_STATIONS!=='undefined'?MMI_STATIONS.indexOf(h.station):-1)}`;
+    const _sid = getStationHistoryId(h.station, currentMode);
     if(!_sessionRecordedIds.has(_sid)){_sessionRecordedIds.add(_sid);StationHistory.record(_sid,fb.score);}
     updateLimitUI();
     updateLibraryCoverage();
@@ -3315,7 +3326,7 @@ function updateLibraryCoverage() {
   if(typeof STATIONS !== 'undefined') {
     const total = STATIONS.length;
     const seen = STATIONS.filter(s => {
-      const id = s.id || `casper_${STATIONS.indexOf(s)}`;
+      const id = getStationHistoryId(s, MODE_CASPER);
       const h = StationHistory.get(id);
       return h && h.attemptCount > 0;
     }).length;
@@ -3329,7 +3340,7 @@ function updateLibraryCoverage() {
   if(typeof MMI_STATIONS !== 'undefined') {
     const total = MMI_STATIONS.length;
     const seen = MMI_STATIONS.filter(s => {
-      const id = s.id || `mmi_${MMI_STATIONS.indexOf(s)}`;
+      const id = getStationHistoryId(s, MODE_MMI);
       const h = StationHistory.get(id);
       return h && h.attemptCount > 0;
     }).length;
@@ -3347,9 +3358,7 @@ function updateLibraryCoverage() {
 function updateSeenPill(station) {
   const pill = document.getElementById('seenBeforePill');
   if (!pill) return;
-  const id = station.id || (currentMode === MODE_MMI
-    ? `mmi_${(typeof MMI_STATIONS !== 'undefined' ? MMI_STATIONS.indexOf(station) : -1)}`
-    : `casper_${(typeof STATIONS !== 'undefined' ? STATIONS.indexOf(station) : -1)}`);
+  const id = getStationHistoryId(station, currentMode);
   const h = StationHistory.get(id);
   pill.style.display = '';
   if (!h || !h.attemptCount) {
@@ -3367,9 +3376,7 @@ function updateStarBtn(station) {
   const btn = document.getElementById('starBtn');
   if (!btn || !station) return;
   btn.style.display = '';
-  const id = station.id || (currentMode === MODE_MMI
-    ? `mmi_${(typeof MMI_STATIONS !== 'undefined' ? MMI_STATIONS.indexOf(station) : -1)}`
-    : `casper_${(typeof STATIONS !== 'undefined' ? STATIONS.indexOf(station) : -1)}`);
+  const id = getStationHistoryId(station, currentMode);
   const h = StationHistory.get(id);
   btn.textContent = (h && h.starred) ? '★' : '☆';
   btn.style.color = (h && h.starred) ? '#f59e0b' : 'var(--gray400)';
@@ -3401,6 +3408,8 @@ function toggleStarStation() {
 
 function updateStarredCategoryBtn() {
   const starred = StationHistory.getStarred();
+  const casperStarred = getCasperStarredStations();
+  const mmiStarred = getMmiStarredStations();
   // CASPer starred btn
   let cbtn = document.getElementById('cat-btn-starred-casper');
   const cFilters = document.getElementById('categoryFilters');
@@ -3418,8 +3427,6 @@ function updateStarredCategoryBtn() {
         else cFilters.appendChild(cbtn);
       }
       const cntEl = document.getElementById('cnt-starred-casper');
-      // Count only CASPer starred
-      const casperStarred = starred.filter(id => !id.startsWith('mmi_'));
       if(cntEl) cntEl.textContent = casperStarred.length;
       cbtn.style.display = casperStarred.length > 0 ? '' : 'none';
     } else if (cbtn) {
@@ -3430,7 +3437,6 @@ function updateStarredCategoryBtn() {
   let mbtn = document.getElementById('cat-btn-starred-mmi');
   const mFilters = document.getElementById('mmiCategoryFilters');
   if (mFilters) {
-    const mmiStarred = starred.filter(id => id.startsWith('mmi_'));
     if (mmiStarred.length > 0) {
       if (!mbtn) {
         mbtn = document.createElement('button');
@@ -3454,8 +3460,21 @@ function updateStarredCategoryBtn() {
 
 function getCasperStarredStations(){
   if(typeof STATIONS==='undefined')return [];
-  const starred=new Set(StationHistory.getStarred().filter(id=>!id.startsWith('mmi_')));
-  return STATIONS.map((s,idx)=>({station:s,id:s.id||`casper_${idx}`,history:StationHistory.get(s.id||`casper_${idx}`)}))
+  const starred=new Set(StationHistory.getStarred());
+  return STATIONS.map(s=> {
+    const id = getStationHistoryId(s, MODE_CASPER);
+    return {station:s,id,history:StationHistory.get(id)};
+  })
+    .filter(x=>starred.has(x.id));
+}
+
+function getMmiStarredStations(){
+  if(typeof MMI_STATIONS==='undefined')return [];
+  const starred=new Set(StationHistory.getStarred());
+  return MMI_STATIONS.map(s=> {
+    const id = getStationHistoryId(s, MODE_MMI);
+    return {station:s,id,history:StationHistory.get(id)};
+  })
     .filter(x=>starred.has(x.id));
 }
 
@@ -3788,10 +3807,7 @@ const COMPETENCY_CATEGORY_HINTS={
 };
 
 function getStationId(station){
-  if(!station)return '';
-  if(station.id)return station.id;
-  const idx=(typeof STATIONS!=='undefined')?STATIONS.indexOf(station):-1;
-  return `casper_${idx}`;
+  return getStationHistoryId(station, MODE_CASPER);
 }
 
 function recommendStationForCompetency(compName){
@@ -4669,7 +4685,7 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
     // Record attempt without AI score if response has substance but no AI feedback
     const _advH = sessionHistory[currentIdx];
     if(_advH && _advH.station){
-      const _advId = _advH.station.id || `mmi_${(typeof MMI_STATIONS!=='undefined'?MMI_STATIONS.indexOf(_advH.station):-1)}`;
+      const _advId = getStationHistoryId(_advH.station, currentMode);
       if(!_sessionRecordedIds.has(_advId) && _advH.answer && _advH.answer.length>=50){
         _sessionRecordedIds.add(_advId);
         StationHistory.record(_advId, _advH.score!=null?_advH.score:null);
