@@ -704,6 +704,19 @@
     .book-btn:hover { background: rgba(245,158,11,0.25); }
     .email-done { display: none; color: var(--teal2); font-weight: 600; font-size: 0.95rem; margin-top: 4px; position: relative; }
     .email-done.show { display: block; }
+    .result-actions {
+      display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+      max-width: 520px; margin: 0 auto 18px; position: relative;
+    }
+    .result-action-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 42px; padding: 0 16px; border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.88); font-family: inherit; font-weight: 800;
+      font-size: 0.84rem; cursor: pointer; transition: all 0.2s;
+    }
+    .result-action-btn:hover { background: rgba(255,255,255,0.13); color: #fff; }
+    .result-status { min-height: 18px; color: rgba(255,255,255,0.58); font-size: 0.78rem; margin: -8px auto 16px; position: relative; }
     .result-shortlist {
       display: none; position: relative; max-width: 620px; margin: 0 auto 22px;
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
@@ -1138,13 +1151,18 @@
       <!-- Post-result email + book -->
       <div class="post-result" id="postResult">
         <h3>Want this turned into an application plan?</h3>
-        <p>Use the broad read below, then book a free 15-minute call if you want Dan to sanity-check your preference strategy.</p>
+        <p>Send yourself the shortlist and next step, copy it for later, or book a free 15-minute call if you want Dan to sanity-check your preference strategy.</p>
         <div class="result-shortlist" id="resultShortlist"></div>
+        <div class="result-actions">
+          <button type="button" class="result-action-btn" id="copyResultBtn">Copy my result</button>
+          <button type="button" class="result-action-btn" id="shareResultBtn">Share result</button>
+        </div>
+        <div class="result-status" id="resultStatus" aria-live="polite"></div>
         <form class="email-row" id="emailForm">
           <input type="email" id="emailInput" placeholder="your@email.com" required>
-          <button type="submit">Get strategy tips</button>
+          <button type="submit">Email me my plan</button>
         </form>
-        <div class="email-done" id="emailDone">Done. You are on the Key2MD tips list.</div>
+        <div class="email-done" id="emailDone">Done. Your calculator plan has been sent.</div>
         <div class="email-divider">or</div>
         <a href="https://calendly.com/brittainmbbs/30min" target="_blank" rel="noopener" class="book-btn">Book a Free 15-Min Call with Dan →</a>
       </div>
@@ -1740,6 +1758,7 @@ const UNDERGRAD_SCHOOLS = [
 ];
 
 let state = { entryMode: 'undergrad', rural: false, casper: '', scoreMode: 'overall', activeBonusUni: 'deakin', bonuses: {} };
+let latestCalculatorPlan = null;
 
 const DUPLICATE_RURAL_BONUS_IDS = {
   deakin: ['geelongMm1Mm2', 'mm3Mm7'],
@@ -1769,6 +1788,75 @@ function escapeHtml(value) {
     '"': '&quot;',
     "'": '&#39;',
   }[ch]));
+}
+
+function trackCalculatorEvent(name, params = {}) {
+  if (window.Key2MDTrack && typeof window.Key2MDTrack.track === 'function') {
+    window.Key2MDTrack.track(name, Object.assign({ event_category: 'calculator' }, params));
+  } else if (typeof gtag === 'function') {
+    gtag('event', name, Object.assign({ event_category: 'calculator' }, params));
+  }
+}
+
+function setResultStatus(message) {
+  const status = document.getElementById('resultStatus');
+  if (status) status.textContent = message || '';
+}
+
+function setLatestCalculatorPlan(plan) {
+  latestCalculatorPlan = Object.assign({
+    generatedAt: new Date().toISOString(),
+    page: 'medical-school-chances',
+    url: 'https://www.key2md.com/medical-school-chances.html',
+  }, plan);
+}
+
+function formatLatestCalculatorPlan() {
+  if (!latestCalculatorPlan) return 'Key2MD medical school chances result: run the calculator to generate a plan.';
+  const lines = [
+    'Key2MD medical school chances result',
+    '',
+    latestCalculatorPlan.summary,
+    '',
+    'Strongest fits:',
+    ...(latestCalculatorPlan.strongest || []).map(item => `- ${item.name}: ${item.detail}`),
+    '',
+    `Next step: ${latestCalculatorPlan.nextStep}`,
+  ];
+  if (latestCalculatorPlan.watchouts?.length) {
+    lines.push('', 'Watchouts:', ...latestCalculatorPlan.watchouts.map(item => `- ${item}`));
+  }
+  lines.push('', 'Run it again:', latestCalculatorPlan.url);
+  return lines.filter(line => line !== undefined && line !== null).join('\n');
+}
+
+async function copyLatestCalculatorPlan() {
+  const text = formatLatestCalculatorPlan();
+  try {
+    await navigator.clipboard.writeText(text);
+    setResultStatus('Copied. Nice and portable.');
+  } catch {
+    setResultStatus('Copy failed in this browser. You can still email the plan to yourself.');
+  }
+  trackCalculatorEvent('calculator_result_copy', { event_label: latestCalculatorPlan?.mode || 'unknown' });
+}
+
+async function shareLatestCalculatorPlan() {
+  const text = formatLatestCalculatorPlan();
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'My Key2MD chances result',
+        text,
+        url: latestCalculatorPlan?.url || 'https://www.key2md.com/medical-school-chances.html',
+      });
+      trackCalculatorEvent('calculator_result_share', { event_label: latestCalculatorPlan?.mode || 'unknown' });
+      return;
+    } catch (err) {
+      if (err && err.name === 'AbortError') return;
+    }
+  }
+  await copyLatestCalculatorPlan();
 }
 
 function schoolById(id) {
@@ -2187,6 +2275,9 @@ recalcBtn.addEventListener('click', () => {
   document.getElementById('calcCard').scrollIntoView({behavior:'smooth', block:'start'});
 });
 
+document.getElementById('copyResultBtn').addEventListener('click', copyLatestCalculatorPlan);
+document.getElementById('shareResultBtn').addEventListener('click', shareLatestCalculatorPlan);
+
 function calculate(gpa, scores) {
   sanitizeBonusesForState();
   const weightedCombo = (gpa / 7) + (scores.weighted / 100);
@@ -2521,6 +2612,18 @@ function updateUndergradPostResultSummary(assessments, profile) {
     ${reaches.length ? `<div class="result-next-step" style="color:rgba(255,255,255,0.65);font-weight:600;">Reach schools from these inputs: ${escapeHtml(reaches.map(item => item.school.short).join(', '))}.</div>` : ''}
   `;
   box.classList.add('show');
+  setLatestCalculatorPlan({
+    mode: 'undergraduate',
+    summary: `Undergraduate profile: ATAR ${profile.atar.toFixed(2)}, UCAT ${profile.percentile !== null ? `${profile.percentile.toFixed(1)} percentile${profile.percentileEstimated ? ' estimated' : ''}` : 'not entered'}, ${profile.rural ? 'rural/regional' : 'non-rural'} applicant.`,
+    strongest: strongest.map(item => ({ name: item.school.short, detail: `${item.verdict} - ${item.school.type}` })),
+    watchouts: [
+      profile.percentileEstimated ? 'UCAT percentile was estimated from total score; use the official UCAT ANZ percentile table when available.' : '',
+      reaches.length ? `Reach schools on these inputs: ${reaches.map(item => item.school.short).join(', ')}.` : '',
+      profile.rural || profile.firstNations ? 'Priority pathways can involve separate documentation, quotas and application steps.' : '',
+    ].filter(Boolean),
+    nextStep,
+  });
+  setResultStatus('');
 }
 
 function renderUnis(gpa, scores) {
@@ -2595,6 +2698,21 @@ function updatePostResultSummary(gpa, scores) {
     ${uowLine}
   `;
   box.classList.add('show');
+  setLatestCalculatorPlan({
+    mode: 'graduate',
+    summary: `Graduate profile: GPA ${gpa.toFixed(2)}, weighted GAMSAT ${scores.weighted.toFixed(1)}, unweighted GAMSAT ${scores.unweighted.toFixed(1)}, ${state.rural ? 'rural' : 'non-rural'} benchmark.`,
+    strongest: strongest.map(item => ({
+      name: item.school.short,
+      detail: `${item.margin >= 0 ? '+' : ''}${item.margin.toFixed(3)} vs observed cutoff${item.adjusted ? ' after selected adjustment' : ''}`,
+    })),
+    watchouts: [
+      weakest.margin < 0 ? `${weakest.school.short} is ${Math.abs(weakest.margin).toFixed(3)} below the observed cutoff.` : '',
+      scores.unweightedEstimated ? 'Unweighted score was estimated; enter S1/S2/S3 for UoM, UQ and Notre Dame accuracy.' : '',
+      (state.casper || uowBonusCount) ? `UOW: ${state.casper || 'unknown CASPer'} plus ${uowBonusCount} selected UOW bonus${uowBonusCount === 1 ? '' : 'es'}.` : '',
+    ].filter(Boolean),
+    nextStep,
+  });
+  setResultStatus('');
 }
 
 function renderSmartInsights(gpa, scores) {
@@ -3036,20 +3154,38 @@ document.getElementById('emailForm').addEventListener('submit', (e) => {
     return;
   }
   input.style.borderColor = '';
-  // Try existing subscribe endpoint (used elsewhere on the site)
-  fetch('https://key2md-api.brittainmbbs.workers.dev/api/email/subscribe', {
+  setResultStatus('Sending your plan...');
+  const payload = {
+    email,
+    source: 'chances-calculator',
+    plan: latestCalculatorPlan,
+    planText: formatLatestCalculatorPlan(),
+  };
+  fetch('https://key2md-api.brittainmbbs.workers.dev/api/calculator/plan', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email, source: 'chances-calculator' }),
-  }).then(() => {
+    body: JSON.stringify(payload),
+  }).then(res => {
+    if (!res.ok) throw new Error('plan_email_failed');
     document.getElementById('emailForm').style.display = 'none';
     document.getElementById('emailDone').classList.add('show');
+    setResultStatus('');
   }).catch(() => {
-    // Even on error, show success (don't block user)
-    document.getElementById('emailForm').style.display = 'none';
-    document.getElementById('emailDone').classList.add('show');
+    return fetch('https://key2md-api.brittainmbbs.workers.dev/api/email/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, source: 'chances-calculator-plan-fallback' }),
+    }).then(res => {
+      if (!res.ok) throw new Error('subscribe_failed');
+      document.getElementById('emailForm').style.display = 'none';
+      document.getElementById('emailDone').textContent = 'Done. You are on the Key2MD list; copy the plan above if you want to keep the exact result.';
+      document.getElementById('emailDone').classList.add('show');
+      setResultStatus('');
+    }).catch(() => {
+      setResultStatus('Email had trouble sending. Copy the result above and keep going.');
+    });
   });
-  if (typeof gtag === 'function') gtag('event', 'email_subscribe', { event_category: 'calculator' });
+  trackCalculatorEvent('calculator_plan_email', { event_label: latestCalculatorPlan?.mode || 'unknown' });
 });
 </script>
 

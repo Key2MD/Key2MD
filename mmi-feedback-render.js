@@ -153,7 +153,7 @@ const MMIFeedbackRender = (() => {
   }
 
   function render(container, data, context) {
-    if (window._mmiLoadingInterval) { clearInterval(window._mmiLoadingInterval); window._mmiLoadingInterval = null; }
+    clearLoadingTimers();
     // context: { tier, specialistMode, stationCategory, durationSec }
     if (!container || !data) return;
 
@@ -251,31 +251,51 @@ const MMIFeedbackRender = (() => {
 
   function renderLoading(container, tier) {
     if (!container) return;
+    clearLoadingTimers();
     const isPremium = tier === 'premium';
     container.innerHTML = `
       <div class="mmi-loading">
         <div class="mmi-loading-spinner"></div>
-        <div class="mmi-loading-text">${isPremium ? 'Analysing your response — voice, presentation, and content…' : 'Transcribing and analysing your response…'}</div>
-        <div class="mmi-loading-sub">${isPremium ? 'Premium analysis takes 20–40 seconds — please keep this tab open' : 'This takes 15–30 seconds'}</div>
+        <div class="mmi-loading-text" id="mmiLoadingText">${isPremium ? 'Preparing your premium analysis…' : 'Transcribing and analysing your response…'}</div>
+        <div class="mmi-loading-sub" id="mmiLoadingSub">${isPremium ? 'This usually takes 20-40 seconds. Please keep this tab open.' : 'This usually takes 15-30 seconds.'}</div>
         ${isPremium ? '<div class="mmi-loading-steps" id="mmiLoadingSteps"><span class="mmi-step active">📝 Transcribing</span><span class="mmi-step">🎙️ Analysing voice</span><span class="mmi-step">📹 Reviewing presentation</span><span class="mmi-step">🤖 Generating feedback</span></div>' : ''}
       </div>`;
-    if (isPremium) startLoadingSteps();
+    if (isPremium) startLinearLoadingSteps();
   }
 
-  function startLoadingSteps() {
+  function clearLoadingTimers() {
+    if (window._mmiLoadingInterval) {
+      clearInterval(window._mmiLoadingInterval);
+      window._mmiLoadingInterval = null;
+    }
+    if (Array.isArray(window._mmiLoadingTimers)) {
+      window._mmiLoadingTimers.forEach(clearTimeout);
+      window._mmiLoadingTimers = [];
+    }
+  }
+
+  function startLinearLoadingSteps() {
     const steps = document.querySelectorAll('.mmi-step');
     if (!steps.length) return;
-    let current = 0;
-    const interval = setInterval(() => {
-      steps.forEach((s, i) => s.classList.toggle('active', i === current));
-      current = (current + 1) % steps.length;
-    }, 5000);
-    // Store so we can clear it
-    window._mmiLoadingInterval = interval;
+    const text = document.getElementById('mmiLoadingText');
+    const sub = document.getElementById('mmiLoadingSub');
+    const phases = [
+      { at: 0,    index: 0, text: 'Transcribing your response…' },
+      { at: 7000, index: 1, text: 'Analysing voice and pacing…' },
+      { at: 15000, index: 2, text: 'Reviewing presentation signals…' },
+      { at: 24000, index: 3, text: 'Writing your feedback…' },
+      { at: 42000, index: 3, text: 'Still working on the final feedback…', sub: 'Longer recordings can take a little extra time. Nothing has gone wrong.' },
+    ];
+    window._mmiLoadingTimers = phases.map(phase => setTimeout(() => {
+      steps.forEach((step, i) => step.classList.toggle('active', i <= phase.index));
+      if (text) text.textContent = phase.text;
+      if (phase.sub && sub) sub.textContent = phase.sub;
+    }, phase.at));
   }
 
   function renderError(container, error) {
     if (!container) return;
+    clearLoadingTimers();
     const isCredits = error.code === 'payment_required' || error.code === 'no_credits';
     const isLimit   = error.code === 'daily_limit_reached';
 
@@ -293,6 +313,7 @@ const MMIFeedbackRender = (() => {
   }
 
   function clear(container) {
+    clearLoadingTimers();
     if (container) container.innerHTML = '';
   }
 

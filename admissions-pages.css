@@ -208,6 +208,63 @@ h1 {
   border-radius: 8px;
   color: #78350f;
 }
+.school-action-strip {
+  margin: 28px 0;
+  padding: 20px;
+  border: 1px solid rgba(14,165,233,0.25);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.school-action-strip strong {
+  display: block;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.school-action-strip span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.service-photo {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 44px rgba(15,23,42,0.12);
+  margin-bottom: 14px;
+}
+.proof-list {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+}
+.proof-list div {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--soft);
+  color: #334155;
+  font-size: 0.92rem;
+}
+.service-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0;
+}
+.service-links a {
+  display: block;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  text-decoration: none;
+  color: #0369a1;
+  font-weight: 900;
+}
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -260,4 +317,7 @@ footer {
   .grid { grid-template-columns: 1fr; }
   .side { position: static; }
   .card-grid { grid-template-columns: 1fr; }
+  .school-action-strip { display: block; }
+  .school-action-strip .btn { margin-top: 14px; }
+  .service-links { grid-template-columns: 1fr; }
 }
