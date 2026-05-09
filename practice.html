@@ -11,14 +11,14 @@
  </script>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Free CASPer &amp; MMI Practice - Timed Stations, AI Feedback | Key2MD</title>
- <meta name="description" content="Free CASPer and MMI practice for Australian med applicants: timed stations, AI feedback, 90+ CASPer scenarios, 40+ MMI stations, and a full CASPer mock.">
+ <title>Free CASPer and MMI Practice | AI Feedback | Key2MD</title>
+ <meta name="description" content="Free CASPer and MMI practice for Australian med applicants: timed stations, AI feedback, 90+ CASPer scenarios and 40+ MMI stations.">
  <link rel="canonical" href="https://www.key2md.com/practice.html">
  <!-- Favicon (inline SVG, matches Key2MD brand) -->
  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a1628'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' font-size='28' font-weight='800' fill='white'%3EK%3Ctspan fill='%230ea5e9'%3E2%3C/tspan%3E%3C/text%3E%3C/svg%3E">
  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%230a1628'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' font-size='80' font-weight='800' fill='white'%3EK%3Ctspan fill='%230ea5e9'%3E2%3C/tspan%3E%3C/text%3E%3C/svg%3E">
- <meta property="og:title" content="Free CASPer &amp; MMI Practice - Timed Stations, AI Feedback">
- <meta property="og:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and a full CASPer mock exam with new stations handwritten by Dan.">
+ <meta property="og:title" content="Free CASPer and MMI Practice | AI Feedback">
+ <meta property="og:description" content="Free CASPer and MMI practice for Australian med applicants: timed stations, AI feedback, 90+ CASPer scenarios and 40+ MMI stations.">
  <meta property="og:type" content="website">
  <meta property="og:url" content="https://www.key2md.com/practice.html">
  <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
@@ -28,8 +28,8 @@
  <meta property="og:image:height" content="630">
  <meta property="og:image:alt" content="Key2MD - MMI, CASPer and GAMSAT Section II coaching.">
  <meta name="twitter:card" content="summary_large_image">
- <meta name="twitter:title" content="Free CASPer &amp; MMI Practice - Timed Stations, AI Feedback">
- <meta name="twitter:description" content="CASPer &amp; MMI timed stations, AI feedback, 90+ scenarios and a full CASPer mock exam with new stations handwritten by Dan.">
+ <meta name="twitter:title" content="Free CASPer and MMI Practice | AI Feedback">
+ <meta name="twitter:description" content="Free CASPer and MMI practice for Australian med applicants: timed stations, AI feedback, 90+ CASPer scenarios and 40+ MMI stations.">
  <link rel="stylesheet" href="practice.css">
  <link rel="stylesheet" href="mmi-styles.css">
  <script type="application/ld+json">
@@ -215,7 +215,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <li><a href="practice.html" class="k2-gold" data-nav="practice">Practice</a></li>
  <li><a href="medicine-entry-requirements.html" data-nav="requirements">Uni Guides</a></li>
  <li><a href="blog.html" data-nav="blog">Blog</a></li>
- <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session</a></li>
+ <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a></li>
  </ul>
  <button class="k2-hamburger" id="k2Hamburger" aria-label="Toggle menu" type="button"><span></span><span></span><span></span></button>
  </nav>
@@ -227,12 +227,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <a href="medical-school-chances.html" class="k2-green">Chances Calculator</a>
  <a href="practice.html" class="k2-gold">Practice</a>
  <a href="medicine-entry-requirements.html">Uni Guides</a>
- <a href="guide.html">Free Guide</a>
- <a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Practice</a>
- <a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a>
- <a href="about.html">About Dan</a>
  <a href="blog.html">Blog</a>
- <a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session</a>
+ <a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a>
  </nav>
 </header>
 <script>
@@ -384,7 +380,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
  <div class="sidebar-card" id="starredQueueCard" style="display:none;">
  <h3 style="display:flex;align-items:center;justify-content:space-between;gap:8px;">Revision Queue <span id="starredQueueCount" style="font-size:0.72rem;color:var(--gold);font-weight:800;">0</span></h3>
- <p style="font-size:0.72rem;color:var(--gray400);line-height:1.45;margin:0 0 10px;">Star tricky stations while practising, then run them as a targeted revision block.</p>
+ <p style="font-size:0.72rem;color:var(--gray400);line-height:1.45;margin:0 0 10px;">Save tricky stations while practising, then run them as a targeted revision block.</p>
  <div id="starredQueueList" style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px;"></div>
  <button id="startStarredQueueBtn" onclick="startStarredRevisionQueue()" style="width:100%;border:none;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid rgba(245,158,11,0.25);border-radius:9px;padding:9px 10px;font-size:0.78rem;font-weight:800;cursor:pointer;font-family:inherit;">Revise starred stations -></button>
  </div>
@@ -420,11 +416,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  </div>
  <div class="mmi-custom-config" id="mmiCustomConfig">
  <label class="mmi-config-label" style="margin-top:0;">Reading Time (seconds, 0-300)</label>
- <input type="number" id="customReadingTime" min="0" max="300" value="120">
+ <input type="number" id="customReadingTime" min="0" max="300" value="120" aria-label="Custom MMI reading time in seconds">
  <label class="mmi-config-label">Recording Time (seconds, max 600)</label>
- <input type="number" id="customRecordingTime" min="60" max="600" value="300">
+ <input type="number" id="customRecordingTime" min="60" max="600" value="300" aria-label="Custom MMI recording time in seconds">
  <label class="mmi-config-label">Number of Prompts (1-4)</label>
- <input type="number" id="customPromptCount" min="1" max="4" value="2">
+ <input type="number" id="customPromptCount" min="1" max="4" value="2" aria-label="Custom MMI prompt count">
  </div>
  </div>
 
@@ -727,8 +723,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  </div>
 
  <!-- Hidden timer sliders - still needed by JS -->
- <input type="range" id="readingSlider" min="15" max="120" step="5" value="60" style="display:none;">
- <input type="range" id="writingSlider" min="60" max="600" step="15" value="210" style="display:none;">
+ <input type="range" id="readingSlider" min="15" max="120" step="5" value="60" style="display:none;" aria-label="CASPer reading timer">
+ <input type="range" id="writingSlider" min="60" max="600" step="15" value="210" style="display:none;" aria-label="CASPer writing timer">
  <span id="readingVal" style="display:none;">60s</span>
  <span id="writingVal" style="display:none;">3:30</span>
 
@@ -967,8 +963,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <span style="font-size:0.62rem;font-weight:700;background:rgba(14,165,233,0.2);color:var(--teal2);padding:2px 6px;border-radius:50px;">Live Zoom</span>
  </div>
  </div>
- <button onclick="location.href='casper-class.html'" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.82rem;font-weight:700;transition:all 0.2s;box-sizing:border-box;border:none;cursor:pointer;font-family:inherit;" onmouseover="this.style.background='#38bdf8'" onmouseout="this.style.background='var(--teal)'">Register / Pay -></button>
- <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:6px;">One-off or weekly access. Page backup after 5:30pm.</div>
+ <button data-track="class_checkout_intent" data-track-detail="practice_bottom_rail" onclick="location.href='casper-class.html'" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.82rem;font-weight:700;transition:all 0.2s;box-sizing:border-box;border:none;cursor:pointer;font-family:inherit;" onmouseover="this.style.background='#38bdf8'" onmouseout="this.style.background='var(--teal)'">Register / Pay -></button>
+ <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:6px;">One-off, weekly, or $440 June package. Page backup after 5:30pm.</div>
  <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.12);">
  <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#c4b5fd;margin-bottom:5px;">Full CASPer Mock</div>
  <div style="font-size:0.74rem;color:rgba(255,255,255,0.6);line-height:1.45;margin-bottom:8px;">4 video + 7 written stations in a CASPer-style sequence. Completely new stations, handwritten by Dan.</div>
@@ -3240,8 +3236,8 @@ function showFeedback(score,fb){
  <span style="font-size:0.72rem;font-weight:${qi.q===q?'800':'500'};color:${qi.q===q?qi.color:'rgba(255,255,255,0.25)'};">${q}</span>
  </div>`).join('')}
  </div>
- <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:4px;">${
- qi.q==='Q4'?'Top quartile. This is what medical schools want to see.':
+<div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:4px;">${
+qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus on repeating it.':
  qi.q==='Q3'?'Above median. Strong foundation - some refinement needed.':
  qi.q==='Q2'?'Below median. The feedback below shows exactly where to focus.':
  'Needs significant work. Read the improvement notes carefully.'
@@ -3270,9 +3266,9 @@ function showFeedback(score,fb){
  if(btn)btn.innerHTML='About this score &#9658;';
  })()" style="background:none;border:none;color:var(--gray400);font-size:0.78rem;cursor:pointer;font-family:inherit;padding:0;flex-shrink:0;line-height:1;" title="Dismiss">x</button>
  </div>
- The AI marking is built on my tutoring philosophy, not a formal grading system. In real sessions I never actually mark students out of 10 - so the 1-10 scale had to be improvised, and it's still being calibrated. I believe any score on this scale above a 6, would be Q4 territory.<br><br>
- The scoring also recently changed. It now compares your response against the Key2MD student pool - which skews right, because these are motivated, actively-preparing candidates. A 6 here is not the same as a 6 against a random cohort.<br><br>
- <strong style="color:var(--gray700);">Don't be discouraged by a lower-than-expected score.</strong> It reflects a harder comparison group and a stricter calibration, not a verdict on your ability. Use it as a direction - the written feedback is what actually moves your performance. From what I've seen, 5 tends to be the average response and likely q2/3, with 6+ entering Quartile 4 range.
+The AI score is a practice calibration, not an official Acuity result. The scale has recently been recalibrated: it is no longer artificially capped at the top end, so genuinely exceptional responses can now receive 10s. That means 7s and 8s are more achievable than they were under the older, compressed scale.<br><br>
+<strong style="color:var(--gray700);">How to read the new scale:</strong> averaging 7+ is likely Q4 territory. Consistent 7s mean you are doing well; consistent 8s put you in a good position. High-Q4 students will often produce 9s, but you do not need every response to be a 9 for the score to be useful.<br><br>
+<strong style="color:var(--gray700);">School context matters.</strong> If you are aiming for Notre Dame, consistent 7s or 8s should be reassuring. For UoW, assume you need regular 8s and 9s because CASPer carries more weight. Use the written feedback to find the repeatable habits behind the number.
  </div>
  </div>`;
  getAiFbEl().innerHTML=`
@@ -3289,8 +3285,8 @@ function showFeedback(score,fb){
  <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;">
  <div style="height:100%;width:${score*10}%;background:${qi.color};border-radius:2px;transition:width 0.6s ease;"></div>
  </div>
- <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:8px;">${
- qi.q==='Q4'?'Top quartile. This is what medical schools want to see.':
+<div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:8px;">${
+qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus on repeating it.':
  qi.q==='Q3'?'Above median. Strong foundation - some refinement needed.':
  qi.q==='Q2'?'Below median. The feedback below shows exactly where to focus.':
  'Needs significant work. Read the improvement notes carefully.'
@@ -3554,7 +3550,7 @@ function renderStarredRevisionQueue(){
 
 function startStarredRevisionQueue(){
  const rows=getCasperStarredStations();
- if(!rows.length){showPracticeNotice('No starred CASPer stations yet. Star tricky stations as you practise.', 'error');return;}
+ if(!rows.length){showPracticeNotice('No starred CASPer stations yet. Save tricky stations as you practise.', 'error');return;}
  currentMode=MODE_CASPER;applyModeUI(MODE_CASPER);
  selectedCategory='__starred';
  document.querySelectorAll('#categoryFilters .cat-btn').forEach(b=>b.classList.toggle('active',b.getAttribute('data-cat')==='__starred'));
@@ -3948,12 +3944,13 @@ function getTodaysSeed(){
 // Used for: distribution bar, quartile positioning, percentile context
 const LB_DIST = { q1: 0.08, q2: 0.22, q3: 0.42, q4: 0.28 };
 
-// Score thresholds that match this distribution
-// These are approximate - tuned so the bar reflects the real shape
+// Updated score interpretation for the current AI marker:
+// 7+ is likely Q4, 8+ is strong, and 9+ is high-Q4 territory.
 function getQuartileFromDist(score) {
- if (score >= 8) return { q: 'Q4', label: 'Q4 - Excellent', color: '#22c55e' };
- if (score >= 6) return { q: 'Q3', label: 'Q3 - Good', color: '#0ea5e9' };
- if (score >= 4) return { q: 'Q2', label: 'Q2 - Developing', color: '#f59e0b' };
+ if (score >= 9) return { q: 'Q4', label: 'Q4 - High', color: '#22c55e' };
+ if (score >= 7) return { q: 'Q4', label: 'Q4 - Likely', color: '#22c55e' };
+ if (score >= 5) return { q: 'Q3', label: 'Q3 - Building', color: '#0ea5e9' };
+ if (score >= 3) return { q: 'Q2', label: 'Q2 - Developing', color: '#f59e0b' };
  return { q: 'Q1', label: 'Q1 - Needs Work', color: '#ef4444' };
 }
 
@@ -5433,14 +5430,14 @@ document.addEventListener('DOMContentLoaded', function(){
  <h3 style="color:#fff;font-size:1.3rem;font-weight:800;margin:0 0 8px;">Book with Dan</h3>
  <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin:0 0 28px;">Choose the option that suits you:</p>
  <div style="display:flex;flex-direction:column;gap:14px;">
- <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
+ <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener" data-track="book_session_click" data-track-detail="book_modal_paid" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
  <span style="background:#f59e0b;color:#0a1628;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$300</span>
  <span style="color:#fff;font-weight:700;font-size:1rem;">1:1 Coaching Session - 1 Hour</span>
  </div>
  <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">MMI, CASPer, or GAMSAT S2. Full personalised session with Dan.</p>
  </a>
- <a href="https://calendly.com/brittainmbbs/30min" target="_blank" rel="noopener" style="display:block;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+ <a href="https://calendly.com/brittainmbbs/30min" target="_blank" rel="noopener" data-track="intro_call_click" data-track-detail="book_modal_free" style="display:block;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
  <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">Free</span>
  <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">15-Min Intro Call</span>
