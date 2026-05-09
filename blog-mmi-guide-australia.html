@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en-AU">
 <head>
  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BZ01FP28PC"></script>
@@ -6,10 +6,10 @@
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>MMI Guide Australia - What Examiners Actually Mark | Key2MD</title>
- <meta name="description" content="The MMI guide for Australian medical school applicants. Why MMI is a character assessment, not a polish test - and what examiners actually score. Written by a UniMelb MD student.">
+ <meta name="description" content="Australian MMI guide: why interviews assess character, not polish, what examiners score, and how to prepare with credible judgement.">
  <link rel="canonical" href="https://www.key2md.com/blog-mmi-guide-australia.html">
  <meta property="og:title" content="MMI Guide Australia - What Examiners Actually Mark">
- <meta property="og:description" content="MMI is a character assessment, not a polish test. What examiners actually score, and how to prepare for it. By a UniMelb MD student.">
+ <meta property="og:description" content="Australian MMI guide: why interviews assess character, not polish, what examiners score, and how to prepare with credible judgement.">
  <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
  <meta property="og:image:width" content="1200">
  <meta property="og:image:height" content="630">
@@ -21,7 +21,7 @@
  <meta property="article:author" content="Dan Brittain">
  <meta name="twitter:card" content="summary_large_image">
  <meta name="twitter:title" content="MMI Guide Australia - What Examiners Actually Mark">
- <meta name="twitter:description" content="MMI is a character assessment, not a polish test. What examiners actually score. By a UniMelb MD student.">
+ <meta name="twitter:description" content="Australian MMI guide: why interviews assess character, not polish, what examiners score, and how to prepare with credible judgement.">
  <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
  <meta name="twitter:image:alt" content="Key2MD - MMI, CASPer and GAMSAT Section II coaching.">
  <meta name="author" content="Dan Brittain - University of Melbourne MD">
@@ -242,12 +242,13 @@ footer a:hover { color:var(--white); }
  <ul class="k2-nav-links">
  <li><a href="casper-class.html" class="k2-gold" data-nav="classes">Friday Classes</a></li>
  <li><a href="testimonials.html" data-nav="results">Results</a></li>
+ <li><a href="dashboard.html" data-nav="dashboard">Dashboard</a></li>
  <li><a href="plans.html" data-nav="plans">Plans</a></li>
  <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">Chances</a></li>
  <li><a href="practice.html" class="k2-gold" data-nav="practice">Practice</a></li>
  <li><a href="medicine-entry-requirements.html" data-nav="requirements">Uni Guides</a></li>
  <li><a href="blog.html" data-nav="blog">Blog</a></li>
- <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session</a></li>
+ <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a></li>
  </ul>
  <button class="k2-hamburger" id="k2Hamburger" aria-label="Toggle menu" type="button"><span></span><span></span><span></span></button>
  </nav>
@@ -255,16 +256,13 @@ footer a:hover { color:var(--white); }
  <a href="index.html">Home</a>
  <a href="casper-class.html" class="k2-gold">Friday Classes</a>
  <a href="testimonials.html">Results</a>
+ <a href="dashboard.html">Dashboard</a>
  <a href="plans.html">Plans &amp; Pricing</a>
  <a href="medical-school-chances.html" class="k2-green">Chances Calculator</a>
  <a href="practice.html" class="k2-gold">Practice</a>
  <a href="medicine-entry-requirements.html">Uni Guides</a>
- <a href="guide.html">Free Guide</a>
- <a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Practice</a>
- <a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a>
- <a href="about.html">About Dan</a>
  <a href="blog.html">Blog</a>
- <a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session</a>
+ <a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a>
  </nav>
 </header>
 <script>
@@ -489,7 +487,7 @@ footer a:hover { color:var(--white); }
  <h3>Related Guides</h3>
  <div class="related-grid">
  <a href="blog-racgp-casper-australia.html" class="related-card"><h4>RACGP Casper Test Guide</h4><p>For doctors applying to AGPT or FSP. Same Casper as medical school. Higher bar. Why qualified doctors underestimate it.</p></a>
- <a href="blog-how-to-get-into-medicine.html" class="related-card"><h4>Star How to Get Into Medicine in Australia</h4><p>Pathways, GAMSAT, GPA, CASPer and MMI - the complete admissions guide.</p></a>
+ <a href="blog-how-to-get-into-medicine.html" class="related-card"><h4>How to Get Into Medicine in Australia</h4><p>Pathways, GAMSAT, GPA, CASPer and MMI - the complete admissions guide.</p></a>
  <a href="blog-casper-guide-australia.html" class="related-card"><h4>CASPer Guide Australia</h4><p>The Q1-Q4 framework and what actually scores well on the typed test.</p></a>
  <a href="blog-university-exceptions.html" class="related-card"><h4>Medical School Exceptions</h4><p>Which universities weight MMI differently from the standard combo.</p></a>
  <a href="medical-school-chances.html" class="related-card" style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-color:rgba(34,197,94,0.3);"><h4 style="color:#4ade80;"> Medical School Chances Calculator</h4><p style="color:rgba(255,255,255,0.65);">See how much your MMI matters at each Australian medical school.</p></a>
@@ -541,5 +539,6 @@ function closeBookModal(){ var m=document.getElementById('bookModal'); if(m){ m.
 document.addEventListener('click', function(e){ var m=document.getElementById('bookModal'); if(m && e.target===m) closeBookModal(); });
 document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=document.getElementById('bookModal'); if(m && m.style.display==='flex') closeBookModal(); } });
 </script>
+<script src="key2md-tracking.js" defer></script>
 </body>
 </html>

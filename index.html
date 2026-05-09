@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en-AU">
 <head>
  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BZ01FP28PC"></script>
@@ -24,8 +24,8 @@
  <meta name="robots" content="index, follow">
 
  <!-- Open Graph -->
- <meta property="og:title" content="MMI, CASPer &amp; GAMSAT Coaching Australia | Key2MD">
- <meta property="og:description" content="UniMelb MD student. 72 med offers in 2024-25 from coached students, with tracked outcomes and individual results varying.">
+ <meta property="og:title" content="MMI, CASPer &amp; GAMSAT Coaching Australia">
+ <meta property="og:description" content="Australian MMI, CASPer and GAMSAT S2 coaching by Dan, a UniMelb MD student. 72 med offers in 2024-25 and 54 CASPer Q4s from coached students.">
  <meta property="og:type" content="website">
  <meta property="og:url" content="https://www.key2md.com/">
  <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
@@ -33,8 +33,8 @@
  <meta property="og:image:height" content="630">
  <meta property="og:image:alt" content="Key2MD - MMI, CASPer and GAMSAT Section II coaching with tracked student outcomes.">
  <meta name="twitter:card" content="summary_large_image">
- <meta name="twitter:title" content="MMI, CASPer &amp; GAMSAT Coaching Australia | Key2MD">
- <meta name="twitter:description" content="UniMelb MD student. 72 med offers in 2024-25 from coached students, with tracked outcomes and individual results varying.">
+ <meta name="twitter:title" content="MMI, CASPer &amp; GAMSAT Coaching Australia">
+ <meta name="twitter:description" content="Australian MMI, CASPer and GAMSAT S2 coaching by Dan, a UniMelb MD student. 72 med offers in 2024-25 and 54 CASPer Q4s from coached students.">
  <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
  <meta name="twitter:image:alt" content="Key2MD - MMI, CASPer and GAMSAT Section II coaching.">
  <script type="application/ld+json">
@@ -149,8 +149,17 @@
  {
  "@type": "Offer",
  "name": "Friday Group CASPer Class",
- "description": "Weekly small-group CASPer practice class on Fridays",
+ "description": "Small-group CASPer practice class on Fridays",
  "price": "120",
+ "priceCurrency": "AUD",
+ "availability": "https://schema.org/InStock",
+ "url": "https://www.key2md.com/casper-class.html"
+ },
+ {
+ "@type": "Offer",
+ "name": "June 11 CASPer Class Package",
+ "description": "Four Friday CASPer live classes leading into the June 11 exam, with the last class on June 5",
+ "price": "440",
  "priceCurrency": "AUD",
  "availability": "https://schema.org/InStock",
  "url": "https://www.key2md.com/casper-class.html"
@@ -258,6 +267,57 @@
  .hero-proof strong{color:var(--white)}
  .hero-proof .dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.3)}
  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+ .home-choice-panel{max-width:640px;margin:28px 0 24px;padding:18px;border-radius:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.13);box-shadow:0 18px 50px rgba(2,8,23,0.22);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+ .home-choice-eyebrow{font-size:0.72rem;font-weight:800;letter-spacing:0.11em;text-transform:uppercase;color:#7dd3fc;margin-bottom:10px}
+ .home-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .home-choice-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:7px;min-height:118px;padding:18px;border-radius:14px;border:1.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;transition:transform 0.2s ease,border-color 0.2s ease,background 0.2s ease,box-shadow 0.2s ease}
+ .home-choice-card:hover{transform:translateY(-2px);border-color:rgba(56,189,248,0.55);background:rgba(255,255,255,0.09);box-shadow:0 12px 28px rgba(2,8,23,0.22)}
+ .home-choice-card.primary{background:linear-gradient(135deg,rgba(14,165,233,0.26),rgba(34,197,94,0.14));border-color:rgba(56,189,248,0.55)}
+ .home-choice-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:10px}
+ .home-choice-title{font-size:1rem;font-weight:900;letter-spacing:0;color:#fff}
+ .home-choice-arrow{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;background:rgba(255,255,255,0.12);color:#fff;font-weight:900;flex:0 0 auto}
+ .home-choice-copy{font-size:0.86rem;line-height:1.55;color:rgba(255,255,255,0.66);margin:0}
+ .home-choice-note{margin:12px 0 0;color:rgba(255,255,255,0.48);font-size:0.78rem;line-height:1.55}
+ .guide-modal{display:none;position:fixed;inset:0;z-index:99998;background:rgba(2,8,23,0.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px}
+ .guide-modal.open{display:flex}
+ .guide-panel{width:min(940px,calc(100vw - 28px));max-height:calc(100vh - 36px);overflow:auto;background:#081426;border:1px solid rgba(255,255,255,0.12);border-radius:22px;box-shadow:0 28px 90px rgba(0,0,0,0.5);position:relative;color:#fff}
+ .guide-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.08);color:#fff;cursor:pointer;font-size:1rem;font-weight:800}
+ .guide-layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:0}
+ .guide-main{padding:34px}
+ .guide-side{padding:34px 28px;background:rgba(255,255,255,0.035);border-left:1px solid rgba(255,255,255,0.08)}
+ .guide-kicker{font-size:0.72rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:#38bdf8;margin-bottom:10px}
+ .guide-title{font-family:'DM Serif Display',Georgia,serif;font-size:clamp(1.75rem,3vw,2.35rem);font-weight:400;line-height:1.08;margin:0 42px 10px 0}
+ .guide-sub{color:rgba(255,255,255,0.66);font-size:0.95rem;line-height:1.65;margin:0 0 24px;max-width:640px}
+ .guide-form{display:grid;gap:18px}
+ .guide-question{border:0;margin:0;padding:0}
+ .guide-question legend{font-size:0.88rem;font-weight:800;color:#e2e8f0;margin-bottom:10px}
+ .guide-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .guide-options.compact{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .guide-option{display:block;position:relative}
+ .guide-option input{position:absolute;opacity:0;pointer-events:none}
+ .guide-pill{display:flex;min-height:52px;align-items:center;border-radius:12px;border:1.5px solid rgba(255,255,255,0.13);background:rgba(255,255,255,0.045);padding:12px 13px;color:rgba(255,255,255,0.78);font-size:0.84rem;font-weight:700;line-height:1.3;cursor:pointer;transition:background 0.2s,border-color 0.2s,color 0.2s,box-shadow 0.2s}
+ .guide-option input:checked + .guide-pill{background:rgba(14,165,233,0.18);border-color:rgba(56,189,248,0.66);color:#fff;box-shadow:0 0 0 3px rgba(14,165,233,0.11)}
+ .guide-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:6px}
+ .guide-submit,.guide-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;padding:13px 22px;font-family:'DM Sans',system-ui,sans-serif;font-weight:850;font-size:0.9rem;cursor:pointer;text-decoration:none;border:0}
+ .guide-submit{background:#0ea5e9;color:#fff}
+ .guide-submit:hover{background:#38bdf8}
+ .guide-secondary{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.82);border:1px solid rgba(255,255,255,0.14)}
+ .guide-side h3{font-size:0.95rem;font-family:'DM Sans',system-ui,sans-serif;font-weight:900;margin:0 0 10px;color:#fff}
+ .guide-side p,.guide-side li{font-size:0.84rem;line-height:1.6;color:rgba(255,255,255,0.62)}
+ .guide-side ul{display:grid;gap:9px;margin:0;padding:0;list-style:none}
+ .guide-side li{padding-left:18px;position:relative}
+ .guide-side li::before{content:'>';position:absolute;left:0;color:#38bdf8;font-weight:900}
+ .guide-result{display:none;margin-top:24px;border-top:1px solid rgba(255,255,255,0.1);padding-top:22px}
+ .guide-result.open{display:block}
+ .guide-result-label{font-size:0.72rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;margin-bottom:8px}
+ .guide-result h3{font-family:'DM Sans',system-ui,sans-serif;font-size:1.25rem;font-weight:900;letter-spacing:0;margin:0 0 8px;color:#fff}
+ .guide-result p{color:rgba(255,255,255,0.7);font-size:0.92rem;line-height:1.65;margin:0 0 14px}
+ .guide-result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0 18px}
+ .guide-result-card{border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.045);padding:13px}
+ .guide-result-card strong{display:block;color:#fff;font-size:0.82rem;margin-bottom:5px}
+ .guide-result-card span{display:block;color:rgba(255,255,255,0.58);font-size:0.78rem;line-height:1.45}
+ .guide-promise{border-left:3px solid #38bdf8;padding:10px 0 10px 14px;color:rgba(255,255,255,0.68);font-size:0.84rem;line-height:1.55}
+ .guide-result-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
  /* Hero photo */
  .hero-photo-wrap{display:flex;flex-direction:column;align-items:center;gap:24px}
  .hero-photo{width:300px;height:400px;border-radius:24px;overflow:hidden;border:3px solid rgba(14,165,233,0.4);box-shadow:0 24px 80px rgba(14,165,233,0.2),0 4px 32px rgba(0,0,0,0.4);position:relative;flex-shrink:0}
@@ -603,6 +663,8 @@
  @media(max-width:1024px){
  .hero-inner{grid-template-columns:1fr;gap:48px}
  .hero-card{max-width:400px}
+ .guide-layout{grid-template-columns:1fr}
+ .guide-side{border-left:0;border-top:1px solid rgba(255,255,255,0.08)}
  .services-grid{grid-template-columns:1fr 1fr}
  .services-grid-bottom{grid-template-columns:1fr 1fr}
  .about-grid{grid-template-columns:1fr}
@@ -621,6 +683,11 @@
  @media(max-width:768px){
  section{padding:64px 0}
  .hero{padding:120px 0 80px}
+ .home-choice-grid{grid-template-columns:1fr}
+ .guide-main{padding:28px 22px}
+ .guide-side{padding:24px 22px}
+ .guide-options,.guide-options.compact{grid-template-columns:1fr}
+ .guide-result-grid{grid-template-columns:1fr}
  .student-paths{padding:56px 0}
  .services-grid{grid-template-columns:1fr}
  .services-grid-bottom{grid-template-columns:1fr}
@@ -644,6 +711,10 @@
  .email-form{flex-direction:column}
  .email-form button{width:100%}
  .hero-ctas{flex-direction:column;align-items:flex-start}
+ .home-choice-panel{padding:14px;border-radius:16px}
+ .home-choice-card{min-height:104px;padding:15px}
+ .guide-modal{padding:10px}
+ .guide-panel{width:calc(100vw - 20px);max-height:calc(100vh - 20px);border-radius:18px}
  }
  
  /* Stats breakdown tooltip - mobile-friendly, constrained to viewport */
@@ -751,6 +822,7 @@
 body[data-page="home"] .k2-nav-links a[data-nav="home"],
 body[data-page="about"] .k2-nav-links a[data-nav="about"],
 body[data-page="results"] .k2-nav-links a[data-nav="results"],
+body[data-page="dashboard"] .k2-nav-links a[data-nav="dashboard"],
 body[data-page="plans"] .k2-nav-links a[data-nav="plans"],
 body[data-page="guide"] .k2-nav-links a[data-nav="guide"],
 body[data-page="practice"] .k2-nav-links a[data-nav="practice"],
@@ -799,12 +871,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <ul class="k2-nav-links">
  <li><a href="casper-class.html" class="k2-gold" data-nav="classes">Friday Classes</a></li>
  <li><a href="testimonials.html" data-nav="results">Results</a></li>
+ <li><a href="dashboard.html" data-nav="dashboard">Dashboard</a></li>
  <li><a href="plans.html" data-nav="plans">Plans</a></li>
  <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">Chances</a></li>
  <li><a href="practice.html" class="k2-gold" data-nav="practice">Practice</a></li>
  <li><a href="medicine-entry-requirements.html" data-nav="requirements">Uni Guides</a></li>
  <li><a href="blog.html" data-nav="blog">Blog</a></li>
- <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session</a></li>
+ <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a></li>
  </ul>
  <button class="k2-hamburger" id="k2Hamburger" aria-label="Toggle menu" type="button"><span></span><span></span><span></span></button>
  </nav>
@@ -812,16 +885,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <a href="index.html">Home</a>
  <a href="casper-class.html" class="k2-gold">Friday Classes</a>
  <a href="testimonials.html">Results</a>
+ <a href="dashboard.html">Dashboard</a>
  <a href="plans.html">Plans &amp; Pricing</a>
  <a href="medical-school-chances.html" class="k2-green">Chances Calculator</a>
  <a href="practice.html" class="k2-gold">Practice</a>
  <a href="medicine-entry-requirements.html">Uni Guides</a>
- <a href="guide.html">Free Guide</a>
- <a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Practice</a>
- <a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a>
- <a href="about.html">About Dan</a>
  <a href="blog.html">Blog</a>
- <a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session</a>
+ <a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a>
  </nav>
 </header>
 <script>
@@ -892,6 +962,93 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  </div>
  </div>
 
+ <!-- Guided Path Modal -->
+ <div id="guideModal" class="guide-modal" aria-hidden="true">
+ <div class="guide-panel" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+ <button type="button" class="guide-close" onclick="closeGuideModal()" aria-label="Close guided path">x</button>
+ <div class="guide-layout">
+ <div class="guide-main">
+ <div class="guide-kicker">Guide me</div>
+ <h2 class="guide-title" id="guideTitle">Find the right Key2MD path in under a minute.</h2>
+ <p class="guide-sub">Answer a few quick questions and Key2MD will point you toward the highest-leverage next step. It is a routing tool, not a model-answer generator.</p>
+ <form class="guide-form" id="guideForm">
+ <fieldset class="guide-question">
+ <legend>Which pathway are you preparing for?</legend>
+ <div class="guide-options">
+ <label class="guide-option"><input type="radio" name="pathway" value="postgrad" checked><span class="guide-pill">Postgraduate medicine</span></label>
+ <label class="guide-option"><input type="radio" name="pathway" value="undergrad"><span class="guide-pill">Undergraduate medicine</span></label>
+ <label class="guide-option"><input type="radio" name="pathway" value="gp"><span class="guide-pill">GP training CASPer</span></label>
+ <label class="guide-option"><input type="radio" name="pathway" value="specialist"><span class="guide-pill">Specialist interview</span></label>
+ </div>
+ </fieldset>
+ <fieldset class="guide-question">
+ <legend>What matters most right now?</legend>
+ <div class="guide-options compact">
+ <label class="guide-option"><input type="checkbox" name="targets" value="uow"><span class="guide-pill">UoW</span></label>
+ <label class="guide-option"><input type="checkbox" name="targets" value="notre_dame"><span class="guide-pill">Notre Dame</span></label>
+ <label class="guide-option"><input type="checkbox" name="targets" value="casper"><span class="guide-pill">CASPer</span></label>
+ <label class="guide-option"><input type="checkbox" name="targets" value="mmi"><span class="guide-pill">MMI</span></label>
+ <label class="guide-option"><input type="checkbox" name="targets" value="gamsat_s2"><span class="guide-pill">GAMSAT S2</span></label>
+ <label class="guide-option"><input type="checkbox" name="targets" value="school_choice"><span class="guide-pill">School choice</span></label>
+ </div>
+ </fieldset>
+ <fieldset class="guide-question">
+ <legend>How soon is the next serious deadline?</legend>
+ <div class="guide-options">
+ <label class="guide-option"><input type="radio" name="timing" value="urgent"><span class="guide-pill">Inside 2 weeks</span></label>
+ <label class="guide-option"><input type="radio" name="timing" value="soon" checked><span class="guide-pill">2 to 6 weeks</span></label>
+ <label class="guide-option"><input type="radio" name="timing" value="building"><span class="guide-pill">2 to 3 months</span></label>
+ <label class="guide-option"><input type="radio" name="timing" value="unsure"><span class="guide-pill">I am not sure</span></label>
+ </div>
+ </fieldset>
+ <fieldset class="guide-question">
+ <legend>What feels like the current bottleneck?</legend>
+ <div class="guide-options">
+ <label class="guide-option"><input type="radio" name="bottleneck" value="strategy" checked><span class="guide-pill">I do not know where I stand</span></label>
+ <label class="guide-option"><input type="radio" name="bottleneck" value="casper"><span class="guide-pill">CASPer score / Q4 risk</span></label>
+ <label class="guide-option"><input type="radio" name="bottleneck" value="mmi"><span class="guide-pill">Interview conversion</span></label>
+ <label class="guide-option"><input type="radio" name="bottleneck" value="writing"><span class="guide-pill">Writing quality</span></label>
+ </div>
+ </fieldset>
+ <fieldset class="guide-question">
+ <legend>What evidence do you already have?</legend>
+ <div class="guide-options">
+ <label class="guide-option"><input type="radio" name="evidence" value="none" checked><span class="guide-pill">No score yet</span></label>
+ <label class="guide-option"><input type="radio" name="evidence" value="mid"><span class="guide-pill">Mostly 5s or 6s</span></label>
+ <label class="guide-option"><input type="radio" name="evidence" value="seven"><span class="guide-pill">Consistent 7+</span></label>
+ <label class="guide-option"><input type="radio" name="evidence" value="offer"><span class="guide-pill">Likely interview / offer-stage</span></label>
+ </div>
+ </fieldset>
+ <div class="guide-actions">
+ <button type="submit" class="guide-submit">Show my path -></button>
+ <button type="button" class="guide-secondary" onclick="exploreKey2MD()">Explore instead</button>
+ </div>
+ </form>
+ <div class="guide-result" id="guideResult" aria-live="polite">
+ <div class="guide-result-label">Recommended next step</div>
+ <h3 id="guideResultTitle"></h3>
+ <p id="guideResultSummary"></p>
+ <div class="guide-result-grid" id="guideResultCards"></div>
+ <div class="guide-promise">No answer scripts. No memorised templates. The goal is diagnosis, calibration and practice that helps you sound like yourself under pressure.</div>
+ <div class="guide-result-actions">
+ <a id="guidePrimaryCta" class="guide-submit" href="#">Open recommendation -></a>
+ <a class="guide-secondary" href="dashboard.html">View saved dashboard</a>
+ </div>
+ </div>
+ </div>
+ <aside class="guide-side">
+ <h3>How Key2MD routes you</h3>
+ <ul>
+ <li>CASPer-sensitive schools need calibration and timed reps before broad content review.</li>
+ <li>MMI applicants usually need conversion practice once the written profile is competitive.</li>
+ <li>GAMSAT S2 problems need feedback loops, not generic quote banks.</li>
+ <li>If the admissions strategy is unclear, school choice comes before buying prep.</li>
+ </ul>
+ </aside>
+ </div>
+ </div>
+ </div>
+
  <!-- === HERO === -->
  <section class="hero" id="home">
  <div class="container">
@@ -900,6 +1057,20 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <div class="hero-badge fade-up visible">Australia's Most Trusted Medical Tutor</div>
  <h1 class="fade-up delay-1 visible" aria-label="72 med offers in 2024 and 2025. 54 CASPer Q4s. One tutor. MMI, CASPer and GAMSAT Coaching Australia">The MMI &amp; CASPer tutor behind <br><span class="highlight">72 med offers, 54 CASPer Q4s,</span> <br>and a 93% tracked offer rate.</h1>
  <p class="hero-sub fade-up delay-2 visible">Student outcomes shared with permission.<br>No rigid frameworks. No recycled answers.</p>
+ <div class="home-choice-panel fade-up delay-3 visible" id="homeChoice">
+ <div class="home-choice-eyebrow">Start your way</div>
+ <div class="home-choice-grid">
+ <button type="button" class="home-choice-card" onclick="exploreKey2MD()">
+ <span class="home-choice-top"><span class="home-choice-title">Explore</span><span class="home-choice-arrow">-></span></span>
+ <span class="home-choice-copy">Browse services, results, guides and tools at your own pace.</span>
+ </button>
+ <button type="button" class="home-choice-card primary" onclick="openGuideModal()">
+ <span class="home-choice-top"><span class="home-choice-title">Guide me</span><span class="home-choice-arrow">-></span></span>
+ <span class="home-choice-copy">Answer a few questions and get the most sensible next step.</span>
+ </button>
+ </div>
+ <p class="home-choice-note">The guided path gives recommendations only. It will not give model answers or scripts to memorise.</p>
+ </div>
  <div class="hero-ctas fade-up delay-3 visible">
  <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" class="btn btn-primary" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'hero_book_session'});" rel="noopener noreferrer">Book a 1-Hour Session - $300 -></a>
  <button class="hero-enquiry-btn" onclick="openEnquiry('General Enquiry')">Send an Enquiry</button>
@@ -1151,7 +1322,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  </div>
  </section>
 
- <!-- === Star FRIDAY CASPER CLASSES - HERO-ADJACENT STAR === -->
+ <!-- === FRIDAY CASPER CLASSES - HERO-ADJACENT === -->
  <section id="casper-classes" style="background:linear-gradient(180deg,var(--navy2) 0%,#0a1628 100%);padding:20px 0 80px;position:relative;overflow:hidden;">
  <!-- Atmosphere -->
  <div style="position:absolute;top:0;right:-150px;width:600px;height:600px;background:radial-gradient(circle,rgba(245,158,11,0.12) 0%,transparent 65%);pointer-events:none;"></div>
@@ -1159,7 +1330,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
  <div class="container" style="position:relative;z-index:2;">
 
- <!-- Star label -->
+ <!-- Featured label -->
  <div class="fade-up" style="text-align:center;margin-bottom:36px;">
  <div style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.08));border:1px solid rgba(245,158,11,0.4);border-radius:50px;padding:8px 20px;font-size:0.75rem;font-weight:800;color:#fbbf24;letter-spacing:0.12em;text-transform:uppercase;">
  <span style="font-size:0.9rem;">Star</span> Most popular | Fridays 6pm AEST
@@ -1174,7 +1345,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <!-- LEFT: pitch -->
  <div style="padding:44px 44px 40px;border-right:1px solid rgba(255,255,255,0.06);">
 
- <h2 style="font-family:'DM Serif Display',Georgia,serif;font-size:clamp(1.8rem,3.2vw,2.5rem);font-weight:400;color:#fff;line-height:1.1;margin-bottom:14px;letter-spacing:-0.5px;">Friday CASPer Classes<br><span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Small group. Real feedback. $120.</span></h2>
+ <h2 style="font-family:'DM Serif Display',Georgia,serif;font-size:clamp(1.8rem,3.2vw,2.5rem);font-weight:400;color:#fff;line-height:1.1;margin-bottom:14px;letter-spacing:-0.5px;">Friday CASPer Classes<br><span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">One-off, weekly, or June package.</span></h2>
 
  <p style="font-size:1rem;color:rgba(255,255,255,0.72);line-height:1.65;margin-bottom:24px;max-width:480px;">
  The weekly group that produced <strong style="color:#fff;">34 Q4 students in 2025</strong> (54 across 2024-25). Every Friday at 6pm AEST you'll write, get individually scored, and hear how other students answered the same prompt - the single fastest way to learn what a Q4 response actually sounds like.
@@ -1225,7 +1396,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  </div>
 
  <h3 style="font-family:'DM Serif Display',Georgia,serif;font-size:1.5rem;font-weight:400;color:#fff;margin-bottom:6px;line-height:1.2;">Register for the next Friday class</h3>
- <p style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-bottom:22px;line-height:1.5;">Choose a one-off pass for this week or ongoing weekly access. Stripe handles payment, then the protected class page reveals the link for paid students.</p>
+ <p style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-bottom:22px;line-height:1.5;">Choose a one-off pass, ongoing weekly access, or the $440 four-class package leading into the June 11 exam. Stripe handles payment, then the protected class page reveals the link for paid students.</p>
 
  <div id="casperClassError" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:0.82rem;padding:10px 14px;border-radius:8px;margin-bottom:14px;"></div>
 
@@ -1240,10 +1411,15 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <div style="font-size:1rem;font-weight:800;color:#fff;">$120/week for weekly access</div>
  <div style="font-size:0.78rem;color:rgba(255,255,255,0.56);line-height:1.5;margin-top:4px;">Automatically register each week and keep the class page as your access point.</div>
  </div>
+ <div style="border:1px solid rgba(34,197,94,0.25);background:rgba(34,197,94,0.08);border-radius:12px;padding:14px 16px;">
+ <div style="font-size:0.76rem;font-weight:800;color:#4ade80;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">June 11 package</div>
+ <div style="font-size:1rem;font-weight:800;color:#fff;">$440 upfront for 4 classes</div>
+ <div style="font-size:0.78rem;color:rgba(255,255,255,0.56);line-height:1.5;margin-top:4px;">Covers the four Friday classes leading into the June 11 exam. Last class: Friday June 5.</div>
+ </div>
  </div>
 
- <button id="ccSubmit" onclick="location.href='casper-class.html'" style="width:100%;padding:15px 24px;border-radius:50px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;font-size:0.95rem;font-weight:800;cursor:pointer;font-family:inherit;transition:all 0.2s;letter-spacing:0.01em;box-shadow:0 6px 20px rgba(245,158,11,0.25);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 28px rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(245,158,11,0.25)'">
- Choose One-off or Ongoing ->
+ <button id="ccSubmit" data-track="class_checkout_intent" data-track-detail="homepage_panel" onclick="location.href='casper-class.html'" style="width:100%;padding:15px 24px;border-radius:50px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;font-size:0.95rem;font-weight:800;cursor:pointer;font-family:inherit;transition:all 0.2s;letter-spacing:0.01em;box-shadow:0 6px 20px rgba(245,158,11,0.25);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 28px rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(245,158,11,0.25)'">
+ Compare all 3 class options ->
  </button>
 
  <p style="text-align:center;font-size:0.72rem;color:rgba(255,255,255,0.38);margin-top:12px;line-height:1.5;">
@@ -1434,7 +1610,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">3.</span>The mistakes that sink good candidates - and how to avoid them</div>
  <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">4.</span>The skills that actually matter - including how to express emotion authentically</div>
  <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">5.</span>What Dan looks for when assessing students - his personal marking philosophy, explained in full</div>
- <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">6.</span>Every station type covered - with model answers and live breakdown</div>
+ <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">6.</span>Every station type covered - with live breakdowns and examiner-style calibration</div>
  <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--gray600);"><span style="color:#7c3aed;font-weight:800;flex-shrink:0;min-width:18px;">7.</span>Your questions answered - nothing is off the table</div>
  </div>
  <div style="margin-top:auto;padding-top:12px;">
@@ -1744,15 +1920,15 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <div class="pricing-label" style="color:#d97706;">Friday Group Class</div>
  <div class="pricing-title" style="color:#0a1628;">Friday CASPer Classes</div>
  <div class="pricing-price" style="color:#d97706;">$120 <sub style="color:#64748b;">/ session</sub></div>
- <p class="pricing-desc" style="color:#475569;">The weekly class that produced 34 Q4s in 2025 (54 across 2024-25). Drop in any Friday - get individually scored feedback and peer benchmarking.</p>
+ <p class="pricing-desc" style="color:#475569;">The weekly class that produced 34 Q4s in 2025 (54 across 2024-25). Drop in any Friday, subscribe weekly, or pay $440 upfront for the four classes leading into the June 11 exam.</p>
  <ul class="pricing-features">
  <li class="pricing-feature" style="color:#334155;"><strong style="color:#0a1628;">Individual feedback from Dan</strong> on your response</li>
  <li class="pricing-feature" style="color:#334155;">Peer benchmarking against 8-12 other students</li>
  <li class="pricing-feature" style="color:#334155;">Live station walk-throughs &amp; common traps</li>
  <li class="pricing-feature" style="color:#334155;">Fridays 6:00pm AEST via Zoom</li>
- <li class="pricing-feature" style="color:#334155;">Drop in any week - no commitment</li>
+ <li class="pricing-feature" style="color:#334155;">$440 package covers 4 classes, last class Friday June 5</li>
  </ul>
- <a href="casper-class.html" class="btn btn-primary" style="width:100%;justify-content:center;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;box-shadow:0 4px 20px rgba(245,158,11,0.35);">Register / Pay -></a>
+ <a href="casper-class.html" class="btn btn-primary" data-track="class_checkout_intent" data-track-detail="homepage_pricing" style="width:100%;justify-content:center;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;box-shadow:0 4px 20px rgba(245,158,11,0.35);">Register / Pay -></a>
  </div>
 
  </div>
@@ -1770,7 +1946,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <p class="section-sub">MMI, CASPer, GAMSAT &amp; specialist training. If something isn't answered here, send Dan a message.</p>
  </div>
  <div class="faq-list" id="faqList">
- <div class="faq-item"><button class="faq-q" style="color:#d97706;">Star How do the Friday CASPer Classes actually work?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Every Friday at 6pm AEST, you join a small group (capped at 12) on Zoom. Dan runs through a real-style CASPer station - you write your response under timed conditions, and then <strong>Dan individually reviews your written answer</strong> and gives you feedback tailored to what you wrote, not a generic rubric. You also hear how 8-12 other motivated students answered the same prompt, which is the single fastest way to learn what a Q4 response actually looks like. You can buy a one-off $120 pass for the next class or ongoing weekly access at $120/week from the protected class page. 34 of last year's regulars scored Q4.</div></div></div>
+ <div class="faq-item"><button class="faq-q" style="color:#d97706;">How do the Friday CASPer Classes actually work?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Every Friday at 6pm AEST, you join a small group (capped at 12) on Zoom. Dan runs through a real-style CASPer station - you write your response under timed conditions, and then <strong>Dan individually reviews your written answer</strong> and gives you feedback tailored to what you wrote, not a generic rubric. You also hear how 8-12 other motivated students answered the same prompt, which is the single fastest way to learn what a Q4 response actually looks like. You can buy a one-off $120 pass, ongoing weekly access at $120/week, or the $440 four-class June 11 exam package from the protected class page. The package includes the four Friday classes leading into the June 11 exam, with the last class on Friday June 5. 34 of last year's regulars scored Q4.</div></div></div>
  <div class="faq-item"><button class="faq-q">Which universities and programs do you cover?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Dan covers all major Australian MD programs including University of Melbourne, Monash, ANU, UQ, USYD, Flinders, UWA, UNSW, and Notre Dame. For specialist training, he covers MMI preparation for RANZCO (Ophthalmology), RACS (Surgery), RANZCP (Psychiatry), ACEM (Emergency Medicine), Dermatology, and Radiology. For GP training, he covers Casper Test preparation for RACGP (AGPT and FSP) and MMI preparation for ACRRM rural pathway selection.</div></div></div>
  <div class="faq-item"><button class="faq-q">Is the specialist training MMI really the same as medical school MMI?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Structurally yes - the station types (ethics, role-play, policy, communication) are the same. What differs is the expected level of response. Specialist program assessors are senior clinicians who expect doctor-level thinking, not student-level. Dan calibrates the coaching accordingly - same framework, higher bar.</div></div></div>
  <div class="faq-item"><button class="faq-q">How is the RACGP Casper Test different from medical school CASPer?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">It is the same Casper Test - same Acuity Insights platform, same nine competencies, same response formats. What changes is the bar. Doctors applying for AGPT or FSP are assessed at registrar level rather than student level: deeper reflection, multilateral empathy, considered ethical reasoning. The full breakdown is in the <a href="blog-racgp-casper-australia.html">RACGP Casper Test Guide</a>. Note: ACRRM uses MMI for selection, not Casper.</div></div></div>
@@ -1844,7 +2020,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:1080px;margin:0 auto;">
 
  <a href="blog-how-to-get-into-medicine.html" style="display:block;background:var(--gray50);border:1px solid var(--gray200);border-radius:var(--radius);padding:28px;text-decoration:none;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(14,165,233,0.4)';this.style.boxShadow='0 12px 32px rgba(10,22,40,0.08)';" onmouseout="this.style.transform='';this.style.borderColor='var(--gray200)';this.style.boxShadow='';">
- <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:14px;">Star Start Here</div>
+ <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:14px;">Start Here</div>
  <h3 style="font-family:'DM Serif Display',Georgia,serif;font-size:1.35rem;font-weight:400;color:var(--navy);line-height:1.25;margin-bottom:10px;letter-spacing:-0.2px;">How to Get Into Medicine in Australia</h3>
  <p style="font-size:0.92rem;color:var(--gray600);line-height:1.6;margin-bottom:14px;">Pathways, GAMSAT, GEMSAS, GPA, CASPer and MMI - the complete guide to Australian medical admissions.</p>
  <span style="font-size:0.85rem;font-weight:600;color:var(--teal3);">Read the guide -></span>
@@ -2022,7 +2198,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  const m=document.getElementById('bookModal');
  if(m)m.addEventListener('click',function(e){if(e.target===this)closeBookModal();});
  });
- document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookModal();closeEnquiry();}});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookModal();closeEnquiry();closeGuideModal();}});
 
  // -- Enquiry modal --
  function openEnquiry(type){
@@ -2064,6 +2240,129 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  .catch(function(){var subject=encodeURIComponent(type+' Enquiry - '+name);var body=encodeURIComponent(type+'\n\nName: '+name+'\nEmail: '+email+'\nType: '+type+'\nTarget: '+(unis||'N/A')+'\nDate: '+(date||'N/A')+'\nNotes: '+(notes||'None'));window.open('mailto:brittainmbbs@gmail.com?subject='+subject+'&body='+body);document.getElementById('eqForm').style.display='none';document.getElementById('eqSuccess').style.display='block';});
  }
  document.addEventListener('DOMContentLoaded',function(){var eq=document.getElementById('enquiryModal');if(eq)eq.addEventListener('click',function(e){if(e.target===this)closeEnquiry();});});
+
+ // -- Homepage guided path --
+ function guideTrack(name, detail){
+ detail = detail || {};
+ if(window.Key2MDTrack && window.Key2MDTrack.funnel) window.Key2MDTrack.funnel(name, detail);
+ if(typeof gtag==='function') gtag('event', name, { event_category:'guided_path', event_label: detail.focus || detail.choice || '' });
+ }
+ function exploreKey2MD(){
+ closeGuideModal();
+ guideTrack('homepage_explore_click', { choice:'explore' });
+ var target=document.querySelector('.student-paths')||document.getElementById('studentPathsTitle');
+ if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+ }
+ function openGuideModal(){
+ var modal=document.getElementById('guideModal');
+ if(!modal)return;
+ modal.classList.add('open');
+ modal.setAttribute('aria-hidden','false');
+ document.body.style.overflow='hidden';
+ guideTrack('homepage_guide_open', { choice:'guide' });
+ setTimeout(function(){var first=modal.querySelector('input,button,a');if(first)first.focus();},80);
+ }
+ function closeGuideModal(){
+ var modal=document.getElementById('guideModal');
+ if(!modal)return;
+ modal.classList.remove('open');
+ modal.setAttribute('aria-hidden','true');
+ if(!document.getElementById('enquiryModal')?.classList.contains('open') && document.getElementById('bookModal')?.style.display!=='flex') document.body.style.overflow='';
+ }
+ function guideEsc(value){
+ return String(value||'').replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});
+ }
+ function guideFormValues(form){
+ var data=new FormData(form);
+ return {
+ pathway:data.get('pathway')||'postgrad',
+ targets:data.getAll('targets'),
+ timing:data.get('timing')||'soon',
+ bottleneck:data.get('bottleneck')||'strategy',
+ evidence:data.get('evidence')||'none'
+ };
+ }
+ function guideHas(values, names){
+ return names.some(function(name){return values.pathway===name||values.bottleneck===name||values.evidence===name||values.timing===name||values.targets.indexOf(name)>-1;});
+ }
+ function buildGuidedRecommendation(values){
+ var urgent=guideHas(values,['urgent','soon']);
+ var strategy=guideHas(values,['strategy','school_choice','unsure']);
+ var casper=guideHas(values,['casper','uow','notre_dame','gp']);
+ var mmi=guideHas(values,['mmi','specialist','offer']);
+ var writing=guideHas(values,['writing','gamsat_s2']);
+ var rec;
+ if(values.pathway==='gp'){
+ rec={focus:'RACGP CASPer',title:'Start with the RACGP CASPer pathway.',summary:'Your answers point to the GP training CASPer as the active selection risk. The best next step is a doctor-specific CASPer read, then timed practice with feedback.',primaryText:'Open RACGP CASPer prep',primaryHref:'racgp-casper-preparation.html',secondaryHref:'practice.html',secondaryText:'Try CASPer practice',cards:[['Why this first','Doctor pathways are judged against a higher professional bar than school-leaver practice usually assumes.'],['Do next','Check the RACGP/FSP format, then do one timed station to locate the real issue.'],['Watch','Do not copy polished answer scripts; the risk is sounding generic under pressure.']],watchouts:['RACGP/FSP CASPer needs mature professional judgement, not undergraduate-style phrasing.','Use practice to find repeated thinking errors before buying more sessions.']};
+ } else if(values.pathway==='specialist'){
+ rec={focus:'Specialist interview',title:'Build a specialist interview conversion plan.',summary:'Your answers point to a high-stakes interview rather than an admissions-test problem. The next step is targeted interview coaching and pressure-tested examples.',primaryText:'Open specialist coaching',primaryHref:'medical-interview-coaching-australia.html',secondaryHref:'mmi-tutor-australia.html',secondaryText:'View MMI coaching',cards:[['Why this first','Specialist selection rewards judgement, ownership and prioritisation under stress.'],['Do next','Map the likely domains, then pressure-test one recent example from your clinical work.'],['Watch','Avoid rehearsed scripts; panels can usually hear when an answer is over-manufactured.']],watchouts:['Your strongest material is probably already in your clinical experience.','The job is to sharpen judgement, not memorise perfect stories.']};
+ } else if(casper && (urgent || values.targets.indexOf('uow')>-1 || values.targets.indexOf('notre_dame')>-1)){
+ rec={focus:'CASPer',title:'Use the CASPer class sprint as the next step.',summary:'Your answers are CASPer-sensitive and timing-sensitive. A live class path gives faster calibration than browsing general advice, especially for UoW, Notre Dame or a near exam date.',primaryText:'View CASPer class options',primaryHref:'casper-class.html',secondaryHref:'practice.html',secondaryText:'Start free CASPer practice',cards:[['Why this first','CASPer improves fastest when you get calibrated on judgement, structure and timing.'],['Do next','Join the class path, then do one practice station before the next live session.'],['Watch','If you are averaging 7+, keep raising reliability rather than chasing flashy answers.']],watchouts:['For UoW and Notre Dame, CASPer can swing the overall strategy.','High Q4 students usually show consistent judgement across multiple station types.']};
+ } else if(mmi){
+ rec={focus:'MMI',title:'Start interview conversion practice.',summary:'Your answers point to MMI performance as the highest-leverage area. Use practice to find repeated weaknesses, then book 1:1 only if you need a human read.',primaryText:'Open MMI practice',primaryHref:'practice.html',secondaryHref:'mmi-tutor-australia.html',secondaryText:'View MMI coaching',cards:[['Why this first','MMI prep should expose patterns across stations, not produce memorised answers.'],['Do next','Record or write one station, review the feedback, then repeat with a different domain.'],['Watch','If feedback repeats the same issue twice, get human coaching before doing more volume.']],watchouts:['Interview conversion is usually about clarity, judgement and specificity.','Do not wait for a formal invite if your written profile is already competitive.']};
+ } else if(writing){
+ rec={focus:'GAMSAT S2',title:'Build a GAMSAT S2 feedback loop.',summary:'Your answers point to writing quality as the active bottleneck. The fastest improvement loop is timed essays, feedback, then one targeted rewrite.',primaryText:'Open GAMSAT S2 practice',primaryHref:'gamsat-s2-practice.html',secondaryHref:'gamsat-section-2-tutor.html',secondaryText:'View S2 coaching',cards:[['Why this first','Section II improves when feedback targets argument, clarity and control.'],['Do next','Write one timed essay, review the weakness, then rewrite only the weakest paragraph.'],['Watch','Do not build a quote bank instead of improving judgement and argument.']],watchouts:['A higher score usually comes from stronger thinking under time, not more ornamental prose.','Human marking is useful when AI feedback keeps circling the same issue.']};
+ } else if(strategy){
+ rec={focus:'Strategy',title:'Run the medical school chances calculator first.',summary:'Your answers suggest the main uncertainty is strategy. Before buying prep, get a school-choice read so CASPer, MMI and GAMSAT effort are pointed at the right target.',primaryText:'Run the chances calculator',primaryHref:'medical-school-chances.html',secondaryHref:'medicine-entry-requirements.html',secondaryText:'Browse university guides',cards:[['Why this first','The best prep choice depends on where your application is actually live.'],['Do next','Run the calculator, save the plan, then use the dashboard to choose practice.'],['Watch','Do not over-invest in a product before you know which schools are realistic.']],watchouts:['School choice changes which bottleneck matters most.','A strategy read can prevent wasted prep on the wrong lever.']};
+ } else {
+ rec={focus:'CASPer',title:'Start with one diagnostic practice loop.',summary:'The safest next step is a low-commitment practice attempt. It gives enough evidence to decide whether you need class, Pro access or human coaching.',primaryText:'Open practice tool',primaryHref:'practice.html',secondaryHref:'plans.html',secondaryText:'Compare plans',cards:[['Why this first','One diagnostic station is more useful than guessing from generic advice.'],['Do next','Complete one timed response, then review the scoring pattern.'],['Watch','If the result is borderline, repeat across a different station type before spending more.']],watchouts:['Use your first score as a diagnostic, not a verdict.','Upgrade only when the free limit starts slowing useful practice.']};
+ }
+ rec.values=values;
+ return rec;
+ }
+ function saveGuidedRecommendation(rec){
+ var plan={
+ mode:'guided_path',
+ focus:rec.focus,
+ summary:rec.summary,
+ strongest:rec.cards.map(function(card){return {name:card[0],detail:card[1]};}),
+ watchouts:rec.watchouts||[],
+ nextStep:rec.title,
+ primaryHref:rec.primaryHref,
+ primaryText:rec.primaryText,
+ secondaryHref:rec.secondaryHref,
+ secondaryText:rec.secondaryText,
+ generatedAt:new Date().toISOString(),
+ page:'index.html',
+ url:location.href
+ };
+ try{
+ localStorage.setItem('key2md_guided_path_v1', JSON.stringify({ recommendation:rec, plan:plan, savedAt:plan.generatedAt }));
+ localStorage.setItem('key2md_latest_calculator_plan_v1', JSON.stringify(plan));
+ }catch(e){}
+ return plan;
+ }
+ function renderGuidedRecommendation(rec){
+ var result=document.getElementById('guideResult');
+ var title=document.getElementById('guideResultTitle');
+ var summary=document.getElementById('guideResultSummary');
+ var cards=document.getElementById('guideResultCards');
+ var primary=document.getElementById('guidePrimaryCta');
+ if(!result||!title||!summary||!cards||!primary)return;
+ title.textContent=rec.title;
+ summary.textContent=rec.summary;
+ cards.innerHTML=rec.cards.map(function(card){return '<div class="guide-result-card"><strong>'+guideEsc(card[0])+'</strong><span>'+guideEsc(card[1])+'</span></div>';}).join('');
+ primary.href=rec.primaryHref;
+ primary.textContent=rec.primaryText+' ->';
+ primary.setAttribute('data-track','guided_path_primary_click');
+ primary.setAttribute('data-track-detail',rec.focus);
+ result.classList.add('open');
+ result.scrollIntoView({behavior:'smooth',block:'nearest'});
+ }
+ document.addEventListener('DOMContentLoaded',function(){
+ var guide=document.getElementById('guideModal');
+ var form=document.getElementById('guideForm');
+ if(guide)guide.addEventListener('click',function(e){if(e.target===this)closeGuideModal();});
+ if(form)form.addEventListener('submit',function(e){
+ e.preventDefault();
+ var values=guideFormValues(form);
+ var rec=buildGuidedRecommendation(values);
+ var plan=saveGuidedRecommendation(rec);
+ renderGuidedRecommendation(rec);
+ guideTrack('guided_path_complete',{focus:rec.focus,pathway:values.pathway,bottleneck:values.bottleneck});
+ if(window.Key2MDProducts && window.Key2MDProducts.recommend) window.Key2MDProducts.recommend({plan:plan});
+ });
+ });
 
  // -- Inline enquiry form --
  function submitInlineEnquiry(){
@@ -2167,14 +2466,14 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <h3 style="color:#fff;font-size:1.3rem;font-weight:800;margin:0 0 8px;">Book with Dan</h3>
  <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin:0 0 28px;">Choose the option that suits you:</p>
  <div style="display:flex;flex-direction:column;gap:14px;">
- <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
+ <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener" data-track="book_session_click" data-track-detail="book_modal_paid" style="display:block;background:rgba(245,158,11,0.1);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:20px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
  <span style="background:#f59e0b;color:#0a1628;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$300</span>
  <span style="color:#fff;font-weight:700;font-size:1rem;">1:1 Coaching Session - 1 Hour</span>
  </div>
  <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">MMI, CASPer, or GAMSAT S2. Full personalised session with Dan.</p>
  </a>
- <a href="https://calendly.com/brittainmbbs/30min" target="_blank" rel="noopener" style="display:block;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+ <a href="https://calendly.com/brittainmbbs/30min" target="_blank" rel="noopener" data-track="intro_call_click" data-track-detail="book_modal_free" style="display:block;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
  <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">Free</span>
  <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">15-Min Intro Call</span>
@@ -2191,6 +2490,7 @@ document.addEventListener('click', function(e){ var m=document.getElementById('b
 document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=document.getElementById('bookModal'); if(m && m.style.display==='flex') closeBookModal(); } });
 </script>
 <!-- === END CANONICAL BOOK MODAL === -->
+<script src="key2md-products.js" defer></script>
 <script src="key2md-tracking.js" defer></script>
 </body>
 </html>

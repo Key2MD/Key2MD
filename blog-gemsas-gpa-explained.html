@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en-AU">
 <head>
  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BZ01FP28PC"></script>
@@ -9,7 +9,7 @@
  <meta name="description" content="Your university GPA and GEMSAS GPA are almost always different. Understand the conversion and calculate yours for medical school.">
  <link rel="canonical" href="https://www.key2md.com/blog-gemsas-gpa-explained.html">
  <meta property="og:title" content="GEMSAS GPA Explained - Why Yours Might Be Wrong">
- <meta property="og:description" content="University GPA vs GEMSAS GPA - understand the conversion and what it means.">
+ <meta property="og:description" content="Your university GPA and GEMSAS GPA are almost always different. Understand the conversion and calculate yours for medical school.">
  <meta property="og:image" content="https://www.key2md.com/Selfie-optimized.jpg">
  <meta property="og:type" content="article">
  <meta property="og:url" content="https://www.key2md.com/blog-gemsas-gpa-explained.html">
@@ -18,7 +18,7 @@
  <meta property="article:author" content="Dan Brittain">
  <meta name="twitter:card" content="summary_large_image">
  <meta name="twitter:title" content="GEMSAS GPA Explained - Why Yours Might Be Wrong">
- <meta name="twitter:description" content="University GPA vs GEMSAS GPA - understand the conversion and what it means.">
+ <meta name="twitter:description" content="Your university GPA and GEMSAS GPA are almost always different. Understand the conversion and calculate yours for medical school.">
  <meta name="twitter:image" content="https://www.key2md.com/Selfie-optimized.jpg">
  <meta name="author" content="Dan Brittain - University of Melbourne MD">
  <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -248,12 +248,13 @@ footer a:hover { color:var(--white); }
  <ul class="k2-nav-links">
  <li><a href="casper-class.html" class="k2-gold" data-nav="classes">Friday Classes</a></li>
  <li><a href="testimonials.html" data-nav="results">Results</a></li>
+ <li><a href="dashboard.html" data-nav="dashboard">Dashboard</a></li>
  <li><a href="plans.html" data-nav="plans">Plans</a></li>
  <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">Chances</a></li>
  <li><a href="practice.html" class="k2-gold" data-nav="practice">Practice</a></li>
  <li><a href="medicine-entry-requirements.html" data-nav="requirements">Uni Guides</a></li>
  <li><a href="blog.html" data-nav="blog">Blog</a></li>
- <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session</a></li>
+ <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a></li>
  </ul>
  <button class="k2-hamburger" id="k2Hamburger" aria-label="Toggle menu" type="button"><span></span><span></span><span></span></button>
  </nav>
@@ -261,16 +262,13 @@ footer a:hover { color:var(--white); }
  <a href="index.html">Home</a>
  <a href="casper-class.html" class="k2-gold">Friday Classes</a>
  <a href="testimonials.html">Results</a>
+ <a href="dashboard.html">Dashboard</a>
  <a href="plans.html">Plans &amp; Pricing</a>
  <a href="medical-school-chances.html" class="k2-green">Chances Calculator</a>
  <a href="practice.html" class="k2-gold">Practice</a>
  <a href="medicine-entry-requirements.html">Uni Guides</a>
- <a href="guide.html">Free Guide</a>
- <a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Practice</a>
- <a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a>
- <a href="about.html">About Dan</a>
  <a href="blog.html">Blog</a>
- <a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session</a>
+ <a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a>
  </nav>
 </header>
 <script>
@@ -353,7 +351,7 @@ footer a:hover { color:var(--white); }
  <div class="related-grid">
  <a href="blog-racgp-casper-australia.html" class="related-card"><h4>RACGP Casper Test Guide</h4><p>For doctors applying to AGPT or FSP. Same Casper as medical school. Higher bar. Why qualified doctors underestimate it.</p></a>
  <a href="blog-mmi-guide-australia.html" class="related-card"><h4>MMI Guide Australia</h4><p>Why MMI is a character assessment, not a polish test - what examiners actually mark, plus specialist training.</p></a>
- <a href="blog-how-to-get-into-medicine.html" class="related-card" style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-color:rgba(56,189,248,0.3);"><h4 style="color:#38bdf8;">Star Start here | How to Get Into Medicine</h4><p style="color:rgba(255,255,255,0.65);">Complete overview of school-leaver vs postgraduate pathways, requirements, and what makes an application competitive.</p></a>
+ <a href="blog-how-to-get-into-medicine.html" class="related-card" style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-color:rgba(56,189,248,0.3);"><h4 style="color:#38bdf8;">Start here | How to Get Into Medicine</h4><p style="color:rgba(255,255,255,0.65);">Complete overview of school-leaver vs postgraduate pathways, requirements, and what makes an application competitive.</p></a>
  <a href="blog-gamsat-score-calculator.html" class="related-card"><h4>GAMSAT Score Calculator</h4><p>The weighted formula, combo score, and what you actually need for a medical school interview.</p></a>
  <a href="blog-casper-guide-australia.html" class="related-card"><h4>CASPer Guide Australia</h4><p>The Q1-Q4 framework, 9 core tenets, WPM strategy, and real example answers with examiner breakdown.</p></a>
  <a href="blog-university-exceptions.html" class="related-card"><h4>University-Specific Exceptions</h4><p>UoW, Notre Dame, USYD and UoM all break the standard combo model - these change your strategy.</p></a>
@@ -415,5 +413,6 @@ function closeBookModal(){ var m=document.getElementById('bookModal'); if(m){ m.
 document.addEventListener('click', function(e){ var m=document.getElementById('bookModal'); if(m && e.target===m) closeBookModal(); });
 document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=document.getElementById('bookModal'); if(m && m.style.display==='flex') closeBookModal(); } });
 </script>
+<script src="key2md-tracking.js" defer></script>
 </body>
 </html>

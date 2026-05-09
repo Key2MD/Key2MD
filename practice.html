@@ -162,6 +162,7 @@
 body[data-page="home"] .k2-nav-links a[data-nav="home"],
 body[data-page="about"] .k2-nav-links a[data-nav="about"],
 body[data-page="results"] .k2-nav-links a[data-nav="results"],
+body[data-page="dashboard"] .k2-nav-links a[data-nav="dashboard"],
 body[data-page="plans"] .k2-nav-links a[data-nav="plans"],
 body[data-page="guide"] .k2-nav-links a[data-nav="guide"],
 body[data-page="practice"] .k2-nav-links a[data-nav="practice"],
@@ -210,6 +211,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <ul class="k2-nav-links">
  <li><a href="casper-class.html" class="k2-gold" data-nav="classes">Friday Classes</a></li>
  <li><a href="testimonials.html" data-nav="results">Results</a></li>
+ <li><a href="dashboard.html" data-nav="dashboard">Dashboard</a></li>
  <li><a href="plans.html" data-nav="plans">Plans</a></li>
  <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">Chances</a></li>
  <li><a href="practice.html" class="k2-gold" data-nav="practice">Practice</a></li>
@@ -223,6 +225,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  <a href="index.html">Home</a>
  <a href="casper-class.html" class="k2-gold">Friday Classes</a>
  <a href="testimonials.html">Results</a>
+ <a href="dashboard.html">Dashboard</a>
  <a href="plans.html">Plans &amp; Pricing</a>
  <a href="medical-school-chances.html" class="k2-green">Chances Calculator</a>
  <a href="practice.html" class="k2-gold">Practice</a>
@@ -3001,6 +3004,7 @@ async function manualRunAI(){
  nextBtn.disabled=true; prevBtn.disabled=true;
  let marked=false;
  try{
+ if(window.Key2MDTrack&&typeof window.Key2MDTrack.funnel==='function') window.Key2MDTrack.funnel('ai_mark_start',{mode:currentMode});
  await runAI(currentIdx);
  marked = !!(sessionHistory[currentIdx] && sessionHistory[currentIdx].score != null);
  }catch(e){
@@ -5180,6 +5184,11 @@ function k2TrackCompletion(score){
  // Keep last 20
  if (p.scores.length > 20) p.scores = p.scores.slice(-20);
  k2SaveProgress(p);
+ if(window.Key2MDTrack&&typeof window.Key2MDTrack.funnel==='function'){
+ const nums=p.scores.map(s=>Number(s.score)).filter(Number.isFinite);
+ const avg=nums.length?Math.round(nums.reduce((a,b)=>a+b,0)/nums.length*10)/10:null;
+ window.Key2MDTrack.funnel('ai_mark_success',{score:score,count:p.count,average:avg});
+ }
  // Render appropriate nudge
  setTimeout(() => k2RenderNudge(), 400); // after feedback animates in
  return p.count > 0 && p.count % 5 === 0;

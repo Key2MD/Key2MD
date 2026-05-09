@@ -26,7 +26,7 @@
  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
  <!-- OG / Twitter -->
  <meta property="og:title" content="Medical School Chances Calculator 2026 | UCAT + GAMSAT">
- <meta property="og:description" content="Estimate undergraduate UCAT/ATAR and graduate GPA/GAMSAT competitiveness for Australian medical schools.">
+ <meta property="og:description" content="Free Australian medical school chances calculator for UCAT, ATAR, GPA and GAMSAT applicants. Compare schools, bonuses and interview strategy.">
  <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
  <meta property="og:image:width" content="1200">
  <meta property="og:image:height" content="630">
@@ -35,7 +35,7 @@
  <meta property="og:url" content="https://www.key2md.com/medical-school-chances.html">
  <meta name="twitter:card" content="summary_large_image">
  <meta name="twitter:title" content="Medical School Chances Calculator 2026 | UCAT + GAMSAT">
- <meta name="twitter:description" content="Estimate undergraduate UCAT/ATAR and graduate GPA/GAMSAT competitiveness for Australian medical schools.">
+ <meta name="twitter:description" content="Free Australian medical school chances calculator for UCAT, ATAR, GPA and GAMSAT applicants. Compare schools, bonuses and interview strategy.">
  <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
  <meta name="twitter:image:alt" content="Key2MD - MMI, CASPer and GAMSAT Section II coaching.">
  <meta name="author" content="Key2MD - Dan - University of Melbourne MD">
@@ -833,12 +833,13 @@
  <ul class="k2-nav-links">
  <li><a href="casper-class.html" class="k2-gold" data-nav="classes">Friday Classes</a></li>
  <li><a href="testimonials.html" data-nav="results">Results</a></li>
+ <li><a href="dashboard.html" data-nav="dashboard">Dashboard</a></li>
  <li><a href="plans.html" data-nav="plans">Plans</a></li>
  <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">Chances</a></li>
  <li><a href="practice.html" class="k2-gold" data-nav="practice">Practice</a></li>
  <li><a href="medicine-entry-requirements.html" data-nav="requirements">Uni Guides</a></li>
  <li><a href="blog.html" data-nav="blog">Blog</a></li>
- <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session</a></li>
+ <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a></li>
  </ul>
  <button class="k2-hamburger" id="k2Hamburger" aria-label="Toggle menu" type="button"><span></span><span></span><span></span></button>
  </nav>
@@ -846,16 +847,13 @@
  <a href="index.html">Home</a>
  <a href="casper-class.html" class="k2-gold">Friday Classes</a>
  <a href="testimonials.html">Results</a>
+ <a href="dashboard.html">Dashboard</a>
  <a href="plans.html">Plans &amp; Pricing</a>
  <a href="medical-school-chances.html" class="k2-green">Chances Calculator</a>
  <a href="practice.html" class="k2-gold">Practice</a>
  <a href="medicine-entry-requirements.html">Uni Guides</a>
- <a href="guide.html">Free Guide</a>
- <a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Practice</a>
- <a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a>
- <a href="about.html">About Dan</a>
  <a href="blog.html">Blog</a>
- <a href="#" class="k2-btn-nav" onclick="openBookModal(event)">Book a Session</a>
+ <a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a>
  </nav>
 </header>
 <script>
@@ -1160,6 +1158,7 @@
  <div class="result-actions">
  <button type="button" class="result-action-btn" id="copyResultBtn">Copy my result</button>
  <button type="button" class="result-action-btn" id="shareResultBtn">Share result</button>
+ <a href="dashboard.html" class="result-action-btn" id="openDashboardBtn" data-track="calculator_open_dashboard">Open dashboard</a>
  </div>
  <div class="result-status" id="resultStatus" aria-live="polite"></div>
  <form class="email-row" id="emailForm">
@@ -1769,6 +1768,7 @@ const UNDERGRAD_SCHOOLS = [
 
 let state = { entryMode: 'graduate', rural: false, casper: '', scoreMode: 'overall', activeBonusUni: 'deakin', bonuses: {} };
 let latestCalculatorPlan = null;
+const K2_LATEST_CALCULATOR_PLAN_KEY = 'key2md_latest_calculator_plan_v1';
 
 const DUPLICATE_RURAL_BONUS_IDS = {
  deakin: ['geelongMm1Mm2', 'mm3Mm7'],
@@ -1819,6 +1819,10 @@ function setLatestCalculatorPlan(plan) {
  page: 'medical-school-chances',
  url: 'https://www.key2md.com/medical-school-chances.html',
  }, plan);
+ try { localStorage.setItem(K2_LATEST_CALCULATOR_PLAN_KEY, JSON.stringify(latestCalculatorPlan)); } catch (e) {}
+ if (window.Key2MDTrack && typeof window.Key2MDTrack.funnel === 'function') {
+ window.Key2MDTrack.funnel('calculator_result_saved', { mode: latestCalculatorPlan.mode || 'unknown' });
+ }
 }
 
 function formatLatestCalculatorPlan() {
@@ -2624,6 +2628,7 @@ function updateUndergradPostResultSummary(assessments, profile) {
  box.classList.add('show');
  setLatestCalculatorPlan({
  mode: 'undergraduate',
+ focus: profile.percentile === null ? 'UCAT data and school shortlist' : 'Undergraduate shortlist and interview conversion',
  summary: `Undergraduate profile: ATAR ${profile.atar.toFixed(2)}, UCAT ${profile.percentile !== null ? `${profile.percentile.toFixed(1)} percentile${profile.percentileEstimated ? ' estimated' : ''}` : 'not entered'}, ${profile.rural ? 'rural/regional' : 'non-rural'} applicant.`,
  strongest: strongest.map(item => ({ name: item.school.short, detail: `${item.verdict} - ${item.school.type}` })),
  watchouts: [
@@ -2632,6 +2637,10 @@ function updateUndergradPostResultSummary(assessments, profile) {
  profile.rural || profile.firstNations ? 'Priority pathways can involve separate documentation, quotas and application steps.' : '',
  ].filter(Boolean),
  nextStep,
+ primaryHref: profile.percentile === null ? 'medical-school-chances.html' : 'practice.html',
+ primaryText: profile.percentile === null ? 'Add UCAT data' : 'Start interview practice',
+ secondaryHref: 'dashboard.html',
+ secondaryText: 'Open dashboard',
  });
  setResultStatus('');
 }
@@ -2776,6 +2785,7 @@ function updatePostResultSummary(gpa, scores) {
  box.classList.add('show');
  setLatestCalculatorPlan({
  mode: 'graduate',
+ focus: strategy.focus,
  summary: `Graduate profile: GPA ${gpa.toFixed(2)}, weighted GAMSAT ${scores.weighted.toFixed(1)}, unweighted GAMSAT ${scores.unweighted.toFixed(1)}, ${state.rural ? 'rural' : 'non-rural'} benchmark.`,
  strongest: strongest.map(item => ({
  name: item.school.short,
@@ -2788,6 +2798,10 @@ function updatePostResultSummary(gpa, scores) {
  ...(strategy.watchouts || []),
  ].filter(Boolean),
  nextStep: strategy.nextStep,
+ primaryHref: strategy.primaryHref,
+ primaryText: strategy.primaryText,
+ secondaryHref: strategy.secondaryHref,
+ secondaryText: strategy.secondaryText,
  });
  setResultStatus('');
 }
