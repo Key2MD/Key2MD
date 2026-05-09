@@ -542,7 +542,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="fade-up">
         <div class="pro-eyebrow">✦ CASPer Pro — Recommended</div>
         <h2>Unlimited AI reviews.<br>No daily cap.</h2>
-        <p>Most serious CASPer students need 10–20 practice stations per week. The free tier gives you 1 per day. Pro removes the cap entirely so you can practise as hard as your prep demands.</p>
+        <p>Most serious CASPer students need 10–20 practice stations per week. The free tier gives you 1 CASPer review per day. Pro removes the cap entirely so you can practise as hard as your prep demands.</p>
         <div class="pro-feats">
           <div class="pro-feat">
             <div class="pro-feat-icon">♾️</div>
@@ -913,8 +913,8 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
   <div class="container">
     <div class="fade-up" style="text-align:center;">
       <div class="section-eyebrow">Other Options</div>
-      <h2 class="section-title">Not ready for Pro? Start here.</h2>
-      <p class="section-sub" style="margin:0 auto;">Everyone gets 1 free AI review per day with a free account. No card needed.</p>
+      <h2 class="section-title">Choose the right practice path.</h2>
+      <p class="section-sub" style="margin:0 auto;">Everyone gets free AI reviews with a free account. Upgrade when volume starts to matter.</p>
     </div>
     <div class="other-grid">
 
@@ -940,7 +940,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <li>Full Q1–Q4 feedback per response</li>
           <li>Works for CASPer &amp; GAMSAT S2</li>
           <li>Credits never expire</li>
-          <li class="dim">Daily free cap still applies</li>
+          <li class="dim">Free caps still apply without Pro</li>
           <li class="dim">Pay per use — not unlimited</li>
         </ul>
       </div>
@@ -963,6 +963,28 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <li>Works for CASPer &amp; GAMSAT S2</li>
         </ul>
       </div>
+
+      <!-- GAMSAT S2 PRO -->
+      <div class="other-card fade-up delay-2">
+        <div class="other-eyebrow">Unlimited essays</div>
+        <div class="other-name">GAMSAT S2 Pro</div>
+        <div class="other-desc">Unlimited AI essay feedback with deeper critique of evidence selection, contradictions, structure, and Band 70 angles.</div>
+        <div style="margin-bottom:4px;"><span class="other-price-big">$49</span> <span class="other-period-sm">/ month</span></div>
+        <div class="other-price-note">$19/week short-term option · Cancel anytime · Stripe billing</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0;">
+          <button class="other-cta" style="margin:0;padding:12px 10px;font-size:0.82rem;" onclick="handleBuyGamsatS2Pro('weekly')">$19 / week →</button>
+          <button class="other-cta" style="margin:0;padding:12px 10px;font-size:0.82rem;background:#7c3aed;" onclick="handleBuyGamsatS2Pro('monthly')">$49 / month →</button>
+        </div>
+        <div class="other-divider"></div>
+        <ul class="other-features">
+          <li>Unlimited GAMSAT Section II AI essay reviews</li>
+          <li>Evidence-selection and contradiction critique</li>
+          <li>Annotated essay feedback</li>
+          <li>Band estimate and Band 70 upgrade angles</li>
+          <li>Best value once writing 5+ essays/month</li>
+          <li class="dim">Human marking by Dan remains separate</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -980,19 +1002,19 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <th>Feature</th>
           <th>Free</th>
           <th>Credits</th>
-          <th class="plan-col">⭐ Pro</th>
+          <th class="plan-col">⭐ Pro Subscriptions</th>
           <th>Dan's Marking</th>
         </tr>
       </thead>
       <tbody>
         <tr><td>CASPer AI reviews</td><td class="partial">1/day</td><td class="partial">Per credit</td><td class="plan-col check">✓ Unlimited</td><td class="cross">—</td></tr>
-        <tr><td>GAMSAT S2 AI reviews</td><td class="partial">1/day</td><td class="partial">Per credit</td><td class="plan-col partial">1/day + credits</td><td class="cross">—</td></tr>
+        <tr><td>GAMSAT S2 AI reviews</td><td class="partial">1/week</td><td class="partial">Per credit</td><td class="plan-col check">✓ Unlimited with S2 Pro</td><td class="cross">—</td></tr>
         <tr><td>Q1–Q4 score</td><td class="check">✓</td><td class="check">✓</td><td class="plan-col check">✓</td><td class="check">✓</td></tr>
         <tr><td>Strengths &amp; improvements</td><td class="check">✓</td><td class="check">✓</td><td class="plan-col check">✓</td><td class="check">✓</td></tr>
         <tr><td>Empathy score</td><td class="check">✓</td><td class="check">✓</td><td class="plan-col check">✓</td><td class="check">✓</td></tr>
         <tr><td>Review history</td><td class="partial">Limited</td><td class="check">✓</td><td class="plan-col check">✓ Full</td><td class="cross">—</td></tr>
         <tr><td>Written feedback by Dan</td><td class="cross">—</td><td class="cross">—</td><td class="plan-col cross">—</td><td class="check">✓</td></tr>
-        <tr><td>Price</td><td class="check">Free</td><td class="partial">From $7</td><td class="plan-col" style="font-weight:800;color:var(--teal3);">$40/week</td><td class="partial">$35–$50</td></tr>
+        <tr><td>Price</td><td class="check">Free</td><td class="partial">From $7</td><td class="plan-col" style="font-weight:800;color:var(--teal3);">$40/wk CASPer · $49/mo S2</td><td class="partial">$35–$50</td></tr>
       </tbody>
     </table>
 
@@ -1000,7 +1022,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <div class="compare-mobile">
       <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--gray200);">⭐ CASPer Pro — what you get</div>
       <div class="cmp-row"><span class="cmp-label">CASPer AI reviews</span><span class="cmp-val">✓ Unlimited</span></div>
-      <div class="cmp-row"><span class="cmp-label">GAMSAT S2 reviews</span><span class="cmp-val">1/day free</span></div>
+      <div class="cmp-row"><span class="cmp-label">GAMSAT S2 reviews</span><span class="cmp-val">Unlimited with S2 Pro</span></div>
       <div class="cmp-row"><span class="cmp-label">Q1–Q4 scoring</span><span class="cmp-val">✓ Every station</span></div>
       <div class="cmp-row"><span class="cmp-label">Empathy score</span><span class="cmp-val">✓ Included</span></div>
       <div class="cmp-row"><span class="cmp-label">Review history</span><span class="cmp-val">✓ Full history</span></div>
@@ -1052,10 +1074,10 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <h2 class="section-title">FAQ</h2>
     </div>
     <div class="faq-inner">
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What exactly is CASPer Pro?</button><div class="faq-a"><div class="faq-a-inner">CASPer Pro removes the daily AI review limit entirely. On the free tier you get 1 AI-scored response per day. With Pro, you can do as many stations as you want, every day, for as long as your subscription is active. It's $40/week, billed automatically, and you can cancel anytime from this page.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What exactly is CASPer Pro?</button><div class="faq-a"><div class="faq-a-inner">CASPer Pro removes the CASPer daily AI review limit entirely. On the free tier you get 1 CASPer AI-scored response per day. With Pro, you can do as many stations as you want, every day, for as long as your subscription is active. It's $40/week, billed automatically, and you can cancel anytime from this page.</div></div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I cancel at any time?</button><div class="faq-a"><div class="faq-a-inner">Yes — cancel from this page anytime. Your access continues until the end of the current billing week, then reverts to the free tier. No lock-in, no cancellation fees.</div></div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Does Pro include GAMSAT S2 reviews?</button><div class="faq-a"><div class="faq-a-inner">No — CASPer Pro is CASPer-only. GAMSAT S2 reviews use the credit system (from $12/review, or $9.60 each in a 10-pack). You still get 1 free GAMSAT S2 review per day on any plan. GAMSAT Pro is coming soon.</div></div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How are credits different from Pro?</button><div class="faq-a"><div class="faq-a-inner">Credits are pay-per-review — you buy a pack and each AI feedback uses one credit. They never expire and work for both CASPer and GAMSAT S2. Pro is a weekly subscription giving unlimited CASPer reviews. If you're doing 6+ CASPer stations per week, Pro is better value. If you mainly need GAMSAT S2, credits make more sense.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Does CASPer Pro include GAMSAT S2 reviews?</button><div class="faq-a"><div class="faq-a-inner">No — CASPer Pro is CASPer-only. GAMSAT S2 now has its own Pro subscription: $19/week or $49/month for unlimited AI essay reviews. If you only write the occasional essay, credits still work from $12/review, or $9.60 each in a 10-pack.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How are credits different from Pro?</button><div class="faq-a"><div class="faq-a-inner">Credits are pay-per-review — you buy a pack and each AI feedback uses one credit. They never expire and work for both CASPer and GAMSAT S2. Pro is subscription access for volume practice: CASPer Pro gives unlimited CASPer reviews, while GAMSAT S2 Pro gives unlimited essay reviews.</div></div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is this the same as Dan's 1:1 coaching?</button><div class="faq-a"><div class="faq-a-inner">The rubric is the same — Dan built the marking criteria from his coaching experience. However, 1:1 coaching includes personalised strategy sessions, live practice, and Dan's direct input on your specific weaknesses. The AI tool is the framework at scale — same criteria, not a replacement for coaching.</div></div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are payments secure?</button><div class="faq-a"><div class="faq-a-inner">All payments are processed by Stripe — the same provider used by Shopify, Airbnb, and major Australian banks. Key2MD never sees or stores your card details. Receipts are sent automatically by Stripe.</div></div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What if my Pro payment fails?</button><div class="faq-a"><div class="faq-a-inner">Stripe will retry automatically. If it continues to fail, your account reverts to the free tier and you'll receive an email. You can resubscribe at any time from this page.</div></div></div>
@@ -1195,6 +1217,13 @@ async function handleBuyPro() {
   }
 }
 
+function handleBuyGamsatS2Pro(tier) {
+  if (!Key2MDAuth.isLoggedIn()) { Key2MDAuth.showAuthModal('signup'); return; }
+  const cleanTier = tier === 'weekly' ? 'weekly' : 'monthly';
+  const price = cleanTier === 'weekly' ? '$19/week' : '$49/month';
+  openModal('GAMSAT S2 Pro', `${price} · Unlimited AI essay feedback · Cancel anytime`, `gamsat_s2_pro_${cleanTier}`);
+}
+
 async function handleMockCheckout(tier) {
   if (!Key2MDAuth.isLoggedIn()) { Key2MDAuth.showAuthModal('signup'); return; }
   const label = tier === 'premium' ? 'Premium' : 'Transcript';
@@ -1245,6 +1274,17 @@ async function confirmCheckout() {
     } else if (pendingAction === 'mmi_credits') {
       const body = { pack_id: selectedMMIPackId, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
       res = await fetch(`${API_BASE}/api/mmi/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(body)});
+    } else if (pendingAction === 'gamsat_s2_pro_weekly' || pendingAction === 'gamsat_s2_pro_monthly') {
+      const tier = pendingAction === 'gamsat_s2_pro_weekly' ? 'weekly' : 'monthly';
+      res = await fetch(`${API_BASE}/api/gamsat-s2/checkout`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({
+          tier,
+          success_url:`${location.origin}/gamsat-s2-practice.html?gamsat_s2_pro=success`,
+          cancel_url:`${location.origin}/plans.html`
+        })
+      });
     } else {
       res = await fetch(`${API_BASE}/api/pro/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({success_url:`${location.origin}/practice.html?pro=success`,cancel_url:`${location.origin}/plans.html`})});
     }

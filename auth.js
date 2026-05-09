@@ -52,10 +52,11 @@ const Key2MDAuth = (() => {
    */
   function canReview() {
     if (!_user) return { allowed: false, reason: 'auth_required' };
-    if (_user.tier === 'pro') return { allowed: true };
     if (!_limits) return { allowed: true }; // optimistic if limits not loaded yet
     const toolLimits = _limits[_config.tool];
-if (toolLimits && toolLimits.remaining <= 0 && !toolLimits.credits) return { allowed: false, reason: 'limit_reached' };
+    if (toolLimits?.unlimited) return { allowed: true };
+    if (_user.tier === 'pro' && _config.tool === 'casper') return { allowed: true };
+    if (toolLimits && toolLimits.remaining <= 0 && !toolLimits.credits) return { allowed: false, reason: 'limit_reached' };
     return { allowed: true };
   }
 

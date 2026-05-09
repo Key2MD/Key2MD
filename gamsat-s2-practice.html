@@ -1652,7 +1652,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <div class="hero-stat"><strong>25</strong><span>Task A Stimuli</span></div>
     <div class="hero-stat"><strong>25</strong><span>Task B Stimuli</span></div>
     <div class="hero-stat"><strong>30 min</strong><span>Timed Sessions</span></div>
-    <div class="hero-stat"><strong>Free</strong><span>AI Review Daily</span></div>
+    <div class="hero-stat"><strong>Free</strong><span>AI Review Weekly</span></div>
   </div>
   <a href="#practice-area" style="display:inline-block;margin-top:24px;padding:14px 32px;background:var(--accent);color:#fff;font-weight:700;font-size:0.95rem;border-radius:100px;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 20px rgba(37,99,235,0.3);" onmouseover="this.style.background='var(--accent-dark)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='var(--accent)';this.style.transform='none'">Start Writing ↓</a>
 </section>
@@ -1744,10 +1744,11 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
 
     <!-- Limit banner -->
     <div class="limit-banner" id="limitBanner">
-      <h4>You’ve used your free AI review for today</h4>
-  <p>Your daily limit resets at midnight AEST. Buy credits for instant access, or submit your essay to Dan for expert human marking and an estimated band score within 48 hours.</p>
+      <h4>You’ve used your free AI essay review</h4>
+  <p>Your free GAMSAT S2 review resets weekly. Buy credits for occasional essays, upgrade to S2 Pro for unlimited AI marking, or submit your essay to Dan for expert human marking and an estimated band score within 48 hours.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="buy-credits-btn" style="width:auto;margin:0;padding:10px 20px;" onclick="openCreditShop()">Buy AI Credits →</button>
+        <button class="buy-credits-btn" style="width:auto;margin:0;padding:10px 20px;background:#7c3aed;color:#fff;border-color:#7c3aed;" onclick="startGamsatProCheckout('monthly', this)">Get S2 Pro →</button>
         <button class="btn-marking" onclick="openMarkingModal()">Submit to Dan — $50 →</button>
       </div>
     </div>
@@ -1863,7 +1864,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <div class="ai-panel">
       <div class="ai-panel-header">
         <span class="ai-panel-title">✦ AI Essay Marking</span>
-        <span class="ai-status-badge" id="gamsatAiStatus">1 free/day</span>
+        <span class="ai-status-badge" id="gamsatAiStatus">1 free/week</span>
       </div>
 
       <!-- Why our AI is different -->
@@ -1884,7 +1885,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <!-- Limits + Credits -->
       <div id="aiLimitWrap" style="margin-top:14px;">
         <div class="ai-limit-bar">
-          <span class="ai-limit-label">Free daily review</span>
+          <span class="ai-limit-label">Free weekly review</span>
           <span class="ai-limit-count" id="aiLimitCount">1 remaining</span>
         </div>
         <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
@@ -1903,14 +1904,17 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <button class="buy-credits-btn" onclick="openCreditShop()">Buy More AI Reviews →</button>
       </div>
 
-      <!-- GAMSAT Pro Coming Soon -->
+      <!-- GAMSAT S2 Pro -->
       <div style="margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(124,58,237,0.08) 0%,rgba(167,139,250,0.04) 100%);border:1.5px solid rgba(124,58,237,0.2);border-radius:10px;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:rgba(124,58,237,0.15);color:#a78bfa;padding:2px 9px;border-radius:50px;">Coming Soon</span>
+          <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:rgba(124,58,237,0.15);color:#7c3aed;padding:2px 9px;border-radius:50px;">Live</span>
           <span style="font-size:0.85rem;font-weight:700;color:var(--text);">GAMSAT S2 Pro</span>
         </div>
-        <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.55;margin:0 0 10px;">Unlimited AI essay reviews, daily — no cap. Same marking engine, unlimited access. Join the waitlist to get early access and a launch discount.</p>
-        <a href="plans.html" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:8px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#7c3aed;font-size:0.8rem;font-weight:700;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(124,58,237,0.18)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'">View Plans &amp; Join Waitlist →</a>
+        <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.55;margin:0 0 10px;">Unlimited AI essay reviews with deeper feedback on evidence selection, contradictions, structure, and Band 70 angles.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button class="buy-credits-btn" style="margin:0;padding:9px 10px;font-size:0.78rem;background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.25);color:#7c3aed;" onclick="startGamsatProCheckout('weekly', this)">$19 / week</button>
+          <button class="buy-credits-btn" style="margin:0;padding:9px 10px;font-size:0.78rem;background:#7c3aed;border-color:#7c3aed;color:#fff;" onclick="startGamsatProCheckout('monthly', this)">$49 / month</button>
+        </div>
       </div>
     </div>
 
@@ -2540,22 +2544,10 @@ function updateLimitUI() {
     // Not logged in
     if (btn) { btn.disabled = false; btn.textContent = '🔍 Get Free AI Feedback'; }
     if (inlineNote) { inlineNote.textContent = 'Create a free account to unlock AI reviews'; inlineNote.className = 'daily-limit-note'; }
-    if (statusBadge) { statusBadge.textContent = '1 free/day'; statusBadge.className = 'ai-status-badge'; }
-    if (countEl) { countEl.textContent = '1 free/day'; countEl.className = 'ai-limit-count'; }
+    if (statusBadge) { statusBadge.textContent = '1 free/week'; statusBadge.className = 'ai-status-badge'; }
+    if (countEl) { countEl.textContent = '1 free/week'; countEl.className = 'ai-limit-count'; }
     if (fillEl) { fillEl.style.width = '100%'; fillEl.className = 'ai-limit-fill'; }
     if (noteEl) noteEl.textContent = 'Create a free account to unlock AI reviews.';
-    if (creditWrap) creditWrap.style.display = 'none';
-    if (buyBtn) buyBtn.style.display = 'none';
-    return;
-  }
-
-  if (Key2MDAuth.isPro()) {
-    if (btn) { btn.disabled = false; btn.textContent = '🔍 Get AI Feedback'; }
-    if (inlineNote) { inlineNote.textContent = '∞ Unlimited (Pro)'; inlineNote.className = 'daily-limit-note'; }
-    if (statusBadge) { statusBadge.textContent = '∞ Unlimited'; statusBadge.className = 'ai-status-badge'; }
-    if (countEl) { countEl.textContent = '∞ Unlimited (Pro)'; countEl.className = 'ai-limit-count'; }
-    if (fillEl) { fillEl.style.width = '100%'; fillEl.className = 'ai-limit-fill'; }
-    if (noteEl) noteEl.textContent = 'Unlimited AI reviews with Pro.';
     if (creditWrap) creditWrap.style.display = 'none';
     if (buyBtn) buyBtn.style.display = 'none';
     return;
@@ -2564,6 +2556,18 @@ function updateLimitUI() {
   if (!limits) return;
   const tool = limits.gamsat;
   if (!tool) return;
+
+  if (tool.unlimited) {
+    if (btn) { btn.disabled = false; btn.textContent = '🔍 Get AI Feedback'; }
+    if (inlineNote) { inlineNote.textContent = '∞ Unlimited (GAMSAT S2 Pro)'; inlineNote.className = 'daily-limit-note'; }
+    if (statusBadge) { statusBadge.textContent = '∞ Unlimited'; statusBadge.className = 'ai-status-badge'; }
+    if (countEl) { countEl.textContent = '∞ Unlimited (GAMSAT S2 Pro)'; countEl.className = 'ai-limit-count'; }
+    if (fillEl) { fillEl.style.width = '100%'; fillEl.className = 'ai-limit-fill'; }
+    if (noteEl) noteEl.textContent = 'Unlimited GAMSAT S2 AI essay reviews with Pro.';
+    if (creditWrap) creditWrap.style.display = 'none';
+    if (buyBtn) buyBtn.style.display = 'none';
+    return;
+  }
 
   const rem = tool.unlimited ? 99 : Math.max(0, tool.limit - tool.used);
   const pct = tool.unlimited ? 100 : (rem / tool.limit * 100);
@@ -2578,7 +2582,7 @@ function updateLimitUI() {
     } else if (credits > 0) {
       countEl.textContent = 'Free used · ' + credits + ' credits left';
     } else {
-      countEl.textContent = 'Used for today';
+      countEl.textContent = 'Used for the week';
     }
     countEl.className = 'ai-limit-count' + ((rem === 0 && credits === 0) ? ' exhausted' : '');
   }
@@ -2593,7 +2597,7 @@ function updateLimitUI() {
       statusBadge.textContent = credits + ' credits';
       statusBadge.className = 'ai-status-badge';
     } else {
-      statusBadge.textContent = 'Used today';
+      statusBadge.textContent = 'Used this week';
       statusBadge.className = 'ai-status-badge exhausted';
     }
   }
@@ -2618,7 +2622,7 @@ function updateLimitUI() {
     } else if (credits > 0) {
       noteEl.textContent = 'Using purchased credits. Buy more anytime.';
     } else {
-      noteEl.textContent = 'Free review used. Buy credits or wait until midnight AEST.';
+      noteEl.textContent = 'Free weekly review used. Buy credits, upgrade to S2 Pro, or wait for the weekly reset.';
     }
   }
 
@@ -2627,8 +2631,8 @@ function updateLimitUI() {
     if (btn) { btn.disabled = false; btn.textContent = credits > 0 && rem <= 0 ? '🔍 Get AI Feedback (1 credit)' : '🔍 Get Free AI Feedback'; }
     if (inlineNote) { inlineNote.textContent = rem > 0 ? rem + ' free AI review per week' : credits + ' credits remaining'; inlineNote.className = 'daily-limit-note'; }
   } else {
-    if (btn) { btn.disabled = true; btn.textContent = 'AI Review Used Today'; }
-    if (inlineNote) { inlineNote.textContent = 'Buy credits or wait until midnight AEST.'; inlineNote.className = 'daily-limit-note used'; }
+    if (btn) { btn.disabled = true; btn.textContent = 'AI Review Used'; }
+    if (inlineNote) { inlineNote.textContent = 'Buy credits, upgrade to S2 Pro, or wait for the weekly reset.'; inlineNote.className = 'daily-limit-note used'; }
   }
 }
 
@@ -2852,9 +2856,10 @@ async function requestAIFeedback() {
   const toolLimits = limits?.gamsat;
   const remaining = toolLimits ? Math.max(0, toolLimits.limit - toolLimits.used) : 1;
   const credits = toolLimits?.credits || 0;
+  const hasUnlimited = !!toolLimits?.unlimited;
   let useCredit = false;
 
-  if (!Key2MDAuth.isPro() && remaining <= 0) {
+  if (!hasUnlimited && remaining <= 0) {
     if (credits > 0) {
       // Auto-use a purchased credit
       useCredit = true;
@@ -3416,6 +3421,46 @@ function purchaseCredits(){
 }
 window.purchaseCredits = purchaseCredits;
 
+function startGamsatProCheckout(tier, btn) {
+  if (!Key2MDAuth.isLoggedIn()) {
+    Key2MDAuth.showAuthModal('signup');
+    return;
+  }
+  const originalText = btn ? btn.textContent : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Redirecting...';
+  }
+  fetch(API_BASE + '/api/gamsat-s2/checkout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + Key2MDAuth.getToken(),
+    },
+    body: JSON.stringify({
+      tier: tier === 'weekly' ? 'weekly' : 'monthly',
+      success_url: window.location.origin + window.location.pathname + '?gamsat_s2_pro=success',
+      cancel_url: window.location.origin + window.location.pathname + '?gamsat_s2_pro=cancelled',
+    }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.checkout_url) {
+      window.location.href = data.checkout_url;
+      return;
+    }
+    throw new Error(data.message || data.error || 'Payment setup failed');
+  })
+  .catch(err => {
+    alert(err.message || 'Payment setup failed. Please try again.');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+}
+window.startGamsatProCheckout = startGamsatProCheckout;
+
 // \u2550\u2550 HANDLE STRIPE RETURN \u2550\u2550
 (function handlePaymentReturn(){
   const params = new URLSearchParams(window.location.search);
@@ -3432,6 +3477,14 @@ window.purchaseCredits = purchaseCredits;
       }
     }, 1500);
   } else if(params.get('payment') === 'cancelled'){
+    window.history.replaceState({}, '', window.location.pathname);
+  } else if(params.get('gamsat_s2_pro') === 'success'){
+    window.history.replaceState({}, '', window.location.pathname);
+    setTimeout(function(){
+      Key2MDAuth.checkSession();
+      alert('GAMSAT S2 Pro is active. Unlimited essay feedback is now unlocked.');
+    }, 1500);
+  } else if(params.get('gamsat_s2_pro') === 'cancelled'){
     window.history.replaceState({}, '', window.location.pathname);
   }
 })();
