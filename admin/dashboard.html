@@ -466,6 +466,7 @@
     <div class="sidebar-section">Comms</div>
     <button class="nav-item" data-page="inbox" onclick="nav('inbox')"><span class="icon">✉️</span> Inbox <span class="nav-badge" id="inboxBadge">0</span></button>
     <button class="nav-item" data-page="broadcast" onclick="nav('broadcast')"><span class="icon">📣</span> Broadcast</button>
+    <button class="nav-item" data-page="class" onclick="nav('class')"><span class="icon">C</span> CASPer Class</button>
     <button class="nav-item" data-page="subscribers" onclick="nav('subscribers')"><span class="icon">👥</span> Subscribers</button>
 
     <div class="sidebar-bottom">
@@ -748,7 +749,7 @@
               <select class="form-sel" id="bcList" onchange="onBcListChange()">
                 <optgroup label="🧪 Test">
                   <option value="test">Test — send to brittainmbbs@gmail.com only</option>
-                  <option value="custom">📩 Custom — enter a single email address</option>
+                  <option value="custom">Custom - paste email addresses</option>
                 </optgroup>
                 <optgroup label="📋 All">
                   <option value="subscribers">Newsletter subscribers only</option>
@@ -770,10 +771,17 @@
               </select>
             </div>
 
-            <!-- Custom email input — shown only when "custom" selected -->
+            <!-- Custom email input - shown only when "custom" selected -->
             <div class="form-row" id="bcCustomRow" style="display:none;">
-              <label class="form-lbl">Recipient email address</label>
-              <input class="form-in" id="bcCustomEmail" type="email" placeholder="e.g. student@gmail.com">
+              <label class="form-lbl">Recipient email addresses</label>
+              <textarea class="form-ta" id="bcCustomEmail" rows="4" placeholder="student1@gmail.com, student2@gmail.com&#10;student3@hotmail.com" oninput="onCustomRecipientsInput()" style="min-height:92px;"></textarea>
+              <div id="bcCustomEmailCount" style="margin-top:6px;font-size:0.72rem;color:var(--muted);line-height:1.45;">Paste emails separated by commas, spaces, semicolons, or new lines. Each student receives their own email.</div>
+              <label class="form-lbl" style="margin-top:12px;">Class access page</label>
+              <input class="form-in" id="bcClassLink" type="url" placeholder="https://www.key2md.com/casper-class.html" oninput="saveBroadcastDraft()">
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;">
+                <button class="btn blue" type="button" onclick="insertCasperClassEmail()" style="padding:8px 12px;font-size:0.78rem;">Build today's class email</button>
+                <span style="font-size:0.72rem;color:var(--muted);">Best option: send the protected Key2MD page, not the raw Zoom link.</span>
+              </div>
             </div>
 
             <div class="broadcast-audience" id="bcAudienceBox">
@@ -826,7 +834,7 @@
             </div>
 
             <div style="margin-bottom:14px;padding:10px 12px;background:rgba(56,189,248,0.06);border:1px solid var(--blue-border);border-radius:8px;font-size:0.75rem;color:var(--muted);">
-              💡 <strong style="color:var(--text);">Tip:</strong> Replies from students go directly to <strong style="color:var(--blue);">dan@key2md.net</strong> and appear in your Inbox tab.
+              <strong style="color:var(--text);">Delivery tip:</strong> Manual sends go as individual Resend emails from <strong style="color:var(--blue);">dan@key2md.net</strong>, not Gmail/BCC. Keep class-link emails short and send a test first.
             </div>
 
             <div class="broadcast-actions">
@@ -851,6 +859,75 @@
           <div style="margin-top:8px;font-size:0.7rem;color:var(--muted2);text-align:center;">Preview updates as you type</div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- -- CASPER CLASS -- -->
+    <div id="pageClass" class="page">
+      <div class="page-header">
+        <div>
+          <div class="page-title">CASPer Class</div>
+          <div class="page-sub">Paid $120 class link gate. Students only see the link after payment or manual authorisation.</div>
+        </div>
+        <div class="page-actions">
+          <span class="refresh-note" id="ccStatus">Not loaded</span>
+          <button class="btn" onclick="loadCasperClass()">Refresh</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,0.85fr);gap:18px;align-items:start;">
+        <div class="bc-card" style="max-width:100%;">
+          <div class="bc-title">This week's class</div>
+          <div class="bc-sub">Paste the real Zoom/Meet link here. Students with paid access will see it on casper-class.html.</div>
+
+          <div class="form-row">
+            <label class="form-lbl">Class title</label>
+            <input class="form-in" id="ccTitle" type="text" placeholder="Key2MD CASPer Live Class">
+          </div>
+          <div class="form-row">
+            <label class="form-lbl">Class ID</label>
+            <input class="form-in" id="ccClassId" type="text" placeholder="2026-05-15-casper">
+            <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">Use a new ID each week so last week's buyers do not see this week's link.</div>
+          </div>
+          <div class="form-row">
+            <label class="form-lbl">Class date/time label</label>
+            <input class="form-in" id="ccStartsAt" type="text" placeholder="Friday 15 May, 6:00pm AEST">
+          </div>
+          <div class="form-row">
+            <label class="form-lbl">Hide link after</label>
+            <input class="form-in" id="ccExpiresAt" type="datetime-local">
+          </div>
+          <div class="form-row">
+            <label class="form-lbl">Private class link</label>
+            <input class="form-in" id="ccJoinUrl" type="url" placeholder="https://zoom.us/j/...">
+          </div>
+          <div class="form-row">
+            <label class="form-lbl">Checkout status</label>
+            <select class="form-sel" id="ccOpenStatus">
+              <option value="open">Open - students can pay $120</option>
+              <option value="closed">Closed - checkout disabled</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+            <button class="btn primary" onclick="saveCasperClass()">Save class gate</button>
+            <button class="btn blue" onclick="copyClassPageLink()">Copy student page</button>
+          </div>
+        </div>
+
+        <div class="bc-card" style="max-width:100%;">
+          <div class="bc-title">Authorised students</div>
+          <div class="bc-sub">Paid students are added automatically by Stripe. Use this for manual comp/backup access.</div>
+          <div class="form-row">
+            <label class="form-lbl">Add emails manually</label>
+            <textarea class="form-ta" id="ccManualEmails" rows="4" placeholder="student@email.com, another@email.com"></textarea>
+          </div>
+          <button class="btn green" onclick="authoriseCasperClass()">Authorise emails</button>
+          <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+          <div class="tbl-toolbar"><span class="tbl-status" id="ccAccessStatus">No access rows loaded.</span></div>
+          <div class="tbl-wrap" style="border-radius:10px;">
+            <div class="tbl-scroller" style="max-height:420px;"><table><thead><tr><th>Email</th><th>Source</th><th>Added</th><th style="width:80px;">Action</th></tr></thead><tbody id="ccAccessBody"></tbody></table></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -981,6 +1058,7 @@
         <div>
           <div class="page-title">Revenue</div>
           <div class="page-sub">All transactions, MRR, and financial breakdown</div>
+          <div style="margin-top:6px;font-size:0.72rem;color:var(--muted);">Use Remove on a transaction row for old fake/refunded local records. This excludes the row from dashboard totals without touching Stripe.</div>
         </div>
         <div class="page-actions">
           <span class="refresh-note" id="rvReconcileStatus"></span>
@@ -1031,6 +1109,7 @@
           <option value="credits">Credit packs</option>
           <option value="mmi_credits">MMI credits</option>
           <option value="marking">Expert marking</option>
+          <option value="casper_class">CASPer class</option>
         </select>
         <select class="ctrl-sel" id="rvLimit" onchange="loadRevenue()">
           <option value="100" selected>100 rows</option>
@@ -1040,7 +1119,7 @@
       <div class="tbl-wrap">
         <div class="tbl-toolbar"><span class="tbl-status" id="rvStatus">—</span></div>
         <div class="tbl-scroller"><table><thead><tr>
-          <th>Time</th><th>Student</th><th>Type</th><th>Amount</th><th>Status</th><th style="width:80px;text-align:center;">Actions</th>
+          <th>Time</th><th>Student</th><th>Type</th><th>Amount</th><th>Status</th><th style="width:140px;text-align:center;">Actions</th>
         </tr></thead><tbody id="rvBody"></tbody></table></div>
         <div class="empty hidden" id="rvEmpty">No transactions yet.</div>
       </div>
@@ -1246,6 +1325,7 @@ const S = {
   reviews: [], users: [], enquiries: [], subscribers: [],
   conversations: [], filteredConvs: [],
   mmiReviews: [], mockAttempts: [], mockManualReviews: [], revenue: [], payers: [], payersFromServer: false, revenueSummary: null, monitoring: null,
+  casperClass: null,
   activeConv: null,
   detailCache: new Map(),
   studentReportDetail: null,
@@ -1340,7 +1420,7 @@ async function api(path, opts={}) {
 // ══════════════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════════════
-const ADMIN_PAGES = new Set(['dashboard','reviews','mmi','mocks','users','enquiries','revenue','monitoring','inbox','broadcast','subscribers']);
+const ADMIN_PAGES = new Set(['dashboard','reviews','mmi','mocks','users','enquiries','revenue','monitoring','inbox','broadcast','class','subscribers']);
 
 function normalisePage(page) {
   const key = String(page || 'dashboard').replace(/^#/, '').trim().toLowerCase();
@@ -1388,6 +1468,7 @@ function nav(page, opts={}) {
   if (target==='enquiries' && !S.enquiries.length) loadEnquiries();
   if (target==='users' && !S.users.length) loadUsers();
   if (target==='broadcast') updateBcStats();
+  if (target==='class') loadCasperClass();
   if (target==='mmi' && !S.mmiReviews.length) loadMMI();
   if (target==='revenue' && !S.revenue.length) loadRevenue();
   if (target==='monitoring') loadMonitoring();
@@ -1436,6 +1517,7 @@ function buildCommandItems() {
     {kind:'Page', title:'Users', sub:'Search students, adjust credits, and change tiers', action:()=>nav('users'), hint:'Open'},
     {kind:'Page', title:'Inbox', sub:'Student conversations and replies', action:()=>nav('inbox'), hint:'Open'},
     {kind:'Page', title:'Broadcast', sub:'Send segmented emails with preview', action:()=>nav('broadcast'), hint:'Open'},
+    {kind:'Page', title:'CASPer Class', sub:'Set the paid class link and authorise students', action:()=>nav('class'), hint:'Open'},
     {kind:'Page', title:'Mock Exams', sub:'Saved full CASPer mocks and manual review queue', action:()=>nav('mocks'), hint:'Open'},
     {kind:'Page', title:'Monitoring', sub:'AI parse failures, Whisper failures, and margin checks', action:()=>nav('monitoring'), hint:'Open'},
   ];
@@ -2621,6 +2703,139 @@ async function sendNewEmail() {
 // ══════════════════════════════════════════════════════
 // BROADCAST
 // ══════════════════════════════════════════════════════
+// CASPER CLASS
+function datetimeLocalFromMs(ms) {
+  const n = Number(ms || 0);
+  if (!n) return '';
+  const d = new Date(n);
+  const pad = v => String(v).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function datetimeLocalToMs(value) {
+  if (!value) return 0;
+  const n = new Date(value).getTime();
+  return Number.isFinite(n) ? n : 0;
+}
+
+async function loadCasperClass() {
+  const status = document.getElementById('ccStatus');
+  if (status) status.textContent = 'Loading...';
+  try {
+    const res = await api('/admin/casper-class');
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.message || data?.error || 'Could not load class gate');
+    S.casperClass = data;
+    renderCasperClass();
+    if (status) status.textContent = 'Loaded';
+  } catch(e) {
+    if (status) status.textContent = e.message;
+  }
+}
+
+function renderCasperClass() {
+  const data = S.casperClass || {};
+  const s = data.settings || {};
+  const privateData = data.private || {};
+  const set = (id, value) => { const el = document.getElementById(id); if (el) el.value = value || ''; };
+  set('ccTitle', s.title || 'Key2MD CASPer Live Class');
+  set('ccClassId', s.class_id || '');
+  set('ccStartsAt', s.starts_at || '');
+  set('ccExpiresAt', datetimeLocalFromMs(s.expires_at));
+  set('ccJoinUrl', privateData.join_url || '');
+  set('ccOpenStatus', s.status || 'open');
+
+  const rows = data.access || [];
+  const status = document.getElementById('ccAccessStatus');
+  if (status) status.textContent = `${rows.length} authorised student${rows.length===1?'':'s'}`;
+  const body = document.getElementById('ccAccessBody');
+  if (!body) return;
+  body.innerHTML = rows.length ? rows.map(row => {
+    const dt = fmtDate(row.created_at);
+    return `<tr class="data-row">
+      <td><div class="cell-main">${esc(row.email || row.user_id || '?')}</div><div class="cell-sub">${esc(row.name || '')}</div></td>
+      <td><span class="badge ${row.source==='stripe'?'badge-paid':'badge-default'}">${esc(row.source || 'admin')}</span></td>
+      <td><div class="cell-main">${dt?.date || '-'}</div><div class="cell-sub">${dt?.time || ''}</div></td>
+      <td><button class="btn" style="font-size:0.68rem;padding:3px 8px;background:var(--red-dim);border-color:var(--red-border);color:var(--red);" onclick='removeCasperClassAccess(${jsArg(row.email || '')}, ${jsArg(row.user_id || '')})'>Remove</button></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="4" style="color:var(--muted);padding:16px;">No one is authorised for this class yet.</td></tr>';
+}
+
+async function saveCasperClass() {
+  const status = document.getElementById('ccStatus');
+  if (status) status.textContent = 'Saving...';
+  const body = {
+    title: document.getElementById('ccTitle')?.value || '',
+    class_id: document.getElementById('ccClassId')?.value || '',
+    starts_at: document.getElementById('ccStartsAt')?.value || '',
+    expires_at: datetimeLocalToMs(document.getElementById('ccExpiresAt')?.value || ''),
+    join_url: document.getElementById('ccJoinUrl')?.value || '',
+    status: document.getElementById('ccOpenStatus')?.value || 'open',
+  };
+  try {
+    const res = await api('/admin/casper-class', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.message || data?.error || 'Could not save class gate');
+    S.casperClass = data;
+    renderCasperClass();
+    if (status) status.textContent = 'Saved';
+  } catch(e) {
+    if (status) status.textContent = e.message;
+    alert(e.message);
+  }
+}
+
+async function authoriseCasperClass() {
+  const emails = document.getElementById('ccManualEmails')?.value || '';
+  const parsed = parseBroadcastEmails(emails);
+  if (!parsed.emails.length || parsed.invalid.length) {
+    alert(parsed.invalid.length ? `Fix invalid email: ${parsed.invalid[0]}` : 'Paste at least one valid email.');
+    return;
+  }
+  const status = document.getElementById('ccStatus');
+  if (status) status.textContent = 'Authorising...';
+  try {
+    const res = await api('/admin/casper-class/authorize', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ emails }) });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.message || data?.error || 'Could not authorise students');
+    S.casperClass = { ...(S.casperClass || {}), access: data.access || [] };
+    document.getElementById('ccManualEmails').value = '';
+    renderCasperClass();
+    if (status) status.textContent = `Authorised ${data.granted || parsed.emails.length}`;
+  } catch(e) {
+    if (status) status.textContent = e.message;
+    alert(e.message);
+  }
+}
+
+async function removeCasperClassAccess(email, userId) {
+  if (!confirm(`Remove CASPer class access for ${email || userId}?`)) return;
+  const status = document.getElementById('ccStatus');
+  if (status) status.textContent = 'Removing access...';
+  try {
+    const res = await api('/admin/casper-class/remove', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email, user_id: userId }) });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.message || data?.error || 'Could not remove access');
+    S.casperClass = { ...(S.casperClass || {}), access: data.access || [] };
+    renderCasperClass();
+    if (status) status.textContent = 'Access removed';
+  } catch(e) {
+    if (status) status.textContent = e.message;
+    alert(e.message);
+  }
+}
+
+async function copyClassPageLink() {
+  const url = 'https://www.key2md.com/casper-class.html';
+  try {
+    await navigator.clipboard.writeText(url);
+    const status = document.getElementById('ccStatus');
+    if (status) status.textContent = 'Student page copied';
+  } catch {
+    alert(url);
+  }
+}
+
 async function updateBcStats() {
   document.getElementById('bcSubs').textContent = S.subscribers.length||'—';
   document.getElementById('bcUsers').textContent = S.users.length||'—';
@@ -2633,6 +2848,94 @@ async function updateBcStats() {
 const BC_DRAFT_KEY = 'k2md_broadcast_draft_v2';
 let bcMode = 'rich'; // 'rich' | 'plain' | 'html'
 let bcAudienceCache = null;
+
+function parseBroadcastEmails(raw) {
+  const source = String(raw || '').toLowerCase();
+  const matches = source.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi) || [];
+  const seen = new Set();
+  const emails = [];
+  for (const match of matches) {
+    const email = match.toLowerCase();
+    if (!seen.has(email)) {
+      seen.add(email);
+      emails.push(email);
+    }
+  }
+  const parts = source
+    .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, ' ')
+    .split(/[\s,;<>()"']+/)
+    .map(v => v.trim())
+    .filter(Boolean);
+  const invalid = [];
+  for (const part of parts) {
+    if (part.includes('@')) {
+      invalid.push(part);
+    }
+  }
+  return { emails, invalid };
+}
+
+function onCustomRecipientsInput() {
+  const raw = document.getElementById('bcCustomEmail')?.value || '';
+  const { emails, invalid } = parseBroadcastEmails(raw);
+  const el = document.getElementById('bcCustomEmailCount');
+  if (el) {
+    if (!raw.trim()) {
+      el.textContent = 'Paste emails separated by commas, spaces, semicolons, or new lines. Each student receives their own email.';
+      el.style.color = 'var(--muted)';
+    } else if (invalid.length) {
+      el.textContent = `${emails.length} valid recipient${emails.length===1?'':'s'}; fix ${invalid.length} invalid entr${invalid.length===1?'y':'ies'}: ${invalid.slice(0,3).join(', ')}`;
+      el.style.color = 'var(--red)';
+    } else if (emails.length > 250) {
+      el.textContent = `${emails.length} recipients found. Manual sends are capped at 250 at a time; split this into smaller groups.`;
+      el.style.color = 'var(--red)';
+    } else {
+      el.textContent = `${emails.length} recipient${emails.length===1?'':'s'} ready. Duplicates are automatically removed.`;
+      el.style.color = 'var(--green)';
+    }
+  }
+  bcAudienceCache = null;
+  refreshBroadcastAudience(false);
+  saveBroadcastDraft();
+}
+
+function isSafeHttpUrl(value) {
+  try {
+    const url = new URL(String(value || '').trim());
+    return url.protocol === 'https:' || url.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
+function insertCasperClassEmail() {
+  const link = (document.getElementById('bcClassLink')?.value || 'https://www.key2md.com/casper-class.html').trim();
+  const al = document.getElementById('bcAlert');
+  if (!link || !isSafeHttpUrl(link)) {
+    if (al) { al.className = 'alert err'; al.textContent = 'Paste a valid class access page first.'; }
+    return;
+  }
+  if (document.getElementById('bcClassLink')) document.getElementById('bcClassLink').value = link;
+  const dateLabel = new Date().toLocaleDateString('en-AU', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'Australia/Sydney',
+  });
+  document.getElementById('bcSubject').value = `Key2MD CASPer class link - ${dateLabel}`;
+  setBcMode('rich');
+  document.getElementById('bcRichEditor').innerHTML = `
+    <p style="margin:0 0 14px;color:#374151;font-size:15px;line-height:1.75;">Hi there,</p>
+    <p style="margin:0 0 14px;color:#374151;font-size:15px;line-height:1.75;">Here is the protected Key2MD access page for today's CASPer group class:</p>
+    <div style="text-align:center;margin:24px 0;">
+      <a href="${esc(link)}" style="display:inline-block;background:#0ea5e9;color:#fff;font-weight:800;padding:13px 28px;border-radius:50px;text-decoration:none;font-size:15px;">Open class access page</a>
+    </div>
+    <p style="margin:0 0 14px;color:#374151;font-size:15px;line-height:1.75;">Log in with the same Key2MD account used for payment. If the button does not open, copy this link into your browser:<br><a href="${esc(link)}" style="color:#0ea5e9;">${esc(link)}</a></p>
+    <p style="margin:22px 0 0;color:#374151;font-size:15px;line-height:1.75;">See you soon,<br>Dan</p>
+  `;
+  if (al) { al.className = 'alert ok'; al.textContent = 'Class email drafted. Preview it, send yourself a test, then send to the pasted recipients.'; }
+  updateBcPreview();
+}
 
 function setBcMode(mode) {
   bcMode = mode;
@@ -2701,8 +3004,8 @@ function buildBroadcastHtml(subject, bodyHtml) {
   </td></tr>
   <tr><td style="background:#f8fafc;border-top:1px solid #e5e7eb;border-radius:0 0 16px 16px;padding:16px 44px;">
     <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.7;text-align:center;">
-      Key2MD · <a href="https://www.key2md.com" style="color:#0ea5e9;text-decoration:none;">key2md.com</a> · You're receiving this as a Key2MD subscriber.<br>
-      Reply to this email — it comes straight to Dan.
+      Key2MD · <a href="https://www.key2md.com" style="color:#0ea5e9;text-decoration:none;">key2md.com</a><br>
+      Reply to this email and it comes straight to Dan.
     </p>
   </td></tr>
 </table>
@@ -2734,6 +3037,11 @@ function onBcListChange() {
   if (customRow) customRow.style.display = val === 'custom' ? 'block' : 'none';
   if (val === 'custom') document.getElementById('bcCustomEmail')?.focus();
   bcAudienceCache = null;
+  if (val === 'custom') {
+    onCustomRecipientsInput();
+    saveBroadcastDraft();
+    return;
+  }
   refreshBroadcastAudience(false);
   saveBroadcastDraft();
 }
@@ -2741,7 +3049,7 @@ function onBcListChange() {
 function getBcListLabel(list) {
   const labels = {
     test:       'TEST — brittainmbbs@gmail.com only',
-    custom:     'Custom email address',
+    custom:     'Manual recipients',
     subscribers:'Newsletter subscribers',
     users:      'All registered users',
     both:       'Everyone (subscribers + users)',
@@ -2762,6 +3070,7 @@ function saveBroadcastDraft() {
     const draft = {
       list: document.getElementById('bcList')?.value || 'test',
       custom: document.getElementById('bcCustomEmail')?.value || '',
+      class_link: document.getElementById('bcClassLink')?.value || '',
       subject: document.getElementById('bcSubject')?.value || '',
       mode: bcMode,
       rich: document.getElementById('bcRichEditor')?.innerHTML || '',
@@ -2780,6 +3089,7 @@ function restoreBroadcastDraft() {
     const d = JSON.parse(raw);
     if (d.list && document.getElementById('bcList')) document.getElementById('bcList').value = d.list;
     if (d.custom && document.getElementById('bcCustomEmail')) document.getElementById('bcCustomEmail').value = d.custom;
+    if (d.class_link && document.getElementById('bcClassLink')) document.getElementById('bcClassLink').value = d.class_link;
     if (d.subject && document.getElementById('bcSubject')) document.getElementById('bcSubject').value = d.subject;
     if (d.rich && document.getElementById('bcRichEditor')) document.getElementById('bcRichEditor').innerHTML = d.rich;
     if (d.plain && document.getElementById('bcPlainBody')) document.getElementById('bcPlainBody').value = d.plain;
@@ -2797,7 +3107,7 @@ function clearBroadcastDraft() {
 function getLocalAudienceEstimate(list, customEmail = '') {
   const set = new Set();
   if (list === 'test') set.add('brittainmbbs@gmail.com');
-  if (list === 'custom' && customEmail) set.add(customEmail.toLowerCase());
+  if (list === 'custom' && customEmail) parseBroadcastEmails(customEmail).emails.forEach(email => set.add(email));
   if (list === 'subscribers' || list === 'both') S.subscribers.forEach(s=>s.email&&set.add(s.email.toLowerCase()));
   if (list === 'users' || list === 'both') S.users.forEach(u=>u.email&&set.add(u.email.toLowerCase()));
   if (list === 'paying') S.users.filter(u=>Number(u.total_spend_aud||0)>0).forEach(u=>u.email&&set.add(u.email.toLowerCase()));
@@ -2817,10 +3127,30 @@ async function refreshBroadcastAudience(showLoading = true, overrideList = null)
   const main = document.getElementById('bcAudienceMain');
   const sub = document.getElementById('bcAudienceSub');
   if (showLoading && main) main.textContent = 'Checking audience...';
-  if (list === 'custom' && (!customEmail || !customEmail.includes('@'))) {
-    if (main) main.textContent = 'Custom send';
-    if (sub) sub.textContent = 'Enter a valid email address before previewing.';
-    return null;
+  if (list === 'custom') {
+    const parsed = parseBroadcastEmails(customEmail);
+    if (!customEmail) {
+      if (main) main.textContent = 'Manual recipients';
+      if (sub) sub.textContent = 'Paste one or more email addresses before previewing.';
+      return null;
+    }
+    if (parsed.invalid.length) {
+      if (main) main.textContent = `${parsed.emails.length} valid recipient${parsed.emails.length===1?'':'s'} found`;
+      if (sub) sub.textContent = `Fix invalid entr${parsed.invalid.length===1?'y':'ies'} first: ${parsed.invalid.slice(0,4).join(', ')}`;
+      return { count: parsed.emails.length, sample: parsed.emails.slice(0,5), invalid: parsed.invalid };
+    }
+    if (parsed.emails.length > 250) {
+      if (main) main.textContent = `${parsed.emails.length} recipients found`;
+      if (sub) sub.textContent = 'Manual sends are capped at 250 at a time. Split this list into smaller groups.';
+      return { count: parsed.emails.length, sample: parsed.emails.slice(0,5), too_many: true };
+    }
+    if (!showLoading) {
+      const local = { count: parsed.emails.length, sample: parsed.emails.slice(0,5), exact: true };
+      bcAudienceCache = local;
+      if (main) main.textContent = `${local.count} recipient${local.count===1?'':'s'} ready - Manual recipients`;
+      if (sub) sub.textContent = local.sample.length ? `Sample: ${local.sample.join(', ')}` : 'Paste one or more email addresses.';
+      return local;
+    }
   }
   try {
     const res = await api('/admin/inbox/broadcast/preview', {
@@ -2883,12 +3213,21 @@ async function sendBroadcast() {
   const btn   = document.getElementById('bcBtn');
   al.className = 'alert';
 
-  // Validate custom email if needed
+  // Validate manual recipient list if needed
   let customEmail = '';
+  let customRecipientCount = 0;
   if (list === 'custom') {
     customEmail = (document.getElementById('bcCustomEmail')?.value||'').trim();
-    if (!customEmail || !customEmail.includes('@') || !customEmail.includes('.')) {
-      al.className='alert err'; al.textContent='Please enter a valid email address for custom send.'; return;
+    const parsed = parseBroadcastEmails(customEmail);
+    customRecipientCount = parsed.emails.length;
+    if (!customRecipientCount) {
+      al.className='alert err'; al.textContent='Paste at least one valid email address for the class send.'; return;
+    }
+    if (customRecipientCount > 250) {
+      al.className='alert err'; al.textContent='Manual sends are capped at 250 recipients at a time. Split this into smaller groups.'; return;
+    }
+    if (parsed.invalid.length) {
+      al.className='alert err'; al.textContent=`Fix invalid email entr${parsed.invalid.length===1?'y':'ies'} before sending: ${parsed.invalid.slice(0,4).join(', ')}`; return;
     }
   }
 
@@ -2897,7 +3236,7 @@ async function sendBroadcast() {
   const preview = await refreshBroadcastAudience(true, list);
   const count = Number(preview?.count || 0);
   if (!count) { al.className='alert err'; al.textContent='No recipients found for this audience.'; return; }
-  const toLabel = list === 'custom' ? customEmail : getBcListLabel(list);
+  const toLabel = list === 'custom' ? `${customRecipientCount} manual recipient${customRecipientCount===1?'':'s'}` : getBcListLabel(list);
   if (!confirm(`Send to: ${toLabel}\nRecipients: ${count}\n\nSubject: ${subj}\n\nThis cannot be undone. Continue?`)) return;
 
   btn.disabled = true; btn.textContent = 'Sending…';
@@ -2916,7 +3255,9 @@ async function sendBroadcast() {
     if (!res.ok) throw new Error(d?.error||'Broadcast failed');
 
     al.className = 'alert ok';
-    al.textContent = `✓ Sent to ${d.sent||1} recipient${(d.sent||1)===1?'':'s'}`;
+    al.textContent = d.failed
+      ? `Sent to ${d.sent||0} recipient${(d.sent||0)===1?'':'s'}; ${d.failed} failed.`
+      : `Sent to ${d.sent||1} recipient${(d.sent||1)===1?'':'s'}.`;
     document.getElementById('bcSubject').value = '';
     document.getElementById('bcRichEditor').innerHTML = '';
     document.getElementById('bcPlainBody').value = '';
@@ -2924,7 +3265,11 @@ async function sendBroadcast() {
     if (list === 'custom' && document.getElementById('bcCustomEmail')) {
       document.getElementById('bcCustomEmail').value = '';
     }
+    if (list === 'custom' && document.getElementById('bcClassLink')) {
+      document.getElementById('bcClassLink').value = '';
+    }
     clearBroadcastDraft();
+    onCustomRecipientsInput();
     updateBcPreview();
     refreshBroadcastAudience(false);
   } catch(e) {
@@ -3295,7 +3640,7 @@ function buildPayerRows(payments) {
     existing.total_spend_aud += amount;
     if (type.includes('subscription')) existing.subscription_spend_aud += amount;
     if (type.includes('credit')) existing.credit_spend_aud += amount;
-    if (type.startsWith('marking_') || type.includes('mock') || type.includes('manual_review')) existing.service_spend_aud += amount;
+    if (type.startsWith('marking_') || type.includes('mock') || type.includes('manual_review') || type === 'casper_class') existing.service_spend_aud += amount;
     if (email && !existing.email) existing.email = email;
     if (p.name && !existing.name) existing.name = p.name;
     if (p.tier && !existing.tier) existing.tier = p.tier;
@@ -3414,20 +3759,40 @@ function renderRevenue() {
         <div style="display:flex;gap:4px;justify-content:center;">
           <button class="btn" style="font-size:0.68rem;padding:3px 8px;" title="View user profile" onclick="event.stopPropagation();viewUserByEmail('${esc(r.email||'')}')">👤</button>
           <button class="btn blue" style="font-size:0.68rem;padding:3px 8px;" title="Email this student" onclick="event.stopPropagation();composeToUser('${esc(r.email||'')}')">✉</button>
-          <button onclick="event.stopPropagation();deleteRevenueRow(${sIdx})" title="Temporarily hide from this table" style="background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);border-radius:6px;padding:3px 7px;cursor:pointer;font-size:0.72rem;font-weight:700;">✕</button>
+          <button onclick="event.stopPropagation();deleteRevenueRow(${sIdx})" title="Remove from dashboard totals" style="background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);border-radius:6px;padding:3px 7px;cursor:pointer;font-size:0.72rem;font-weight:700;">Remove</button>
         </div>
       </td>
     </tr>`;
   }).join('') : '';
 }
 
-function deleteRevenueRow(idx) {
+async function deleteRevenueRow(idx) {
   const r = S.revenue[idx];
   if (!r) return;
   const label = `${r.email||'?'}  -  $${Number(r.amount_aud||0).toFixed(2)}  -  ${r.type||''}`;
-  if (!confirm(`Temporarily hide this transaction from the dashboard table?\n\n${label}\n\nThis only changes the current browser view. It does not change Stripe or the saved payment record.`)) return;
-  S.revenue.splice(idx, 1);
-  renderRevenue();
+  if (!r.id) {
+    alert('This row is missing a payment ID, so it cannot be removed safely.');
+    return;
+  }
+  if (!confirm(`Remove this transaction from dashboard totals?\n\n${label}\n\nThis will not refund, cancel, or edit anything in Stripe. It marks the old local payment row as removed so it stops counting in Revenue, Users, and Top Payers.`)) return;
+  const status = document.getElementById('rvReconcileStatus');
+  if (status) status.textContent = 'Removing payment row...';
+  try {
+    const res = await api('/admin/payments/remove', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ id: r.id })
+    });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) throw new Error(data?.message || data?.error || 'Could not remove payment row');
+    S.revenue.splice(idx, 1);
+    await Promise.all([loadRevenue(), loadUsers()]);
+    updateDashboard();
+    if (status) status.textContent = 'Payment removed from dashboard totals.';
+  } catch(e) {
+    if (status) status.textContent = e.message;
+    alert(e.message);
+  }
 }
 
 function viewUserByEmail(email) {
