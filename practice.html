@@ -3188,9 +3188,10 @@ ${h.answer}
  updateLimitUI();
  updateLibraryCoverage();
  if(pool[currentIdx]) { updateSeenPill(pool[currentIdx]); updateStarBtn(pool[currentIdx]); }
- showFeedback(fb.score,fb);updateTrend();updateAvgStat();updatePersistentCompetencyProgress();
+ let showScoreCalibrationReminder = false;
+ try{ showScoreCalibrationReminder = k2TrackCompletion(fb.score) === true; }catch(e){}
+ showFeedback(fb.score,fb,{forceScoreDisclaimer:showScoreCalibrationReminder});updateTrend();updateAvgStat();updatePersistentCompetencyProgress();
  refreshLeaderboardData({silent:true});
- try{ k2TrackCompletion(fb.score); }catch(e){}
 
  }catch(err){
  clearStreamTimers();
@@ -3209,8 +3210,9 @@ function getCalibrationQuartile(){
  return {avg:Math.round(avg*10)/10, n:scores.length, ...qi};
 }
 
-function showFeedback(score,fb){
+function showFeedback(score,fb,options){
  if(!fb)return;
+ const forceScoreDisclaimer = !!(options && options.forceScoreDisclaimer);
  // Confetti for high scores
  if(score>=8) triggerConfetti();
  const qi=getQuartile(score);
@@ -3244,8 +3246,9 @@ qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus 
  }</div>
  </div>
  `:'';
- // Check if disclaimer has been permanently dismissed
- const disclaimerDismissed = (() => { try { return localStorage.getItem('k2_score_disclaimer_dismissed') === '1'; } catch { return false; } })();
+ // Check if disclaimer has been permanently dismissed, unless this is the every-5-marking reminder.
+ const disclaimerDismissed = forceScoreDisclaimer ? false : (() => { try { return localStorage.getItem('k2_score_disclaimer_dismissed') === '1'; } catch { return false; } })();
+ const scoreReminderHtml = forceScoreDisclaimer ? `<div style="display:inline-block;margin-bottom:8px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.22);border-radius:50px;padding:4px 9px;color:var(--teal3);font-size:0.68rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;">Calibration reminder - shown every 5 AI markings</div>` : '';
  const disclaimerHtml = `
  <div id="k2ScoreDisclaimerWrap" style="margin-bottom:10px;">
  <button onclick="(function(btn){
@@ -3266,6 +3269,7 @@ qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus 
  if(btn)btn.innerHTML='About this score &#9658;';
  })()" style="background:none;border:none;color:var(--gray400);font-size:0.78rem;cursor:pointer;font-family:inherit;padding:0;flex-shrink:0;line-height:1;" title="Dismiss">x</button>
  </div>
+ ${scoreReminderHtml}
 The AI score is a practice calibration, not an official Acuity result. The scale has recently been recalibrated: it is no longer artificially capped at the top end, so genuinely exceptional responses can now receive 10s. That means 7s and 8s are more achievable than they were under the older, compressed scale.<br><br>
 <strong style="color:var(--gray700);">How to read the new scale:</strong> averaging 7+ is likely Q4 territory. Consistent 7s mean you are doing well; consistent 8s put you in a good position. High-Q4 students will often produce 9s, but you do not need every response to be a 9 for the score to be useful.<br><br>
 <strong style="color:var(--gray700);">School context matters.</strong> If you are aiming for Notre Dame, consistent 7s or 8s should be reassuring. For UoW, assume you need regular 8s and 9s because CASPer carries more weight. Use the written feedback to find the repeatable habits behind the number.
@@ -5178,6 +5182,7 @@ function k2TrackCompletion(score){
  k2SaveProgress(p);
  // Render appropriate nudge
  setTimeout(() => k2RenderNudge(), 400); // after feedback animates in
+ return p.count > 0 && p.count % 5 === 0;
 }
 
 function k2DetectPlateau(scores){
