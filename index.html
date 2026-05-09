@@ -152,7 +152,8 @@
         "description": "Weekly small-group CASPer practice class on Fridays",
         "price": "120",
         "priceCurrency": "AUD",
-        "availability": "https://schema.org/InStock"
+        "availability": "https://schema.org/InStock",
+        "url": "https://www.key2md.com/casper-class.html"
       },
       {
         "@type": "Offer",
@@ -797,7 +798,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <a href="index.html" class="k2-logo">Key<span>2</span>MD</a>
     <ul class="k2-nav-links">
       <li><a href="index.html" data-nav="home">Home</a></li>
-      <li><a href="index.html#casper-classes" style="color:#fbbf24;font-weight:700;">⭐ Friday Classes</a></li>
+      <li><a href="casper-class.html" style="color:#fbbf24;font-weight:700;">⭐ Friday Classes</a></li>
       <li><a href="testimonials.html" data-nav="results">Results</a></li>
       <li><a href="plans.html" data-nav="plans">Plans</a></li>
       <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">📊 Chances</a></li>
@@ -818,7 +819,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
   </nav>
   <nav class="k2-mobile-nav" id="k2MobileNav">
     <a href="index.html">Home</a>
-    <a href="index.html#casper-classes" style="color:#fbbf24;font-weight:700;">⭐ Friday CASPer Classes</a>
+    <a href="casper-class.html" style="color:#fbbf24;font-weight:700;">⭐ Friday CASPer Classes</a>
     <a href="practice.html" class="k2-gold">🎯 CASPer &amp; MMI Practice</a>
     <a href="medical-school-chances.html" class="k2-green">📊 Chances Calculator</a>
     <a href="testimonials.html">Results</a>
@@ -869,8 +870,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <div class="eq-field">
           <label>What are you interested in? *</label>
           <select id="eqType">
-            <option value="CASPer Classes — Friday Signup">⭐ Friday CASPer Classes — $120/session</option>
-            <option value="CASPer Group Session">Friday CASPer Group Session</option>
             <option value="MMI Coaching">1:1 MMI Coaching</option>
             <option value="CASPer Coaching">1:1 CASPer Coaching</option>
             <option value="Specialist MMI">Specialist Training MMI</option>
@@ -1224,41 +1223,39 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
             </div>
           </div>
 
-          <!-- RIGHT: signup form -->
+          <!-- RIGHT: paid registration -->
           <div style="padding:44px 40px;background:rgba(0,0,0,0.2);display:flex;flex-direction:column;justify-content:center;">
             <div id="casperClassForm">
 
               <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);border-radius:50px;padding:5px 14px;font-size:0.72rem;font-weight:700;color:#4ade80;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:16px;">
                 <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,0.2);"></span>
-                Open for signups
+                Paid registration open
               </div>
 
-              <h3 style="font-family:'DM Serif Display',Georgia,serif;font-size:1.5rem;font-weight:400;color:#fff;margin-bottom:6px;line-height:1.2;">Join the next Friday class</h3>
-        <p style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-bottom:22px;line-height:1.5;">Sign up here and Dan can email you the Zoom link and next available Friday. No commitment — come to the ones that suit you.</p>
+              <h3 style="font-family:'DM Serif Display',Georgia,serif;font-size:1.5rem;font-weight:400;color:#fff;margin-bottom:6px;line-height:1.2;">Register for the next Friday class</h3>
+              <p style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-bottom:22px;line-height:1.5;">Choose a one-off pass for this week or ongoing weekly access. Stripe handles payment, then the protected class page reveals the link for paid students.</p>
 
               <div id="casperClassError" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:0.82rem;padding:10px 14px;border-radius:8px;margin-bottom:14px;"></div>
 
-              <div style="margin-bottom:12px;">
-                <label style="display:block;font-size:0.75rem;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:6px;letter-spacing:0.04em;">Your Name *</label>
-                <input type="text" id="ccName" placeholder="e.g. Sarah Chen" autocomplete="name" style="width:100%;padding:12px 14px;border:1.5px solid rgba(255,255,255,0.12);border-radius:10px;font-size:0.9rem;font-family:inherit;color:#fff;background:rgba(255,255,255,0.05);outline:none;transition:all 0.2s;box-sizing:border-box;" onfocus="this.style.borderColor='#fbbf24';this.style.background='rgba(245,158,11,0.06)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)';this.style.background='rgba(255,255,255,0.05)'">
+              <div style="display:grid;gap:10px;margin-bottom:18px;">
+                <div style="border:1px solid rgba(245,158,11,0.25);background:rgba(245,158,11,0.08);border-radius:12px;padding:14px 16px;">
+                  <div style="font-size:0.76rem;font-weight:800;color:#fbbf24;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">One-off</div>
+                  <div style="font-size:1rem;font-weight:800;color:#fff;">$120 for this Friday</div>
+                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.56);line-height:1.5;margin-top:4px;">Drop in for a single class, no ongoing commitment.</div>
+                </div>
+                <div style="border:1px solid rgba(14,165,233,0.25);background:rgba(14,165,233,0.08);border-radius:12px;padding:14px 16px;">
+                  <div style="font-size:0.76rem;font-weight:800;color:#38bdf8;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">Ongoing</div>
+                  <div style="font-size:1rem;font-weight:800;color:#fff;">$120/week for weekly access</div>
+                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.56);line-height:1.5;margin-top:4px;">Automatically register each week and keep the class page as your access point.</div>
+                </div>
               </div>
 
-              <div style="margin-bottom:12px;">
-                <label style="display:block;font-size:0.75rem;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:6px;letter-spacing:0.04em;">Your Email *</label>
-                <input type="email" id="ccEmail" placeholder="e.g. sarah@email.com" autocomplete="email" style="width:100%;padding:12px 14px;border:1.5px solid rgba(255,255,255,0.12);border-radius:10px;font-size:0.9rem;font-family:inherit;color:#fff;background:rgba(255,255,255,0.05);outline:none;transition:all 0.2s;box-sizing:border-box;" onfocus="this.style.borderColor='#fbbf24';this.style.background='rgba(245,158,11,0.06)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)';this.style.background='rgba(255,255,255,0.05)'">
-              </div>
-
-              <div style="margin-bottom:14px;">
-                <label style="display:block;font-size:0.75rem;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:6px;letter-spacing:0.04em;">Exam date / target intake <span style="font-weight:400;color:rgba(255,255,255,0.4);">(optional)</span></label>
-                <input type="text" id="ccNotes" placeholder="e.g. CASPer May 2026 / UniMelb" style="width:100%;padding:12px 14px;border:1.5px solid rgba(255,255,255,0.12);border-radius:10px;font-size:0.9rem;font-family:inherit;color:#fff;background:rgba(255,255,255,0.05);outline:none;transition:all 0.2s;box-sizing:border-box;" onfocus="this.style.borderColor='#fbbf24';this.style.background='rgba(245,158,11,0.06)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)';this.style.background='rgba(255,255,255,0.05)'">
-              </div>
-
-              <button id="ccSubmit" onclick="submitCasperClass()" style="width:100%;padding:15px 24px;border-radius:50px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;font-size:0.95rem;font-weight:800;cursor:pointer;font-family:inherit;transition:all 0.2s;letter-spacing:0.01em;box-shadow:0 6px 20px rgba(245,158,11,0.25);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 28px rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(245,158,11,0.25)'">
-                Reserve My Friday Spot →
+              <button id="ccSubmit" onclick="location.href='casper-class.html'" style="width:100%;padding:15px 24px;border-radius:50px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;font-size:0.95rem;font-weight:800;cursor:pointer;font-family:inherit;transition:all 0.2s;letter-spacing:0.01em;box-shadow:0 6px 20px rgba(245,158,11,0.25);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 28px rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(245,158,11,0.25)'">
+                Choose One-off or Ongoing →
               </button>
 
               <p style="text-align:center;font-size:0.72rem;color:rgba(255,255,255,0.38);margin-top:12px;line-height:1.5;">
-                No payment required now. Dan sends you the details &amp; Zoom link after signup.
+                Secure Stripe checkout. Paid students can use the protected page after 5:30pm if email goes to junk.
               </p>
             </div>
 
@@ -1763,7 +1760,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
             <li class="pricing-feature" style="color:#334155;">Fridays 6:00pm AEST via Zoom</li>
             <li class="pricing-feature" style="color:#334155;">Drop in any week — no commitment</li>
           </ul>
-          <a href="#casper-classes" class="btn btn-primary" style="width:100%;justify-content:center;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;box-shadow:0 4px 20px rgba(245,158,11,0.35);">Reserve My Spot →</a>
+          <a href="casper-class.html" class="btn btn-primary" style="width:100%;justify-content:center;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;box-shadow:0 4px 20px rgba(245,158,11,0.35);">Register / Pay →</a>
         </div>
 
       </div>
@@ -1781,7 +1778,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
         <p class="section-sub">MMI, CASPer, GAMSAT &amp; specialist training. If something isn't answered here, send Dan a message.</p>
       </div>
       <div class="faq-list" id="faqList">
-        <div class="faq-item"><button class="faq-q" style="color:#d97706;">⭐ How do the Friday CASPer Classes actually work?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Every Friday at 6pm AEST, you join a small group (capped at 12) on Zoom. Dan runs through a real-style CASPer station — you write your response under timed conditions, and then <strong>Dan individually reviews your written answer</strong> and gives you feedback tailored to what you wrote, not a generic rubric. You also hear how 8–12 other motivated students answered the same prompt, which is the single fastest way to learn what a Q4 response actually looks like. $120 per session, drop in any week — no commitment or block booking. 34 of last year's regulars scored Q4.</div></div></div>
+        <div class="faq-item"><button class="faq-q" style="color:#d97706;">⭐ How do the Friday CASPer Classes actually work?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Every Friday at 6pm AEST, you join a small group (capped at 12) on Zoom. Dan runs through a real-style CASPer station — you write your response under timed conditions, and then <strong>Dan individually reviews your written answer</strong> and gives you feedback tailored to what you wrote, not a generic rubric. You also hear how 8–12 other motivated students answered the same prompt, which is the single fastest way to learn what a Q4 response actually looks like. You can buy a one-off $120 pass for the next class or ongoing weekly access at $120/week from the protected class page. 34 of last year's regulars scored Q4.</div></div></div>
         <div class="faq-item"><button class="faq-q">Which universities and programs do you cover?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Dan covers all major Australian MD programs including University of Melbourne, Monash, ANU, UQ, USYD, Flinders, UWA, UNSW, and Notre Dame. For specialist training, he covers MMI preparation for RANZCO (Ophthalmology), RACS (Surgery), RANZCP (Psychiatry), ACEM (Emergency Medicine), Dermatology, and Radiology. For GP training, he covers Casper Test preparation for RACGP (AGPT and FSP) and MMI preparation for ACRRM rural pathway selection.</div></div></div>
         <div class="faq-item"><button class="faq-q">Is the specialist training MMI really the same as medical school MMI?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Structurally yes — the station types (ethics, role-play, policy, communication) are the same. What differs is the expected level of response. Specialist program assessors are senior clinicians who expect doctor-level thinking, not student-level. Dan calibrates the coaching accordingly — same framework, higher bar.</div></div></div>
         <div class="faq-item"><button class="faq-q">How is the RACGP Casper Test different from medical school CASPer?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">It is the same Casper Test — same Acuity Insights platform, same nine competencies, same response formats. What changes is the bar. Doctors applying for AGPT or FSP are assessed at registrar level rather than student level: deeper reflection, multilateral empathy, considered ethical reasoning. The full breakdown is in the <a href="blog-racgp-casper-australia.html">RACGP Casper Test Guide</a>. Note: ACRRM uses MMI for selection, not Casper.</div></div></div>
@@ -2049,8 +2046,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       document.getElementById('eqSubmitBtn').disabled=false;
       document.getElementById('eqSubmitBtn').textContent='Send to Dan →';
       if(type&&select){for(var i=0;i<select.options.length;i++){if(select.options[i].value===type){select.selectedIndex=i;break;}}}
-      if(type==='CASPer Group Session'){badge.textContent='👥 Group Session';badge.style.cssText='background:rgba(14,165,233,0.15);color:#38bdf8;border:1px solid rgba(14,165,233,0.3);';title.textContent='Join Friday CASPer Group';}
-      else if(type==='Specialist MMI'){badge.textContent='🔬 Specialist MMI';badge.style.cssText='background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.3);';title.textContent='Specialist Training MMI Coaching';}
+      if(type==='Specialist MMI'){badge.textContent='🔬 Specialist MMI';badge.style.cssText='background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.3);';title.textContent='Specialist Training MMI Coaching';}
       else if(type==='GP CASPer'){badge.textContent='🩺 RACGP Casper Test';badge.style.cssText='background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.25);';title.textContent='RACGP Casper — AGPT & FSP Coaching';}
       else{badge.textContent='📩 Enquiry';badge.style.cssText='background:rgba(14,165,233,0.15);color:#38bdf8;border:1px solid rgba(14,165,233,0.3);';title.textContent='Register Your Interest';}
     sub.textContent='Dan usually replies within 24 hours.';
@@ -2127,47 +2123,9 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       });
     });
 
-    // ── Email capture ──
+    // ── Friday class registration ──
     function submitCasperClass(){
-      var nameEl=document.getElementById('ccName');
-      var emailEl=document.getElementById('ccEmail');
-      var notesEl=document.getElementById('ccNotes');
-      var errEl=document.getElementById('casperClassError');
-      var btn=document.getElementById('ccSubmit');
-      var form=document.getElementById('casperClassForm');
-      var success=document.getElementById('casperClassSuccess');
-      var name=nameEl.value.trim();
-      var email=emailEl.value.trim();
-      var notes=notesEl.value.trim();
-      if(!name){errEl.textContent='Please enter your name.';errEl.style.display='block';nameEl.focus();return;}
-      if(!email||!email.includes('@')||!email.includes('.')){errEl.textContent='Please enter a valid email address.';errEl.style.display='block';emailEl.focus();return;}
-      errEl.style.display='none';btn.disabled=true;btn.textContent='Sending…';btn.style.opacity='0.7';
-      fetch('https://key2md-api.brittainmbbs.workers.dev/api/enquiry',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          name:name,
-          email:email,
-          type:'CASPer Classes — Friday Signup',
-          universities:'',
-          exam_date:notes,
-          notes:'⭐ FRIDAY CASPER CLASS SIGNUP — add to Friday-invite list. Exam/intake: '+(notes||'not specified')
-        })
-      })
-      .then(function(res){return res.json();})
-      .then(function(){
-        form.style.display='none';
-        success.style.display='block';
-        if(typeof gtag==='function')gtag('event','casper_class_signup',{event_category:'conversion',event_label:'friday_classes'});
-      })
-      .catch(function(){
-        // Fallback: mailto
-        var subject=encodeURIComponent('⭐ Friday CASPer Class Signup — '+name);
-        var body=encodeURIComponent('Friday CASPer Class Signup\n\nName: '+name+'\nEmail: '+email+'\nExam date / intake: '+(notes||'Not specified')+'\n\nPlease add to the Friday invite list.');
-        window.open('mailto:brittainmbbs@gmail.com?subject='+subject+'&body='+body);
-        form.style.display='none';
-        success.style.display='block';
-      });
+      location.href='casper-class.html';
     }
     window.submitCasperClass=submitCasperClass;
 

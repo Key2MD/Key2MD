@@ -971,8 +971,8 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
             <span style="font-size:0.62rem;font-weight:700;background:rgba(14,165,233,0.2);color:var(--teal2);padding:2px 6px;border-radius:50px;">Live Zoom</span>
           </div>
         </div>
-        <button onclick="openEnquiry('CASPer Group Session')" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.82rem;font-weight:700;transition:all 0.2s;box-sizing:border-box;border:none;cursor:pointer;font-family:inherit;" onmouseover="this.style.background='#38bdf8'" onmouseout="this.style.background='var(--teal)'">Express Interest →</button>
-        <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:6px;">Dan replies within 24 hours</div>
+        <button onclick="location.href='casper-class.html'" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:50px;background:var(--teal);color:#fff;font-size:0.82rem;font-weight:700;transition:all 0.2s;box-sizing:border-box;border:none;cursor:pointer;font-family:inherit;" onmouseover="this.style.background='#38bdf8'" onmouseout="this.style.background='var(--teal)'">Register / Pay →</button>
+        <div style="font-size:0.62rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:6px;">One-off or weekly access. Page backup after 5:30pm.</div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.12);">
           <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#c4b5fd;margin-bottom:5px;">Full CASPer Mock</div>
       <div style="font-size:0.74rem;color:rgba(255,255,255,0.6);line-height:1.45;margin-bottom:8px;">4 video + 7 written stations in a CASPer-style sequence. Completely new stations, handwritten by Dan.</div>
@@ -1016,7 +1016,6 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
       <div class="eq-field">
         <label>What are you interested in?</label>
         <select id="eqType">
-          <option value="CASPer Group Session">Friday CASPer Group Session ($120)</option>
           <option value="General Enquiry">General Enquiry</option>
           <option value="Bug Report">Bug Report</option>
         </select>
@@ -4803,7 +4802,7 @@ function openEnquiry(type){
   var bugRow=document.getElementById('eqBugRow');
   if(bugRow) bugRow.style.display=(type==='Bug Report')?'block':'none';
   if(type&&select){for(var i=0;i<select.options.length;i++){if(select.options[i].value===type){select.selectedIndex=i;break;}}}
-  if(type==='CASPer Group Session'){
+  if(false){
     badge.textContent='👥 Group Session';
     badge.style.cssText='background:rgba(14,165,233,0.15);color:#38bdf8;border:1px solid rgba(14,165,233,0.3);';
     title.textContent='Join Friday CASPer Group';
