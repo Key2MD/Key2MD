@@ -7,12 +7,13 @@
  <meta name="description" content="Register for the Key2MD CASPer live class. Small-group practice with Dan, with one-off, weekly, or four-class June exam package access.">
  <link rel="canonical" href="https://www.key2md.com/casper-class.html">
  <meta name="robots" content="index, follow">
- <meta property="og:title" content="CASPer Live Class Australia | Key2MD">
- <meta property="og:description" content="Small-group CASPer class with Dan. One-off, weekly, or four-class June exam package access.">
+ <meta property="og:title" content="CASPer Live Class Australia">
+ <meta property="og:description" content="Register for the Key2MD CASPer live class. Small-group practice with Dan, with one-off, weekly, or four-class June exam package access.">
  <meta property="og:type" content="website">
  <meta property="og:url" content="https://www.key2md.com/casper-class.html">
  <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
  <script src="auth.js" defer></script>
+ <script src="key2md-tracking.js" defer></script>
  <link rel="stylesheet" href="admissions-pages.css">
  <style>
  /* -- Page-specific overrides -- */
@@ -319,6 +320,10 @@
  .booking-card { position: static; }
  }
  </style>
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="CASPer Live Class Australia">
+ <meta name="twitter:description" content="Register for the Key2MD CASPer live class. Small-group practice with Dan, with one-off, weekly, or four-class June exam package access.">
+ <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
 </head>
 <body>
 
@@ -329,14 +334,31 @@
  <div class="simple-links">
  <a class="simple-gold" href="casper-class.html">Friday Classes</a>
  <a href="testimonials.html">Results</a>
+ <a href="dashboard.html">Dashboard</a>
  <a href="plans.html">Plans</a>
  <a class="simple-green" href="medical-school-chances.html">Chances</a>
- <a href="practice.html">Practice</a>
- <a href="medicine-entry-requirements.html">Uni Guides</a>
+ <div class="simple-dropdown"><a class="simple-gold" href="practice.html">Practice</a>
+ <div class="simple-dropdown-menu" aria-label="Practice tools">
+ <a class="simple-gold" href="practice.html">CASPer/MMI Practice</a>
+ <a class="simple-purple" href="gamsat-s2-practice.html">GAMSAT S2 Essay Practice</a>
+ <a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a>
+ </div>
+ </div>
+ <div class="simple-dropdown"><a href="guide.html">Resources</a>
+ <div class="simple-dropdown-menu" aria-label="Key2MD resources">
+ <a href="guide.html">Full Guide</a>
+ <a href="about.html">About Dan</a>
+ <a href="medicine-entry-requirements.html">Uni Entry Guides</a>
  <a href="blog.html">Blog</a>
- <a class="simple-cta" href="index.html#book">Book a Session</a>
+ <a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a>
+ <a href="blog-casper-guide-australia.html">CASPer Guide</a>
+ <a href="blog-mmi-guide-australia.html">MMI Guide</a>
+ <a href="blog-gamsat-section-2-reading-list.html">GAMSAT S2 Reading List</a>
  </div>
  </div>
+ <a class="simple-cta" href="index.html#book" data-track="book_modal_open">Book a Session</a>
+ </div>
+</div>
  </nav>
 
  <!-- Hero -->
@@ -439,17 +461,17 @@
  <div id="k2mdAuthBar"></div>
 
  <div class="plan-options" id="planOptions">
- <button type="button" class="plan-option active" id="planOneOff" onclick="selectClassPlan('one_off')">
+ <button type="button" class="plan-option active" id="planOneOff" data-track="class_plan_select" data-plan="one_off" data-track-detail="casper_class_card" onclick="selectClassPlan('one_off')">
  <div class="plan-kicker">This week only</div>
  <strong>One-off class pass - $120 AUD</strong>
  <span>Drop in for a single Friday class, no ongoing commitment.</span>
  </button>
- <button type="button" class="plan-option" id="planOngoing" onclick="selectClassPlan('ongoing')">
+ <button type="button" class="plan-option" id="planOngoing" data-track="class_plan_select" data-plan="ongoing" data-track-detail="casper_class_card" onclick="selectClassPlan('ongoing')">
  <div class="plan-kicker">Weekly access</div>
  <strong>Ongoing weekly - $120 AUD/week</strong>
  <span>Auto-registers you each week until you cancel.</span>
  </button>
- <button type="button" class="plan-option" id="planPackage" onclick="selectClassPlan('package')">
+ <button type="button" class="plan-option" id="planPackage" data-track="class_plan_select" data-plan="package" data-track-detail="casper_class_card" onclick="selectClassPlan('package')">
  <div class="plan-kicker">June 11 exam package</div>
  <strong>4-class upfront package - $440 AUD</strong>
  <span>Covers the four Friday classes leading into the June 11 exam. Last class: Friday June 5.</span>
@@ -616,6 +638,7 @@
  const btn = document.getElementById('payBtn');
  btn.disabled = true;
  btn.textContent = 'Redirecting to Stripe...';
+ window.Key2MDTrack?.classCheckoutStart?.(selectedClassPlan);
  try {
  const res = await fetch(`${API_BASE}/api/casper-class/checkout`, {
  method: 'POST',
@@ -623,14 +646,14 @@
  body: JSON.stringify({
  purchase_type: selectedClassPlan,
  plan: selectedClassPlan,
- success_url: `${location.origin}${location.pathname}?payment=success`,
- cancel_url: `${location.origin}${location.pathname}?payment=cancelled`
+ success_url: `${location.origin}${location.pathname}?payment=success&session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(selectedClassPlan)}`,
+ cancel_url: `${location.origin}${location.pathname}?payment=cancelled&plan=${encodeURIComponent(selectedClassPlan)}`
  })
  });
  const data = await res.json();
  if (!res.ok) throw new Error(data.message || data.error || 'Payment setup failed.');
  const checkoutUrl = data.checkout_url || data.url || data.redirect_url;
- if (checkoutUrl) { window.location.href = checkoutUrl; return; }
+ if (checkoutUrl) { window.Key2MDTrack?.stripeRedirect?.('casper_class', selectedClassPlan); window.location.href = checkoutUrl; return; }
  if (data.already_paid) {
  setStatus('You already have access for this class. Refreshing your access now.', 'ok');
  await refreshClassStatus();
@@ -638,6 +661,12 @@
  }
  throw new Error(data.message || data.error || 'No checkout URL returned');
  } catch(e) {
+ window.Key2MDTrack?.track?.('class_checkout_error', {
+ event_category: 'conversion',
+ event_label: selectedClassPlan,
+ plan: selectedClassPlan,
+ detail: String(e.message || 'unknown').slice(0, 80)
+ });
  setStatus(e.message || 'Something went wrong. Try again.', 'err');
  btn.disabled = false;
  btn.textContent = checkoutButtonText();
@@ -659,7 +688,48 @@
  }
  }
 
- document.addEventListener('DOMContentLoaded', refreshClassStatus);
+ async function trackClassPaymentReturn(){
+ const params = new URLSearchParams(location.search);
+ const paymentState = params.get('payment');
+ if (!paymentState) return;
+ const fallbackPlan = params.get('plan') || selectedClassPlan;
+ const base = { event_category: 'conversion', event_label: paymentState, plan: fallbackPlan };
+ if (paymentState === 'success' && params.get('session_id') && token()) {
+ try {
+ const res = await fetch(`${API_BASE}/api/casper-class/checkout-session?session_id=${encodeURIComponent(params.get('session_id'))}`, {
+ headers: { Authorization: `Bearer ${token()}` }
+ });
+ const data = await res.json().catch(() => ({}));
+ if (res.ok && data.ok) {
+ const verified = {
+ event_category: 'conversion',
+ event_label: data.purchase_type || fallbackPlan,
+ plan: data.purchase_type || fallbackPlan,
+ product: data.type || 'casper_class',
+ value: Number(data.amount_total || 0) / 100,
+ currency: (data.currency || 'aud').toUpperCase(),
+ detail: data.paid ? 'verified_paid' : 'verified_unpaid'
+ };
+ window.Key2MDTrack?.track?.('class_payment_return', verified);
+ if (data.paid) window.Key2MDTrack?.track?.('class_payment_success', verified);
+ else window.Key2MDTrack?.track?.('class_payment_unverified', verified);
+ return;
+ }
+ } catch(e) {
+ window.Key2MDTrack?.track?.('class_payment_verify_error', { ...base, detail: String(e.message || 'unknown').slice(0, 80) });
+ }
+ }
+ window.Key2MDTrack?.track?.('class_payment_return', base);
+ window.Key2MDTrack?.track?.(
+ paymentState === 'success' ? 'class_payment_success' : 'class_payment_cancelled',
+ base
+ );
+ }
+
+ document.addEventListener('DOMContentLoaded', () => {
+ trackClassPaymentReturn();
+ refreshClassStatus();
+ });
  </script>
 
 </body>

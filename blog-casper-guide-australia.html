@@ -38,7 +38,7 @@
  --radius:16px; --radius-sm:10px;
 }
 html { scroll-behavior: smooth; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--gray50); color: var(--gray800); line-height: 1.75; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: linear-gradient(180deg,#f8fafc 0%,#ffffff 42%,#f8fafc 100%); color: var(--gray800); line-height: 1.75; }
 a { text-decoration: none; color: inherit; }
 img { max-width: 100%; display: block; }
 
@@ -70,12 +70,12 @@ footer a:hover { color:var(--white); }
 .article-wrap li strong { color:var(--gray800); }
 
 /* Callout box */
-.callout { border-radius:var(--radius); padding:20px 24px; margin:24px 0; border-left:4px solid; }
-.callout-teal { background:rgba(14,165,233,0.06); border-color:var(--teal); }
-.callout-gold { background:rgba(245,158,11,0.06); border-color:var(--gold); }
-.callout-red { background:rgba(239,68,68,0.06); border-color:var(--red); }
-.callout-navy { background:rgba(10,22,40,0.04); border-color:var(--navy); }
-.callout-title { font-size:0.88rem; font-weight:700; color:var(--gray800); margin-bottom:6px; }
+.callout { border:1px solid var(--gray200); border-left-width:5px; border-radius:18px; padding:22px 24px; margin:26px 0; box-shadow:0 14px 32px rgba(15,23,42,0.06); }
+.callout-teal { background:linear-gradient(135deg,rgba(14,165,233,0.08),#fff); border-color:rgba(14,165,233,0.18); border-left-color:var(--teal); }
+.callout-gold { background:linear-gradient(135deg,rgba(245,158,11,0.09),#fff); border-color:rgba(245,158,11,0.2); border-left-color:var(--gold); }
+.callout-red { background:linear-gradient(135deg,rgba(239,68,68,0.08),#fff); border-color:rgba(239,68,68,0.2); border-left-color:var(--red); }
+.callout-navy { background:linear-gradient(135deg,rgba(10,22,40,0.05),#fff); border-color:rgba(10,22,40,0.14); border-left-color:var(--navy); }
+.callout-title { font-size:0.88rem; font-weight:800; color:var(--gray800); margin-bottom:6px; }
 .callout p { font-size:0.88rem; color:var(--gray600); line-height:1.7; margin-bottom:0; }
 
 /* Formula box */
@@ -85,14 +85,41 @@ footer a:hover { color:var(--white); }
 .formula-note { font-size:0.82rem; color:rgba(255,255,255,0.5); }
 
 /* CTA banner */
-.cta-banner { background:var(--navy); border-radius:var(--radius); padding:36px 32px; margin:40px 0; text-align:center; }
-.cta-banner h3 { font-size:1.2rem; font-weight:800; color:var(--white); margin-bottom:8px; }
-.cta-banner p { font-size:0.88rem; color:rgba(255,255,255,0.55); margin-bottom:20px; }
-.cta-banner .btn { display:inline-block; padding:12px 28px; border-radius:50px; font-weight:700; font-size:0.9rem; transition:all 0.2s; text-decoration:none; }
-.cta-banner .btn-primary { background:var(--teal); color:var(--white); margin-right:10px; }
-.cta-banner .btn-primary:hover { background:var(--teal2); transform:translateY(-1px); }
-.cta-banner .btn-outline { border:1.5px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.7); }
-.cta-banner .btn-outline:hover { border-color:rgba(255,255,255,0.4); color:var(--white); }
+.cta-banner { position:relative; overflow:hidden; background:radial-gradient(circle at 86% 12%,rgba(56,189,248,0.22),transparent 32%),linear-gradient(135deg,#071326 0%,#0d2a52 100%); border:1px solid rgba(56,189,248,0.18); border-radius:22px; padding:40px 34px; margin:44px 0; text-align:center; box-shadow:0 24px 60px rgba(15,23,42,0.18); }
+.cta-banner::before { content:''; position:absolute; inset:0 0 auto; height:3px; background:linear-gradient(90deg,var(--teal),var(--teal2),var(--gold)); }
+.cta-banner h3 { position:relative; font-size:1.24rem; font-weight:800; color:var(--white); margin-bottom:8px; }
+.cta-banner p { position:relative; font-size:0.9rem; color:rgba(255,255,255,0.68); margin:0 auto 22px; max-width:560px; }
+.cta-banner .btn { position:relative; display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:0 24px; border-radius:999px; font-weight:800; font-size:0.9rem; transition:transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease; text-decoration:none; margin:4px 6px; }
+.cta-banner .btn-primary { background:linear-gradient(135deg,var(--teal),var(--teal2)); color:var(--white); box-shadow:0 14px 30px rgba(14,165,233,0.28); }
+.cta-banner .btn-primary:hover { background:linear-gradient(135deg,var(--teal3),var(--teal2)); transform:translateY(-1px); box-shadow:0 18px 38px rgba(14,165,233,0.36); }
+.cta-banner .btn-outline { border:1.5px solid rgba(255,255,255,0.22); color:rgba(255,255,255,0.82); background:rgba(255,255,255,0.05); }
+.cta-banner .btn-outline:hover { border-color:rgba(56,189,248,0.5); color:var(--white); background:rgba(14,165,233,0.14); }
+
+/* Decision-tool CTA */
+.tool-nudge { margin:28px 0; padding:22px; border:1px solid rgba(14,165,233,0.22); border-radius:18px; background:radial-gradient(circle at 96% 12%,rgba(14,165,233,0.12),transparent 30%),linear-gradient(135deg,#fff 0%,#f8fafc 100%); box-shadow:0 16px 38px rgba(15,23,42,0.08); display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.tool-nudge-kicker { display:inline-flex; align-items:center; min-height:24px; padding:0 10px; border-radius:999px; background:rgba(14,165,233,0.1); color:var(--teal3); font-size:0.68rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; }
+.tool-nudge strong { display:block; color:var(--navy); font-size:1.02rem; line-height:1.35; margin:8px 0 4px; }
+.tool-nudge p { margin:0; font-size:0.9rem; color:var(--gray600); line-height:1.65; }
+.tool-nudge a.tool-nudge-btn { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:0 18px; border-radius:999px; background:linear-gradient(135deg,var(--teal),var(--teal2)); color:#fff !important; font-size:0.88rem; font-weight:800; text-decoration:none !important; box-shadow:0 14px 30px rgba(14,165,233,0.24); transition:transform 0.18s ease, box-shadow 0.18s ease; white-space:nowrap; }
+.tool-nudge a.tool-nudge-btn::after { content:'->'; }
+.tool-nudge a.tool-nudge-btn:hover { transform:translateY(-1px); box-shadow:0 18px 38px rgba(14,165,233,0.34); }
+.tool-nudge.is-dark { background:radial-gradient(circle at 92% 8%,rgba(56,189,248,0.24),transparent 34%),linear-gradient(135deg,#071326 0%,#0d2a52 100%); border-color:rgba(56,189,248,0.22); box-shadow:0 22px 52px rgba(15,23,42,0.18); }
+.tool-nudge.is-dark .tool-nudge-kicker { background:rgba(56,189,248,0.16); color:var(--teal2); }
+.tool-nudge.is-dark strong { color:#fff; }
+.tool-nudge.is-dark p { color:rgba(255,255,255,0.7); }
+.tool-nudge.is-dark a.tool-nudge-btn { background:#fff; color:var(--navy) !important; box-shadow:0 14px 30px rgba(0,0,0,0.2); }
+.calculator-feature { max-width:900px; margin:-34px auto 36px; padding:0 20px; }
+.calculator-feature-card { display:block; position:relative; overflow:hidden; border-radius:22px; padding:30px 34px; color:#fff; text-decoration:none; background:radial-gradient(circle at 90% 8%,rgba(56,189,248,0.25),transparent 34%),linear-gradient(135deg,#071326 0%,#0d2a52 100%); border:1px solid rgba(56,189,248,0.22); box-shadow:0 26px 70px rgba(15,23,42,0.24); transition:transform 0.18s ease, box-shadow 0.18s ease; }
+.calculator-feature-card:hover { transform:translateY(-2px); box-shadow:0 32px 82px rgba(15,23,42,0.3); }
+.calculator-feature-inner { position:relative; display:flex; align-items:center; gap:22px; justify-content:space-between; }
+.calculator-feature-kicker { display:inline-flex; min-height:24px; align-items:center; padding:0 10px; border-radius:999px; background:rgba(14,165,233,0.16); color:var(--teal2); font-size:0.68rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px; }
+.calculator-feature-title { font-size:1.32rem; font-weight:800; color:#fff; line-height:1.25; margin-bottom:5px; }
+.calculator-feature-copy { font-size:0.92rem; color:rgba(255,255,255,0.72); line-height:1.55; }
+.calculator-feature-action { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:0 20px; border-radius:999px; background:linear-gradient(135deg,var(--teal),var(--teal2)); color:#fff; font-size:0.9rem; font-weight:800; box-shadow:0 14px 30px rgba(14,165,233,0.28); white-space:nowrap; }
+.calculator-feature-action::after { content:'->'; }
+.topic-link-grid { max-width:1040px; margin:0 auto 34px; padding:0 20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
+.topic-link-grid a { display:flex; align-items:center; min-height:52px; border:1px solid var(--gray200); border-radius:14px; padding:14px 16px; text-decoration:none; color:var(--navy); font-weight:800; background:linear-gradient(135deg,#fff 0%,#f8fafc 100%); box-shadow:0 10px 24px rgba(15,23,42,0.05); transition:transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+.topic-link-grid a:hover { transform:translateY(-1px); border-color:rgba(14,165,233,0.35); box-shadow:0 16px 34px rgba(14,165,233,0.12); color:var(--teal3); }
 
 /* Breadcrumb */
 .breadcrumb { font-size:0.78rem; color:rgba(255,255,255,0.35); margin-bottom:16px; }
@@ -100,13 +127,20 @@ footer a:hover { color:var(--white); }
 .breadcrumb a:hover { color:var(--teal2); }
 
 /* Related articles */
-.related { margin-top:48px; padding-top:32px; border-top:1px solid var(--gray200); }
-.related h3 { font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:16px; }
-.related-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
-.related-card { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius-sm); padding:20px; transition:all 0.2s; text-decoration:none; }
-.related-card:hover { border-color:var(--teal); box-shadow:0 4px 20px rgba(14,165,233,0.1); transform:translateY(-2px); }
-.related-card h4 { font-size:0.88rem; font-weight:700; color:var(--navy); margin-bottom:6px; }
-.related-card p { font-size:0.78rem; color:var(--gray400); line-height:1.5; }
+.related { margin-top:52px; padding-top:34px; border-top:1px solid rgba(226,232,240,0.9); }
+.related h3 { font-size:1rem; font-weight:800; color:var(--navy); margin-bottom:16px; }
+.related-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; }
+.related-card { display:block; background:linear-gradient(135deg,#fff 0%,#f8fafc 100%); border:1px solid var(--gray200); border-radius:16px; padding:22px; transition:transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; text-decoration:none !important; color:inherit; box-shadow:0 12px 28px rgba(15,23,42,0.06); }
+.related-card:hover { border-color:rgba(14,165,233,0.38); box-shadow:0 18px 40px rgba(14,165,233,0.12); transform:translateY(-2px); }
+.related-card h4 { font-size:0.9rem; font-weight:800; color:var(--navy); margin-bottom:7px; line-height:1.35; }
+.related-card p { font-size:0.8rem; color:var(--gray600); line-height:1.55; margin:0; }
+.related-card.featured { background:radial-gradient(circle at 92% 8%,rgba(56,189,248,0.22),transparent 35%),linear-gradient(135deg,#071326,#0d2a52); border-color:rgba(56,189,248,0.28); box-shadow:0 18px 44px rgba(15,23,42,0.18); }
+.related-card.featured h4 { color:#7dd3fc; }
+.related-card.featured p { color:rgba(255,255,255,0.68); }
+.related-card.featured.green { border-color:rgba(34,197,94,0.3); }
+.related-card.featured.green h4 { color:#86efac; }
+.related-card.featured.gold { border-color:rgba(245,158,11,0.34); }
+.related-card.featured.gold h4 { color:#fcd34d; }
 
 /* Student card */
 .student-card { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius-sm); padding:16px 20px; margin:12px 0; }
@@ -143,6 +177,11 @@ footer a:hover { color:var(--white); }
 @media (max-width:768px) {
  .blog-hero { padding:88px 5% 40px; }
  .article-wrap { padding:32px 16px 48px; }
+ .tool-nudge { display:block; padding:20px; }
+ .tool-nudge a.tool-nudge-btn { width:100%; margin-top:16px; }
+ .calculator-feature-card { padding:24px; }
+ .calculator-feature-inner { display:block; }
+ .calculator-feature-action { width:100%; margin-top:16px; }
 }
 </style>
 <script type="application/ld+json">
@@ -295,6 +334,23 @@ footer a:hover { color:var(--white); }
  ]
 }
  </script>
+<style id="k2-nav-dropdown-fix">
+.k2-nav-links li.k2-dropdown{position:relative;}
+.k2-nav-links li.k2-dropdown>a{display:inline-flex;align-items:center;gap:5px;}
+.k2-nav-links li.k2-dropdown>a::after{content:'';width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;opacity:0.72;transform:translateY(-2px) rotate(45deg);}
+.k2-dropdown-menu{position:absolute;top:calc(100% + 8px);left:0;right:auto;min-width:258px;background:#071326;border:1px solid rgba(14,165,233,0.28);border-radius:14px;padding:8px;box-shadow:0 18px 48px rgba(0,0,0,0.52);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity 0.16s ease,visibility 0.16s ease,transform 0.16s ease;list-style:none;margin:0;z-index:1001;}
+.k2-dropdown:hover>.k2-dropdown-menu,.k2-dropdown:focus-within>.k2-dropdown-menu,.k2-dropdown.open>.k2-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0);}
+.k2-dropdown-menu li{margin:0;}
+.k2-dropdown-menu a{display:block;padding:10px 12px;border-radius:10px;font-size:0.86rem;color:rgba(255,255,255,0.84);font-weight:650;white-space:nowrap;text-decoration:none;}
+.k2-dropdown-menu a:hover{background:rgba(14,165,233,0.14);color:#fff;}
+.k2-dropdown-menu a.k2-gold{color:#fbbf24;font-weight:800;}
+.k2-dropdown-menu a.k2-purple{color:#c4b5fd;font-weight:800;}
+.k2-mobile-label{display:block;margin:10px 0 4px;padding:8px 14px 4px;color:rgba(255,255,255,0.42);font-size:0.68rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;font-family:'DM Sans',system-ui,sans-serif;}
+.k2-mobile-nav a.k2-purple{color:#c4b5fd;font-weight:700;}
+body[data-page="guide"] .k2-nav-links a[data-nav="resources"],body[data-page="about"] .k2-nav-links a[data-nav="resources"],body[data-page="blog"] .k2-nav-links a[data-nav="resources"],body[data-page="requirements"] .k2-nav-links a[data-nav="resources"]{color:#0ea5e9;}
+body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
+@media(max-width:900px){.k2-dropdown-menu{display:none;}}
+</style>
 </head>
 <body>
 <!-- === KEY2MD CANONICAL NAV === -->
@@ -307,9 +363,25 @@ footer a:hover { color:var(--white); }
  <li><a href="dashboard.html" data-nav="dashboard">Dashboard</a></li>
  <li><a href="plans.html" data-nav="plans">Plans</a></li>
  <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">Chances</a></li>
- <li><a href="practice.html" class="k2-gold" data-nav="practice">Practice</a></li>
- <li><a href="medicine-entry-requirements.html" data-nav="requirements">Uni Guides</a></li>
- <li><a href="blog.html" data-nav="blog">Blog</a></li>
+ <li class="k2-dropdown"><a href="practice.html" class="k2-gold" data-nav="practice" aria-haspopup="true">Practice</a>
+ <ul class="k2-dropdown-menu" aria-label="Practice tools">
+ <li><a href="practice.html" class="k2-gold">CASPer/MMI Practice</a></li>
+ <li><a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Essay Practice</a></li>
+ <li><a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a></li>
+ </ul>
+ </li>
+ <li class="k2-dropdown"><a href="guide.html" data-nav="resources" aria-haspopup="true">Resources</a>
+ <ul class="k2-dropdown-menu" aria-label="Key2MD resources">
+ <li><a href="guide.html">Full Guide</a></li>
+ <li><a href="about.html">About Dan</a></li>
+ <li><a href="medicine-entry-requirements.html">Uni Entry Guides</a></li>
+ <li><a href="blog.html">Blog</a></li>
+ <li><a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a></li>
+ <li><a href="blog-casper-guide-australia.html">CASPer Guide</a></li>
+ <li><a href="blog-mmi-guide-australia.html">MMI Guide</a></li>
+ <li><a href="blog-gamsat-section-2-reading-list.html">GAMSAT S2 Reading List</a></li>
+ </ul>
+ </li>
  <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a></li>
  </ul>
  <button class="k2-hamburger" id="k2Hamburger" aria-label="Toggle menu" type="button"><span></span><span></span><span></span></button>
@@ -321,9 +393,19 @@ footer a:hover { color:var(--white); }
  <a href="dashboard.html">Dashboard</a>
  <a href="plans.html">Plans &amp; Pricing</a>
  <a href="medical-school-chances.html" class="k2-green">Chances Calculator</a>
- <a href="practice.html" class="k2-gold">Practice</a>
- <a href="medicine-entry-requirements.html">Uni Guides</a>
+ <span class="k2-mobile-label">Practice</span>
+ <a href="practice.html" class="k2-gold">CASPer/MMI Practice</a>
+ <a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Essay Practice</a>
+ <a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a>
+ <span class="k2-mobile-label">Resources</span>
+ <a href="guide.html">Full Guide</a>
+ <a href="about.html">About Dan</a>
+ <a href="medicine-entry-requirements.html">Uni Entry Guides</a>
+ <a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a>
  <a href="blog.html">Blog</a>
+ <a href="blog-casper-guide-australia.html">CASPer Guide</a>
+ <a href="blog-mmi-guide-australia.html">MMI Guide</a>
+ <a href="blog-gamsat-section-2-reading-list.html">GAMSAT S2 Reading List</a>
  <a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a>
  </nav>
 </header>
@@ -361,7 +443,14 @@ footer a:hover { color:var(--white); }
  <p>CASPer (Computer-Based Assessment for Sampling Personal Characteristics) is a situational judgment test. For Australian graduate-entry medicine, it is used only by <strong>University of Wollongong, Notre Dame Sydney and Notre Dame Fremantle</strong>. Other postgraduate medical schools do not factor CASPer into selection at all. Some undergraduate pathways, such as Curtin, also use CASPer.</p>
 
  <h2>2025/2026 Format</h2>
- <div style="background:#f0fdf4;border-left:4px solid #22c55e;padding:14px 18px;border-radius:8px;margin:18px 0;font-size:0.95rem;color:#14532d;"><strong>Before you prep:</strong> for postgraduate medicine, CASPer only matters at UoW, UNDF and UNDS. See your combo position at every Australian medical school - and whether CASPer is the make-or-break factor for you - with the free <a href="medical-school-chances.html" style="color:#14532d;text-decoration:underline;font-weight:700;"> Medical School Chances Calculator</a>.</p></div>
+ <div class="tool-nudge">
+ <div>
+ <span class="tool-nudge-kicker">Before you prep</span>
+ <strong>Check whether CASPer is a genuine lever for you.</strong>
+ <p>For postgraduate medicine, CASPer only matters at UoW, UNDF and UNDS. The chances calculator shows whether CASPer is the make-or-break factor alongside your GPA and GAMSAT.</p>
+ </div>
+ <a class="tool-nudge-btn" href="medical-school-chances.html">Open calculator</a>
+ </div>
  <p>The current CASPer format consists of <strong>14 stations</strong>: 9 typed response stations and 5 video response stations. Each typed station gives you 5 minutes to answer 3 open-ended questions about a scenario. Video stations give you 1 minute to respond verbally to a single prompt.</p>
 
  <div class="callout callout-teal">
@@ -425,12 +514,12 @@ footer a:hover { color:var(--white); }
  <div class="related-grid">
  <a href="blog-racgp-casper-australia.html" class="related-card"><h4>RACGP Casper Test Guide</h4><p>For doctors applying to AGPT or FSP. Same Casper as medical school. Higher bar. Why qualified doctors underestimate it.</p></a>
  <a href="blog-mmi-guide-australia.html" class="related-card"><h4>MMI Guide Australia</h4><p>Why MMI is a character assessment, not a polish test - what examiners actually mark, plus specialist training.</p></a>
- <a href="blog-how-to-get-into-medicine.html" class="related-card" style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-color:rgba(56,189,248,0.3);"><h4 style="color:#38bdf8;">Start here | How to Get Into Medicine</h4><p style="color:rgba(255,255,255,0.65);">Complete overview of school-leaver vs postgraduate pathways, requirements, and what makes an application competitive.</p></a>
+ <a href="blog-how-to-get-into-medicine.html" class="related-card featured"><h4>Start here | How to Get Into Medicine</h4><p>Complete overview of school-leaver vs postgraduate pathways, requirements, and what makes an application competitive.</p></a>
  <a href="blog-gamsat-score-calculator.html" class="related-card"><h4>GAMSAT Score Calculator</h4><p>The weighted formula, combo score, and what you actually need for a medical school interview.</p></a>
  <a href="blog-gemsas-gpa-explained.html" class="related-card"><h4>GEMSAS GPA Explained</h4><p>Why your university GPA and GEMSAS GPA are almost always different - and how the conversion works.</p></a>
  <a href="blog-university-exceptions.html" class="related-card"><h4>University-Specific Exceptions</h4><p>UoW, Notre Dame, USYD and UoM all break the standard combo model - these change your strategy.</p></a>
  <a href="blog-gamsat-section-2-reading-list.html" class="related-card"><h4>GAMSAT Section 2 Reading List</h4><p>Dan's curated book list with themes, order of importance, and honest notes for Band 70+ essays.</p></a>
- <a href="medical-school-chances.html" class="related-card" style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-color:rgba(34,197,94,0.3);"><h4 style="color:#4ade80;"> Medical School Chances Calculator</h4><p style="color:rgba(255,255,255,0.65);">See where your GPA + GAMSAT rank at 10 Australian medical schools (2026 intake data).</p></a>
+ <a href="medical-school-chances.html" class="related-card featured green"><h4>Medical School Chances Calculator</h4><p>See where your GPA + GAMSAT rank at 10 Australian medical schools (2026 intake data).</p></a>
  </div>
  </div>
 </div>

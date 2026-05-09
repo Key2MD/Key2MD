@@ -823,6 +823,23 @@
  ]
 }
  </script>
+<style id="k2-nav-dropdown-fix">
+.k2-nav-links li.k2-dropdown{position:relative;}
+.k2-nav-links li.k2-dropdown>a{display:inline-flex;align-items:center;gap:5px;}
+.k2-nav-links li.k2-dropdown>a::after{content:'';width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;opacity:0.72;transform:translateY(-2px) rotate(45deg);}
+.k2-dropdown-menu{position:absolute;top:calc(100% + 8px);left:0;right:auto;min-width:258px;background:#071326;border:1px solid rgba(14,165,233,0.28);border-radius:14px;padding:8px;box-shadow:0 18px 48px rgba(0,0,0,0.52);opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity 0.16s ease,visibility 0.16s ease,transform 0.16s ease;list-style:none;margin:0;z-index:1001;}
+.k2-dropdown:hover>.k2-dropdown-menu,.k2-dropdown:focus-within>.k2-dropdown-menu,.k2-dropdown.open>.k2-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0);}
+.k2-dropdown-menu li{margin:0;}
+.k2-dropdown-menu a{display:block;padding:10px 12px;border-radius:10px;font-size:0.86rem;color:rgba(255,255,255,0.84);font-weight:650;white-space:nowrap;text-decoration:none;}
+.k2-dropdown-menu a:hover{background:rgba(14,165,233,0.14);color:#fff;}
+.k2-dropdown-menu a.k2-gold{color:#fbbf24;font-weight:800;}
+.k2-dropdown-menu a.k2-purple{color:#c4b5fd;font-weight:800;}
+.k2-mobile-label{display:block;margin:10px 0 4px;padding:8px 14px 4px;color:rgba(255,255,255,0.42);font-size:0.68rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;font-family:'DM Sans',system-ui,sans-serif;}
+.k2-mobile-nav a.k2-purple{color:#c4b5fd;font-weight:700;}
+body[data-page="guide"] .k2-nav-links a[data-nav="resources"],body[data-page="about"] .k2-nav-links a[data-nav="resources"],body[data-page="blog"] .k2-nav-links a[data-nav="resources"],body[data-page="requirements"] .k2-nav-links a[data-nav="resources"]{color:#0ea5e9;}
+body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
+@media(max-width:900px){.k2-dropdown-menu{display:none;}}
+</style>
 </head>
 <body>
 
@@ -836,9 +853,25 @@
  <li><a href="dashboard.html" data-nav="dashboard">Dashboard</a></li>
  <li><a href="plans.html" data-nav="plans">Plans</a></li>
  <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">Chances</a></li>
- <li><a href="practice.html" class="k2-gold" data-nav="practice">Practice</a></li>
- <li><a href="medicine-entry-requirements.html" data-nav="requirements">Uni Guides</a></li>
- <li><a href="blog.html" data-nav="blog">Blog</a></li>
+ <li class="k2-dropdown"><a href="practice.html" class="k2-gold" data-nav="practice" aria-haspopup="true">Practice</a>
+ <ul class="k2-dropdown-menu" aria-label="Practice tools">
+ <li><a href="practice.html" class="k2-gold">CASPer/MMI Practice</a></li>
+ <li><a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Essay Practice</a></li>
+ <li><a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a></li>
+ </ul>
+ </li>
+ <li class="k2-dropdown"><a href="guide.html" data-nav="resources" aria-haspopup="true">Resources</a>
+ <ul class="k2-dropdown-menu" aria-label="Key2MD resources">
+ <li><a href="guide.html">Full Guide</a></li>
+ <li><a href="about.html">About Dan</a></li>
+ <li><a href="medicine-entry-requirements.html">Uni Entry Guides</a></li>
+ <li><a href="blog.html">Blog</a></li>
+ <li><a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a></li>
+ <li><a href="blog-casper-guide-australia.html">CASPer Guide</a></li>
+ <li><a href="blog-mmi-guide-australia.html">MMI Guide</a></li>
+ <li><a href="blog-gamsat-section-2-reading-list.html">GAMSAT S2 Reading List</a></li>
+ </ul>
+ </li>
  <li><a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a></li>
  </ul>
  <button class="k2-hamburger" id="k2Hamburger" aria-label="Toggle menu" type="button"><span></span><span></span><span></span></button>
@@ -850,9 +883,19 @@
  <a href="dashboard.html">Dashboard</a>
  <a href="plans.html">Plans &amp; Pricing</a>
  <a href="medical-school-chances.html" class="k2-green">Chances Calculator</a>
- <a href="practice.html" class="k2-gold">Practice</a>
- <a href="medicine-entry-requirements.html">Uni Guides</a>
+ <span class="k2-mobile-label">Practice</span>
+ <a href="practice.html" class="k2-gold">CASPer/MMI Practice</a>
+ <a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Essay Practice</a>
+ <a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a>
+ <span class="k2-mobile-label">Resources</span>
+ <a href="guide.html">Full Guide</a>
+ <a href="about.html">About Dan</a>
+ <a href="medicine-entry-requirements.html">Uni Entry Guides</a>
+ <a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a>
  <a href="blog.html">Blog</a>
+ <a href="blog-casper-guide-australia.html">CASPer Guide</a>
+ <a href="blog-mmi-guide-australia.html">MMI Guide</a>
+ <a href="blog-gamsat-section-2-reading-list.html">GAMSAT S2 Reading List</a>
  <a href="#" class="k2-btn-nav" onclick="openBookModal(event)" data-track="book_modal_open">Book a Session</a>
  </nav>
 </header>
