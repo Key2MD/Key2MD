@@ -2885,6 +2885,12 @@ async function requestAIFeedback() {
   const systemPrompt = `You are an expert GAMSAT Section II examiner and writing coach, deeply familiar with Des O'Neill's GAMSAT preparation framework. Your role is to provide detailed, honest, and pedagogically useful feedback on student essays.
 
 You must respond ONLY with a valid JSON object. No preamble, no markdown fences, no explanation outside the JSON.
+JSON safety rules:
+- Use plain JSON strings only.
+- Do not put line breaks inside any string value.
+- Avoid double quote characters inside comments; use apostrophes instead.
+- Keep each comment concise so the JSON completes fully.
+- If quoting the essay, put the quote in the phrase field without surrounding quote marks.
 
 ACER assesses two criteria:
 1. Thought and Content (major emphasis): quality and insightfulness of ideas, engagement with theme, development of argument
@@ -2946,7 +2952,7 @@ Please analyse this essay and provide feedback in the specified JSON format.`;
       [{ role: 'user', content: userMessage }],
       {
         system: systemPrompt,
-        max_tokens: 2000,
+        max_tokens: 2800,
         question: station.theme,
         response: essay,
         use_credit: useCredit,
@@ -2966,12 +2972,11 @@ Please analyse this essay and provide feedback in the specified JSON format.`;
         updateLimitUI();
         return;
       }
-      throw new Error(data.error);
+      throw new Error(data.message || data.error);
     }
 
-    const raw = data.content[0].text;
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const feedback = JSON.parse(clean);
+    const raw = getReviewText(data);
+    const feedback = parseFeedbackJson(raw);
     updateLimitUI();
     renderFeedback(feedback, essay);
 
@@ -2982,12 +2987,42 @@ Please analyse this essay and provide feedback in the specified JSON format.`;
   }
 }
 
+function getReviewText(data) {
+  const block = data && Array.isArray(data.content)
+    ? data.content.find(item => typeof item.text === 'string')
+    : null;
+  if (!block) {
+    throw new Error(data?.message || data?.error || 'The marker did not return readable feedback.');
+  }
+  return block.text;
+}
+
+function parseFeedbackJson(raw) {
+  const text = String(raw || '').trim();
+  const candidates = [text];
+  const fenceMatch = text.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```\s*$/i);
+  if (fenceMatch) candidates.push(fenceMatch[1].trim());
+  const firstBrace = text.indexOf('{');
+  const lastBrace = text.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    candidates.push(text.slice(firstBrace, lastBrace + 1).trim());
+  }
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    try { return JSON.parse(candidate); } catch {}
+  }
+
+  throw new Error('The AI feedback came back in an unreadable format. No credit should be used for this failed attempt; please try again.');
+}
+
 function renderFeedback(f, essayText) {
+  f = f || {};
   document.getElementById('feedbackLoading').classList.remove('active');
   document.getElementById('aiFeedbackBtn').disabled = false;
 
   // Band score
-  document.getElementById('bandScoreBadge').textContent = f.bandScore;
+  document.getElementById('bandScoreBadge').textContent = f.bandScore || 'Review';
 
   // Score breakdown
   const scoreBreakdown = document.getElementById('scoreBreakdown');
@@ -2998,22 +3033,25 @@ function renderFeedback(f, essayText) {
     languageExpression: 'Language'
   };
   scoreBreakdown.innerHTML = '';
+  const scores = f.scores || {};
   for (const [key, label] of Object.entries(criteriaMap)) {
-    const s = f.scores[key];
+    const s = scores[key];
     if (!s) continue;
-    const pct = (s.score / s.max) * 100;
+    const score = Number(s.score) || 0;
+    const max = Number(s.max) || 10;
+    const pct = Math.max(0, Math.min(100, (score / max) * 100));
     const barClass = pct >= 70 ? 'good' : pct >= 50 ? 'mid' : 'low';
     scoreBreakdown.innerHTML += `
       <div class="score-criterion">
         <div class="score-criterion-name">${label}</div>
         <div class="score-bar-wrap"><div class="score-bar ${barClass}" style="width:${pct}%"></div></div>
-        <div class="score-criterion-val">${s.score}/${s.max} — ${s.comment}</div>
+        <div class="score-criterion-val">${score}/${max} — ${escapeHtml(s.comment || '')}</div>
       </div>`;
   }
 
   // Annotated essay (Examiner's Lens)
   let annotated = escapeHtml(essayText);
-  if (f.annotations && f.annotations.length) {
+  if (Array.isArray(f.annotations) && f.annotations.length) {
     f.annotations.forEach(ann => {
       if (!ann.phrase) return;
       const escaped = escapeHtml(ann.phrase);
@@ -3030,20 +3068,20 @@ function renderFeedback(f, essayText) {
     <div class="feedback-section">
       <h4>Overall Assessment</h4>
       <p>${escapeHtml(f.overallFeedback || '')}</p>
-      ${f.bandJustification ? `<p style="margin-top:8px; color:var(--text-muted); font-size:0.85rem;"><em>Band ${f.bandScore}: ${escapeHtml(f.bandJustification)}</em></p>` : ''}
+      ${f.bandJustification ? `<p style="margin-top:8px; color:var(--text-muted); font-size:0.85rem;"><em>Band ${escapeHtml(f.bandScore || '')}: ${escapeHtml(f.bandJustification)}</em></p>` : ''}
     </div>
     <div class="feedback-section">
       <h4>✓ Strengths</h4>
-      <ul>${(f.strengths||[]).map(s=>`<li>${escapeHtml(s)}</li>`).join('')}</ul>
+      <ul>${(Array.isArray(f.strengths) ? f.strengths : []).map(s=>`<li>${escapeHtml(s)}</li>`).join('')}</ul>
     </div>
     <div class="feedback-section">
       <h4>→ Priority Improvements</h4>
-      <ul>${(f.improvements||[]).map(i=>`<li>${escapeHtml(i)}</li>`).join('')}</ul>
+      <ul>${(Array.isArray(f.improvements) ? f.improvements : []).map(i=>`<li>${escapeHtml(i)}</li>`).join('')}</ul>
     </div>`;
 
   // Band 70 hints
   const band70List = document.getElementById('band70List');
-  band70List.innerHTML = (f.band70Hints||[]).map(h=>`<li>${escapeHtml(h)}</li>`).join('');
+  band70List.innerHTML = (Array.isArray(f.band70Hints) ? f.band70Hints : []).map(h=>`<li>${escapeHtml(h)}</li>`).join('');
 
   document.getElementById('feedbackPanel').classList.add('active');
   document.getElementById('feedbackPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -3056,7 +3094,7 @@ function hideFeedback() {
 
 function escapeHtml(str) {
   if (!str) return '';
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 /* ═══════════════════════════════════════════════

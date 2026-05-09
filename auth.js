@@ -99,6 +99,9 @@ if (toolLimits && toolLimits.remaining <= 0 && !toolLimits.credits) return { all
       showLimitReached();
       return { error: 'limit_reached', ...data };
     }
+    if (!res.ok) {
+      return data;
+    }
 
     // Refresh limits after successful review
     await loadLimits();
