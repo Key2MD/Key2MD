@@ -2907,22 +2907,37 @@ Des O'Neill's key principles:
 - Expository essays need a logical point of view argued through evidence
 - Band 70+ essays take unexpected, insightful angles that remain thematically faithful
 
+Depth requirement:
+- Give roughly 50% more analysis than a short marker summary.
+- Each criterion comment should be 2-3 useful sentences, not a generic one-liner.
+- Pay special attention to evidence selection: whether examples are specific, relevant, credible, well-explained, and actually proving the claim.
+- Actively look for contradictions, overclaims, unresolved tensions, or places where the essay's conclusion does not follow from its own reasoning.
+- If the essay makes a sophisticated tension work deliberately, praise that; if it accidentally undermines itself, explain exactly how to fix it.
+
 Respond with this exact JSON structure:
 {
   "bandScore": "55-60",
   "bandJustification": "brief justification of band score",
   "scores": {
-    "thoughtContent": { "score": 7, "max": 10, "comment": "..." },
-    "organisation": { "score": 6, "max": 10, "comment": "..." },
-    "themeEngagement": { "score": 7, "max": 10, "comment": "..." },
-    "languageExpression": { "score": 6, "max": 10, "comment": "..." }
+    "thoughtContent": { "score": 7, "max": 10, "comment": "2-3 sentences with concrete reference to the essay" },
+    "organisation": { "score": 6, "max": 10, "comment": "2-3 sentences with concrete reference to the essay" },
+    "themeEngagement": { "score": 7, "max": 10, "comment": "2-3 sentences with concrete reference to the essay" },
+    "languageExpression": { "score": 6, "max": 10, "comment": "2-3 sentences with concrete reference to the essay" }
   },
-  "strengths": ["strength 1", "strength 2", "strength 3"],
-  "improvements": ["improvement 1", "improvement 2", "improvement 3"],
-  "annotations": [
-    { "phrase": "exact phrase from essay (10-20 words)", "type": "strength|weak|stimulus", "comment": "brief examiner comment" }
+  "strengths": ["specific strength 1", "specific strength 2", "specific strength 3", "specific strength 4"],
+  "improvements": ["priority improvement 1", "priority improvement 2", "priority improvement 3", "priority improvement 4"],
+  "evidenceCritique": {
+    "selection": "2-3 sentences on the quality, specificity, and relevance of the evidence/examples selected",
+    "development": "2-3 sentences on whether evidence is analysed, connected back to the thesis, or simply asserted",
+    "missingEvidence": "1-2 concrete examples, distinctions, or evidence types that would make the argument more persuasive"
+  },
+  "contradictions": [
+    { "issue": "internal tension, contradiction, overclaim, or unsupported leap", "where": "exact phrase or paragraph reference", "whyItMatters": "why it weakens the essay", "fix": "how to resolve it" }
   ],
-  "overallFeedback": "3-4 sentences of overall feedback in examiner voice",
+  "annotations": [
+    { "phrase": "exact phrase from essay (8-20 words)", "type": "strength|weak|stimulus", "comment": "brief examiner comment" }
+  ],
+  "overallFeedback": "5-6 sentences of overall feedback in examiner voice",
   "band70Hints": [
     "thematic angle a band 70 response would explore",
     "thematic angle a band 70 response would explore",
@@ -2933,7 +2948,8 @@ Respond with this exact JSON structure:
 
 For bandScore use format like "50-55", "55-60", "60-65", "65-70", "70-75", "75+"
 Scores out of 10. Be honest — do not inflate scores. Most student essays score 5-7/10.
-Annotations: pick 4-6 actual phrases from the essay. Type: strength=green, weak=red, stimulus=blue.
+Annotations: pick 6-8 actual phrases from the essay. Type: strength=green, weak=red, stimulus=blue.
+Contradictions: include 1-3 items if there are meaningful tensions. If there are no clear contradictions, return an empty array.
 Band70Hints: specific thematic or argumentative angles, not generic advice.`;
 
   const userMessage = `GAMSAT Section II ${taskDesc}
@@ -2952,7 +2968,7 @@ Please analyse this essay and provide feedback in the specified JSON format.`;
       [{ role: 'user', content: userMessage }],
       {
         system: systemPrompt,
-        max_tokens: 2800,
+        max_tokens: 4200,
         question: station.theme,
         response: essay,
         use_credit: useCredit,
@@ -3016,6 +3032,37 @@ function parseFeedbackJson(raw) {
   throw new Error('The AI feedback came back in an unreadable format. No credit should be used for this failed attempt; please try again.');
 }
 
+function renderEvidenceCritique(evidenceCritique) {
+  if (!evidenceCritique || typeof evidenceCritique !== 'object') return '';
+  const rows = [
+    ['Evidence selection', evidenceCritique.selection],
+    ['Evidence development', evidenceCritique.development],
+    ['What evidence would strengthen this', evidenceCritique.missingEvidence],
+  ].filter(([, value]) => value);
+  if (!rows.length) return '';
+  return `
+    <div class="feedback-section">
+      <h4>Evidence Selection</h4>
+      ${rows.map(([label, value]) => `<p><strong>${label}:</strong> ${escapeHtml(value)}</p>`).join('')}
+    </div>`;
+}
+
+function renderContradictions(contradictions) {
+  if (!Array.isArray(contradictions) || !contradictions.length) return '';
+  return `
+    <div class="feedback-section">
+      <h4>Internal Tensions / Contradictions</h4>
+      <ul>${contradictions.map(item => {
+        if (typeof item === 'string') return `<li>${escapeHtml(item)}</li>`;
+        const issue = escapeHtml(item.issue || 'Tension in the argument');
+        const where = item.where ? ` <em>${escapeHtml(item.where)}</em>.` : '';
+        const why = item.whyItMatters ? ` ${escapeHtml(item.whyItMatters)}` : '';
+        const fix = item.fix ? ` <strong>Fix:</strong> ${escapeHtml(item.fix)}` : '';
+        return `<li><strong>${issue}</strong>${where}${why}${fix}</li>`;
+      }).join('')}</ul>
+    </div>`;
+}
+
 function renderFeedback(f, essayText) {
   f = f || {};
   document.getElementById('feedbackLoading').classList.remove('active');
@@ -3077,7 +3124,9 @@ function renderFeedback(f, essayText) {
     <div class="feedback-section">
       <h4>→ Priority Improvements</h4>
       <ul>${(Array.isArray(f.improvements) ? f.improvements : []).map(i=>`<li>${escapeHtml(i)}</li>`).join('')}</ul>
-    </div>`;
+    </div>
+    ${renderEvidenceCritique(f.evidenceCritique)}
+    ${renderContradictions(f.contradictions)}`;
 
   // Band 70 hints
   const band70List = document.getElementById('band70List');
