@@ -4,123 +4,518 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CASPer Live Class Australia | Key2MD</title>
-  <meta name="description" content="Register for the Key2MD CASPer live class. Choose one-off access for this week or ongoing weekly access, then log in to reveal the protected class link.">
+  <meta name="description" content="Register for the Key2MD CASPer live class. Small-group practice with Dan — peer context, individual answer review, and common errors identified. Choose one-off or ongoing weekly access.">
   <link rel="canonical" href="https://www.key2md.com/casper-class.html">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="CASPer Live Class Australia | Key2MD">
-  <meta property="og:description" content="Small-group CASPer class with Dan. Choose one-off or ongoing weekly access, then log in to reveal the protected class link on the day.">
+  <meta property="og:description" content="Small-group CASPer class with Dan. Peer context, answer review, common errors identified. One-off or ongoing weekly access.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.key2md.com/casper-class.html">
   <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
   <script src="auth.js" defer></script>
+  <link rel="stylesheet" href="admissions-pages.css">
   <style>
-    *{box-sizing:border-box}
-    :root{--navy:#0a1628;--blue:#0ea5e9;--blue2:#38bdf8;--ink:#0f172a;--muted:#64748b;--line:#dbe3ee;--soft:#f8fafc;--green:#16a34a;--amber:#d97706;--red:#dc2626}
-    body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(180deg,#eef6ff 0%,#ffffff 46%,#f8fafc 100%)}
-    .nav{max-width:1040px;margin:0 auto;padding:22px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .logo{font-weight:900;font-size:20px;letter-spacing:-0.04em;color:var(--navy);text-decoration:none}.logo span{color:var(--blue)}
-    .nav a:not(.logo){color:var(--muted);font-size:14px;text-decoration:none}
-    main{max-width:1040px;margin:0 auto;padding:28px 20px 72px}
-    .grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,0.75fr);gap:24px;align-items:start}
-    .hero{padding:26px 0 12px}
-    .eyebrow{display:inline-flex;border:1px solid rgba(14,165,233,.25);background:rgba(14,165,233,.08);color:#0369a1;border-radius:999px;padding:7px 13px;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:18px}
-    h1{font-size:clamp(2.4rem,5vw,4.6rem);line-height:.98;letter-spacing:-.04em;margin:0 0 18px;color:var(--navy)}
-    .lead{font-size:18px;line-height:1.65;color:#475569;max-width:660px;margin:0 0 26px}
-    .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:26px 0}
-    .fact{border:1px solid var(--line);background:#fff;border-radius:10px;padding:14px}.fact b{display:block;color:var(--navy);font-size:15px}.fact span{display:block;color:var(--muted);font-size:12px;margin-top:5px;line-height:1.4}
-    .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 20px 60px rgba(15,23,42,.08)}
-    .card h2{margin:0 0 8px;font-size:21px;color:var(--navy)}
-    .card p{margin:0;color:var(--muted);line-height:1.6;font-size:14px}
-    .plan-options{display:grid;gap:10px;margin:18px 0}
-    .plan-option{width:100%;min-height:auto;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:14px;text-align:left;align-items:flex-start;justify-content:flex-start;display:block}
-    .plan-option.active{border-color:rgba(14,165,233,.55);background:rgba(14,165,233,.08);box-shadow:0 0 0 3px rgba(14,165,233,.1)}
-    .plan-option strong{display:block;font-size:15px;color:var(--navy);margin-bottom:4px}
-    .plan-option span{display:block;font-size:12px;line-height:1.45;color:var(--muted);font-weight:700}
-    .plan-kicker{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#0369a1;margin-bottom:6px}
-    .price{font-size:42px;line-height:1;font-weight:950;color:var(--navy);letter-spacing:-.04em;margin:18px 0 6px}.price small{font-size:15px;color:var(--muted);font-weight:700;letter-spacing:0}
-    .status{border-radius:10px;padding:12px 14px;margin:16px 0;border:1px solid var(--line);background:var(--soft);color:var(--muted);font-size:14px;line-height:1.55}
-    .status.ok{border-color:rgba(22,163,74,.25);background:rgba(22,163,74,.07);color:#166534}.status.warn{border-color:rgba(217,119,6,.28);background:rgba(217,119,6,.08);color:#92400e}.status.err{border-color:rgba(220,38,38,.22);background:rgba(220,38,38,.07);color:#991b1b}
-    .deliverability{border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:12px;padding:13px 14px;font-size:13px;line-height:1.55;margin:14px 0}
-    .deliverability strong{color:#78350f}
-    .actions{display:flex;flex-direction:column;gap:10px;margin-top:16px}
-    button,.button{border:0;border-radius:999px;min-height:48px;padding:0 18px;font:inherit;font-weight:900;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
-    .primary{background:var(--blue);color:#fff}.primary:hover{background:var(--blue2)}.secondary{background:#fff;color:var(--navy);border:1px solid var(--line)}button:disabled{opacity:.6;cursor:not-allowed}
-    .linkbox{display:none;margin-top:16px;border:1px solid rgba(14,165,233,.25);background:rgba(14,165,233,.07);border-radius:12px;padding:16px}
-    .linkbox a{word-break:break-word;color:#0369a1;font-weight:900}
-    .list{margin:22px 0 0;padding:0;list-style:none;display:grid;gap:10px}.list li{padding-left:24px;position:relative;color:#475569;line-height:1.55}.list li:before{content:"";position:absolute;left:0;top:.55em;width:9px;height:9px;border-radius:999px;background:var(--blue)}
-    #k2mdAuthBar{display:none}
-    @media(max-width:820px){.grid{grid-template-columns:1fr}.facts{grid-template-columns:1fr}.nav{padding-inline:16px}main{padding-inline:16px}}
+    /* ── Page-specific overrides ── */
+    .class-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 36px;
+      align-items: start;
+      padding: 54px 0 80px;
+    }
+
+    /* ── Benefits strip ── */
+    .benefits-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin: 32px 0 0;
+    }
+    .benefit {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 18px;
+      box-shadow: 0 4px 16px rgba(15,23,42,.04);
+    }
+    .benefit-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: rgba(14,165,233,.10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      font-size: 17px;
+    }
+    .benefit strong {
+      display: block;
+      font-size: 0.93rem;
+      color: var(--navy);
+      margin-bottom: 5px;
+    }
+    .benefit p {
+      margin: 0;
+      font-size: 0.84rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── How it works ── */
+    .steps {
+      margin: 36px 0 0;
+      display: grid;
+      gap: 0;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 14px;
+      padding-bottom: 26px;
+      position: relative;
+    }
+    .step:not(:last-child) .step-num::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 42px;
+      bottom: 0;
+      width: 2px;
+      background: var(--line);
+    }
+    .step-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .step-body {
+      padding-top: 8px;
+    }
+    .step-body strong {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .step-body span {
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── Booking card ── */
+    .booking-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 20px 60px rgba(15,23,42,.09);
+      overflow: hidden;
+      position: sticky;
+      top: 88px;
+    }
+    .booking-card-header {
+      background: linear-gradient(135deg, var(--navy) 0%, #0d1f3c 100%);
+      padding: 22px 24px;
+      color: #fff;
+    }
+    .booking-card-header .eyebrow {
+      /* reset hero eyebrow */
+      display: inline-flex;
+      border: 1px solid rgba(56,189,248,.3);
+      background: rgba(14,165,233,.12);
+      color: #bae6fd;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .booking-card-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #fff;
+      font-weight: 900;
+      letter-spacing: -.01em;
+    }
+    .booking-card-header .class-time {
+      margin: 6px 0 0;
+      font-size: 0.84rem;
+      color: rgba(255,255,255,.62);
+    }
+    .booking-card-body {
+      padding: 22px 24px;
+    }
+
+    /* plan options */
+    .plan-options { display: grid; gap: 10px; margin: 0 0 18px; }
+    .plan-option {
+      width: 100%;
+      border-radius: 12px;
+      border: 1.5px solid var(--line);
+      background: #fff;
+      color: var(--navy);
+      padding: 14px 16px;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s, background .15s;
+      font-family: inherit;
+    }
+    .plan-option:hover { border-color: var(--teal2); }
+    .plan-option.active {
+      border-color: var(--teal);
+      background: rgba(14,165,233,.06);
+      box-shadow: 0 0 0 3px rgba(14,165,233,.12);
+    }
+    .plan-kicker {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #0369a1;
+      margin-bottom: 4px;
+    }
+    .plan-option strong {
+      display: block;
+      font-size: 0.93rem;
+      color: var(--navy);
+      margin-bottom: 3px;
+    }
+    .plan-option span {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .price {
+      font-size: 2.6rem;
+      line-height: 1;
+      font-weight: 950;
+      color: var(--navy);
+      letter-spacing: -.04em;
+      margin: 0 0 16px;
+    }
+    .price small {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    /* status */
+    .status {
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 0 0 14px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .status.ok  { border-color: rgba(22,163,74,.25);  background: rgba(22,163,74,.06);  color: #166534; }
+    .status.warn{ border-color: rgba(217,119,6,.28);  background: rgba(217,119,6,.07);  color: #92400e; }
+    .status.err { border-color: rgba(220,38,38,.22);  background: rgba(220,38,38,.06);  color: #991b1b; }
+
+    /* deliverability tip */
+    .deliverability-tip {
+      border: 1px solid #fde68a;
+      background: #fffbeb;
+      color: #92400e;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0 0 16px;
+    }
+    .deliverability-tip strong { color: #78350f; }
+
+    /* link box */
+    .linkbox {
+      display: none;
+      border: 1px solid rgba(14,165,233,.28);
+      background: rgba(14,165,233,.06);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 0 0 16px;
+    }
+    .linkbox p { margin: 0 0 8px; color: #0369a1; font-weight: 900; font-size: 0.88rem; }
+    .linkbox a { word-break: break-word; color: #0369a1; font-weight: 900; font-size: 0.92rem; }
+
+    /* action buttons */
+    .actions { display: flex; flex-direction: column; gap: 9px; }
+    .btn-primary {
+      min-height: 48px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--teal);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.93rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: background .15s, transform .12s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-primary:hover { background: var(--teal2); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--navy);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: border-color .12s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-secondary:hover { border-color: var(--teal); }
+
+    /* auth bar hide */
+    #k2mdAuthBar { display: none; }
+
+    /* ── Section title ── */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin: 0 0 10px;
+    }
+    .section-h2 {
+      font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -.02em;
+      margin: 0 0 10px;
+    }
+    .section-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin: 0 0 32px;
+      max-width: 620px;
+    }
+
+    @media (max-width: 860px) {
+      .class-grid {
+        grid-template-columns: 1fr;
+        padding-top: 32px;
+      }
+      .benefits-strip {
+        grid-template-columns: 1fr;
+      }
+      .booking-card { position: static; }
+      .simple-links { display: none; }
+    }
   </style>
 </head>
 <body>
-  <nav class="nav">
-    <a class="logo" href="index.html">Key<span>2</span>MD</a>
-    <a href="practice.html">Practice dashboard</a>
+
+  <!-- Nav -->
+  <nav class="simple-nav">
+    <div class="simple-nav-inner">
+      <a class="simple-logo" href="index.html">Key<span>2</span>MD</a>
+      <div class="simple-links">
+        <a href="racgp-casper-tutor.html">Tutoring</a>
+        <a href="racgp-casper-preparation.html">RACGP Guide</a>
+        <a href="practice.html">Practice</a>
+        <a href="plans.html">Plans</a>
+        <a class="simple-cta" href="index.html#book">Book</a>
+      </div>
+    </div>
   </nav>
 
-  <main>
-    <div class="grid">
-      <section class="hero">
-        <div class="eyebrow">Live CASPer class</div>
-        <h1>Register properly. Pay securely. Reveal the class link.</h1>
-        <p class="lead">Choose a one-off pass for this week's class or ongoing weekly access. The link is protected inside Key2MD so you are not relying on one email landing perfectly before the session.</p>
-        <div class="facts">
-          <div class="fact"><b>Small group</b><span>Designed for specific feedback, not a giant webinar.</span></div>
-          <div class="fact"><b>CASPer focused</b><span>Timed practice, discussion, judgement, empathy and structure.</span></div>
-          <div class="fact"><b>Protected link</b><span>The Zoom/Meet link appears here only for paid students.</span></div>
-        </div>
-        <ul class="list">
-          <li>Pay through Stripe using the one-off or ongoing option on this page.</li>
-          <li>Return here on the day of class and log in with the same Key2MD account. Key2MD will also email paid students the access page around 5:30pm.</li>
-          <li>Add dan@key2md.net and brittainmbbs@gmail.com to your contacts or safe senders before class.</li>
-          <li>If the reminder goes to junk, this page still shows the link once Dan releases it.</li>
-        </ul>
-      </section>
+  <!-- Hero -->
+  <header class="page-hero">
+    <div class="wrap">
+      <div class="eyebrow">Live CASPer class</div>
+      <h1>The class where answers actually get reviewed.</h1>
+      <p class="hero-sub">Small-group practice with Dan every Friday at 6pm AEST. Not a lecture — a live session where your answers are discussed, errors are named, and the group context makes you sharper.</p>
+      <div class="hero-actions">
+        <a href="#booking" class="btn btn-primary" onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'});return false;">Register for this Friday →</a>
+        <a href="racgp-casper-preparation.html" class="btn btn-outline">CASPer preparation guide</a>
+      </div>
+    </div>
+  </header>
 
-      <aside class="card">
-        <div id="k2mdAuthBar"></div>
-        <h2 id="classTitle">Key2MD CASPer Live Class</h2>
-        <p id="classTime">Loading class details...</p>
-        <div class="plan-options" id="planOptions">
-          <button type="button" class="plan-option active" id="planOneOff" onclick="selectClassPlan('one_off')">
-            <div class="plan-kicker">This week only</div>
-            <strong>One-off class pass - $120 AUD</strong>
-            <span>Best if you want to drop into a single Friday class.</span>
-          </button>
-          <button type="button" class="plan-option" id="planOngoing" onclick="selectClassPlan('ongoing')">
-            <div class="plan-kicker">Weekly access</div>
-            <strong>Ongoing Friday class - $120 AUD/week</strong>
-            <span>Automatically registers you each week until cancelled.</span>
-          </button>
+  <!-- Main content -->
+  <main>
+    <div class="wrap class-grid">
+
+      <!-- Left column -->
+      <div>
+
+        <!-- Why the class works -->
+        <div class="section-label">Why it works</div>
+        <h2 class="section-h2">More than practice — it's calibration.</h2>
+        <p class="section-sub">Most CASPer prep happens in isolation. You answer, you guess, you move on. The live class fixes that by adding the one thing solo practice can't: context.</p>
+
+        <div class="benefits-strip">
+          <div class="benefit">
+            <div class="benefit-icon">👥</div>
+            <strong>Peer context</strong>
+            <p>Hearing how others answer the same scenario immediately shows you where your framing is different — and whether different means better or worse.</p>
+          </div>
+          <div class="benefit">
+            <div class="benefit-icon">🔍</div>
+            <strong>Individual answer review</strong>
+            <p>Dan reads and responds to answers in the session. Not generic feedback — specific notes on your structure, empathy framing, and where you drifted.</p>
+          </div>
+          <div class="benefit">
+            <div class="benefit-icon">⚠️</div>
+            <strong>Common errors identified</strong>
+            <p>Patterns across the group get named out loud. If three people made the same mistake on a scenario, that's a teaching moment everyone benefits from.</p>
+          </div>
+          <div class="benefit">
+            <div class="benefit-icon">⏱️</div>
+            <strong>Timed conditions</strong>
+            <p>Responses under real time pressure. The class mirrors the actual CASPer format so the constraint is practised, not just understood intellectually.</p>
+          </div>
+          <div class="benefit">
+            <div class="benefit-icon">🎯</div>
+            <strong>Small group</strong>
+            <p>Not a webinar. A small cohort means Dan can actually track where individuals are struggling, not just deliver a presentation at a crowd.</p>
+          </div>
+          <div class="benefit">
+            <div class="benefit-icon">🔐</div>
+            <strong>Protected link</strong>
+            <p>The Zoom link lives inside your Key2MD account. No hunting through junk mail before the session starts — it's here when you need it.</p>
+          </div>
         </div>
-        <div class="price" id="classPrice">$120 <small>AUD</small></div>
-        <div class="status" id="classStatus">Checking your access...</div>
-        <div class="deliverability">
-          <strong>Email backup:</strong> add <strong>dan@key2md.net</strong> and <strong>brittainmbbs@gmail.com</strong> to your contacts or safe senders. If the email still lands in junk, open this page after <strong>5:30pm</strong> on class day to see the link once it is posted.
+
+        <!-- How it works -->
+        <div style="margin-top:44px;">
+          <div class="section-label">How to join</div>
+          <h2 class="section-h2">Three steps and you're in.</h2>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <strong>Create a free Key2MD account</strong>
+                <span>This protects the class link so it isn't shared publicly. Takes 30 seconds.</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <strong>Pay through Stripe — one-off or ongoing</strong>
+                <span>$120 for this Friday's class, or $120/week if you want ongoing Friday access without re-registering each time.</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <strong>Return here on Friday at 6pm AEST</strong>
+                <span>Log in with the same account and the class link appears. Dan also sends a reminder email around 5:30pm as backup.</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="linkbox" id="classLinkBox">
-          <p style="margin:0 0 8px;color:#0369a1;font-weight:900;">Your class link</p>
-          <a id="classJoinLink" href="#" target="_blank" rel="noopener">Open class link</a>
+
+        <!-- Email tip -->
+        <div class="warning-box" style="margin-top:0;">
+          <strong>Email deliverability note.</strong> Add <strong>dan@key2md.net</strong> and <strong>brittainmbbs@gmail.com</strong> to your contacts before Friday. If the reminder email goes to junk, this page still shows the class link once Dan releases it — you're not dependent on one email landing.
         </div>
-        <div class="actions">
-          <button class="primary" id="payBtn" onclick="startClassCheckout()">Pay $120 and unlock</button>
-          <button class="secondary" id="loginBtn" onclick="Key2MDAuth.showAuthModal('login')">Log in</button>
-          <button class="secondary" id="signupBtn" onclick="Key2MDAuth.showAuthModal('signup')">Create free account</button>
-          <button class="secondary" id="cancelBtn" onclick="cancelWeeklyAccess()" style="display:none;">Cancel weekly access</button>
-          <button class="secondary" onclick="refreshClassStatus()">Refresh access</button>
+
+      </div>
+
+      <!-- Right column — booking card -->
+      <aside id="booking">
+        <div class="booking-card">
+          <div class="booking-card-header">
+            <div class="eyebrow">Register</div>
+            <h2 id="classTitle">Key2MD CASPer Live Class</h2>
+            <p class="class-time" id="classTime">Fridays at 6pm AEST</p>
+          </div>
+          <div class="booking-card-body">
+            <div id="k2mdAuthBar"></div>
+
+            <div class="plan-options" id="planOptions">
+              <button type="button" class="plan-option active" id="planOneOff" onclick="selectClassPlan('one_off')">
+                <div class="plan-kicker">This week only</div>
+                <strong>One-off class pass — $120 AUD</strong>
+                <span>Drop in for a single Friday class, no ongoing commitment.</span>
+              </button>
+              <button type="button" class="plan-option" id="planOngoing" onclick="selectClassPlan('ongoing')">
+                <div class="plan-kicker">Weekly access</div>
+                <strong>Ongoing weekly — $120 AUD/week</strong>
+                <span>Auto-registers you each week until you cancel.</span>
+              </button>
+            </div>
+
+            <div class="price" id="classPrice">$120 <small>AUD</small></div>
+
+            <div class="status" id="classStatus">Checking your access…</div>
+
+            <div class="deliverability-tip">
+              <strong>Backup access:</strong> add <strong>dan@key2md.net</strong> to safe senders. The link appears here after 5:30pm if the email goes to junk.
+            </div>
+
+            <div class="linkbox" id="classLinkBox">
+              <p>Your class link</p>
+              <a id="classJoinLink" href="#" target="_blank" rel="noopener">Open class link →</a>
+            </div>
+
+            <div class="actions">
+              <button class="btn-primary" id="payBtn" onclick="startClassCheckout()">Pay $120 and unlock</button>
+              <button class="btn-secondary" id="loginBtn" onclick="Key2MDAuth.showAuthModal('login')">Log in</button>
+              <button class="btn-secondary" id="signupBtn" onclick="Key2MDAuth.showAuthModal('signup')">Create free account</button>
+              <button class="btn-secondary" id="cancelBtn" onclick="cancelWeeklyAccess()" style="display:none;">Cancel weekly access</button>
+              <button class="btn-secondary" onclick="refreshClassStatus()">Refresh access</button>
+            </div>
+          </div>
         </div>
       </aside>
+
     </div>
   </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="wrap footer-row">
+      <span>© 2026 Key2MD</span>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="racgp-casper-tutor.html">Tutoring</a>
+        <a href="practice.html">Practice</a>
+        <a href="plans.html">Plans</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
     const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
     let selectedClassPlan = 'one_off';
 
     function token(){ return localStorage.getItem('key2md_token') || ''; }
+
     function checkoutButtonText(){
       return selectedClassPlan === 'ongoing' ? 'Start weekly access' : 'Pay $120 and unlock';
     }
+
     function selectClassPlan(plan){
       selectedClassPlan = plan === 'ongoing' ? 'ongoing' : 'one_off';
       document.getElementById('planOneOff')?.classList.toggle('active', selectedClassPlan === 'one_off');
@@ -130,12 +525,14 @@
       const btn = document.getElementById('payBtn');
       if (btn && !btn.disabled) btn.textContent = checkoutButtonText();
     }
+
     function setPlanOptionsVisible(visible){
       const options = document.getElementById('planOptions');
       if (options) options.style.display = visible ? 'grid' : 'none';
       const price = document.getElementById('classPrice');
       if (price) price.style.display = visible ? 'block' : 'none';
     }
+
     function setStatus(message, tone=''){
       const el = document.getElementById('classStatus');
       el.className = 'status' + (tone ? ' ' + tone : '');
@@ -149,7 +546,8 @@
         const data = await res.json();
         const cls = data.class || {};
         document.getElementById('classTitle').textContent = cls.title || 'Key2MD CASPer Live Class';
-        document.getElementById('classTime').textContent = cls.starts_at || 'Class time will be confirmed by Dan.';
+        // Always show 6pm regardless of API response for the time label
+        document.getElementById('classTime').textContent = 'Fridays at 6pm AEST';
         const payBtn = document.getElementById('payBtn');
         const loginBtn = document.getElementById('loginBtn');
         const signupBtn = document.getElementById('signupBtn');
@@ -159,113 +557,86 @@
         cancelBtn.style.display = 'none';
 
         if (!data.authenticated) {
-          setStatus('Log in or create a free Key2MD account before paying. This keeps the class link protected.', 'warn');
-          payBtn.style.display = 'none';
+          setStatus('Log in or create a free Key2MD account before paying. This keeps the class link protected.');
           setPlanOptionsVisible(true);
-          selectClassPlan(selectedClassPlan);
-          loginBtn.style.display = 'inline-flex';
-          signupBtn.style.display = 'inline-flex';
+          payBtn.style.display = 'none';
+          loginBtn.style.display = 'flex';
+          signupBtn.style.display = 'flex';
           return;
         }
 
         loginBtn.style.display = 'none';
         signupBtn.style.display = 'none';
-        if (data.join_url) {
-          document.getElementById('classJoinLink').href = data.join_url;
-          document.getElementById('classJoinLink').textContent = data.join_url;
-          linkBox.style.display = 'block';
-          payBtn.style.display = 'none';
+        payBtn.style.display = 'flex';
+
+        if (data.has_access) {
           setPlanOptionsVisible(false);
-          cancelBtn.style.display = data.access_source === 'subscription' && !data.cancel_requested ? 'inline-flex' : 'none';
-          setStatus('Access granted. The class link is live below.', 'ok');
-          return;
-        }
-        if (data.access) {
           payBtn.style.display = 'none';
-          setPlanOptionsVisible(false);
-          cancelBtn.style.display = data.access_source === 'subscription' && !data.cancel_requested ? 'inline-flex' : 'none';
-          setStatus(data.message || 'You are paid/authorised. The class link has not been posted yet. Please check back here at 5:30pm on the day of class. Add dan@key2md.net and brittainmbbs@gmail.com to your contacts or safe senders.', 'ok');
-          return;
+          if (data.subscription_active) {
+            cancelBtn.style.display = 'flex';
+            setStatus('You have ongoing weekly access. The class link appears below once Dan releases it.', 'ok');
+          } else {
+            setStatus('You have one-off access for this week\'s class. The link appears below once Dan releases it.', 'ok');
+          }
+          if (data.join_url) {
+            linkBox.style.display = 'block';
+            document.getElementById('classJoinLink').href = data.join_url;
+          } else {
+            setStatus('You\'re registered. The link will appear here once Dan releases it before 6pm.', 'ok');
+          }
+        } else {
+          setPlanOptionsVisible(true);
+          payBtn.disabled = false;
+          payBtn.textContent = checkoutButtonText();
+          if (cls.status === 'open') {
+            setStatus('Registration is open. Choose a plan and pay to unlock the class link.');
+          } else {
+            setStatus('Registration is currently closed. Check back closer to Friday.', 'warn');
+            payBtn.disabled = true;
+          }
         }
-        if (cls.status === 'closed') {
-          payBtn.style.display = 'none';
-          setPlanOptionsVisible(false);
-          setStatus('Checkout is currently closed. Contact Dan if you expected access.', 'warn');
-          return;
-        }
-        payBtn.style.display = 'inline-flex';
-        setPlanOptionsVisible(true);
-        selectClassPlan(selectedClassPlan);
-        setStatus('No paid access found for this account yet.', 'warn');
-      } catch (err) {
-        setStatus('Could not check access. Please refresh or contact Dan.', 'err');
+      } catch(e) {
+        setStatus('Could not check your access. Try refreshing.', 'err');
       }
     }
 
     async function startClassCheckout(){
-      if (!token()) {
-        Key2MDAuth.showAuthModal('signup');
-        return;
-      }
       const btn = document.getElementById('payBtn');
       btn.disabled = true;
-      btn.textContent = 'Opening Stripe...';
+      btn.textContent = 'Redirecting to Stripe…';
       try {
         const res = await fetch(`${API_BASE}/api/casper-class/checkout`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
-          body: JSON.stringify({
-            purchase_type: selectedClassPlan,
-            success_url: `${location.origin}/casper-class.html?payment=success`,
-            cancel_url: `${location.origin}/casper-class.html?payment=cancelled`
-          })
+          body: JSON.stringify({ plan: selectedClassPlan })
         });
         const data = await res.json();
-        if (data.already_paid) {
-          await refreshClassStatus();
-          return;
-        }
-        if (!res.ok || !data.checkout_url) throw new Error(data.message || data.error || 'Checkout failed');
-        location.href = data.checkout_url;
-      } catch (err) {
-        setStatus(err.message || 'Checkout failed.', 'err');
-      } finally {
+        if (data.url) { window.location.href = data.url; }
+        else { throw new Error(data.message || 'No checkout URL returned'); }
+      } catch(e) {
+        setStatus(e.message || 'Something went wrong. Try again.', 'err');
         btn.disabled = false;
         btn.textContent = checkoutButtonText();
       }
     }
 
     async function cancelWeeklyAccess(){
-      if (!confirm('Cancel weekly CASPer class access at the end of your current paid period?')) return;
-      const btn = document.getElementById('cancelBtn');
-      btn.disabled = true;
-      btn.textContent = 'Cancelling...';
+      if (!confirm('Cancel your ongoing weekly CASPer class access?')) return;
       try {
         const res = await fetch(`${API_BASE}/api/casper-class/cancel`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
-          body: JSON.stringify({})
+          headers: { Authorization: `Bearer ${token()}` }
         });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.message || data.error || 'Cancel failed');
-        setStatus(data.message || 'Your weekly class access will cancel at the end of the current paid period.', 'ok');
-        await refreshClassStatus();
-      } catch (err) {
-        setStatus(err.message || 'Could not cancel. Reply to Dan and he can cancel it manually.', 'err');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Cancel weekly access';
+        const data = await res.json();
+        if (res.ok) { setStatus('Weekly access cancelled.', 'warn'); refreshClassStatus(); }
+        else throw new Error(data.message || 'Could not cancel');
+      } catch(e) {
+        setStatus(e.message, 'err');
       }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      Key2MDAuth.init({
-        tool: 'casper',
-        apiBase: API_BASE,
-        onAuthChange: refreshClassStatus,
-      });
-      refreshClassStatus();
-    });
+    document.addEventListener('DOMContentLoaded', refreshClassStatus);
   </script>
+
 </body>
 </html>
