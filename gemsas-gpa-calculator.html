@@ -1,237 +1,251 @@
 <!DOCTYPE html>
 <html lang="en-AU">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GEMSAS GPA Calculator Australia | Weighted GPA Planner | Key2MD</title>
-  <meta name="description" content="Estimate your GEMSAS-style GPA with a weighted or unweighted calculator, then use your GPA and GAMSAT to plan Australian medical school preferences.">
-  <link rel="canonical" href="https://www.key2md.com/gemsas-gpa-calculator.html">
-  <meta name="robots" content="index, follow">
-  <meta property="og:title" content="GEMSAS GPA Calculator Australia | Key2MD">
-  <meta property="og:description" content="A simple GEMSAS-style GPA planning calculator for Australian medical school applicants.">
-  <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
-  <link rel="stylesheet" href="admissions-pages.css">
-  <style>
-    .calc-panel {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fff;
-      box-shadow: 0 16px 42px rgba(15,23,42,0.08);
-      padding: 22px;
-      margin: 24px 0;
-    }
-    .calc-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin: 16px 0;
-    }
-    .calc-field label {
-      display: block;
-      color: var(--navy);
-      font-weight: 900;
-      margin-bottom: 6px;
-      font-size: 0.9rem;
-    }
-    .calc-field span {
-      display: block;
-      color: var(--muted);
-      font-size: 0.82rem;
-      margin-bottom: 8px;
-    }
-    .calc-field input {
-      width: 100%;
-      min-height: 46px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 0 12px;
-      font: inherit;
-      font-weight: 800;
-      color: var(--navy);
-    }
-    .calc-toggle {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 12px 0 18px;
-    }
-    .calc-toggle button {
-      min-height: 40px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 0 14px;
-      background: #fff;
-      color: var(--navy);
-      font: inherit;
-      font-weight: 900;
-      cursor: pointer;
-    }
-    .calc-toggle button.active {
-      background: var(--navy);
-      color: #fff;
-      border-color: var(--navy);
-    }
-    .result-box {
-      display: grid;
-      gap: 6px;
-      padding: 18px;
-      border-radius: 10px;
-      background: #ecfeff;
-      border: 1px solid rgba(14,165,233,0.24);
-      color: var(--navy);
-    }
-    .result-score {
-      font-size: clamp(2rem, 7vw, 3.6rem);
-      line-height: 1;
-      font-weight: 950;
-      color: #075985;
-    }
-    .result-note {
-      color: #334155;
-      margin: 0;
-    }
-    @media (max-width: 720px) {
-      .calc-grid { grid-template-columns: 1fr; }
-    }
-  </style>
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@graph":[
-    {"@type":"WebApplication","name":"GEMSAS GPA Calculator Australia","applicationCategory":"EducationApplication","operatingSystem":"Any","url":"https://www.key2md.com/gemsas-gpa-calculator.html","provider":{"@type":"Organization","name":"Key2MD","url":"https://www.key2md.com/"}},
-    {"@type":"BreadcrumbList","itemListElement":[
-      {"@type":"ListItem","position":1,"name":"Home","item":"https://www.key2md.com/"},
-      {"@type":"ListItem","position":2,"name":"GEMSAS GPA Calculator","item":"https://www.key2md.com/gemsas-gpa-calculator.html"}
-    ]}
-  ]}
-  </script>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>GEMSAS GPA Calculator Australia | Weighted GPA Planner | Key2MD</title>
+ <meta name="description" content="Estimate your GEMSAS-style GPA with a weighted or unweighted calculator, then use your GPA and GAMSAT to plan Australian medical school preferences.">
+ <link rel="canonical" href="https://www.key2md.com/gemsas-gpa-calculator.html">
+ <meta name="robots" content="index, follow">
+ <meta property="og:title" content="GEMSAS GPA Calculator Australia | Key2MD">
+ <meta property="og:description" content="A simple GEMSAS-style GPA planning calculator for Australian medical school applicants.">
+ <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
+ <link rel="stylesheet" href="admissions-pages.css">
+ <style>
+ .calc-panel {
+ border: 1px solid var(--line);
+ border-radius: 12px;
+ background: #fff;
+ box-shadow: 0 16px 42px rgba(15,23,42,0.08);
+ padding: 22px;
+ margin: 24px 0;
+ }
+ .calc-grid {
+ display: grid;
+ grid-template-columns: repeat(3, minmax(0, 1fr));
+ gap: 14px;
+ margin: 16px 0;
+ }
+ .calc-field label {
+ display: block;
+ color: var(--navy);
+ font-weight: 900;
+ margin-bottom: 6px;
+ font-size: 0.9rem;
+ }
+ .calc-field span {
+ display: block;
+ color: var(--muted);
+ font-size: 0.82rem;
+ margin-bottom: 8px;
+ }
+ .calc-field input {
+ width: 100%;
+ min-height: 46px;
+ border: 1px solid var(--line);
+ border-radius: 10px;
+ padding: 0 12px;
+ font: inherit;
+ font-weight: 800;
+ color: var(--navy);
+ }
+ .calc-toggle {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 8px;
+ margin: 12px 0 18px;
+ }
+ .calc-toggle button {
+ min-height: 40px;
+ border: 1px solid var(--line);
+ border-radius: 999px;
+ padding: 0 14px;
+ background: #fff;
+ color: var(--navy);
+ font: inherit;
+ font-weight: 900;
+ cursor: pointer;
+ }
+ .calc-toggle button.active {
+ background: var(--navy);
+ color: #fff;
+ border-color: var(--navy);
+ }
+ .result-box {
+ display: grid;
+ gap: 6px;
+ padding: 18px;
+ border-radius: 10px;
+ background: #ecfeff;
+ border: 1px solid rgba(14,165,233,0.24);
+ color: var(--navy);
+ }
+ .result-score {
+ font-size: clamp(2rem, 7vw, 3.6rem);
+ line-height: 1;
+ font-weight: 950;
+ color: #075985;
+ }
+ .result-note {
+ color: #334155;
+ margin: 0;
+ }
+ @media (max-width: 720px) {
+ .calc-grid { grid-template-columns: 1fr; }
+ }
+ </style>
+ <script type="application/ld+json">
+ {"@context":"https://schema.org","@graph":[
+ {"@type":"WebApplication","name":"GEMSAS GPA Calculator Australia","applicationCategory":"EducationApplication","operatingSystem":"Any","url":"https://www.key2md.com/gemsas-gpa-calculator.html","provider":{"@type":"Organization","name":"Key2MD","url":"https://www.key2md.com/"}},
+ {"@type":"BreadcrumbList","itemListElement":[
+ {"@type":"ListItem","position":1,"name":"Home","item":"https://www.key2md.com/"},
+ {"@type":"ListItem","position":2,"name":"GEMSAS GPA Calculator","item":"https://www.key2md.com/gemsas-gpa-calculator.html"}
+ ]}
+ ]}
+ </script>
 </head>
 <body>
-  <nav class="simple-nav"><div class="simple-nav-inner"><a class="simple-logo" href="index.html">Key<span>2</span>MD</a><div class="simple-links"><a href="medical-school-chances.html">Chances</a><a href="medicine-entry-requirements.html">Requirements</a><a href="practice.html">Practice</a><a href="blog.html">Blog</a><a class="simple-cta" href="index.html#book">Book</a></div></div></nav>
+ <nav class="simple-nav" aria-label="Primary navigation">
+ <div class="simple-nav-inner">
+ <a class="simple-logo" href="index.html">Key<span>2</span>MD</a>
+ <div class="simple-links">
+ <a class="simple-gold" href="casper-class.html">Friday Classes</a>
+ <a href="testimonials.html">Results</a>
+ <a href="plans.html">Plans</a>
+ <a class="simple-green" href="medical-school-chances.html">Chances</a>
+ <a href="practice.html">Practice</a>
+ <a href="medicine-entry-requirements.html">Uni Guides</a>
+ <a href="blog.html">Blog</a>
+ <a class="simple-cta" href="index.html#book">Book a Session</a>
+ </div>
+ </div>
+ </nav>
 
-  <header class="page-hero">
-    <div class="wrap">
-      <div class="eyebrow">Admissions tool</div>
-      <h1>GEMSAS GPA calculator for medical school planning.</h1>
-      <p class="hero-sub">Estimate a GEMSAS-style GPA, compare weighted and unweighted calculations, and use the result to make smarter Australian medical school preference decisions.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="#calculator">Calculate GPA</a>
-        <a class="btn btn-outline" href="medical-school-chances.html">Use chances calculator</a>
-      </div>
-    </div>
-  </header>
+ <header class="page-hero">
+ <div class="wrap">
+ <div class="eyebrow">Admissions tool</div>
+ <h1>GEMSAS GPA calculator for medical school planning.</h1>
+ <p class="hero-sub">Estimate a GEMSAS-style GPA, compare weighted and unweighted calculations, and use the result to make smarter Australian medical school preference decisions.</p>
+ <div class="hero-actions">
+ <a class="btn btn-primary" href="#calculator">Calculate GPA</a>
+ <a class="btn btn-outline" href="medical-school-chances.html">Use chances calculator</a>
+ </div>
+ </div>
+ </header>
 
-  <main class="content">
-    <div class="wrap grid">
-      <article class="article">
-        <h2 id="calculator">GEMSAS-style GPA estimate</h2>
-        <p>This calculator is a planning tool, not an official GEMSAS calculation. It is useful for early strategy: whether GPA or GAMSAT is the likely bottleneck, which schools may be more forgiving, and whether a bonus-sensitive shortlist makes sense.</p>
+ <main class="content">
+ <div class="wrap grid">
+ <article class="article">
+ <h2 id="calculator">GEMSAS-style GPA estimate</h2>
+ <p>This calculator is a planning tool, not an official GEMSAS calculation. It is useful for early strategy: whether GPA or GAMSAT is the likely bottleneck, which schools may be more forgiving, and whether a bonus-sensitive shortlist makes sense.</p>
 
-        <section class="calc-panel" aria-label="GEMSAS GPA calculator">
-          <h2 style="margin-top:0;">Enter your three most recent full-time equivalent years</h2>
-          <p>Use a 7-point GPA scale. If you only have a rough GPA for each year, the estimate is still useful for planning.</p>
-          <div class="calc-toggle" role="group" aria-label="Calculation mode">
-            <button type="button" class="active" data-mode="weighted">Weighted 1:2:3</button>
-            <button type="button" data-mode="unweighted">Unweighted average</button>
-          </div>
-          <div class="calc-grid">
-            <div class="calc-field">
-              <label for="gpa-third">Third-last year</label>
-              <span>Oldest of the three years</span>
-              <input id="gpa-third" type="number" inputmode="decimal" min="0" max="7" step="0.01" value="6.20">
-            </div>
-            <div class="calc-field">
-              <label for="gpa-second">Second-last year</label>
-              <span>Middle year</span>
-              <input id="gpa-second" type="number" inputmode="decimal" min="0" max="7" step="0.01" value="6.40">
-            </div>
-            <div class="calc-field">
-              <label for="gpa-final">Final year</label>
-              <span>Most recent year</span>
-              <input id="gpa-final" type="number" inputmode="decimal" min="0" max="7" step="0.01" value="6.70">
-            </div>
-          </div>
-          <div class="result-box" aria-live="polite">
-            <span class="result-score" id="gemsas-result">6.55</span>
-            <p class="result-note" id="gemsas-note">Weighted estimate using third-last x1, second-last x2, final year x3.</p>
-          </div>
-        </section>
+ <section class="calc-panel" aria-label="GEMSAS GPA calculator">
+ <h2 style="margin-top:0;">Enter your three most recent full-time equivalent years</h2>
+ <p>Use a 7-point GPA scale. If you only have a rough GPA for each year, the estimate is still useful for planning.</p>
+ <div class="calc-toggle" role="group" aria-label="Calculation mode">
+ <button type="button" class="active" data-mode="weighted">Weighted 1:2:3</button>
+ <button type="button" data-mode="unweighted">Unweighted average</button>
+ </div>
+ <div class="calc-grid">
+ <div class="calc-field">
+ <label for="gpa-third">Third-last year</label>
+ <span>Oldest of the three years</span>
+ <input id="gpa-third" type="number" inputmode="decimal" min="0" max="7" step="0.01" value="6.20">
+ </div>
+ <div class="calc-field">
+ <label for="gpa-second">Second-last year</label>
+ <span>Middle year</span>
+ <input id="gpa-second" type="number" inputmode="decimal" min="0" max="7" step="0.01" value="6.40">
+ </div>
+ <div class="calc-field">
+ <label for="gpa-final">Final year</label>
+ <span>Most recent year</span>
+ <input id="gpa-final" type="number" inputmode="decimal" min="0" max="7" step="0.01" value="6.70">
+ </div>
+ </div>
+ <div class="result-box" aria-live="polite">
+ <span class="result-score" id="gemsas-result">6.55</span>
+ <p class="result-note" id="gemsas-note">Weighted estimate using third-last x1, second-last x2, final year x3.</p>
+ </div>
+ </section>
 
-        <h2>What this number does and does not tell you</h2>
-        <p>A strong GPA can make a moderate GAMSAT more competitive. A strong GAMSAT can rescue an average GPA at some schools. But the right strategy depends on the school, bonus rules, rural status, CASPer requirements, sub-section minimums and whether the school weights GPA and GAMSAT equally.</p>
-        <div class="card-grid">
-          <div class="info-card"><strong>Use it for shortlisting</strong><span>Pair this estimate with your GAMSAT to find schools where your application is naturally stronger.</span></div>
-          <div class="info-card"><strong>Check school exceptions</strong><span>Some schools change the picture with bonuses, hurdle rules, CASPer or interview-heavy selection.</span></div>
-          <div class="info-card"><strong>Do not treat it as official</strong><span>Completed degrees, credit transfer, honours and school-specific policies can alter the final calculation.</span></div>
-          <div class="info-card"><strong>Update it over time</strong><span>One improved final-year result can materially move a weighted GPA estimate.</span></div>
-        </div>
+ <h2>What this number does and does not tell you</h2>
+ <p>A strong GPA can make a moderate GAMSAT more competitive. A strong GAMSAT can rescue an average GPA at some schools. But the right strategy depends on the school, bonus rules, rural status, CASPer requirements, sub-section minimums and whether the school weights GPA and GAMSAT equally.</p>
+ <div class="card-grid">
+ <div class="info-card"><strong>Use it for shortlisting</strong><span>Pair this estimate with your GAMSAT to find schools where your application is naturally stronger.</span></div>
+ <div class="info-card"><strong>Check school exceptions</strong><span>Some schools change the picture with bonuses, hurdle rules, CASPer or interview-heavy selection.</span></div>
+ <div class="info-card"><strong>Do not treat it as official</strong><span>Completed degrees, credit transfer, honours and school-specific policies can alter the final calculation.</span></div>
+ <div class="info-card"><strong>Update it over time</strong><span>One improved final-year result can materially move a weighted GPA estimate.</span></div>
+ </div>
 
-        <h2>Next step after calculating your GPA</h2>
-        <p>If your GPA is strong, your highest-yield move may be GAMSAT or interview preparation. If your GPA is weaker, you may need a school list that is more sensitive to bonuses, rural weighting, CASPer strength or GAMSAT performance.</p>
-        <div class="mini-cta">
-          <h2>Turn the GPA into a preference plan</h2>
-          <p>Use the medical school chances calculator to combine GPA, GAMSAT, CASPer, rural status and bonuses into a clearer shortlist.</p>
-          <a class="btn btn-primary" href="medical-school-chances.html">Open chances calculator</a>
-        </div>
-      </article>
+ <h2>Next step after calculating your GPA</h2>
+ <p>If your GPA is strong, your highest-yield move may be GAMSAT or interview preparation. If your GPA is weaker, you may need a school list that is more sensitive to bonuses, rural weighting, CASPer strength or GAMSAT performance.</p>
+ <div class="mini-cta">
+ <h2>Turn the GPA into a preference plan</h2>
+ <p>Use the medical school chances calculator to combine GPA, GAMSAT, CASPer, rural status and bonuses into a clearer shortlist.</p>
+ <a class="btn btn-primary" href="medical-school-chances.html">Open chances calculator</a>
+ </div>
+ </article>
 
-      <aside class="side">
-        <div class="side-card">
-          <h2>Useful admissions tools</h2>
-          <ul>
-            <li><a href="medical-school-chances.html">Medical school chances calculator</a></li>
-            <li><a href="medicine-entry-requirements.html">Medicine entry requirements</a></li>
-            <li><a href="blog-gemsas-gpa-explained.html">GEMSAS GPA explained</a></li>
-            <li><a href="blog-gamsat-score-calculator.html">GAMSAT score calculator</a></li>
-          </ul>
-        </div>
-        <div class="side-card">
-          <h3>Important note</h3>
-          <p>Use this as a planning estimate only. Before applying, check the current official GEMSAS guide and each university's published admissions page.</p>
-        </div>
-      </aside>
-    </div>
-  </main>
+ <aside class="side">
+ <div class="side-card">
+ <h2>Useful admissions tools</h2>
+ <ul>
+ <li><a href="medical-school-chances.html">Medical school chances calculator</a></li>
+ <li><a href="medicine-entry-requirements.html">Medicine entry requirements</a></li>
+ <li><a href="blog-gemsas-gpa-explained.html">GEMSAS GPA explained</a></li>
+ <li><a href="blog-gamsat-score-calculator.html">GAMSAT score calculator</a></li>
+ </ul>
+ </div>
+ <div class="side-card">
+ <h3>Important note</h3>
+ <p>Use this as a planning estimate only. Before applying, check the current official GEMSAS guide and each university's published admissions page.</p>
+ </div>
+ </aside>
+ </div>
+ </main>
 
-  <footer><div class="wrap footer-row"><div>&copy; 2026 Key2MD</div><div class="footer-links"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="ai-disclaimer.html">AI Disclaimer</a></div></div></footer>
-  <script>
-    (function () {
-      const inputs = [
-        document.getElementById('gpa-third'),
-        document.getElementById('gpa-second'),
-        document.getElementById('gpa-final')
-      ];
-      const result = document.getElementById('gemsas-result');
-      const note = document.getElementById('gemsas-note');
-      const buttons = Array.from(document.querySelectorAll('[data-mode]'));
-      let mode = 'weighted';
+ <footer><div class="wrap footer-row"><div>(c) 2026 Key2MD</div><div class="footer-links"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="ai-disclaimer.html">AI Disclaimer</a></div></div></footer>
+ <script>
+ (function () {
+ const inputs = [
+ document.getElementById('gpa-third'),
+ document.getElementById('gpa-second'),
+ document.getElementById('gpa-final')
+ ];
+ const result = document.getElementById('gemsas-result');
+ const note = document.getElementById('gemsas-note');
+ const buttons = Array.from(document.querySelectorAll('[data-mode]'));
+ let mode = 'weighted';
 
-      function clean(value) {
-        const number = Number(value);
-        if (!Number.isFinite(number)) return 0;
-        return Math.max(0, Math.min(7, number));
-      }
+ function clean(value) {
+ const number = Number(value);
+ if (!Number.isFinite(number)) return 0;
+ return Math.max(0, Math.min(7, number));
+ }
 
-      function calculate() {
-        const values = inputs.map(input => clean(input.value));
-        const score = mode === 'weighted'
-          ? (values[0] + values[1] * 2 + values[2] * 3) / 6
-          : (values[0] + values[1] + values[2]) / 3;
-        result.textContent = score.toFixed(2);
-        note.textContent = mode === 'weighted'
-          ? 'Weighted estimate using third-last x1, second-last x2, final year x3.'
-          : 'Unweighted estimate using the simple average of the three years.';
-      }
+ function calculate() {
+ const values = inputs.map(input => clean(input.value));
+ const score = mode === 'weighted'
+ ? (values[0] + values[1] * 2 + values[2] * 3) / 6
+ : (values[0] + values[1] + values[2]) / 3;
+ result.textContent = score.toFixed(2);
+ note.textContent = mode === 'weighted'
+ ? 'Weighted estimate using third-last x1, second-last x2, final year x3.'
+ : 'Unweighted estimate using the simple average of the three years.';
+ }
 
-      buttons.forEach(button => {
-        button.addEventListener('click', () => {
-          mode = button.dataset.mode;
-          buttons.forEach(item => item.classList.toggle('active', item === button));
-          calculate();
-        });
-      });
-      inputs.forEach(input => input.addEventListener('input', calculate));
-      calculate();
-    })();
-  </script>
-  <script src="key2md-tracking.js" defer></script>
+ buttons.forEach(button => {
+ button.addEventListener('click', () => {
+ mode = button.dataset.mode;
+ buttons.forEach(item => item.classList.toggle('active', item === button));
+ calculate();
+ });
+ });
+ inputs.forEach(input => input.addEventListener('input', calculate));
+ calculate();
+ })();
+ </script>
+ <script src="key2md-tracking.js" defer></script>
 </body>
 </html>

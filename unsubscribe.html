@@ -3,328 +3,328 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unsubscribe · Key2MD</title>
+<title>Unsubscribe | Key2MD</title>
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --navy: #0a1628;
-    --teal: #0ea5e9;
-    --teal2: #38bdf8;
-    --white: #ffffff;
-  }
+ :root {
+ --navy: #0a1628;
+ --teal: #0ea5e9;
+ --teal2: #38bdf8;
+ --white: #ffffff;
+ }
 
-  body {
-    font-family: 'DM Sans', system-ui, sans-serif;
-    background: var(--navy);
-    color: var(--white);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 80px 24px 40px;
-    -webkit-font-smoothing: antialiased;
-    background-image:
-      radial-gradient(ellipse 50% 35% at 80% 5%, rgba(14,165,233,0.1) 0%, transparent 60%),
-      radial-gradient(ellipse 35% 25% at 10% 90%, rgba(14,165,233,0.05) 0%, transparent 55%);
-  }
+ body {
+ font-family: 'DM Sans', system-ui, sans-serif;
+ background: var(--navy);
+ color: var(--white);
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: center;
+ padding: 80px 24px 40px;
+ -webkit-font-smoothing: antialiased;
+ background-image:
+ radial-gradient(ellipse 50% 35% at 80% 5%, rgba(14,165,233,0.1) 0%, transparent 60%),
+ radial-gradient(ellipse 35% 25% at 10% 90%, rgba(14,165,233,0.05) 0%, transparent 55%);
+ }
 
-  .nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    padding: 18px 32px;
-    display: flex;
-    align-items: center;
-  }
+ .nav {
+ position: fixed;
+ top: 0; left: 0; right: 0;
+ padding: 18px 32px;
+ display: flex;
+ align-items: center;
+ }
 
-  .logo {
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 800;
-    font-size: 20px;
-    letter-spacing: -0.04em;
-    color: var(--white);
-    text-decoration: none;
-  }
-  .logo span { color: var(--teal); }
+ .logo {
+ font-family: 'DM Sans', sans-serif;
+ font-weight: 800;
+ font-size: 20px;
+ letter-spacing: -0.04em;
+ color: var(--white);
+ text-decoration: none;
+ }
+ .logo span { color: var(--teal); }
 
-  .card {
-    width: 100%;
-    max-width: 460px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.09);
-    border-radius: 24px;
-    padding: 48px 40px;
-    text-align: center;
-  }
+ .card {
+ width: 100%;
+ max-width: 460px;
+ background: rgba(255,255,255,0.04);
+ border: 1px solid rgba(255,255,255,0.09);
+ border-radius: 24px;
+ padding: 48px 40px;
+ text-align: center;
+ }
 
-  .icon { font-size: 44px; margin-bottom: 24px; display: block; }
+ .icon { font-size: 44px; margin-bottom: 24px; display: block; }
 
-  h1 {
-    font-family: 'DM Serif Display', Georgia, serif;
-    font-size: 30px;
-    color: var(--white);
-    margin-bottom: 12px;
-    line-height: 1.15;
-  }
+ h1 {
+ font-family: 'DM Serif Display', Georgia, serif;
+ font-size: 30px;
+ color: var(--white);
+ margin-bottom: 12px;
+ line-height: 1.15;
+ }
 
-  .sub {
-    font-size: 15px;
-    color: rgba(255,255,255,0.45);
-    line-height: 1.7;
-    margin-bottom: 32px;
-  }
+ .sub {
+ font-size: 15px;
+ color: rgba(255,255,255,0.45);
+ line-height: 1.7;
+ margin-bottom: 32px;
+ }
 
-  /* States */
-  #successState, #alreadyState, #errorState { display: none; }
+ /* States */
+ #successState, #alreadyState, #errorState { display: none; }
 
-  .field { margin-bottom: 16px; text-align: left; }
+ .field { margin-bottom: 16px; text-align: left; }
 
-  label {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 7px;
-  }
+ label {
+ display: block;
+ font-size: 12px;
+ font-weight: 700;
+ text-transform: uppercase;
+ letter-spacing: 0.08em;
+ color: rgba(255,255,255,0.4);
+ margin-bottom: 7px;
+ }
 
-  input[type="email"] {
-    width: 100%;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 10px;
-    padding: 14px 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    color: var(--white);
-    outline: none;
-    transition: border-color 0.2s, background 0.2s;
-  }
+ input[type="email"] {
+ width: 100%;
+ background: rgba(255,255,255,0.06);
+ border: 1px solid rgba(255,255,255,0.12);
+ border-radius: 10px;
+ padding: 14px 16px;
+ font-family: 'DM Sans', sans-serif;
+ font-size: 15px;
+ color: var(--white);
+ outline: none;
+ transition: border-color 0.2s, background 0.2s;
+ }
 
-  input::placeholder { color: rgba(255,255,255,0.2); }
-  input:focus { border-color: var(--teal); background: rgba(14,165,233,0.06); }
+ input::placeholder { color: rgba(255,255,255,0.2); }
+ input:focus { border-color: var(--teal); background: rgba(14,165,233,0.06); }
 
-  .field-err {
-    font-size: 12px;
-    color: #f87171;
-    margin-top: 5px;
-    text-align: left;
-    display: none;
-  }
+ .field-err {
+ font-size: 12px;
+ color: #f87171;
+ margin-top: 5px;
+ text-align: left;
+ display: none;
+ }
 
-  .unsub-btn {
-    width: 100%;
-    background: rgba(248,113,113,0.12);
-    border: 1px solid rgba(248,113,113,0.3);
-    color: #fca5a5;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 15px;
-    border-radius: 100px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-    margin-bottom: 12px;
-  }
+ .unsub-btn {
+ width: 100%;
+ background: rgba(248,113,113,0.12);
+ border: 1px solid rgba(248,113,113,0.3);
+ color: #fca5a5;
+ font-family: 'DM Sans', sans-serif;
+ font-size: 14px;
+ font-weight: 700;
+ letter-spacing: 0.04em;
+ text-transform: uppercase;
+ padding: 15px;
+ border-radius: 100px;
+ cursor: pointer;
+ transition: background 0.2s, transform 0.15s;
+ margin-bottom: 12px;
+ }
 
-  .unsub-btn:hover { background: rgba(248,113,113,0.2); transform: translateY(-1px); }
-  .unsub-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+ .unsub-btn:hover { background: rgba(248,113,113,0.2); transform: translateY(-1px); }
+ .unsub-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-  .divider-text { font-size: 12px; color: rgba(255,255,255,0.2); margin: 8px 0; }
+ .divider-text { font-size: 12px; color: rgba(255,255,255,0.2); margin: 8px 0; }
 
-  .keep-btn {
-    display: block;
-    width: 100%;
-    background: var(--teal);
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 15px;
-    border-radius: 100px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background 0.2s, transform 0.15s;
-  }
+ .keep-btn {
+ display: block;
+ width: 100%;
+ background: var(--teal);
+ color: var(--white);
+ font-family: 'DM Sans', sans-serif;
+ font-size: 14px;
+ font-weight: 700;
+ letter-spacing: 0.04em;
+ text-transform: uppercase;
+ padding: 15px;
+ border-radius: 100px;
+ border: none;
+ cursor: pointer;
+ text-decoration: none;
+ transition: background 0.2s, transform 0.15s;
+ }
 
-  .keep-btn:hover { background: var(--teal2); transform: translateY(-1px); }
+ .keep-btn:hover { background: var(--teal2); transform: translateY(-1px); }
 
-  /* Success / already / error */
-  .info-box {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 16px 20px;
-    font-size: 14px;
-    color: rgba(255,255,255,0.45);
-    line-height: 1.65;
-    margin-bottom: 24px;
-    text-align: left;
-  }
+ /* Success / already / error */
+ .info-box {
+ background: rgba(255,255,255,0.04);
+ border: 1px solid rgba(255,255,255,0.08);
+ border-radius: 12px;
+ padding: 16px 20px;
+ font-size: 14px;
+ color: rgba(255,255,255,0.45);
+ line-height: 1.65;
+ margin-bottom: 24px;
+ text-align: left;
+ }
 
-  .info-box a { color: var(--teal2); text-decoration: none; }
-  .info-box a:hover { text-decoration: underline; }
+ .info-box a { color: var(--teal2); text-decoration: none; }
+ .info-box a:hover { text-decoration: underline; }
 
-  .home-btn {
-    display: inline-block;
-    background: rgba(14,165,233,0.12);
-    border: 1px solid rgba(14,165,233,0.25);
-    color: var(--teal2);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 13px 32px;
-    border-radius: 100px;
-    text-decoration: none;
-    transition: background 0.2s;
-  }
+ .home-btn {
+ display: inline-block;
+ background: rgba(14,165,233,0.12);
+ border: 1px solid rgba(14,165,233,0.25);
+ color: var(--teal2);
+ font-family: 'DM Sans', sans-serif;
+ font-size: 14px;
+ font-weight: 700;
+ padding: 13px 32px;
+ border-radius: 100px;
+ text-decoration: none;
+ transition: background 0.2s;
+ }
 
-  .home-btn:hover { background: rgba(14,165,233,0.2); }
+ .home-btn:hover { background: rgba(14,165,233,0.2); }
 
-  .footer-note {
-    margin-top: 32px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.18);
-    line-height: 1.6;
-    text-align: center;
-  }
+ .footer-note {
+ margin-top: 32px;
+ font-size: 12px;
+ color: rgba(255,255,255,0.18);
+ line-height: 1.6;
+ text-align: center;
+ }
 
-  .footer-note a { color: rgba(255,255,255,0.3); text-decoration: underline; }
+ .footer-note a { color: rgba(255,255,255,0.3); text-decoration: underline; }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a class="logo" href="https://key2md.com">Key<span>2</span>MD</a>
+ <a class="logo" href="https://key2md.com">Key<span>2</span>MD</a>
 </nav>
 
 <div class="card">
 
-  <!-- FORM STATE -->
-  <div id="formState">
-    <span class="icon">✉️</span>
-    <h1>Unsubscribe</h1>
-    <p class="sub">Enter your email and we'll remove you from all Key2MD emails immediately. No questions asked.</p>
+ <!-- FORM STATE -->
+ <div id="formState">
+ <span class="icon"></span>
+ <h1>Unsubscribe</h1>
+ <p class="sub">Enter your email and we'll remove you from all Key2MD emails immediately. No questions asked.</p>
 
-    <div class="field">
-      <label for="emailIn">Your email address</label>
-      <input type="email" id="emailIn" placeholder="you@email.com" autocomplete="email">
-      <div class="field-err" id="emailErr">Please enter a valid email address.</div>
-    </div>
+ <div class="field">
+ <label for="emailIn">Your email address</label>
+ <input type="email" id="emailIn" placeholder="you@email.com" autocomplete="email">
+ <div class="field-err" id="emailErr">Please enter a valid email address.</div>
+ </div>
 
-    <button class="unsub-btn" id="unsubBtn" onclick="handleUnsub()">
-      Unsubscribe me
-    </button>
+ <button class="unsub-btn" id="unsubBtn" onclick="handleUnsub()">
+ Unsubscribe me
+ </button>
 
-    <div class="divider-text">or</div>
+ <div class="divider-text">or</div>
 
-    <a class="keep-btn" href="https://key2md.com">Keep me subscribed →</a>
-  </div>
+ <a class="keep-btn" href="https://key2md.com">Keep me subscribed -></a>
+ </div>
 
-  <!-- SUCCESS STATE -->
-  <div id="successState">
-    <span class="icon">👋</span>
-    <h1>Done — you're off the list.</h1>
-    <p class="sub"><strong id="removedEmail" style="color:rgba(255,255,255,0.7);"></strong> has been removed. You won't hear from us again.</p>
-    <div class="info-box">
-      Changed your mind? You can re-subscribe any time at <a href="https://key2md.com">key2md.com</a>. We're always happy to have you back.
-    </div>
-    <a class="home-btn" href="https://key2md.com">Back to Key2MD</a>
-  </div>
+ <!-- SUCCESS STATE -->
+ <div id="successState">
+ <span class="icon"></span>
+ <h1>Done - you're off the list.</h1>
+ <p class="sub"><strong id="removedEmail" style="color:rgba(255,255,255,0.7);"></strong> has been removed. You won't hear from us again.</p>
+ <div class="info-box">
+ Changed your mind? You can re-subscribe any time at <a href="https://key2md.com">key2md.com</a>. We're always happy to have you back.
+ </div>
+ <a class="home-btn" href="https://key2md.com">Back to Key2MD</a>
+ </div>
 
-  <!-- ALREADY STATE (not on list) -->
-  <div id="alreadyState">
-    <span class="icon">✅</span>
-    <h1>You're already off the list.</h1>
-    <p class="sub">That email isn't in our system — you're clear. If you're still getting emails, reply directly and Dan will sort it immediately.</p>
-    <a class="home-btn" href="https://key2md.com">Back to Key2MD</a>
-  </div>
+ <!-- ALREADY STATE (not on list) -->
+ <div id="alreadyState">
+ <span class="icon">OK</span>
+ <h1>You're already off the list.</h1>
+ <p class="sub">That email isn't in our system - you're clear. If you're still getting emails, reply directly and Dan will sort it immediately.</p>
+ <a class="home-btn" href="https://key2md.com">Back to Key2MD</a>
+ </div>
 
-  <!-- ERROR STATE -->
-  <div id="errorState">
-    <span class="icon">⚠️</span>
-    <h1>Something went wrong.</h1>
-    <p class="sub">We couldn't process your request. Please reply directly to any Key2MD email and Dan will remove you manually.</p>
-    <a class="home-btn" href="https://key2md.com">Back to Key2MD</a>
-  </div>
+ <!-- ERROR STATE -->
+ <div id="errorState">
+ <span class="icon">!</span>
+ <h1>Something went wrong.</h1>
+ <p class="sub">We couldn't process your request. Please reply directly to any Key2MD email and Dan will remove you manually.</p>
+ <a class="home-btn" href="https://key2md.com">Back to Key2MD</a>
+ </div>
 
 </div>
 
 <p class="footer-note">
-  Key2MD · <a href="https://key2md.com">key2md.com</a> · © 2026<br>
-  Questions? Reply to any Key2MD email — it goes straight to Dan.
+ Key2MD | <a href="https://key2md.com">key2md.com</a> | (c) 2026<br>
+ Questions? Reply to any Key2MD email - it goes straight to Dan.
 </p>
 
 <script>
-  const API = 'https://key2md-api.brittainmbbs.workers.dev';
+ const API = 'https://key2md-api.brittainmbbs.workers.dev';
 
-  // Pre-fill email from ?email= URL param (useful for one-click unsub links in emails)
-  (function() {
-    const params = new URLSearchParams(window.location.search);
-    const e = params.get('email');
-    if (e) document.getElementById('emailIn').value = decodeURIComponent(e);
-  })();
+ // Pre-fill email from ?email= URL param (useful for one-click unsub links in emails)
+ (function() {
+ const params = new URLSearchParams(window.location.search);
+ const e = params.get('email');
+ if (e) document.getElementById('emailIn').value = decodeURIComponent(e);
+ })();
 
-  function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+ function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
-  function show(stateId) {
-    ['formState','successState','alreadyState','errorState'].forEach(id => {
-      document.getElementById(id).style.display = id === stateId ? 'block' : 'none';
-    });
-  }
+ function show(stateId) {
+ ['formState','successState','alreadyState','errorState'].forEach(id => {
+ document.getElementById(id).style.display = id === stateId ? 'block' : 'none';
+ });
+ }
 
-  async function handleUnsub() {
-    const email = document.getElementById('emailIn').value.trim();
-    const err   = document.getElementById('emailErr');
-    const btn   = document.getElementById('unsubBtn');
+ async function handleUnsub() {
+ const email = document.getElementById('emailIn').value.trim();
+ const err = document.getElementById('emailErr');
+ const btn = document.getElementById('unsubBtn');
 
-    if (!validateEmail(email)) {
-      err.style.display = 'block';
-      document.getElementById('emailIn').style.borderColor = '#f87171';
-      return;
-    }
+ if (!validateEmail(email)) {
+ err.style.display = 'block';
+ document.getElementById('emailIn').style.borderColor = '#f87171';
+ return;
+ }
 
-    err.style.display = 'none';
-    document.getElementById('emailIn').style.borderColor = '';
-    btn.disabled = true;
-    btn.textContent = 'Removing…';
+ err.style.display = 'none';
+ document.getElementById('emailIn').style.borderColor = '';
+ btn.disabled = true;
+ btn.textContent = 'Removing...';
 
-    try {
-      const res = await fetch(`${API}/api/email/unsubscribe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
+ try {
+ const res = await fetch(`${API}/api/email/unsubscribe`, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ email }),
+ });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+ if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      const data = await res.json();
+ const data = await res.json();
 
-      if (data.ok) {
-        document.getElementById('removedEmail').textContent = email.toLowerCase();
-        show('successState');
-      } else {
-        throw new Error(data.error || 'Unknown error');
-      }
-    } catch (e) {
-      console.error('Unsubscribe error:', e);
-      show('errorState');
-    }
-  }
+ if (data.ok) {
+ document.getElementById('removedEmail').textContent = email.toLowerCase();
+ show('successState');
+ } else {
+ throw new Error(data.error || 'Unknown error');
+ }
+ } catch (e) {
+ console.error('Unsubscribe error:', e);
+ show('errorState');
+ }
+ }
 
-  document.getElementById('emailIn').addEventListener('keydown', e => {
-    if (e.key === 'Enter') handleUnsub();
-  });
+ document.getElementById('emailIn').addEventListener('keydown', e => {
+ if (e.key === 'Enter') handleUnsub();
+ });
 </script>
 
 </body>
