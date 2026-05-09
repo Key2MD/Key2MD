@@ -1746,7 +1746,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
     <!-- Limit banner -->
     <div class="limit-banner" id="limitBanner">
       <h4>You’ve used your free AI essay review</h4>
-  <p>Your free GAMSAT S2 review resets weekly. Buy credits for occasional essays, upgrade to S2 Pro for unlimited AI marking, or submit your essay to Dan for expert human marking and an estimated band score within 48 hours.</p>
+  <p>Your free GAMSAT S2 review resets weekly. Buy credits for occasional essays, upgrade to S2 Pro for fair-use unlimited AI marking, or submit your essay to Dan for expert human marking and an estimated band score within 48 hours.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="buy-credits-btn" style="width:auto;margin:0;padding:10px 20px;" onclick="openCreditShop()">Buy AI Credits →</button>
         <button class="buy-credits-btn" style="width:auto;margin:0;padding:10px 20px;background:#7c3aed;color:#fff;border-color:#7c3aed;" onclick="startGamsatProCheckout('monthly', this)">Get S2 Pro →</button>
@@ -1917,7 +1917,7 @@ body[data-page="gamsat"]   .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
           <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:rgba(124,58,237,0.15);color:#7c3aed;padding:2px 9px;border-radius:50px;">Live</span>
           <span style="font-size:0.85rem;font-weight:700;color:var(--text);">GAMSAT S2 Pro</span>
         </div>
-        <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.55;margin:0 0 10px;">Unlimited AI essay reviews with deeper feedback on theme engagement, evidence selection, structure, and band-up changes.</p>
+        <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.55;margin:0 0 10px;">Fair-use unlimited AI essay reviews with deeper feedback on theme engagement, evidence selection, structure, and band-up changes.</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <button class="buy-credits-btn" style="margin:0;padding:9px 10px;font-size:0.78rem;background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.25);color:#7c3aed;" onclick="startGamsatProCheckout('weekly', this)">$19 / week</button>
           <button class="buy-credits-btn" style="margin:0;padding:9px 10px;font-size:0.78rem;background:#7c3aed;border-color:#7c3aed;color:#fff;" onclick="startGamsatProCheckout('monthly', this)">$49 / month</button>
@@ -2565,12 +2565,13 @@ function updateLimitUI() {
   if (!tool) return;
 
   if (tool.unlimited) {
-    if (btn) { btn.disabled = false; btn.textContent = '🔍 Get AI Feedback'; }
-    if (inlineNote) { inlineNote.textContent = '∞ Unlimited (GAMSAT S2 Pro)'; inlineNote.className = 'daily-limit-note'; }
-    if (statusBadge) { statusBadge.textContent = '∞ Unlimited'; statusBadge.className = 'ai-status-badge'; }
-    if (countEl) { countEl.textContent = '∞ Unlimited (GAMSAT S2 Pro)'; countEl.className = 'ai-limit-count'; }
+    const fairUseBlocked = tool.fair_use && tool.fair_use.allowed === false;
+    if (btn) { btn.disabled = !!fairUseBlocked; btn.textContent = fairUseBlocked ? 'Fair-use limit reached' : '🔍 Get AI Feedback'; }
+    if (inlineNote) { inlineNote.textContent = fairUseBlocked ? 'Fair-use limit reached' : '∞ Fair-use unlimited (GAMSAT S2 Pro)'; inlineNote.className = 'daily-limit-note'; }
+    if (statusBadge) { statusBadge.textContent = fairUseBlocked ? 'Fair-use limit reached' : '∞ S2 Pro'; statusBadge.className = 'ai-status-badge' + (fairUseBlocked ? ' exhausted' : ''); }
+    if (countEl) { countEl.textContent = fairUseBlocked ? 'Fair-use limit reached' : '∞ Fair-use unlimited (GAMSAT S2 Pro)'; countEl.className = 'ai-limit-count' + (fairUseBlocked ? ' exhausted' : ''); }
     if (fillEl) { fillEl.style.width = '100%'; fillEl.className = 'ai-limit-fill'; }
-    if (noteEl) noteEl.textContent = 'Unlimited GAMSAT S2 AI essay reviews with Pro.';
+    if (noteEl) noteEl.textContent = fairUseBlocked ? 'You have reached the S2 Pro fair-use ceiling. Contact Dan if this is legitimate study volume.' : 'Fair-use unlimited GAMSAT S2 AI essay reviews with Pro.';
     if (creditWrap) creditWrap.style.display = 'none';
     if (buyBtn) buyBtn.style.display = 'none';
     return;
@@ -2583,7 +2584,7 @@ function updateLimitUI() {
   // Update panel limit count
   if (countEl) {
     if (tool.unlimited) {
-      countEl.textContent = '∞ Unlimited (Pro)';
+      countEl.textContent = '∞ Fair-use unlimited (Pro)';
     } else if (rem > 0) {
       countEl.textContent = rem + ' free remaining';
     } else if (credits > 0) {
@@ -2866,6 +2867,12 @@ async function requestAIFeedback() {
   const hasUnlimited = !!toolLimits?.unlimited;
   let useCredit = false;
 
+  if (hasUnlimited && toolLimits?.fair_use && toolLimits.fair_use.allowed === false) {
+    updateLimitUI();
+    alert('You have reached the GAMSAT S2 Pro fair-use limit. Contact Dan if this is legitimate study volume.');
+    return;
+  }
+
   if (!hasUnlimited && remaining <= 0) {
     if (credits > 0) {
       // Auto-use a purchased credit
@@ -3006,6 +3013,12 @@ Please analyse this essay and provide feedback in the specified JSON format.`;
         document.getElementById('limitBanner').classList.add('active');
         document.getElementById('limitBanner').scrollIntoView({ behavior: 'smooth', block: 'center' });
         updateLimitUI();
+        return;
+      }
+      if (data.error === 'fair_use_limit_reached') {
+        await Key2MDAuth.checkSession();
+        updateLimitUI();
+        alert(data.message || 'You have reached the GAMSAT S2 Pro fair-use limit. Contact Dan if this is legitimate study volume.');
         return;
       }
       throw new Error(data.message || data.error);
@@ -3580,7 +3593,7 @@ window.startGamsatProCheckout = startGamsatProCheckout;
     window.history.replaceState({}, '', window.location.pathname);
     setTimeout(function(){
       Key2MDAuth.checkSession();
-      alert('GAMSAT S2 Pro is active. Unlimited essay feedback is now unlocked.');
+      alert('GAMSAT S2 Pro is active. Fair-use unlimited essay feedback is now unlocked.');
     }, 1500);
   } else if(params.get('gamsat_s2_pro') === 'cancelled'){
     window.history.replaceState({}, '', window.location.pathname);
