@@ -454,7 +454,9 @@
  .about-bio strong{color:var(--navy)}
  .about-highlights{display:flex;flex-direction:column;gap:16px;margin-top:24px}
  .highlight-item{display:flex;align-items:flex-start;gap:14px}
- .highlight-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--navy),var(--navy3));display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+ .credential-icon,.highlight-icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(14,165,233,0.24);background:linear-gradient(135deg,rgba(14,165,233,0.16),rgba(14,165,233,0.07));color:#7dd3fc;font-weight:900;letter-spacing:0.05em;line-height:1}
+ .credential-icon{width:32px;height:32px;border-radius:8px;font-size:0.62rem}
+ .highlight-icon{width:40px;height:40px;border-radius:10px;font-size:0.72rem;background:linear-gradient(135deg,var(--navy),var(--navy3));box-shadow:0 8px 18px rgba(10,22,40,0.12)}
  .highlight-text strong{display:block;font-weight:700;color:var(--navy);font-size:0.92rem;margin-bottom:2px}
  .highlight-text span{font-size:0.82rem;color:var(--gray400)}
 
@@ -1327,14 +1329,14 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div style="display:flex;align-items:center;gap:14px;">
  <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#0284c7);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;color:#fff;flex-shrink:0;">D</div>
  <div><div style="font-size:1rem;font-weight:800;color:#fff;">Dan</div><div style="font-size:0.78rem;color:var(--teal2);font-weight:600;">UniMelb MD Student</div></div>
- <div style="margin-left:auto;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);border-radius:50px;padding:4px 10px;font-size:0.68rem;font-weight:700;color:#22c55e;">OK Verified</div>
+ <div style="margin-left:auto;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.35);border-radius:50px;padding:4px 10px;font-size:0.68rem;font-weight:700;color:#22c55e;">Verified</div>
  </div>
  <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
  <div style="display:flex;flex-direction:column;gap:12px;">
- <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;"></div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">99.85 ATAR</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Top 0.15% nationally</div></div></div>
- <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;"></div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">r/GAMSAT Moderator-Hired</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Independent community context</div></div></div>
- <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">Star</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">StudentVIP Verified</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Background checked &amp; reviewed</div></div></div>
- <div style="display:flex;align-items:center;gap:12px;"><div style="width:32px;height:32px;border-radius:8px;background:rgba(14,165,233,0.12);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;"></div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">72 Med Offers in 2024-25</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">93%+ tracked offer rate (2025 MMI)</div></div></div>
+ <div style="display:flex;align-items:center;gap:12px;"><div class="credential-icon" aria-hidden="true">99</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">99.85 ATAR</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Top 0.15% nationally</div></div></div>
+ <div style="display:flex;align-items:center;gap:12px;"><div class="credential-icon" aria-hidden="true">RG</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">r/GAMSAT Moderator-Hired</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Independent community context</div></div></div>
+ <div style="display:flex;align-items:center;gap:12px;"><div class="credential-icon" aria-hidden="true">VIP</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">StudentVIP Verified</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Background checked &amp; reviewed</div></div></div>
+ <div style="display:flex;align-items:center;gap:12px;"><div class="credential-icon" aria-hidden="true">72</div><div><div style="font-size:0.82rem;font-weight:700;color:#fff;">72 Med Offers in 2024-25</div><div style="font-size:0.72rem;color:rgba(255,255,255,0.45);">93%+ tracked offer rate (2025 MMI)</div></div></div>
  </div>
  <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
  <div style="text-align:center;"><span style="font-size:1.8rem;font-weight:800;color:var(--teal);">6+</span><span style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-left:6px;">years tutoring</span></div>
@@ -1354,11 +1356,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <p class="about-bio">Dan is a current <strong>University of Melbourne MD student</strong> who achieved a <strong>99.85 ATAR</strong> and knows exactly what it takes to get into Australia's most competitive medical programs. He's not just a tutor - he's been chosen by the moderators of <strong>r/GAMSAT</strong>, one of Australia's largest med-aspiring communities, and is verified on StudentVIP.</p>
  <p class="about-bio">With 200+ students coached - including candidates who received offers from <strong>all 6 universities they applied to</strong>, doctors accepted into <strong>specialty training programs</strong>, and GP applicants who passed RACGP CASPer on their first attempt - Dan's methods are proven, personalised, and built around what actually works in the room.</p>
  <div class="about-highlights">
- <div class="highlight-item"><div class="highlight-icon"></div><div class="highlight-text"><strong>University of Melbourne MD</strong><span>Currently in clinical years of the Doctor of Medicine program</span></div></div>
- <div class="highlight-item"><div class="highlight-icon"></div><div class="highlight-text"><strong>99.85 ATAR</strong><span>Top 0.15% academic performer nationally</span></div></div>
- <div class="highlight-item"><div class="highlight-icon"></div><div class="highlight-text"><strong>r/GAMSAT Community Trusted</strong><span>Hired by subreddit moderators - a rare mark of trust</span></div></div>
- <div class="highlight-item"><div class="highlight-icon"></div><div class="highlight-text"><strong>Specialist &amp; GP Training Coaching</strong><span>Experienced coaching doctors through RANZCO, RACS, RACGP &amp; ACRRM selection</span></div></div>
- <div class="highlight-item"><div class="highlight-icon"></div><div class="highlight-text"><strong><a href="https://www.linkedin.com/in/d-brittain/" target="_blank" style="color:var(--teal3);text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" rel="noopener noreferrer">LinkedIn - Dan Brittain</a></strong><span>Connect, verify credentials, and see Dan's professional background</span></div></div>
+ <div class="highlight-item"><div class="highlight-icon" aria-hidden="true">MD</div><div class="highlight-text"><strong>University of Melbourne MD</strong><span>Currently in clinical years of the Doctor of Medicine program</span></div></div>
+ <div class="highlight-item"><div class="highlight-icon" aria-hidden="true">99</div><div class="highlight-text"><strong>99.85 ATAR</strong><span>Top 0.15% academic performer nationally</span></div></div>
+ <div class="highlight-item"><div class="highlight-icon" aria-hidden="true">RG</div><div class="highlight-text"><strong>r/GAMSAT Community Trusted</strong><span>Hired by subreddit moderators - a rare mark of trust</span></div></div>
+ <div class="highlight-item"><div class="highlight-icon" aria-hidden="true">GP</div><div class="highlight-text"><strong>Specialist &amp; GP Training Coaching</strong><span>Experienced coaching doctors through RANZCO, RACS, RACGP &amp; ACRRM selection</span></div></div>
+ <div class="highlight-item"><div class="highlight-icon" aria-hidden="true">in</div><div class="highlight-text"><strong><a href="https://www.linkedin.com/in/d-brittain/" target="_blank" style="color:var(--teal3);text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" rel="noopener noreferrer">LinkedIn - Dan Brittain</a></strong><span>Connect, verify credentials, and see Dan's professional background</span></div></div>
  </div>
  </div>
  </div>
