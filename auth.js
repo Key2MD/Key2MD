@@ -24,6 +24,47 @@ const Key2MDAuth = (() => {
  let _limits = null;
  let _config = {};
  const TOKEN_KEY = 'key2md_token';
+ const DEVICE_KEY = 'key2md_device_id';
+ let _fetchPatched = false;
+
+ function makeDeviceId() {
+ if (window.crypto?.randomUUID) return window.crypto.randomUUID().replace(/-/g, '');
+ return `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
+ }
+
+ function getDeviceId() {
+ let id = localStorage.getItem(DEVICE_KEY);
+ if (!id || !/^[A-Za-z0-9_-]{12,120}$/.test(id)) {
+ id = makeDeviceId().slice(0, 80);
+ localStorage.setItem(DEVICE_KEY, id);
+ }
+ return id;
+ }
+
+ function getTrackingHeaders(extra = {}) {
+ const headers = new Headers(extra || {});
+ headers.set('X-K2-Device-Id', getDeviceId());
+ try { headers.set('X-K2-Client-Tz', Intl.DateTimeFormat().resolvedOptions().timeZone || ''); } catch {}
+ return headers;
+ }
+
+ function installFetchActivityHeaders() {
+ if (_fetchPatched || !window.fetch || !_config.apiBase) return;
+ const nativeFetch = window.fetch.bind(window);
+ const apiBase = _config.apiBase.replace(/\/+$/, '');
+ window.fetch = (input, init = {}) => {
+ try {
+ const url = typeof input === 'string' ? input : input?.url || '';
+ if (url && url.startsWith(apiBase)) {
+ const next = { ...init };
+ next.headers = getTrackingHeaders(init?.headers || (typeof input === 'string' ? {} : input.headers || {}));
+ return nativeFetch(input, next);
+ }
+ } catch {}
+ return nativeFetch(input, init);
+ };
+ _fetchPatched = true;
+ }
 
  // -- Public API --
 
@@ -35,6 +76,7 @@ const Key2MDAuth = (() => {
  onLimitsLoaded: config.onLimitsLoaded || (() => {}),
  };
 
+ installFetchActivityHeaders();
  injectAuthModal();
  injectAuthBar();
  checkSession();
@@ -74,10 +116,10 @@ const Key2MDAuth = (() => {
  const token = getToken();
  const res = await fetch(`${_config.apiBase}/api/review`, {
  method: 'POST',
- headers: {
+ headers: getTrackingHeaders({
  'Content-Type': 'application/json',
  'Authorization': `Bearer ${token}`,
- },
+ }),
  body: JSON.stringify({
  tool: _config.tool,
  model: extraContext.model || 'claude-sonnet-4-6',
@@ -121,7 +163,7 @@ const Key2MDAuth = (() => {
 
  try {
  const res = await fetch(`${_config.apiBase}/api/auth/me`, {
- headers: { 'Authorization': `Bearer ${token}` },
+ headers: getTrackingHeaders({ 'Authorization': `Bearer ${token}` }),
  });
  const data = await res.json();
  if (data.user) {
@@ -142,7 +184,7 @@ const Key2MDAuth = (() => {
 
  try {
  const res = await fetch(`${_config.apiBase}/api/limits`, {
- headers: { 'Authorization': `Bearer ${token}` },
+ headers: getTrackingHeaders({ 'Authorization': `Bearer ${token}` }),
  });
  _limits = await res.json();
  _config.onLimitsLoaded(_limits);
@@ -163,7 +205,7 @@ const Key2MDAuth = (() => {
  async function signup(email, password, name) {
  const res = await fetch(`${_config.apiBase}/api/auth/signup`, {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
+ headers: getTrackingHeaders({ 'Content-Type': 'application/json' }),
  body: JSON.stringify({ email, password, name }),
  });
  const data = await res.json();
@@ -179,7 +221,7 @@ const Key2MDAuth = (() => {
  async function login(email, password) {
  const res = await fetch(`${_config.apiBase}/api/auth/login`, {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
+ headers: getTrackingHeaders({ 'Content-Type': 'application/json' }),
  body: JSON.stringify({ email, password }),
  });
  const data = await res.json();
@@ -197,7 +239,7 @@ const Key2MDAuth = (() => {
  if (token) {
  fetch(`${_config.apiBase}/api/auth/logout`, {
  method: 'POST',
- headers: { 'Authorization': `Bearer ${token}` },
+ headers: getTrackingHeaders({ 'Authorization': `Bearer ${token}` }),
  }).catch(() => {});
  }
  localStorage.removeItem(TOKEN_KEY);
@@ -468,7 +510,7 @@ const Key2MDAuth = (() => {
  try {
  await fetch(`${_config.apiBase}/api/auth/forgot`, {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
+ headers: getTrackingHeaders({ 'Content-Type': 'application/json' }),
  body: JSON.stringify({ email }),
  });
  errEl.textContent = 'If an account exists with this email, a reset link has been sent.';
@@ -500,6 +542,7 @@ const Key2MDAuth = (() => {
  isLoggedIn,
  isPro,
  getToken,
+ getTrackingHeaders,
  getApiBase,
  canReview,
  canMakeRequest,
