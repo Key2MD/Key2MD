@@ -172,6 +172,166 @@
   color: var(--muted);
   font-size: 0.82rem;
  }
+ .skill-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+ }
+ .skill-filter {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--navy);
+  border-radius: 999px;
+  min-height: 36px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+ }
+ .skill-filter.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+ }
+ .skill-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
+  gap: 18px;
+  align-items: start;
+ }
+ .skill-grid {
+  display: grid;
+  gap: 10px;
+ }
+ .skill-chip {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 14px;
+  padding: 13px 14px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 8px;
+ }
+ .skill-chip.active {
+  border-color: rgba(14,165,233,0.62);
+  box-shadow: 0 12px 28px rgba(14,165,233,0.12);
+ }
+ .skill-chip-top,
+ .skill-score-row,
+ .skill-detail-head,
+ .skill-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+ }
+ .skill-chip-name {
+  color: var(--navy);
+  font-size: 0.88rem;
+  font-weight: 950;
+ }
+ .skill-score {
+  color: var(--teal);
+  font-size: 1rem;
+  font-weight: 950;
+  white-space: nowrap;
+ }
+ .skill-chip-meta,
+ .skill-detail-meta,
+ .skill-mini-label,
+ .skill-attempt-meta {
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.45;
+ }
+ .skill-spark {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 4px;
+  align-items: end;
+  height: 34px;
+ }
+ .skill-bar {
+  border-radius: 999px 999px 2px 2px;
+  min-height: 5px;
+  background: var(--teal);
+ }
+ .skill-detail {
+  border: 1px solid var(--line);
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 18px;
+ }
+ .skill-detail h3 {
+  margin-bottom: 4px;
+ }
+ .skill-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0;
+ }
+ .skill-mini {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+ }
+ .skill-mini b {
+  display: block;
+  color: var(--navy);
+  font-size: 1.1rem;
+  margin-bottom: 3px;
+ }
+ .skill-drill {
+  background: #fff;
+  border: 1px solid rgba(14,165,233,0.22);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 12px;
+ }
+ .skill-drill strong {
+  display: block;
+  color: var(--navy);
+  font-size: 0.86rem;
+  margin-bottom: 5px;
+ }
+ .skill-drill span,
+ .skill-attempt-copy {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.55;
+ }
+ .skill-action-row {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-top: 14px;
+ }
+ .skill-action-row .journey-btn {
+  min-height: 38px;
+  font-size: 0.78rem;
+ }
+ .skill-attempts {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+ }
+ .skill-attempt {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+ }
+ .skill-attempt strong {
+  color: var(--navy);
+  font-size: 0.82rem;
+ }
  #k2mdAuthBar {
   margin-top: 14px;
  }
@@ -183,6 +343,10 @@
    position: static;
   }
   .journey-stats {
+   grid-template-columns: 1fr;
+  }
+  .skill-layout,
+  .skill-mini-grid {
    grid-template-columns: 1fr;
   }
  }
@@ -258,6 +422,22 @@
  <a class="journey-btn secondary" href="history.html">View review history</a>
  </div>
  </article>
+
+ <article class="journey-card" id="skillMapCard">
+ <div class="journey-kicker">CASPer skill map</div>
+ <h2>Track the patterns behind your scores.</h2>
+ <p class="journey-muted" id="skillMapSummary">This turns your AI feedback into a living competency map: priority weaknesses, recent trend, strongest skill, and the next useful drill.</p>
+ <div class="skill-toolbar" aria-label="Skill map sort options">
+ <button type="button" class="skill-filter active" data-skill-sort="priority" onclick="setSkillSort('priority')">Priority</button>
+ <button type="button" class="skill-filter" data-skill-sort="recent" onclick="setSkillSort('recent')">Recent score</button>
+ <button type="button" class="skill-filter" data-skill-sort="improving" onclick="setSkillSort('improving')">Improving</button>
+ <button type="button" class="skill-filter" data-skill-sort="volume" onclick="setSkillSort('volume')">Most practised</button>
+ </div>
+ <div class="skill-layout">
+ <div class="skill-grid" id="skillGrid"></div>
+ <div class="skill-detail" id="skillDetail"></div>
+ </div>
+ </article>
  </section>
 
  <aside class="journey-side">
@@ -291,6 +471,57 @@
  const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
  const PLAN_KEY = 'key2md_latest_calculator_plan_v1';
  const HISTORY_KEY = 'k2md_station_history_v1';
+ const COMPETENCY_PROGRESS_KEY = 'k2md_casper_competency_progress_v1';
+ const SKILL_STATE = { sort: 'priority', selected: '' };
+ const CASPER_COMPETENCIES = [
+  'Collaboration',
+  'Communication',
+  'Empathy',
+  'Fairness',
+  'Ethics',
+  'Motivation',
+  'Problem Solving',
+  'Resilience',
+  'Self-Awareness'
+ ];
+ const SKILL_DRILLS = {
+  Collaboration: {
+   focus: 'Make the shared goal explicit before you suggest action.',
+   drill: 'Do one workplace or group-conflict station and force yourself to name who needs to be involved, what each person needs, and how you would preserve trust.'
+  },
+  Communication: {
+   focus: 'Show the exact conversation, not just the intention.',
+   drill: 'Do a timed station and write the first two sentences as if you were speaking to the person directly: calm tone, clear purpose, and a concrete next question.'
+  },
+  Empathy: {
+   focus: 'Name the feeling and why it matters in this scenario.',
+   drill: 'For the next three stations, open with one specific emotional acknowledgement before moving to facts or solutions.'
+  },
+  Fairness: {
+   focus: 'Balance the people affected instead of protecting only one side.',
+   drill: 'Pick a dilemma station and list the stakeholders before answering. Your final answer should protect safety, dignity, and process.'
+  },
+  Ethics: {
+   focus: 'State the principle, then convert it into action.',
+   drill: 'Do one professionalism station and explicitly link your choice to confidentiality, honesty, safety, consent, or accountability.'
+  },
+  Motivation: {
+   focus: 'Make your reason for acting visible.',
+   drill: 'Answer a difficult scenario and add one sentence explaining why your action protects the person, team, or community.'
+  },
+  'Problem Solving': {
+   focus: 'Move from concern to a practical next step.',
+   drill: 'Use a three-step answer: gather missing information, act on immediate risk, then follow up with the right person or process.'
+  },
+  Resilience: {
+   focus: 'Show calm recovery under pressure.',
+   drill: 'Use a timed station after a short break. Keep the answer simple: acknowledge pressure, choose the safest next action, and reflect afterwards.'
+  },
+  'Self-Awareness': {
+   focus: 'Show your limits without becoming passive.',
+   drill: 'Use one station to practise saying what you do not know yet, how you would check it, and who you would involve.'
+  }
+ };
 
  function readJson(key, fallback) {
   try {
@@ -355,6 +586,208 @@
   document.getElementById('averageScore').textContent = scored.length ? (scored.reduce(function (a, b) { return a + b; }, 0) / scored.length).toFixed(1) : '-';
  }
 
+ function normalizeCompetencyName(name) {
+  const raw = String(name || '').trim();
+  const lower = raw.toLowerCase().replace(/[_-]+/g, ' ');
+  const aliases = {
+   collaboration: 'Collaboration',
+   communication: 'Communication',
+   empathy: 'Empathy',
+   fairness: 'Fairness',
+   ethics: 'Ethics',
+   motivation: 'Motivation',
+   'problem solving': 'Problem Solving',
+   problem_solving: 'Problem Solving',
+   resilience: 'Resilience',
+   'self awareness': 'Self-Awareness',
+   self_awareness: 'Self-Awareness',
+   selfawareness: 'Self-Awareness'
+  };
+  return aliases[lower] || raw;
+ }
+
+ function readCompetencyRows() {
+  const rows = readJson(COMPETENCY_PROGRESS_KEY, []);
+  return Array.isArray(rows) ? rows : [];
+ }
+
+ function average(values) {
+  const nums = values.map(Number).filter(function (value) { return Number.isFinite(value); });
+  return nums.length ? nums.reduce(function (sum, value) { return sum + value; }, 0) / nums.length : null;
+ }
+
+ function isFiniteScore(value) {
+  return value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value));
+ }
+
+ function round1(value) {
+  return isFiniteScore(value) ? Number(value).toFixed(1) : '-';
+ }
+
+ function scoreTone(score) {
+  if (!isFiniteScore(score)) return '#94a3b8';
+  if (score >= 8) return '#16a34a';
+  if (score >= 7) return '#0ea5e9';
+  if (score >= 5.5) return '#d97706';
+  return '#dc2626';
+ }
+
+ function trendLabel(delta) {
+  if (!isFiniteScore(delta)) return 'No trend yet';
+  if (delta >= 0.6) return '+' + delta.toFixed(1) + ' improving';
+  if (delta <= -0.6) return delta.toFixed(1) + ' slipping';
+  return 'Stable';
+ }
+
+ function quartileSignal(score) {
+  if (!isFiniteScore(score)) return 'Awaiting data';
+  if (score >= 8) return 'Strong Q4-style practice signal';
+  if (score >= 7) return 'Likely Q4-style practice signal';
+  if (score >= 6) return 'Developing toward Q4';
+  return 'Needs targeted work';
+ }
+
+ function buildSkillStats() {
+  const map = {};
+  CASPER_COMPETENCIES.forEach(function (name) {
+   map[name] = { name: name, points: [], categories: {}, latestImprove: '', latestEvidence: '' };
+  });
+  readCompetencyRows().forEach(function (row) {
+   const comps = Array.isArray(row && row.competencies) ? row.competencies : [];
+   comps.forEach(function (comp) {
+    const name = normalizeCompetencyName(comp && comp.name);
+    if (!map[name]) map[name] = { name: name, points: [], categories: {}, latestImprove: '', latestEvidence: '' };
+    const score = Number(comp && comp.score);
+    if (!Number.isFinite(score)) return;
+    const point = {
+     score: score,
+     at: row.at || row.created_at || '',
+     category: row.category || 'Mixed station',
+     station: row.station_id || row.stationId || '',
+     improve: comp.improve || comp.improvement || '',
+     evidence: comp.evidence || ''
+    };
+    map[name].points.push(point);
+    map[name].categories[point.category] = (map[name].categories[point.category] || 0) + 1;
+    if (point.improve) map[name].latestImprove = point.improve;
+    if (point.evidence) map[name].latestEvidence = point.evidence;
+   });
+  });
+  return Object.values(map).map(function (stat) {
+   stat.points.sort(function (a, b) { return new Date(a.at || 0) - new Date(b.at || 0); });
+   const scores = stat.points.map(function (point) { return point.score; });
+   const recentScores = scores.slice(-5);
+   const firstScores = scores.slice(0, Math.min(5, scores.length));
+   stat.count = scores.length;
+   stat.avg = average(scores);
+   stat.recent = average(recentScores);
+   stat.best = scores.length ? Math.max.apply(Math, scores) : null;
+   stat.delta = stat.count >= 2 ? (average(recentScores) - average(firstScores)) : null;
+   stat.priority = isFiniteScore(stat.recent) ? (10 - stat.recent) + Math.max(0, 4 - stat.count) * 0.2 : 99;
+   return stat;
+  });
+ }
+
+ function sortedSkillStats() {
+  const stats = buildSkillStats();
+  const sort = SKILL_STATE.sort;
+  return stats.sort(function (a, b) {
+   if (sort === 'recent') return (b.recent || -1) - (a.recent || -1);
+   if (sort === 'improving') return (b.delta || -99) - (a.delta || -99);
+   if (sort === 'volume') return b.count - a.count || (a.recent || 99) - (b.recent || 99);
+   return a.priority - b.priority || b.count - a.count;
+  });
+ }
+
+ function skillSparkHtml(points) {
+  const recent = (points || []).slice(-8);
+  if (!recent.length) {
+   return '<div class="skill-spark" aria-hidden="true"><span class="skill-bar" style="height:5px;background:#cbd5e1;"></span><span class="skill-bar" style="height:5px;background:#cbd5e1;"></span><span class="skill-bar" style="height:5px;background:#cbd5e1;"></span></div>';
+  }
+  return '<div class="skill-spark" aria-hidden="true">' + recent.map(function (point) {
+   const height = Math.max(8, Math.min(34, Number(point.score) * 3.4));
+   return '<span class="skill-bar" style="height:' + height.toFixed(0) + 'px;background:' + scoreTone(point.score) + ';"></span>';
+  }).join('') + '</div>';
+ }
+
+ function categorySummary(stat) {
+  const entries = Object.entries(stat.categories || {}).sort(function (a, b) { return b[1] - a[1]; });
+  return entries.length ? entries.slice(0, 2).map(function (entry) { return entry[0] + ' x' + entry[1]; }).join(', ') : 'No station categories yet';
+ }
+
+ function formatDate(value) {
+  if (!value) return 'Recent attempt';
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) : 'Recent attempt';
+ }
+
+ function renderSkillMap() {
+  const grid = document.getElementById('skillGrid');
+  const detail = document.getElementById('skillDetail');
+  const summary = document.getElementById('skillMapSummary');
+  if (!grid || !detail || !summary) return;
+  const stats = sortedSkillStats();
+  const withData = stats.filter(function (stat) { return stat.count > 0; });
+  const strongest = withData.slice().sort(function (a, b) { return (b.recent || -1) - (a.recent || -1); })[0];
+  const priority = withData.slice().sort(function (a, b) { return a.priority - b.priority; })[0];
+  summary.textContent = withData.length
+   ? 'Tracked ' + withData.reduce(function (sum, stat) { return sum + stat.count; }, 0) + ' competency datapoints. Priority focus: ' + priority.name + '. Strongest recent signal: ' + strongest.name + '.'
+   : 'Complete AI-marked stations in CASPer/MMI practice and your competency trends will appear here automatically.';
+  if (!withData.length) {
+   grid.innerHTML = '<div class="journey-item"><strong>No competency data yet</strong><span>Do a few AI-marked stations first. After each marked response, Key2MD will build this into a trend map.</span></div>';
+   detail.innerHTML = '<h3>Start with three stations.</h3><p class="journey-muted">The first useful read appears after roughly three marked answers. After five, the patterns become much more reliable.</p><div class="journey-actions"><a class="journey-btn primary" href="practice.html">Start practice</a></div>';
+   return;
+  }
+  if (!SKILL_STATE.selected || !stats.some(function (stat) { return stat.name === SKILL_STATE.selected; })) {
+   SKILL_STATE.selected = priority.name;
+  }
+  grid.innerHTML = stats.map(function (stat) {
+   const active = stat.name === SKILL_STATE.selected;
+   const recent = isFiniteScore(stat.recent) ? round1(stat.recent) + '/10' : '-';
+   return '<button type="button" class="skill-chip' + (active ? ' active' : '') + '" onclick="selectSkill(' + "'" + escapeJs(stat.name) + "'" + ')">' +
+    '<span class="skill-chip-top"><span class="skill-chip-name">' + escapeHtml(stat.name) + '</span><span class="skill-score" style="color:' + scoreTone(stat.recent) + ';">' + recent + '</span></span>' +
+    skillSparkHtml(stat.points) +
+    '<span class="skill-score-row"><span class="skill-chip-meta">' + stat.count + ' datapoint' + (stat.count === 1 ? '' : 's') + '</span><span class="skill-chip-meta">' + escapeHtml(trendLabel(stat.delta)) + '</span></span>' +
+    '</button>';
+  }).join('');
+  renderSkillDetail(stats.find(function (stat) { return stat.name === SKILL_STATE.selected; }) || withData[0]);
+ }
+
+ function renderSkillDetail(stat) {
+  const detail = document.getElementById('skillDetail');
+  if (!detail || !stat) return;
+  const drill = SKILL_DRILLS[stat.name] || { focus: 'Make this skill visible in the answer.', drill: 'Do one timed station and add one explicit sentence showing this competency.' };
+  const recentAttempts = stat.points.slice(-3).reverse();
+  detail.innerHTML =
+   '<div class="skill-detail-head"><div><h3>' + escapeHtml(stat.name) + '</h3><div class="skill-detail-meta">' + escapeHtml(quartileSignal(stat.recent)) + '</div></div><div class="skill-score" style="color:' + scoreTone(stat.recent) + ';">' + (Number.isFinite(Number(stat.recent)) ? round1(stat.recent) + '/10' : '-') + '</div></div>' +
+   '<div class="skill-mini-grid">' +
+   '<div class="skill-mini"><b>' + round1(stat.avg) + '</b><span class="skill-mini-label">All-time average</span></div>' +
+   '<div class="skill-mini"><b>' + (isFiniteScore(stat.delta) ? (stat.delta > 0 ? '+' : '') + stat.delta.toFixed(1) : '-') + '</b><span class="skill-mini-label">Trend</span></div>' +
+   '<div class="skill-mini"><b>' + (isFiniteScore(stat.best) ? round1(stat.best) : '-') + '</b><span class="skill-mini-label">Best mark</span></div>' +
+   '</div>' +
+   '<div class="skill-drill"><strong>Next focus</strong><span>' + escapeHtml(drill.focus) + '</span></div>' +
+   '<div class="skill-drill"><strong>Recommended drill</strong><span>' + escapeHtml(drill.drill) + '</span></div>' +
+   '<div class="skill-drill"><strong>Where it is showing up</strong><span>' + escapeHtml(categorySummary(stat)) + '</span></div>' +
+   (stat.latestImprove ? '<div class="skill-drill"><strong>Latest improvement note</strong><span>' + escapeHtml(stat.latestImprove) + '</span></div>' : '') +
+   '<div class="skill-action-row"><a class="journey-btn primary" href="practice.html">Practise this now</a><a class="journey-btn secondary" href="history.html">Open history</a></div>' +
+   '<div class="skill-attempts">' + (recentAttempts.length ? recentAttempts.map(function (point) {
+    return '<div class="skill-attempt"><div class="skill-score-row"><strong>' + escapeHtml(point.category) + '</strong><span class="skill-score" style="font-size:0.82rem;color:' + scoreTone(point.score) + ';">' + round1(point.score) + '/10</span></div><div class="skill-attempt-meta">' + escapeHtml(formatDate(point.at)) + '</div>' + (point.evidence ? '<span class="skill-attempt-copy">' + escapeHtml(point.evidence) + '</span>' : '') + '</div>';
+   }).join('') : '<div class="skill-attempt"><span class="skill-attempt-copy">No recent examples yet.</span></div>') + '</div>';
+ }
+
+ function setSkillSort(sort) {
+  SKILL_STATE.sort = sort;
+  document.querySelectorAll('[data-skill-sort]').forEach(function (button) {
+   button.classList.toggle('active', button.dataset.skillSort === sort);
+  });
+  renderSkillMap();
+ }
+
+ function selectSkill(name) {
+  SKILL_STATE.selected = name;
+  renderSkillMap();
+ }
+
  function renderAccount() {
   const status = document.getElementById('accountStatus');
   if (typeof Key2MDAuth === 'undefined') {
@@ -381,8 +814,13 @@
   return escapeHtml(value).replace(/`/g, '&#96;');
  }
 
+ function escapeJs(value) {
+  return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r/g, '\\r').replace(/\n/g, '\\n');
+ }
+
  renderPlan();
  renderProgress();
+ renderSkillMap();
  renderAccount();
  </script>
  <script src="key2md-tracking.js" defer></script>

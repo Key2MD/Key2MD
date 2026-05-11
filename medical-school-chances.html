@@ -3264,9 +3264,9 @@ function renderUoWCard(u, gpa, scores) {
  <div class="uni-uow-hurdles">
  <strong>Your hurdle status:</strong>
  <ul>
- <li class="${gpaMet ? 'hurdle-met' : 'hurdle-miss'}">GPA ${hurdles.gpaMin}: <strong>${gpaMet ? 'OK Met' : 'x Not met'}</strong> (${gpa.toFixed(2)})</li>
- <li class="${gamMet ? 'hurdle-met' : 'hurdle-miss'}">GAMSAT overall ${hurdles.gamsatMin}: <strong>${gamMet ? 'OK Met' : 'x Not met'}</strong> (${gam.toFixed(1)})</li>
- <li class="${sectionMet === true ? 'hurdle-met' : (sectionMet === false ? 'hurdle-miss' : 'hurdle-unknown')}">GAMSAT sections ${hurdles.sectionMin}: <strong>${sectionKnown ? (sectionMet ? 'OK Met' : 'x Not met') : 'Unknown'}</strong>${sectionKnown ? ` (S1 ${scores.sections.s1.toFixed(0)}, S2 ${scores.sections.s2.toFixed(0)}, S3 ${scores.sections.s3.toFixed(0)})` : ' - enter section scores to check exactly'}</li>
+ <li class="${gpaMet ? 'hurdle-met' : 'hurdle-miss'}">GPA ${hurdles.gpaMin}: <strong>${gpaMet ? 'Met' : 'Not met'}</strong> (${gpa.toFixed(2)})</li>
+ <li class="${gamMet ? 'hurdle-met' : 'hurdle-miss'}">GAMSAT overall ${hurdles.gamsatMin}: <strong>${gamMet ? 'Met' : 'Not met'}</strong> (${gam.toFixed(1)})</li>
+ <li class="${sectionMet === true ? 'hurdle-met' : (sectionMet === false ? 'hurdle-miss' : 'hurdle-unknown')}">GAMSAT sections ${hurdles.sectionMin}: <strong>${sectionKnown ? (sectionMet ? 'Met' : 'Not met') : 'Unknown'}</strong>${sectionKnown ? ` (S1 ${scores.sections.s1.toFixed(0)}, S2 ${scores.sections.s2.toFixed(0)}, S3 ${scores.sections.s3.toFixed(0)})` : ' - enter section scores to check exactly'}</li>
  <li class="${casperStatus === 'met' ? 'hurdle-met' : (casperStatus === 'likely-not' ? 'hurdle-miss' : 'hurdle-unknown')}">CASPer: <strong>${state.casper || 'Not specified'}</strong> - ${hurdles.casperReq} required</li>
  <li class="hurdle-unknown">Bonus: ${hurdles.bonusReq}</li>
  </ul>

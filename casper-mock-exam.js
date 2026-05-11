@@ -1587,6 +1587,75 @@ window.FullCasperMock = (() => {
  };
  }
 
+ function buildMockActionPlan(report, rows) {
+ const actions = [];
+ const weakestCriterion = report.criteria.find(c => Number.isFinite(c.avg));
+ const weakestCategory = report.categories.find(c => Number.isFinite(c.avg));
+ const scoredRows = rows.filter(row => Number.isFinite(row.score10));
+ actions.push({
+ label: 'Next station',
+ title: report.oneThing.title,
+ detail: report.oneThing.body,
+ });
+ if (weakestCriterion) {
+ actions.push({
+ label: 'Next 3 stations',
+ title: `Make ${weakestCriterion.label.toLowerCase()} visible every time`,
+ detail: weakestCriterion.improve || `Before submitting, check that your answer explicitly shows ${weakestCriterion.label.toLowerCase()} rather than leaving the marker to infer it.`,
+ });
+ }
+ if (report.stamina.tone === 'risk') {
+ actions.push({
+ label: 'Next full mock',
+ title: 'Protect late-station quality',
+ detail: 'In typed stations 5-7, use the same opening structure as early stations: direct answer, specific concern, concrete next step. Your issue may be fatigue, not knowledge.',
+ });
+ }
+ if (weakestCategory) {
+ actions.push({
+ label: 'Category focus',
+ title: `Repeat ${weakestCategory.category} under timing`,
+ detail: `This category averaged ${weakestCategory.avg}/10 across ${weakestCategory.n} scored station${weakestCategory.n === 1 ? '' : 's'}. Treat it as the next practice block, not as a permanent weakness.`,
+ });
+ }
+ if (scoredRows.length < rows.length) {
+ actions.push({
+ label: 'Report quality',
+ title: 'Complete the missing analyses',
+ detail: 'Some station feedback did not finish, so use the report as a partial signal and review the station explorer before making big conclusions.',
+ });
+ }
+ return actions.slice(0, 4);
+ }
+
+ function buildReadinessChecklist(report) {
+ const weakestCriterion = report.criteria.find(c => Number.isFinite(c.avg));
+ const lowCriteria = report.criteria.filter(c => Number.isFinite(c.avg) && c.avg < 6.5);
+ const diff = Number(report.stamina.diff);
+ return [
+ {
+ label: 'Overall repeatability',
+ status: Number.isFinite(report.overallAvg) && report.overallAvg >= 7 ? 'ready' : Number.isFinite(report.overallAvg) && report.overallAvg >= 6.5 ? 'watch' : 'work',
+ detail: Number.isFinite(report.overallAvg) ? `${report.overallAvg}/10 overall. The key question is whether you can reproduce this under timing.` : 'Awaiting enough scored stations for an overall signal.',
+ },
+ {
+ label: 'Criterion balance',
+ status: !weakestCriterion ? 'watch' : lowCriteria.length ? 'work' : 'ready',
+ detail: weakestCriterion ? `Lowest criterion: ${weakestCriterion.label} at ${weakestCriterion.avg}/10.` : 'No criterion pattern available yet.',
+ },
+ {
+ label: 'Late-station stamina',
+ status: report.stamina.tone === 'risk' ? 'work' : report.stamina.tone === 'strong' ? 'ready' : 'watch',
+ detail: report.stamina.tone === 'risk' ? `Late quality dropped by ${Number.isFinite(diff) ? Math.abs(diff).toFixed(1) : 'a visible margin'} points.` : report.stamina.body,
+ },
+ {
+ label: 'Clear improvement target',
+ status: report.oneThing ? 'ready' : 'watch',
+ detail: report.oneThing ? report.oneThing.title : 'Do another marked station to find the highest-yield next move.',
+ },
+ ];
+ }
+
  function buildMockReport(rows) {
  const scored = rows.map(r => r.score10).filter(Number.isFinite);
  const overallAvg = round1(average(scored));
@@ -1597,6 +1666,8 @@ window.FullCasperMock = (() => {
  const interpretation = buildInterpretation(overallAvg);
  const report = { rows, overallAvg, criteria, stamina, patterns, categories, interpretation };
  report.oneThing = buildOneThing(report);
+ report.actionPlan = buildMockActionPlan(report, rows);
+ report.readiness = buildReadinessChecklist(report);
  return report;
  }
 
@@ -1637,6 +1708,8 @@ window.FullCasperMock = (() => {
  categories: report.categories,
  interpretation: report.interpretation,
  oneThing: report.oneThing,
+ actionPlan: report.actionPlan,
+ readiness: report.readiness,
  };
  const completedAnalyses = rows.filter(r => Number.isFinite(r.score10)).length;
  const failedAnalyses = rows.filter(r => r.processingError).length;
@@ -1660,6 +1733,9 @@ window.FullCasperMock = (() => {
  ${failedAnalyses ? renderPartialReportNotice(rows) : ''}
  ${renderInterpretation(report)}
  ${renderOneThing(report.oneThing)}
+ ${renderReportActions()}
+ ${renderReadinessChecklist(report.readiness)}
+ ${renderActionPlan(report.actionPlan)}
 
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:22px;">
  ${renderCriterionHeatmap(report.criteria)}
@@ -1805,7 +1881,7 @@ window.FullCasperMock = (() => {
  <video id="${id}" playsinline preload="metadata" src="${esc(src)}" data-duration="${duration || ''}" style="width:100%;aspect-ratio:16/9;background:#000;display:block;cursor:pointer;"></video>
  <div style="padding:11px 12px 12px;background:linear-gradient(180deg,#0a1628,#07111f);">
  <div style="display:flex;align-items:center;gap:10px;">
- <button type="button" id="${id}Btn" aria-label="Play recording" style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-size:0.82rem;font-weight:900;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0;">></button>
+ <button type="button" id="${id}Btn" aria-label="Play recording" style="min-width:54px;height:34px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-size:0.72rem;font-weight:900;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0;">Play</button>
  <div style="position:relative;height:18px;flex:1;display:flex;align-items:center;">
  <div style="position:absolute;left:0;right:0;height:5px;border-radius:999px;background:rgba(255,255,255,0.18);overflow:hidden;">
  <div id="${id}Fill" style="height:100%;width:0%;background:#0ea5e9;border-radius:999px;"></div>
@@ -1843,7 +1919,7 @@ window.FullCasperMock = (() => {
  range.value = String(Math.round(pct * 1000));
  fill.style.width = `${pct * 100}%`;
  time.textContent = `${mockTime(current)} / ${d ? mockTime(d) : '--:--'}`;
- btn.textContent = video.paused || video.ended ? '>' : 'PausePause';
+ btn.textContent = video.paused || video.ended ? 'Play' : 'Pause';
  };
  const seek = () => {
  const d = usableDuration();
@@ -2102,6 +2178,109 @@ window.FullCasperMock = (() => {
  `;
  }
 
+ function renderReportActions() {
+ return `
+ <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#f8fafc;border:1px solid var(--gray200);border-radius:14px;padding:14px 16px;margin-bottom:18px;">
+ <div>
+ <div style="font-size:0.78rem;font-weight:900;color:var(--navy);">Save the useful part</div>
+ <div style="font-size:0.76rem;color:var(--gray500);line-height:1.45;">Copy a plain-English summary, print the report, or return to your tracked student journey.</div>
+ </div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;">
+ <button type="button" onclick="FullCasperMock.copyReportSummary()" class="btn-restart btn-restart-outline" style="padding:10px 14px;">Copy summary</button>
+ <button type="button" onclick="FullCasperMock.printReport()" class="btn-restart btn-restart-outline" style="padding:10px 14px;">Print report</button>
+ <a href="student-journey.html" class="btn-restart" style="padding:10px 14px;text-decoration:none;">Open My Journey</a>
+ </div>
+ <div id="mockReportActionStatus" style="width:100%;font-size:0.74rem;color:var(--gray500);line-height:1.4;"></div>
+ </div>
+ `;
+ }
+
+ function renderReadinessChecklist(items) {
+ const colorFor = status => status === 'ready' ? '#16a34a' : status === 'work' ? '#dc2626' : '#d97706';
+ const labelFor = status => status === 'ready' ? 'Ready signal' : status === 'work' ? 'Needs work' : 'Watch';
+ return card('Readiness checklist', `
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">
+ ${(items || []).map(item => `
+ <div style="background:#f8fafc;border:1px solid var(--gray200);border-radius:12px;padding:12px 13px;">
+ <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px;">
+ <div style="font-size:0.82rem;font-weight:900;color:var(--navy);line-height:1.3;">${esc(item.label)}</div>
+ <div style="font-size:0.66rem;font-weight:900;color:${colorFor(item.status)};text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;">${labelFor(item.status)}</div>
+ </div>
+ <div style="font-size:0.75rem;color:var(--gray500);line-height:1.5;">${esc(item.detail)}</div>
+ </div>
+ `).join('')}
+ </div>
+ `);
+ }
+
+ function renderActionPlan(actions) {
+ return card('Action plan', `
+ <div style="font-size:0.78rem;color:var(--gray500);line-height:1.55;margin-bottom:10px;">Use this as the next practice block. The aim is not to memorise a perfect answer; it is to make the tested skill visible under time pressure.</div>
+ ${(actions || []).map((action, i) => `
+ <div style="display:grid;grid-template-columns:34px minmax(0,1fr);gap:11px;padding:11px 0;border-top:1px solid var(--gray100);">
+ <div style="width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:900;">${i + 1}</div>
+ <div>
+ <div style="font-size:0.68rem;font-weight:900;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">${esc(action.label)}</div>
+ <div style="font-size:0.86rem;font-weight:900;color:var(--navy);line-height:1.35;">${esc(action.title)}</div>
+ <div style="font-size:0.77rem;color:var(--gray500);line-height:1.55;margin-top:4px;">${esc(action.detail)}</div>
+ </div>
+ </div>
+ `).join('')}
+ `);
+ }
+
+ function reportSummaryText(report = latestReport) {
+ if (!report) return 'No mock report is available yet.';
+ const lines = [
+ 'Key2MD full CASPer mock summary',
+ '',
+ `Overall: ${Number.isFinite(report.overallAvg) ? report.overallAvg + '/10' : 'awaiting scored feedback'}`,
+ `Interpretation: ${report.interpretation?.band || 'No interpretation available'}`,
+ '',
+ `One thing to fix: ${report.oneThing?.title || 'Awaiting pattern data'}`,
+ report.oneThing?.body || '',
+ '',
+ 'Action plan:',
+ ...(report.actionPlan || []).map((action, i) => `${i + 1}. ${action.title} - ${action.detail}`),
+ '',
+ 'Reminder: this is a Key2MD practice signal, not an official Acuity score.'
+ ];
+ return lines.filter(line => line !== undefined && line !== null).join('\n');
+ }
+
+ function copyReportSummary() {
+ const text = reportSummaryText();
+ const status = byId('mockReportActionStatus');
+ const done = () => { if (status) status.textContent = 'Report summary copied.'; };
+ const failed = () => { if (status) status.textContent = 'Could not copy automatically. Use Print report instead.'; };
+ if (navigator.clipboard?.writeText) {
+ navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done, failed));
+ return;
+ }
+ fallbackCopy(text, done, failed);
+ }
+
+ function fallbackCopy(text, done, failed) {
+ try {
+ const textarea = document.createElement('textarea');
+ textarea.value = text;
+ textarea.setAttribute('readonly', '');
+ textarea.style.position = 'fixed';
+ textarea.style.left = '-9999px';
+ document.body.appendChild(textarea);
+ textarea.select();
+ const ok = document.execCommand('copy');
+ textarea.remove();
+ ok ? done() : failed();
+ } catch {
+ failed();
+ }
+ }
+
+ function printReport() {
+ window.print();
+ }
+
  function renderCriterionHeatmap(criteria) {
  const rows = criteria.map(c => {
  const pct = Number.isFinite(c.avg) ? Math.max(4, Math.min(100, Math.round(c.avg * 10))) : 0;
@@ -2272,6 +2451,8 @@ window.FullCasperMock = (() => {
  requestManualReview,
  showReviewStation,
  showRecording,
+ copyReportSummary,
+ printReport,
  skipBreak,
  };
 })();

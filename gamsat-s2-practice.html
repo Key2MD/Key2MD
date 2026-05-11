@@ -2604,9 +2604,9 @@ function updateLimitUI() {
  if (tool.unlimited) {
  const fairUseBlocked = tool.fair_use && tool.fair_use.allowed === false;
  if (btn) { btn.disabled = !!fairUseBlocked; btn.textContent = fairUseBlocked ? 'Fair-use limit reached' : ' Get AI Feedback'; }
- if (inlineNote) { inlineNote.textContent = fairUseBlocked ? 'Fair-use limit reached' : 'Unlimited Fair-use unlimited (GAMSAT S2 Pro)'; inlineNote.className = 'daily-limit-note'; }
+ if (inlineNote) { inlineNote.textContent = fairUseBlocked ? 'Fair-use limit reached' : 'Fair-use unlimited (GAMSAT S2 Pro)'; inlineNote.className = 'daily-limit-note'; }
  if (statusBadge) { statusBadge.textContent = fairUseBlocked ? 'Fair-use limit reached' : 'Unlimited S2 Pro'; statusBadge.className = 'ai-status-badge' + (fairUseBlocked ? ' exhausted' : ''); }
- if (countEl) { countEl.textContent = fairUseBlocked ? 'Fair-use limit reached' : 'Unlimited Fair-use unlimited (GAMSAT S2 Pro)'; countEl.className = 'ai-limit-count' + (fairUseBlocked ? ' exhausted' : ''); }
+ if (countEl) { countEl.textContent = fairUseBlocked ? 'Fair-use limit reached' : 'Fair-use unlimited (GAMSAT S2 Pro)'; countEl.className = 'ai-limit-count' + (fairUseBlocked ? ' exhausted' : ''); }
  if (fillEl) { fillEl.style.width = '100%'; fillEl.className = 'ai-limit-fill'; }
  if (noteEl) noteEl.textContent = fairUseBlocked ? 'You have reached the S2 Pro fair-use ceiling. Contact Dan if this is legitimate study volume.' : 'Fair-use unlimited GAMSAT S2 AI essay reviews with Pro.';
  if (creditWrap) creditWrap.style.display = 'none';
@@ -2621,7 +2621,7 @@ function updateLimitUI() {
  // Update panel limit count
  if (countEl) {
  if (tool.unlimited) {
- countEl.textContent = 'Unlimited Fair-use unlimited (Pro)';
+ countEl.textContent = 'Fair-use unlimited (Pro)';
  } else if (rem > 0) {
  countEl.textContent = rem + ' free remaining';
  } else if (credits > 0) {
