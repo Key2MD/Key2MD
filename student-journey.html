@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>My Journey | Key2MD</title>
+ <meta name="description" content="Track your Key2MD admissions plan, practice progress, saved calculator results and next recommended step.">
+ <link rel="canonical" href="https://www.key2md.com/student-journey.html">
+ <meta name="robots" content="noindex, follow">
+ <meta property="og:title" content="My Journey | Key2MD">
+ <meta property="og:description" content="Track your Key2MD admissions plan, practice progress, saved calculator results and next recommended step.">
+ <meta property="og:type" content="website">
+ <meta property="og:url" content="https://www.key2md.com/student-journey.html">
+ <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="My Journey | Key2MD">
+ <meta name="twitter:description" content="Track your Key2MD admissions plan, practice progress, saved calculator results and next recommended step.">
+ <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
+ <link rel="icon" type="image/x-icon" href="/favicon.ico">
+ <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+ <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+ <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+ <script src="auth.js"></script>
+ <link rel="stylesheet" href="admissions-pages.css">
+ <style>
+ .journey-hero {
+  background: radial-gradient(circle at 15% 0%, rgba(14,165,233,0.25), transparent 34%),
+  linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+  color: #fff;
+  padding: 86px 0 62px;
+ }
+ .journey-hero h1 {
+  max-width: 760px;
+ }
+ .journey-shell {
+  padding: 48px 0 80px;
+  background: #f8fafc;
+ }
+ .journey-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+  align-items: start;
+ }
+ .journey-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 16px 42px rgba(15,23,42,0.06);
+ }
+ .journey-card + .journey-card {
+  margin-top: 18px;
+ }
+ .journey-kicker {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 8px;
+ }
+ .journey-card h2,
+ .journey-card h3 {
+  color: var(--navy);
+  line-height: 1.16;
+  margin: 0 0 10px;
+ }
+ .journey-card h2 {
+  font-size: clamp(1.45rem, 3vw, 2.15rem);
+ }
+ .journey-card h3 {
+  font-size: 1.05rem;
+ }
+ .journey-muted {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  margin: 0;
+ }
+ .journey-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+ }
+ .journey-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 900;
+  font-size: 0.86rem;
+  border: 1px solid transparent;
+ }
+ .journey-btn.primary {
+  background: var(--teal);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(14,165,233,0.2);
+ }
+ .journey-btn.secondary {
+  background: #fff;
+  color: var(--navy);
+  border-color: var(--line);
+ }
+ .journey-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+ }
+ .journey-item {
+  border: 1px solid var(--line);
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 14px 16px;
+ }
+ .journey-item strong {
+  display: block;
+  color: var(--navy);
+  font-size: 0.9rem;
+  margin-bottom: 3px;
+ }
+ .journey-item span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+ }
+ .journey-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+ }
+ .journey-stat {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+ }
+ .journey-stat b {
+  display: block;
+  color: var(--teal);
+  font-size: 1.45rem;
+  line-height: 1;
+  margin-bottom: 5px;
+ }
+ .journey-stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+ }
+ .journey-side {
+  position: sticky;
+  top: 88px;
+  display: grid;
+  gap: 14px;
+ }
+ .journey-empty {
+  border: 1px dashed rgba(14,165,233,0.34);
+  background: rgba(14,165,233,0.05);
+ }
+ .journey-status {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.82rem;
+ }
+ #k2mdAuthBar {
+  margin-top: 14px;
+ }
+ @media (max-width: 860px) {
+  .journey-layout {
+   grid-template-columns: 1fr;
+  }
+  .journey-side {
+   position: static;
+  }
+  .journey-stats {
+   grid-template-columns: 1fr;
+  }
+ }
+ </style>
+</head>
+<body data-page="journey">
+ <nav class="simple-nav" aria-label="Primary navigation">
+ <div class="simple-nav-inner">
+ <a class="simple-logo" href="index.html">Key<span>2</span>MD</a>
+ <div class="simple-links">
+ <a class="simple-gold" href="casper-class.html">Friday Classes</a>
+ <a href="testimonials.html">Results</a>
+ <a href="student-journey.html">My Journey</a>
+ <a href="plans.html">Plans</a>
+ <a class="simple-green" href="medical-school-chances.html">Chances</a>
+ <div class="simple-dropdown"><a class="simple-gold" href="practice.html">Practice</a>
+ <div class="simple-dropdown-menu" aria-label="Practice tools">
+ <a class="simple-gold" href="practice.html">CASPer/MMI Practice</a>
+ <a class="simple-purple" href="gamsat-s2-practice.html">GAMSAT S2 Essay Practice</a>
+ <a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a>
+ </div>
+ </div>
+ <div class="simple-dropdown"><a href="guide.html">Resources</a>
+ <div class="simple-dropdown-menu" aria-label="Key2MD resources">
+ <a href="guide.html">Full Guide</a>
+ <a href="about.html">About Dan</a>
+ <a href="medicine-entry-requirements.html">Uni Entry Guides</a>
+ <a href="blog.html">Blog</a>
+ <a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a>
+ <a href="blog-casper-guide-australia.html">CASPer Guide</a>
+ <a href="blog-mmi-guide-australia.html">MMI Guide</a>
+ <a href="blog-gamsat-section-2-reading-list.html">GAMSAT S2 Reading List</a>
+ </div>
+ </div>
+ <a class="simple-cta" href="index.html#book" data-track="book_modal_open">Book a Session</a>
+ </div>
+</div>
+ </nav>
+
+ <header class="journey-hero">
+ <div class="wrap">
+ <div class="eyebrow">Student journey</div>
+ <h1>One place to see where you are up to.</h1>
+ <p class="hero-sub">Your saved calculator plan, practice direction, and next useful Key2MD step. This is the student-facing area; the admin dashboard stays separate.</p>
+ </div>
+ </header>
+
+ <main class="journey-shell">
+ <div class="wrap journey-layout">
+ <section>
+ <article class="journey-card" id="planCard">
+ <div class="journey-kicker">Saved plan</div>
+ <h2 id="planTitle">No saved plan yet.</h2>
+ <p class="journey-muted" id="planSummary">Run the guide-me flow or medical school chances calculator and your latest recommendation will appear here.</p>
+ <div class="journey-list" id="planDetails" style="display:none;"></div>
+ <div class="journey-actions" id="planActions">
+ <a class="journey-btn primary" href="medical-school-chances.html">Run chances calculator</a>
+ <a class="journey-btn secondary" href="index.html#guide-me">Use guide me</a>
+ </div>
+ </article>
+
+ <article class="journey-card">
+ <div class="journey-kicker">Practice progress</div>
+ <h2>Your practice snapshot</h2>
+ <p class="journey-muted">This reads the practice history saved in this browser. Sign in on the practice tool to preserve more history against your account.</p>
+ <div class="journey-stats">
+ <div class="journey-stat"><b id="attemptedCount">0</b><span>Stations seen</span></div>
+ <div class="journey-stat"><b id="averageScore">-</b><span>Latest average</span></div>
+ <div class="journey-stat"><b id="starredCount">0</b><span>Starred</span></div>
+ </div>
+ <div class="journey-actions">
+ <a class="journey-btn primary" href="practice.html">Open practice</a>
+ <a class="journey-btn secondary" href="history.html">View review history</a>
+ </div>
+ </article>
+ </section>
+
+ <aside class="journey-side">
+ <article class="journey-card">
+ <div class="journey-kicker">Account</div>
+ <h3>Save progress across devices</h3>
+ <p class="journey-muted">Log in to keep paid credits, Pro access, and review history tied to your account.</p>
+ <div id="k2mdAuthBar"></div>
+ <div class="journey-status" id="accountStatus"></div>
+ </article>
+ <article class="journey-card journey-empty">
+ <div class="journey-kicker">Best next step</div>
+ <h3 id="nextStepTitle">Start with a diagnostic loop.</h3>
+ <p class="journey-muted" id="nextStepCopy">Do one timed station, review the feedback, then use that evidence to decide whether class, Pro, or 1:1 help is the right upgrade.</p>
+ <div class="journey-actions">
+ <a class="journey-btn primary" id="nextStepLink" href="practice.html">Start practice</a>
+ </div>
+ </article>
+ </aside>
+ </div>
+ </main>
+
+ <footer>
+ <div class="wrap footer-row">
+ <div>(c) 2026 Key2MD</div>
+ <div class="footer-links"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="ai-disclaimer.html">AI Disclaimer</a></div>
+ </div>
+ </footer>
+
+ <script>
+ const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+ const PLAN_KEY = 'key2md_latest_calculator_plan_v1';
+ const HISTORY_KEY = 'k2md_station_history_v1';
+
+ function readJson(key, fallback) {
+  try {
+   const raw = localStorage.getItem(key);
+   return raw ? JSON.parse(raw) : fallback;
+  } catch (error) {
+   return fallback;
+  }
+ }
+
+ function text(value, fallback) {
+  return value === null || value === undefined || value === '' ? fallback : String(value);
+ }
+
+ function renderPlan() {
+  const plan = readJson(PLAN_KEY, null);
+  const title = document.getElementById('planTitle');
+  const summary = document.getElementById('planSummary');
+  const details = document.getElementById('planDetails');
+  const actions = document.getElementById('planActions');
+  const nextTitle = document.getElementById('nextStepTitle');
+  const nextCopy = document.getElementById('nextStepCopy');
+  const nextLink = document.getElementById('nextStepLink');
+
+  if (!plan) return;
+
+  title.textContent = text(plan.title || plan.focus, 'Saved admissions plan');
+  summary.textContent = text(plan.summary, 'Your latest calculator or guide-me recommendation is saved here.');
+  const strongest = Array.isArray(plan.strongest) ? plan.strongest : [];
+  const watchouts = Array.isArray(plan.watchouts) ? plan.watchouts : [];
+  const rows = [];
+  strongest.slice(0, 4).forEach(function (item) {
+   rows.push('<div class="journey-item"><strong>' + escapeHtml(item.name || 'Strong fit') + '</strong><span>' + escapeHtml(item.detail || '') + '</span></div>');
+  });
+  watchouts.slice(0, 3).forEach(function (item) {
+   rows.push('<div class="journey-item"><strong>Watch</strong><span>' + escapeHtml(item) + '</span></div>');
+  });
+  if (rows.length) {
+   details.innerHTML = rows.join('');
+   details.style.display = '';
+  }
+  const primaryHref = plan.primaryHref || 'practice.html';
+  const primaryText = plan.primaryText || 'Open next step';
+  const secondaryHref = plan.secondaryHref || 'medical-school-chances.html';
+  const secondaryText = plan.secondaryText || 'Run calculator again';
+  actions.innerHTML = '<a class="journey-btn primary" href="' + escapeAttr(primaryHref) + '">' + escapeHtml(primaryText) + '</a>' +
+   '<a class="journey-btn secondary" href="' + escapeAttr(secondaryHref) + '">' + escapeHtml(secondaryText) + '</a>';
+  nextTitle.textContent = text(plan.nextStep || plan.title || plan.focus, 'Use your saved plan as the next step.');
+  nextCopy.textContent = text(plan.summary, 'Follow the recommendation saved from your latest calculator or guide-me result.');
+  nextLink.href = primaryHref;
+  nextLink.textContent = primaryText;
+ }
+
+ function renderProgress() {
+  const history = readJson(HISTORY_KEY, {});
+  const rows = Object.values(history || {});
+  const attempted = rows.filter(function (row) { return row && row.attemptCount > 0; });
+  const scored = attempted.map(function (row) { return Number(row.lastScore); }).filter(function (score) { return Number.isFinite(score); });
+  const starred = rows.filter(function (row) { return row && row.starred; });
+  document.getElementById('attemptedCount').textContent = attempted.length;
+  document.getElementById('starredCount').textContent = starred.length;
+  document.getElementById('averageScore').textContent = scored.length ? (scored.reduce(function (a, b) { return a + b; }, 0) / scored.length).toFixed(1) : '-';
+ }
+
+ function renderAccount() {
+  const status = document.getElementById('accountStatus');
+  if (typeof Key2MDAuth === 'undefined') {
+   status.textContent = 'Account tools are still loading.';
+   return;
+  }
+  Key2MDAuth.init({
+   tool: 'casper',
+   apiBase: API_BASE,
+   onAuthChange: function (user) {
+    status.textContent = user ? 'Signed in as ' + user.email + '.' : 'Not signed in on this device.';
+   },
+   onLimitsLoaded: function () {}
+  });
+ }
+
+ function escapeHtml(value) {
+  return String(value || '').replace(/[&<>"']/g, function (ch) {
+   return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+  });
+ }
+
+ function escapeAttr(value) {
+  return escapeHtml(value).replace(/`/g, '&#96;');
+ }
+
+ renderPlan();
+ renderProgress();
+ renderAccount();
+ </script>
+ <script src="key2md-tracking.js" defer></script>
+</body>
+</html>

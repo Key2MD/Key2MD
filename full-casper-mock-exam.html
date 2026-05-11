@@ -136,6 +136,11 @@
  .nav-dropdown-menu a{display:block;padding:10px 12px;border-radius:10px;color:rgba(255,255,255,.84);font-weight:650;white-space:nowrap}
  .nav-dropdown-menu a:hover{background:rgba(14,165,233,.14);color:#fff}
  .nav-dropdown-menu a.nav-purple{color:#c4b5fd;font-weight:900}
+ .nav-menu-toggle{display:none;width:42px;height:42px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.08);color:#fff;align-items:center;justify-content:center;flex-direction:column;gap:5px;cursor:pointer;margin-left:auto}
+ .nav-menu-toggle span{display:block;width:20px;height:2px;border-radius:999px;background:currentColor;transition:transform .18s ease,opacity .18s ease}
+ .nav-menu-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+ .nav-menu-toggle.open span:nth-child(2){opacity:0}
+ .nav-menu-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
  .hero{min-height:88vh;display:flex;align-items:center;position:relative;color:#fff;background-image:linear-gradient(90deg,rgba(10,22,40,.96),rgba(10,22,40,.78),rgba(10,22,40,.48)),url("key2md-og.png");background-size:cover;background-position:center;padding:92px 0 70px;overflow:hidden}
  .hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(180deg,rgba(248,250,252,0),var(--gray50))}
  .hero-content{position:relative;z-index:2;max-width:760px}
@@ -184,17 +189,19 @@
  footer .container{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
  footer a{color:#fff;font-weight:800}
  @media(max-width:820px){
- .nav{padding:12px 0}
- .nav-inner{align-items:flex-start;flex-wrap:wrap;gap:8px 12px}
- .nav-links{width:100%;order:2;font-size:.82rem}
- .nav-links a{padding:8px 10px}
- .nav-links a.nav-cta{padding:8px 14px}
+ .nav{position:fixed;background:#0a1628;padding:10px 0;box-shadow:0 12px 32px rgba(0,0,0,.32)}
+ .nav-inner{align-items:center;flex-wrap:nowrap;gap:12px;position:relative}
+ .nav-menu-toggle{display:flex}
+ .nav-links{display:none;position:absolute;top:calc(100% + 10px);left:0;right:0;width:100%;max-height:calc(100vh - 74px);overflow-y:auto;flex-direction:column;align-items:stretch;gap:4px;margin-left:0;padding:12px 14px 18px;background:#060f1e;border:1px solid rgba(14,165,233,.22);border-radius:0 0 16px 16px;box-shadow:0 18px 44px rgba(0,0,0,.58);font-size:.92rem}
+ .nav-links.open{display:flex}
+ .nav-links>a{display:block;border-bottom:1px solid rgba(255,255,255,.06);padding:11px 12px}
+ .nav-links a.nav-cta{padding:11px 14px;text-align:center}
  .nav-dropdown{width:100%}
- .nav-dropdown>a{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.48);font-weight:900;pointer-events:none}
+ .nav-dropdown>a{padding:12px 12px 4px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);font-weight:900;pointer-events:none}
  .nav-dropdown>a::after{display:none}
- .nav-dropdown-menu{position:static;opacity:1;visibility:visible;transform:none;width:100%;min-width:0;margin-top:3px;padding:6px;display:flex;flex-wrap:wrap;gap:4px;background:rgba(7,19,38,.46);box-shadow:none}
- .nav-dropdown-menu a{padding:8px 10px;white-space:normal}
- .hero{min-height:82vh}
+ .nav-dropdown-menu{position:static;opacity:1;visibility:visible;transform:none;width:100%;min-width:0;margin-top:0;padding:6px;display:grid;gap:4px;background:#0a1628;border-color:rgba(14,165,233,.16);box-shadow:none}
+ .nav-dropdown-menu a{padding:9px 10px;white-space:normal}
+ .hero{min-height:82vh;padding-top:126px}
  .grid,.plans,.report,.sequence{grid-template-columns:1fr}
  .arrow{display:none}
  }
@@ -207,7 +214,7 @@
  <nav class="nav-links" aria-label="Primary">
  <a class="nav-gold" href="casper-class.html" data-nav="classes">Friday Classes</a>
  <a href="testimonials.html" data-nav="results">Results</a>
- <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
+ <a href="student-journey.html" data-nav="journey">My Journey</a>
  <a href="plans.html" data-nav="plans">Plans</a>
  <a class="nav-green" href="medical-school-chances.html" data-nav="chances">Chances</a>
  <div class="nav-dropdown"><a class="nav-gold" href="practice.html" data-nav="practice">Practice</a>

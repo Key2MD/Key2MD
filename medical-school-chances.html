@@ -38,7 +38,7 @@
  <meta name="twitter:description" content="Free Australian medical school chances calculator for UCAT, ATAR, GPA and GAMSAT applicants. Compare schools, bonuses and interview strategy.">
  <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
  <meta name="twitter:image:alt" content="Key2MD - MMI, CASPer and GAMSAT Section II coaching.">
- <meta name="author" content="Key2MD - Dan - University of Melbourne MD">
+ <meta name="author" content="Key2MD - Dan - University of Melbourne MD student">
 
  <!-- JSON-LD: WebApplication schema for rich results -->
  <script type="application/ld+json">
@@ -850,7 +850,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <ul class="k2-nav-links">
  <li><a href="casper-class.html" class="k2-gold" data-nav="classes">Friday Classes</a></li>
  <li><a href="testimonials.html" data-nav="results">Results</a></li>
- <li><a href="dashboard.html" data-nav="dashboard">Dashboard</a></li>
+ <li><a href="student-journey.html" data-nav="journey">My Journey</a></li>
  <li><a href="plans.html" data-nav="plans">Plans</a></li>
  <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">Chances</a></li>
  <li class="k2-dropdown"><a href="practice.html" class="k2-gold" data-nav="practice" aria-haspopup="true">Practice</a>
@@ -880,7 +880,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <a href="index.html">Home</a>
  <a href="casper-class.html" class="k2-gold">Friday Classes</a>
  <a href="testimonials.html">Results</a>
- <a href="dashboard.html">Dashboard</a>
+ <a href="student-journey.html">My Journey</a>
  <a href="plans.html">Plans &amp; Pricing</a>
  <a href="medical-school-chances.html" class="k2-green">Chances Calculator</a>
  <span class="k2-mobile-label">Practice</span>
@@ -1201,7 +1201,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="result-actions">
  <button type="button" class="result-action-btn" id="copyResultBtn">Copy my result</button>
  <button type="button" class="result-action-btn" id="shareResultBtn">Share result</button>
- <a href="dashboard.html" class="result-action-btn" id="openDashboardBtn" data-track="calculator_open_dashboard">Open dashboard</a>
+ <a href="student-journey.html" class="result-action-btn" id="openJourneyBtn" data-track="calculator_open_journey">Open my journey</a>
  </div>
  <div class="result-status" id="resultStatus" aria-live="polite"></div>
  <form class="email-row" id="emailForm">
@@ -1349,7 +1349,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <a href="privacy.html">Privacy</a>
  <a href="terms.html">Terms</a>
  </div>
- <div>(c) 2026 Key2MD | Dan | UniMelb MD student</div>
+ <div>(c) 2026 Key2MD | Dan | University of Melbourne MD student</div>
 </footer>
 
 <!-- === BOOK MODAL === -->
@@ -2682,8 +2682,8 @@ function updateUndergradPostResultSummary(assessments, profile) {
  nextStep,
  primaryHref: profile.percentile === null ? 'medical-school-chances.html' : 'practice.html',
  primaryText: profile.percentile === null ? 'Add UCAT data' : 'Start interview practice',
- secondaryHref: 'dashboard.html',
- secondaryText: 'Open dashboard',
+ secondaryHref: 'student-journey.html',
+ secondaryText: 'Open my journey',
  });
  setResultStatus('');
 }
