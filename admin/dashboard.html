@@ -233,6 +233,18 @@
  .admin-note strong{color:var(--text);}
  .admin-note.blue{border-color:var(--blue-border);background:var(--blue-dim);}
  .admin-note.amber{border-color:var(--amber-border);background:var(--amber-dim);}
+ .risk-pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;border-radius:999px;padding:4px 9px;font-size:0.66rem;font-weight:850;text-transform:uppercase;letter-spacing:0.04em;border:1px solid var(--border);}
+ .risk-pill.high{color:var(--red);background:var(--red-dim);border-color:var(--red-border);}
+ .risk-pill.medium{color:var(--amber);background:var(--amber-dim);border-color:var(--amber-border);}
+ .risk-pill.watch{color:var(--blue);background:var(--blue-dim);border-color:var(--blue-border);}
+ .risk-pill.low{color:var(--muted);background:var(--surface2);}
+ .reason-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+ .reason-chip{display:inline-flex;align-items:center;border:1px solid var(--border);background:rgba(255,255,255,0.045);border-radius:999px;padding:2px 7px;font-size:0.64rem;font-weight:700;color:var(--muted);}
+ .activity-timeline{display:flex;flex-direction:column;gap:7px;}
+ .activity-signal{display:grid;grid-template-columns:86px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
+ .activity-signal:last-child{border-bottom:none;}
+ .activity-signal-type{font-size:0.62rem;font-weight:850;color:var(--muted2);text-transform:uppercase;letter-spacing:0.07em;}
+ .activity-signal-main{font-size:0.75rem;color:var(--muted);line-height:1.5;}
  .mock-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
  .mock-admin-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
  .mock-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);}
@@ -470,6 +482,7 @@
  <button class="nav-item" data-page="mmi" onclick="nav('mmi')"><span class="icon"></span> MMI Reviews <span class="nav-badge" id="mmiBadge">0</span></button>
  <button class="nav-item" data-page="mocks" onclick="nav('mocks')"><span class="icon">M</span> Mock Exams <span class="nav-badge" id="mockBadge">0</span></button>
  <button class="nav-item" data-page="users" onclick="nav('users')"><span class="icon"></span> Users</button>
+ <button class="nav-item" data-page="sharing" onclick="nav('sharing')"><span class="icon">ID</span> Sharing Watchlist <span class="nav-badge" id="sharingBadge">0</span></button>
  <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')"><span class="icon"></span> Enquiries <span class="nav-badge" id="enqBadge">0</span></button>
 
  <div class="sidebar-section">Finance</div>
@@ -484,7 +497,7 @@
 
  <div class="sidebar-bottom">
  <button class="btn-command" onclick="openCommandPalette()">Quick search <kbd>Ctrl K</kbd></button>
- <button class="btn-logout" onclick="doLogout()">Back Log out</button>
+ <button class="btn-logout" onclick="doLogout()">Log out</button>
  </div>
  </aside>
 
@@ -529,6 +542,7 @@
  <div class="stat"><div class="stat-label">Credits Held</div><div class="stat-val" id="dCredits">-</div><div class="stat-sub">CASPer + GAMSAT</div></div>
  <div class="stat"><div class="stat-label">MMI Credits</div><div class="stat-val" id="dMMICredits">-</div><div class="stat-sub">transcript balance</div></div>
  <div class="stat blue"><div class="stat-label">Today</div><div class="stat-val" id="dTodayReviews">-</div><div class="stat-sub">AI reviews today</div></div>
+ <div class="stat red"><div class="stat-label">Sharing Risk</div><div class="stat-val" id="dSharingRisk">-</div><div class="stat-sub" id="dSharingRiskSub">watchlist</div></div>
  <div class="stat"><div class="stat-label">Avg Score</div><div class="stat-val" id="dAvgScore">-</div><div class="stat-sub">recent CASPer scores</div></div>
  <div class="stat"><div class="stat-label">Subscribers</div><div class="stat-val" id="dSubs">-</div><div class="stat-sub">newsletter list</div></div>
  <div class="stat amber"><div class="stat-label">Inbox</div><div class="stat-val" id="dUnread">-</div><div class="stat-sub">unread conversations</div></div>
@@ -701,6 +715,50 @@
  </div>
  </div>
 
+ <!-- -- SHARING WATCHLIST -- -->
+ <div id="pageSharing" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Account Sharing Watchlist</div>
+ <div class="page-sub">Privacy-safe device, network and region patterns for manual review.</div>
+ </div>
+ <div class="page-actions">
+ <span class="refresh-note" id="sharingUpdated">Not refreshed yet</span>
+ <button class="btn blue" onclick="loadSharingWatchlist()">Refresh</button>
+ </div>
+ </div>
+ <div class="admin-note amber" style="margin-bottom:14px;">
+ <strong>Manual review only:</strong> high scores are signals, not proof. VPNs, mobile data, campus networks and travel can all create noise. Use the reasons and recent activity before taking action.
+ </div>
+ <div class="controls">
+ <input class="ctrl-in" id="sharingSearch" type="text" placeholder=" Search email, name, reason, country..." oninput="renderSharingWatchlist()">
+ <select class="ctrl-sel" id="sharingRisk" onchange="loadSharingWatchlist()">
+ <option value="20" selected>Watch and above</option>
+ <option value="40">Medium and above</option>
+ <option value="70">High only</option>
+ <option value="0">All tracked</option>
+ </select>
+ <select class="ctrl-sel" id="sharingLimit" onchange="loadSharingWatchlist()">
+ <option value="50">50 rows</option>
+ <option value="100" selected>100 rows</option>
+ <option value="250">250 rows</option>
+ </select>
+ </div>
+ <div class="stats-grid" style="margin-bottom:12px;">
+ <div class="stat red"><div class="stat-label">High Risk</div><div class="stat-val" id="sharingHigh">-</div><div class="stat-sub">score 70+</div></div>
+ <div class="stat amber"><div class="stat-label">Medium</div><div class="stat-val" id="sharingMedium">-</div><div class="stat-sub">score 40-69</div></div>
+ <div class="stat blue"><div class="stat-label">Watch</div><div class="stat-val" id="sharingWatch">-</div><div class="stat-sub">score 20-39</div></div>
+ <div class="stat"><div class="stat-label">Tracked Rows</div><div class="stat-val" id="sharingTotal">-</div><div class="stat-sub">matching filter</div></div>
+ </div>
+ <div class="tbl-wrap">
+ <div class="tbl-toolbar"><span class="tbl-status" id="sharingStatus">-</span></div>
+ <div class="tbl-scroller"><table style="min-width:1080px;"><thead><tr>
+ <th style="width:26px;"></th><th>Risk</th><th>Student</th><th>Devices</th><th>Networks</th><th>Regions</th><th>Review Load</th><th>Last Seen</th><th>Reasons</th>
+ </tr></thead><tbody id="sharingBody"></tbody></table></div>
+ <div class="empty hidden" id="sharingEmpty">No account-sharing signals match this filter yet.</div>
+ </div>
+ </div>
+
  <!-- -- ENQUIRIES -- -->
  <div id="pageEnquiries" class="page">
  <div class="page-header">
@@ -772,7 +830,7 @@
  <div class="compose-footer">
  <span class="compose-hint" id="replyStatus">Sent from dan@key2md.net</span>
  <button class="btn-send" id="sendBtn" onclick="sendReply()">
- <span class="spinner" id="sendSpinner"></span>Send Open
+ <span class="spinner" id="sendSpinner"></span>Send
  </button>
  </div>
  </div>
@@ -859,7 +917,7 @@
  <div style="display:flex;gap:6px;">
  <button class="seg active" id="bcModeRich" onclick="setBcMode('rich')" style="font-size:0.68rem;padding:3px 10px;">* Rich</button>
  <button class="seg" id="bcModePlain" onclick="setBcMode('plain')" style="font-size:0.68rem;padding:3px 10px;">Plain text</button>
- <button class="seg" id="bcModeHtml" onclick="setBcMode('html')" style="font-size:0.68rem;padding:3px 10px;">Keyboard Raw HTML</button>
+ <button class="seg" id="bcModeHtml" onclick="setBcMode('html')" style="font-size:0.68rem;padding:3px 10px;">Raw HTML</button>
  </div>
  </label>
 
@@ -1345,7 +1403,7 @@
  <div class="modal-alert" id="ncAlert"></div>
  <div class="modal-footer">
  <button class="btn" onclick="closeNewCompose()">Cancel</button>
- <button class="btn-send" id="ncSendBtn" onclick="sendNewEmail()"><span class="spinner" id="ncSpinner"></span>Send Open</button>
+ <button class="btn-send" id="ncSendBtn" onclick="sendNewEmail()"><span class="spinner" id="ncSpinner"></span>Send</button>
  </div>
  </div>
 </div>
@@ -1406,7 +1464,7 @@ const MOCK_READER_CHANNEL_PREFIX = 'k2md_mock_reader_handoff_';
 
 const S = {
  token: null,
- reviews: [], s2Reviews: [], users: [], enquiries: [], subscribers: [],
+ reviews: [], s2Reviews: [], users: [], sharingWatchlist: [], enquiries: [], subscribers: [],
  conversations: [], filteredConvs: [],
  mmiReviews: [], mockAttempts: [], mockManualReviews: [], revenue: [], payers: [], payersFromServer: false, revenueSummary: null, monitoring: null,
  casperClass: null,
@@ -1505,7 +1563,7 @@ async function api(path, opts={}) {
 // ======================================================
 // NAVIGATION
 // ======================================================
-const ADMIN_PAGES = new Set(['dashboard','reviews','s2','mmi','mocks','users','enquiries','revenue','monitoring','inbox','broadcast','class','subscribers']);
+const ADMIN_PAGES = new Set(['dashboard','reviews','s2','mmi','mocks','users','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','subscribers']);
 
 function normalisePage(page) {
  const key = String(page || 'dashboard').replace(/^#/, '').trim().toLowerCase();
@@ -1552,6 +1610,7 @@ function nav(page, opts={}) {
  if (target==='mocks' && !S.mockAttempts.length && !S.mockManualReviews.length) loadMockAdmin();
  if (target==='enquiries' && !S.enquiries.length) loadEnquiries();
  if (target==='users' && !S.users.length) loadUsers();
+ if (target==='sharing' && !S.sharingWatchlist.length) loadSharingWatchlist();
  if (target==='broadcast') { updateBcStats(); if (!S.broadcastHistory.length) loadBroadcastHistory(); }
  if (target==='class') loadCasperClass();
  if (target==='mmi' && !S.mmiReviews.length) loadMMI();
@@ -1601,6 +1660,7 @@ function buildCommandItems() {
  const items = [
  {kind:'Page', title:'Dashboard', sub:'Owner priorities, revenue, workload, and activity', action:()=>nav('dashboard'), hint:'Open'},
  {kind:'Page', title:'Users', sub:'Search students, adjust credits, and change tiers', action:()=>nav('users'), hint:'Open'},
+ {kind:'Page', title:'Sharing Watchlist', sub:'Check possible account sharing by device, network, and region signals', action:()=>nav('sharing'), hint:'Open'},
  {kind:'Page', title:'S2 Essay Reviews', sub:'GAMSAT essays, band scores, evidence critique, and feedback', action:()=>nav('s2'), hint:'Open'},
  {kind:'Page', title:'Inbox', sub:'Student conversations and replies', action:()=>nav('inbox'), hint:'Open'},
  {kind:'Page', title:'Broadcast', sub:'Send segmented emails with preview', action:()=>nav('broadcast'), hint:'Open'},
@@ -1616,6 +1676,15 @@ function buildCommandItems() {
  keywords:[u.id,u.name,u.email,u.tier,u.mmi_pro_tier].join(' '),
  action:()=>viewUserByEmail(u.email || ''),
  hint:'Open user',
+ }));
+
+ S.sharingWatchlist.forEach(row => items.push({
+ kind:'Sharing',
+ title:row.email || row.name || 'Account signal',
+ sub:`${riskLabel(row.risk?.level)} ${row.risk?.score || 0}/100 | ${(row.risk?.reasons || []).slice(0,2).join(' | ')}`,
+ keywords:[row.email,row.name,row.risk?.level,(row.risk?.reasons||[]).join(' '),row.countries,row.user_agents].join(' '),
+ action:()=>openSharingUser(row.user_id || '', row.email || ''),
+ hint:'Review',
  }));
 
  S.enquiries.forEach(e => items.push({
@@ -1766,7 +1835,7 @@ document.addEventListener('keydown', e => {
 async function bootLoad() {
  await Promise.all([
  loadReviews(), loadS2Reviews(), loadUsers(), loadEnquiries(),
- loadSubscribers(), loadInbox(), loadMMI(), loadMockAdmin(), loadRevenue(), loadMonitoring(), loadBroadcastHistory(),
+ loadSubscribers(), loadInbox(), loadMMI(), loadMockAdmin(), loadRevenue(), loadMonitoring(), loadBroadcastHistory(), loadSharingWatchlist(),
  ]);
  const lu = document.getElementById('lastUpdated');
  if (lu) lu.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
@@ -1791,6 +1860,9 @@ function updateDashboard() {
  const mmi = S.mmiReviews;
  const mocks = S.mockAttempts;
  const manualMocks = S.mockManualReviews;
+ const sharingRows = S.sharingWatchlist || [];
+ const sharingHigh = sharingRows.filter(r=>r.risk?.level==='high').length;
+ const sharingMedium = sharingRows.filter(r=>r.risk?.level==='medium').length;
 
  const paying = users.filter(u=>Number(u.total_spend_aud||0)>0).length;
  const credits = users.reduce((s,u)=>s+Number(u.casper_balance||0)+Number(u.gamsat_balance||0),0);
@@ -1836,6 +1908,8 @@ function updateDashboard() {
  if(fsEl) fsEl.textContent = `${15-foundingCount} slot${15-foundingCount===1?'':'s'} remaining`;
  document.getElementById('dSubs').textContent = subs.length;
  document.getElementById('dTodayReviews').textContent = todayReviews + todayS2;
+ document.getElementById('dSharingRisk').textContent = sharingHigh || sharingMedium || '-';
+ document.getElementById('dSharingRiskSub').textContent = sharingHigh ? `${sharingHigh} high risk` : sharingMedium ? `${sharingMedium} medium risk` : 'no major signals';
  document.getElementById('dAvgScore').textContent = avgScore ? avgScore.toFixed(1) : '-';
  document.getElementById('dUnread').textContent = unread;
  document.getElementById('dashHeadline').textContent = `${todayReviews} CASPer + ${todayS2} S2 reviews today | ${mmi.filter(r=>isToday(r.created_at)).length} MMI sessions | ${manualPending} mock review${manualPending===1?'':'s'} pending | ${unread} unread message${unread===1?'':'s'}`;
@@ -1846,7 +1920,7 @@ function updateDashboard() {
  `${users.length} registered students | ${paying} paying customers | ${pro} CASPer Pro | ${mmiPro} MMI Pro | ${mmi.length} MMI sessions total | ${mocks.length} saved mock exams | ${enqs7} enquiries in the last 7 days`;
  document.getElementById('dashBrief').textContent =
  `${users.length} registered students - ${paying} paying customers - ${reviews.length} CASPer - ${s2.length} S2 essays - ${mmi.length} MMI sessions - ${mocks.length} saved mock exams - ${enqs7} enquiries in the last 7 days`;
- renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length,manualPending,manualAging,parseFailures,whisperFailures,paying7});
+ renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length,manualPending,manualAging,parseFailures,whisperFailures,paying7,sharingHigh,sharingMedium});
  renderBusinessInsights({conversion,pro,mmiPro,paying,users,credits,reviews,s2,todayReviews,todayS2,signups7,enqs7,avgScore,mmi});
  renderActivityFeed();
  renderReviewQuality();
@@ -1858,6 +1932,8 @@ function updateDashboard() {
  if (mb) { mb.textContent = mmi.length; mb.classList.toggle('show', mmi.length>0); }
  const mockBadge = document.getElementById('mockBadge');
  if (mockBadge) { mockBadge.textContent = manualPending || mocks.length; mockBadge.classList.toggle('show', manualPending>0 || mocks.length>0); }
+ const sharingBadge = document.getElementById('sharingBadge');
+ if (sharingBadge) { sharingBadge.textContent = sharingHigh || sharingMedium || 0; sharingBadge.classList.toggle('show', sharingHigh>0 || sharingMedium>0); }
 
  const enqEl = document.getElementById('dashRecentEnq');
  enqEl.innerHTML = enqs.slice(0,5).map(e=>`
@@ -1881,6 +1957,7 @@ function updateDashboard() {
 
 function renderActionQueue(m) {
  const items = [
+ {icon:'ID', title:`${(m.sharingHigh||0)+(m.sharingMedium||0)} account-sharing signal${((m.sharingHigh||0)+(m.sharingMedium||0))===1?'':'s'}`, sub:`${m.sharingHigh||0} high risk, ${m.sharingMedium||0} medium risk. Review before acting.`, page:'sharing', show:((m.sharingHigh||0)+(m.sharingMedium||0))>0, tone:(m.sharingHigh||0)>0?'red':'amber'},
  {icon:'24h', title:`${m.manualAging||0} mock review${m.manualAging===1?'':'s'} waiting over 24h`, sub:'Prioritise these first so paid manual reviews feel premium.', page:'mocks', show:(m.manualAging||0)>0, tone:'red'},
  {icon:'M', title:`${m.manualPending||0} mock review${m.manualPending===1?'':'s'} pending`, sub:'Open the saved full mock and update manual notes/status.', page:'mocks', show:(m.manualPending||0)>0, tone:'amber'},
  {icon:'ERR', title:`${(m.parseFailures||0)+(m.whisperFailures||0)} AI processing issue${((m.parseFailures||0)+(m.whisperFailures||0))===1?'':'s'}`, sub:'Check parse/Whisper failures before they become student-facing friction.', page:'monitoring', show:((m.parseFailures||0)+(m.whisperFailures||0))>0, tone:'red'},
@@ -2275,6 +2352,7 @@ function renderUserDetail(det) {
  const payments = det.payments||[];
  const reviews = det.reviews||[];
  const mmiReviews = det.mmi_reviews||[];
+ const accountActivity = det.account_activity?.recent || [];
  const totalSpend = payments.filter(p=>p.status==='completed').reduce((s,p)=>s+Number(p.amount_aud||0),0);
  const scored = reviews.map(r=>Number(parseFb(r.ai_feedback)?.score)).filter(Number.isFinite);
  const avgScore = scored.length ? scored.reduce((a,b)=>a+b,0)/scored.length : null;
@@ -2323,7 +2401,152 @@ function renderUserDetail(det) {
  ${mmiReviews.slice(0,6).map(r=>{const fb=parseMMIFb(r.ai_feedback_json);return`<tr><td>${toolBadge('mmi')}</td><td>${fb?.overall?.score ? `${esc(fb.overall.score)}/5` : '-'}</td><td>${esc(r.tier||'-')}</td><td>${relTime(r.created_at)}</td></tr>`;}).join('')}
  </tbody></table>
  </div>
+ <div class="detail-box">
+ <div class="detail-box-hd">Account Activity Signals</div>
+ <div class="activity-timeline">
+ ${accountActivity.length ? accountActivity.slice(0,8).map(item => {
+ const place = [item.city,item.region,item.country].filter(Boolean).join(', ') || 'unknown location';
+ return `<div class="activity-signal">
+ <div class="activity-signal-type">${esc(item.event_type || 'activity')}</div>
+ <div class="activity-signal-main">${relTime(item.created_at)} | ${esc(place)} | device ${esc(item.device_hint || '-')} | network ${esc(item.network_hint || '-')}<br>${esc(item.user_agent_family || '')}</div>
  </div>`;
+ }).join('') : '<div style="color:var(--muted2);font-size:0.78rem;">No privacy-safe activity signals recorded yet.</div>'}
+ </div>
+ </div>
+ </div>`;
+}
+
+// ======================================================
+// ACCOUNT SHARING WATCHLIST
+// ======================================================
+async function loadSharingWatchlist() {
+ const minRisk = document.getElementById('sharingRisk')?.value || '20';
+ const limit = document.getElementById('sharingLimit')?.value || '100';
+ const status = document.getElementById('sharingStatus');
+ if (status) status.textContent = 'Loading account-sharing signals...';
+ try {
+ const res = await api(`/admin/account-sharing?min_risk=${encodeURIComponent(minRisk)}&limit=${encodeURIComponent(limit)}`);
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Failed');
+ S.sharingWatchlist = data.rows || [];
+ const updated = document.getElementById('sharingUpdated');
+ if (updated) updated.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
+ renderSharingWatchlist();
+ updateDashboard();
+ } catch(e) {
+ console.error('Sharing watchlist load error:', e);
+ if (status) status.textContent = `Sharing watchlist failed: ${e.message}`;
+ const tbody = document.getElementById('sharingBody');
+ if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="padding:18px;color:var(--red);font-size:0.82rem;">${esc(e.message)}. This appears after first deploy until activity is collected.</td></tr>`;
+ }
+}
+
+function riskLabel(level) {
+ const value = String(level || 'low').toLowerCase();
+ return value === 'high' ? 'High' : value === 'medium' ? 'Medium' : value === 'watch' ? 'Watch' : 'Low';
+}
+
+function riskBadge(risk) {
+ const level = String(risk?.level || 'low').toLowerCase();
+ return `<span class="risk-pill ${esc(level)}">${riskLabel(level)} ${Number(risk?.score || 0)}</span>`;
+}
+
+function renderSharingWatchlist() {
+ const q = (document.getElementById('sharingSearch')?.value || '').trim().toLowerCase();
+ const rows = (S.sharingWatchlist || []).filter(row => {
+ const hay = [row.email,row.name,row.tier,row.countries,row.user_agents,row.risk?.level,(row.risk?.reasons||[]).join(' ')].join(' ').toLowerCase();
+ return !q || hay.includes(q);
+ });
+ const high = rows.filter(r=>r.risk?.level==='high').length;
+ const medium = rows.filter(r=>r.risk?.level==='medium').length;
+ const watch = rows.filter(r=>r.risk?.level==='watch').length;
+ const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+ set('sharingHigh', high);
+ set('sharingMedium', medium);
+ set('sharingWatch', watch);
+ set('sharingTotal', rows.length);
+ const status = document.getElementById('sharingStatus');
+ if (status) status.textContent = `${rows.length} account${rows.length===1?'':'s'} flagged by current filter`;
+ document.getElementById('sharingEmpty')?.classList.toggle('hidden', rows.length > 0);
+
+ const tbody = document.getElementById('sharingBody');
+ if (!tbody) return;
+ tbody.innerHTML = '';
+ rows.forEach(row => {
+ const risk = row.risk || {};
+ const reasons = risk.reasons || [];
+ const countries = String(row.countries || '').split(',').filter(Boolean);
+ const agents = String(row.user_agents || '').split(',').filter(Boolean).slice(0, 3);
+ const main = document.createElement('tr');
+ main.className = 'data-row';
+ main.innerHTML = `
+ <td><div class="expander">v</div></td>
+ <td>${riskBadge(risk)}</td>
+ <td>
+ <div class="cell-main">${esc(row.email || 'Unknown student')}</div>
+ <div class="cell-sub">${esc(row.name || '-')} ${tierBadge(row.tier || 'free')}</div>
+ </td>
+ <td><strong>${row.devices_30d || 0}</strong><div class="cell-sub">${row.devices_7d || 0} in 7d</div></td>
+ <td><strong>${row.networks_30d || 0}</strong><div class="cell-sub">${row.networks_7d || 0} in 7d</div></td>
+ <td><strong>${row.countries_30d || 0}</strong><div class="cell-sub">${countries.length ? esc(countries.join(', ')) : `${row.regions_7d || 0} regions in 7d`}</div></td>
+ <td><strong>${row.review_events_30d || 0}</strong><div class="cell-sub">${row.review_events_7d || 0} in 7d | ${row.review_events_24h || 0} in 24h</div></td>
+ <td><div class="cell-main">${fmtDate(row.last_seen_at)?.date || '-'}</div><div class="cell-sub">${relTime(row.last_seen_at)}</div></td>
+ <td><div class="reason-list">${reasons.length ? reasons.map(r=>`<span class="reason-chip">${esc(r)}</span>`).join('') : '<span class="reason-chip">Low signal</span>'}</div></td>`;
+ const detail = document.createElement('tr');
+ detail.className = 'detail-row';
+ detail.innerHTML = `<td colspan="9" class="detail-panel">${renderSharingDetail(row, agents)}</td>`;
+ main.addEventListener('click', () => {
+ const open = detail.classList.contains('open');
+ detail.classList.toggle('open', !open);
+ main.classList.toggle('expanded', !open);
+ });
+ tbody.appendChild(main);
+ tbody.appendChild(detail);
+ });
+}
+
+function renderSharingDetail(row, agents = []) {
+ const recent = row.recent || [];
+ return `<div class="detail-inner">
+ <div class="detail-box">
+ <div class="detail-box-hd">How to Read This</div>
+ <div class="detail-box-row">This is a <strong>manual review signal</strong>, not proof of sharing.</div>
+ <div class="detail-box-row">Good first step: check whether the pattern could be travel, mobile data, family devices, or a VPN.</div>
+ <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+ <button class="btn blue" onclick="event.stopPropagation();openSharingUser(${jsArg(row.user_id || '')},${jsArg(row.email || '')})">Open user</button>
+ <button class="btn" onclick="event.stopPropagation();composeToUser(${jsArg(row.email || '')})">Email student</button>
+ </div>
+ </div>
+ <div class="detail-box">
+ <div class="detail-box-hd">Signals</div>
+ <div class="mini-metric-row">
+ <div class="mini-metric"><div>Devices 30d</div><div>${row.devices_30d || 0}</div></div>
+ <div class="mini-metric"><div>Networks 30d</div><div>${row.networks_30d || 0}</div></div>
+ <div class="mini-metric"><div>Countries 30d</div><div>${row.countries_30d || 0}</div></div>
+ </div>
+ <div class="detail-box-row">Browsers seen: <strong>${agents.length ? esc(agents.join(', ')) : '-'}</strong></div>
+ <div class="detail-box-row">Login/signup events: <strong>${row.login_events_30d || 0}</strong></div>
+ </div>
+ <div class="detail-box">
+ <div class="detail-box-hd">Recent Anonymous Activity</div>
+ <div class="activity-timeline">
+ ${recent.length ? recent.map(item => {
+ const place = [item.city,item.region,item.country].filter(Boolean).join(', ') || 'unknown location';
+ return `<div class="activity-signal">
+ <div class="activity-signal-type">${esc(item.event_type || 'activity')}</div>
+ <div class="activity-signal-main">${relTime(item.created_at)} | ${esc(place)} | device ${esc(item.device_hint || '-')} | network ${esc(item.network_hint || '-')}<br>${esc(item.user_agent_family || '')}</div>
+ </div>`;
+ }).join('') : '<div style="color:var(--muted2);font-size:0.78rem;">Recent activity appears here after new logins or reviews.</div>'}
+ </div>
+ </div>
+ </div>`;
+}
+
+function openSharingUser(userId, email) {
+ nav('users');
+ const search = document.getElementById('usrSearch');
+ if (search) search.value = email || userId || '';
+ loadUsers();
 }
 
 // ======================================================
@@ -3359,7 +3582,7 @@ function buildBroadcastHtml(subject, bodyHtml) {
  <tr><td style="background:#fff;padding:36px 44px 28px;">
  ${bodyHtml}
  <hr style="border:none;border-top:1px solid #f1f5f9;margin:28px 0 22px;">
- <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0;">- Dan<br><span style="color:#9ca3af;font-size:12px;">UniMelb MD | Key2MD founder</span></p>
+ <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0;">- Dan<br><span style="color:#9ca3af;font-size:12px;">University of Melbourne MD student | Key2MD founder</span></p>
  </td></tr>
  <tr><td style="background:#f8fafc;border-top:1px solid #e5e7eb;border-radius:0 0 16px 16px;padding:16px 44px;">
  <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.7;text-align:center;">
