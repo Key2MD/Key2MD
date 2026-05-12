@@ -328,14 +328,22 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 <script>
 (function(){
  var h = document.getElementById('k2Hamburger');
- var m = document.getElementById('k2MobileNav');
- var hdr = document.getElementById('k2Header');
- if (h && m) {
- h.addEventListener('click', function(){ h.classList.toggle('open'); m.classList.toggle('open'); });
- m.querySelectorAll('a').forEach(function(a){
- a.addEventListener('click', function(){ h.classList.remove('open'); m.classList.remove('open'); });
- });
- }
+	 var m = document.getElementById('k2MobileNav');
+	 var hdr = document.getElementById('k2Header');
+	 if (h && m) {
+	 h.setAttribute('aria-controls', m.id || 'k2MobileNav');
+	 h.setAttribute('aria-expanded', 'false');
+	 function setMobileMenu(open){
+	 h.classList.toggle('open', open);
+	 m.classList.toggle('open', open);
+	 h.setAttribute('aria-expanded', open ? 'true' : 'false');
+	 }
+	 h.addEventListener('click', function(){ setMobileMenu(!m.classList.contains('open')); });
+	 m.querySelectorAll('a').forEach(function(a){
+	 a.addEventListener('click', function(){ setMobileMenu(false); });
+	 });
+	 document.addEventListener('keydown', function(e){ if(e.key === 'Escape') setMobileMenu(false); });
+	 }
  if (hdr) {
  window.addEventListener('scroll', function(){ hdr.classList.toggle('scrolled', window.scrollY > 40); }, {passive:true});
  }
