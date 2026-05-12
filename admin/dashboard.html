@@ -1553,6 +1553,7 @@ const API = 'https://key2md-api.brittainmbbs.workers.dev';
 const SS_KEY = 'k2md_admin_token';
 const LEGACY_HANDOFF_KEY = 'k2md_admin_token_handoff';
 const MOCK_READER_CHANNEL_PREFIX = 'k2md_mock_reader_handoff_';
+const WARM_OUTREACH_LOCAL_KEY = 'k2md_warm_outreach_local_v1';
 
 const S = {
  token: null,
@@ -2549,7 +2550,7 @@ async function loadWarmLeads() {
  const res = await api(url);
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.error || 'Failed');
- S.warmLeads = data.rows || [];
+ S.warmLeads = applyWarmLeadLocalOutreach(data.rows || []);
  const updated = document.getElementById('warmLeadUpdated');
  if (updated) updated.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
  renderWarmLeads();
@@ -2613,6 +2614,7 @@ function renderWarmLeads() {
  <div style="display:flex;gap:5px;flex-wrap:wrap;">
  <button class="btn blue" data-warm-action="compose" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Compose</button>
  <button class="btn" data-warm-action="copy" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Copy</button>
+ <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Mark sent</button>
  <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Report</button>
  <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">User</button>
  </div>
@@ -2675,6 +2677,7 @@ function renderWarmLeadEmailPlaceholder(row) {
  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
  <button class="btn blue" data-warm-action="compose" data-warm-id="${esc(row.id)}">Compose rich email</button>
  <button class="btn" data-warm-action="copy" data-warm-id="${esc(row.id)}">Copy text fallback</button>
+ <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}">Mark sent</button>
  <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}">Open student report</button>
  <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}">Open user</button>
  </div>
@@ -2703,6 +2706,93 @@ function findWarmLead(id) {
  return (S.warmLeads || []).find(row => String(row.id) === String(id));
 }
 
+function warmLeadEmailKey(email) {
+ return String(email || '').trim().toLowerCase();
+}
+
+function readWarmLeadLocalOutreach() {
+ try {
+ return JSON.parse(localStorage.getItem(WARM_OUTREACH_LOCAL_KEY) || '{}') || {};
+ } catch {
+ return {};
+ }
+}
+
+function writeWarmLeadLocalOutreach(map) {
+ try { localStorage.setItem(WARM_OUTREACH_LOCAL_KEY, JSON.stringify(map || {})); } catch {}
+}
+
+function warmLeadDaysSinceLocal(value) {
+ const t = Date.parse(value || '');
+ if (!Number.isFinite(t)) return null;
+ return Math.max(0, (Date.now() - t) / 86400000);
+}
+
+function warmLeadStatusFromLocal(record) {
+ const at = record?.last_outreach_at || record?.at || new Date().toISOString();
+ const days = warmLeadDaysSinceLocal(at);
+ const rounded = days === null ? null : Math.round(days);
+ const label = days === null ? 'Contacted' : days < 1 ? 'Contacted today' : `${rounded} day${rounded === 1 ? '' : 's'} ago`;
+ const status = days !== null && days <= 7 ? 'recent' : days !== null && days <= 21 ? 'contacted' : 'ready_followup';
+ return {
+ has_outreach: true,
+ outreach_count: Number(record?.outreach_count || record?.count || 1),
+ last_outreach_at: at,
+ last_outreach_subject: record?.last_outreach_subject || record?.subject || 'Warm lead outreach',
+ days_since_outreach: days === null ? null : Math.round(days * 10) / 10,
+ status,
+ label,
+ };
+}
+
+function applyWarmLeadLocalOutreach(rows) {
+ const map = readWarmLeadLocalOutreach();
+ return (rows || []).map(row => {
+ const local = map[warmLeadEmailKey(row.email)];
+ if (!local || row.outreach_history?.has_outreach) return row;
+ return { ...row, outreach_history: warmLeadStatusFromLocal(local) };
+ });
+}
+
+function markWarmLeadContacted(email, subject, outreach = null) {
+ const key = warmLeadEmailKey(email);
+ if (!key) return;
+ const next = outreach?.has_outreach ? outreach : warmLeadStatusFromLocal({ subject, at: new Date().toISOString() });
+ S.warmLeads = (S.warmLeads || []).map(row => warmLeadEmailKey(row.email) === key ? { ...row, outreach_history: next } : row);
+ renderWarmLeads();
+ updateDashboard();
+}
+
+function recordWarmLeadLocalOutreach(email, subject, outreach = null) {
+ const key = warmLeadEmailKey(email);
+ if (!key) return;
+ const map = readWarmLeadLocalOutreach();
+ const next = outreach?.has_outreach ? {
+ last_outreach_at: outreach.last_outreach_at || new Date().toISOString(),
+ last_outreach_subject: outreach.last_outreach_subject || subject || 'Warm lead outreach',
+ outreach_count: outreach.outreach_count || 1,
+ } : {
+ at: new Date().toISOString(),
+ subject: subject || 'Warm lead outreach',
+ count: 1,
+ };
+ map[key] = next;
+ writeWarmLeadLocalOutreach(map);
+ markWarmLeadContacted(email, subject, outreach);
+}
+
+async function persistWarmLeadOutreach(email, subject, body = '') {
+ const res = await api('/admin/warm-leads/outreach', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ email, subject: subject || 'Warm lead outreach', body: body || '' }),
+ });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not log outreach');
+ if (data?.outreach?.has_outreach) recordWarmLeadLocalOutreach(email, subject, data.outreach);
+ return data;
+}
+
 function ensureWarmLeadButtonHandlers() {
  const tbody = document.getElementById('warmBody');
  if (!tbody || tbody.dataset.warmHandlers === '1') return;
@@ -2720,10 +2810,11 @@ async function runWarmLeadAction(action, id, btn = null) {
  const row = findWarmLead(id);
  if (!row) return;
  const original = btn ? btn.textContent : '';
- if (btn) { btn.disabled = true; btn.textContent = action === 'compose' ? 'Loading...' : action === 'copy' ? 'Building...' : original; }
+ if (btn) { btn.disabled = true; btn.textContent = action === 'compose' ? 'Loading...' : action === 'copy' ? 'Building...' : action === 'mark' ? 'Marking...' : original; }
  try {
  if (action === 'compose') await openWarmLeadEmail(id);
  else if (action === 'copy') await copyWarmLeadDraft(id);
+ else if (action === 'mark') await markWarmLeadOutreachAction(id);
  else if (action === 'report') await openWarmLeadReport(id);
  else if (action === 'user') viewUserByEmail(row.email || '');
  } finally {
@@ -2777,6 +2868,7 @@ function renderWarmLeadReportPanel(row, email) {
  <div class="warm-email-actions">
  <button class="btn blue" data-warm-action="compose" data-warm-id="${esc(row.id)}">Compose rich email</button>
  <button class="btn" data-warm-action="copy" data-warm-id="${esc(row.id)}">Copy text</button>
+ <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}">Mark sent</button>
  <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}">Open report</button>
  <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}">Open user</button>
  </div>
@@ -2837,6 +2929,23 @@ async function copyWarmLeadDraft(id) {
  copyText(body, 'Warm lead draft copied');
 }
 
+async function markWarmLeadOutreachAction(id) {
+ const row = findWarmLead(id);
+ if (!row?.email) return;
+ const subject = row._reportEmail?.subject || row.outreach?.subject || 'Warm lead outreach';
+ const body = row._reportEmail?.text || row.outreach?.body || '';
+ recordWarmLeadLocalOutreach(row.email, subject);
+ try {
+ await persistWarmLeadOutreach(row.email, subject, body);
+ const status = document.getElementById('warmStatus');
+ if (status) status.textContent = 'Warm lead marked as contacted';
+ } catch(e) {
+ console.warn('Warm lead outreach log failed:', e);
+ const status = document.getElementById('warmStatus');
+ if (status) status.textContent = 'Marked locally. Server log did not update yet.';
+ }
+}
+
 function buildWarmLeadReportEmail(row, det, note = '') {
  const hasFullDetail = !!det?.user;
  const p = hasFullDetail ? buildStudentPerformanceProfile(det) : buildWarmLeadSummaryProfile(row);
@@ -2846,7 +2955,7 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  const introScore = p.casperCount
  ? `You have ${p.casperCount} marked CASPer-style response${p.casperCount===1?'':'s'} on Key2MD${p.avgScoreText !== '-' ? `, averaging about ${p.avgScoreText}/10` : ''}.`
  : `You have ${Number(row.review_count || 0)} written practice response${Number(row.review_count || 0)===1?'':'s'} on Key2MD.`;
- const subject = 'A quick Key2MD report on your CASPer practice';
+ const subject = 'A quick note on your Key2MD practice';
  const exampleText = examples.length
  ? [
  'Specific examples from your answers:',
@@ -2861,20 +2970,21 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  p.topImprovement,
  `Stronger shape: "${warmLeadDashboardRewrite('', p.topImprovement)}"`,
  ].join('\n');
+ const link = warmLeadDashboardPrimaryLink(product);
  const text = [
  `Hi ${p.firstName},`,
  '',
  `I had a look over your recent Key2MD practice because you have clearly been putting in the work. ${introScore}`,
  '',
- 'I wanted to send something genuinely useful, so I have included a short practice report below rather than just sending a generic link.',
+ 'I wanted to send something useful while the pattern was fresh.',
  '',
- 'Overall interpretation:',
+ 'Current read:',
  `Current average: ${p.avgScoreText}/10. ${p.band}`,
  '',
- 'Main strength:',
+ 'What looks strong:',
  p.topStrength,
  '',
- 'One priority to fix:',
+ 'What I would fix next:',
  primaryFocusSentence(p),
  p.topImprovement,
  '',
@@ -2886,6 +2996,8 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  warmLeadDashboardCorePoint(product),
  '',
  warmLeadDashboardNextStep(product),
+ '',
+ `${link.label}: ${link.url}`,
  '',
  'No pressure either way - I mainly wanted to send a useful observation while the practice pattern was fresh. You are clearly doing the work, and that is the part I cannot manufacture for students.',
  '',
@@ -2964,103 +3076,59 @@ function warmLeadSummaryExamples(row) {
 }
 
 function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern, introScore }) {
- const kpis = [
- ['CASPer reviews', p.casperCount],
- ['CASPer average', p.avgScoreText === '-' ? '-' : `${p.avgScoreText}/10`],
- ['Recent trend', p.trendText],
- ['Practice signal', `${Number(row.review_count_14d || 0)} recent`],
- ];
  const plan = (p.nextSteps || []).slice(0, 4);
  const exampleHtml = examples.length
  ? examples.map((ex, index) => `
- <tr>
- <td style="padding:14px 0;border-top:${index ? '1px solid #233149' : '0'};">
- <div style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#38bdf8;font-weight:800;margin-bottom:8px;">Example ${index + 1}</div>
- <div style="border-left:3px solid #38bdf8;background:#0b1728;border-radius:8px;padding:12px 14px;color:#dbeafe;font-size:14px;line-height:1.65;">"${esc(ex.quote)}"</div>
- <div style="margin-top:10px;color:#9fb0c7;font-size:13px;line-height:1.6;"><strong style="color:#ffffff;">What to improve:</strong> ${esc(ex.improvement)}</div>
- <div style="margin-top:10px;background:#082f49;border:1px solid #155e75;border-radius:8px;padding:12px 14px;color:#e0f2fe;font-size:13px;line-height:1.6;"><strong>Stronger shape:</strong> "${esc(ex.rewrite)}"</div>
- </td>
- </tr>`).join('')
- : `<tr><td style="padding:14px 0;color:#9fb0c7;font-size:13px;line-height:1.6;"><strong style="color:#ffffff;">Answer-level pattern to watch:</strong> ${esc(p.topImprovement)}<div style="margin-top:10px;background:#082f49;border:1px solid #155e75;border-radius:8px;padding:12px 14px;color:#e0f2fe;font-size:13px;line-height:1.6;"><strong>Stronger shape:</strong> "${esc(warmLeadDashboardRewrite('', p.topImprovement))}"</div></td></tr>`;
- const scoreRows = scorePattern.length
- ? scorePattern.map(c => emailScoreRow(c.name, c.avg)).join('')
- : `<tr><td style="padding:10px 0;color:#9fb0c7;font-size:13px;">More marked stations will make the competency pattern clearer.</td></tr>`;
+ <div style="margin:16px 0 0;">
+ <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#334155;"><strong>Example ${index + 1}:</strong> "${esc(ex.quote)}"</p>
+ <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#475569;"><strong>What to improve:</strong> ${esc(ex.improvement)}</p>
+ <p style="margin:0;font-size:13px;line-height:1.6;color:#475569;"><strong>A stronger shape:</strong> "${esc(ex.rewrite)}"</p>
+ </div>`).join('')
+ : `<p style="margin:8px 0 0;font-size:13px;line-height:1.65;color:#475569;"><strong>Answer-level pattern to watch:</strong> ${esc(p.topImprovement)}<br><strong>A stronger shape:</strong> "${esc(warmLeadDashboardRewrite('', p.topImprovement))}"</p>`;
+ const scoreText = scorePattern.length
+ ? scorePattern.map(c => `${c.name}: ${Number.isFinite(Number(c.avg)) ? Number(c.avg).toFixed(1) : '-'}/10`).join(', ')
+ : 'More marked stations will make the competency pattern clearer.';
+ const link = warmLeadDashboardPrimaryLink(product);
  return `<!doctype html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f3f8fc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#0f172a;">
- <div style="display:none;max-height:0;overflow:hidden;color:transparent;">A short Key2MD practice report based on your recent CASPer answers.</div>
- <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f8fc;margin:0;padding:0;">
- <tr><td align="center" style="padding:28px 12px;">
- <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:760px;background:#ffffff;border:1px solid #dbe7f4;border-radius:14px;overflow:hidden;box-shadow:0 18px 45px rgba(15,23,42,0.12);">
- <tr><td style="padding:26px 28px;background:#071426;color:#ffffff;">
- <div style="font-size:22px;font-weight:900;letter-spacing:-0.4px;">Key<span style="color:#38bdf8;">2</span>MD</div>
- <div style="margin-top:14px;font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:#7dd3fc;font-weight:800;">Practice report</div>
- <h1 style="margin:8px 0 0;font-size:28px;line-height:1.18;color:#ffffff;">A quick note on your CASPer practice</h1>
- <p style="margin:12px 0 0;color:#cbd5e1;font-size:15px;line-height:1.7;">Hi ${esc(p.firstName)}, I had a look over your recent Key2MD practice because you have clearly been putting in the work. ${esc(introScore)}</p>
- </td></tr>
- <tr><td style="padding:22px 28px 0;">
- <p style="margin:0;color:#334155;font-size:15px;line-height:1.75;">I wanted to send something genuinely useful rather than just another link. The snapshot below is based on your practice history and the patterns showing up in your marked answers.</p>
- </td></tr>
- <tr><td style="padding:22px 20px 8px;">
- <table role="presentation" width="100%" cellspacing="8" cellpadding="0" style="background:#0b1728;border:1px solid #233149;border-radius:14px;">
- <tr><td style="padding:18px 18px 4px;">
- <div style="font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:#38bdf8;font-weight:900;">Student report - ${esc(p.displayName)}</div>
- </td></tr>
- <tr><td style="padding:0 10px 8px;">
- <table role="presentation" width="100%" cellspacing="8" cellpadding="0"><tr>
- ${kpis.map(([label,value]) => `<td width="25%" style="background:#111d31;border:1px solid #29374e;border-radius:10px;padding:12px;"><div style="font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#7890aa;font-weight:800;">${esc(label)}</div><div style="margin-top:6px;color:#ffffff;font-size:19px;font-weight:900;">${esc(value)}</div></td>`).join('')}
- </tr></table>
- </td></tr>
- <tr><td style="padding:0 18px 18px;">
- <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
- <td width="50%" valign="top" style="padding:0 8px 0 0;">
- ${emailReportCard('Overall Interpretation', `Current CASPer average: <strong style="color:#ffffff;">${esc(p.avgScoreText)}/10</strong>. ${esc(p.band)}`)}
- ${emailReportCard('Main Strength', esc(p.topStrength))}
- ${emailReportCard('One Priority To Fix', `<strong style="color:#ffffff;">${esc(primaryFocusSentence(p))}</strong><div style="margin-top:10px;border-left:3px solid #38bdf8;padding-left:10px;color:#9fb0c7;">${esc(p.topImprovement)}</div>`)}
- </td>
- <td width="50%" valign="top" style="padding:0 0 0 8px;">
- ${emailReportCard('Next Practice Plan', `<ul style="margin:0;padding-left:18px;color:#9fb0c7;font-size:13px;line-height:1.8;">${plan.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
- ${emailReportCard('Score Pattern', `<div style="color:#9fb0c7;font-size:13px;line-height:1.6;margin-bottom:8px;">Recent average: <strong style="color:#ffffff;">${esc(p.recentAvgText)}/10</strong>. Trend: <strong style="color:#ffffff;">${esc(p.trendText)}</strong>.</div><table role="presentation" width="100%" cellspacing="0" cellpadding="0">${scoreRows}</table>`)}
- ${emailReportCard('How To Use This', 'Do the next few stations with one goal only: make the human impact specific before moving into action. That is usually the fastest way to lift a CASPer answer.')}
- </td>
- </tr></table>
- </td></tr>
- </table>
- </td></tr>
- <tr><td style="padding:18px 28px 0;">
- <h2 style="margin:0 0 10px;color:#071426;font-size:18px;">A couple of answer-level notes</h2>
- <table role="presentation" width="100%" cellspacing="0" cellpadding="0">${exampleHtml}</table>
- <p style="margin:14px 0 0;color:#475569;font-size:14px;line-height:1.75;">${esc(warmLeadDashboardCorePoint(product))}</p>
- </td></tr>
- <tr><td style="padding:22px 28px;">
- <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eef8ff;border:1px solid #bae6fd;border-radius:12px;">
- <tr><td style="padding:18px;">
- <div style="font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#0284c7;font-weight:900;">Useful next step</div>
- <p style="margin:8px 0 14px;color:#0f172a;font-size:14px;line-height:1.7;">${esc(warmLeadDashboardNextStep(product))}</p>
- <a href="https://www.key2md.com/casper-class.html" style="display:inline-block;background:#0ea5e9;color:#ffffff;text-decoration:none;font-size:13px;font-weight:800;border-radius:999px;padding:11px 16px;margin:0 8px 8px 0;">CASPer class</a>
- <a href="https://www.key2md.com/plans.html" style="display:inline-block;background:#071426;color:#ffffff;text-decoration:none;font-size:13px;font-weight:800;border-radius:999px;padding:11px 16px;margin:0 0 8px 0;">CASPer Pro</a>
- </td></tr>
- </table>
- <p style="margin:18px 0 0;color:#475569;font-size:14px;line-height:1.7;">No pressure either way - I mainly wanted to send a useful observation while the practice pattern was fresh. You are clearly doing the work, and that is the part I cannot manufacture for students.</p>
- <p style="margin:18px 0 0;color:#071426;font-size:14px;line-height:1.6;">Dan<br><span style="color:#64748b;">University of Melbourne MD student | Key2MD</span></p>
- </td></tr>
- <tr><td style="padding:18px 28px;background:#f8fafc;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:12px;line-height:1.6;">Key2MD | <a href="https://www.key2md.com" style="color:#0284c7;">key2md.com</a></td></tr>
- </table>
- </td></tr>
- </table>
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#0f172a;">
+ <div style="display:none;max-height:0;overflow:hidden;color:transparent;">A quick personal note on your recent Key2MD practice.</div>
+ <div style="max-width:620px;margin:0 auto;padding:24px 18px;">
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">Hi ${esc(p.firstName)},</p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">I had a look over your recent Key2MD practice because you have clearly been putting in the work. ${esc(introScore)}</p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">I wanted to send something useful while the pattern was fresh.</p>
+
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>What looks strong</strong></p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(p.topStrength)}</p>
+
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>What I would fix next</strong></p>
+ <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#334155;">${esc(primaryFocusSentence(p))}</p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(p.topImprovement)}</p>
+
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>Current read</strong></p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">Average: ${esc(p.avgScoreText)}/10. Recent average: ${esc(p.recentAvgText)}/10. Trend: ${esc(p.trendText)}.</p>
+ <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#475569;">${esc(p.band)}</p>
+ <p style="margin:0 0 16px;font-size:13px;line-height:1.65;color:#64748b;">${esc(scoreText)}</p>
+
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>A couple of answer-level notes</strong></p>
+ ${exampleHtml}
+
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>Next few attempts</strong></p>
+ <ul style="margin:0 0 16px;padding-left:20px;color:#334155;font-size:15px;line-height:1.7;">
+ ${plan.map(x => `<li>${esc(x)}</li>`).join('')}
+ </ul>
+
+ <p style="margin:22px 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(warmLeadDashboardCorePoint(product))}</p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(warmLeadDashboardNextStep(product))}</p>
+ <p style="margin:0 0 18px;font-size:15px;line-height:1.7;"><a href="${esc(link.url)}" style="color:#0369a1;text-decoration:underline;">${esc(link.label)}</a></p>
+
+ <p style="margin:22px 0 16px;font-size:15px;line-height:1.7;color:#334155;">No pressure either way. You are clearly doing the work, and that is the part I cannot manufacture for students.</p>
+ <p style="margin:0 0 22px;font-size:15px;line-height:1.7;">Dan<br><span style="color:#64748b;">University of Melbourne MD student | Key2MD</span></p>
+ <p style="margin:0;border-top:1px solid #e2e8f0;padding-top:12px;font-size:12px;line-height:1.6;color:#94a3b8;">Key2MD</p>
+ </div>
 </body>
 </html>`;
-}
-
-function emailReportCard(title, body) {
- return `<div style="background:#111d31;border:1px solid #29374e;border-radius:10px;padding:14px;margin-bottom:12px;"><div style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#38bdf8;font-weight:900;margin-bottom:8px;">${esc(title)}</div><div style="color:#9fb0c7;font-size:13px;line-height:1.7;">${body}</div></div>`;
-}
-
-function emailScoreRow(name, score) {
- const n = Number(score);
- const pct = Math.max(6, Math.min(100, (Number.isFinite(n) ? n : 0) * 10));
- return `<tr><td style="padding:5px 0;"><div style="font-size:12px;color:#cbd5e1;margin-bottom:4px;">${esc(name)} <span style="float:right;color:#ffffff;font-weight:800;">${Number.isFinite(n) ? n.toFixed(1) : '-'}</span></div><div style="height:5px;background:#27354a;border-radius:999px;overflow:hidden;"><div style="height:5px;width:${pct}%;background:linear-gradient(90deg,#f87171,#facc15,#22c55e);border-radius:999px;"></div></div></td></tr>`;
 }
 
 function buildWarmLeadCombinedOutreach(row, det) {
@@ -3165,11 +3233,19 @@ function warmLeadDashboardCorePoint(product) {
 }
 
 function warmLeadDashboardNextStep(product) {
- if (product === 'Full CASPer Mock') return 'If CASPer is your main focus, the useful paid next step is probably either the Friday CASPer class for live calibration, or the full mock if you want to test consistency across a whole exam. Reply with "class" or "mock" and I can point you to the right one.';
- if (product === 'CASPer Pro') return 'If CASPer is what you are working on, the Friday CASPer class may be a better next step than just doing more isolated questions because it lets us unpack exactly why an answer does or does not read as Q4. If useful, reply "class" and I can send the details.';
- if (product === 'MMI AI Feedback') return 'If interviews are coming up, 1:1 tutoring is probably more useful than another generic resource because the issue is usually how you sound under pressure. Reply with your target universities and timing and I can suggest the highest-yield focus.';
- if (product === 'GAMSAT S2 Pro') return 'If Section II is your focus, the useful next step is either repeated AI feedback on full essays or a 1:1 writing session to find the recurring habit holding the mark down. Reply with your rough score target and I can suggest which is more sensible.';
+ if (product === 'Full CASPer Mock') return 'If CASPer is your main focus, the next useful step is probably either live calibration in the Friday class, or a full mock if you want to test consistency across a whole exam. If you reply with where you are in your prep, I can point you to the better fit.';
+ if (product === 'CASPer Pro') return 'If CASPer is what you are working on, the Friday class may be more useful than just doing more isolated questions because it lets us unpack exactly why an answer does or does not read as Q4. If useful, reply with your test date and I can suggest what to focus on.';
+ if (product === 'MMI AI Feedback') return 'If interviews are coming up, a focused session is usually more useful than another generic resource because the issue is often how the answer sounds under pressure. Reply with your target universities and timing and I can suggest the highest-yield focus.';
+ if (product === 'GAMSAT S2 Pro') return 'If Section II is your focus, the useful next step is either repeated feedback on full essays or a short writing session to find the recurring habit holding the mark down. Reply with your rough score target and I can suggest which is more sensible.';
  return 'If you want help turning this into a clearer plan, reply with what exam or interview you are preparing for and I can suggest the next step.';
+}
+
+function warmLeadDashboardPrimaryLink(product) {
+ if (product === 'Full CASPer Mock') return { url: 'https://www.key2md.com/plans.html#full-casper-mock', label: 'Full CASPer mock details' };
+ if (product === 'CASPer Pro') return { url: 'https://www.key2md.com/casper-class.html', label: 'CASPer class details' };
+ if (product === 'MMI AI Feedback') return { url: 'https://www.key2md.com/mmi-tutor-australia.html', label: 'MMI support details' };
+ if (product === 'GAMSAT S2 Pro') return { url: 'https://www.key2md.com/gamsat-s2-practice.html', label: 'GAMSAT Section II practice' };
+ return { url: 'https://www.key2md.com/plans.html', label: 'Key2MD options' };
 }
 
 async function openWarmLeadReport(id) {
@@ -3942,9 +4018,12 @@ async function sendNewEmail() {
  if (!to||!body) { al.className='modal-alert err'; al.textContent='Recipient and message required.'; return; }
  btn.disabled=true; sp.style.display='inline-block';
  try {
- const res = await api('/admin/inbox/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject:subj||'Message from Key2MD',body,html:S.composeHtml||''})});
+ const cleanSubject = subj || 'Message from Key2MD';
+ const res = await api('/admin/inbox/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject:cleanSubject,body,html:S.composeHtml||''})});
  const d = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(d?.error||'Send failed');
+ recordWarmLeadLocalOutreach(to, cleanSubject, d?.outreach || null);
+ persistWarmLeadOutreach(to, cleanSubject, body).catch(e => console.warn('Warm lead outreach log failed:', e));
  al.className='modal-alert ok'; al.textContent=`OK Sent to ${to}`;
  document.getElementById('ncTo').value=''; document.getElementById('ncSubject').value=''; document.getElementById('ncBody').value=''; setComposeHtml('');
  await loadInbox();
