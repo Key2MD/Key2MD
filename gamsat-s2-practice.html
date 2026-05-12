@@ -3052,6 +3052,10 @@ Please analyse this essay and provide feedback in the specified JSON format.`;
  updateLimitUI();
  return;
  }
+ if (data.error === 'ai_overloaded' || data.code === 'ai_overloaded') {
+ alert(data.message || 'The AI reviewer is temporarily busy. Please wait 30 seconds and try again. Your essay has not been lost and no credit/free attempt was used.');
+ return;
+ }
  if (data.error === 'fair_use_limit_reached') {
  await Key2MDAuth.checkSession();
  updateLimitUI();

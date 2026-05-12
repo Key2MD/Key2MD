@@ -3272,8 +3272,14 @@ ${h.answer}
  </div>`;
  updateLimitUI(); return;
  }
+ if(isAiBusyStatus(res.status)){
+ const d = await res.json().catch(()=>({}));
+ renderAiBusyMessage(container, d);
+ return;
+ }
  if(!res.ok){
  const d = await res.json().catch(()=>({}));
+ if(isAiBusyPayload(d)){ renderAiBusyMessage(container, d); return; }
  container.innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">Error: ${d.error||'Unknown error'}${d.message?' - '+d.message:''}</div>`;
  return;
  }
@@ -3318,12 +3324,25 @@ ${h.answer}
 
  }catch(err){
  clearStreamTimers();
+ if(isAiBusyMessage(err?.message)){ renderAiBusyMessage(getAiFbEl(), {}); return; }
  getAiFbEl().innerHTML=`<div style="font-size:0.82rem;color:#dc2626;padding:10px 0;">AI marking failed. (${err.message})</div>`;
  }
 }
 
 function getAiFbEl(){return currentMode===MODE_MMI?$('aiFeedbackWrapMMI'):aiFeedbackWrap;}
 function showAiLoading(){getAiFbEl().innerHTML=`<div class="ai-loading"><div class="spinner"></div>AI reviewing your response...</div>`;}
+function isAiBusyStatus(status){return status===529||status===503;}
+function isAiBusyPayload(data){return data?.error==='ai_overloaded'||data?.code==='ai_overloaded';}
+function isAiBusyMessage(message){return /ai_overloaded|temporarily busy|temporarily unavailable|overload|overloaded|\b529\b|\b503\b/i.test(String(message||''));}
+function renderAiBusyMessage(target,data){
+ const el=target||getAiFbEl();
+ el.innerHTML=`<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;margin-top:10px;">
+ <strong style="color:#1d4ed8;font-size:0.88rem;display:block;margin-bottom:4px;">AI reviewer temporarily busy</strong>
+ <span class="ai-busy-copy" style="font-size:0.82rem;color:#1e3a8a;"></span>
+ </div>`;
+ const copy=el.querySelector('.ai-busy-copy');
+ if(copy) copy.textContent=data?.message||'Please wait 30 seconds and try again. Your answer has not been lost and no credit/free attempt was used.';
+}
 function getCalibrationQuartile(){
  // Returns calibration based on ALL scored stations so far
  const scores=sessionHistory.filter(h=>h&&h.score!=null).map(h=>h.score);

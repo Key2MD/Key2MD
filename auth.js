@@ -48,6 +48,23 @@ const Key2MDAuth = (() => {
  return headers;
  }
 
+ const AI_BUSY_MESSAGE = 'The AI reviewer is temporarily busy. Please wait 30 seconds and try again. Your answer has not been lost.';
+
+ function isAiBusyStatus(status) {
+ return status === 529 || status === 503;
+ }
+
+ function aiBusyError(status, data = {}) {
+ return {
+ error: 'ai_overloaded',
+ code: 'ai_overloaded',
+ status,
+ retryable: true,
+ message: AI_BUSY_MESSAGE,
+ upstream_error: data.error,
+ };
+ }
+
  function installFetchActivityHeaders() {
  if (_fetchPatched || !window.fetch || !_config.apiBase) return;
  const nativeFetch = window.fetch.bind(window);
@@ -132,7 +149,7 @@ const Key2MDAuth = (() => {
  }),
  });
 
- const data = await res.json();
+ const data = await res.json().catch(() => ({}));
 
  if (res.status === 401) {
  showAuthModal('signup');
@@ -141,6 +158,9 @@ const Key2MDAuth = (() => {
  if (res.status === 429) {
  showLimitReached();
  return { error: 'limit_reached', ...data };
+ }
+ if (isAiBusyStatus(res.status)) {
+ return aiBusyError(res.status, data);
  }
  if (!res.ok) {
  return data;
