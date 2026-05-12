@@ -628,9 +628,11 @@
  <option value="missing">No score</option>
  </select>
  <select class="ctrl-sel" id="revLimit" onchange="loadReviews()">
- <option value="50" selected>50 rows</option>
+ <option value="50">50 rows</option>
  <option value="100">100 rows</option>
  <option value="250">250 rows</option>
+ <option value="1000">1,000 rows</option>
+ <option value="5000" selected>All rows</option>
  </select>
  <button class="btn" onclick="loadReviews()">Refresh</button>
  <button class="btn" onclick="exportCsv('reviews')">Download CSV</button>
@@ -675,9 +677,11 @@
  <option value="missing_evidence">Missing evidence note</option>
  </select>
  <select class="ctrl-sel" id="s2Limit" onchange="loadS2Reviews()">
- <option value="50" selected>50 rows</option>
+ <option value="50">50 rows</option>
  <option value="100">100 rows</option>
  <option value="250">250 rows</option>
+ <option value="1000">1,000 rows</option>
+ <option value="5000" selected>All rows</option>
  </select>
  <button class="btn" onclick="loadS2Reviews()">Refresh</button>
  <button class="btn" onclick="exportCsv('s2')">Download CSV</button>
@@ -727,7 +731,9 @@
  <select class="ctrl-sel" id="usrLimit" onchange="loadUsers()">
  <option value="50">50 rows</option>
  <option value="100">100 rows</option>
- <option value="250" selected>250 rows</option>
+ <option value="250">250 rows</option>
+ <option value="1000">1,000 rows</option>
+ <option value="5000" selected>All rows</option>
  </select>
  <button class="btn" onclick="loadUsers()">Refresh</button>
  <button class="btn" onclick="exportCsv('users')">Download CSV</button>
@@ -860,8 +866,10 @@
  <option value="General">General</option>
  </select>
  <select class="ctrl-sel" id="enqLimit" onchange="loadEnquiries()">
- <option value="50" selected>50 rows</option>
+ <option value="50">50 rows</option>
  <option value="100">100 rows</option>
+ <option value="1000">1,000 rows</option>
+ <option value="5000" selected>All rows</option>
  </select>
  <button class="btn" onclick="loadEnquiries()">Refresh</button>
  </div>
@@ -1264,9 +1272,11 @@
  <option value="1">Poor (1)</option>
  </select>
  <select class="ctrl-sel" id="mmiLimit" onchange="loadMMI()">
- <option value="50" selected>50 rows</option>
+ <option value="50">50 rows</option>
  <option value="100">100 rows</option>
  <option value="250">250 rows</option>
+ <option value="1000">1,000 rows</option>
+ <option value="5000" selected>All rows</option>
  </select>
  <button class="btn" onclick="loadMMI()">Refresh</button>
  </div>
@@ -1339,8 +1349,10 @@
  <option value="casper_class">CASPer class</option>
  </select>
  <select class="ctrl-sel" id="rvLimit" onchange="loadRevenue()">
- <option value="100" selected>100 rows</option>
+ <option value="100">100 rows</option>
  <option value="250">250 rows</option>
+ <option value="1000">1,000 rows</option>
+ <option value="5000" selected>All rows</option>
  </select>
  </div>
  <div class="tbl-wrap">
@@ -1837,7 +1849,7 @@ function buildCommandItems() {
  hint:'View',
  }));
 
- S.reviews.slice(0,250).forEach(r => items.push({
+ S.reviews.forEach(r => items.push({
  kind:'Review',
  title:r.email || r.name || 'CASPer review',
  sub:`${r.tool || 'review'} | ${parseFb(r.ai_feedback)?.score ? `${parseFb(r.ai_feedback).score}/10` : 'no score'} | ${relTime(r.created_at)}`,
@@ -1846,7 +1858,7 @@ function buildCommandItems() {
  hint:'Find',
  }));
 
- S.s2Reviews.slice(0,250).forEach(r => {
+ S.s2Reviews.forEach(r => {
  const fb = parseS2Fb(r.ai_feedback);
  items.push({
  kind:'S2',
@@ -2141,7 +2153,7 @@ function renderReviewQuality() {
 // REVIEWS
 // ======================================================
 async function loadReviews() {
- const limit = document.getElementById('revLimit')?.value||'50';
+ const limit = document.getElementById('revLimit')?.value||'5000';
  try {
  const res = await api(`/admin/reviews?tool=casper&limit=${limit}`);
  const data = await res.json().catch(()=>({}));
@@ -2210,7 +2222,7 @@ function renderReviews() {
 // S2 ESSAY REVIEWS
 // ======================================================
 async function loadS2Reviews() {
- const limit = document.getElementById('s2Limit')?.value||'50';
+ const limit = document.getElementById('s2Limit')?.value||'5000';
  try {
  const res = await api(`/admin/reviews?tool=gamsat&limit=${limit}`);
  const data = await res.json().catch(()=>({}));
@@ -2330,7 +2342,7 @@ function renderS2Detail(row, fb) {
 }
 
 async function loadUsers() {
- const limit = document.getElementById('usrLimit')?.value||'50';
+ const limit = document.getElementById('usrLimit')?.value||'5000';
  const tier = document.getElementById('usrTier')?.value||'';
  const q = (document.getElementById('usrSearch')?.value||'').trim();
  const status = document.getElementById('usrStatus');
@@ -3713,7 +3725,7 @@ function studentReportPlainText(p, mode) {
 }
 
 async function loadEnquiries() {
- const limit = document.getElementById('enqLimit')?.value||'50';
+ const limit = document.getElementById('enqLimit')?.value||'5000';
  try {
  const res = await api(`/admin/enquiries?limit=${limit}`);
  const data = await res.json().catch(()=>({}));
@@ -4935,7 +4947,7 @@ async function quickMockStatus(id, status) {
 }
 
 async function loadMMI() {
- const limit = document.getElementById('mmiLimit')?.value||'50';
+ const limit = document.getElementById('mmiLimit')?.value||'5000';
  try {
  const res = await api(`/admin/mmi?limit=${limit}`);
  const data = await res.json().catch(()=>({}));
@@ -5035,14 +5047,14 @@ function mmiScoreC(s) { const n=parseInt(s,10); return n>=4?'score-h':n>=3?'scor
 // REVENUE
 // ======================================================
 async function loadRevenue() {
- const limit = document.getElementById('rvLimit')?.value||'100';
+ const limit = document.getElementById('rvLimit')?.value||'5000';
  try {
  const res = await api(`/admin/payments?limit=${limit}`);
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.error||'Failed');
  S.revenue = data.rows||[];
  try {
- const payerRes = await api('/admin/payers?limit=500');
+ const payerRes = await api('/admin/payers?limit=5000');
  const payerData = await payerRes.json().catch(()=>({}));
  if (payerRes.ok) {
  S.payers = payerData.rows||[];
@@ -5504,14 +5516,14 @@ async function grantMockPass(replace = false) {
 // ======================================================
 async function exportCsv(type) {
  let endpoint = type;
- let limit = document.getElementById('usrLimit')?.value || '50';
+ let limit = document.getElementById('usrLimit')?.value || '5000';
  let extra = '';
  if (type === 'reviews') {
- limit = document.getElementById('revLimit')?.value || '50';
+ limit = document.getElementById('revLimit')?.value || '5000';
  extra = '&tool=casper';
  } else if (type === 's2') {
  endpoint = 'reviews';
- limit = document.getElementById('s2Limit')?.value || '50';
+ limit = document.getElementById('s2Limit')?.value || '5000';
  extra = '&tool=gamsat';
  }
  try {
