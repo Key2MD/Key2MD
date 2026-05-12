@@ -264,10 +264,26 @@
  .broadcast-history-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;}
  .broadcast-history-subject{font-size:0.84rem;font-weight:800;color:var(--text);line-height:1.35;}
  .broadcast-history-meta{font-size:0.68rem;color:var(--muted2);white-space:nowrap;}
- .broadcast-history-preview{font-size:0.74rem;color:var(--muted);line-height:1.5;margin-top:6px;}
- .broadcast-history-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
- .broadcast-history-empty{padding:18px 16px;color:var(--muted2);font-size:0.78rem;line-height:1.55;}
- .template-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.broadcast-history-preview{font-size:0.74rem;color:var(--muted);line-height:1.5;margin-top:6px;}
+.broadcast-history-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.broadcast-history-empty{padding:18px 16px;color:var(--muted2);font-size:0.78rem;line-height:1.55;}
+.warm-lead-score{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:32px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-size:0.88rem;font-weight:900;color:var(--text);}
+.warm-lead-score.hot{background:rgba(34,197,94,0.14);border-color:rgba(34,197,94,0.28);color:var(--green);}
+.warm-lead-score.warm{background:rgba(245,158,11,0.14);border-color:rgba(245,158,11,0.28);color:var(--amber);}
+.warm-lead-score.watch{background:rgba(56,189,248,0.12);border-color:rgba(56,189,248,0.24);color:var(--blue);}
+.warm-reason-list{display:flex;gap:5px;flex-wrap:wrap;max-width:360px;}
+.warm-reason{display:inline-flex;align-items:center;border:1px solid var(--border);background:var(--surface2);border-radius:999px;padding:3px 8px;font-size:0.66rem;font-weight:750;color:var(--muted);}
+.warm-outreach{display:inline-flex;align-items:center;border:1px solid var(--border);background:var(--surface2);border-radius:999px;padding:4px 9px;font-size:0.68rem;font-weight:850;color:var(--muted);white-space:nowrap;}
+.warm-outreach.not_contacted{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.24);color:var(--green);}
+.warm-outreach.recent{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.25);color:var(--red);}
+.warm-outreach.contacted{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.28);color:var(--amber);}
+.warm-outreach.ready_followup{background:rgba(56,189,248,0.12);border-color:rgba(56,189,248,0.24);color:var(--blue);}
+.warm-draft{white-space:pre-wrap;background:#06111f;border:1px solid var(--border2);border-radius:12px;padding:14px;color:#dbeafe;font-size:0.78rem;line-height:1.6;max-height:360px;overflow:auto;}
+.warm-quote{border-left:3px solid var(--blue);background:var(--surface2);padding:10px 12px;border-radius:10px;color:var(--muted);font-size:0.78rem;line-height:1.55;}
+.warm-rewrite{border-left:3px solid var(--green);background:rgba(34,197,94,0.08);padding:10px 12px;border-radius:10px;color:var(--text);font-size:0.78rem;line-height:1.55;}
+.warm-detail-grid{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(320px,1.1fr);gap:14px;}
+@media(max-width:900px){.warm-detail-grid{grid-template-columns:1fr;}}
+.template-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
 
  /* == CONTROLS == */
  .controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
@@ -482,6 +498,7 @@
  <button class="nav-item" data-page="mmi" onclick="nav('mmi')"><span class="icon"></span> MMI Reviews <span class="nav-badge" id="mmiBadge">0</span></button>
  <button class="nav-item" data-page="mocks" onclick="nav('mocks')"><span class="icon">M</span> Mock Exams <span class="nav-badge" id="mockBadge">0</span></button>
  <button class="nav-item" data-page="users" onclick="nav('users')"><span class="icon"></span> Users</button>
+ <button class="nav-item" data-page="warmleads" onclick="nav('warmleads')"><span class="icon">$</span> Warm Leads <span class="nav-badge" id="warmLeadBadge">0</span></button>
  <button class="nav-item" data-page="sharing" onclick="nav('sharing')"><span class="icon">ID</span> Sharing Watchlist <span class="nav-badge" id="sharingBadge">0</span></button>
  <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')"><span class="icon"></span> Enquiries <span class="nav-badge" id="enqBadge">0</span></button>
 
@@ -712,6 +729,65 @@
  <th style="width:26px;"></th><th>User</th><th>Subscriptions</th><th>Credits</th><th>Reviews</th><th>Spend</th><th>Payments</th><th>Last paid</th><th>Free today</th><th>Joined</th><th>Actions</th>
  </tr></thead><tbody id="usrBody"></tbody></table></div>
  <div class="empty hidden" id="usrEmpty">No users match your filters.</div>
+ </div>
+ </div>
+
+ <!-- -- WARM LEADS -- -->
+ <div id="pageWarmleads" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Warm Leads</div>
+ <div class="page-sub">Regular non-subscribers ranked by practice intent, with tailored outreach drafts based on their own answers.</div>
+ </div>
+ <div class="page-actions">
+ <span class="refresh-note" id="warmLeadUpdated">Not refreshed yet</span>
+ <button class="btn blue" onclick="loadWarmLeads()">Refresh</button>
+ </div>
+ </div>
+ <div class="admin-note amber" style="margin-bottom:14px;">
+ <strong>Use judgement:</strong> these are prediction signals, not permission to spam. Best use is a specific, useful, one-to-one note that quotes their actual work and offers a concrete next step.
+ </div>
+ <div class="controls">
+ <input class="ctrl-in" id="warmSearch" type="text" placeholder=" Search email, name, reason, draft..." oninput="renderWarmLeads()">
+ <select class="ctrl-sel" id="warmProduct" onchange="loadWarmLeads()">
+ <option value="">All products</option>
+ <option value="casper">CASPer Pro</option>
+ <option value="mock">Full mock</option>
+ <option value="gamsat">GAMSAT S2 Pro</option>
+ <option value="mmi">MMI feedback</option>
+ </select>
+ <select class="ctrl-sel" id="warmOutreach" onchange="renderWarmLeads()">
+ <option value="">All outreach</option>
+ <option value="not_contacted">Not contacted</option>
+ <option value="ready_followup">Ready follow-up</option>
+ <option value="contacted">Already contacted</option>
+ <option value="recent">Contacted last 7 days</option>
+ </select>
+ <select class="ctrl-sel" id="warmScore" onchange="loadWarmLeads()">
+ <option value="25">Watch+</option>
+ <option value="35" selected>Warm+</option>
+ <option value="55">Strong warm+</option>
+ <option value="75">Hot only</option>
+ </select>
+ <select class="ctrl-sel" id="warmLimit" onchange="loadWarmLeads()">
+ <option value="25">25 rows</option>
+ <option value="50" selected>50 rows</option>
+ <option value="100">100 rows</option>
+ </select>
+ </div>
+ <div class="stats-grid" style="margin-bottom:12px;">
+ <div class="stat green"><div class="stat-label">Hot</div><div class="stat-val" id="warmHot">-</div><div class="stat-sub">score 75+</div></div>
+ <div class="stat amber"><div class="stat-label">Warm</div><div class="stat-val" id="warmWarm">-</div><div class="stat-sub">score 55-74</div></div>
+ <div class="stat blue"><div class="stat-label">Watch</div><div class="stat-val" id="warmWatch">-</div><div class="stat-sub">below 55</div></div>
+ <div class="stat"><div class="stat-label">Reached Out</div><div class="stat-val" id="warmReached">-</div><div class="stat-sub">logged outbound</div></div>
+ <div class="stat"><div class="stat-label">Drafts</div><div class="stat-val" id="warmTotal">-</div><div class="stat-sub">matching filter</div></div>
+ </div>
+ <div class="tbl-wrap">
+ <div class="tbl-toolbar"><span class="tbl-status" id="warmStatus">-</span></div>
+ <div class="tbl-scroller"><table style="min-width:1120px;"><thead><tr>
+ <th style="width:26px;"></th><th>Lead</th><th>Student</th><th>Recommendation</th><th>Practice signal</th><th>Why warm</th><th>Outreach</th><th>Last active</th><th>Actions</th>
+ </tr></thead><tbody id="warmBody"></tbody></table></div>
+ <div class="empty hidden" id="warmEmpty">No warm leads match this filter yet.</div>
  </div>
  </div>
 
@@ -1464,7 +1540,7 @@ const MOCK_READER_CHANNEL_PREFIX = 'k2md_mock_reader_handoff_';
 
 const S = {
  token: null,
- reviews: [], s2Reviews: [], users: [], sharingWatchlist: [], enquiries: [], subscribers: [],
+ reviews: [], s2Reviews: [], users: [], warmLeads: [], sharingWatchlist: [], enquiries: [], subscribers: [],
  conversations: [], filteredConvs: [],
  mmiReviews: [], mockAttempts: [], mockManualReviews: [], revenue: [], payers: [], payersFromServer: false, revenueSummary: null, monitoring: null,
  casperClass: null,
@@ -1563,7 +1639,7 @@ async function api(path, opts={}) {
 // ======================================================
 // NAVIGATION
 // ======================================================
-const ADMIN_PAGES = new Set(['dashboard','reviews','s2','mmi','mocks','users','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','subscribers']);
+const ADMIN_PAGES = new Set(['dashboard','reviews','s2','mmi','mocks','users','warmleads','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','subscribers']);
 
 function normalisePage(page) {
  const key = String(page || 'dashboard').replace(/^#/, '').trim().toLowerCase();
@@ -1610,6 +1686,7 @@ function nav(page, opts={}) {
  if (target==='mocks' && !S.mockAttempts.length && !S.mockManualReviews.length) loadMockAdmin();
  if (target==='enquiries' && !S.enquiries.length) loadEnquiries();
  if (target==='users' && !S.users.length) loadUsers();
+ if (target==='warmleads' && !S.warmLeads.length) loadWarmLeads();
  if (target==='sharing' && !S.sharingWatchlist.length) loadSharingWatchlist();
  if (target==='broadcast') { updateBcStats(); if (!S.broadcastHistory.length) loadBroadcastHistory(); }
  if (target==='class') loadCasperClass();
@@ -1660,6 +1737,7 @@ function buildCommandItems() {
  const items = [
  {kind:'Page', title:'Dashboard', sub:'Owner priorities, revenue, workload, and activity', action:()=>nav('dashboard'), hint:'Open'},
  {kind:'Page', title:'Users', sub:'Search students, adjust credits, and change tiers', action:()=>nav('users'), hint:'Open'},
+ {kind:'Page', title:'Warm Leads', sub:'Active non-subscribers with tailored outreach drafts', action:()=>nav('warmleads'), hint:'Open'},
  {kind:'Page', title:'Sharing Watchlist', sub:'Check possible account sharing by device, network, and region signals', action:()=>nav('sharing'), hint:'Open'},
  {kind:'Page', title:'S2 Essay Reviews', sub:'GAMSAT essays, band scores, evidence critique, and feedback', action:()=>nav('s2'), hint:'Open'},
  {kind:'Page', title:'Inbox', sub:'Student conversations and replies', action:()=>nav('inbox'), hint:'Open'},
@@ -1676,6 +1754,15 @@ function buildCommandItems() {
  keywords:[u.id,u.name,u.email,u.tier,u.mmi_pro_tier].join(' '),
  action:()=>viewUserByEmail(u.email || ''),
  hint:'Open user',
+ }));
+
+ S.warmLeads.forEach(row => items.push({
+ kind:'Warm lead',
+ title:row.email || row.name || 'Warm lead',
+ sub:`${row.lead_score || 0}/100 | ${row.recommended_product || 'Next step'} | ${(row.reasons || []).slice(0,2).join(' | ')}`,
+ keywords:[row.email,row.name,row.recommended_product,(row.reasons||[]).join(' '),row.outreach?.body].join(' '),
+ action:()=>openWarmLeadEmail(row.id),
+ hint:'Compose',
  }));
 
  S.sharingWatchlist.forEach(row => items.push({
@@ -1835,7 +1922,7 @@ document.addEventListener('keydown', e => {
 async function bootLoad() {
  await Promise.all([
  loadReviews(), loadS2Reviews(), loadUsers(), loadEnquiries(),
- loadSubscribers(), loadInbox(), loadMMI(), loadMockAdmin(), loadRevenue(), loadMonitoring(), loadBroadcastHistory(), loadSharingWatchlist(),
+ loadSubscribers(), loadInbox(), loadMMI(), loadMockAdmin(), loadRevenue(), loadMonitoring(), loadBroadcastHistory(), loadWarmLeads(), loadSharingWatchlist(),
  ]);
  const lu = document.getElementById('lastUpdated');
  if (lu) lu.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
@@ -1861,8 +1948,11 @@ function updateDashboard() {
  const mocks = S.mockAttempts;
  const manualMocks = S.mockManualReviews;
  const sharingRows = S.sharingWatchlist || [];
+ const warmLeads = S.warmLeads || [];
  const sharingHigh = sharingRows.filter(r=>r.risk?.level==='high').length;
  const sharingMedium = sharingRows.filter(r=>r.risk?.level==='medium').length;
+ const warmHot = warmLeads.filter(r=>Number(r.lead_score||0)>=75).length;
+ const warmStrong = warmLeads.filter(r=>Number(r.lead_score||0)>=55).length;
 
  const paying = users.filter(u=>Number(u.total_spend_aud||0)>0).length;
  const credits = users.reduce((s,u)=>s+Number(u.casper_balance||0)+Number(u.gamsat_balance||0),0);
@@ -1920,7 +2010,7 @@ function updateDashboard() {
  `${users.length} registered students | ${paying} paying customers | ${pro} CASPer Pro | ${mmiPro} MMI Pro | ${mmi.length} MMI sessions total | ${mocks.length} saved mock exams | ${enqs7} enquiries in the last 7 days`;
  document.getElementById('dashBrief').textContent =
  `${users.length} registered students - ${paying} paying customers - ${reviews.length} CASPer - ${s2.length} S2 essays - ${mmi.length} MMI sessions - ${mocks.length} saved mock exams - ${enqs7} enquiries in the last 7 days`;
- renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length,manualPending,manualAging,parseFailures,whisperFailures,paying7,sharingHigh,sharingMedium});
+ renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length,manualPending,manualAging,parseFailures,whisperFailures,paying7,sharingHigh,sharingMedium,warmHot,warmStrong});
  renderBusinessInsights({conversion,pro,mmiPro,paying,users,credits,reviews,s2,todayReviews,todayS2,signups7,enqs7,avgScore,mmi});
  renderActivityFeed();
  renderReviewQuality();
@@ -1934,6 +2024,8 @@ function updateDashboard() {
  if (mockBadge) { mockBadge.textContent = manualPending || mocks.length; mockBadge.classList.toggle('show', manualPending>0 || mocks.length>0); }
  const sharingBadge = document.getElementById('sharingBadge');
  if (sharingBadge) { sharingBadge.textContent = sharingHigh || sharingMedium || 0; sharingBadge.classList.toggle('show', sharingHigh>0 || sharingMedium>0); }
+ const warmBadge = document.getElementById('warmLeadBadge');
+ if (warmBadge) { warmBadge.textContent = warmStrong || 0; warmBadge.classList.toggle('show', warmStrong>0); }
 
  const enqEl = document.getElementById('dashRecentEnq');
  enqEl.innerHTML = enqs.slice(0,5).map(e=>`
@@ -1958,6 +2050,7 @@ function updateDashboard() {
 function renderActionQueue(m) {
  const items = [
  {icon:'ID', title:`${(m.sharingHigh||0)+(m.sharingMedium||0)} account-sharing signal${((m.sharingHigh||0)+(m.sharingMedium||0))===1?'':'s'}`, sub:`${m.sharingHigh||0} high risk, ${m.sharingMedium||0} medium risk. Review before acting.`, page:'sharing', show:((m.sharingHigh||0)+(m.sharingMedium||0))>0, tone:(m.sharingHigh||0)>0?'red':'amber'},
+ {icon:'$', title:`${m.warmStrong||0} warm lead${(m.warmStrong||0)===1?'':'s'} ready`, sub:`${m.warmHot||0} hot, ${Math.max(0,(m.warmStrong||0)-(m.warmHot||0))} strong warm. Send tailored outreach while practice intent is high.`, page:'warmleads', show:(m.warmStrong||0)>0, tone:(m.warmHot||0)>0?'green':'blue'},
  {icon:'24h', title:`${m.manualAging||0} mock review${m.manualAging===1?'':'s'} waiting over 24h`, sub:'Prioritise these first so paid manual reviews feel premium.', page:'mocks', show:(m.manualAging||0)>0, tone:'red'},
  {icon:'M', title:`${m.manualPending||0} mock review${m.manualPending===1?'':'s'} pending`, sub:'Open the saved full mock and update manual notes/status.', page:'mocks', show:(m.manualPending||0)>0, tone:'amber'},
  {icon:'ERR', title:`${(m.parseFailures||0)+(m.whisperFailures||0)} AI processing issue${((m.parseFailures||0)+(m.whisperFailures||0))===1?'':'s'}`, sub:'Check parse/Whisper failures before they become student-facing friction.', page:'monitoring', show:((m.parseFailures||0)+(m.whisperFailures||0))>0, tone:'red'},
@@ -2414,6 +2507,201 @@ function renderUserDetail(det) {
  </div>
  </div>
  </div>`;
+}
+
+// ======================================================
+// WARM LEADS
+// ======================================================
+function setText(id, value) {
+ const el = document.getElementById(id);
+ if (el) el.textContent = value;
+}
+
+async function loadWarmLeads() {
+ const limit = document.getElementById('warmLimit')?.value || '50';
+ const minScore = document.getElementById('warmScore')?.value || '35';
+ const product = document.getElementById('warmProduct')?.value || '';
+ const status = document.getElementById('warmStatus');
+ const tbody = document.getElementById('warmBody');
+ const empty = document.getElementById('warmEmpty');
+ if (status) status.textContent = 'Loading warm leads...';
+ if (empty) empty.classList.add('hidden');
+ let url = `/admin/warm-leads?limit=${encodeURIComponent(limit)}&min_score=${encodeURIComponent(minScore)}`;
+ if (product) url += `&product=${encodeURIComponent(product)}`;
+ try {
+ const res = await api(url);
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Failed');
+ S.warmLeads = data.rows || [];
+ const updated = document.getElementById('warmLeadUpdated');
+ if (updated) updated.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
+ renderWarmLeads();
+ updateDashboard();
+ } catch(e) {
+ console.error('Warm leads load error:', e);
+ if (status) status.textContent = `Warm leads failed: ${e.message}`;
+ if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="padding:18px;color:var(--red);font-size:0.82rem;">${esc(e.message)}. Deploy the latest Worker if this endpoint is new.</td></tr>`;
+ if (empty) empty.classList.add('hidden');
+ }
+}
+
+function renderWarmLeads() {
+ const q = (document.getElementById('warmSearch')?.value || '').trim().toLowerCase();
+ const outreachFilter = document.getElementById('warmOutreach')?.value || '';
+ const rows = (S.warmLeads || []).filter(row => {
+ const outreach = row.outreach_history || {};
+ const status = outreach.status || 'not_contacted';
+ const outreachMatch = !outreachFilter
+ || status === outreachFilter
+ || (outreachFilter === 'contacted' && outreach.has_outreach);
+ if (!outreachMatch) return false;
+ if (!q) return true;
+ return [
+ row.email,row.name,row.recommended_product,row.lead_level,
+ ...(row.reasons || []),
+ row.sample?.quote,row.sample?.rewrite,row.sample?.improvement,row.outreach?.body,
+ outreach.label,outreach.last_outreach_subject,
+ ].some(value => String(value || '').toLowerCase().includes(q));
+ });
+ const hot = rows.filter(row => Number(row.lead_score || 0) >= 75).length;
+ const warm = rows.filter(row => Number(row.lead_score || 0) >= 55 && Number(row.lead_score || 0) < 75).length;
+ const watch = rows.filter(row => Number(row.lead_score || 0) < 55).length;
+ const reached = rows.filter(row => row.outreach_history?.has_outreach).length;
+ setText('warmHot', hot || '-');
+ setText('warmWarm', warm || '-');
+ setText('warmWatch', watch || '-');
+ setText('warmReached', reached || '-');
+ setText('warmTotal', rows.length || '-');
+ setText('warmStatus', `${rows.length} warm lead${rows.length===1?'':'s'}`);
+ document.getElementById('warmEmpty')?.classList.toggle('hidden', rows.length > 0);
+ const tbody = document.getElementById('warmBody');
+ if (!tbody) return;
+ tbody.innerHTML = '';
+ rows.forEach(row => {
+ const dt = fmtDate(row.last_review_at);
+ const score = Number(row.lead_score || 0);
+ const level = warmLeadLevel(row);
+ const tr = document.createElement('tr');
+ tr.className = 'data-row';
+ tr.innerHTML = `
+ <td><div class="expander">v</div></td>
+ <td><span class="warm-lead-score ${level}">${score}</span><div class="cell-sub">${esc(levelLabel(level))}</div></td>
+ <td><div class="cell-main">${esc(row.email || '-')}</div><div class="cell-sub">${esc(row.name || '-')} | ${esc(row.tier || 'free')}</div></td>
+ <td><div class="cell-main">${esc(row.recommended_product || '-')}</div><div class="cell-sub">${row.avg_casper_score ? `CASPer avg ${esc(row.avg_casper_score)}/10` : 'No CASPer average yet'}</div></td>
+ <td><div class="cell-main">${Number(row.review_count || 0)} written | ${Number(row.mmi_review_count || 0)} MMI</div><div class="cell-sub">${Number(row.review_count_14d || 0)} recent | ${Number(row.active_review_days || 0)} active days | ${fmtMoney(row.total_spend_aud || 0)} spend</div></td>
+ <td><div class="warm-reason-list">${(row.reasons || []).slice(0,5).map(reason => `<span class="warm-reason">${esc(reason)}</span>`).join('')}</div></td>
+ <td>${outreachBadge(row.outreach_history)}</td>
+ <td><div class="cell-main">${dt?.date || '-'}</div><div class="cell-sub">${row.last_review_at ? relTime(row.last_review_at) : ''}</div></td>
+ <td>
+ <div style="display:flex;gap:5px;flex-wrap:wrap;">
+ <button class="btn blue" style="font-size:0.68rem;padding:4px 8px;" onclick="event.stopPropagation();openWarmLeadEmail(${jsArg(row.id)})">Compose</button>
+ <button class="btn" style="font-size:0.68rem;padding:4px 8px;" onclick="event.stopPropagation();copyWarmLeadDraft(${jsArg(row.id)})">Copy</button>
+ <button class="btn green" style="font-size:0.68rem;padding:4px 8px;" onclick="event.stopPropagation();openWarmLeadReport(${jsArg(row.id)})">Report</button>
+ <button class="btn amber" style="font-size:0.68rem;padding:4px 8px;" onclick="event.stopPropagation();viewUserByEmail(${jsArg(row.email || '')})">User</button>
+ </div>
+ </td>`;
+ const detail = document.createElement('tr');
+ detail.className = 'detail-row';
+ detail.innerHTML = `<td colspan="9" class="detail-panel">${renderWarmLeadDetail(row)}</td>`;
+ tr.addEventListener('click', () => {
+ const open = detail.classList.contains('open');
+ detail.classList.toggle('open', !open);
+ tr.classList.toggle('expanded', !open);
+ });
+ tbody.appendChild(tr);
+ tbody.appendChild(detail);
+ });
+}
+
+function renderWarmLeadDetail(row) {
+ const sample = row.sample || {};
+ const recent = row.recent_reviews || [];
+ return `<div class="detail-inner">
+ <div class="warm-detail-grid" style="grid-column:1/-1;">
+ <div class="detail-box">
+ <div class="detail-box-hd">Why this lead is warm</div>
+ <div class="mini-metric-row">
+ <div class="mini-metric"><div>Lead score</div><div>${Number(row.lead_score || 0)}</div></div>
+ <div class="mini-metric"><div>Practice</div><div>${Number(row.review_count || 0) + Number(row.mmi_review_count || 0)}</div></div>
+ <div class="mini-metric"><div>Recent</div><div>${Number(row.review_count_14d || 0)}</div></div>
+ </div>
+ <div class="detail-box-row"><strong>Outreach:</strong> ${outreachBadge(row.outreach_history)} ${row.outreach_history?.last_outreach_subject ? `<span style="color:var(--muted2);font-size:0.74rem;">${esc(row.outreach_history.last_outreach_subject)}</span>` : ''}</div>
+ <div class="warm-reason-list" style="margin:10px 0;">${(row.reasons || []).map(reason => `<span class="warm-reason">${esc(reason)}</span>`).join('')}</div>
+ ${sample.quote ? `<div class="detail-box-row"><strong>Student quote</strong></div><div class="warm-quote">"${esc(sample.quote)}"</div>` : '<div class="detail-box-row">No quotable response captured yet.</div>'}
+ ${sample.rewrite ? `<div class="detail-box-row" style="margin-top:10px;"><strong>Suggested micro-rewrite</strong></div><div class="warm-rewrite">${esc(sample.rewrite)}</div>` : ''}
+ ${sample.improvement ? `<div class="detail-box-row" style="margin-top:10px;"><strong>AI improvement signal:</strong> ${esc(sample.improvement)}</div>` : ''}
+ <div class="detail-box-hd" style="margin-top:14px;">Recent review signals</div>
+ <table class="subtbl"><thead><tr><th>Tool</th><th>Score</th><th>Feedback</th><th>Time</th></tr></thead><tbody>
+ ${recent.length ? recent.map(r => `<tr><td>${toolBadge(r.tool || '-')}</td><td>${r.score ? esc(r.score) : '-'}</td><td>${esc(r.improvement || r.strength || '-')}</td><td>${relTime(r.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" style="color:var(--muted2);">No recent parsed reviews.</td></tr>'}
+ </tbody></table>
+ </div>
+ <div class="detail-box">
+ <div class="detail-box-hd">Tailored outreach draft</div>
+ <div class="warm-draft">${esc(row.outreach?.body || '')}</div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+ <button class="btn blue" onclick="openWarmLeadEmail(${jsArg(row.id)})">Compose email</button>
+ <button class="btn" onclick="copyWarmLeadDraft(${jsArg(row.id)})">Copy draft</button>
+ <button class="btn green" onclick="openWarmLeadReport(${jsArg(row.id)})">Open student report</button>
+ <button class="btn amber" onclick="viewUserByEmail(${jsArg(row.email || '')})">Open user</button>
+ </div>
+ </div>
+ </div>
+ </div>`;
+}
+
+function warmLeadLevel(row) {
+ const score = Number(row.lead_score || 0);
+ return score >= 75 ? 'hot' : score >= 55 ? 'warm' : 'watch';
+}
+
+function levelLabel(level) {
+ return level === 'hot' ? 'Hot' : level === 'warm' ? 'Warm' : 'Watch';
+}
+
+function outreachBadge(history) {
+ const h = history || {};
+ const status = h.status || 'not_contacted';
+ const label = h.label || 'Not contacted';
+ const count = Number(h.outreach_count || 0);
+ const suffix = count > 1 ? ` (${count})` : '';
+ return `<span class="warm-outreach ${esc(status)}">${esc(label)}${suffix}</span>`;
+}
+
+function findWarmLead(id) {
+ return (S.warmLeads || []).find(row => String(row.id) === String(id));
+}
+
+function openWarmLeadEmail(id) {
+ const row = findWarmLead(id);
+ if (!row) return;
+ composeToUser(row.email || '', row.outreach?.subject || 'Quick note on your Key2MD practice', row.outreach?.body || '');
+}
+
+function copyWarmLeadDraft(id) {
+ const row = findWarmLead(id);
+ if (!row) return;
+ copyText(row.outreach?.body || '', 'Warm lead draft copied');
+}
+
+async function openWarmLeadReport(id) {
+ const row = findWarmLead(id);
+ if (!row) return;
+ try {
+ let det = S.detailCache.get(row.id);
+ if (!det) {
+ const res = await api(`/admin/users/${encodeURIComponent(row.id)}`);
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Could not load student detail');
+ det = data;
+ S.detailCache.set(row.id, det);
+ }
+ S.studentReportDetail = det;
+ S.studentReportMode = 'student';
+ renderStudentReportModal();
+ document.getElementById('studentReportModal')?.classList.add('open');
+ } catch(e) {
+ alert(e.message || 'Could not open student report');
+ }
 }
 
 // ======================================================
