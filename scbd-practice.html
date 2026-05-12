@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>SCBD Practice App | Key2MD</title>
+ <meta name="description" content="A browser-based Standardised Case-Based Discussion practice app with timed stations, examiner-gated reveals, rule-based scoring and pathophysiology-focused debriefs.">
+ <link rel="canonical" href="https://www.key2md.com/scbd-practice.html">
+ <link rel="icon" type="image/svg+xml" href="favicon.svg">
+ <link rel="stylesheet" href="scbd-practice.css">
+ <script src="scbd-cases.js" defer></script>
+ <script src="scbd-practice.js" defer></script>
+</head>
+<body data-page="practice">
+ <header class="scbd-topbar">
+  <a class="brand" href="index.html" aria-label="Key2MD home">Key<span>2</span>MD</a>
+  <nav class="top-actions" aria-label="SCBD navigation">
+   <button class="nav-tab active" type="button" data-route="library">Cases</button>
+   <button class="nav-tab" type="button" data-route="frameworks">Frameworks</button>
+   <button class="nav-tab" type="button" data-route="progress">Progress</button>
+   <a class="nav-link" href="practice.html">CASPer/MMI</a>
+  </nav>
+ </header>
+
+ <main id="scbdApp" class="app-shell" aria-live="polite">
+  <section class="loading-panel">
+   <h1>Loading SCBD practice...</h1>
+   <p>The app runs locally in your browser. No account, server, or API key is required.</p>
+  </section>
+ </main>
+
+ <noscript>
+  <section class="noscript">
+   <h1>JavaScript is required</h1>
+   <p>This practice app needs JavaScript to run the timer, examiner reveal logic and debrief scoring.</p>
+  </section>
+ </noscript>
+</body>
+</html>
