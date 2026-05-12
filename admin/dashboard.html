@@ -2671,16 +2671,150 @@ function findWarmLead(id) {
  return (S.warmLeads || []).find(row => String(row.id) === String(id));
 }
 
-function openWarmLeadEmail(id) {
- const row = findWarmLead(id);
- if (!row) return;
- composeToUser(row.email || '', row.outreach?.subject || 'Quick note on your Key2MD practice', row.outreach?.body || '');
+async function getWarmLeadDetail(row) {
+ if (!row?.id) return null;
+ let det = S.detailCache.get(row.id);
+ if (det) return det;
+ const res = await api(`/admin/users/${encodeURIComponent(row.id)}`);
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Could not load student detail');
+ S.detailCache.set(row.id, data);
+ return data;
 }
 
-function copyWarmLeadDraft(id) {
+async function openWarmLeadEmail(id) {
  const row = findWarmLead(id);
  if (!row) return;
- copyText(row.outreach?.body || '', 'Warm lead draft copied');
+ let body = row.outreach?.body || '';
+ try {
+ const det = await getWarmLeadDetail(row);
+ body = buildWarmLeadCombinedOutreach(row, det) || body;
+ } catch(e) {
+ console.warn('Warm lead detail enrichment failed:', e);
+ }
+ composeToUser(row.email || '', row.outreach?.subject || 'Quick note on your Key2MD practice', body);
+}
+
+async function copyWarmLeadDraft(id) {
+ const row = findWarmLead(id);
+ if (!row) return;
+ let body = row.outreach?.body || '';
+ try {
+ const det = await getWarmLeadDetail(row);
+ body = buildWarmLeadCombinedOutreach(row, det) || body;
+ } catch(e) {
+ console.warn('Warm lead detail enrichment failed:', e);
+ }
+ copyText(body, 'Warm lead draft copied');
+}
+
+function buildWarmLeadCombinedOutreach(row, det) {
+ if (!det?.user) return row.outreach?.body || '';
+ const p = buildStudentPerformanceProfile(det);
+ const examples = warmLeadDetailExamples(det).slice(0, 2);
+ const serverReport = row.student_report || {};
+ const strength = serverReport.strength || p.topStrength;
+ const focus = serverReport.focus || primaryFocusSentence(p);
+ const improvement = serverReport.improvement || p.topImprovement;
+ const plan = serverReport.practice_plan?.length ? serverReport.practice_plan : p.nextSteps;
+ const product = row.recommended_product || 'next step';
+ const nextStep = warmLeadDashboardNextStep(product);
+ const scoreLine = p.casperCount
+ ? `From the data I can see, you have ${p.casperCount} marked CASPer-style response${p.casperCount===1?'':'s'}${p.avgScoreText !== '-' ? `, with an average around ${p.avgScoreText}/10` : ''}.`
+ : `From the data I can see, you have ${Number(row.review_count || 0)} written practice response${Number(row.review_count || 0)===1?'':'s'} logged.`;
+ const exampleBlock = examples.length ? [
+ 'Specific examples from your answers:',
+ ...examples.flatMap((ex, index) => [
+ `${index + 1}. You wrote: "${ex.quote}"`,
+ `   What to improve: ${ex.improvement}`,
+ `   Stronger shape: "${ex.rewrite}"`,
+ ]),
+ '',
+ 'I am not giving you model answers to copy. The point is to keep your instinct, but make the skill visible enough that a marker does not have to guess what you meant.',
+ ].join('\n') : (row.outreach?.body || '').includes('Specific examples from your answers') ? '' : 'I could not pull a clean short quote into this draft, so I would still check the user report before sending.';
+ return [
+ `Hi ${p.firstName},`,
+ '',
+ `I had a look over your recent Key2MD practice because you have clearly been putting in the work. ${scoreLine}`,
+ '',
+ 'I wanted to send something genuinely useful rather than just another link.',
+ '',
+ 'Mini practice report:',
+ `- What looks strong: ${strength}`,
+ `- What I would focus on next: ${focus}`,
+ improvement && improvement !== focus ? `- Repeated feedback signal: ${improvement}` : '',
+ '',
+ exampleBlock,
+ '',
+ 'A practical plan for the next few attempts:',
+ ...plan.slice(0, 3).map(item => `- ${item}`),
+ '',
+ warmLeadDashboardCorePoint(product),
+ '',
+ nextStep,
+ '',
+ 'No pressure either way - I mainly wanted to send a useful observation while the practice pattern was fresh. You are clearly doing the work, and that is the part I cannot manufacture for students.',
+ '',
+ 'Dan',
+ 'University of Melbourne MD student | Key2MD',
+ ].filter(line => line !== '').join('\n');
+}
+
+function warmLeadDetailExamples(det) {
+ const reviews = det?.reviews || [];
+ const out = [];
+ for (const review of reviews) {
+ const response = String(review.response_text || '').replace(/\s+/g, ' ').trim();
+ if (response.length < 35) continue;
+ const fb = parseFb(review.ai_feedback) || {};
+ const quote = warmLeadDashboardQuote(response);
+ if (!quote) continue;
+ const improvement = firstText([fb.improvements, fb.biggest_improvement, fb.missed, fb.overallFeedback, fb.summary], 'This is a useful instinct, but it needs to be more specific and examiner-visible.');
+ const rewrite = warmLeadDashboardRewrite(quote, improvement);
+ out.push({ quote, improvement, rewrite });
+ if (out.length >= 3) break;
+ }
+ return out;
+}
+
+function warmLeadDashboardQuote(response) {
+ const text = String(response || '').replace(/\s+/g, ' ').trim();
+ const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+ const preferred = sentences.find(s => /non[-\s]?confrontational|support|empath|listen|talk|speak/i.test(s) && s.trim().length <= 240);
+ const useful = preferred || sentences.find(s => s.trim().length >= 45 && s.trim().length <= 220) || sentences.slice(0, 2).join(' ') || text;
+ return useful.trim().slice(0, 240);
+}
+
+function warmLeadDashboardRewrite(quote, improvement) {
+ const q = String(quote || '').toLowerCase();
+ const imp = String(improvement || '').toLowerCase();
+ if (/non[-\s]?confrontational/.test(q)) return 'I would speak with them privately, ask what happened before assuming intent, explain the impact I am worried about, and keep the tone calm so they can respond honestly.';
+ if (/support|help/.test(q) || /support|help/.test(imp)) return 'I would offer practical support by asking what they need, helping them access the right person or service, and still being clear about any fairness or safety concern.';
+ if (/empath|feel|emotion/.test(q) || /empath|feel|emotion/.test(imp)) return 'I would first acknowledge that this may feel stressful or embarrassing, then ask open questions so they do not feel judged before deciding the next step.';
+ if (/listen|perspective|side/.test(q) || /listen|perspective|side/.test(imp)) return 'I would ask them to walk me through what happened, listen for any pressure or misunderstanding I have missed, then explain my concern and agree on a fair next step.';
+ return 'I would make the action explicit: speak privately, ask what happened, name the concern, explain why it matters, and agree on the safest next step rather than leaving the intention implied.';
+}
+
+function firstText(values, fallback) {
+ for (const value of values || []) {
+ const text = Array.isArray(value) ? value.join('; ') : String(value || '');
+ if (text.trim().length > 18) return text.trim().replace(/\s+/g, ' ');
+ }
+ return fallback;
+}
+
+function warmLeadDashboardCorePoint(product) {
+ if (String(product || '').includes('GAMSAT')) return 'The bigger point is that S2 rewards controlled thinking, not just fluent writing. A polished paragraph still needs to make the claim, evidence, and implication visible.';
+ if (String(product || '').includes('MMI')) return 'The bigger point is that interviewers cannot credit judgement they cannot hear. Strong answers show the wording, sequence, and reason behind the decision.';
+ return 'The bigger point is that CASPer markers cannot assume your motivation. If an answer says "I would be non-confrontational", the mark comes from showing how you would do that, why that tone matters, and what risk you are managing.';
+}
+
+function warmLeadDashboardNextStep(product) {
+ if (product === 'Full CASPer Mock') return 'If CASPer is your main focus, the useful paid next step is probably either the Friday CASPer class for live calibration, or the full mock if you want to test consistency across a whole exam. Reply with "class" or "mock" and I can point you to the right one.';
+ if (product === 'CASPer Pro') return 'If CASPer is what you are working on, the Friday CASPer class may be a better next step than just doing more isolated questions because it lets us unpack exactly why an answer does or does not read as Q4. If useful, reply "class" and I can send the details.';
+ if (product === 'MMI AI Feedback') return 'If interviews are coming up, 1:1 tutoring is probably more useful than another generic resource because the issue is usually how you sound under pressure. Reply with your target universities and timing and I can suggest the highest-yield focus.';
+ if (product === 'GAMSAT S2 Pro') return 'If Section II is your focus, the useful next step is either repeated AI feedback on full essays or a 1:1 writing session to find the recurring habit holding the mark down. Reply with your rough score target and I can suggest which is more sensible.';
+ return 'If you want help turning this into a clearer plan, reply with what exam or interview you are preparing for and I can suggest the next step.';
 }
 
 async function openWarmLeadReport(id) {
