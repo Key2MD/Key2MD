@@ -159,6 +159,40 @@ a { color: inherit; }
  background: var(--teal2) !important;
  color: #04111f !important;
 }
+.simple-menu-toggle {
+ display: none;
+ width: 42px;
+ height: 42px;
+ border: 1px solid rgba(255,255,255,0.16);
+ border-radius: 12px;
+ background: rgba(255,255,255,0.08);
+ color: #fff;
+ align-items: center;
+ justify-content: center;
+ flex-direction: column;
+ gap: 5px;
+ cursor: pointer;
+ margin-left: auto;
+ padding: 0;
+ font: inherit;
+}
+.simple-menu-toggle span {
+ display: block;
+ width: 20px;
+ height: 2px;
+ border-radius: 999px;
+ background: currentColor;
+ transition: transform 0.18s ease, opacity 0.18s ease;
+}
+.simple-menu-toggle.open span:nth-child(1) {
+ transform: translateY(7px) rotate(45deg);
+}
+.simple-menu-toggle.open span:nth-child(2) {
+ opacity: 0;
+}
+.simple-menu-toggle.open span:nth-child(3) {
+ transform: translateY(-7px) rotate(-45deg);
+}
 .page-hero {
  background: radial-gradient(circle at 20% 0%, rgba(14,165,233,0.25), transparent 34%),
  linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
@@ -552,36 +586,70 @@ footer {
 }
 .footer-links a { color: var(--muted); text-decoration: none; font-weight: 700; }
 @media (max-width: 860px) {
- .simple-nav-inner {
- width: 100%;
- min-height: auto;
- flex-wrap: wrap;
- align-items: flex-start;
- gap: 8px 12px;
- padding: 10px 16px 12px;
+ .simple-nav {
+  position: sticky;
  }
- .simple-logo {
- padding-top: 4px;
+	 .simple-nav-inner {
+	 width: 100%;
+	 min-height: 64px;
+	 flex-wrap: nowrap;
+	 align-items: center;
+	 gap: 12px;
+	 padding: 0 16px;
+	 position: relative;
+	 }
+	 .simple-logo {
+	 padding-top: 0;
+	 }
+ .simple-menu-toggle {
+  display: inline-flex;
  }
- .simple-links {
-  order: 2;
-  width: 100%;
-  gap: 6px;
-  font-size: 0.84rem;
-  overflow: visible;
-  flex-wrap: wrap;
+	 .simple-links {
+	  display: none;
+	  position: absolute;
+	  top: 100%;
+	  left: 0;
+	  right: 0;
+	  width: 100%;
+	  max-height: calc(100vh - 64px);
+	  overflow-y: auto;
+	  flex-direction: column;
+	  align-items: stretch;
+	  gap: 4px;
+	  margin: 0;
+	  padding: 12px 16px 18px;
+	  background: #060f1e;
+	  border-top: 1px solid rgba(14,165,233,0.18);
+	  border-bottom: 2px solid rgba(14,165,233,0.25);
+	  box-shadow: 0 18px 44px rgba(0,0,0,0.58);
+	  font-size: 0.92rem;
+	  color: rgba(255,255,255,0.92);
+	  -webkit-overflow-scrolling: touch;
+	 }
+ .simple-nav.simple-nav-open .simple-links {
+  display: flex;
  }
- .simple-links a {
-  padding: 8px 10px;
- }
+	 .simple-links a {
+	  width: 100%;
+	  min-height: 42px;
+	  display: flex;
+	  align-items: center;
+	  border-radius: 10px;
+	  border-bottom: 1px solid rgba(255,255,255,0.06);
+	  padding: 10px 14px;
+	  white-space: normal;
+	 }
  .simple-dropdown {
   width: 100%;
  }
- .simple-dropdown > a {
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.48);
+	 .simple-dropdown > a {
+	  min-height: auto;
+	  border-bottom: 0;
+	  padding: 12px 14px 4px;
+	  font-size: 0.68rem;
+	  letter-spacing: 0.1em;
+	  text-transform: uppercase;
+	  color: rgba(255,255,255,0.48);
   font-weight: 900;
   pointer-events: none;
  }
@@ -593,24 +661,28 @@ footer {
   opacity: 1;
   visibility: visible;
   transform: none;
-  width: 100%;
-  min-width: 0;
-  margin-top: 3px;
-  padding: 6px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  background: rgba(7,19,38,0.46);
-  box-shadow: none;
- }
- .simple-dropdown-menu a {
-  padding: 8px 10px;
-  white-space: normal;
- }
- .simple-cta {
-  min-height: 34px;
-  padding: 0 14px !important;
- }
+	  width: 100%;
+	  min-width: 0;
+	  margin-top: 0;
+	  padding: 0 0 6px;
+	  display: flex;
+	  flex-direction: column;
+	  gap: 4px;
+	  background: transparent;
+	  border: 0;
+	  box-shadow: none;
+	 }
+	 .simple-dropdown-menu a {
+	  padding: 10px 14px;
+	  white-space: normal;
+	 }
+	 .simple-cta {
+	  justify-content: center;
+	  min-height: 44px;
+	  margin-top: 4px;
+	  padding: 0 14px !important;
+	  border-bottom: 0 !important;
+	 }
  .grid { grid-template-columns: 1fr; }
  .side { position: static; }
  .card-grid { grid-template-columns: 1fr; }
