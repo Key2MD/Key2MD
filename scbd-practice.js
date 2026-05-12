@@ -34,6 +34,21 @@
 
  const BROAD_TERMS = {
   history: {
+   "onset": ["hopc"],
+   "when did it start": ["hopc"],
+   "duration": ["hopc"],
+   "how long": ["hopc"],
+   "getting worse": ["hopc"],
+   "worsening": ["hopc"],
+   "progression": ["hopc"],
+   "has this happened before": ["hopc"],
+   "ever happened before": ["hopc"],
+   "previous episodes": ["hopc"],
+   "first time": ["hopc"],
+   "what makes it better": ["hopc"],
+   "what makes it worse": ["hopc"],
+   "relieving factors": ["hopc"],
+   "aggravating factors": ["hopc"],
    "systems review": ["constitutional", "cardiac", "resp", "bowel", "urinary", "neuro", "mood"],
    "red flags": ["redflag"],
    "social history": ["background"],
@@ -81,9 +96,9 @@
  ]);
 
  const MATCH_STOPWORDS = new Set([
-  "a", "an", "and", "any", "are", "ask", "about", "check", "do", "does", "exam", "examination",
-  "for", "have", "i", "in", "is", "look", "looking", "of", "or", "order", "perform", "request",
-  "the", "they", "to", "will", "with", "would"
+ "a", "an", "and", "any", "are", "ask", "about", "check", "do", "does", "exam", "examination",
+  "ever", "for", "had", "has", "happened", "have", "i", "in", "is", "it", "look", "looking", "of",
+  "or", "order", "perform", "request", "that", "the", "they", "this", "to", "will", "with", "would"
  ]);
 
  const state = {
@@ -93,6 +108,9 @@
   phase: "library",
   trainingMode: false,
   aiCoach: false,
+  semanticFallback: true,
+  semanticUnavailable: false,
+  examinerLoading: false,
   coachLoading: false,
   coachMessage: "",
   coachError: "",
@@ -292,11 +310,13 @@
    const termScore = Math.max(0, ...itemTerms(item, scope).map(term => scoreTerm(queryNorm, queryTokens, term)));
    const broadScore = state.strictness === "strict" ? 0 : itemBroadScore(item, groups, scope);
    const score = Math.max(termScore, broadScore);
-   return { item, score };
+   return { item, score, termScore, broadScore };
   });
+  const threshold = thresholdFor(scope);
+  const hasDirectMatch = scored.some(entry => entry.termScore >= threshold);
   return scored
-   .filter(entry => entry.score >= thresholdFor(scope))
-   .sort((a, b) => b.score - a.score || (b.item.weight || 0) - (a.item.weight || 0))
+   .filter(entry => hasDirectMatch ? entry.termScore >= threshold : entry.score >= threshold)
+   .sort((a, b) => b.score - a.score || itemWeight(b.item) - itemWeight(a.item))
    .slice(0, maxMatchesFor(scope))
    .map(entry => entry.item);
  }
@@ -309,6 +329,28 @@
 
  function isRevealed(scope, id) {
   return state.revealed[scope].includes(id);
+ }
+
+ function itemWeight(item) {
+  const value = Number(item?.weight);
+  return Number.isFinite(value) ? Math.max(0, value) : 1;
+ }
+
+ function itemReasoningCredit(item, scope) {
+  if (itemWeight(item) > 0) return 0;
+  const explicit = Number(item?.reasoningCredit);
+  if (Number.isFinite(explicit) && explicit > 0) return explicit;
+  if (scope === "history") return 0.3;
+  if (scope === "examination") return 0.2;
+  if (scope === "investigations") return 0.2;
+  return 0;
+ }
+
+ function reasoningCreditCap(scope, maxPoints) {
+  if (scope === "history") return Math.min(1.2, maxPoints * 0.15);
+  if (scope === "examination") return Math.min(0.6, maxPoints * 0.15);
+  if (scope === "investigations") return Math.min(0.6, maxPoints * 0.15);
+  return 0;
  }
 
  function reveal(scope, id) {
@@ -372,6 +414,8 @@
   state.strictness = "balanced";
   state.askScope = "history";
   state.askText = "";
+  state.examinerLoading = false;
+  state.semanticUnavailable = false;
   state.coachLoading = false;
   state.coachMessage = "";
   state.coachError = "";
@@ -398,17 +442,36 @@
   startTimer("station");
  }
 
- function askExaminer() {
+ async function askExaminer() {
+  if (state.examinerLoading) return;
   const caseData = getCase();
   const scope = state.askScope;
   const query = state.askText.trim();
   if (!query) return;
-  const matches = findMatches(caseData, scope, query);
+  let matches = findMatches(caseData, scope, query);
+  let source = "local";
+  let apiError = "";
+  if (!matches.length && state.semanticFallback && !state.semanticUnavailable) {
+   state.examinerLoading = true;
+   render();
+   try {
+    matches = await semanticExaminerMatch(caseData, scope, query);
+    source = matches.length ? "semantic" : "none";
+   } catch (err) {
+    apiError = err.message || "Semantic fallback unavailable";
+    state.semanticUnavailable = true;
+    source = "none";
+   } finally {
+    state.examinerLoading = false;
+   }
+  }
   const newMatches = matches.filter(item => !isRevealed(scope, item.id));
   for (const item of newMatches) reveal(scope, item.id);
   state.log.unshift({
    scope,
    query,
+   source,
+   apiError,
    matchedIds: matches.map(m => m.id),
    newIds: newMatches.map(m => m.id),
    at: new Date().toISOString()
@@ -419,15 +482,58 @@
   render();
  }
 
+ async function semanticExaminerMatch(caseData, scope, query) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 3500);
+  const validItems = allItems(caseData, scope);
+  const response = await fetch(`${API_BASE}/api/scbd-coach`, {
+   method: "POST",
+   headers: coachHeaders(),
+   signal: controller.signal,
+   body: JSON.stringify({
+    mode: "route_query",
+    scope,
+    query,
+    strictness: state.strictness,
+    maxItems: maxMatchesFor(scope),
+    case: {
+     id: caseData.id,
+     stem: caseData.stem,
+     presentation: caseData.presentation,
+     setting: caseData.setting,
+     hidden: Boolean(caseData.hidden)
+    },
+    items: validItems.map(item => ({
+     id: item.id,
+     label: item.label,
+     answer: scope === "investigations" ? item.result : item.answer,
+     keywords: item.keywords || [],
+     concepts: item.concepts || [],
+     group: item.group || item.system || item.tier || "",
+     weight: itemWeight(item)
+    }))
+   })
+  }).finally(() => clearTimeout(timer));
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.message || data.error || "Semantic fallback unavailable");
+  const ids = Array.isArray(data.itemIds) ? data.itemIds : [];
+  const allowed = new Set(validItems.map(item => item.id));
+  return ids
+   .filter(id => allowed.has(id))
+   .slice(0, maxMatchesFor(scope))
+   .map(id => validItems.find(item => item.id === id))
+   .filter(Boolean);
+ }
+
  function findNudgeTarget(caseData) {
   const primary = allItems(caseData, state.askScope)
    .filter(item => !isRevealed(state.askScope, item.id))
-   .sort((a, b) => (b.weight || 0) - (a.weight || 0))[0];
+   .sort((a, b) => itemWeight(b) - itemWeight(a))[0];
   if (primary) return { scope: state.askScope, item: primary };
   for (const scope of ["history", "examination", "investigations"]) {
    const item = allItems(caseData, scope)
     .filter(candidate => !isRevealed(scope, candidate.id))
-    .sort((a, b) => (b.weight || 0) - (a.weight || 0))[0];
+    .sort((a, b) => itemWeight(b) - itemWeight(a))[0];
    if (item) return { scope, item };
   }
   return null;
@@ -437,7 +543,7 @@
   if (!target) return "You have covered the prepared hidden information. Use the remaining time to tighten your working diagnosis and management.";
   const { scope, item } = target;
   const concepts = item.concepts || [];
-  const highRisk = (item.weight || 1) >= 3 || item.group === "redflag";
+  const highRisk = itemWeight(item) >= 3 || item.group === "redflag";
   if (concepts.includes("vte")) return "Is there a thrombotic or embolic pathway you still need to actively stress-test?";
   if (concepts.includes("pregnancy")) return "Is there a reproductive-age safety check that would change urgency or disposition?";
   if (concepts.includes("neuro")) return "What neurological danger signs would make this unsafe to manage routinely?";
@@ -518,7 +624,7 @@
      },
      target: target ? {
       scope: target.scope,
-      weight: target.item.weight || 1,
+      weight: itemWeight(target.item),
       group: target.item.group || target.item.system || target.item.tier || "",
       concepts: target.item.concepts || [],
       teaching: target.item.teaching || ""
@@ -559,21 +665,32 @@
 
  function scoreDomain(caseData, scope, maxPoints) {
   const items = allItems(caseData, scope);
-  const total = items.reduce((sum, item) => sum + (item.weight || 1), 0) || 1;
-  const got = items.reduce((sum, item) => sum + (isRevealed(scope, item.id) ? (item.weight || 1) : 0), 0);
+  const coreItems = items.filter(item => itemWeight(item) > 0);
+  const extraItems = items.filter(item => itemWeight(item) === 0 && itemReasoningCredit(item, scope) > 0);
+  const total = coreItems.reduce((sum, item) => sum + itemWeight(item), 0) || 1;
+  const got = coreItems.reduce((sum, item) => sum + (isRevealed(scope, item.id) ? itemWeight(item) : 0), 0);
+  const coreScore = (got / total) * maxPoints;
+  const bonusRaw = extraItems.reduce((sum, item) => sum + (isRevealed(scope, item.id) ? itemReasoningCredit(item, scope) : 0), 0);
+  const availableBonus = Math.round(Math.min(reasoningCreditCap(scope, maxPoints), bonusRaw) * 10) / 10;
+  const score = Math.round(Math.min(maxPoints, coreScore + availableBonus) * 10) / 10;
+  const appliedBonus = Math.round(Math.max(0, score - coreScore) * 10) / 10;
   return {
-   score: Math.round((got / total) * maxPoints * 10) / 10,
+   score,
    max: maxPoints,
+   coreScore: Math.round(coreScore * 10) / 10,
+   bonus: appliedBonus,
+   availableBonus,
    got,
    total,
-   missed: items.filter(item => !isRevealed(scope, item.id))
+   extraMatched: extraItems.filter(item => isRevealed(scope, item.id)),
+   missed: coreItems.filter(item => !isRevealed(scope, item.id))
   };
  }
 
  function scoreManagement(caseData) {
   const plan = state.management;
   const items = caseData.management || [];
-  const total = items.reduce((sum, item) => sum + (item.weight || 1), 0) || 1;
+  const total = items.reduce((sum, item) => sum + itemWeight(item), 0) || 1;
   const matched = [];
   const missed = [];
   for (const item of items) {
@@ -581,14 +698,14 @@
    if (matchFreeText(plan, candidates)) matched.push(item);
    else missed.push(item);
   }
-  const got = matched.reduce((sum, item) => sum + (item.weight || 1), 0);
+  const got = matched.reduce((sum, item) => sum + itemWeight(item), 0);
   return {
    score: Math.round((got / total) * 4 * 10) / 10,
    max: 4,
    got,
    total,
    matched,
-   missed
+   missed: missed.filter(item => itemWeight(item) > 0)
   };
  }
 
@@ -773,12 +890,16 @@
       <span><strong>Training</strong><span>Allows Socratic nudges without naming the missing answer.</span></span>
      </label>
     </div>
-    ${state.trainingMode && !compact ? `
+   ${state.trainingMode && !compact ? `
      <label class="checkbox-row">
       <input type="checkbox" data-field="aiCoach" ${state.aiCoach ? "checked" : ""}>
       <span>Use optional AI wording for nudges when the API is available</span>
      </label>
     ` : ""}
+    <label class="checkbox-row">
+     <input type="checkbox" data-field="semanticFallback" ${state.semanticFallback ? "checked" : ""}>
+     <span>Use API semantic matching when your wording was not predicted${state.semanticUnavailable ? " (currently unavailable)" : ""}</span>
+    </label>
    </section>
   `;
  }
@@ -918,7 +1039,7 @@
       </div>
       <div class="examiner-row">
        <input class="input" data-field="askText" value="${escapeHtml(state.askText)}" placeholder="${escapeHtml(placeholderForScope(state.askScope))}">
-       <button class="btn" type="button" data-action="ask-examiner">Ask / order</button>
+       <button class="btn" type="button" data-action="ask-examiner" ${state.examinerLoading ? "disabled" : ""}>${state.examinerLoading ? "Checking..." : "Ask / order"}</button>
       </div>
       <p class="helper">${helperForScope(state.askScope)}</p>
       ${renderCoachPanel()}
@@ -981,7 +1102,7 @@
   return "Order tests in a safe sequence: bedside, bloods, imaging, then special tests.";
  }
 
- function renderRevealed(caseData, includeLatestMiss = true) {
+ function renderRevealed(caseData, includeLatestMiss = true, includeTeaching = false) {
   const blocks = [];
   for (const scope of ["history", "examination", "investigations"]) {
    const ids = state.revealed[scope];
@@ -992,17 +1113,23 @@
      <li class="answer-card">
       <strong>${escapeHtml(scopeLabel(scope))}: ${escapeHtml(item.label)}</strong>
       <p>${escapeHtml(answer)}</p>
-      <p class="why">${escapeHtml(item.teaching)}</p>
+      ${includeTeaching && item.teaching ? `<p class="why">${escapeHtml(item.teaching)}</p>` : ""}
      </li>
     `);
    }
   }
   const latest = state.log[0];
   const missed = includeLatestMiss && latest && latest.matchedIds.length === 0
-   ? `<li class="answer-card empty"><strong>Examiner:</strong> I don't have that information prepared.${state.trainingMode ? " You can rephrase, move on, or ask for a nudge." : ""}</li>`
+   ? `<li class="answer-card empty"><strong>Examiner:</strong> ${fallbackNoMatch(latest.scope)}${state.trainingMode ? " You can rephrase, move on, or ask for a nudge." : ""}</li>`
    : "";
   if (!blocks.length) return missed || `<li class="answer-card empty">No hidden information has been revealed yet. Ask the examiner to start exposing the case.</li>`;
   return missed + blocks.join("");
+ }
+
+ function fallbackNoMatch(scope) {
+  if (scope === "investigations") return "That test is not indicated or not performed in this case.";
+  if (scope === "examination") return "That examination finding is not provided in this case.";
+  return "There is no additional history available for that question in this case.";
  }
 
  function scopeLabel(scope) {
@@ -1020,7 +1147,7 @@
    ...exam.missed.map(item => ({ ...item, domain: "Examination" })),
    ...investigations.missed.map(item => ({ ...item, domain: "Investigations" })),
    ...management.missed.map(item => ({ ...item, domain: "Management" }))
-  ].sort((a, b) => (b.weight || 0) - (a.weight || 0)).slice(0, 12);
+  ].filter(item => itemWeight(item) > 0).sort((a, b) => itemWeight(b) - itemWeight(a)).slice(0, 12);
 
   renderShell(`
    <section class="hero-panel">
@@ -1028,9 +1155,9 @@
     <h1 class="debrief-title">${escapeHtml(caseData.title)}</h1>
     <p><strong>Final diagnosis:</strong> ${escapeHtml(caseData.finalDiagnosis)}. Your working diagnosis was ${debrief.diagnosisCorrect ? "a match" : "not a match"}.</p>
     <div class="score-grid">
-     ${renderScore("History", history.score, 8)}
-     ${renderScore("Exam", exam.score, 4)}
-     ${renderScore("Investigations", investigations.score, 4)}
+     ${renderScore("History", history.score, 8, history.bonus)}
+     ${renderScore("Exam", exam.score, 4, exam.bonus)}
+     ${renderScore("Investigations", investigations.score, 4, investigations.bonus)}
      ${renderScore("Management", management.score, 4)}
     </div>
     <div class="notice ${debrief.total < 7 ? "warning" : ""}"><strong>Total:</strong> ${debrief.total}/20. The historical pass mark you described is low, but the goal here is safe, explicit reasoning rather than scraping over a line.</div>
@@ -1052,8 +1179,19 @@
    </section>
 
    <section class="debrief-card">
+    <h2 class="subhead">Reasoning credit</h2>
+    <ul class="missed-list">
+     ${renderReasoningCredit([
+      { label: "History", scope: "history", domain: history },
+      { label: "Examination", scope: "examination", domain: exam },
+      { label: "Investigations", scope: "investigations", domain: investigations }
+     ])}
+    </ul>
+   </section>
+
+   <section class="debrief-card">
     <h2 class="subhead">What you did uncover</h2>
-    <ul class="answer-log">${renderRevealed(caseData, false)}</ul>
+    <ul class="answer-log">${renderRevealed(caseData, false, true)}</ul>
    </section>
 
    <section class="debrief-card">
@@ -1078,12 +1216,23 @@
   `);
  }
 
- function renderScore(label, score, max) {
-  return `<div class="score-tile"><strong>${score}/${max}</strong><span>${label}</span></div>`;
+ function renderScore(label, score, max, bonus = 0) {
+  return `<div class="score-tile"><strong>${score}/${max}</strong><span>${label}${bonus > 0 ? `, +${bonus} reasoning` : ""}</span></div>`;
+ }
+
+ function renderReasoningCredit(domains) {
+  const items = domains.flatMap(entry => (entry.domain.extraMatched || []).map(item => ({ ...item, domainLabel: entry.label, bonus: itemReasoningCredit(item, entry.scope) })));
+  if (!items.length) return `<li class="missed-item"><strong>No extra rule-out credit recorded:</strong> This does not mean you were unsafe; it just means your score came from core rubric items.</li>`;
+  return items.map(item => `
+   <li class="missed-item green">
+    <strong>${escapeHtml(item.domainLabel)}: ${escapeHtml(item.label)} (+${item.bonus})</strong>
+    <p>You received extra reasoning credit for actively ruling this pathway in or out. ${escapeHtml(item.teaching)}</p>
+   </li>
+  `).join("");
  }
 
  function renderMissed(item) {
-  const weightClass = (item.weight || 1) >= 3 ? "red" : (item.weight || 1) === 2 ? "amber" : "";
+  const weightClass = itemWeight(item) >= 3 ? "red" : itemWeight(item) === 2 ? "amber" : "";
   const verb = item.domain === "Investigations" ? "order" : item.domain === "Examination" ? "examine for" : item.domain === "Management" ? "include" : "ask about";
   return `
    <li class="missed-item ${weightClass}">
@@ -1237,6 +1386,10 @@
    render();
   }
   if (field === "aiCoach") state.aiCoach = event.target.checked;
+  if (field === "semanticFallback") {
+   state.semanticFallback = event.target.checked;
+   state.semanticUnavailable = false;
+  }
   if (field && field.startsWith("filter-")) render();
  });
 
@@ -1255,6 +1408,11 @@
   }
   if (field === "aiCoach") {
    state.aiCoach = event.target.checked;
+   render();
+  }
+  if (field === "semanticFallback") {
+   state.semanticFallback = event.target.checked;
+   state.semanticUnavailable = false;
    render();
   }
   if (field.startsWith("filter-")) render();
