@@ -493,8 +493,8 @@
 
  <div class="actions">
  <button class="btn-primary" id="payBtn" onclick="startClassCheckout()">Pay $120 and unlock</button>
- <button class="btn-secondary" id="loginBtn" onclick="Key2MDAuth.showAuthModal('login')">Log in</button>
- <button class="btn-secondary" id="signupBtn" onclick="Key2MDAuth.showAuthModal('signup')">Create free account</button>
+	 <button class="btn-secondary" id="loginBtn" onclick="openClassAuth('login')">Log in</button>
+	 <button class="btn-secondary" id="signupBtn" onclick="openClassAuth('signup')">Create free account</button>
  <button class="btn-secondary" id="cancelBtn" onclick="cancelWeeklyAccess()" style="display:none;">Cancel weekly access</button>
  <button class="btn-secondary" onclick="refreshClassStatus()">Refresh access</button>
  </div>
@@ -518,10 +518,11 @@
  </div>
  </footer>
 
- <script>
- const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
- let selectedClassPlan = 'one_off';
- const CLASS_PLANS = {
+	 <script>
+	 const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+	 let selectedClassPlan = 'one_off';
+	 let classAuthReady = false;
+	 const CLASS_PLANS = {
  one_off: {
  priceHtml: '$120 <small>AUD</small>',
  buttonText: 'Pay $120 and unlock'
@@ -536,7 +537,30 @@
  }
  };
 
- function token(){ return localStorage.getItem('key2md_token') || ''; }
+	 function token(){
+	 return (typeof Key2MDAuth !== 'undefined' && Key2MDAuth.getToken?.()) || localStorage.getItem('key2md_token') || '';
+	 }
+
+	 function initClassAuth(){
+	 if (classAuthReady) return true;
+	 if (typeof Key2MDAuth === 'undefined' || !Key2MDAuth.init) return false;
+	 Key2MDAuth.init({
+	 tool: 'casper',
+	 apiBase: API_BASE,
+	 onAuthChange: () => refreshClassStatus(),
+	 onLimitsLoaded: () => {}
+	 });
+	 classAuthReady = true;
+	 return true;
+	 }
+
+	 function openClassAuth(view='signup'){
+	 if (!initClassAuth()) {
+	 setStatus('Account tools are still loading. Try again in a moment.', 'warn');
+	 return;
+	 }
+	 Key2MDAuth.showAuthModal(view);
+	 }
 
  function checkoutButtonText(){
  return CLASS_PLANS[selectedClassPlan]?.buttonText || CLASS_PLANS.one_off.buttonText;
@@ -566,8 +590,8 @@
  el.textContent = message;
  }
 
- async function refreshClassStatus(){
- const headers = token() ? { Authorization: `Bearer ${token()}` } : {};
+	 async function refreshClassStatus(){
+	 const headers = token() ? { Authorization: `Bearer ${token()}` } : {};
  try {
  const res = await fetch(`${API_BASE}/api/casper-class/status`, { headers });
  const data = await res.json();
@@ -629,15 +653,28 @@
  payBtn.disabled = true;
  }
  }
- } catch(e) {
- setStatus('Could not check your access. Try refreshing.', 'err');
- }
- }
+	 } catch(e) {
+	 setStatus('Could not check your access. Try refreshing.', 'err');
+	 const payBtn = document.getElementById('payBtn');
+	 const loginBtn = document.getElementById('loginBtn');
+	 const signupBtn = document.getElementById('signupBtn');
+	 if (!token()) {
+	 if (payBtn) payBtn.style.display = 'none';
+	 if (loginBtn) loginBtn.style.display = 'flex';
+	 if (signupBtn) signupBtn.style.display = 'flex';
+	 }
+	 }
+	 }
 
- async function startClassCheckout(){
- const btn = document.getElementById('payBtn');
- btn.disabled = true;
- btn.textContent = 'Redirecting to Stripe...';
+	 async function startClassCheckout(){
+	 if (!token()) {
+	 setStatus('Log in or create a free Key2MD account before paying. This keeps the class link protected.');
+	 openClassAuth('signup');
+	 return;
+	 }
+	 const btn = document.getElementById('payBtn');
+	 btn.disabled = true;
+	 btn.textContent = 'Redirecting to Stripe...';
  window.Key2MDTrack?.classCheckoutStart?.(selectedClassPlan);
  try {
  const res = await fetch(`${API_BASE}/api/casper-class/checkout`, {
@@ -726,10 +763,11 @@
  );
  }
 
- document.addEventListener('DOMContentLoaded', () => {
- trackClassPaymentReturn();
- refreshClassStatus();
- });
+	 document.addEventListener('DOMContentLoaded', () => {
+	 trackClassPaymentReturn();
+	 initClassAuth();
+	 refreshClassStatus();
+	 });
  </script>
 
 </body>
