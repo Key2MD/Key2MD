@@ -279,9 +279,18 @@
 .warm-outreach.contacted{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.28);color:var(--amber);}
 .warm-outreach.ready_followup{background:rgba(56,189,248,0.12);border-color:rgba(56,189,248,0.24);color:var(--blue);}
 .warm-draft{white-space:pre-wrap;background:#06111f;border:1px solid var(--border2);border-radius:12px;padding:14px;color:#dbeafe;font-size:0.78rem;line-height:1.6;max-height:360px;overflow:auto;}
+.warm-email-panel{background:#06111f;border:1px solid var(--border2);border-radius:14px;overflow:hidden;}
+.warm-email-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(56,189,248,0.06);}
+.warm-email-title{font-size:0.76rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue);}
+.warm-email-sub{margin-top:3px;color:var(--muted);font-size:0.74rem;line-height:1.45;}
+.warm-email-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;}
+.warm-email-frame-wrap{padding:12px;background:#0b1220;}
+.warm-email-frame{width:100%;height:720px;border:1px solid var(--border2);border-radius:10px;background:#fff;display:block;}
+.warm-email-loading{padding:24px;color:var(--muted);font-size:0.82rem;line-height:1.65;background:#06111f;border:1px dashed var(--border2);border-radius:12px;}
+.warm-email-error{padding:16px;color:var(--red);font-size:0.82rem;line-height:1.55;background:var(--red-dim);border:1px solid var(--red-border);border-radius:12px;}
 .warm-quote{border-left:3px solid var(--blue);background:var(--surface2);padding:10px 12px;border-radius:10px;color:var(--muted);font-size:0.78rem;line-height:1.55;}
 .warm-rewrite{border-left:3px solid var(--green);background:rgba(34,197,94,0.08);padding:10px 12px;border-radius:10px;color:var(--text);font-size:0.78rem;line-height:1.55;}
-.warm-detail-grid{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(320px,1.1fr);gap:14px;}
+.warm-detail-grid{display:grid;grid-template-columns:minmax(280px,0.62fr) minmax(420px,1.38fr);gap:14px;}
 @media(max-width:900px){.warm-detail-grid{grid-template-columns:1fr;}}
 .template-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
 
@@ -748,7 +757,7 @@
  <strong>Use judgement:</strong> these are prediction signals, not permission to spam. Best use is a specific, useful, one-to-one note that quotes their actual work and offers a concrete next step.
  </div>
  <div class="controls">
- <input class="ctrl-in" id="warmSearch" type="text" placeholder=" Search email, name, reason, draft..." oninput="renderWarmLeads()">
+ <input class="ctrl-in" id="warmSearch" type="text" placeholder=" Search email, name, reason, report..." oninput="renderWarmLeads()">
  <select class="ctrl-sel" id="warmProduct" onchange="loadWarmLeads()">
  <option value="">All products</option>
  <option value="casper">CASPer Pro</option>
@@ -1544,6 +1553,7 @@ const API = 'https://key2md-api.brittainmbbs.workers.dev';
 const SS_KEY = 'k2md_admin_token';
 const LEGACY_HANDOFF_KEY = 'k2md_admin_token_handoff';
 const MOCK_READER_CHANNEL_PREFIX = 'k2md_mock_reader_handoff_';
+const WARM_OUTREACH_LOCAL_KEY = 'k2md_warm_outreach_local_v1';
 
 const S = {
  token: null,
@@ -2540,7 +2550,7 @@ async function loadWarmLeads() {
  const res = await api(url);
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.error || 'Failed');
- S.warmLeads = data.rows || [];
+ S.warmLeads = applyWarmLeadLocalOutreach(data.rows || []);
  const updated = document.getElementById('warmLeadUpdated');
  if (updated) updated.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
  renderWarmLeads();
@@ -2602,28 +2612,38 @@ function renderWarmLeads() {
  <td><div class="cell-main">${dt?.date || '-'}</div><div class="cell-sub">${row.last_review_at ? relTime(row.last_review_at) : ''}</div></td>
  <td>
  <div style="display:flex;gap:5px;flex-wrap:wrap;">
- <button class="btn blue" style="font-size:0.68rem;padding:4px 8px;" onclick="event.stopPropagation();openWarmLeadEmail(${jsArg(row.id)})">Compose</button>
- <button class="btn" style="font-size:0.68rem;padding:4px 8px;" onclick="event.stopPropagation();copyWarmLeadDraft(${jsArg(row.id)})">Copy</button>
- <button class="btn green" style="font-size:0.68rem;padding:4px 8px;" onclick="event.stopPropagation();openWarmLeadReport(${jsArg(row.id)})">Report</button>
- <button class="btn amber" style="font-size:0.68rem;padding:4px 8px;" onclick="event.stopPropagation();viewUserByEmail(${jsArg(row.email || '')})">User</button>
+ <button class="btn blue" data-warm-action="compose" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Compose</button>
+ <button class="btn" data-warm-action="copy" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Copy</button>
+ <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Mark sent</button>
+ <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Report</button>
+ <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">User</button>
  </div>
  </td>`;
  const detail = document.createElement('tr');
  detail.className = 'detail-row';
  detail.innerHTML = `<td colspan="9" class="detail-panel">${renderWarmLeadDetail(row)}</td>`;
- tr.addEventListener('click', () => {
+ tr.addEventListener('click', event => {
+ if (event.target.closest('[data-warm-action]')) return;
  const open = detail.classList.contains('open');
  detail.classList.toggle('open', !open);
  tr.classList.toggle('expanded', !open);
+ if (open) return;
+ hydrateWarmLeadDetail(row.id);
  });
  tbody.appendChild(tr);
  tbody.appendChild(detail);
  });
+ ensureWarmLeadButtonHandlers();
+}
+
+function warmLeadDomId(id) {
+ return `warmLeadDetail_${String(id || '').replace(/[^A-Za-z0-9_-]/g, '_')}`;
 }
 
 function renderWarmLeadDetail(row) {
  const sample = row.sample || {};
  const recent = row.recent_reviews || [];
+ const targetId = warmLeadDomId(row.id);
  return `<div class="detail-inner">
  <div class="warm-detail-grid" style="grid-column:1/-1;">
  <div class="detail-box">
@@ -2635,7 +2655,7 @@ function renderWarmLeadDetail(row) {
  </div>
  <div class="detail-box-row"><strong>Outreach:</strong> ${outreachBadge(row.outreach_history)} ${row.outreach_history?.last_outreach_subject ? `<span style="color:var(--muted2);font-size:0.74rem;">${esc(row.outreach_history.last_outreach_subject)}</span>` : ''}</div>
  <div class="warm-reason-list" style="margin:10px 0;">${(row.reasons || []).map(reason => `<span class="warm-reason">${esc(reason)}</span>`).join('')}</div>
- ${sample.quote ? `<div class="detail-box-row"><strong>Student quote</strong></div><div class="warm-quote">"${esc(sample.quote)}"</div>` : '<div class="detail-box-row">No quotable response captured yet.</div>'}
+ ${sample.quote ? `<div class="detail-box-row"><strong>Student quote</strong></div><div class="warm-quote">"${esc(sample.quote)}"</div>` : '<div class="detail-box-row">No short quote in the row snapshot yet. The report preview still uses the student profile on the right.</div>'}
  ${sample.rewrite ? `<div class="detail-box-row" style="margin-top:10px;"><strong>Suggested micro-rewrite</strong></div><div class="warm-rewrite">${esc(sample.rewrite)}</div>` : ''}
  ${sample.improvement ? `<div class="detail-box-row" style="margin-top:10px;"><strong>AI improvement signal:</strong> ${esc(sample.improvement)}</div>` : ''}
  <div class="detail-box-hd" style="margin-top:14px;">Recent review signals</div>
@@ -2643,16 +2663,23 @@ function renderWarmLeadDetail(row) {
  ${recent.length ? recent.map(r => `<tr><td>${toolBadge(r.tool || '-')}</td><td>${r.score ? esc(r.score) : '-'}</td><td>${esc(r.improvement || r.strength || '-')}</td><td>${relTime(r.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" style="color:var(--muted2);">No recent parsed reviews.</td></tr>'}
  </tbody></table>
  </div>
- <div class="detail-box">
- <div class="detail-box-hd">Tailored outreach draft</div>
- <div class="warm-draft">${esc(row.outreach?.body || '')}</div>
- <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
- <button class="btn blue" onclick="openWarmLeadEmail(${jsArg(row.id)})">Compose email</button>
- <button class="btn" onclick="copyWarmLeadDraft(${jsArg(row.id)})">Copy draft</button>
- <button class="btn green" onclick="openWarmLeadReport(${jsArg(row.id)})">Open student report</button>
- <button class="btn amber" onclick="viewUserByEmail(${jsArg(row.email || '')})">Open user</button>
+ <div id="${targetId}">
+ ${renderWarmLeadEmailPlaceholder(row)}
  </div>
  </div>
+ </div>`;
+}
+
+function renderWarmLeadEmailPlaceholder(row) {
+ return `<div class="warm-email-loading">
+ <strong style="color:var(--text);">Student report email preview</strong><br>
+ Opened rows now load the full student report before composing. This avoids sending the old generic Warm Leads draft.
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+ <button class="btn blue" data-warm-action="compose" data-warm-id="${esc(row.id)}">Compose rich email</button>
+ <button class="btn" data-warm-action="copy" data-warm-id="${esc(row.id)}">Copy text fallback</button>
+ <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}">Mark sent</button>
+ <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}">Open student report</button>
+ <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}">Open user</button>
  </div>
  </div>`;
 }
@@ -2679,6 +2706,122 @@ function findWarmLead(id) {
  return (S.warmLeads || []).find(row => String(row.id) === String(id));
 }
 
+function warmLeadEmailKey(email) {
+ return String(email || '').trim().toLowerCase();
+}
+
+function readWarmLeadLocalOutreach() {
+ try {
+ return JSON.parse(localStorage.getItem(WARM_OUTREACH_LOCAL_KEY) || '{}') || {};
+ } catch {
+ return {};
+ }
+}
+
+function writeWarmLeadLocalOutreach(map) {
+ try { localStorage.setItem(WARM_OUTREACH_LOCAL_KEY, JSON.stringify(map || {})); } catch {}
+}
+
+function warmLeadDaysSinceLocal(value) {
+ const t = Date.parse(value || '');
+ if (!Number.isFinite(t)) return null;
+ return Math.max(0, (Date.now() - t) / 86400000);
+}
+
+function warmLeadStatusFromLocal(record) {
+ const at = record?.last_outreach_at || record?.at || new Date().toISOString();
+ const days = warmLeadDaysSinceLocal(at);
+ const rounded = days === null ? null : Math.round(days);
+ const label = days === null ? 'Contacted' : days < 1 ? 'Contacted today' : `${rounded} day${rounded === 1 ? '' : 's'} ago`;
+ const status = days !== null && days <= 7 ? 'recent' : days !== null && days <= 21 ? 'contacted' : 'ready_followup';
+ return {
+ has_outreach: true,
+ outreach_count: Number(record?.outreach_count || record?.count || 1),
+ last_outreach_at: at,
+ last_outreach_subject: record?.last_outreach_subject || record?.subject || 'Warm lead outreach',
+ days_since_outreach: days === null ? null : Math.round(days * 10) / 10,
+ status,
+ label,
+ };
+}
+
+function applyWarmLeadLocalOutreach(rows) {
+ const map = readWarmLeadLocalOutreach();
+ return (rows || []).map(row => {
+ const local = map[warmLeadEmailKey(row.email)];
+ if (!local || row.outreach_history?.has_outreach) return row;
+ return { ...row, outreach_history: warmLeadStatusFromLocal(local) };
+ });
+}
+
+function markWarmLeadContacted(email, subject, outreach = null) {
+ const key = warmLeadEmailKey(email);
+ if (!key) return;
+ const next = outreach?.has_outreach ? outreach : warmLeadStatusFromLocal({ subject, at: new Date().toISOString() });
+ S.warmLeads = (S.warmLeads || []).map(row => warmLeadEmailKey(row.email) === key ? { ...row, outreach_history: next } : row);
+ renderWarmLeads();
+ updateDashboard();
+}
+
+function recordWarmLeadLocalOutreach(email, subject, outreach = null) {
+ const key = warmLeadEmailKey(email);
+ if (!key) return;
+ const map = readWarmLeadLocalOutreach();
+ const next = outreach?.has_outreach ? {
+ last_outreach_at: outreach.last_outreach_at || new Date().toISOString(),
+ last_outreach_subject: outreach.last_outreach_subject || subject || 'Warm lead outreach',
+ outreach_count: outreach.outreach_count || 1,
+ } : {
+ at: new Date().toISOString(),
+ subject: subject || 'Warm lead outreach',
+ count: 1,
+ };
+ map[key] = next;
+ writeWarmLeadLocalOutreach(map);
+ markWarmLeadContacted(email, subject, outreach);
+}
+
+async function persistWarmLeadOutreach(email, subject, body = '') {
+ const res = await api('/admin/warm-leads/outreach', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ email, subject: subject || 'Warm lead outreach', body: body || '' }),
+ });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not log outreach');
+ if (data?.outreach?.has_outreach) recordWarmLeadLocalOutreach(email, subject, data.outreach);
+ return data;
+}
+
+function ensureWarmLeadButtonHandlers() {
+ const tbody = document.getElementById('warmBody');
+ if (!tbody || tbody.dataset.warmHandlers === '1') return;
+ tbody.dataset.warmHandlers = '1';
+ tbody.addEventListener('click', event => {
+ const btn = event.target.closest('[data-warm-action]');
+ if (!btn || !tbody.contains(btn)) return;
+ event.preventDefault();
+ event.stopPropagation();
+ runWarmLeadAction(btn.dataset.warmAction, btn.dataset.warmId, btn);
+ });
+}
+
+async function runWarmLeadAction(action, id, btn = null) {
+ const row = findWarmLead(id);
+ if (!row) return;
+ const original = btn ? btn.textContent : '';
+ if (btn) { btn.disabled = true; btn.textContent = action === 'compose' ? 'Loading...' : action === 'copy' ? 'Building...' : action === 'mark' ? 'Marking...' : original; }
+ try {
+ if (action === 'compose') await openWarmLeadEmail(id);
+ else if (action === 'copy') await copyWarmLeadDraft(id);
+ else if (action === 'mark') await markWarmLeadOutreachAction(id);
+ else if (action === 'report') await openWarmLeadReport(id);
+ else if (action === 'user') viewUserByEmail(row.email || '');
+ } finally {
+ if (btn) { btn.disabled = false; btn.textContent = original; }
+ }
+}
+
 async function getWarmLeadDetail(row) {
  if (!row?.id) return null;
  let det = S.detailCache.get(row.id);
@@ -2690,6 +2833,52 @@ async function getWarmLeadDetail(row) {
  return data;
 }
 
+async function hydrateWarmLeadDetail(id) {
+ const row = findWarmLead(id);
+ if (!row) return;
+ const target = document.getElementById(warmLeadDomId(id));
+ if (!target) return;
+ if (row._reportEmail) {
+ target.innerHTML = renderWarmLeadReportPanel(row, row._reportEmail);
+ return;
+ }
+ target.innerHTML = `<div class="warm-email-loading"><strong style="color:var(--text);">Building rich report email...</strong><br>Loading the full student report, examples, score pattern, and email preview.</div>`;
+ try {
+ const det = await getWarmLeadDetail(row);
+ const email = buildWarmLeadReportEmail(row, det);
+ row._reportEmail = email;
+ target.innerHTML = renderWarmLeadReportPanel(row, email);
+ } catch(e) {
+ const email = buildWarmLeadReportEmail(row, null, 'Built from the warm-lead summary because full student detail could not be loaded.');
+ row._reportEmail = email;
+ target.innerHTML = renderWarmLeadReportPanel(row, email);
+ }
+}
+
+function renderWarmLeadReportPanel(row, email) {
+ const subject = email?.subject || row.outreach?.subject || 'Quick note on your Key2MD practice';
+ const html = email?.html || '';
+ return `<div class="warm-email-panel">
+ <div class="warm-email-panel-head">
+ <div>
+ <div class="warm-email-title">Rich warm lead email</div>
+ <div class="warm-email-sub">Subject: ${esc(subject)}<br>Uses the student report as the centrepiece, then softly nudges CASPer class or Pro.</div>
+ ${email?.note ? `<div class="warm-email-sub" style="color:var(--amber);margin-top:6px;">${esc(email.note)}</div>` : ''}
+ </div>
+ <div class="warm-email-actions">
+ <button class="btn blue" data-warm-action="compose" data-warm-id="${esc(row.id)}">Compose rich email</button>
+ <button class="btn" data-warm-action="copy" data-warm-id="${esc(row.id)}">Copy text</button>
+ <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}">Mark sent</button>
+ <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}">Open report</button>
+ <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}">Open user</button>
+ </div>
+ </div>
+ <div class="warm-email-frame-wrap">
+ ${html ? `<iframe class="warm-email-frame" title="Warm lead email preview" sandbox="allow-popups allow-top-navigation-by-user-activation" srcdoc="${esc(html)}"></iframe>` : `<div class="warm-draft">${esc(email?.text || row.outreach?.body || '')}</div>`}
+ </div>
+ </div>`;
+}
+
 async function openWarmLeadEmail(id) {
  const row = findWarmLead(id);
  if (!row) return;
@@ -2697,13 +2886,23 @@ async function openWarmLeadEmail(id) {
  let html = '';
  let subject = row.outreach?.subject || 'Quick note on your Key2MD practice';
  try {
- const det = await getWarmLeadDetail(row);
- const email = buildWarmLeadReportEmail(row, det);
- body = email.text || buildWarmLeadCombinedOutreach(row, det) || body;
+ const det = row._reportEmail ? null : await getWarmLeadDetail(row);
+ const email = row._reportEmail || buildWarmLeadReportEmail(row, det);
+ row._reportEmail = email;
+ body = email.text || (det ? buildWarmLeadCombinedOutreach(row, det) : '') || body;
  html = email.html || '';
  subject = email.subject || subject;
+ const target = document.getElementById(warmLeadDomId(id));
+ if (target) target.innerHTML = renderWarmLeadReportPanel(row, email);
  } catch(e) {
  console.warn('Warm lead detail enrichment failed:', e);
+ const email = buildWarmLeadReportEmail(row, null, 'Built from the warm-lead summary because full student detail could not be loaded.');
+ row._reportEmail = email;
+ body = email.text || body;
+ html = email.html || '';
+ subject = email.subject || subject;
+ const target = document.getElementById(warmLeadDomId(id));
+ if (target) target.innerHTML = renderWarmLeadReportPanel(row, email);
  }
  composeToUser(row.email || '', subject, body, html);
 }
@@ -2714,18 +2913,44 @@ async function copyWarmLeadDraft(id) {
  let body = row.outreach?.body || '';
  try {
  const det = await getWarmLeadDetail(row);
- body = buildWarmLeadCombinedOutreach(row, det) || body;
+ const email = buildWarmLeadReportEmail(row, det);
+ row._reportEmail = email;
+ body = email.text || buildWarmLeadCombinedOutreach(row, det) || body;
+ const target = document.getElementById(warmLeadDomId(id));
+ if (target) target.innerHTML = renderWarmLeadReportPanel(row, email);
  } catch(e) {
  console.warn('Warm lead detail enrichment failed:', e);
+ const email = buildWarmLeadReportEmail(row, null, 'Built from the warm-lead summary because full student detail could not be loaded.');
+ row._reportEmail = email;
+ body = email.text || body;
+ const target = document.getElementById(warmLeadDomId(id));
+ if (target) target.innerHTML = renderWarmLeadReportPanel(row, email);
  }
  copyText(body, 'Warm lead draft copied');
 }
 
-function buildWarmLeadReportEmail(row, det) {
- if (!det?.user) return { subject: row.outreach?.subject || 'Quick note on your Key2MD practice', text: row.outreach?.body || '', html: '' };
- const p = buildStudentPerformanceProfile(det);
+async function markWarmLeadOutreachAction(id) {
+ const row = findWarmLead(id);
+ if (!row?.email) return;
+ const subject = row._reportEmail?.subject || row.outreach?.subject || 'Warm lead outreach';
+ const body = row._reportEmail?.text || row.outreach?.body || '';
+ recordWarmLeadLocalOutreach(row.email, subject);
+ try {
+ await persistWarmLeadOutreach(row.email, subject, body);
+ const status = document.getElementById('warmStatus');
+ if (status) status.textContent = 'Warm lead marked as contacted';
+ } catch(e) {
+ console.warn('Warm lead outreach log failed:', e);
+ const status = document.getElementById('warmStatus');
+ if (status) status.textContent = 'Marked locally. Server log did not update yet.';
+ }
+}
+
+function buildWarmLeadReportEmail(row, det, note = '') {
+ const hasFullDetail = !!det?.user;
+ const p = hasFullDetail ? buildStudentPerformanceProfile(det) : buildWarmLeadSummaryProfile(row);
  const product = row.recommended_product || 'CASPer Pro';
- const examples = warmLeadDetailExamples(det).slice(0, 2);
+ const examples = hasFullDetail ? warmLeadDetailExamples(det).slice(0, 2) : warmLeadSummaryExamples(row).slice(0, 2);
  const scorePattern = [...(p.weakest || []), ...(p.strongest || [])].slice(0, 4);
  const introScore = p.casperCount
  ? `You have ${p.casperCount} marked CASPer-style response${p.casperCount===1?'':'s'} on Key2MD${p.avgScoreText !== '-' ? `, averaging about ${p.avgScoreText}/10` : ''}.`
@@ -2740,7 +2965,11 @@ function buildWarmLeadReportEmail(row, det) {
  `   Stronger shape: "${ex.rewrite}"`,
  ]),
  ].join('\n')
- : 'Specific example: I would check the detailed report before sending if you want an exact quoted answer included.';
+ : [
+ 'Answer-level pattern to watch:',
+ p.topImprovement,
+ `Stronger shape: "${warmLeadDashboardRewrite('', p.topImprovement)}"`,
+ ].join('\n');
  const text = [
  `Hi ${p.firstName},`,
  '',
@@ -2773,7 +3002,74 @@ function buildWarmLeadReportEmail(row, det) {
  'University of Melbourne MD student | Key2MD',
  ].join('\n');
  const html = buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern, introScore });
- return { subject, text, html };
+ return { subject, text, html, note };
+}
+
+function buildWarmLeadSummaryProfile(row) {
+ const report = row.student_report || {};
+ const displayName = row.name || row.email || 'Student';
+ const firstName = String(row.name || row.email || 'there').trim().split(/\s+/)[0].split('@')[0] || 'there';
+ const avgRaw = report.avg_score ?? row.avg_casper_score;
+ const recentRaw = report.recent_avg;
+ const avgScore = avgRaw === null || avgRaw === undefined || avgRaw === '' ? NaN : Number(avgRaw);
+ const recentAvg = recentRaw === null || recentRaw === undefined || recentRaw === '' ? NaN : Number(recentRaw);
+ const casperCount = Number(row.casper_reviews || row.review_count || report.review_count || 0);
+ const trendText = Number.isFinite(recentAvg) && Number.isFinite(avgScore)
+ ? `${recentAvg >= avgScore ? '+' : ''}${(recentAvg - avgScore).toFixed(1)}`
+ : 'Not enough data';
+ return {
+ user: { email: row.email || '', name: row.name || '' },
+ displayName,
+ firstName,
+ email: row.email || '',
+ totalSpend: Number(row.total_spend_aud || 0),
+ casperCount,
+ mmiCount: Number(row.mmi_review_count || 0),
+ avgScore: Number.isFinite(avgScore) ? avgScore : null,
+ avgScoreText: Number.isFinite(avgScore) ? avgScore.toFixed(1) : '-',
+ recentAvg: Number.isFinite(recentAvg) ? recentAvg : null,
+ recentAvgText: Number.isFinite(recentAvg) ? recentAvg.toFixed(1) : '-',
+ trendDelta: null,
+ trendText,
+ band: Number.isFinite(avgScore)
+ ? performanceBand(avgScore)
+ : 'This report is based on recent practice activity and answer-level signals. More scored CASPer reviews will make the performance read sharper.',
+ weakest: [],
+ strongest: [],
+ topStrength: report.strength || row.sample?.strength || 'You are doing the most important first step: actually practising and reading feedback, rather than just collecting generic CASPer advice.',
+ topImprovement: report.improvement || report.focus || row.sample?.improvement || 'The highest-yield lift is making your reasoning and interpersonal skill visible instead of assuming the marker will infer it.',
+ nextSteps: Array.isArray(report.practice_plan) && report.practice_plan.length
+ ? report.practice_plan
+ : [
+ 'For the next three responses, choose one sentence and rewrite it so the marker can see the action, the reason, and the human impact.',
+ 'For CASPer, practise one station type twice before switching topics, so you can see whether the same wording habit is improving.',
+ 'Do not chase model answers. Keep your own instinct, but make it more observable.',
+ ],
+ focusAreas: [],
+ agenda: [],
+ risks: [],
+ latestAt: row.last_review_at || null,
+ mmiAvg: null,
+ mmiScored: [],
+ };
+}
+
+function warmLeadSummaryExamples(row) {
+ const reportExamples = Array.isArray(row.student_report?.examples) ? row.student_report.examples : [];
+ const examples = reportExamples.map(ex => ({
+ quote: ex.quote || ex.response || '',
+ improvement: ex.improvement || row.student_report?.improvement || 'This is a useful instinct, but it needs to be more specific and examiner-visible.',
+ rewrite: ex.rewrite || ex.suggestion || warmLeadDashboardRewrite(ex.quote || '', ex.improvement || ''),
+ })).filter(ex => String(ex.quote || '').trim().length >= 20);
+ if (examples.length) return examples;
+ if (row.sample?.quote || row.sample?.improvement || row.sample?.rewrite) {
+ return [{
+ quote: row.sample.quote || row.sample.response_preview || '',
+ improvement: row.sample.improvement || 'This is a useful instinct, but it needs to be more specific and examiner-visible.',
+ rewrite: row.sample.rewrite || warmLeadDashboardRewrite(row.sample.quote || row.sample.response_preview || '', row.sample.improvement || ''),
+ }];
+ }
+ return [];
 }
 
 function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern, introScore }) {
@@ -2794,7 +3090,7 @@ function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern,
  <div style="margin-top:10px;background:#082f49;border:1px solid #155e75;border-radius:8px;padding:12px 14px;color:#e0f2fe;font-size:13px;line-height:1.6;"><strong>Stronger shape:</strong> "${esc(ex.rewrite)}"</div>
  </td>
  </tr>`).join('')
- : `<tr><td style="padding:14px 0;color:#9fb0c7;font-size:13px;line-height:1.6;">I would check the report before sending if you want an exact quoted answer included here.</td></tr>`;
+ : `<tr><td style="padding:14px 0;color:#9fb0c7;font-size:13px;line-height:1.6;"><strong style="color:#ffffff;">Answer-level pattern to watch:</strong> ${esc(p.topImprovement)}<div style="margin-top:10px;background:#082f49;border:1px solid #155e75;border-radius:8px;padding:12px 14px;color:#e0f2fe;font-size:13px;line-height:1.6;"><strong>Stronger shape:</strong> "${esc(warmLeadDashboardRewrite('', p.topImprovement))}"</div></td></tr>`;
  const scoreRows = scorePattern.length
  ? scorePattern.map(c => emailScoreRow(c.name, c.avg)).join('')
  : `<tr><td style="padding:10px 0;color:#9fb0c7;font-size:13px;">More marked stations will make the competency pattern clearer.</td></tr>`;
@@ -3709,7 +4005,11 @@ function setComposeHtml(html = '') {
  const preview = document.getElementById('ncHtmlPreview');
  const label = document.getElementById('ncBodyLabel');
  if (wrap) wrap.style.display = S.composeHtml ? 'block' : 'none';
- if (preview) preview.innerHTML = S.composeHtml || '';
+ if (preview) {
+ preview.innerHTML = S.composeHtml
+ ? `<iframe class="warm-email-frame" style="height:520px;border:0;border-radius:8px;" title="HTML email preview" sandbox="allow-popups allow-top-navigation-by-user-activation" srcdoc="${esc(S.composeHtml)}"></iframe>`
+ : '';
+ }
  if (label) label.textContent = S.composeHtml ? 'Plain-text fallback' : 'Message';
 }
 
@@ -3751,9 +4051,12 @@ async function sendNewEmail() {
  if (!to||!body) { al.className='modal-alert err'; al.textContent='Recipient and message required.'; return; }
  btn.disabled=true; sp.style.display='inline-block';
  try {
- const res = await api('/admin/inbox/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject:subj||'Message from Key2MD',body,html:S.composeHtml||''})});
+ const cleanSubject = subj || 'Message from Key2MD';
+ const res = await api('/admin/inbox/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject:cleanSubject,body,html:S.composeHtml||''})});
  const d = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(d?.error||'Send failed');
+ recordWarmLeadLocalOutreach(to, cleanSubject, d?.outreach || null);
+ persistWarmLeadOutreach(to, cleanSubject, body).catch(e => console.warn('Warm lead outreach log failed:', e));
  al.className='modal-alert ok'; al.textContent=`OK Sent to ${to}`;
  document.getElementById('ncTo').value=''; document.getElementById('ncSubject').value=''; document.getElementById('ncBody').value=''; setComposeHtml('');
  await loadInbox();
