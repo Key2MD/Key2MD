@@ -1564,6 +1564,7 @@ const S = {
  broadcastHistory: [],
  activeConv: null,
  composeHtml: '',
+ composeMode: 'standard',
  detailCache: new Map(),
  studentReportDetail: null,
  studentReportMode: 'tutor',
@@ -2904,7 +2905,7 @@ async function openWarmLeadEmail(id) {
  const target = document.getElementById(warmLeadDomId(id));
  if (target) target.innerHTML = renderWarmLeadReportPanel(row, email);
  }
- composeToUser(row.email || '', subject, body, html);
+ composeToUser(row.email || '', subject, body, html, 'warm_lead');
 }
 
 async function copyWarmLeadDraft(id) {
@@ -2971,6 +2972,7 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  `Stronger shape: "${warmLeadDashboardRewrite('', p.topImprovement)}"`,
  ].join('\n');
  const link = warmLeadDashboardPrimaryLink(product);
+ const unsubscribeUrl = `https://www.key2md.com/unsubscribe.html?email=${encodeURIComponent(p.email || row.email || '')}`;
  const text = [
  `Hi ${p.firstName},`,
  '',
@@ -2998,6 +3000,8 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  warmLeadDashboardNextStep(product),
  '',
  `${link.label}: ${link.url}`,
+ '',
+ `If you would rather not receive these occasional notes, you can unsubscribe here: ${unsubscribeUrl}`,
  '',
  'No pressure either way - I mainly wanted to send a useful observation while the practice pattern was fresh. You are clearly doing the work, and that is the part I cannot manufacture for students.',
  '',
@@ -3089,6 +3093,7 @@ function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern,
  ? scorePattern.map(c => `${c.name}: ${Number.isFinite(Number(c.avg)) ? Number(c.avg).toFixed(1) : '-'}/10`).join(', ')
  : 'More marked stations will make the competency pattern clearer.';
  const link = warmLeadDashboardPrimaryLink(product);
+ const unsubscribeUrl = `https://www.key2md.com/unsubscribe.html?email=${encodeURIComponent(p.email || row.email || '')}`;
  return `<!doctype html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -3125,7 +3130,7 @@ function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern,
 
  <p style="margin:22px 0 16px;font-size:15px;line-height:1.7;color:#334155;">No pressure either way. You are clearly doing the work, and that is the part I cannot manufacture for students.</p>
  <p style="margin:0 0 22px;font-size:15px;line-height:1.7;">Dan<br><span style="color:#64748b;">University of Melbourne MD student | Key2MD</span></p>
- <p style="margin:0;border-top:1px solid #e2e8f0;padding-top:12px;font-size:12px;line-height:1.6;color:#94a3b8;">Key2MD</p>
+ <p style="margin:0;border-top:1px solid #e2e8f0;padding-top:12px;font-size:12px;line-height:1.6;color:#94a3b8;">Key2MD<br>If you would rather not receive these occasional notes, you can <a href="${esc(unsubscribeUrl)}" style="color:#64748b;text-decoration:underline;">unsubscribe here</a>.</p>
  </div>
 </body>
 </html>`;
@@ -3985,12 +3990,13 @@ function openNewCompose(preserveHtml = false) {
  document.getElementById('ncModal').classList.add('open');
  document.getElementById('ncTo').focus();
 }
-function closeNewCompose() { document.getElementById('ncModal').classList.remove('open'); document.getElementById('ncAlert').className='modal-alert'; setComposeHtml(''); }
-function composeToUser(email, subject = '', body = '', html = '') {
+function closeNewCompose() { document.getElementById('ncModal').classList.remove('open'); document.getElementById('ncAlert').className='modal-alert'; S.composeMode='standard'; setComposeHtml(''); }
+function composeToUser(email, subject = '', body = '', html = '', mode = 'standard') {
  document.getElementById('ncTo').value = email;
  document.getElementById('ncSubject').value = subject || '';
  document.getElementById('ncBody').value = body || '';
- setComposeHtml(html || '');
+ S.composeMode = mode || 'standard';
+ setComposeHtml(S.composeMode === 'warm_lead' ? '' : (html || ''));
  openNewCompose(true);
  nav('inbox');
 }
@@ -4019,13 +4025,14 @@ async function sendNewEmail() {
  btn.disabled=true; sp.style.display='inline-block';
  try {
  const cleanSubject = subj || 'Message from Key2MD';
- const res = await api('/admin/inbox/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject:cleanSubject,body,html:S.composeHtml||''})});
+ const category = S.composeMode || 'standard';
+ const res = await api('/admin/inbox/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject:cleanSubject,body,html:S.composeHtml||'',category})});
  const d = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(d?.error||'Send failed');
  recordWarmLeadLocalOutreach(to, cleanSubject, d?.outreach || null);
  persistWarmLeadOutreach(to, cleanSubject, body).catch(e => console.warn('Warm lead outreach log failed:', e));
  al.className='modal-alert ok'; al.textContent=`OK Sent to ${to}`;
- document.getElementById('ncTo').value=''; document.getElementById('ncSubject').value=''; document.getElementById('ncBody').value=''; setComposeHtml('');
+ document.getElementById('ncTo').value=''; document.getElementById('ncSubject').value=''; document.getElementById('ncBody').value=''; S.composeMode='standard'; setComposeHtml('');
  await loadInbox();
  setTimeout(closeNewCompose, 1800);
  } catch(e) { al.className='modal-alert err'; al.textContent=e.message; }
