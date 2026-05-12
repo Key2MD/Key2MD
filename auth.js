@@ -344,6 +344,8 @@ const Key2MDAuth = (() => {
  if (document.activeElement?.closest('#k2mdAuthSignup')) _doSignup();
  } else if (document.getElementById('k2mdAuthLogin').style.display !== 'none') {
  if (document.activeElement?.closest('#k2mdAuthLogin')) _doLogin();
+ } else if (document.getElementById('k2mdAuthForgot').style.display !== 'none') {
+ if (document.activeElement?.closest('#k2mdAuthForgot')) _doForgot();
  }
  });
  }
@@ -359,7 +361,11 @@ const Key2MDAuth = (() => {
  // Clear errors
  document.getElementById('k2mdSignupError').style.display = 'none';
  document.getElementById('k2mdLoginError').style.display = 'none';
- document.getElementById('k2mdForgotError').style.display = 'none';
+ const forgotError = document.getElementById('k2mdForgotError');
+ forgotError.style.display = 'none';
+ forgotError.style.background = '';
+ forgotError.style.borderColor = '';
+ forgotError.style.color = '';
 
  modal.classList.add('open');
  document.body.style.overflow = 'hidden';
@@ -430,7 +436,7 @@ const Key2MDAuth = (() => {
  const fillEl = document.getElementById('aiLimitFill');
 
  if (toolLimits.unlimited) {
- if (countEl) { countEl.textContent = 'Unlimited Unlimited (Pro)'; countEl.className = 'ai-limit-count'; }
+ if (countEl) { countEl.textContent = 'Unlimited (Pro)'; countEl.className = 'ai-limit-count'; }
  if (fillEl) { fillEl.style.width = '100%'; fillEl.className = 'ai-limit-fill'; }
  return;
  }
@@ -506,20 +512,28 @@ const Key2MDAuth = (() => {
 
  btn.disabled = true;
  btn.textContent = 'Sending...';
+ errEl.style.display = 'none';
+ errEl.style.background = '';
+ errEl.style.borderColor = '';
+ errEl.style.color = '';
 
  try {
- await fetch(`${_config.apiBase}/api/auth/forgot`, {
+ const res = await fetch(`${_config.apiBase}/api/auth/forgot`, {
  method: 'POST',
  headers: getTrackingHeaders({ 'Content-Type': 'application/json' }),
  body: JSON.stringify({ email }),
  });
+ if (!res.ok) {
+ const data = await res.json().catch(() => ({}));
+ throw new Error(data.error || 'Password reset email could not be sent right now.');
+ }
  errEl.textContent = 'If an account exists with this email, a reset link has been sent.';
  errEl.style.display = 'block';
  errEl.style.background = 'rgba(34,197,94,0.12)';
  errEl.style.borderColor = 'rgba(34,197,94,0.3)';
  errEl.style.color = '#86efac';
- } catch {
- errEl.textContent = 'Something went wrong. Please try again.';
+ } catch (err) {
+ errEl.textContent = err.message || 'Something went wrong. Please try again.';
  errEl.style.display = 'block';
  } finally {
  btn.disabled = false;

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Reset Password | Key2MD</title>
+<link rel="preconnect" href="https://key2md-api.brittainmbbs.workers.dev">
+<style>
+:root {
+ --ink:#071426;
+ --muted:#66758d;
+ --line:#dbe7f4;
+ --sky:#0ea5e9;
+ --sky-dark:#0284c7;
+ --navy:#071426;
+ --panel:#ffffff;
+ --soft:#eef8ff;
+ --danger:#b91c1c;
+ --success:#047857;
+}
+* { box-sizing:border-box; }
+body {
+ margin:0;
+ min-height:100vh;
+ font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+ color:var(--ink);
+ background:
+  radial-gradient(circle at 18% 8%, rgba(14,165,233,0.16), transparent 28rem),
+  linear-gradient(180deg, #f8fcff 0%, #eef6ff 100%);
+}
+a { color:inherit; }
+.shell {
+ width:min(1120px, calc(100% - 40px));
+ min-height:100vh;
+ margin:0 auto;
+ display:grid;
+ grid-template-columns:minmax(0, 0.95fr) minmax(340px, 440px);
+ gap:56px;
+ align-items:center;
+ padding:48px 0;
+}
+.brand {
+ display:inline-flex;
+ align-items:center;
+ gap:10px;
+ margin-bottom:44px;
+ text-decoration:none;
+ font-weight:900;
+ font-size:1.55rem;
+ letter-spacing:-0.02em;
+}
+.brand span { color:var(--sky); }
+.eyebrow {
+ margin:0 0 14px;
+ color:var(--sky-dark);
+ font-size:0.78rem;
+ font-weight:900;
+ letter-spacing:0.14em;
+ text-transform:uppercase;
+}
+h1 {
+ max-width:720px;
+ margin:0;
+ font-size:clamp(2.4rem, 6vw, 4.7rem);
+ line-height:0.98;
+ letter-spacing:0;
+}
+.intro {
+ max-width:620px;
+ margin:22px 0 0;
+ color:#34435a;
+ font-size:1.08rem;
+ line-height:1.75;
+}
+.trust-row {
+ display:flex;
+ flex-wrap:wrap;
+ gap:10px;
+ margin-top:28px;
+}
+.pill {
+ border:1px solid rgba(14,165,233,0.3);
+ background:rgba(255,255,255,0.72);
+ color:#075985;
+ border-radius:999px;
+ padding:8px 12px;
+ font-size:0.82rem;
+ font-weight:800;
+}
+.card {
+ background:var(--panel);
+ border:1px solid var(--line);
+ border-radius:8px;
+ box-shadow:0 24px 70px rgba(7,20,38,0.12);
+ overflow:hidden;
+}
+.card-head {
+ background:var(--navy);
+ color:#fff;
+ padding:28px;
+}
+.card-head h2 {
+ margin:0 0 8px;
+ font-size:1.35rem;
+ letter-spacing:0;
+}
+.card-head p {
+ margin:0;
+ color:#b8c7d9;
+ line-height:1.55;
+ font-size:0.94rem;
+}
+.form {
+ padding:28px;
+}
+.field {
+ display:block;
+ margin-bottom:16px;
+}
+.label {
+ display:block;
+ margin-bottom:8px;
+ font-size:0.78rem;
+ font-weight:900;
+ color:#334155;
+ letter-spacing:0.08em;
+ text-transform:uppercase;
+}
+input {
+ width:100%;
+ border:1px solid #c9d8ea;
+ border-radius:8px;
+ padding:14px 15px;
+ color:#0f172a;
+ font:inherit;
+ outline:none;
+ background:#fff;
+ transition:border-color .15s ease, box-shadow .15s ease;
+}
+input:focus {
+ border-color:var(--sky);
+ box-shadow:0 0 0 4px rgba(14,165,233,0.13);
+}
+.hint {
+ margin:-4px 0 18px;
+ color:var(--muted);
+ font-size:0.86rem;
+ line-height:1.55;
+}
+.notice {
+ display:none;
+ margin:0 0 16px;
+ padding:12px 13px;
+ border-radius:8px;
+ border:1px solid transparent;
+ font-size:0.92rem;
+ line-height:1.55;
+}
+.notice.error {
+ display:block;
+ color:var(--danger);
+ background:#fff1f2;
+ border-color:#fecdd3;
+}
+.notice.success {
+ display:block;
+ color:var(--success);
+ background:#ecfdf5;
+ border-color:#a7f3d0;
+}
+.button {
+ width:100%;
+ border:0;
+ border-radius:999px;
+ background:linear-gradient(135deg, #0ea5e9, #0284c7);
+ color:#fff;
+ min-height:52px;
+ padding:0 20px;
+ font:inherit;
+ font-weight:900;
+ cursor:pointer;
+ box-shadow:0 14px 32px rgba(14,165,233,0.28);
+ transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+.button:hover { transform:translateY(-1px); box-shadow:0 18px 36px rgba(14,165,233,0.34); }
+.button:disabled { cursor:not-allowed; opacity:0.65; transform:none; box-shadow:none; }
+.footer-link {
+ display:block;
+ margin-top:18px;
+ text-align:center;
+ color:#486078;
+ font-size:0.9rem;
+ text-decoration:none;
+}
+.footer-link strong { color:var(--sky-dark); }
+.fallback {
+ margin-top:20px;
+ padding:14px;
+ border-radius:8px;
+ background:var(--soft);
+ color:#38506a;
+ font-size:0.87rem;
+ line-height:1.55;
+}
+@media (max-width: 860px) {
+ .shell {
+  min-height:auto;
+  grid-template-columns:1fr;
+  gap:28px;
+  width:min(100% - 28px, 520px);
+  padding:28px 0;
+ }
+ .brand { margin-bottom:26px; }
+ .intro { font-size:1rem; }
+ .trust-row { margin-top:20px; }
+ .card-head, .form { padding:22px; }
+}
+</style>
+</head>
+<body>
+<main class="shell">
+<section>
+<a class="brand" href="index.html" aria-label="Key2MD home">Key<span>2</span>MD</a>
+<p class="eyebrow">Account security</p>
+<h1>Reset your Key2MD password.</h1>
+<p class="intro">Choose a new password for your student account. Once it is updated, you can return to the practice tools and log in normally.</p>
+<div class="trust-row" aria-label="Password reset notes">
+<span class="pill">Secure reset link</span>
+<span class="pill">Expires after 1 hour</span>
+<span class="pill">New password required</span>
+</div>
+</section>
+
+<section class="card" aria-label="Reset password form">
+<div class="card-head">
+<h2>Set a new password</h2>
+<p>Use at least 8 characters. Your old password will stop working immediately after this is saved.</p>
+</div>
+<form class="form" id="resetForm" novalidate>
+<div class="notice" id="resetNotice" role="status" aria-live="polite"></div>
+<label class="field">
+<span class="label">New password</span>
+<input id="password" type="password" autocomplete="new-password" minlength="8" required>
+</label>
+<label class="field">
+<span class="label">Confirm password</span>
+<input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required>
+</label>
+<p class="hint">If this reset link has expired, request a fresh one from the login window.</p>
+<button class="button" id="submitBtn" type="submit">Update password</button>
+<a class="footer-link" href="practice.html"><strong>Return to practice</strong></a>
+<div class="fallback">Having trouble? Reply to any Key2MD email or contact Dan directly and the account can be checked manually.</div>
+</form>
+</section>
+</main>
+
+<script>
+(function () {
+ const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+ const form = document.getElementById('resetForm');
+ const notice = document.getElementById('resetNotice');
+ const password = document.getElementById('password');
+ const confirmPassword = document.getElementById('confirmPassword');
+ const submitBtn = document.getElementById('submitBtn');
+ const token = new URLSearchParams(window.location.search).get('token') || '';
+
+ function showNotice(message, type) {
+  notice.textContent = message;
+  notice.className = 'notice ' + type;
+ }
+
+ if (!token) {
+  showNotice('This reset link is missing its token. Please request a fresh password reset from the login window.', 'error');
+  submitBtn.disabled = true;
+ }
+
+ form.addEventListener('submit', async function (event) {
+  event.preventDefault();
+  if (!token) return;
+
+  const nextPassword = password.value;
+  const confirmation = confirmPassword.value;
+
+  if (nextPassword.length < 8) {
+   showNotice('Please choose a password with at least 8 characters.', 'error');
+   return;
+  }
+
+  if (nextPassword !== confirmation) {
+   showNotice('The two passwords do not match yet.', 'error');
+   return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Updating...';
+  notice.className = 'notice';
+  notice.textContent = '';
+
+  try {
+   const res = await fetch(API_BASE + '/api/auth/reset', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body:JSON.stringify({ token:token, password:nextPassword }),
+   });
+   const data = await res.json().catch(function () { return {}; });
+   if (!res.ok) throw new Error(data.error || 'This reset link is invalid or has expired.');
+   try { localStorage.removeItem('key2md_token'); } catch (error) {}
+   password.value = '';
+   confirmPassword.value = '';
+   showNotice('Password updated. You can now log in with your new password.', 'success');
+  } catch (error) {
+   showNotice(error.message || 'Password reset failed. Please request a fresh reset link.', 'error');
+  } finally {
+   submitBtn.disabled = false;
+   submitBtn.textContent = 'Update password';
+  }
+ });
+})();
+</script>
+</body>
+</html>
