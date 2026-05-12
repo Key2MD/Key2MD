@@ -2540,7 +2540,7 @@ async function loadWarmLeads() {
  } catch(e) {
  console.error('Warm leads load error:', e);
  if (status) status.textContent = `Warm leads failed: ${e.message}`;
- if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="padding:18px;color:var(--red);font-size:0.82rem;">${esc(e.message)}. Deploy the latest Worker if this endpoint is new.</td></tr>`;
+ if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="padding:18px;color:var(--red);font-size:0.82rem;">${esc(e.message)}. Refresh once after deploying the Worker; if it persists, check the Worker logs.</td></tr>`;
  if (empty) empty.classList.add('hidden');
  }
 }
