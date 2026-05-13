@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Full Mock Report - Key2MD</title>
+ <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+ <link rel="icon" href="/favicon.ico">
+ <script src="auth.js" defer></script>
+ <style>
+ *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+ :root{--navy:#0a1628;--teal:#0ea5e9;--teal3:#0284c7;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray400:#94a3b8;--gray600:#475569;--gray800:#1e293b;--white:#fff;--green:#16a34a;--amber:#d97706;--red:#dc2626}
+ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--gray50);color:var(--gray800);line-height:1.6}
+ a{color:inherit;text-decoration:none}
+ .topbar{background:rgba(10,22,40,.97);color:#fff;position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(255,255,255,.08)}
+ .topbar-inner{max-width:1180px;margin:0 auto;padding:15px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+ .logo{font-size:1.35rem;font-weight:900;letter-spacing:-.03em}.logo span{color:var(--teal)}
+ .nav-actions{display:flex;gap:10px;flex-wrap:wrap}.nav-actions a,.nav-actions button{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;border-radius:50px;padding:8px 13px;font:inherit;font-size:.8rem;font-weight:800;cursor:pointer}
+ .wrap{max-width:1180px;margin:0 auto;padding:34px 24px 64px}
+ .hero{background:var(--navy);color:#fff;border-radius:18px;overflow:hidden;margin-bottom:18px}
+ .hero-main{padding:30px 32px}.kicker{font-size:.68rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.52);margin-bottom:7px}
+ h1{font-size:clamp(1.65rem,3vw,2.35rem);line-height:1.12;margin-bottom:8px}.hero p{color:rgba(255,255,255,.7);font-size:.92rem;max-width:800px}
+ .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;padding:18px 32px;background:rgba(255,255,255,.04);border-top:1px solid rgba(255,255,255,.08)}
+ .stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px}.stat strong{display:block;font-size:1.3rem}.stat span{font-size:.68rem;color:rgba(255,255,255,.56);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+ .panel{background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px;margin-bottom:16px}
+ .panel h2{font-size:1.05rem;color:var(--navy);margin-bottom:8px}.panel p{font-size:.86rem;color:var(--gray600)}
+ .overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.tile{background:var(--gray50);border:1px solid var(--gray200);border-radius:12px;padding:14px}.tile strong{display:block;color:var(--navy);font-size:.82rem;margin-bottom:5px}.tile p{font-size:.82rem}
+ .notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:11px 13px;font-size:.8rem;margin-top:12px}
+ .manual{background:#f0fdf4;border-color:#bbf7d0}.manual strong{color:#14532d}.manual p{color:#166534;white-space:pre-wrap}
+ .station{background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:18px;margin-bottom:14px}
+ .station-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}.station-title{font-weight:900;color:var(--navy)}.score{font-weight:900;color:var(--teal3);white-space:nowrap}
+ .station-grid{display:grid;grid-template-columns:minmax(270px,.9fr) minmax(0,1.1fr);gap:16px;align-items:start}
+ .label{font-size:.66rem;font-weight:900;color:var(--teal3);letter-spacing:.09em;text-transform:uppercase;margin:10px 0 5px}
+ .text{font-size:.84rem;color:var(--gray600);line-height:1.7;white-space:pre-wrap}.box{background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:12px;max-height:230px;overflow:auto}
+ .video-box{background:#07111f;border-radius:12px;overflow:hidden;border:1px solid rgba(10,22,40,.18)}video{width:100%;aspect-ratio:16/9;background:#000;display:none}.load-video{width:100%;min-height:160px;border:0;background:#07111f;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font:inherit;cursor:pointer;padding:18px}.load-video span{font-size:.76rem;color:rgba(255,255,255,.64)}
+ .sync{max-height:270px;overflow:auto;border:1px solid var(--gray200);border-radius:10px;background:#fff;padding:8px;display:grid;gap:4px}.seg{width:100%;border:0;background:transparent;text-align:left;border-radius:8px;padding:7px 8px;font:inherit;font-size:.8rem;line-height:1.55;color:var(--gray600);cursor:pointer}.seg:hover{background:var(--gray50);color:var(--navy)}.seg.active{background:rgba(14,165,233,.11);color:var(--navy);box-shadow:inset 3px 0 0 var(--teal)}
+ .feedback{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.feedback .tile{padding:11px}.criteria{margin-top:12px;border:1px solid rgba(14,165,233,.18);background:rgba(14,165,233,.035);border-radius:12px;padding:12px}.criterion{padding:8px 0;border-top:1px solid var(--gray100)}.criterion:first-child{border-top:0}.criterion-head{display:flex;justify-content:space-between;gap:10px;font-size:.78rem;font-weight:850;color:var(--navy)}.criterion p{font-size:.76rem;color:var(--gray600);margin-top:4px}
+ .state{background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:44px 28px;text-align:center}.state h2{color:var(--navy);font-size:1.2rem;margin-bottom:6px}.btn{display:inline-flex;border:0;background:var(--teal);color:#fff;border-radius:50px;padding:11px 18px;font:inherit;font-size:.86rem;font-weight:850;cursor:pointer;margin-top:16px}
+ @media(max-width:760px){.station-grid,.feedback{grid-template-columns:1fr}.station-head{flex-direction:column}.topbar-inner{align-items:flex-start;flex-direction:column}}
+ @media print{.topbar,.nav-actions,.load-video,video{display:none!important}.wrap{padding:0}.hero,.panel,.station{break-inside:avoid;border-color:#ddd}.hero{color:#111;background:#fff}.hero p,.kicker{color:#555}.stats{background:#fff;border-top:1px solid #ddd}.stat{border-color:#ddd}.stat span{color:#555}}
+ </style>
+</head>
+<body>
+ <header class="topbar">
+ <div class="topbar-inner">
+ <a class="logo" href="index.html">Key<span>2</span>MD</a>
+ <div class="nav-actions">
+ <a href="history.html">Back to history</a>
+ <a href="full-casper-mock-exam.html">Take another mock</a>
+ <button type="button" onclick="window.print()">Print report</button>
+ </div>
+ </div>
+ </header>
+ <main class="wrap">
+ <div id="content" class="state"><h2>Loading your full mock report...</h2><p>Please wait while the report is opened securely.</p></div>
+ </main>
+ <script>
+ const API_BASE='https://key2md-api.brittainmbbs.workers.dev';
+ const TOKEN_KEY='key2md_token';
+ const content=document.getElementById('content');
+ let attempt=null;
+ function esc(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+ function attr(value){return esc(value).replace(/`/g,'&#96;');}
+ function fmtDate(value){if(!value)return '';try{return new Intl.DateTimeFormat('en-AU',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));}catch{return String(value);}}
+ function fmtDuration(sec){const s=Math.max(0,Math.round(Number(sec)||0));return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
+ function scoreColor(score){const n=Number(score);if(!Number.isFinite(n))return'var(--gray400)';if(n>=7)return'var(--green)';if(n>=5.5)return'var(--teal3)';if(n>=4.5)return'var(--amber)';return'var(--red)';}
+ function rowScore(row){const n=Number(row.score);return Number.isFinite(n)?`${Math.round(n*10)/10}/10`:'-';}
+ function feedback(row){const fb=row.feedback||{},overall=fb.overall||{};return{strength:overall.biggest_strength||fb.strengths||fb.strength||'No specific strength returned.',improve:overall.biggest_improvement||fb.improvements||fb.improve||'No specific improvement returned.'};}
+ function paramsId(){return new URLSearchParams(location.search).get('id')||'';}
+ document.addEventListener('DOMContentLoaded',()=>{
+ Key2MDAuth.init({tool:'casper',apiBase:API_BASE,onAuthChange:user=>{if(user)loadReport();else showLogin();}});
+ });
+ function showLogin(){content.innerHTML=`<h2>Log in to view this report</h2><p>Your mock report is private to your account.</p><button class="btn" onclick="Key2MDAuth.showAuthModal('login')">Log in</button>`;}
+ async function loadReport(){
+ const id=paramsId(),token=localStorage.getItem(TOKEN_KEY);
+ if(!id){content.innerHTML='<h2>Missing report id</h2><p>Open this page from your history.</p>';return;}
+ try{
+ const res=await fetch(`${API_BASE}/api/casper-mock/attempt/${encodeURIComponent(id)}`,{headers:{Authorization:`Bearer ${token}`}});
+ const data=await res.json().catch(()=>({}));
+ if(!res.ok)throw new Error(data.message||data.error||'Could not load report.');
+ attempt=data.attempt; renderReport();
+ }catch(err){content.innerHTML=`<h2>Could not open report</h2><p>${esc(err.message||'Try again later.')}</p><a class="btn" href="history.html">Back to history</a>`;}
+ }
+ function renderReport(){
+ const rows=attempt.rows||[],report=attempt.report||{};
+ const videoRows=rows.filter(r=>r.type==='video'),typedRows=rows.filter(r=>r.type!=='video');
+ const manual=String(attempt.manual_review_notes||'').trim();
+ content.className='';
+ content.innerHTML=`
+ <section class="hero">
+ <div class="hero-main"><div class="kicker">Full CASPer mock report</div><h1>${esc(report.interpretation?.band||'Your mock report')}</h1><p>${esc(report.interpretation?.text||'Review your score pattern, station feedback, recordings, and transcripts from this full mock attempt.')}</p></div>
+ <div class="stats">
+ <div class="stat"><strong>${esc(report.overallAvg??'-')}</strong><span>Overall /10</span></div>
+ <div class="stat"><strong>${rows.length}</strong><span>Stations</span></div>
+ <div class="stat"><strong>${videoRows.length}</strong><span>Video</span></div>
+ <div class="stat"><strong>${typedRows.length}</strong><span>Typed</span></div>
+ <div class="stat"><strong>${esc(fmtDate(attempt.completed_at)||'-')}</strong><span>Completed</span></div>
+ </div>
+ </section>
+ <section class="panel">
+ <h2>Report summary</h2>
+ <div class="overview">
+ <div class="tile"><strong>${esc(report.oneThing?.title||'The one thing to fix')}</strong><p>${esc(report.oneThing?.body||'No repeated pattern was returned for this attempt.')}</p></div>
+ <div class="tile"><strong>${esc(report.actionPlan?.[0]?.title||'Next practice move')}</strong><p>${esc(report.actionPlan?.[0]?.detail||'Repeat the weakest station type under timing.')}</p></div>
+ <div class="tile"><strong>${esc(report.stamina?.label||'Stamina pattern')}</strong><p>${esc(report.stamina?.body||'Review the station list for early versus late performance.')}</p></div>
+ </div>
+ ${manual?`<div class="tile manual" style="margin-top:12px;"><strong>Dan's manual review result</strong><p>${esc(manual)}</p></div>`:''}
+ <div class="notice">Video recordings expire 30 days after the mock. Transcripts and feedback remain available so you can still understand the marking.</div>
+ </section>
+ ${rows.map(stationHTML).join('')}`;
+ }
+ function stationHTML(row,index){
+ const isVideo=row.type==='video',title=`${isVideo?'Video':'Typed'} ${row.localIndex||index+1}`;
+ const fb=feedback(row);
+ return `<section class="station">
+ <div class="station-head"><div><div class="station-title">${esc(title)} - ${esc(row.station?.category||'CASPer')}</div><div class="text" style="font-size:.75rem;color:var(--gray400);">${esc(row.tier||(isVideo?attempt.tier:'typed'))}</div></div><div class="score" style="color:${scoreColor(row.score)}">${esc(rowScore(row))}</div></div>
+ <div class="station-grid">
+ <div>${isVideo?videoHTML(row,index):typedHTML(row)}</div>
+ <div><div class="label">Scenario</div><div class="text">${esc(row.station?.scenario||'')}</div>${promptsHTML(row)}
+ <div class="feedback"><div class="tile"><strong>Strength</strong><p>${esc(fb.strength)}</p></div><div class="tile"><strong>Improve</strong><p>${esc(fb.improve)}</p></div></div>${criteriaHTML(row)}</div>
+ </div></section>`;
+ }
+ function promptsHTML(row){return row.station?.prompt1||row.station?.prompt2?`<div class="label">Prompts</div><div class="text">${row.station?.prompt1?`1. ${esc(row.station.prompt1)}`:''}${row.station?.prompt2?`\n2. ${esc(row.station.prompt2)}`:''}</div>`:'';}
+ function typedHTML(row){return `<div class="label">Typed response</div><div class="box text">${esc(row.answer||'No typed response captured.')}</div>`;}
+ function videoHTML(row,index){
+ const id=`reportvid-${attempt.id}-${index}`.replace(/[^a-zA-Z0-9_-]/g,'');
+ const canLoad=row.recording_key&&!attempt.expired;
+ const segs=Array.isArray(row.transcript_segments)?row.transcript_segments:[];
+ return `<div class="video-box"><video id="${attr(id)}" controls playsinline preload="metadata" data-attempt-id="${attr(attempt.id)}" data-recording-key="${attr(row.recording_key||'')}"></video>${canLoad?`<button type="button" class="load-video" onclick="loadRecording(event,'${attr(id)}')"><strong>Load recording</strong><span>Authenticated playback. Expires ${esc(fmtDate(attempt.expires_at))}.</span></button>`:`<div class="load-video" style="cursor:default;"><strong>${attempt.expired?'Recording expired':'No recording saved'}</strong><span>${attempt.expired?'The 30-day playback window has passed.':'Transcript and feedback are still shown below.'}</span></div>`}</div>${row.duration_sec?`<div class="text" style="font-size:.75rem;margin-top:7px;color:var(--gray400);">Duration ${esc(fmtDuration(row.duration_sec))}</div>`:''}${segs.length?`<div class="label">Synced transcript</div>${syncHTML(id,segs)}`:(row.transcript?`<div class="label">Transcript used for marking</div><div class="box text">${esc(row.transcript)}</div>`:'')}`;
+ }
+ function syncHTML(videoId,segs){return `<div class="sync" data-sync-for="${attr(videoId)}">${segs.map(seg=>`<button type="button" class="seg" data-start="${attr(seg.start||0)}" data-end="${attr(seg.end||seg.start||0)}" onclick="jumpTranscript('${attr(videoId)}',${Number(seg.start||0)})">${esc(seg.text||'')}</button>`).join('')}</div>`;}
+ function criteriaHTML(row){
+ const fb=row.feedback||{};
+ if(row.type==='video'){
+ const items=[];(fb.per_prompt||[]).forEach((prompt,i)=>{Object.entries(prompt.scores||{}).forEach(([key,value])=>{const score=Number(value?.score);items.push(`<div class="criterion"><div class="criterion-head"><span>Prompt ${i+1} ${esc(key.replace(/_/g,' '))}</span><span style="color:${scoreColor(score)}">${Number.isFinite(score)?score+'/10':'-'}</span></div><p>${esc(value?.comment||value?.label||'')}</p></div>`);});});
+ return items.length?`<div class="criteria">${items.join('')}</div>`:'';
+ }
+ const raw=fb.competencies,items=Array.isArray(raw)?raw:(raw?Object.entries(raw).map(([key,value])=>typeof value==='object'?{name:key,...value}:{name:key,score:value}):[]);
+ return items.length?`<div class="criteria">${items.map(item=>{const score=Number(item.score);return`<div class="criterion"><div class="criterion-head"><span>${esc(item.name||item.competency||'Competency')}</span><span style="color:${scoreColor(score)}">${Number.isFinite(score)?score+'/10':'-'}</span></div><p>${esc(item.improve||item.improvement||item.evidence||item.reason||item.note||'')}</p></div>`;}).join('')}</div>`:'';
+ }
+ async function loadRecording(event,videoId){
+ event?.stopPropagation?.();const video=document.getElementById(videoId),btn=event?.currentTarget;if(!video)return;
+ if(video.dataset.loaded==='1'){video.style.display='block';video.play().catch(()=>{});return;}
+ if(btn){btn.disabled=true;btn.querySelector('span').textContent='Loading secure playback...';}
+ try{
+ const token=localStorage.getItem(TOKEN_KEY);
+ const res=await fetch(`${API_BASE}/api/casper-mock/recording?attempt_id=${encodeURIComponent(video.dataset.attemptId||'')}&key=${encodeURIComponent(video.dataset.recordingKey||'')}`,{headers:{Authorization:`Bearer ${token}`}});
+ if(!res.ok){const data=await res.json().catch(()=>({}));throw new Error(data.message||data.error||'Recording unavailable.');}
+ const blob=await res.blob(),url=URL.createObjectURL(blob);
+ video.dataset.loaded='1';video.dataset.blobUrl=url;video.src=url;video.style.display='block';bindSync(video);if(btn)btn.style.display='none';video.play().catch(()=>{});
+ }catch(err){if(btn){btn.disabled=false;btn.innerHTML=`<strong>Could not load recording</strong><span>${esc(err.message||'Try again later.')}</span>`;}}
+ }
+ function bindSync(video){if(video.dataset.syncBound==='1')return;video.dataset.syncBound='1';video.addEventListener('timeupdate',()=>syncTranscript(video.id,video.currentTime||0));video.addEventListener('seeked',()=>syncTranscript(video.id,video.currentTime||0));}
+ function syncTranscript(videoId,time){const wrap=document.querySelector(`[data-sync-for="${CSS.escape(videoId)}"]`);if(!wrap)return;let active=null;wrap.querySelectorAll('.seg').forEach(btn=>{const start=Number(btn.dataset.start||0),end=Number(btn.dataset.end||start+2),on=time>=start&&time<Math.max(end,start+.8);btn.classList.toggle('active',on);if(on)active=btn;});if(active&&wrap.dataset.lastActive!==String(active.dataset.start)){wrap.dataset.lastActive=String(active.dataset.start);active.scrollIntoView({block:'nearest'});}}
+ function jumpTranscript(videoId,start){const video=document.getElementById(videoId);if(!video)return;video.currentTime=Math.max(0,Number(start)||0);syncTranscript(videoId,video.currentTime);if(video.dataset.loaded==='1')video.play().catch(()=>{});}
+ </script>
+</body>
+</html>

@@ -16,6 +16,7 @@ window.FullCasperMock = (() => {
  const STATION_TRANSITION_SECONDS = 10;
  const CASPER_REFLECTION_SECONDS = 30;
  const CASPER_TYPED_SECONDS = 210;
+ const MOCK_DRAFT_KEY = 'k2md_full_mock_draft_v1';
  const MOCK_PRICES = {
  transcript: { standard: 59, pro: 41, value: 69, video: 20 },
  premium: { standard: 79, pro: 55, value: 97, video: 48 },
@@ -41,6 +42,10 @@ window.FullCasperMock = (() => {
  let mockAttemptId = null;
  let savedAttemptId = null;
  let latestReport = null;
+ let draftTimer = null;
+ let pendingDraftAnswer = null;
+ let serverCheckpointBusy = false;
+ let queuedCheckpointReason = null;
 
  function byId(id) {
  return document.getElementById(id);
@@ -110,6 +115,149 @@ window.FullCasperMock = (() => {
  transitionTimer = null;
  transitionActive = false;
  transitionNextIndex = null;
+ }
+
+ function readMockDraft() {
+ try {
+ const draft = JSON.parse(localStorage.getItem(MOCK_DRAFT_KEY) || 'null');
+ if (!draft || !draft.attempt_id || draft.completed) return null;
+ return draft;
+ } catch {
+ return null;
+ }
+ }
+
+ function clearMockDraft() {
+ try { localStorage.removeItem(MOCK_DRAFT_KEY); } catch {}
+ }
+
+ function startDraftMonitor() {
+ clearInterval(draftTimer);
+ draftTimer = setInterval(() => saveMockDraft({ phase: 'autosave' }), 3000);
+ }
+
+ function stopDraftMonitor() {
+ clearInterval(draftTimer);
+ draftTimer = null;
+ }
+
+ function draftAgeText(draft) {
+ const updated = Date.parse(draft?.updated_at || '');
+ if (!Number.isFinite(updated)) return 'recently';
+ const mins = Math.max(0, Math.round((Date.now() - updated) / 60000));
+ if (mins < 1) return 'just now';
+ if (mins < 60) return `${mins} min ago`;
+ const hours = Math.round(mins / 60);
+ return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+ }
+
+ function serialiseSequenceForDraft() {
+ return sequence.map((item, i) => ({
+ type: item.type === 'video' ? 'video' : 'typed',
+ order: Number(item.order || i + 1),
+ station: item.station || null,
+ }));
+ }
+
+ function saveMockDraft(extra = {}) {
+ if (!active || !started || !mockAttemptId) return;
+ try {
+ const bridge = window.K2PracticeBridge;
+ bridge?.saveAnswer?.();
+ const current = bridge?.getCurrentHistory?.() || null;
+ const item = sequence[index] || null;
+ const typedValue = byId('answerTextarea')?.value || current?.answer || '';
+ const draft = {
+ version: 1,
+ attempt_id: mockAttemptId,
+ saved_attempt_id: savedAttemptId,
+ tier: config.tier,
+ index,
+ updated_at: new Date().toISOString(),
+ sequence: serialiseSequenceForDraft(),
+ rows: serialiseAttemptRows(buildRows()),
+ current: item ? {
+ index,
+ type: item.type,
+ order: item.order,
+ station: item.station || current?.station || null,
+ answer: item.type === 'typed' ? typedValue : '',
+ } : null,
+ ...extra,
+ };
+ localStorage.setItem(MOCK_DRAFT_KEY, JSON.stringify(draft));
+ } catch {}
+ }
+
+ function hydrateResultsFromDraft(rows = []) {
+ return rows.map(row => ({
+ type: row.type === 'video' ? 'video' : 'typed',
+ station: row.station || null,
+ answer: row.answer || '',
+ score: row.score ?? null,
+ feedback: row.feedback || null,
+ feedbackTask: null,
+ feedbackSettled: true,
+ transcript: row.transcript || '',
+ transcriptSegments: Array.isArray(row.transcript_segments) ? row.transcript_segments : [],
+ reviewId: row.review_id || null,
+ recordingKey: row.recording_key || null,
+ durationSec: row.duration_sec || null,
+ processingError: row.processing_error || null,
+ tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
+ }));
+ }
+
+ function restoreDraft() {
+ const draft = readMockDraft();
+ if (!draft) return;
+ active = true;
+ started = true;
+ config.tier = draft.tier === 'premium' ? 'premium' : 'transcript';
+ sequence = Array.isArray(draft.sequence) ? draft.sequence.map((item, i) => ({
+ type: item.type === 'video' ? 'video' : 'typed',
+ order: Number(item.order || i + 1),
+ station: item.station || null,
+ })) : [];
+ results = hydrateResultsFromDraft(draft.rows || []);
+ index = Math.max(0, Math.min(Number(draft.index || results.length || 0), Math.max(sequence.length - 1, 0)));
+ mockAttemptId = draft.attempt_id;
+ savedAttemptId = draft.saved_attempt_id || draft.attempt_id;
+ latestReport = null;
+ pendingDraftAnswer = draft.current?.type === 'typed' && Number(draft.current.index) === index ? draft.current : null;
+ stationToken += 1;
+ advancing = false;
+ rulesAccepted = true;
+ window.K2_ACTIVE_CASPER_MOCK = { tier: config.tier, attempt_id: mockAttemptId };
+ byId('casperMockMainArea')?.style.setProperty('display', 'none');
+ setTier(config.tier);
+ startDraftMonitor();
+ launchCurrent();
+ }
+
+ function discardDraft() {
+ clearMockDraft();
+ renderIdle();
+ }
+
+ async function checkpointMockAttempt(reason = 'station') {
+ if (!mockAttemptId || !results.length) return;
+ if (serverCheckpointBusy) {
+ queuedCheckpointReason = reason;
+ return;
+ }
+ serverCheckpointBusy = true;
+ try {
+ await saveMockAttempt(buildRows(), null, 'in_progress');
+ saveMockDraft({ phase: reason, checkpointed_at: new Date().toISOString() });
+ } catch (err) {
+ saveMockDraft({ phase: reason, checkpoint_error: err.message || 'Checkpoint failed' });
+ } finally {
+ serverCheckpointBusy = false;
+ const nextReason = queuedCheckpointReason;
+ queuedCheckpointReason = null;
+ if (nextReason) checkpointMockAttempt(nextReason);
+ }
  }
 
  function hideStationReflection() {
@@ -402,6 +550,7 @@ window.FullCasperMock = (() => {
  }
 
  function deactivateMockMode() {
+ saveMockDraft({ phase: 'paused' });
  active = false;
  started = false;
  advancing = false;
@@ -412,6 +561,7 @@ window.FullCasperMock = (() => {
  clearDoneMonitor();
  clearTransitionTimer();
  clearInterval(breakTimer);
+ stopDraftMonitor();
  byId('casperMockConfigPanel')?.style.setProperty('display', 'none');
  const area = byId('casperMockMainArea');
  if (area) area.style.display = 'none';
@@ -465,11 +615,25 @@ window.FullCasperMock = (() => {
  function renderIdle() {
  const area = ensureMainArea();
  if (!area) return;
+ const draft = readMockDraft();
+ const draftBanner = draft ? `
+ <div style="max-width:720px;margin:0 auto 18px;background:#ecfeff;border:1px solid rgba(14,165,233,0.26);border-radius:12px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;flex-wrap:wrap;">
+ <div>
+ <div style="font-size:0.75rem;font-weight:900;color:var(--navy);">Saved mock draft found</div>
+ <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;">Last saved ${esc(draftAgeText(draft))}. Restore it to continue from station ${Number(draft.index || 0) + 1}.</div>
+ </div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;">
+ <button type="button" onclick="FullCasperMock.restoreDraft()" style="padding:9px 14px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:850;cursor:pointer;font-family:inherit;">Restore draft</button>
+ <button type="button" onclick="FullCasperMock.discardDraft()" style="padding:9px 14px;border-radius:50px;border:1px solid rgba(14,165,233,0.25);background:#fff;color:var(--teal3);font-size:0.78rem;font-weight:850;cursor:pointer;font-family:inherit;">Discard</button>
+ </div>
+ </div>
+ ` : '';
  area.innerHTML = `
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:34px 32px;text-align:center;">
  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Full CASPer Mock Exam</div>
  <h2 style="font-size:1.7rem;line-height:1.2;color:var(--navy);margin:0 0 10px;">Practise the full sequence in one sitting.</h2>
  <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with the optional breaks built in. The stations are completely new and handwritten by Dan, so it feels like a fresh exam rather than recycled practice.</p>
+ ${draftBanner}
  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:720px;margin:0 auto 26px;text-align:left;">
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
  <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">4 video stations</div>
@@ -575,10 +739,13 @@ window.FullCasperMock = (() => {
  mockAttemptId = mock.attempt_id;
  savedAttemptId = null;
  latestReport = null;
+ pendingDraftAnswer = null;
  stationToken = 0;
  advancing = false;
  started = true;
  window.K2_ACTIVE_CASPER_MOCK = { tier: config.tier, attempt_id: mockAttemptId };
+ startDraftMonitor();
+ saveMockDraft({ phase: 'started' });
  setCheckoutState(false);
  byId('casperMockMainArea')?.style.setProperty('display', 'none');
  launchCurrent();
@@ -649,10 +816,20 @@ window.FullCasperMock = (() => {
  await Promise.all(tasks.map(async ({ row }) => {
  try {
  const data = await withAnalysisTimeout(row.feedbackTask, row);
+ applyMockFeedbackData(row, data);
+ } catch (err) {
+ applyMockFeedbackError(row, err);
+ }
+ }));
+ }
+
+ function applyMockFeedbackData(row, data) {
+ if (!row || row.feedbackSettled) return;
  row.feedbackSettled = true;
  if (row.type === 'video') {
  row.feedback = data?.feedback || null;
  row.transcript = data?.transcript || '';
+ row.transcriptSegments = Array.isArray(data?.transcript_segments) ? data.transcript_segments : [];
  row.rawFeedback = data || null;
  row.reviewId = data?.review_id || null;
  row.recordingKey = data?.recording_url || null;
@@ -660,11 +837,12 @@ window.FullCasperMock = (() => {
  row.score = Number.isFinite(Number(data?.score)) ? Number(data.score) : null;
  row.feedback = data?.feedback || null;
  }
- } catch (err) {
- row.feedbackSettled = true;
- row.processingError = err.message || 'Feedback processing failed.';
  }
- }));
+
+ function applyMockFeedbackError(row, err) {
+ if (!row || row.feedbackSettled) return;
+ row.feedbackSettled = true;
+ row.processingError = err?.message || 'Feedback processing failed.';
  }
 
  function serialiseAttemptRows(rows = buildRows()) {
@@ -677,6 +855,7 @@ window.FullCasperMock = (() => {
  score: row.score10,
  feedback: row.feedback || null,
  transcript: row.transcript || '',
+ transcript_segments: row.transcriptSegments || row.transcript_segments || row.rawFeedback?.transcript_segments || [],
  review_id: row.reviewId || row.rawFeedback?.review_id || null,
  recording_key: row.recordingKey || row.rawFeedback?.recording_url || null,
  duration_sec: row.durationSec || row.duration_sec || row.rawFeedback?.durationSec || null,
@@ -685,17 +864,19 @@ window.FullCasperMock = (() => {
  }));
  }
 
- async function saveMockAttempt(rows = buildRows(), report = latestReport) {
+ async function saveMockAttempt(rows = buildRows(), report = latestReport, status = report ? 'completed' : 'in_progress') {
  const auth = getAuth();
  const token = auth?.getToken?.();
  if (!token || !mockAttemptId) throw new Error('Sign in required to save this mock attempt.');
+ const finalStatus = status === 'in_progress' ? 'in_progress' : 'completed';
  const res = await fetch(`${apiBase()}/api/casper-mock/attempts`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
  body: JSON.stringify({
  attempt_id: mockAttemptId,
  tier: config.tier,
- completed_at: new Date().toISOString(),
+ status: finalStatus,
+ completed_at: finalStatus === 'completed' ? new Date().toISOString() : null,
  rows: serialiseAttemptRows(rows),
  report,
  }),
@@ -830,6 +1011,21 @@ window.FullCasperMock = (() => {
  readingTime: CASPER_REFLECTION_SECONDS,
  writingTime: CASPER_TYPED_SECONDS,
  });
+ if (pendingDraftAnswer && Number(pendingDraftAnswer.index) === index) {
+ const answer = String(pendingDraftAnswer.answer || '');
+ setTimeout(() => {
+ const textarea = byId('answerTextarea');
+ const current = bridge.getCurrentHistory?.();
+ if (textarea && answer && !textarea.value) {
+ textarea.value = answer;
+ textarea.dispatchEvent(new Event('input', { bubbles: true }));
+ }
+ if (current && answer && !current.answer) current.answer = answer;
+ bridge.saveAnswer?.();
+ pendingDraftAnswer = null;
+ saveMockDraft({ phase: 'restored_current_answer' });
+ }, 120);
+ }
  keepMockModeChrome();
  hideStationReflection();
  }
@@ -1070,7 +1266,7 @@ window.FullCasperMock = (() => {
  const current = bridge?.getCurrentHistory?.();
  const isVideoSubmission = payload?.kind === 'mock_video_submission';
  const isWrittenSubmission = payload?.kind === 'mock_written_submission';
- results.push({
+ const submittedRow = {
  type: item.type,
  station: item.station,
  answer: isWrittenSubmission ? payload.answer || '' : current?.answer || '',
@@ -1081,8 +1277,22 @@ window.FullCasperMock = (() => {
  durationSec: isVideoSubmission ? payload.durationSec : null,
  processingError: null,
  tier: item.type === 'video' ? config.tier : 'typed',
+ };
+ results.push(submittedRow);
+ if (submittedRow.feedbackTask) {
+ submittedRow.feedbackTask.then(data => {
+ applyMockFeedbackData(submittedRow, data);
+ saveMockDraft({ phase: 'analysis_saved' });
+ checkpointMockAttempt('analysis_saved');
+ }).catch(err => {
+ applyMockFeedbackError(submittedRow, err);
+ saveMockDraft({ phase: 'analysis_failed' });
+ checkpointMockAttempt('analysis_failed');
  });
+ }
  bridge?.completeCurrentStation?.();
+ saveMockDraft({ phase: 'station_saved' });
+ checkpointMockAttempt('station_saved');
 
  const nextIndex = index + 1;
  renderStationTransition(nextIndex, item.type);
@@ -1674,6 +1884,7 @@ window.FullCasperMock = (() => {
  async function renderDebrief() {
  started = false;
  rulesAccepted = false;
+ stopDraftMonitor();
  restoreSubmit();
  window.K2_ACTIVE_CASPER_MOCK = null;
  window.K2PracticeBridge?.hardStopSession?.();
@@ -1764,7 +1975,9 @@ window.FullCasperMock = (() => {
  </div>
  `;
  setTimeout(() => showReviewStation(0), 0);
- saveMockAttempt(rows, latestReport).catch(err => {
+ saveMockAttempt(rows, latestReport, 'completed').then(() => {
+ clearMockDraft();
+ }).catch(err => {
  const status = byId('mockManualReviewStatus');
  if (status) status.textContent = `Mock report visible. Manual review checkout will retry saving if needed: ${err.message}`;
  });
@@ -1949,11 +2162,12 @@ window.FullCasperMock = (() => {
  const presentation = row.feedback?.presentation;
  return `
  <div style="display:grid;grid-template-columns:minmax(min(100%,320px),0.9fr) minmax(0,1.1fr);gap:20px;align-items:start;">
- <div>
- ${mockVideoPlayerHtml(row, 'mockStationVideoPlayer')}
- <div style="font-size:0.76rem;color:var(--gray400);line-height:1.45;margin-top:8px;">${esc(rowScoreLabel(row))} - ${esc(row.station?.category || 'Video station')}</div>
- ${row.transcript ? `<div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:12px;margin-top:12px;"><div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Transcript</div><div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;max-height:190px;overflow:auto;">${esc(row.transcript)}</div></div>` : ''}
- </div>
+	 <div>
+	 ${mockVideoPlayerHtml(row, 'mockStationVideoPlayer')}
+	 <div style="font-size:0.76rem;color:var(--gray400);line-height:1.45;margin-top:8px;">${esc(rowScoreLabel(row))} - ${esc(row.station?.category || 'Video station')}</div>
+	 <div style="font-size:0.72rem;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:9px 10px;line-height:1.45;margin-top:10px;">Recording playback is kept for 30 days after the mock. Save any notes you need before it expires.</div>
+	 ${row.transcript ? `<div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:12px;margin-top:12px;"><div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Transcript used for marking</div><div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;max-height:230px;overflow:auto;">${esc(row.transcript)}</div></div>` : ''}
+	 </div>
  <div style="display:grid;gap:14px;">
  ${scenarioPromptHtml(row)}
  ${videoFeedbackHtml(row)}
@@ -2183,12 +2397,12 @@ window.FullCasperMock = (() => {
  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#f8fafc;border:1px solid var(--gray200);border-radius:14px;padding:14px 16px;margin-bottom:18px;">
  <div>
  <div style="font-size:0.78rem;font-weight:900;color:var(--navy);">Save the useful part</div>
- <div style="font-size:0.76rem;color:var(--gray500);line-height:1.45;">Copy a plain-English summary, print the report, or return to your tracked student journey.</div>
+	 <div style="font-size:0.76rem;color:var(--gray500);line-height:1.45;">Copy a plain-English summary, print the tailored report, or review the full mock later in History.</div>
  </div>
  <div style="display:flex;gap:8px;flex-wrap:wrap;">
  <button type="button" onclick="FullCasperMock.copyReportSummary()" class="btn-restart btn-restart-outline" style="padding:10px 14px;">Copy summary</button>
  <button type="button" onclick="FullCasperMock.printReport()" class="btn-restart btn-restart-outline" style="padding:10px 14px;">Print report</button>
- <a href="student-journey.html" class="btn-restart" style="padding:10px 14px;text-decoration:none;">Open My Journey</a>
+	 <a href="history.html" class="btn-restart" style="padding:10px 14px;text-decoration:none;">Open History</a>
  </div>
  <div id="mockReportActionStatus" style="width:100%;font-size:0.74rem;color:var(--gray500);line-height:1.4;"></div>
  </div>
@@ -2277,9 +2491,132 @@ window.FullCasperMock = (() => {
  }
  }
 
- function printReport() {
- window.print();
- }
+	 function printReport() {
+	 const html = buildPrintableMockReportHtml(latestReport, finalReviewRows);
+	 const popup = window.open('', '_blank', 'noopener,noreferrer');
+	 if (!popup) {
+	 const status = byId('mockReportActionStatus');
+	 if (status) status.textContent = 'Your browser blocked the print window. Allow popups for Key2MD, then try again.';
+	 return;
+	 }
+	 popup.document.open();
+	 popup.document.write(html);
+	 popup.document.close();
+	 popup.focus();
+	 setTimeout(() => popup.print(), 250);
+	 }
+
+	 function buildPrintableMockReportHtml(report = latestReport, rows = finalReviewRows) {
+	 const studentName = getAuth()?.getUser?.()?.name || 'Student';
+	 const printedAt = new Date().toLocaleString('en-AU', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+	 const stationRows = (rows || []).map(printStationHtml).join('');
+	 const criteriaRows = (report?.criteria || []).filter(c => Number.isFinite(c.avg)).map(c => `
+	 <div class="crit">
+	 <div><strong>${esc(c.label)}</strong><span>${esc(c.n)} station${c.n === 1 ? '' : 's'}</span></div>
+	 <b>${esc(c.avg)}/10</b>
+	 </div>
+	 `).join('');
+	 const actionRows = (report?.actionPlan || []).map((action, i) => `
+	 <li><strong>${i + 1}. ${esc(action.title || action.label || 'Action')}</strong><br>${esc(action.detail || '')}</li>
+	 `).join('');
+	 return `<!doctype html>
+	 <html lang="en-AU">
+	 <head>
+	 <meta charset="utf-8">
+	 <title>Key2MD Full CASPer Mock Report</title>
+	 <style>
+	 *{box-sizing:border-box}body{margin:0;background:#eef3f7;color:#122033;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;line-height:1.55}.page{max-width:980px;margin:0 auto;padding:34px 30px 50px}.hero{background:#0a1628;color:#fff;border-radius:10px;padding:28px 30px;margin-bottom:18px}.kicker{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#38bdf8;margin-bottom:7px}h1{font-size:28px;line-height:1.15;margin:0 0 8px}h2{font-size:18px;color:#0a1628;margin:0 0 10px}.hero p{margin:0;color:rgba(255,255,255,.72)}.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}.metric,.card,.station{background:#fff;border:1px solid #dbe4ee;border-radius:8px;padding:14px}.metric b{display:block;color:#0a1628;font-size:19px}.metric span{display:block;color:#64748b;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{margin-bottom:14px}.one{font-size:15px;color:#334155}.actions{padding-left:20px;margin:6px 0 0}.actions li{margin-bottom:9px}.crit{display:flex;justify-content:space-between;gap:14px;border-top:1px solid #e2e8f0;padding:9px 0}.crit:first-child{border-top:0}.crit span{display:block;color:#64748b;font-size:12px}.station{break-inside:avoid;margin:14px 0}.station-head{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #e2e8f0;padding-bottom:9px;margin-bottom:10px}.station-title{font-weight:900;color:#0a1628}.score{font-weight:900;color:#0284c7;white-space:nowrap}.label{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#0284c7;margin:12px 0 4px}.text{white-space:pre-wrap;font-size:13px;color:#334155}.note-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.note{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px}.note strong{display:block;color:#0a1628;font-size:12px;margin-bottom:3px}.criteria{margin-top:8px}.criterion{display:grid;grid-template-columns:130px 1fr;gap:10px;border-top:1px solid #e2e8f0;padding:8px 0;font-size:12px}.criterion b{color:#0a1628}.footer{color:#64748b;font-size:12px;margin-top:18px}@media print{body{background:#fff}.page{padding:0}.hero,.metric,.card,.station{box-shadow:none}.hero{border-radius:0}.no-print{display:none}}
+	 </style>
+	 </head>
+	 <body>
+	 <main class="page">
+	 <section class="hero">
+	 <div class="kicker">Key2MD Full CASPer Mock Report</div>
+	 <h1>${esc(studentName)} - full mock summary</h1>
+	 <p>Generated ${esc(printedAt)}. This is a Key2MD practice report, not an official Acuity result.</p>
+	 </section>
+	 <section class="meta">
+	 <div class="metric"><b>${Number.isFinite(report?.overallAvg) ? esc(report.overallAvg) + '/10' : '-'}</b><span>Overall practice signal</span></div>
+	 <div class="metric"><b>${esc((rows || []).length)}</b><span>Stations completed</span></div>
+	 <div class="metric"><b>${esc((rows || []).filter(r => r.type === 'video').length)}</b><span>Video stations</span></div>
+	 <div class="metric"><b>${esc((rows || []).filter(r => r.type !== 'video').length)}</b><span>Typed stations</span></div>
+	 </section>
+	 <section class="grid">
+	 <div class="card"><h2>${esc(report?.interpretation?.band || 'Overall interpretation')}</h2><div class="one">${esc(report?.interpretation?.text || 'No overall interpretation returned yet.')}</div></div>
+	 <div class="card"><h2>The one thing to fix</h2><div class="one"><strong>${esc(report?.oneThing?.title || 'Awaiting pattern data')}</strong><br>${esc(report?.oneThing?.body || '')}</div></div>
+	 </section>
+	 <section class="card"><h2>Action plan</h2><ol class="actions">${actionRows || '<li>Review each station below and pick one repeated weakness to practise next.</li>'}</ol></section>
+	 <section class="card"><h2>Criterion snapshot</h2>${criteriaRows || '<div class="text">Criterion data is still processing.</div>'}</section>
+	 <section><h2>Station-by-station summary</h2>${stationRows || '<div class="station">No stations captured.</div>'}</section>
+	 <div class="footer">Video recordings and mock data are retained for 30 days. Use the History page to review available recordings and transcripts while they are still stored.</div>
+	 </main>
+	 </body>
+	 </html>`;
+	 }
+
+	 function printStationHtml(row) {
+	 const isVideo = row?.type === 'video';
+	 const title = `${isVideo ? 'Video' : 'Typed'} ${row?.localIndex || row?.order || ''}`.trim();
+	 const station = row?.station || {};
+	 const fb = row?.feedback || {};
+	 const overall = fb.overall || {};
+	 const strength = isVideo ? overall.biggest_strength : fb.strengths;
+	 const improve = isVideo ? overall.biggest_improvement : fb.improvements;
+	 const answerLabel = isVideo ? 'Transcript excerpt' : 'Student response excerpt';
+	 const answerText = isVideo ? row?.transcript : row?.answer;
+	 return `<article class="station">
+	 <div class="station-head">
+	 <div><div class="station-title">${esc(title)} - ${esc(station.category || 'CASPer')}</div><div class="text">${esc(station.scenario || '')}</div></div>
+	 <div class="score">${esc(rowScoreLabel(row))}</div>
+	 </div>
+	 ${station.prompt1 || station.prompt2 ? `<div class="label">Prompts</div><div class="text">${station.prompt1 ? `1. ${esc(station.prompt1)}` : ''}${station.prompt2 ? `\n2. ${esc(station.prompt2)}` : ''}</div>` : ''}
+	 <div class="label">${answerLabel}</div>
+	 <div class="text">${esc(truncateText(answerText || 'No response captured.', 900))}</div>
+	 <div class="note-grid">
+	 <div class="note"><strong>Strength</strong>${esc(strength || 'No specific strength returned.')}</div>
+	 <div class="note"><strong>Improve</strong>${esc(improve || 'No specific improvement returned.')}</div>
+	 </div>
+	 ${isVideo ? printVideoCriteriaHtml(fb.per_prompt || []) : printTypedCompetenciesHtml(fb.competencies)}
+	 </article>`;
+	 }
+
+	 function printVideoCriteriaHtml(prompts) {
+	 const rows = [];
+	 (prompts || []).forEach((prompt, i) => {
+	 Object.entries(prompt?.scores || {}).forEach(([key, value]) => {
+	 const score = Number(value?.score);
+	 const label = key.replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase());
+	 rows.push(`<div class="criterion"><b>Prompt ${i + 1} ${esc(label)}${Number.isFinite(score) ? ` (${score}/10)` : ''}</b><span>${esc(value?.comment || value?.label || '')}</span></div>`);
+	 });
+	 });
+	 return rows.length ? `<div class="criteria"><div class="label">Video criteria</div>${rows.join('')}</div>` : '';
+	 }
+
+	 function printTypedCompetenciesHtml(raw) {
+	 const comps = normalizeTypedCompetenciesForPrint(raw);
+	 if (!comps.length) return '';
+	 return `<div class="criteria"><div class="label">Typed competencies</div>${comps.map(comp => `
+	 <div class="criterion"><b>${esc(comp.name)}${Number.isFinite(comp.score) ? ` (${comp.score}/10)` : ''}</b><span>${esc(comp.note || '')}</span></div>
+	 `).join('')}</div>`;
+	 }
+
+	 function normalizeTypedCompetenciesForPrint(raw) {
+	 if (!raw) return [];
+	 const list = Array.isArray(raw) ? raw : Object.entries(raw).map(([key, value]) => typeof value === 'object' ? { name: key, ...value } : { name: key, score: value });
+	 return list.map(item => {
+	 const score = Number(item.score);
+	 return {
+	 name: item.name || item.competency || item.label || 'Competency',
+	 score: Number.isFinite(score) ? Math.round(score * 10) / 10 : null,
+	 note: item.improve || item.improvement || item.next_step || item.nextStep || item.evidence || item.reason || item.note || item.comment || '',
+	 };
+	 }).filter(item => item.name);
+	 }
+
+	 function truncateText(value, max = 500) {
+	 const clean = String(value || '').replace(/\s+/g, ' ').trim();
+	 return clean.length > max ? clean.slice(0, max - 3) + '...' : clean;
+	 }
 
  function renderCriterionHeatmap(criteria) {
  const rows = criteria.map(c => {
@@ -2445,6 +2782,8 @@ window.FullCasperMock = (() => {
  setTier,
  refreshPricing,
  checkoutMock,
+ restoreDraft,
+ discardDraft,
  proceedAfterRules,
  continueAfterStation,
  enableCameraAndStartVideoStation,

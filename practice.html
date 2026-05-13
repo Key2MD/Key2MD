@@ -1620,7 +1620,7 @@ async function submitMMIForFeedback() {
 function createMMIMockReviewSnapshot() {
  const isPremium = mmiPremiumMode;
  const tier = isPremium ? 'premium' : 'transcript';
- const requireVideoUpload = !!window.K2_ACTIVE_CASPER_MOCK && isPremium;
+ const requireVideoUpload = !!window.K2_ACTIVE_CASPER_MOCK;
  const snapshotRecordingBlob = recordingBlob || (recordedChunks.length ? new Blob(recordedChunks, { type: mediaRecorder?.mimeType || 'video/webm' }) : null);
  const snapshotAudioBlob = audioBlob || (audioChunks.length ? new Blob(audioChunks, { type: audioRecorder?.mimeType || 'audio/webm' }) : null);
  const uploadBlob = requireVideoUpload ? snapshotRecordingBlob : (snapshotAudioBlob || snapshotRecordingBlob);

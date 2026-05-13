@@ -45,7 +45,7 @@
  .logo { font-size:1.5rem; font-weight:800; color:var(--white); letter-spacing:-0.5px; }
  .logo span { color:var(--teal); }
 
- .page-wrap { max-width:900px; margin:0 auto; padding:100px 24px 60px; }
+	 .page-wrap { max-width:1120px; margin:0 auto; padding:100px 24px 60px; }
 
  /* Hero */
  .page-hero { margin-bottom:32px; }
@@ -69,7 +69,7 @@
  .result-count { font-size:0.82rem; color:var(--gray400); }
 
  /* Stats bar */
- .stats-bar { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:24px; }
+	 .stats-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
  .stat-card { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius-sm); padding:16px; text-align:center; }
  .stat-num { font-size:1.8rem; font-weight:800; color:var(--teal); display:block; }
  .stat-label { font-size:0.72rem; color:var(--gray400); font-weight:500; text-transform:uppercase; letter-spacing:0.06em; }
@@ -97,7 +97,54 @@
  .competency-row-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
  .competency-row-name { font-size:0.8rem; font-weight:700; color:var(--navy); }
  .competency-row-score { font-size:0.72rem; font-weight:800; white-space:nowrap; }
- .competency-row-detail { font-size:0.74rem; color:var(--gray600); line-height:1.5; margin-top:5px; }
+	 .competency-row-detail { font-size:0.74rem; color:var(--gray600); line-height:1.5; margin-top:5px; }
+
+	 /* Full mock history */
+	 .mock-history-section { background:linear-gradient(180deg,#fff,#f8fbff); border:1px solid rgba(14,165,233,0.22); border-radius:var(--radius); padding:20px; margin-bottom:22px; box-shadow:0 12px 34px rgba(14,165,233,0.08); }
+	 .mock-history-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px; }
+	 .mock-history-kicker { font-size:0.68rem; font-weight:850; letter-spacing:0.12em; text-transform:uppercase; color:var(--teal3); margin-bottom:4px; }
+	 .mock-history-title { font-size:1.08rem; font-weight:900; color:var(--navy); line-height:1.3; }
+	 .mock-history-sub { font-size:0.82rem; color:var(--gray600); line-height:1.55; margin-top:4px; max-width:720px; }
+	 .mock-history-list { display:grid; gap:14px; }
+	 .mock-card { background:#fff; border:1px solid var(--gray200); border-radius:14px; overflow:hidden; }
+	 .mock-card-header { width:100%; border:0; background:#fff; padding:16px 18px; display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:14px; align-items:center; text-align:left; cursor:pointer; font-family:inherit; }
+	 .mock-card-header:hover { background:var(--gray50); }
+	 .mock-card-title { font-size:0.94rem; font-weight:900; color:var(--navy); line-height:1.3; }
+	 .mock-card-meta { font-size:0.76rem; color:var(--gray400); line-height:1.45; margin-top:2px; }
+	 .mock-report-link { display:inline-flex; align-items:center; justify-content:center; padding:7px 11px; border-radius:50px; border:1px solid rgba(14,165,233,0.26); background:#fff; color:var(--teal3); font-size:0.72rem; font-weight:850; white-space:nowrap; }
+	 .mock-report-link:hover { background:rgba(14,165,233,0.08); }
+	 .mock-score { font-size:1.1rem; font-weight:900; color:var(--teal3); white-space:nowrap; }
+	 .mock-status-pill { border-radius:50px; padding:5px 10px; font-size:0.68rem; font-weight:850; background:rgba(14,165,233,0.1); color:var(--teal3); white-space:nowrap; }
+	 .mock-status-pill.warn { background:#fff7ed; color:#9a3412; }
+	 .mock-card-body { display:none; border-top:1px solid var(--gray100); padding:18px; }
+	 .mock-card.open .mock-card-body { display:block; }
+	 .mock-overview-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
+	 .mock-overview-tile { background:var(--gray50); border:1px solid var(--gray200); border-radius:12px; padding:13px 14px; }
+	 .mock-overview-tile strong { display:block; font-size:0.78rem; color:var(--navy); margin-bottom:4px; }
+	 .mock-overview-tile p { font-size:0.8rem; color:var(--gray600); line-height:1.55; margin:0; }
+	 .mock-station-list { display:grid; gap:12px; }
+	 .mock-station { border:1px solid var(--gray200); border-radius:12px; padding:14px; background:#fff; }
+	 .mock-station-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:10px; }
+	 .mock-station-title { font-size:0.86rem; font-weight:900; color:var(--navy); }
+	 .mock-station-score { font-size:0.78rem; font-weight:900; color:var(--teal3); white-space:nowrap; }
+	 .mock-station-grid { display:grid; grid-template-columns:minmax(240px,0.95fr) minmax(0,1.05fr); gap:14px; align-items:start; }
+	 .mock-section-label { font-size:0.66rem; font-weight:850; color:var(--teal3); letter-spacing:0.08em; text-transform:uppercase; margin:10px 0 5px; }
+	 .mock-text { font-size:0.82rem; color:var(--gray600); line-height:1.65; white-space:pre-wrap; }
+	 .mock-transcript { max-height:210px; overflow:auto; border:1px solid var(--gray200); border-radius:10px; background:var(--gray50); padding:11px 12px; }
+	 .mock-sync-transcript { max-height:250px; overflow:auto; border:1px solid var(--gray200); border-radius:10px; background:#fff; padding:8px; display:grid; gap:4px; }
+	 .mock-sync-segment { width:100%; border:0; background:transparent; color:var(--gray600); border-radius:8px; padding:7px 8px; text-align:left; font:inherit; font-size:0.8rem; line-height:1.55; cursor:pointer; }
+	 .mock-sync-segment:hover { background:var(--gray50); color:var(--navy); }
+	 .mock-sync-segment.active { background:rgba(14,165,233,0.11); color:var(--navy); box-shadow:inset 3px 0 0 var(--teal); }
+	 .mock-video-box { background:#07111f; border-radius:12px; overflow:hidden; border:1px solid rgba(10,22,40,0.16); }
+	 .mock-video-box video { width:100%; aspect-ratio:16/9; background:#000; display:none; }
+	 .mock-video-load { width:100%; min-height:150px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; border:0; background:#07111f; color:#fff; cursor:pointer; font-family:inherit; padding:18px; }
+	 .mock-video-load strong { font-size:0.9rem; }
+	 .mock-video-load span { font-size:0.75rem; color:rgba(255,255,255,0.62); line-height:1.45; }
+	 .mock-expiry-note { background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:10px; padding:9px 10px; font-size:0.76rem; line-height:1.45; margin:10px 0; }
+	 .mock-feedback-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+	 .mock-feedback-item { background:var(--gray50); border:1px solid var(--gray200); border-radius:10px; padding:10px 11px; }
+	 .mock-feedback-item strong { display:block; font-size:0.72rem; color:var(--navy); margin-bottom:4px; }
+	 .mock-feedback-item p { font-size:0.78rem; color:var(--gray600); line-height:1.5; margin:0; }
 
  /* Review cards */
  .reviews-list { display:flex; flex-direction:column; gap:14px; }
@@ -170,7 +217,7 @@
 
  /* Editable response */
  .response-edit-wrap { display:flex; flex-direction:column; gap:8px; }
- .response-textarea { width:100%; min-height:140px; padding:14px 16px; border:1.5px solid var(--gray200); border-radius:10px; font-size:0.87rem; color:var(--gray800); line-height:1.75; font-family:inherit; resize:vertical; outline:none; transition:border-color 0.2s; box-sizing:border-box; }
+	 .response-textarea { width:100%; min-height:220px; padding:14px 16px; border:1.5px solid var(--gray200); border-radius:10px; font-size:0.9rem; color:var(--gray800); line-height:1.75; font-family:inherit; resize:vertical; outline:none; transition:border-color 0.2s; box-sizing:border-box; }
  .response-textarea:focus { border-color:var(--teal); background:#fff; }
  .response-edit-actions { display:flex; align-items:center; gap:10px; }
  .btn-save-edit { padding:7px 18px; border-radius:50px; border:none; background:var(--teal); color:#fff; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background 0.2s; }
@@ -178,11 +225,13 @@
  .btn-save-edit:disabled { opacity:0.5; cursor:not-allowed; }
  .edit-save-status { font-size:0.75rem; color:var(--gray400); }
 
- @media (max-width: 700px) {
- .stats-bar { grid-template-columns:1fr 1fr; }
- .feedback-grid { grid-template-columns:1fr; }
- .competency-panel-header { flex-direction:column; align-items:stretch; }
- }
+	 @media (max-width: 700px) {
+	 .stats-bar { grid-template-columns:1fr 1fr; }
+	 .feedback-grid { grid-template-columns:1fr; }
+	 .competency-panel-header { flex-direction:column; align-items:stretch; }
+	 .mock-card-header { grid-template-columns:1fr; }
+	 .mock-station-grid,.mock-feedback-grid { grid-template-columns:1fr; }
+	 }
  </style>
 <style id="k2-nav-styles">
 /* =======================================================
@@ -376,14 +425,28 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div id="mainContent" style="display:none;">
 
  <!-- Stats -->
- <div class="stats-bar" id="statsBar">
- <div class="stat-card"><span class="stat-num" id="statTotal">-</span><span class="stat-label">Total Reviews</span></div>
- <div class="stat-card"><span class="stat-num" id="statCasper">-</span><span class="stat-label">CASPer</span></div>
- <div class="stat-card"><span class="stat-num" id="statGamsat">-</span><span class="stat-label">GAMSAT</span></div>
- <div class="stat-card"><span class="stat-num" id="statAvg">-</span><span class="stat-label">Avg Score</span></div>
- </div>
+	 <div class="stats-bar" id="statsBar">
+	 <div class="stat-card"><span class="stat-num" id="statTotal">-</span><span class="stat-label">Total Reviews</span></div>
+	 <div class="stat-card"><span class="stat-num" id="statCasper">-</span><span class="stat-label">CASPer</span></div>
+	 <div class="stat-card"><span class="stat-num" id="statGamsat">-</span><span class="stat-label">GAMSAT</span></div>
+	 <div class="stat-card"><span class="stat-num" id="statMock">-</span><span class="stat-label">Full Mocks</span></div>
+	 <div class="stat-card"><span class="stat-num" id="statAvg">-</span><span class="stat-label">Avg Score</span></div>
+	 </div>
 
- <!-- Competency progress -->
+	 <!-- Full mock history -->
+	 <section class="mock-history-section" id="mockHistorySection" style="display:none;">
+	 <div class="mock-history-head">
+	 <div>
+	 <div class="mock-history-kicker">Full mock exam history</div>
+	 <div class="mock-history-title">Your complete CASPer mock reports</div>
+	 <div class="mock-history-sub">Review your full-mock score pattern, station feedback, video recordings and transcripts. Recordings are available for 30 days after completion.</div>
+	 </div>
+	 <a href="full-casper-mock-exam.html" class="filter-btn" style="white-space:nowrap;">Take another mock</a>
+	 </div>
+	 <div class="mock-history-list" id="mockHistoryList"></div>
+	 </section>
+
+	 <!-- Competency progress -->
  <div class="competency-panel" id="competencyPanel">
  <div class="competency-panel-header">
  <div>
@@ -439,6 +502,7 @@ const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
 const TOKEN_KEY = 'key2md_token';
 
 let allReviews = [];
+let mockAttempts = [];
 let currentFilter = 'all';
 let currentCompetencyFilter = null;
 const CASPER_COMPETENCIES = [
@@ -486,24 +550,50 @@ async function loadReviews() {
  showState('loading');
 
  try {
- const res = await fetch(`${API_BASE}/api/reviews`, {
- headers: { 'Authorization': `Bearer ${token}` },
- });
+	 const res = await fetch(`${API_BASE}/api/reviews`, {
+	 headers: { 'Authorization': `Bearer ${token}` },
+	 });
 
  if (!res.ok) {
  const data = await res.json().catch(() => ({}));
  throw new Error(data.error || `HTTP ${res.status}`);
  }
 
- const data = await res.json();
- allReviews = data.reviews || [];
- updateStats();
- renderCompetencyProgress();
- renderReviews();
+	 const data = await res.json();
+	 allReviews = data.reviews || [];
+	 mockAttempts = await loadMockAttempts(token);
+	 updateStats();
+	 renderMockHistory();
+	 renderCompetencyProgress();
+	 renderReviews();
  } catch (err) {
  showState('error');
  document.getElementById('errorMsg').textContent = err.message || 'Please try refreshing the page.';
+	 }
+	}
+
+async function loadMockAttempts(token) {
+ try {
+ const res = await fetch(`${API_BASE}/api/casper-mock/attempts?limit=20`, {
+ headers: { 'Authorization': `Bearer ${token}` },
+ });
+ if (!res.ok) return [];
+ const data = await res.json().catch(() => ({}));
+ return data.attempts || [];
+ } catch {
+ return [];
  }
+}
+
+async function loadMockAttemptDetail(id) {
+ const token = localStorage.getItem(TOKEN_KEY);
+ if (!token || !id) throw new Error('Login required.');
+ const res = await fetch(`${API_BASE}/api/casper-mock/attempt/${encodeURIComponent(id)}`, {
+ headers: { 'Authorization': `Bearer ${token}` },
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) throw new Error(data.message || data.error || 'Could not load this mock report.');
+ return data.attempt;
 }
 
 // -- Stats --
@@ -515,11 +605,12 @@ function updateStats() {
  const scores = allReviews.map(r => extractScore(r)).filter(s => s !== null);
  const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10 : null;
 
- document.getElementById('statTotal').textContent = allReviews.length;
- document.getElementById('statCasper').textContent = casperReviews.length;
- document.getElementById('statGamsat').textContent = gamsatReviews.length;
- document.getElementById('statAvg').textContent = avg !== null ? avg + '/10' : '-';
-}
+	 document.getElementById('statTotal').textContent = allReviews.length;
+	 document.getElementById('statCasper').textContent = casperReviews.length;
+	 document.getElementById('statGamsat').textContent = gamsatReviews.length;
+	 document.getElementById('statMock').textContent = mockAttempts.length;
+	 document.getElementById('statAvg').textContent = avg !== null ? avg + '/10' : '-';
+	}
 
 function extractScore(review) {
  if (!review.ai_feedback) return null;
@@ -663,7 +754,252 @@ function renderCompetencyProgress() {
  }).join('');
 }
 
-// -- Render --
+	// -- Render --
+function renderMockHistory() {
+ const section = document.getElementById('mockHistorySection');
+ const list = document.getElementById('mockHistoryList');
+ if (!section || !list) return;
+ if (!mockAttempts.length) {
+ section.style.display = 'none';
+ list.innerHTML = '';
+ return;
+ }
+ section.style.display = 'block';
+ list.innerHTML = mockAttempts.map(mockCardHTML).join('');
+}
+
+function mockCardHTML(attempt) {
+ const rows = attempt.rows || [];
+ const report = attempt.report || {};
+ const completed = formatDate(attempt.completed_at);
+ const expires = mockExpiryText(attempt);
+ const score = Number.isFinite(Number(report.overallAvg)) ? `${Math.round(Number(report.overallAvg) * 10) / 10}/10` : '-';
+ const manual = attempt.manual_review_paid ? 'Manual review requested' : 'AI report';
+ const statusClass = attempt.expired ? ' warn' : '';
+ const stationCount = attempt.station_count || rows.length || 11;
+ const isLoaded = Array.isArray(attempt.rows);
+ return `
+ <article class="mock-card" id="mock-${escapeAttr(attempt.id)}">
+ <button type="button" class="mock-card-header" onclick="toggleMockAttempt('${escapeAttr(attempt.id)}')">
+ <div>
+ <div class="mock-card-title">Full CASPer Mock - ${escapeHtml(attempt.tier || 'mock')}</div>
+ <div class="mock-card-meta">${completed || 'Saved mock'} | ${stationCount} stations | ${escapeHtml(manual)}</div>
+ </div>
+ <span class="mock-report-link" role="link" tabindex="0" onclick="event.stopPropagation();window.location.href='mock-report.html?id=${encodeURIComponent(attempt.id)}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();window.location.href='mock-report.html?id=${encodeURIComponent(attempt.id)}'}">Open report</span>
+ <div class="mock-score">${escapeHtml(score)}</div>
+ <span class="mock-status-pill${statusClass}">${escapeHtml(expires)}</span>
+ </button>
+ <div class="mock-card-body">
+ ${isLoaded ? `${mockOverviewHTML(attempt)}<div class="mock-station-list">${rows.map((row, i) => mockStationHTML(attempt, row, i)).join('')}</div>` : `<div class="mock-expiry-note" style="background:#eff6ff;border-color:rgba(14,165,233,0.22);color:#075985;">Loading the full station report only when opened keeps this page quick, especially when video transcripts are attached.</div>`}
+ </div>
+ </article>
+ `;
+}
+
+function mockOverviewHTML(attempt) {
+ const report = attempt.report || {};
+ const action = (report.actionPlan || [])[0];
+ const oneThing = report.oneThing || {};
+ const manualNotes = String(attempt.manual_review_notes || '').trim();
+ return `
+ <div class="mock-overview-grid">
+ <div class="mock-overview-tile"><strong>${escapeHtml(report.interpretation?.band || 'Overall interpretation')}</strong><p>${escapeHtml(report.interpretation?.text || 'Open each station below to review the details.')}</p></div>
+ <div class="mock-overview-tile"><strong>${escapeHtml(oneThing.title || 'The one thing to fix')}</strong><p>${escapeHtml(oneThing.body || 'No repeated pattern was returned for this attempt.')}</p></div>
+ <div class="mock-overview-tile"><strong>${escapeHtml(action?.title || 'Next practice move')}</strong><p>${escapeHtml(action?.detail || 'Repeat the weakest station type and rewrite the opening 2-3 sentences.')}</p></div>
+ </div>
+ ${manualNotes ? `<div class="mock-overview-tile" style="margin-bottom:12px;background:#f0fdf4;border-color:#bbf7d0;"><strong>Dan's manual review result</strong><p>${escapeHtml(manualNotes)}</p></div>` : ''}
+ <div class="mock-expiry-note">Video recordings are available for 30 days after the mock. Transcripts and feedback are shown here so the marking remains understandable even after playback expires.</div>
+ `;
+}
+
+function mockStationHTML(attempt, row, index) {
+ const isVideo = row.type === 'video';
+ const title = `${isVideo ? 'Video' : 'Typed'} ${row.localIndex || index + 1}`;
+ const score = mockRowScore(row);
+ const feedback = mockFeedback(row);
+ return `
+ <section class="mock-station">
+ <div class="mock-station-head">
+ <div>
+ <div class="mock-station-title">${escapeHtml(title)} - ${escapeHtml(row.station?.category || 'CASPer')}</div>
+ <div class="mock-card-meta">${escapeHtml(row.tier || (isVideo ? attempt.tier : 'typed'))}</div>
+ </div>
+ <div class="mock-station-score">${escapeHtml(score)}</div>
+ </div>
+ <div class="mock-station-grid">
+ <div>
+ ${isVideo ? mockVideoHTML(attempt, row, index) : mockTypedAnswerHTML(row)}
+ </div>
+ <div>
+ <div class="mock-section-label">Scenario</div>
+ <div class="mock-text">${escapeHtml(row.station?.scenario || '')}</div>
+ ${row.station?.prompt1 || row.station?.prompt2 ? `<div class="mock-section-label">Prompts</div><div class="mock-text">${row.station?.prompt1 ? `1. ${escapeHtml(row.station.prompt1)}` : ''}${row.station?.prompt2 ? `\n2. ${escapeHtml(row.station.prompt2)}` : ''}</div>` : ''}
+ <div class="mock-feedback-grid">
+ <div class="mock-feedback-item"><strong>Strength</strong><p>${escapeHtml(feedback.strength)}</p></div>
+ <div class="mock-feedback-item"><strong>Improve</strong><p>${escapeHtml(feedback.improve)}</p></div>
+ </div>
+ ${mockCriteriaHTML(row)}
+ </div>
+ </div>
+ </section>
+ `;
+}
+
+function mockVideoHTML(attempt, row, index) {
+ const videoId = `mockvid-${attempt.id}-${index}`.replace(/[^a-zA-Z0-9_-]/g, '');
+ const canLoad = row.recording_key && !attempt.expired;
+ const segments = Array.isArray(row.transcript_segments) ? row.transcript_segments : [];
+ return `
+ <div class="mock-video-box">
+ <video id="${escapeAttr(videoId)}" controls playsinline preload="metadata" data-attempt-id="${escapeAttr(attempt.id)}" data-recording-key="${escapeAttr(row.recording_key || '')}"></video>
+ ${canLoad ? `<button type="button" class="mock-video-load" onclick="loadMockRecording(event,'${escapeAttr(videoId)}')"><strong>Load recording</strong><span>Authenticated playback. Expires ${escapeHtml(formatDate(attempt.expires_at))}.</span></button>` : `<div class="mock-video-load" style="cursor:default;"><strong>${attempt.expired ? 'Recording expired' : 'No recording saved'}</strong><span>${attempt.expired ? 'The 30-day playback window has passed.' : 'Transcript and feedback are still shown below.'}</span></div>`}
+ </div>
+ ${row.duration_sec ? `<div class="mock-card-meta" style="margin-top:7px;">Duration ${escapeHtml(formatDuration(row.duration_sec))}</div>` : ''}
+ ${segments.length ? `<div class="mock-section-label">Synced transcript</div>${mockSyncedTranscriptHTML(videoId, segments)}` : (row.transcript ? `<div class="mock-section-label">Transcript used for marking</div><div class="mock-transcript mock-text">${escapeHtml(row.transcript)}</div>` : '')}
+ `;
+}
+
+function mockSyncedTranscriptHTML(videoId, segments) {
+ return `<div class="mock-sync-transcript" data-sync-for="${escapeAttr(videoId)}">${segments.map((seg, i) => `
+ <button type="button" class="mock-sync-segment" data-video-id="${escapeAttr(videoId)}" data-start="${escapeAttr(seg.start || 0)}" data-end="${escapeAttr(seg.end || seg.start || 0)}" onclick="jumpMockTranscript('${escapeAttr(videoId)}', ${Number(seg.start || 0)})">
+ ${escapeHtml(seg.text || '')}
+ </button>
+ `).join('')}</div>`;
+}
+
+function mockTypedAnswerHTML(row) {
+ return `
+ <div class="mock-section-label">Typed response</div>
+ <div class="mock-transcript mock-text">${escapeHtml(row.answer || 'No typed response captured.')}</div>
+ `;
+}
+
+function mockFeedback(row) {
+ const fb = row.feedback || {};
+ const overall = fb.overall || {};
+ return {
+ strength: overall.biggest_strength || fb.strengths || fb.strength || 'No specific strength returned.',
+ improve: overall.biggest_improvement || fb.improvements || fb.improve || 'No specific improvement returned.',
+ };
+}
+
+function mockCriteriaHTML(row) {
+ const fb = row.feedback || {};
+ if (row.type === 'video') {
+ const items = [];
+ (fb.per_prompt || []).forEach((prompt, i) => {
+ Object.entries(prompt.scores || {}).forEach(([key, value]) => {
+ const score = Number(value?.score);
+ items.push(`<div class="competency-row"><div class="competency-row-head"><span class="competency-row-name">Prompt ${i + 1} ${escapeHtml(niceMockKey(key))}</span><span class="competency-row-score" style="color:${scoreColor(Number.isFinite(score) ? score : 0)};">${Number.isFinite(score) ? score + '/10' : '-'}</span></div><div class="competency-row-detail">${escapeHtml(value?.comment || value?.label || '')}</div></div>`);
+ });
+ });
+ return items.length ? `<div class="competency-breakdown"><div class="competency-breakdown-title">Video criteria</div>${items.join('')}</div>` : '';
+ }
+ const comps = normalizeCompetencies(fb.competencies).sort((a, b) => a.score - b.score);
+ return comps.length ? `<div class="competency-breakdown"><div class="competency-breakdown-title">Typed competencies</div>${comps.map(comp => `<div class="competency-row"><div class="competency-row-head"><span class="competency-row-name">${escapeHtml(comp.name)}</span><span class="competency-row-score" style="color:${scoreColor(comp.score)};">${comp.score}/10</span></div><div class="competency-row-detail">${escapeHtml(comp.improve || comp.evidence || '')}</div></div>`).join('')}</div>` : '';
+}
+
+async function toggleMockAttempt(id) {
+ const card = document.getElementById(`mock-${id}`);
+ if (!card) return;
+ const attempt = mockAttempts.find(item => item.id === id);
+ const willOpen = !card.classList.contains('open');
+ card.classList.toggle('open');
+ if (!willOpen || !attempt || Array.isArray(attempt.rows) || attempt.loading) return;
+ const body = card.querySelector('.mock-card-body');
+ if (body) body.innerHTML = '<div class="spinner-wrap" style="padding:24px;"><div class="spinner"></div> Loading full mock report...</div>';
+ attempt.loading = true;
+ try {
+ const detail = await loadMockAttemptDetail(id);
+ const idx = mockAttempts.findIndex(item => item.id === id);
+ if (idx >= 0) mockAttempts[idx] = { ...mockAttempts[idx], ...detail };
+ renderMockHistory();
+ const reopened = document.getElementById(`mock-${id}`);
+ if (reopened) reopened.classList.add('open');
+ } catch (err) {
+ if (body) body.innerHTML = `<div class="mock-expiry-note"><strong>Could not load report.</strong> ${escapeHtml(err.message || 'Try again later.')}</div>`;
+ } finally {
+ attempt.loading = false;
+ }
+}
+window.toggleMockAttempt = toggleMockAttempt;
+
+async function loadMockRecording(event, videoId) {
+ if (event) event.stopPropagation();
+ const video = document.getElementById(videoId);
+ if (!video) return;
+ const btn = event?.currentTarget || null;
+ if (video.dataset.loaded === '1') {
+ video.style.display = 'block';
+ video.play().catch(() => {});
+ return;
+ }
+ const token = localStorage.getItem(TOKEN_KEY);
+ if (!token) return;
+ if (btn) {
+ btn.disabled = true;
+ const label = btn.querySelector('span');
+ if (label) label.textContent = 'Loading secure playback...';
+ }
+ try {
+ const url = `${API_BASE}/api/casper-mock/recording?attempt_id=${encodeURIComponent(video.dataset.attemptId || '')}&key=${encodeURIComponent(video.dataset.recordingKey || '')}`;
+ const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+ if (!res.ok) {
+ const data = await res.json().catch(() => ({}));
+ throw new Error(data.message || data.error || 'Recording unavailable.');
+ }
+ const blob = await res.blob();
+ if (video.dataset.blobUrl) URL.revokeObjectURL(video.dataset.blobUrl);
+ const objectUrl = URL.createObjectURL(blob);
+ video.dataset.blobUrl = objectUrl;
+ video.dataset.loaded = '1';
+ video.src = objectUrl;
+ video.style.display = 'block';
+ bindMockTranscriptSync(video);
+ if (btn) btn.style.display = 'none';
+ video.play().catch(() => {});
+ } catch (err) {
+ if (btn) {
+ btn.disabled = false;
+ btn.innerHTML = `<strong>Could not load recording</strong><span>${escapeHtml(err.message || 'Try again later.')}</span>`;
+ }
+ }
+}
+window.loadMockRecording = loadMockRecording;
+
+function bindMockTranscriptSync(video) {
+ if (!video || video.dataset.syncBound === '1') return;
+ video.dataset.syncBound = '1';
+ video.addEventListener('timeupdate', () => syncMockTranscript(video.id, video.currentTime || 0));
+ video.addEventListener('seeked', () => syncMockTranscript(video.id, video.currentTime || 0));
+}
+
+function syncMockTranscript(videoId, time) {
+ const wrap = document.querySelector(`[data-sync-for="${CSS.escape(videoId)}"]`);
+ if (!wrap) return;
+ let active = null;
+ wrap.querySelectorAll('.mock-sync-segment').forEach(btn => {
+ const start = Number(btn.dataset.start || 0);
+ const end = Number(btn.dataset.end || start + 2);
+ const isActive = time >= start && time < Math.max(end, start + 0.8);
+ btn.classList.toggle('active', isActive);
+ if (isActive) active = btn;
+ });
+ if (active && wrap.dataset.lastActive !== String(active.dataset.start)) {
+ wrap.dataset.lastActive = String(active.dataset.start);
+ active.scrollIntoView({ block: 'nearest' });
+ }
+}
+
+function jumpMockTranscript(videoId, start) {
+ const video = document.getElementById(videoId);
+ if (!video) return;
+ video.currentTime = Math.max(0, Number(start) || 0);
+ syncMockTranscript(videoId, video.currentTime);
+ if (video.dataset.loaded === '1') video.play().catch(() => {});
+}
+window.jumpMockTranscript = jumpMockTranscript;
+
 function renderReviews() {
  let filtered = allReviews;
  if (currentFilter === 'saved') {
@@ -683,10 +1019,10 @@ function renderReviews() {
  document.getElementById('resultCount').textContent =
  filtered.length + ' ' + label + (filtered.length !== 1 ? 's' : '');
 
- if (filtered.length === 0) {
- showState(allReviews.length === 0 ? 'empty' : 'emptyFilter');
- return;
- }
+	 if (filtered.length === 0) {
+	 showState(allReviews.length === 0 ? (mockAttempts.length ? 'emptySingle' : 'empty') : 'emptyFilter');
+	 return;
+	 }
 
  showState('list');
 
@@ -940,24 +1276,53 @@ window.saveEditedResponse = saveEditedResponse;
 
 // -- Helpers --
 function showState(state) {
- document.getElementById('loadingState').style.display = state === 'loading' ? 'flex' : 'none';
- document.getElementById('errorState').style.display = state === 'error' ? 'block' : 'none';
- document.getElementById('emptyState').style.display = (state === 'empty' || state === 'emptyFilter') ? 'block' : 'none';
- document.getElementById('reviewsList').style.display = state === 'list' ? 'flex' : 'none';
+	 document.getElementById('loadingState').style.display = state === 'loading' ? 'flex' : 'none';
+	 document.getElementById('errorState').style.display = state === 'error' ? 'block' : 'none';
+	 document.getElementById('emptyState').style.display = (state === 'empty' || state === 'emptySingle' || state === 'emptyFilter') ? 'block' : 'none';
+	 document.getElementById('reviewsList').style.display = state === 'list' ? 'flex' : 'none';
 
  if (state === 'emptyFilter') {
  document.getElementById('emptyState').querySelector('.state-title').textContent = 'No reviews match this filter';
  document.getElementById('emptyState').querySelector('.state-sub').textContent = 'Try switching to "All" to see everything.';
- } else if (state === 'empty') {
- document.getElementById('emptyState').querySelector('.state-title').textContent = 'No reviews yet';
- document.getElementById('emptyState').querySelector('.state-sub').textContent = 'Complete a station and get AI feedback to see your history here.';
- }
-}
+	 } else if (state === 'empty') {
+	 document.getElementById('emptyState').querySelector('.state-title').textContent = 'No reviews yet';
+	 document.getElementById('emptyState').querySelector('.state-sub').textContent = 'Complete a station and get AI feedback to see your history here.';
+	 } else if (state === 'emptySingle') {
+	 document.getElementById('emptyState').querySelector('.state-title').textContent = 'No single-station reviews yet';
+	 document.getElementById('emptyState').querySelector('.state-sub').textContent = 'Your full mock reports are above. Single CASPer/GAMSAT reviews will appear here once you use the practice tools.';
+	 }
+	}
 
 function formatDate(iso) {
- if (!iso) return '';
- const d = new Date(iso);
- return d.toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+	 if (!iso) return '';
+	 const d = new Date(iso);
+	 return d.toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+	}
+
+function mockExpiryText(attempt) {
+ if (attempt.expired) return 'Video expired';
+ const expires = Number(attempt.expires_at || 0);
+ if (!expires) return '30-day playback';
+ const days = Math.max(0, Math.ceil((expires - Date.now()) / 86400000));
+ if (days <= 1) return 'Expires today';
+ return `${days} days left`;
+}
+
+function mockRowScore(row) {
+ const score = Number(row?.score);
+ return Number.isFinite(score) ? `${Math.round(score * 10) / 10}/10` : 'No score';
+}
+
+function formatDuration(seconds) {
+ const total = Math.max(0, Math.round(Number(seconds) || 0));
+ const m = Math.floor(total / 60);
+ const s = total % 60;
+ return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+function niceMockKey(key) {
+ const map = { real_world_awareness:'Real-world judgement', communication:'Communication', reasoning:'Reasoning', empathy:'Empathy', reflection:'Reflection' };
+ return map[key] || String(key || '').replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase());
 }
 
 function creditBadge(source) {
