@@ -24,15 +24,25 @@
  .sidebar > .btn-start { order:2; }
  #aiMarkingCard { order:3; }
  #categoryCard { order:4; }
- #leaderboardCard { order:5; }
- #starredQueueCard { order:6; }
- #mmiOptionsCard { order:7; }
+ #questionSubmitCard { order:5; }
+ #leaderboardCard { order:6; }
+ #starredQueueCard { order:7; }
+ #mmiOptionsCard { order:8; }
  .account-card { border-color:rgba(14,165,233,0.26); box-shadow:0 14px 34px rgba(14,165,233,0.08); }
  .account-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
  .account-card-kicker { font-size:0.68rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal3); margin-bottom:4px; }
  .account-card-title { font-size:1rem; line-height:1.25; font-weight:850; color:var(--navy); }
  .account-card-copy { font-size:0.76rem; color:var(--gray600); line-height:1.5; margin-bottom:12px; }
  .account-card-badge { flex-shrink:0; font-size:0.62rem; font-weight:850; letter-spacing:0.08em; text-transform:uppercase; color:#075985; background:#e0f2fe; border:1px solid rgba(14,165,233,0.22); border-radius:999px; padding:4px 8px; }
+
+ .question-submit-card { border-color:rgba(245,158,11,0.28); background:linear-gradient(180deg,#fff,#fffbeb); }
+ .question-submit-kicker { font-size:0.66rem; font-weight:900; letter-spacing:0.1em; text-transform:uppercase; color:#b45309; margin-bottom:5px; }
+ .question-submit-title { font-size:0.98rem; line-height:1.3; font-weight:900; color:var(--navy); margin-bottom:6px; }
+ .question-submit-copy { font-size:0.76rem; color:var(--gray600); line-height:1.5; margin-bottom:10px; }
+ .question-submit-benefits { display:grid; gap:6px; margin-bottom:12px; }
+ .question-submit-benefits span { display:block; font-size:0.7rem; line-height:1.35; color:#7c2d12; background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:7px 8px; }
+ .question-submit-btn { width:100%; border:0; border-radius:999px; background:var(--gold); color:var(--navy); padding:10px 13px; font-family:inherit; font-size:0.8rem; font-weight:900; cursor:pointer; transition:transform 0.18s, background 0.18s; }
+ .question-submit-btn:hover { background:#fbbf24; transform:translateY(-1px); }
 
  /* Practice insights - replaces the old clunky bottom-card grid with one coach-led panel. */
  .practice-insights-area { display:flex; flex-direction:column; gap:14px; margin-top:24px; }
@@ -73,7 +83,7 @@
  .practice-trend-labels { display:flex; justify-content:space-between; gap:8px; color:var(--gray400); font-size:0.68rem; font-weight:800; }
  .practice-coach-note { border-left:3px solid var(--teal); padding:2px 0 2px 13px; color:var(--gray600); font-size:0.9rem; line-height:1.6; }
  .practice-coach-note strong { color:var(--navy); }
- .practice-action-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+ .practice-action-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; }
  .practice-action-card { border:1px solid var(--gray200); border-radius:12px; padding:15px; background:#fff; display:flex; flex-direction:column; min-width:0; }
  .practice-action-card.dark { background:linear-gradient(135deg,var(--navy),#0d2a52); border-color:rgba(14,165,233,0.25); color:#fff; }
  .practice-action-kicker { font-size:0.66rem; font-weight:900; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal3); margin-bottom:7px; }
@@ -155,8 +165,8 @@
  .tmc-desc { font-size:0.7rem; color:var(--gray600); line-height:1.35; }
 
  /* -- Enquiry Modal (matches live site) -- */
- #enquiryModal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center; }
- #enquiryModal.open { display:flex; }
+ #enquiryModal, #questionSubmitModal { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center; }
+ #enquiryModal.open, #questionSubmitModal.open { display:flex; }
  .enquiry-card { background:#0d1f3c; border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:36px 32px; max-width:460px; width:92%; position:relative; max-height:92vh; overflow-y:auto; }
  .enquiry-close { position:absolute; top:14px; right:14px; background:rgba(255,255,255,0.08); border:none; color:#fff; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
  .enquiry-title { color:#fff; font-size:1.2rem; font-weight:800; margin-bottom:4px; }
@@ -178,6 +188,15 @@
  .eq-success { text-align:center; padding:20px 0; }
  .eq-success-icon { font-size:2.5rem; margin-bottom:12px; }
  .eq-success-title { color:#fff; font-size:1.1rem; font-weight:700; margin-bottom:6px; }
+ .question-modal-card { max-width:620px; }
+ .question-format-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+ .question-format-grid .eq-field:first-child { grid-column:1 / -1; }
+ .question-benefit-box { background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); border-radius:12px; padding:12px 14px; margin-bottom:16px; color:#fde68a; font-size:0.8rem; line-height:1.55; }
+ .question-benefit-box strong { color:#fff; display:block; margin-bottom:4px; }
+ .question-submit-status { display:none; font-size:0.8rem; line-height:1.45; padding:10px 12px; border-radius:10px; margin-bottom:12px; }
+ .question-submit-status.error { display:block; color:#fecaca; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.28); }
+ .question-submit-status.ok { display:block; color:#bbf7d0; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.26); }
+ @media(max-width:640px){ .question-format-grid { grid-template-columns:1fr; } }
  .eq-success-sub { color:rgba(255,255,255,0.5); font-size:0.85rem; }
 
  .main-content { display:flex; flex-direction:column; gap:16px; min-width:0; }
@@ -225,7 +244,7 @@
  .answer-section { border-top:1px solid var(--gray100); padding:18px 28px; display:flex; flex-direction:column; gap:10px; }
  .answer-label { font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray400); display:flex; align-items:center; justify-content:space-between; }
  .word-count { font-size:0.75rem; color:var(--gray400); font-weight:400; letter-spacing:0; text-transform:none; }
- .answer-textarea { width:100%; min-height:150px; padding:15px; border:1px solid var(--gray200); border-radius:12px; font-family:inherit; font-size:0.93rem; color:var(--gray800); line-height:1.68; resize:vertical; outline:none; transition:border-color 0.2s; background:var(--gray50); }
+ .answer-textarea { width:100%; min-height:260px; height:min(38vh, 380px); padding:16px; border:1px solid var(--gray200); border-radius:12px; font-family:inherit; font-size:0.95rem; color:var(--gray800); line-height:1.7; resize:vertical; outline:none; transition:border-color 0.2s; background:var(--gray50); }
  .answer-textarea:focus { border-color:var(--teal); background:var(--white); }
  .answer-textarea::placeholder { color:var(--gray400); }
 

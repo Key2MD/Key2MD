@@ -424,6 +424,17 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
 
+ <div class="sidebar-card question-submit-card" id="questionSubmitCard">
+ <div class="question-submit-kicker">Student question bank</div>
+ <div class="question-submit-title">Submit your own CASPer question</div>
+ <p class="question-submit-copy">Dan will personally review submissions and may add strong ones to the practice bank.</p>
+ <div class="question-submit-benefits">
+ <span>Think like a marker: what is the dilemma really testing?</span>
+ <span>Build deeper skill by designing the prompt, not just answering it.</span>
+ </div>
+ <button type="button" class="question-submit-btn" onclick="openQuestionSubmitModal()">Submit prompt, Q1, Q2</button>
+ </div>
+
  <div class="sidebar-card" id="starredQueueCard" style="display:none;">
  <h3 style="display:flex;align-items:center;justify-content:space-between;gap:8px;">Revision Queue <span id="starredQueueCount" style="font-size:0.72rem;color:var(--gold);font-weight:800;">0</span></h3>
  <p style="font-size:0.72rem;color:var(--gray400);line-height:1.45;margin:0 0 10px;">Save tricky stations while practising, then run them as a targeted revision block.</p>
@@ -1078,6 +1089,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button type="button" class="practice-action-btn gold" onclick="openMarkingModal()">Submit to Dan</button>
  </article>
  <article class="practice-action-card">
+ <div class="practice-action-kicker">Question writing</div>
+ <div class="practice-action-title">Submit a CASPer-style prompt</div>
+ <p class="practice-action-copy">Writing the scenario, Q1 and Q2 forces you to think about what the station is assessing. Dan reviews submissions and may add strong ones to the bank.</p>
+ <div class="practice-action-meta"><span class="practice-mini-tag">Prompt</span><span class="practice-mini-tag">Q1</span><span class="practice-mini-tag">Q2</span></div>
+ <button type="button" class="practice-action-btn outline" onclick="openQuestionSubmitModal()">Submit a question</button>
+ </article>
+ <article class="practice-action-card">
  <div class="practice-action-kicker">Weekly tips</div>
  <div class="practice-action-title">Get Dan's CASPer/MMI breakdowns</div>
  <p class="practice-action-copy">Scenario breakdowns, common mistakes, and practical prep advice. Useful if you are not ready to pay yet but want direction.</p>
@@ -1150,6 +1168,61 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="eq-success-title">Sent!</div>
  <div class="eq-success-sub">Dan usually replies within 24 hours. Keep an eye on your inbox.</div>
  <button class="eq-btn-submit" onclick="closeEnquiry()" style="margin-top:20px;width:100%;">Got it -></button>
+ </div>
+ </div>
+ </div>
+</div>
+
+<!-- CASPER QUESTION SUBMISSION MODAL -->
+<div id="questionSubmitModal">
+ <div class="enquiry-card question-modal-card">
+ <button class="enquiry-close" onclick="closeQuestionSubmitModal()">x</button>
+ <div id="questionSubmitForm">
+ <div class="enquiry-type-badge" style="background:rgba(245,158,11,0.14);color:#fbbf24;border:1px solid rgba(245,158,11,0.28);">CASPer question submission</div>
+ <div class="enquiry-title">Submit your own CASPer question</div>
+ <div class="enquiry-sub">Dan will personally review it and may add it to the practice bank if it fits.</div>
+ <div class="question-benefit-box">
+ <strong>Why this is good prep</strong>
+ Writing a question makes you think like a CASPer marker: what conflict is being assessed, what a fair answer would need to notice, and where empathy, judgement, communication and professionalism show up.
+ </div>
+ <div id="questionSubmitStatus" class="question-submit-status"></div>
+ <div class="question-format-grid">
+ <div class="eq-field">
+ <label>Prompt / scenario *</label>
+ <textarea id="qsPrompt" rows="5" placeholder="Describe the CASPer scenario. Include the tension, stakeholders, and enough context for a student to answer."></textarea>
+ </div>
+ <div class="eq-field">
+ <label>Q1 *</label>
+ <textarea id="qsQ1" rows="3" placeholder="e.g. What would you do in this situation?"></textarea>
+ </div>
+ <div class="eq-field">
+ <label>Q2 *</label>
+ <textarea id="qsQ2" rows="3" placeholder="e.g. How would you balance fairness and empathy here?"></textarea>
+ </div>
+ </div>
+ <div class="eq-field">
+ <label>What do you think this assesses? (optional)</label>
+ <textarea id="qsReflection" rows="2" placeholder="e.g. empathy under uncertainty, conflict resolution, fairness, professionalism..."></textarea>
+ </div>
+ <div class="eq-field">
+ <label>Your name</label>
+ <input type="text" id="qsName" placeholder="Your name">
+ </div>
+ <div class="eq-field">
+ <label>Your email *</label>
+ <input type="email" id="qsEmail" placeholder="you@email.com">
+ </div>
+ <div class="eq-actions">
+ <button class="eq-btn-cancel" onclick="closeQuestionSubmitModal()">Cancel</button>
+ <button class="eq-btn-submit" id="questionSubmitBtn" onclick="submitCasperQuestion()">Send to Dan -></button>
+ </div>
+ </div>
+ <div id="questionSubmitSuccess" style="display:none;">
+ <div class="eq-success">
+ <div class="eq-success-icon">OK</div>
+ <div class="eq-success-title">Question submitted</div>
+ <div class="eq-success-sub">Dan will review it personally. The useful part for you is already happening: you are training yourself to see what CASPer is actually assessing.</div>
+ <button class="eq-btn-submit" onclick="closeQuestionSubmitModal()" style="margin-top:20px;width:100%;">Done</button>
  </div>
  </div>
  </div>
@@ -5011,11 +5084,90 @@ function submitEnquiry(){
  document.getElementById('eqSuccess').style.display='block';
  });
 }
+
+function questionSubmitStatus(message, tone) {
+ var el = document.getElementById('questionSubmitStatus');
+ if (!el) return;
+ el.className = 'question-submit-status ' + (tone || 'error');
+ el.textContent = message;
+}
+
+function openQuestionSubmitModal() {
+ var modal = document.getElementById('questionSubmitModal');
+ if (!modal) return;
+ var auth = getK2Auth();
+ var user = auth?.getUser?.() || null;
+ document.getElementById('questionSubmitForm').style.display = 'block';
+ document.getElementById('questionSubmitSuccess').style.display = 'none';
+ var status = document.getElementById('questionSubmitStatus');
+ if (status) { status.className = 'question-submit-status'; status.textContent = ''; }
+ var btn = document.getElementById('questionSubmitBtn');
+ if (btn) { btn.disabled = false; btn.textContent = 'Send to Dan ->'; }
+ if (user) {
+ var name = document.getElementById('qsName');
+ var email = document.getElementById('qsEmail');
+ if (name && !name.value) name.value = user.name || '';
+ if (email && !email.value) email.value = user.email || '';
+ }
+ modal.classList.add('open');
+ document.body.style.overflow = 'hidden';
+ setTimeout(function(){ document.getElementById('qsPrompt')?.focus(); }, 100);
+}
+
+function closeQuestionSubmitModal() {
+ var modal = document.getElementById('questionSubmitModal');
+ if (modal) modal.classList.remove('open');
+ document.body.style.overflow = '';
+}
+
+function submitCasperQuestion() {
+ var prompt = document.getElementById('qsPrompt').value.trim();
+ var q1 = document.getElementById('qsQ1').value.trim();
+ var q2 = document.getElementById('qsQ2').value.trim();
+ var reflection = document.getElementById('qsReflection').value.trim();
+ var name = document.getElementById('qsName').value.trim();
+ var email = document.getElementById('qsEmail').value.trim();
+ var btn = document.getElementById('questionSubmitBtn');
+ if (!prompt || prompt.length < 40) { questionSubmitStatus('Please write a scenario/prompt of at least 40 characters.', 'error'); return; }
+ if (!q1 || q1.length < 8) { questionSubmitStatus('Please add Q1.', 'error'); return; }
+ if (!q2 || q2.length < 8) { questionSubmitStatus('Please add Q2.', 'error'); return; }
+ if (!email || !email.includes('@')) { questionSubmitStatus('Please add a valid email so Dan knows who submitted it.', 'error'); return; }
+ questionSubmitStatus('Sending your question to Dan...', 'ok');
+ if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+ var headers = { 'Content-Type': 'application/json' };
+ var auth = getK2Auth();
+ var token = auth?.getToken?.();
+ if (token) headers.Authorization = 'Bearer ' + token;
+ fetch(API_BASE + '/api/casper-question-submissions', {
+ method: 'POST',
+ headers: headers,
+ body: JSON.stringify({ prompt: prompt, q1: q1, q2: q2, reflection: reflection, name: name, email: email })
+ })
+ .then(function(res){
+ return res.json().catch(function(){ return {}; }).then(function(data){
+ if (!res.ok) throw new Error(data.message || data.error || 'Could not submit your question.');
+ return data;
+ });
+ })
+ .then(function(){
+ document.getElementById('questionSubmitForm').style.display = 'none';
+ document.getElementById('questionSubmitSuccess').style.display = 'block';
+ ['qsPrompt','qsQ1','qsQ2','qsReflection'].forEach(function(id){ var el = document.getElementById(id); if (el) el.value = ''; });
+ if (typeof gtag === 'function') gtag('event', 'casper_question_submission', { event_category: 'engagement' });
+ })
+ .catch(function(err){
+ questionSubmitStatus(err.message || 'Could not submit your question. Try again or email Dan directly.', 'error');
+ if (btn) { btn.disabled = false; btn.textContent = 'Send to Dan ->'; }
+ });
+}
+
 document.addEventListener('DOMContentLoaded',function(){
  var eq=document.getElementById('enquiryModal');
  if(eq)eq.addEventListener('click',function(e){if(e.target===this)closeEnquiry();});
+ var qs=document.getElementById('questionSubmitModal');
+ if(qs)qs.addEventListener('click',function(e){if(e.target===this)closeQuestionSubmitModal();});
 });
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeEnquiry();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeEnquiry();closeQuestionSubmitModal();}});
 
 // Hamburger
 
