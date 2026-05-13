@@ -7,39 +7,94 @@
   <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
   <meta name="referrer" content="no-referrer">
   <style>
-    :root{--navy:#0a1628;--teal:#0ea5e9;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray500:#64748b;--gray700:#334155}
+    :root{
+      --navy:#0a1628;
+      --ink:#122033;
+      --muted:#64748b;
+      --soft:#f8fafc;
+      --line:#dbe4ee;
+      --line-strong:#c6d3e1;
+      --blue:#0ea5e9;
+      --blue-soft:#e8f6fd;
+      --green:#16a34a;
+      --green-soft:#ecfdf3;
+      --amber:#d97706;
+      --amber-soft:#fff7ed;
+      --red:#dc2626;
+      --red-soft:#fef2f2;
+    }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--gray50);color:var(--navy)}
-    header{background:var(--navy);color:#fff;padding:22px 28px;display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
-    header h1{margin:0;font-size:1.35rem}
-    .header-link{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.22);border-radius:999px;color:#fff;text-decoration:none;padding:9px 14px;font-weight:800;font-size:.82rem;background:rgba(255,255,255,.08)}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#eef3f7;color:var(--ink)}
+    header{background:var(--navy);color:#fff;padding:20px 28px;display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.08)}
+    header h1{margin:0;font-size:1.25rem;line-height:1.2}
+    main{max-width:1480px;margin:0 auto;padding:20px}
+    h2,h3,h4{color:var(--navy)}
+    h3{font-size:.96rem;margin:0 0 10px}
+    h4{font-size:.82rem;margin:16px 0 8px}
+    .header-link{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.22);border-radius:8px;color:#fff;text-decoration:none;padding:9px 14px;font-weight:800;font-size:.82rem;background:rgba(255,255,255,.08)}
     .header-link:hover{background:rgba(255,255,255,.14)}
-    main{max-width:1240px;margin:0 auto;padding:24px}
-    .card{background:#fff;border:1px solid var(--gray200);border-radius:14px;padding:18px;margin-bottom:16px}
-    .muted{color:var(--gray500);font-size:.86rem;line-height:1.55}
-    input,textarea,select{width:100%;border:1px solid var(--gray200);border-radius:10px;padding:10px 12px;font:inherit}
-    button{border:0;border-radius:999px;background:var(--navy);color:#fff;padding:10px 16px;font-weight:800;cursor:pointer}
-    button.secondary{background:#fff;color:var(--gray700);border:1px solid var(--gray200)}
-    .grid{display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:start}
-    .list-item{width:100%;text-align:left;background:#fff;color:var(--navy);border:1px solid var(--gray200);border-radius:12px;padding:12px;margin-bottom:10px}
-    .list-item.active{border-color:var(--teal);background:rgba(14,165,233,.06)}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-    .tabs button{background:#fff;color:var(--gray700);border:1px solid var(--gray200);padding:8px 12px;font-size:.78rem}
+    .card,.panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px;box-shadow:0 10px 24px rgba(15,23,42,.05)}
+    .muted{color:var(--muted);font-size:.86rem;line-height:1.55}
+    input,textarea,select{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:10px 12px;font:inherit;color:var(--ink);background:#fff}
+    textarea{line-height:1.55;resize:vertical}
+    button{border:0;border-radius:8px;background:var(--navy);color:#fff;padding:10px 16px;font-weight:800;cursor:pointer;font-family:inherit}
+    button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line-strong)}
+    button.secondary:hover,.list-item:hover{border-color:#9fb3c8;background:#f8fbfe}
+    .grid{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start}
+    .reader-sidebar{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+    .list-item{width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:10px}
+    .list-item.active{border-color:var(--blue);background:var(--blue-soft)}
+    .list-title{font-weight:900;margin-bottom:4px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .list-meta{font-size:.76rem;color:var(--muted);line-height:1.45}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+    .tabs button{background:#fff;color:var(--ink);border:1px solid var(--line-strong);padding:8px 11px;font-size:.78rem}
     .tabs button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-    .station-grid{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr);gap:18px}
-    pre{white-space:pre-wrap;background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:12px;line-height:1.55;max-height:440px;overflow:auto}
+    .attempt-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px}
+    .attempt-head h2{margin:0 0 5px;font-size:1.35rem}
+    .metric-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:14px 0 4px}
+    .metric{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+    .metric strong{display:block;font-size:1rem;color:var(--navy)}
+    .metric span{display:block;font-size:.72rem;color:var(--muted);margin-top:2px}
+    .station-grid{display:grid;grid-template-columns:minmax(300px,.9fr) minmax(0,1.1fr);gap:18px;align-items:start}
+    .review-box{background:#fff;border:1px solid var(--line);border-radius:8px;padding:15px;margin-bottom:14px}
+    .review-box.soft{background:var(--soft)}
+    .section-label{font-size:.68rem;font-weight:900;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+    .text-block{white-space:pre-wrap;color:var(--ink);font-size:.9rem;line-height:1.7}
+    .scroll-block{max-height:360px;overflow:auto}
+    .prompt-list{display:grid;gap:10px;margin-top:12px}
+    .prompt-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
+    .feedback-shell{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px}
+    .feedback-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
+    .score-pill,.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:var(--blue-soft);color:#0369a1;padding:5px 10px;font-size:.75rem;font-weight:900;white-space:nowrap}
+    .score-pill.good{background:var(--green-soft);color:var(--green)}
+    .score-pill.warn{background:var(--amber-soft);color:var(--amber)}
+    .score-pill.risk{background:var(--red-soft);color:var(--red)}
+    .feedback-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px}
+    .summary-tile{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--soft)}
+    .summary-tile strong{display:block;color:var(--navy);font-size:.78rem;margin-bottom:5px}
+    .summary-tile div{font-size:.86rem;color:var(--ink);line-height:1.6}
+    .criteria-grid{display:grid;gap:9px}
+    .criterion-row{display:grid;grid-template-columns:minmax(135px,.35fr) minmax(0,1fr);gap:12px;border-top:1px solid var(--line);padding-top:10px}
+    .criterion-name{font-weight:900;color:var(--navy);font-size:.82rem}
+    .criterion-note{color:var(--ink);font-size:.84rem;line-height:1.55}
+    .mini-label{color:var(--muted);font-size:.72rem;font-weight:800;margin-top:3px}
+    .data-lines{display:grid;gap:8px}
+    .data-line{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;border-top:1px solid var(--line);padding-top:8px;font-size:.84rem;line-height:1.5}
+    .data-line b{color:var(--navy)}
+    pre{white-space:pre-wrap;background:#0f172a;color:#e2e8f0;border:1px solid #1e293b;border-radius:8px;padding:12px;line-height:1.55;max-height:320px;overflow:auto}
+    details.raw{margin-top:12px}
+    details.raw summary{cursor:pointer;color:var(--muted);font-size:.78rem;font-weight:800}
     video{width:100%;aspect-ratio:16/9;background:#000}
-    .mock-video-shell{background:#07111f;border:1px solid rgba(10,22,40,.18);border-radius:14px;overflow:hidden;box-shadow:0 10px 28px rgba(10,22,40,.12)}
-    .mock-video-bar{padding:11px 12px 12px;background:linear-gradient(180deg,#0a1628,#07111f)}
+    .mock-video-shell{background:#07111f;border:1px solid rgba(10,22,40,.18);border-radius:8px;overflow:hidden;box-shadow:0 10px 28px rgba(10,22,40,.12)}
+    .mock-video-bar{padding:11px 12px 12px;background:#07111f}
     .mock-video-row{display:flex;align-items:center;gap:10px}
-    .mock-video-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;padding:0;font-size:.82rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .mock-video-btn{width:38px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;padding:0;font-size:.82rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .mock-video-track{position:relative;height:18px;flex:1;display:flex;align-items:center}
     .mock-video-bg{position:absolute;left:0;right:0;height:5px;border-radius:999px;background:rgba(255,255,255,.18);overflow:hidden}
-    .mock-video-fill{height:100%;width:0;background:var(--teal);border-radius:999px}
+    .mock-video-fill{height:100%;width:0;background:var(--blue);border-radius:999px}
     .mock-video-range{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}
     .mock-video-time{min-width:74px;text-align:right;color:rgba(255,255,255,.72);font-size:.72rem;font-weight:800;font-variant-numeric:tabular-nums}
-    .pill{display:inline-block;border-radius:999px;background:rgba(14,165,233,.1);color:#0369a1;padding:4px 9px;font-size:.72rem;font-weight:800}
-    @media(max-width:900px){.grid,.station-grid{grid-template-columns:1fr}}
+    @media(max-width:1060px){.grid,.station-grid,.feedback-summary{grid-template-columns:1fr}.reader-sidebar{position:static;max-height:none}}
   </style>
 </head>
 <body>
@@ -64,7 +119,7 @@
 
     <section id="readerApp" style="display:none">
       <div class="grid">
-        <aside class="card">
+        <aside class="panel reader-sidebar">
           <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px">
             <h2 style="margin:0;font-size:1rem">Mock Attempts</h2>
             <button class="secondary" onclick="loadList()">Refresh</button>
@@ -75,7 +130,7 @@
           </div>
           <div id="reviewList" class="muted">Loading...</div>
         </aside>
-        <section id="attemptPanel" class="card">
+        <section id="attemptPanel" class="panel">
           <div class="muted">Select a paid mock review request.</div>
         </section>
       </div>
@@ -116,6 +171,89 @@
 
     function esc(v){return String(v ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
     function authHeaders(){return adminToken ? {'Authorization':'Bearer '+adminToken} : {};}
+    function isObj(v){return v && typeof v === 'object' && !Array.isArray(v);}
+    function textOf(v){
+      if(v == null || v === '')return '';
+      if(typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')return String(v);
+      return '';
+    }
+    function firstText(){
+      for(const value of arguments){
+        const out=textOf(value).trim();
+        if(out)return out;
+      }
+      return '';
+    }
+    function readableValue(value){
+      const direct=textOf(value).trim();
+      if(direct)return direct;
+      if(Array.isArray(value))return value.map(readableValue).filter(Boolean).join('; ');
+      if(isObj(value)){
+        const parts=[
+          value.score !== undefined && value.score !== null && String(value.score).trim() !== '' ? `Score ${value.score}` : '',
+          firstText(value.label,value.comment,value.summary,value.evidence,value.improve,value.improvement,value.reason,value.note),
+        ].filter(Boolean);
+        return parts.join(' - ');
+      }
+      return '';
+    }
+    function niceKey(key){
+      const map={
+        overall:'Overall',
+        score:'Score',
+        label:'Label',
+        comment:'Comment',
+        summary:'Summary',
+        empathy:'Empathy',
+        communication:'Communication',
+        reasoning:'Reasoning',
+        reflection:'Reflection',
+        real_world_awareness:'Real-world judgement',
+        thought_content:'Thought content',
+        organisation:'Organisation',
+        theme_engagement:'Theme engagement',
+        evidence_illustration:'Evidence and illustration',
+        language_style:'Language and style',
+        biggest_strength:'Biggest strength',
+        biggest_improvement:'Biggest improvement',
+        excellent_version:'Excellent response would add',
+        visual_presence:'Visual presence',
+        one_improvement:'One improvement',
+        next_step:'Next step',
+        nextStep:'Next step',
+      };
+      return map[key] || String(key || '').replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[_-]+/g,' ').replace(/\b\w/g,ch=>ch.toUpperCase());
+    }
+    function statusText(value){return String(value || 'not_requested').replace(/_/g,' ');}
+    function fmtDateTime(value){
+      if(!value)return '';
+      const d=new Date(value);
+      if(Number.isNaN(d.getTime()))return String(value);
+      return d.toLocaleString('en-AU',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    }
+    function scoreTone(score){
+      const n=Number(score);
+      if(!Number.isFinite(n))return '';
+      if(n >= 7)return 'good';
+      if(n < 4.5)return 'risk';
+      if(n < 5.5)return 'warn';
+      return '';
+    }
+    function scorePill(score,label='',scale='10'){
+      const hasScore=score !== null && score !== undefined && String(score).trim() !== '';
+      const n=hasScore?Number(score):NaN;
+      const main=Number.isFinite(n)?`${Math.round(n*10)/10}/${scale}`:'No score';
+      return `<span class="score-pill ${scoreTone(n)}">${esc(main)}${label?` <span>${esc(label)}</span>`:''}</span>`;
+    }
+    function dataLines(obj, skip=[]){
+      if(!isObj(obj))return '';
+      const hidden=new Set(skip);
+      const rows=Object.entries(obj).map(([key,value])=>[key,readableValue(value)]).filter(([key,value])=>!hidden.has(key)&&value);
+      if(!rows.length)return '';
+      return `<div class="data-lines">${rows.map(([key,value])=>`
+        <div class="data-line"><b>${esc(niceKey(key))}</b><span>${esc(value)}</span></div>
+      `).join('')}</div>`;
+    }
 
     function startAdminHandoff(){
       if(adminToken || !handoffId || !('BroadcastChannel' in window))return;
@@ -167,8 +305,8 @@
       list.textContent='Loading...';
       const allBtn=document.getElementById('scopeAllBtn'), paidBtn=document.getElementById('scopePaidBtn');
       if(allBtn&&paidBtn){
-        allBtn.style.background=listScope==='all'?'var(--navy)':'#fff'; allBtn.style.color=listScope==='all'?'#fff':'var(--gray700)';
-        paidBtn.style.background=listScope==='paid'?'var(--navy)':'#fff'; paidBtn.style.color=listScope==='paid'?'#fff':'var(--gray700)';
+        allBtn.style.background=listScope==='all'?'var(--navy)':'#fff'; allBtn.style.color=listScope==='all'?'#fff':'var(--ink)';
+        paidBtn.style.background=listScope==='paid'?'var(--navy)':'#fff'; paidBtn.style.color=listScope==='paid'?'#fff':'var(--ink)';
       }
       const endpoint = listScope === 'paid' ? '/api/admin/casper-mock/manual-reviews' : '/api/admin/casper-mock/attempts';
       const res=await fetch(API_BASE+endpoint,{headers:authHeaders()});
@@ -176,10 +314,14 @@
       if(!res.ok){list.textContent=data.error||'Could not load reviews';return;}
       const rows=data.rows||[];
       list.innerHTML=rows.length?rows.map(r=>`
-        <button class="list-item" onclick="openAttempt('${esc(r.id)}')">
-          <div style="font-weight:900">${esc(r.user_name||r.user_email||'Student')}</div>
-          <div class="muted">${esc(r.user_email||'')}<br>${esc(r.tier||'mock')} - ${r.manual_review_paid ? 'paid manual review' : 'saved mock only'} - ${esc(r.manual_review_status||'not_requested')}</div>
-          <div class="muted">${esc(r.completed_at||'')}</div>
+        <button class="list-item ${currentAttempt?.id===r.id?'active':''}" data-attempt-id="${esc(r.id)}" onclick="openAttempt('${esc(r.id)}')">
+          <div class="list-title">${esc(r.user_name||r.user_email||'Student')}</div>
+          <div class="list-meta">${esc(r.user_email||'No email')}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin:9px 0 7px;">
+            <span class="pill">${esc(r.tier||'mock')}</span>
+            <span class="score-pill ${r.manual_review_paid?'good':''}">${r.manual_review_paid ? 'Paid review' : 'Saved mock'}</span>
+          </div>
+          <div class="list-meta">${esc(statusText(r.manual_review_status))}${r.completed_at ? ' | ' + esc(fmtDateTime(r.completed_at)) : ''}</div>
         </button>
       `).join(''):(listScope === 'paid' ? 'No paid manual reviews yet.' : 'No saved mock attempts yet.');
       return rows;
@@ -191,28 +333,45 @@
       const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(id),{headers:authHeaders()});
       const data=await res.json().catch(()=>({}));
       if(!res.ok){panel.innerHTML='<div class="muted">'+esc(data.error||'Could not load attempt')+'</div>';return;}
-      currentAttempt=data.attempt; currentStation=0; renderAttempt();
+      currentAttempt=data.attempt; currentStation=0; markActiveAttempt(id); renderAttempt();
+    }
+
+    function markActiveAttempt(id){
+      document.querySelectorAll('[data-attempt-id]').forEach(btn=>btn.classList.toggle('active', btn.dataset.attemptId===id));
     }
 
     function renderAttempt(){
       const a=currentAttempt, rows=a.rows||[];
-      const tabs=rows.map((r,i)=>`<button class="${i===currentStation?'active':''}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}</button>`).join('');
+      const scored=rows.map(r=>Number(r.score)).filter(Number.isFinite);
+      const avg=scored.length?Math.round((scored.reduce((sum,n)=>sum+n,0)/scored.length)*10)/10:'-';
+      const videoCount=rows.filter(r=>r.type==='video').length;
+      const typedCount=rows.filter(r=>r.type!=='video').length;
+      const tabs=rows.map((r,i)=>`<button class="${i===currentStation?'active':''}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}${Number.isFinite(Number(r.score))?` - ${Math.round(Number(r.score)*10)/10}`:''}</button>`).join('');
       document.getElementById('attemptPanel').innerHTML=`
-        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+        <div class="attempt-head">
           <div>
             <h2 style="margin:0">${esc(a.user_name||a.user_email||'Student')}</h2>
-            <div class="muted">${esc(a.user_email||'')} - <span class="pill">${esc(a.tier)}</span> - ${esc(a.manual_review_status||'pending_review')}</div>
+            <div class="muted">${esc(a.user_email||'No email')} | <span class="pill">${esc(a.tier||'mock')}</span> | ${esc(statusText(a.manual_review_status||'pending_review'))}</div>
           </div>
           <button class="secondary" onclick="saveNotes()">Save notes</button>
         </div>
+        <div class="metric-row">
+          <div class="metric"><strong>${esc(avg)}</strong><span>Average reviewed score</span></div>
+          <div class="metric"><strong>${scored.length}/${rows.length}</strong><span>Stations with AI feedback</span></div>
+          <div class="metric"><strong>${videoCount}</strong><span>Video stations</span></div>
+          <div class="metric"><strong>${typedCount}</strong><span>Typed stations</span></div>
+          <div class="metric"><strong>${esc(fmtDateTime(a.completed_at)||'-')}</strong><span>Completed</span></div>
+        </div>
         <div class="tabs">${tabs}</div>
         <div>${stationHtml(rows[currentStation])}</div>
-        <div class="card" style="margin-top:16px">
-          <h3>Admin notes</h3>
+        <div class="review-box" style="margin-top:16px">
+          <h3>Manual review result</h3>
           <select id="reviewStatus" style="max-width:240px;margin-bottom:10px">
             ${['pending_review','in_review','completed'].map(s=>`<option value="${s}" ${a.manual_review_status===s?'selected':''}>${s}</option>`).join('')}
           </select>
-          <textarea id="adminNotes" rows="7" placeholder="Overall notes, station-specific notes, final recommendation...">${esc(a.admin_notes||'')}</textarea>
+          <textarea id="manualReviewNotes" rows="7" placeholder="Student-facing manual review result. This appears in the student's history when status is completed.">${esc(a.manual_review_notes||'')}</textarea>
+          <h3 style="margin-top:16px;">Private admin notes</h3>
+          <textarea id="adminNotes" rows="5" placeholder="Internal notes only. These are not shown to the student.">${esc(a.admin_notes||'')}</textarea>
           <div id="saveStatus" class="muted" style="margin-top:8px"></div>
         </div>
       `;
@@ -264,7 +423,7 @@
         video.src=url;
       }catch(e){
         video.removeAttribute('src');
-        video.insertAdjacentHTML('afterend','<div class="muted" style="padding:12px;background:#fff;border:1px solid var(--gray200);border-radius:10px;margin:10px;">Recording could not be loaded with this admin session.</div>');
+        video.insertAdjacentHTML('afterend','<div class="muted" style="padding:12px;background:#fff;border:1px solid var(--line);border-radius:8px;margin:10px;">Recording could not be loaded with this admin session.</div>');
       }
       initVideoPlayer(id);
     }
@@ -295,31 +454,177 @@
 
     function stationHtml(r){
       if(!r)return '<div class="muted">No station selected.</div>';
-      const station=r.station||{}, fb=r.feedback||{};
-      const scenario=`<div class="card"><h3>Scenario</h3><div class="muted">${esc(station.scenario||'')}</div><h4>Prompts</h4><ol><li>${esc(station.prompt1||'')}</li><li>${esc(station.prompt2||'')}</li></ol></div>`;
+      const station=r.station||{};
       if(r.type==='video'){
         const key=r.recording_key;
-        return `<div class="station-grid"><div>${videoPlayerHtml(key,r)}<pre>${esc(r.transcript||'No transcript')}</pre></div><div>${scenario}${feedbackHtml(fb)}</div></div>`;
+        return `<div class="station-grid">
+          <div>
+            ${videoPlayerHtml(key,r)}
+            ${textPanel('Transcript', r.transcript, 'No transcript captured.')}
+          </div>
+          <div>
+            ${scenarioHtml(station)}
+            ${feedbackHtml(r.feedback||{}, r)}
+          </div>
+        </div>`;
       }
-      return `<div class="station-grid"><div>${scenario}<h3>Typed answer</h3><pre>${esc(r.answer||'No answer')}</pre></div><div>${feedbackHtml(fb)}</div></div>`;
+      return `<div class="station-grid">
+        <div>
+          ${scenarioHtml(station)}
+          ${textPanel('Typed answer', r.answer, 'No typed answer captured.')}
+        </div>
+        <div>${feedbackHtml(r.feedback||{}, r)}</div>
+      </div>`;
     }
 
-    function feedbackHtml(fb){
+    function scenarioHtml(station){
+      const prompts=[station.prompt1,station.prompt2].filter(Boolean);
+      return `<div class="review-box soft">
+        <div class="section-label">Scenario</div>
+        <div class="text-block">${esc(station.scenario||'No scenario available.')}</div>
+        ${prompts.length?`<div class="prompt-list">${prompts.map((prompt,i)=>`
+          <div class="prompt-card">
+            <div class="section-label">Prompt ${i+1}</div>
+            <div class="text-block">${esc(prompt)}</div>
+          </div>
+        `).join('')}</div>`:''}
+      </div>`;
+    }
+
+    function textPanel(title,text,empty){
+      return `<div class="review-box">
+        <div class="section-label">${esc(title)}</div>
+        <div class="text-block scroll-block">${esc(text||empty)}</div>
+      </div>`;
+    }
+
+    function feedbackHtml(fb,row){
+      if(!fb || !Object.keys(fb).length){
+        return `<div class="feedback-shell"><h3>AI Feedback</h3><div class="muted">No AI feedback returned for this station.</div></div>`;
+      }
       const overall=fb.overall||{};
-      const comps=Array.isArray(fb.competencies)?fb.competencies:[];
-      const prompts=Array.isArray(fb.per_prompt)?fb.per_prompt:[];
-      return `<div class="card"><h3>AI Feedback</h3>
-        <div class="pill">${esc(overall.score||fb.score||'')}/10 ${esc(overall.label||'')}</div>
-        <p><strong>Strength:</strong> ${esc(overall.biggest_strength||fb.strengths||'')}</p>
-        <p><strong>Improve:</strong> ${esc(overall.biggest_improvement||fb.improvements||'')}</p>
-        ${fb.presentation?`<h4>Presentation</h4><pre>${esc(JSON.stringify(fb.presentation,null,2))}</pre>`:''}
-        ${comps.length?`<h4>Competencies</h4><pre>${esc(JSON.stringify(comps,null,2))}</pre>`:''}
-        ${prompts.length?`<h4>Prompt feedback</h4><pre>${esc(JSON.stringify(prompts,null,2))}</pre>`:''}
+      const score=firstText(overall.score,fb.score,row?.score);
+      const label=firstText(overall.label,fb.label);
+      const strength=firstText(overall.biggest_strength,fb.strengths,fb.strength);
+      const improve=firstText(overall.biggest_improvement,fb.improvements,fb.improve);
+      const excellent=firstText(overall.excellent_version,fb.excellent_version);
+      return `<div class="feedback-shell">
+        <div class="feedback-head">
+          <div>
+            <h3>AI Feedback</h3>
+            <div class="muted">${esc(row?.type==='video'?'Video station analysis':'Typed station analysis')}</div>
+          </div>
+          ${scorePill(score,label)}
+        </div>
+        ${strength||improve?`<div class="feedback-summary">
+          ${strength?`<div class="summary-tile"><strong>Strength</strong><div>${esc(strength)}</div></div>`:''}
+          ${improve?`<div class="summary-tile"><strong>Improve</strong><div>${esc(improve)}</div></div>`:''}
+        </div>`:''}
+        ${excellent?`<div class="summary-tile" style="margin-bottom:12px;"><strong>Excellent response would add</strong><div>${esc(excellent)}</div></div>`:''}
+        ${generalFeedbackHtml(fb)}
+        ${promptFeedbackHtml(Array.isArray(fb.per_prompt)?fb.per_prompt:[])}
+        ${competenciesHtml(fb.competencies)}
+        ${presentationHtml(fb.presentation)}
+        <details class="raw"><summary>Technical data</summary><pre>${esc(JSON.stringify(fb,null,2))}</pre></details>
+      </div>`;
+    }
+
+    function generalFeedbackHtml(fb){
+      const pairs=[
+        ['Empathy',fb.empathy],
+        ['Missed point',fb.missed],
+        ['Next step',fb.next_step||fb.nextStep],
+      ].filter(([,value])=>textOf(value).trim() && textOf(value).trim().toLowerCase()!=='none');
+      if(!pairs.length)return '';
+      return `<div class="review-box soft">
+        <div class="section-label">Station notes</div>
+        <div class="data-lines">${pairs.map(([label,value])=>`
+          <div class="data-line"><b>${esc(label)}</b><span>${esc(value)}</span></div>
+        `).join('')}</div>
+      </div>`;
+    }
+
+    function promptFeedbackHtml(prompts){
+      if(!prompts.length)return '';
+      return `<div class="review-box">
+        <h3>Prompt feedback</h3>
+        <div class="prompt-list">${prompts.map((prompt,i)=>`
+          <div class="prompt-card">
+            <div class="feedback-head" style="margin-bottom:8px;">
+              <div>
+                <div class="section-label">Prompt ${Number.isFinite(Number(prompt.prompt_index))?Number(prompt.prompt_index)+1:i+1}</div>
+                ${prompt.prompt_text?`<div class="text-block" style="font-size:.84rem;">${esc(prompt.prompt_text)}</div>`:''}
+              </div>
+              ${promptAveragePill(prompt)}
+            </div>
+            ${prompt.summary?`<div class="criterion-note" style="margin-bottom:10px;">${esc(prompt.summary)}</div>`:''}
+            ${criteriaHtml(prompt.scores||{})}
+            ${dataLines(prompt,['prompt_index','prompt_text','scores','summary'])}
+          </div>
+        `).join('')}</div>
+      </div>`;
+    }
+
+    function promptAveragePill(prompt){
+      const scores=Object.values(prompt?.scores||{}).map(item=>Number(isObj(item)?item.score:item)).filter(Number.isFinite);
+      if(!scores.length)return '';
+      const avg=Math.round((scores.reduce((sum,n)=>sum+n,0)/scores.length)*10)/10;
+      return scorePill(avg,'avg');
+    }
+
+    function criteriaHtml(scores){
+      const entries=Object.entries(scores||{});
+      if(!entries.length)return '';
+      return `<div class="criteria-grid">${entries.map(([key,value])=>{
+        const item=isObj(value)?value:{score:value};
+        const score=item.score;
+        const note=firstText(item.comment,item.evidence,item.improve,item.improvement,item.reason,item.note,item.summary,!isObj(value)?value:'');
+        const label=firstText(item.label);
+        return `<div class="criterion-row">
+          <div>
+            <div class="criterion-name">${esc(niceKey(key))}</div>
+            <div class="mini-label">${scorePill(score,label)}</div>
+          </div>
+          <div class="criterion-note">${esc(note||'No comment returned.')}</div>
+        </div>`;
+      }).join('')}</div>`;
+    }
+
+    function competenciesHtml(raw){
+      if(!raw)return '';
+      const list=Array.isArray(raw)
+        ? raw
+        : Object.entries(raw).map(([key,value])=>isObj(value)?{name:key,...value}:{name:key,score:value});
+      const usable=list.filter(Boolean);
+      if(!usable.length)return '';
+      return `<div class="review-box">
+        <h3>Competencies</h3>
+        <div class="criteria-grid">${usable.map(item=>{
+          const name=firstText(item.name,item.competency,item.label,'Competency');
+          const note=firstText(item.improve,item.improvement,item.next_step,item.nextStep,item.evidence,item.reason,item.note,item.comment);
+          return `<div class="criterion-row">
+            <div>
+              <div class="criterion-name">${esc(niceKey(name))}</div>
+              <div class="mini-label">${scorePill(item.score,item.label&&item.label!==name?item.label:'')}</div>
+            </div>
+            <div class="criterion-note">${esc(note||'No note returned.')}</div>
+          </div>`;
+        }).join('')}</div>
+      </div>`;
+    }
+
+    function presentationHtml(presentation){
+      if(!isObj(presentation))return '';
+      const html=dataLines(presentation,[]);
+      if(!html)return '';
+      return `<div class="review-box">
+        <h3>Presentation</h3>
+        ${html}
       </div>`;
     }
 
     async function saveNotes(){
-      const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/notes',{method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({status:reviewStatus.value,notes:adminNotes.value})});
+      const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/notes',{method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({status:reviewStatus.value,manual_review_notes:manualReviewNotes.value,notes:adminNotes.value})});
       const data=await res.json().catch(()=>({}));
       document.getElementById('saveStatus').textContent=res.ok?'Saved.':(data.error||'Save failed');
     }
