@@ -107,12 +107,16 @@
 	 .mock-history-sub { font-size:0.82rem; color:var(--gray600); line-height:1.55; margin-top:4px; max-width:720px; }
 	 .mock-history-list { display:grid; gap:14px; }
 	 .mock-card { background:#fff; border:1px solid var(--gray200); border-radius:14px; overflow:hidden; }
-	 .mock-card-header { width:100%; border:0; background:#fff; padding:16px 18px; display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:14px; align-items:center; text-align:left; cursor:pointer; font-family:inherit; }
-	 .mock-card-header:hover { background:var(--gray50); }
+	 .mock-card-header { background:#fff; padding:16px 18px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:center; }
 	 .mock-card-title { font-size:0.94rem; font-weight:900; color:var(--navy); line-height:1.3; }
 	 .mock-card-meta { font-size:0.76rem; color:var(--gray400); line-height:1.45; margin-top:2px; }
-	 .mock-report-link { display:inline-flex; align-items:center; justify-content:center; padding:7px 11px; border-radius:50px; border:1px solid rgba(14,165,233,0.26); background:#fff; color:var(--teal3); font-size:0.72rem; font-weight:850; white-space:nowrap; }
-	 .mock-report-link:hover { background:rgba(14,165,233,0.08); }
+	 .mock-card-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
+	 .mock-report-link { display:inline-flex; align-items:center; justify-content:center; min-height:36px; padding:9px 15px; border-radius:50px; border:1px solid var(--teal); background:var(--teal); color:#fff; font-size:0.78rem; font-weight:900; white-space:nowrap; box-shadow:0 8px 18px rgba(14,165,233,0.18); }
+	 .mock-report-link:hover { background:var(--teal2); border-color:var(--teal2); transform:translateY(-1px); }
+	 .mock-preview-btn { min-height:36px; padding:8px 13px; border-radius:50px; border:1px solid var(--gray200); background:#fff; color:var(--gray600); font-size:0.76rem; font-weight:850; font-family:inherit; cursor:pointer; white-space:nowrap; }
+	 .mock-preview-btn:hover { border-color:rgba(14,165,233,0.35); background:rgba(14,165,233,0.06); color:var(--teal3); }
+	 .mock-card.open .mock-preview-btn { background:var(--navy); border-color:var(--navy); color:#fff; }
+	 .mock-card-stats { display:flex; align-items:center; gap:9px; margin-top:8px; flex-wrap:wrap; }
 	 .mock-score { font-size:1.1rem; font-weight:900; color:var(--teal3); white-space:nowrap; }
 	 .mock-status-pill { border-radius:50px; padding:5px 10px; font-size:0.68rem; font-weight:850; background:rgba(14,165,233,0.1); color:var(--teal3); white-space:nowrap; }
 	 .mock-status-pill.warn { background:#fff7ed; color:#9a3412; }
@@ -230,6 +234,8 @@
 	 .feedback-grid { grid-template-columns:1fr; }
 	 .competency-panel-header { flex-direction:column; align-items:stretch; }
 	 .mock-card-header { grid-template-columns:1fr; }
+	 .mock-card-actions { justify-content:flex-start; }
+	 .mock-report-link,.mock-preview-btn { width:100%; }
 	 .mock-station-grid,.mock-feedback-grid { grid-template-columns:1fr; }
 	 }
  </style>
@@ -439,7 +445,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 	 <div>
 	 <div class="mock-history-kicker">Full mock exam history</div>
 	 <div class="mock-history-title">Your complete CASPer mock reports</div>
-	 <div class="mock-history-sub">Review your full-mock score pattern, station feedback, video recordings and transcripts. Recordings are available for 30 days after completion.</div>
+	 <div class="mock-history-sub">Use <strong>View full mock review</strong> for the polished report page. Use <strong>Quick preview here</strong> if you just want to expand the stations inside history. Recordings are available for 30 days after completion.</div>
 	 </div>
 	 <a href="full-casper-mock-exam.html" class="filter-btn" style="white-space:nowrap;">Take another mock</a>
 	 </div>
@@ -780,17 +786,22 @@ function mockCardHTML(attempt) {
  const isLoaded = Array.isArray(attempt.rows);
  return `
  <article class="mock-card" id="mock-${escapeAttr(attempt.id)}">
- <button type="button" class="mock-card-header" onclick="toggleMockAttempt('${escapeAttr(attempt.id)}')">
+ <div class="mock-card-header">
  <div>
  <div class="mock-card-title">Full CASPer Mock - ${escapeHtml(attempt.tier || 'mock')}</div>
  <div class="mock-card-meta">${completed || 'Saved mock'} | ${stationCount} stations | ${escapeHtml(manual)}</div>
- </div>
- <span class="mock-report-link" role="link" tabindex="0" onclick="event.stopPropagation();window.location.href='mock-report.html?id=${encodeURIComponent(attempt.id)}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();window.location.href='mock-report.html?id=${encodeURIComponent(attempt.id)}'}">Open report</span>
+ <div class="mock-card-stats">
  <div class="mock-score">${escapeHtml(score)}</div>
  <span class="mock-status-pill${statusClass}">${escapeHtml(expires)}</span>
- </button>
+ </div>
+ </div>
+ <div class="mock-card-actions">
+ <a class="mock-report-link" href="mock-report.html?id=${encodeURIComponent(attempt.id)}">View full mock review</a>
+ <button type="button" class="mock-preview-btn" onclick="toggleMockAttempt('${escapeAttr(attempt.id)}')">${isLoaded ? 'Quick preview here' : 'Load preview here'}</button>
+ </div>
+ </div>
  <div class="mock-card-body">
- ${isLoaded ? `${mockOverviewHTML(attempt)}<div class="mock-station-list">${rows.map((row, i) => mockStationHTML(attempt, row, i)).join('')}</div>` : `<div class="mock-expiry-note" style="background:#eff6ff;border-color:rgba(14,165,233,0.22);color:#075985;">Loading the full station report only when opened keeps this page quick, especially when video transcripts are attached.</div>`}
+ ${isLoaded ? `${mockOverviewHTML(attempt)}<div class="mock-station-list">${rows.map((row, i) => mockStationHTML(attempt, row, i)).join('')}</div>` : `<div class="mock-expiry-note" style="background:#eff6ff;border-color:rgba(14,165,233,0.22);color:#075985;">Press <strong>Load preview here</strong> to expand the station-by-station preview inside history, or use <strong>View full mock review</strong> for the dedicated report page.</div>`}
  </div>
  </article>
  `;
