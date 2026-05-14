@@ -202,6 +202,7 @@ window.FullCasperMock = (() => {
  transcriptSegments: Array.isArray(row.transcript_segments) ? row.transcript_segments : [],
  reviewId: row.review_id || null,
  recordingKey: row.recording_key || null,
+ transcriptionAudioKey: row.transcription_audio_key || null,
  durationSec: row.duration_sec || null,
  processingError: row.processing_error || null,
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
@@ -833,6 +834,7 @@ window.FullCasperMock = (() => {
  row.rawFeedback = data || null;
  row.reviewId = data?.review_id || null;
  row.recordingKey = data?.recording_url || null;
+ row.transcriptionAudioKey = data?.transcription_audio_key || null;
  row.processingError = data?.processing_error || data?.message || null;
  } else {
  row.score = Number.isFinite(Number(data?.score)) ? Number(data.score) : null;
@@ -859,6 +861,7 @@ window.FullCasperMock = (() => {
  transcript_segments: row.transcriptSegments || row.transcript_segments || row.rawFeedback?.transcript_segments || [],
  review_id: row.reviewId || row.rawFeedback?.review_id || null,
  recording_key: row.recordingKey || row.rawFeedback?.recording_url || null,
+ transcription_audio_key: row.transcriptionAudioKey || row.rawFeedback?.transcription_audio_key || null,
  duration_sec: row.durationSec || row.duration_sec || row.rawFeedback?.durationSec || null,
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
  processing_error: row.processingError || null,
