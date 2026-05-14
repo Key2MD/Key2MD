@@ -86,6 +86,14 @@
     details.raw summary{cursor:pointer;color:var(--muted);font-size:.78rem;font-weight:800}
     video{width:100%;aspect-ratio:16/9;background:#000}
     .mock-video-shell{background:#07111f;border:1px solid rgba(10,22,40,.18);border-radius:8px;overflow:hidden;box-shadow:0 10px 28px rgba(10,22,40,.12)}
+    .mock-video-stage{position:relative;background:linear-gradient(135deg,#07111f,#10233a);min-height:190px}
+    .mock-video-stage video{display:block;position:relative;z-index:1}
+    .mock-video-overlay{position:absolute;inset:0;z-index:2;border:0;background:radial-gradient(circle at 50% 38%,rgba(14,165,233,.25),rgba(7,17,31,.94) 58%);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;cursor:pointer;font:inherit}
+    .mock-video-shell.is-playing .mock-video-overlay{opacity:0;pointer-events:none}
+    .mock-video-shell.is-error .mock-video-overlay{background:linear-gradient(135deg,#3b0d0d,#07111f);cursor:default}
+    .mock-video-playmark{width:62px;height:62px;border-radius:50%;background:#fff;color:var(--navy);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.4rem;font-weight:900;box-shadow:0 18px 44px rgba(0,0,0,.25)}
+    .mock-video-overlay-title{font-size:.95rem;font-weight:900;margin-bottom:4px}
+    .mock-video-overlay-sub{font-size:.78rem;color:rgba(255,255,255,.72);line-height:1.45;max-width:360px}
     .mock-video-bar{padding:11px 12px 12px;background:#07111f}
     .mock-video-row{display:flex;align-items:center;gap:10px}
     .mock-video-btn{width:38px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;padding:0;font-size:.82rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -94,6 +102,12 @@
     .mock-video-fill{height:100%;width:0;background:var(--blue);border-radius:999px}
     .mock-video-range{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}
     .mock-video-time{min-width:74px;text-align:right;color:rgba(255,255,255,.72);font-size:.72rem;font-weight:800;font-variant-numeric:tabular-nums}
+    .mock-video-status{padding:7px 12px 0;color:rgba(255,255,255,.62);font-size:.72rem;line-height:1.35}
+    .mock-sync-transcript{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:#fff;padding:8px;display:grid;gap:5px}
+    .mock-sync-segment{width:100%;text-align:left;border:0;background:transparent;color:var(--ink);padding:8px 9px;border-radius:7px;font-weight:650;line-height:1.55;font-size:.84rem}
+    .mock-sync-segment:hover{background:#f1f7fc;color:var(--navy)}
+    .mock-sync-segment.active{background:var(--blue-soft);box-shadow:inset 3px 0 0 var(--blue);color:var(--navy)}
+    .mock-sync-time{font-size:.68rem;color:var(--muted);font-weight:900;margin-right:7px;font-variant-numeric:tabular-nums}
     @media(max-width:1060px){.grid,.station-grid,.feedback-summary{grid-template-columns:1fr}.reader-sidebar{position:static;max-height:none}}
   </style>
 </head>
@@ -405,8 +419,9 @@
     function videoPlayerHtml(recordingKey,r,id='adminVideoPlayer'){
       const duration=rowDuration(r);
       if(!recordingKey){
-        return `<div class="mock-video-shell" style="min-height:180px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:18px;">
+        return `<div class="mock-video-shell" style="min-height:190px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:18px;">
           <div>
+            <div class="mock-video-playmark" style="background:rgba(255,255,255,.12);color:#fff;">!</div>
             <div style="font-weight:850;margin-bottom:6px;">No recording key saved</div>
             <div style="font-size:0.78rem;color:rgba(255,255,255,0.68);line-height:1.5;">${duration?`The browser captured about ${fmtTime(duration)}, but the analysis/upload did not return a playable recording.`:'The video upload did not complete for this station.'}</div>
           </div>
@@ -414,7 +429,16 @@
       }
       const keyAttr = recordingKey ? ` data-recording-key="${esc(recordingKey)}"` : '';
       return `<div class="mock-video-shell">
-        <video id="${id}" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="display:block;cursor:pointer"></video>
+        <div class="mock-video-stage">
+          <video id="${id}" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="cursor:pointer"></video>
+          <button type="button" id="${id}Overlay" class="mock-video-overlay" onclick="playAdminRecording('${esc(id)}')">
+            <span>
+              <span class="mock-video-playmark">▶</span>
+              <span class="mock-video-overlay-title" id="${id}OverlayTitle">Loading recording...</span>
+              <span class="mock-video-overlay-sub" id="${id}OverlaySub">Preparing secure admin playback. If the first frame is dark, the recording is still being loaded.</span>
+            </span>
+          </button>
+        </div>
         <div class="mock-video-bar">
           <div class="mock-video-row">
             <button type="button" id="${id}Btn" class="mock-video-btn" aria-label="Play recording">▶</button>
@@ -424,15 +448,92 @@
             </div>
             <div id="${id}Time" class="mock-video-time">0:00 / ${duration?fmtTime(duration):'--:--'}</div>
           </div>
+          <div id="${id}Status" class="mock-video-status">Loading secure recording...</div>
         </div>
       </div>`;
     }
 
-    async function loadAdminRecording(id='adminVideoPlayer'){
+    function videoShell(video){
+      return video?.closest?.('.mock-video-shell') || null;
+    }
+
+    function setVideoState(id,state,title,sub){
+      const video=document.getElementById(id);
+      const shell=videoShell(video);
+      const status=document.getElementById(id+'Status');
+      const overlayTitle=document.getElementById(id+'OverlayTitle');
+      const overlaySub=document.getElementById(id+'OverlaySub');
+      if(shell){
+        shell.classList.toggle('is-loading',state==='loading');
+        shell.classList.toggle('is-ready',state==='ready');
+        shell.classList.toggle('is-playing',state==='playing');
+        shell.classList.toggle('is-error',state==='error');
+      }
+      if(status)status.textContent=sub||title||'';
+      if(overlayTitle)overlayTitle.textContent=title||'Recording';
+      if(overlaySub)overlaySub.textContent=sub||'';
+    }
+
+    function setAdminFallbackPoster(video){
+      if(!video || video.poster)return;
+      const canvas=document.createElement('canvas');
+      canvas.width=1280; canvas.height=720;
+      const ctx=canvas.getContext('2d');
+      if(!ctx)return;
+      const grad=ctx.createLinearGradient(0,0,1280,720);
+      grad.addColorStop(0,'#07111f');
+      grad.addColorStop(0.55,'#12324f');
+      grad.addColorStop(1,'#07111f');
+      ctx.fillStyle=grad; ctx.fillRect(0,0,1280,720);
+      ctx.fillStyle='rgba(14,165,233,0.18)'; ctx.beginPath(); ctx.arc(640,300,170,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ffffff'; ctx.beginPath(); ctx.moveTo(605,260); ctx.lineTo(605,380); ctx.lineTo(705,320); ctx.close(); ctx.fill();
+      ctx.font='700 36px Inter, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillText('CASPer mock recording',640,470);
+      video.poster=canvas.toDataURL('image/jpeg',0.82);
+    }
+
+    function tryCaptureAdminPoster(video){
+      if(!video || video.dataset.posterCaptureStarted==='1')return;
+      video.dataset.posterCaptureStarted='1';
+      const duration=Number(video.duration)||Number(video.dataset.duration)||0;
+      if(!duration || !video.videoWidth || !video.videoHeight)return;
+      const target=Math.min(Math.max(duration*0.08,0.35),Math.max(0.35,duration-0.15),1.5);
+      const original=Number(video.currentTime)||0;
+      const draw=()=>{
+        try{
+          const canvas=document.createElement('canvas');
+          canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+          const ctx=canvas.getContext('2d');
+          ctx.drawImage(video,0,0,canvas.width,canvas.height);
+          video.poster=canvas.toDataURL('image/jpeg',0.82);
+        }catch{}
+        if(Math.abs((Number(video.currentTime)||0)-target)<0.2){
+          try{ video.currentTime=original; }catch{}
+        }
+      };
+      if(Math.abs(original-target)<0.15){ draw(); return; }
+      const onSeeked=()=>{ video.removeEventListener('seeked',onSeeked); draw(); };
+      video.addEventListener('seeked',onSeeked);
+      try{ video.currentTime=target; }catch{ video.removeEventListener('seeked',onSeeked); }
+    }
+
+    async function loadAdminRecording(id='adminVideoPlayer',opts={}){
       const video=document.getElementById(id);
       if(!video)return;
       const key=video.dataset.recordingKey||'';
+      setAdminFallbackPoster(video);
       if(!key){initVideoPlayer(id);return;}
+      if(video.dataset.loaded==='1'){
+        initVideoPlayer(id);
+        if(opts.playAfterLoad)await playAdminRecording(id);
+        return;
+      }
+      if(video.dataset.loading==='1'){
+        if(opts.playAfterLoad)video.dataset.playWhenReady='1';
+        setVideoState(id,'loading','Loading recording...','The video is still being prepared. It will play as soon as it is ready.');
+        return;
+      }
+      video.dataset.loading='1';
+      setVideoState(id,'loading','Loading recording...','Fetching the secure video file for playback.');
       try{
         const res=await fetch(API_BASE+'/api/admin/casper-mock/recording?key='+encodeURIComponent(key),{headers:authHeaders()});
         if(!res.ok)throw new Error('Recording unavailable');
@@ -441,16 +542,24 @@
         const url=URL.createObjectURL(blob);
         video.dataset.blobUrl=url;
         video.src=url;
+        video.dataset.loaded='1';
+        video.load();
+        setVideoState(id,'ready','Ready to play','Click the large play button or the control bar. Transcript highlighting will follow playback.');
       }catch(e){
         video.removeAttribute('src');
-        video.insertAdjacentHTML('afterend','<div class="muted" style="padding:12px;background:#fff;border:1px solid var(--line);border-radius:8px;margin:10px;">Recording could not be loaded with this admin session.</div>');
+        setVideoState(id,'error','Recording could not be loaded','Refresh the admin session, then try again. The saved key is still shown in the attempt data.');
       }
+      video.dataset.loading='';
       initVideoPlayer(id);
+      const shouldPlay=opts.playAfterLoad || video.dataset.playWhenReady==='1';
+      video.dataset.playWhenReady='';
+      if(shouldPlay && video.dataset.loaded==='1')await playAdminRecording(id);
     }
 
     function initVideoPlayer(id='adminVideoPlayer'){
       const video=document.getElementById(id), btn=document.getElementById(id+'Btn'), range=document.getElementById(id+'Range'), fill=document.getElementById(id+'Fill'), time=document.getElementById(id+'Time');
       if(!video||!btn||!range||!fill||!time)return;
+      setAdminFallbackPoster(video);
       const hint=()=>{const n=Number(video.dataset.duration||0);return Number.isFinite(n)&&n>0?n:0;};
       const dur=()=>{const d=Number(video.duration);return Number.isFinite(d)&&d>0&&d<86400?d:hint();};
       const update=()=>{
@@ -459,17 +568,96 @@
         fill.style.width=(pct*100)+'%';
         time.textContent=`${fmtTime(cur)} / ${d?fmtTime(d):'--:--'}`;
         btn.textContent=video.paused||video.ended?'▶':'❚❚';
+        if(video.paused||video.ended){
+          if(video.dataset.loaded==='1')setVideoState(id,'ready','Ready to play','Click play to review the recording with the transcript.');
+        }else{
+          setVideoState(id,'playing','Playing','Transcript highlighting follows the current playback time.');
+        }
+        syncAdminTranscript(id,cur);
       };
       const seek=()=>{const d=dur();if(!d)return;video.currentTime=(Number(range.value)/1000)*d;update();};
-      const toggle=()=>{if(!video.getAttribute('src'))return;if(video.paused||video.ended)video.play().catch(()=>{});else video.pause();};
+      const toggle=()=>{if(video.paused||video.ended)playAdminRecording(id);else video.pause();};
       if(!video.dataset.bound){
         video.dataset.bound='1';
         btn.addEventListener('click',toggle);
         video.addEventListener('click',toggle);
         range.addEventListener('input',seek);
-        ['loadedmetadata','durationchange','timeupdate','play','pause','ended','seeked'].forEach(ev=>video.addEventListener(ev,update));
+        video.addEventListener('loadedmetadata',()=>{tryCaptureAdminPoster(video);update();});
+        video.addEventListener('loadeddata',()=>{tryCaptureAdminPoster(video);update();});
+        ['durationchange','timeupdate','play','pause','ended','seeked'].forEach(ev=>video.addEventListener(ev,update));
       }
       update();
+    }
+
+    async function playAdminRecording(id='adminVideoPlayer'){
+      const video=document.getElementById(id);
+      if(!video)return;
+      if(video.dataset.loaded!=='1' || !video.getAttribute('src')){
+        await loadAdminRecording(id,{playAfterLoad:true});
+        return;
+      }
+      try{
+        await video.play();
+        setVideoState(id,'playing','Playing','Transcript highlighting follows the current playback time.');
+      }catch{
+        setVideoState(id,'ready','Ready to play','Your browser blocked autoplay. Press the play button once more.');
+      }
+    }
+
+    function transcriptSegments(row){
+      const direct=Array.isArray(row?.transcript_segments) ? row.transcript_segments : [];
+      const camel=Array.isArray(row?.transcriptSegments) ? row.transcriptSegments : [];
+      return (direct.length ? direct : camel)
+        .map(seg=>({
+          start:Number(seg.start ?? seg.start_time ?? 0),
+          end:Number(seg.end ?? seg.end_time ?? seg.start ?? 0),
+          text:String(seg.text || '').trim(),
+        }))
+        .filter(seg=>seg.text);
+    }
+
+    function transcriptPanelHtml(row,videoId='adminVideoPlayer'){
+      const segments=transcriptSegments(row);
+      if(segments.length){
+        return `<div class="review-box">
+          <div class="section-label">Synced transcript</div>
+          <div class="muted" style="margin-bottom:8px;">Click a line to jump the video. The active line follows playback.</div>
+          <div class="mock-sync-transcript" data-sync-for="${esc(videoId)}">${segments.map((seg,i)=>{
+            const end=Number.isFinite(seg.end)&&seg.end>seg.start?seg.end:seg.start+2.5;
+            return `<button type="button" class="mock-sync-segment" data-video-id="${esc(videoId)}" data-start="${esc(seg.start)}" data-end="${esc(end)}" onclick="jumpAdminTranscript('${esc(videoId)}',${Number(seg.start)||0})"><span class="mock-sync-time">${esc(fmtTime(seg.start))}</span>${esc(seg.text)}</button>`;
+          }).join('')}</div>
+        </div>`;
+      }
+      return textPanel('Transcript', row?.transcript, row?.processing_error ? 'No transcript was generated for this recording.' : 'No transcript captured.');
+    }
+
+    function syncAdminTranscript(videoId,time){
+      const safeId=window.CSS?.escape ? CSS.escape(videoId) : String(videoId).replace(/["\\]/g,'\\$&');
+      const wrap=document.querySelector(`[data-sync-for="${safeId}"]`);
+      if(!wrap)return;
+      let active=null;
+      wrap.querySelectorAll('.mock-sync-segment').forEach(btn=>{
+        const start=Number(btn.dataset.start||0);
+        const end=Number(btn.dataset.end||start+2.5);
+        const on=time>=start && time<Math.max(end,start+0.8);
+        btn.classList.toggle('active',on);
+        if(on)active=btn;
+      });
+      if(active && wrap.dataset.lastActive!==String(active.dataset.start)){
+        wrap.dataset.lastActive=String(active.dataset.start);
+        active.scrollIntoView({block:'nearest'});
+      }
+    }
+
+    async function jumpAdminTranscript(videoId,start){
+      const video=document.getElementById(videoId);
+      if(!video)return;
+      if(video.dataset.loaded!=='1' || !video.getAttribute('src')){
+        await loadAdminRecording(videoId);
+      }
+      try{ video.currentTime=Math.max(0,Number(start)||0); }catch{}
+      syncAdminTranscript(videoId,Number(start)||0);
+      playAdminRecording(videoId);
     }
 
     function stationHtml(r){
@@ -490,7 +678,7 @@
             ${videoPlayerHtml(key,r)}
             ${issue}
             ${reprocess}
-            ${textPanel('Transcript', r.transcript, r.processing_error ? 'No transcript was generated for this recording.' : 'No transcript captured.')}
+            ${transcriptPanelHtml(r,'adminVideoPlayer')}
           </div>
           <div>
             ${scenarioHtml(station)}
