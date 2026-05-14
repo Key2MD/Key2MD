@@ -342,11 +342,12 @@
 
     function renderAttempt(){
       const a=currentAttempt, rows=a.rows||[];
-      const scored=rows.map(r=>Number(r.score)).filter(Number.isFinite);
+      const scored=rows.map(stationScore).filter(Number.isFinite);
+      const analysed=rows.filter(hasFeedback);
       const avg=scored.length?Math.round((scored.reduce((sum,n)=>sum+n,0)/scored.length)*10)/10:'-';
       const videoCount=rows.filter(r=>r.type==='video').length;
       const typedCount=rows.filter(r=>r.type!=='video').length;
-      const tabs=rows.map((r,i)=>`<button class="${i===currentStation?'active':''}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}${Number.isFinite(Number(r.score))?` - ${Math.round(Number(r.score)*10)/10}`:''}</button>`).join('');
+      const tabs=rows.map((r,i)=>{const score=stationScore(r);return `<button class="${i===currentStation?'active':''}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}${Number.isFinite(score)?` - ${Math.round(score*10)/10}`:r.processing_error?' - issue':''}</button>`;}).join('');
       document.getElementById('attemptPanel').innerHTML=`
         <div class="attempt-head">
           <div>
@@ -357,7 +358,7 @@
         </div>
         <div class="metric-row">
           <div class="metric"><strong>${esc(avg)}</strong><span>Average reviewed score</span></div>
-          <div class="metric"><strong>${scored.length}/${rows.length}</strong><span>Stations with AI feedback</span></div>
+          <div class="metric"><strong>${analysed.length}/${rows.length}</strong><span>Stations with AI feedback</span></div>
           <div class="metric"><strong>${videoCount}</strong><span>Video stations</span></div>
           <div class="metric"><strong>${typedCount}</strong><span>Typed stations</span></div>
           <div class="metric"><strong>${esc(fmtDateTime(a.completed_at)||'-')}</strong><span>Completed</span></div>
@@ -390,8 +391,27 @@
       return found||0;
     }
 
+    function hasFeedback(row){
+      return !!(row?.feedback && typeof row.feedback==='object' && Object.keys(row.feedback).length);
+    }
+
+    function stationScore(row){
+      if(!hasFeedback(row))return null;
+      const fb=row.feedback||{}, overall=fb.overall||{};
+      const score=Number(overall.score ?? fb.score ?? row.score);
+      return Number.isFinite(score)&&score>0 ? score : null;
+    }
+
     function videoPlayerHtml(recordingKey,r,id='adminVideoPlayer'){
       const duration=rowDuration(r);
+      if(!recordingKey){
+        return `<div class="mock-video-shell" style="min-height:180px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:18px;">
+          <div>
+            <div style="font-weight:850;margin-bottom:6px;">No recording key saved</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.68);line-height:1.5;">${duration?`The browser captured about ${fmtTime(duration)}, but the analysis/upload did not return a playable recording.`:'The video upload did not complete for this station.'}</div>
+          </div>
+        </div>`;
+      }
       const keyAttr = recordingKey ? ` data-recording-key="${esc(recordingKey)}"` : '';
       return `<div class="mock-video-shell">
         <video id="${id}" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="display:block;cursor:pointer"></video>
@@ -455,12 +475,22 @@
     function stationHtml(r){
       if(!r)return '<div class="muted">No station selected.</div>';
       const station=r.station||{};
+      const issue=r.processing_error?`<div class="review-box" style="border-color:#fed7aa;background:#fff7ed;color:#7c2d12;"><div class="section-label" style="color:#c2410c;">Analysis issue</div><div class="text-block">${esc(r.processing_error)}</div></div>`:'';
       if(r.type==='video'){
         const key=r.recording_key;
+        const canReprocess=key && (!hasFeedback(r) || r.processing_error || !r.transcript);
+        const reprocess=canReprocess?`<div class="review-box" style="border-color:#bae6fd;background:#f0f9ff;">
+          <div class="section-label" style="color:#0369a1;">Safety net</div>
+          <div class="text-block" style="margin-bottom:10px;">A saved recording exists. Re-run transcript and AI feedback from admin so this station does not stay broken for the student.</div>
+          <button id="reprocessBtn" class="secondary" type="button" onclick="reprocessCurrentStation()">Reprocess saved recording</button>
+          <div id="reprocessStatus" class="muted" style="margin-top:8px;"></div>
+        </div>`:'';
         return `<div class="station-grid">
           <div>
             ${videoPlayerHtml(key,r)}
-            ${textPanel('Transcript', r.transcript, 'No transcript captured.')}
+            ${issue}
+            ${reprocess}
+            ${textPanel('Transcript', r.transcript, r.processing_error ? 'No transcript was generated for this recording.' : 'No transcript captured.')}
           </div>
           <div>
             ${scenarioHtml(station)}
@@ -500,7 +530,8 @@
 
     function feedbackHtml(fb,row){
       if(!fb || !Object.keys(fb).length){
-        return `<div class="feedback-shell"><h3>AI Feedback</h3><div class="muted">No AI feedback returned for this station.</div></div>`;
+        const issue=row?.processing_error || 'No AI feedback returned for this station.';
+        return `<div class="feedback-shell"><h3>AI Feedback</h3><div class="muted">${esc(issue)}</div></div>`;
       }
       const overall=fb.overall||{};
       const score=firstText(overall.score,fb.score,row?.score);
@@ -627,6 +658,28 @@
       const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/notes',{method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({status:reviewStatus.value,manual_review_notes:manualReviewNotes.value,notes:adminNotes.value})});
       const data=await res.json().catch(()=>({}));
       document.getElementById('saveStatus').textContent=res.ok?'Saved.':(data.error||'Save failed');
+    }
+
+    async function reprocessCurrentStation(){
+      if(!currentAttempt)return;
+      const btn=document.getElementById('reprocessBtn');
+      const status=document.getElementById('reprocessStatus');
+      if(btn){btn.disabled=true;btn.textContent='Reprocessing...';}
+      if(status)status.textContent='Running transcript and AI feedback from the saved recording. This may take a minute.';
+      try{
+        const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/reprocess',{
+          method:'POST',
+          headers:{...authHeaders(),'Content-Type':'application/json'},
+          body:JSON.stringify({row_index:currentStation})
+        });
+        const data=await res.json().catch(()=>({}));
+        if(!res.ok)throw new Error(data.message||data.error||'Reprocess failed');
+        currentAttempt=data.attempt||currentAttempt;
+        renderAttempt();
+      }catch(err){
+        if(btn){btn.disabled=false;btn.textContent='Reprocess saved recording';}
+        if(status)status.textContent=err.message||'Reprocess failed.';
+      }
     }
 
     if(adminToken) {
