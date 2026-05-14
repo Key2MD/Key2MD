@@ -251,6 +251,32 @@
  .mock-panel-title{font-size:0.78rem;font-weight:850;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
  .mock-panel-sub{font-size:0.72rem;color:var(--muted2);margin-top:3px;line-height:1.45;}
  .mock-action-row{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;}
+ .mock-command-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+ .mock-command-card{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.045);padding:13px 14px;min-height:92px;color:var(--text);text-align:left;font-family:inherit;cursor:pointer;transition:transform 0.16s,border-color 0.16s,background 0.16s;}
+ .mock-command-card:hover{transform:translateY(-1px);border-color:var(--border2);background:rgba(255,255,255,0.065);}
+ .mock-command-card.action{border-color:var(--amber-border);background:linear-gradient(135deg,rgba(251,191,36,0.12),rgba(255,255,255,0.035));}
+ .mock-command-card.good{border-color:var(--green-border);background:linear-gradient(135deg,rgba(74,222,128,0.1),rgba(255,255,255,0.035));}
+ .mock-command-card.blue{border-color:var(--blue-border);background:linear-gradient(135deg,rgba(56,189,248,0.12),rgba(255,255,255,0.035));}
+ .mock-card-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted2);font-weight:850;margin-bottom:6px;}
+ .mock-card-value{font-size:1.45rem;font-weight:900;letter-spacing:-0.03em;color:var(--text);}
+ .mock-card-sub{font-size:0.68rem;color:var(--muted);line-height:1.45;margin-top:4px;}
+ .mock-filter-card{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.035);padding:12px;margin-bottom:14px;}
+ .mock-filter-top{display:grid;grid-template-columns:minmax(260px,1fr) auto auto;gap:8px;align-items:center;margin-bottom:10px;}
+ .mock-search-wrap{display:flex;gap:7px;align-items:center;}
+ .mock-search-wrap .ctrl-in{min-width:0;}
+ .mock-chip-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+ .mock-chip{border:1px solid var(--border2);background:rgba(255,255,255,0.045);color:var(--muted);border-radius:999px;padding:7px 11px;font-size:0.74rem;font-weight:800;cursor:pointer;transition:all 0.18s;}
+ .mock-chip:hover{color:var(--text);background:rgba(255,255,255,0.075);}
+ .mock-chip.active{color:#03111d;background:var(--blue);border-color:var(--blue);}
+ .mock-chip.warn.active{background:var(--amber);border-color:var(--amber);}
+ .mock-chip.good.active{background:var(--green);border-color:var(--green);}
+ .mock-active-filters{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:0.72rem;color:var(--muted2);}
+ .mock-filter-pill{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--blue-border);background:var(--blue-dim);color:var(--blue);border-radius:999px;padding:4px 9px;font-weight:800;}
+ .mock-row-flags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+ .mock-row-flag{display:inline-flex;align-items:center;border:1px solid var(--border);background:rgba(255,255,255,0.04);border-radius:999px;padding:2px 7px;font-size:0.62rem;font-weight:750;color:var(--muted);}
+ .mock-row-flag.warn{border-color:var(--amber-border);background:var(--amber-dim);color:var(--amber);}
+ .mock-row-flag.good{border-color:var(--green-border);background:var(--green-dim);color:var(--green);}
+ .mock-row-flag.blue{border-color:var(--blue-border);background:var(--blue-dim);color:var(--blue);}
  .broadcast-audience{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:10px 0 14px;padding:11px 12px;border:1px solid var(--blue-border);background:var(--blue-dim);border-radius:10px;}
  .broadcast-audience-main{font-size:0.82rem;font-weight:800;color:var(--text);}
  .broadcast-audience-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;line-height:1.45;}
@@ -288,6 +314,7 @@
 .warm-email-frame{width:100%;height:720px;border:1px solid var(--border2);border-radius:10px;background:#fff;display:block;}
 .warm-email-loading{padding:24px;color:var(--muted);font-size:0.82rem;line-height:1.65;background:#06111f;border:1px dashed var(--border2);border-radius:12px;}
 .warm-email-error{padding:16px;color:var(--red);font-size:0.82rem;line-height:1.55;background:var(--red-dim);border:1px solid var(--red-border);border-radius:12px;}
+.warm-station{background:rgba(148,163,184,0.08);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--muted);font-size:0.78rem;line-height:1.55;max-height:180px;overflow:auto;}
 .warm-quote{border-left:3px solid var(--blue);background:var(--surface2);padding:10px 12px;border-radius:10px;color:var(--muted);font-size:0.78rem;line-height:1.55;}
 .warm-rewrite{border-left:3px solid var(--green);background:rgba(34,197,94,0.08);padding:10px 12px;border-radius:10px;color:var(--text);font-size:0.78rem;line-height:1.55;}
 .warm-detail-grid{display:grid;grid-template-columns:minmax(280px,0.62fr) minmax(420px,1.38fr);gap:14px;}
@@ -461,14 +488,16 @@
  .command-card,.ops-grid,.insight-grid{grid-template-columns:1fr;}
  .command-actions{justify-content:flex-start;}
  .mini-metric-row{grid-template-columns:1fr;}
+ .mock-admin-grid,.mock-command-strip,.mock-filter-top{grid-template-columns:1fr;}
  }
  @media(max-width:1100px){
- .dash-grid,.ops-grid,.command-card{grid-template-columns:1fr;}
+ .dash-grid,.ops-grid,.command-card,.mock-command-strip{grid-template-columns:1fr 1fr;}
  .stats-grid{grid-template-columns:repeat(3,1fr);}
  }
  @media(max-width:620px){
  .stats-grid{grid-template-columns:1fr 1fr;}
  .activity-item{grid-template-columns:1fr;}
+ .mock-command-strip,.mock-filter-top{grid-template-columns:1fr;}
  }
  </style>
 </head>
@@ -1090,6 +1119,7 @@
  </div>
  <div class="page-actions">
  <span class="refresh-note" id="ccStatus">Not loaded</span>
+ <button class="btn blue" onclick="reconcileCasperClass()">Recover Stripe $120</button>
  <button class="btn" onclick="loadCasperClass()">Refresh</button>
  </div>
  </div>
@@ -1200,15 +1230,34 @@
  <div class="admin-note blue" style="margin-bottom:14px;">
  <strong>Privacy guard:</strong> this page only uses admin-protected mock endpoints. Use the reader buttons to inspect an individual attempt with the same admin session.
  </div>
- <div class="controls">
- <input class="ctrl-in" id="mockSearch" type="text" placeholder="Filter by email, name, status..." oninput="renderMockAdmin()">
- <select class="ctrl-sel" id="mockScope" onchange="renderMockAdmin()">
- <option value="all">All saved mocks</option>
- <option value="manual">Paid manual reviews</option>
- <option value="pending">Manual pending/in review</option>
- <option value="premium">Premium mocks</option>
- <option value="transcript">Transcript mocks</option>
+ <div class="mock-command-strip" id="mockSummaryCards"></div>
+ <div class="mock-filter-card">
+ <div class="mock-filter-top">
+ <div class="mock-search-wrap">
+ <input class="ctrl-in" id="mockSearch" type="text" placeholder="Search student, email, status, attempt ID..." oninput="renderMockAdmin()">
+ <button class="btn" type="button" onclick="clearMockSearch()">Clear search</button>
+ </div>
+ <select class="ctrl-sel" id="mockSort" onchange="setMockSort(this.value)">
+ <option value="recent">Newest activity</option>
+ <option value="completed">Newest completed</option>
+ <option value="oldest">Oldest first</option>
+ <option value="student">Student A-Z</option>
+ <option value="tier">Tier</option>
  </select>
+ <button class="btn" type="button" onclick="clearMockFilters()">Reset filters</button>
+ </div>
+ <div class="mock-chip-row" id="mockScopeChips">
+ <button class="mock-chip" type="button" data-scope="all" onclick="setMockScope('all')">All saved</button>
+ <button class="mock-chip good" type="button" data-scope="completed" onclick="setMockScope('completed')">Completed</button>
+ <button class="mock-chip warn" type="button" data-scope="needs_attention" onclick="setMockScope('needs_attention')">Needs attention</button>
+ <button class="mock-chip warn" type="button" data-scope="manual" onclick="setMockScope('manual')">Paid review</button>
+ <button class="mock-chip warn" type="button" data-scope="pending" onclick="setMockScope('pending')">Review pending</button>
+ <button class="mock-chip" type="button" data-scope="premium" onclick="setMockScope('premium')">Premium</button>
+ <button class="mock-chip" type="button" data-scope="transcript" onclick="setMockScope('transcript')">Transcript</button>
+ <button class="mock-chip" type="button" data-scope="in_progress" onclick="setMockScope('in_progress')">In progress</button>
+ <button class="mock-chip" type="button" data-scope="issues" onclick="setMockScope('issues')">Analysis issues</button>
+ </div>
+ <div class="mock-active-filters" id="mockActiveFilters"></div>
  </div>
  <div class="mock-admin-grid">
  <section class="mock-admin-panel">
@@ -1217,10 +1266,10 @@
  <div class="mock-panel-title">Manual Review Queue</div>
  <div class="mock-panel-sub" id="mockManualStatus">Loading...</div>
  </div>
- <button class="btn amber" onclick="document.getElementById('mockScope').value='manual';renderMockAdmin()">Show paid</button>
+ <button class="btn amber" onclick="setMockScope('manual')">Only paid</button>
  </div>
  <div class="tbl-scroller"><table><thead><tr>
- <th>Student</th><th>Tier</th><th>Status</th><th>Paid</th><th style="width:170px;text-align:center;">Actions</th>
+ <th>Student</th><th>Tier</th><th>Mock / Review</th><th>Paid</th><th style="width:190px;text-align:center;">Actions</th>
  </tr></thead><tbody id="mockManualBody"></tbody></table></div>
  </section>
  <section class="mock-admin-panel">
@@ -1232,7 +1281,7 @@
  <button class="btn" onclick="openMockReader()">Reader</button>
  </div>
  <div class="tbl-scroller"><table><thead><tr>
- <th>Student</th><th>Tier</th><th>Status</th><th>Completed</th><th style="width:170px;text-align:center;">Actions</th>
+ <th>Student</th><th>Tier</th><th>Mock / Review</th><th>Finished</th><th style="width:190px;text-align:center;">Actions</th>
  </tr></thead><tbody id="mockBody"></tbody></table></div>
  </section>
  </div>
@@ -1583,6 +1632,8 @@ const S = {
  creditModalUserId: null,
  tierModalUserId: null,
  mockPassModalUserId: null,
+ mockScope: localStorage.getItem('k2md_mock_admin_scope') || 'all',
+ mockSort: localStorage.getItem('k2md_mock_admin_sort') || 'recent',
  userSegment: 'all',
  userSearchTimer: null,
  commandItems: [],
@@ -2590,7 +2641,7 @@ function renderWarmLeads() {
  return [
  row.email,row.name,row.recommended_product,row.lead_level,
  ...(row.reasons || []),
- row.sample?.quote,row.sample?.rewrite,row.sample?.improvement,row.outreach?.body,
+ row.sample?.question_preview,row.sample?.quote,row.sample?.rewrite,row.sample?.improvement,row.outreach?.body,
  outreach.label,outreach.last_outreach_subject,
  ].some(value => String(value || '').toLowerCase().includes(q));
  });
@@ -2668,7 +2719,8 @@ function renderWarmLeadDetail(row) {
  </div>
  <div class="detail-box-row"><strong>Outreach:</strong> ${outreachBadge(row.outreach_history)} ${row.outreach_history?.last_outreach_subject ? `<span style="color:var(--muted2);font-size:0.74rem;">${esc(row.outreach_history.last_outreach_subject)}</span>` : ''}</div>
  <div class="warm-reason-list" style="margin:10px 0;">${(row.reasons || []).map(reason => `<span class="warm-reason">${esc(reason)}</span>`).join('')}</div>
- ${sample.quote ? `<div class="detail-box-row"><strong>Student quote</strong></div><div class="warm-quote">"${esc(sample.quote)}"</div>` : '<div class="detail-box-row">No short quote in the row snapshot yet. The report preview still uses the student profile on the right.</div>'}
+ ${sample.question_preview ? `<div class="detail-box-row"><strong>Station reference</strong></div><div class="warm-station">${esc(sample.question_preview)}</div>` : ''}
+ ${sample.quote ? `<div class="detail-box-row" style="margin-top:10px;"><strong>Student quote</strong></div><div class="warm-quote">"${esc(sample.quote)}"</div>` : '<div class="detail-box-row">No short quote in the row snapshot yet. The report preview still uses the student profile on the right.</div>'}
  ${sample.rewrite ? `<div class="detail-box-row" style="margin-top:10px;"><strong>Suggested micro-rewrite</strong></div><div class="warm-rewrite">${esc(sample.rewrite)}</div>` : ''}
  ${sample.improvement ? `<div class="detail-box-row" style="margin-top:10px;"><strong>AI improvement signal:</strong> ${esc(sample.improvement)}</div>` : ''}
  <div class="detail-box-hd" style="margin-top:14px;">Recent review signals</div>
@@ -2869,13 +2921,13 @@ async function hydrateWarmLeadDetail(id) {
 }
 
 function renderWarmLeadReportPanel(row, email) {
- const subject = email?.subject || row.outreach?.subject || 'Quick note on your Key2MD practice';
+ const subject = email?.subject || row.outreach?.subject || 'A learning note from your Key2MD practice';
  const html = email?.html || '';
  return `<div class="warm-email-panel">
  <div class="warm-email-panel-head">
  <div>
  <div class="warm-email-title">Rich warm lead email</div>
- <div class="warm-email-sub">Subject: ${esc(subject)}<br>Uses the student report as the centrepiece, then softly nudges CASPer class or Pro.</div>
+ <div class="warm-email-sub">Subject: ${esc(subject)}<br>Uses a full station reference, one quote, and a teaching point before a soft next-step mention.</div>
  ${email?.note ? `<div class="warm-email-sub" style="color:var(--amber);margin-top:6px;">${esc(email.note)}</div>` : ''}
  </div>
  <div class="warm-email-actions">
@@ -2897,7 +2949,7 @@ async function openWarmLeadEmail(id) {
  if (!row) return;
  let body = row.outreach?.body || '';
  let html = '';
- let subject = row.outreach?.subject || 'Quick note on your Key2MD practice';
+ let subject = row.outreach?.subject || 'A learning note from your Key2MD practice';
  try {
  const det = row._reportEmail ? null : await getWarmLeadDetail(row);
  const email = row._reportEmail || buildWarmLeadReportEmail(row, det);
@@ -2968,20 +3020,22 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  const introScore = p.casperCount
  ? `You have ${p.casperCount} marked CASPer-style response${p.casperCount===1?'':'s'} on Key2MD${p.avgScoreText !== '-' ? `, averaging about ${p.avgScoreText}/10` : ''}.`
  : `You have ${Number(row.review_count || 0)} written practice response${Number(row.review_count || 0)===1?'':'s'} on Key2MD.`;
- const subject = 'A quick note on your Key2MD practice';
+ const subject = 'A learning note from your Key2MD practice';
  const exampleText = examples.length
  ? [
- 'Specific examples from your answers:',
+ 'One or two station examples, so the advice has context:',
  ...examples.flatMap((ex, index) => [
- `${index + 1}. You wrote: "${ex.quote}"`,
- `   What to improve: ${ex.improvement}`,
- `   Stronger shape: "${ex.rewrite}"`,
+ `${index + 1}. Station reference:`,
+ `   ${ex.scenario || 'The original station context was not available in this summary view.'}`,
+ `   A line you wrote: "${ex.quote}"`,
+ `   Why this is a useful learning point: ${ex.learningPoint || ex.improvement}`,
+ `   Practice move: ${ex.rewrite}`,
  ]),
  ].join('\n')
  : [
  'Answer-level pattern to watch:',
  p.topImprovement,
- `Stronger shape: "${warmLeadDashboardRewrite('', p.topImprovement)}"`,
+ `Practice move: ${warmLeadDashboardRewrite('', p.topImprovement)}`,
  ].join('\n');
  const link = warmLeadDashboardPrimaryLink(product);
  const unsubscribeUrl = `https://www.key2md.com/unsubscribe.html?email=${encodeURIComponent(p.email || row.email || '')}`;
@@ -2990,21 +3044,21 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  '',
  `I had a look over your recent Key2MD practice because you have clearly been putting in the work. ${introScore}`,
  '',
- 'I wanted to send something useful while the pattern was fresh.',
+ 'I wanted to send something useful while the pattern was fresh. I would not over-read one station on its own, but it can be a good window into a broader answering habit.',
  '',
- 'Current read:',
+ 'Practice read:',
  `Current average: ${p.avgScoreText}/10. ${p.band}`,
  '',
  'What looks strong:',
  p.topStrength,
  '',
- 'What I would fix next:',
+ 'The main thing I would practise next:',
  primaryFocusSentence(p),
  p.topImprovement,
  '',
  exampleText,
  '',
- 'Next practice plan:',
+ 'Next few practice attempts:',
  ...p.nextSteps.slice(0, 4).map(x => `- ${x}`),
  '',
  warmLeadDashboardCorePoint(product),
@@ -3015,7 +3069,7 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  '',
  `If you would rather not receive these occasional notes, you can unsubscribe here: ${unsubscribeUrl}`,
  '',
- 'No pressure either way - I mainly wanted to send a useful observation while the practice pattern was fresh. You are clearly doing the work, and that is the part I cannot manufacture for students.',
+ 'No pressure either way. I mainly wanted to send a useful observation while the practice pattern was fresh. You are clearly doing the work, and that is the part I cannot manufacture for students.',
  '',
  'Dan',
  'University of Melbourne MD student | Key2MD',
@@ -3073,19 +3127,48 @@ function buildWarmLeadSummaryProfile(row) {
  };
 }
 
+function warmLeadEmailScenario(value, max = 2200) {
+ const text = String(value || '').replace(/\s+/g, ' ').trim();
+ if (!text) return '';
+ if (text.length <= max) return text;
+ return `${text.slice(0, max - 18).trim()}...`;
+}
+
+function warmLeadDashboardLearningPoint(improvement) {
+ const text = String(improvement || '').replace(/\s+/g, ' ').trim();
+ if (!text) {
+ return 'This is a good place to practise turning an instinct into visible behaviour: what you would say, why it matters, and what risk or value you are protecting.';
+ }
+ const lower = text.toLowerCase();
+ if (/specific|concrete|detail|practical|action|step/.test(lower)) {
+ return `The learning point is specificity. ${text} In practice, the marker should be able to picture the conversation or decision, not just infer your intention.`;
+ }
+ if (/empath|emotion|feel|support|listen/.test(lower)) {
+ return `The learning point is to demonstrate empathy rather than simply name it. ${text} The strongest answers usually show the opening words, the question you would ask, and why that tone protects the person.`;
+ }
+ if (/fair|ethic|professional|policy|safety|confidential/.test(lower)) {
+ return `The learning point is balancing warmth with responsibility. ${text} Good answers make the competing duties explicit, so the response feels fair rather than merely kind.`;
+ }
+ return text;
+}
+
 function warmLeadSummaryExamples(row) {
  const reportExamples = Array.isArray(row.student_report?.examples) ? row.student_report.examples : [];
  const examples = reportExamples.map(ex => ({
+ scenario: warmLeadEmailScenario(ex.scenario || ex.question || ex.prompt || row.sample?.question_preview || ''),
  quote: ex.quote || ex.response || '',
  improvement: ex.improvement || row.student_report?.improvement || 'This is a useful instinct, but it needs to be more specific and examiner-visible.',
  rewrite: ex.rewrite || ex.suggestion || warmLeadDashboardRewrite(ex.quote || '', ex.improvement || ''),
+ learningPoint: ex.learning_point || ex.learningPoint || warmLeadDashboardLearningPoint(ex.improvement || row.student_report?.improvement || ''),
  })).filter(ex => String(ex.quote || '').trim().length >= 20);
  if (examples.length) return examples;
  if (row.sample?.quote || row.sample?.improvement || row.sample?.rewrite) {
  return [{
+ scenario: warmLeadEmailScenario(row.sample.question_preview || ''),
  quote: row.sample.quote || row.sample.response_preview || '',
  improvement: row.sample.improvement || 'This is a useful instinct, but it needs to be more specific and examiner-visible.',
  rewrite: row.sample.rewrite || warmLeadDashboardRewrite(row.sample.quote || row.sample.response_preview || '', row.sample.improvement || ''),
+ learningPoint: warmLeadDashboardLearningPoint(row.sample.improvement || ''),
  }];
  }
  return [];
@@ -3095,12 +3178,14 @@ function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern,
  const plan = (p.nextSteps || []).slice(0, 4);
  const exampleHtml = examples.length
  ? examples.map((ex, index) => `
- <div style="margin:16px 0 0;">
- <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#334155;"><strong>Example ${index + 1}:</strong> "${esc(ex.quote)}"</p>
- <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#475569;"><strong>What to improve:</strong> ${esc(ex.improvement)}</p>
- <p style="margin:0;font-size:13px;line-height:1.6;color:#475569;"><strong>A stronger shape:</strong> "${esc(ex.rewrite)}"</p>
+ <div style="margin:18px 0 0;padding:14px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;">
+ <p style="margin:0 0 8px;font-size:13px;line-height:1.6;color:#0f172a;"><strong>Station reference ${index + 1}</strong></p>
+ <p style="margin:0 0 12px;font-size:13px;line-height:1.65;color:#475569;">${esc(ex.scenario || 'The original station text was not available in this summary view.')}</p>
+ <p style="margin:0 0 8px;font-size:13px;line-height:1.6;color:#334155;"><strong>A line you wrote:</strong> "${esc(ex.quote)}"</p>
+ <p style="margin:0 0 8px;font-size:13px;line-height:1.6;color:#475569;"><strong>Why this is useful:</strong> ${esc(ex.learningPoint || ex.improvement)}</p>
+ <p style="margin:0;font-size:13px;line-height:1.6;color:#475569;"><strong>Practice move:</strong> ${esc(ex.rewrite)}</p>
  </div>`).join('')
- : `<p style="margin:8px 0 0;font-size:13px;line-height:1.65;color:#475569;"><strong>Answer-level pattern to watch:</strong> ${esc(p.topImprovement)}<br><strong>A stronger shape:</strong> "${esc(warmLeadDashboardRewrite('', p.topImprovement))}"</p>`;
+ : `<p style="margin:8px 0 0;font-size:13px;line-height:1.65;color:#475569;"><strong>Answer-level pattern to watch:</strong> ${esc(p.topImprovement)}<br><strong>Practice move:</strong> ${esc(warmLeadDashboardRewrite('', p.topImprovement))}</p>`;
  const scoreText = scorePattern.length
  ? scorePattern.map(c => `${c.name}: ${Number.isFinite(Number(c.avg)) ? Number(c.avg).toFixed(1) : '-'}/10`).join(', ')
  : 'More marked stations will make the competency pattern clearer.';
@@ -3114,12 +3199,12 @@ function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern,
  <div style="max-width:620px;margin:0 auto;padding:24px 18px;">
  <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">Hi ${esc(p.firstName)},</p>
  <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">I had a look over your recent Key2MD practice because you have clearly been putting in the work. ${esc(introScore)}</p>
- <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">I wanted to send something useful while the pattern was fresh.</p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">I wanted to send something useful while the pattern was fresh. I would not over-read one station on its own, but it can be a good window into a broader answering habit.</p>
 
  <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>What looks strong</strong></p>
  <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(p.topStrength)}</p>
 
- <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>What I would fix next</strong></p>
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>The main thing I would practise next</strong></p>
  <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#334155;">${esc(primaryFocusSentence(p))}</p>
  <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(p.topImprovement)}</p>
 
@@ -3128,7 +3213,7 @@ function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern,
  <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#475569;">${esc(p.band)}</p>
  <p style="margin:0 0 16px;font-size:13px;line-height:1.65;color:#64748b;">${esc(scoreText)}</p>
 
- <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>A couple of answer-level notes</strong></p>
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>A station example with context</strong></p>
  ${exampleHtml}
 
  <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>Next few attempts</strong></p>
@@ -3159,41 +3244,46 @@ function buildWarmLeadCombinedOutreach(row, det) {
  const plan = serverReport.practice_plan?.length ? serverReport.practice_plan : p.nextSteps;
  const product = row.recommended_product || 'next step';
  const nextStep = warmLeadDashboardNextStep(product);
+ const link = warmLeadDashboardPrimaryLink(product);
  const scoreLine = p.casperCount
  ? `From the data I can see, you have ${p.casperCount} marked CASPer-style response${p.casperCount===1?'':'s'}${p.avgScoreText !== '-' ? `, with an average around ${p.avgScoreText}/10` : ''}.`
  : `From the data I can see, you have ${Number(row.review_count || 0)} written practice response${Number(row.review_count || 0)===1?'':'s'} logged.`;
  const exampleBlock = examples.length ? [
- 'Specific examples from your answers:',
+ 'One or two station examples, so the advice has context:',
  ...examples.flatMap((ex, index) => [
- `${index + 1}. You wrote: "${ex.quote}"`,
- `   What to improve: ${ex.improvement}`,
- `   Stronger shape: "${ex.rewrite}"`,
+ `${index + 1}. Station reference:`,
+ `   ${ex.scenario || 'The original station text was not available in this summary view.'}`,
+ `   A line you wrote: "${ex.quote}"`,
+ `   Why this is a useful learning point: ${ex.learningPoint || ex.improvement}`,
+ `   Practice move: ${ex.rewrite}`,
  ]),
  '',
  'I am not giving you model answers to copy. The point is to keep your instinct, but make the skill visible enough that a marker does not have to guess what you meant.',
- ].join('\n') : (row.outreach?.body || '').includes('Specific examples from your answers') ? '' : 'I could not pull a clean short quote into this draft, so I would still check the user report before sending.';
+ ].join('\n') : (row.outreach?.body || '').includes('Station reference') ? '' : 'I could not pull a clean station example into this draft, so I would still check the user report before sending.';
  return [
  `Hi ${p.firstName},`,
  '',
  `I had a look over your recent Key2MD practice because you have clearly been putting in the work. ${scoreLine}`,
  '',
- 'I wanted to send something genuinely useful rather than just another link.',
+ 'I wanted to send something genuinely useful rather than just another link. I would not over-read one station by itself, but it can show a broader habit worth practising.',
  '',
- 'Mini practice report:',
+ 'Practice read:',
  `- What looks strong: ${strength}`,
  `- What I would focus on next: ${focus}`,
  improvement && improvement !== focus ? `- Repeated feedback signal: ${improvement}` : '',
  '',
  exampleBlock,
  '',
- 'A practical plan for the next few attempts:',
+ 'Next few practice attempts:',
  ...plan.slice(0, 3).map(item => `- ${item}`),
  '',
  warmLeadDashboardCorePoint(product),
  '',
  nextStep,
  '',
- 'No pressure either way - I mainly wanted to send a useful observation while the practice pattern was fresh. You are clearly doing the work, and that is the part I cannot manufacture for students.',
+ `${link.label}: ${link.url}`,
+ '',
+ 'No pressure either way. I mainly wanted to send a useful observation while the practice pattern was fresh. You are clearly doing the work, and that is the part I cannot manufacture for students.',
  '',
  'Dan',
  'University of Melbourne MD student | Key2MD',
@@ -3211,7 +3301,13 @@ function warmLeadDetailExamples(det) {
  if (!quote) continue;
  const improvement = firstText([fb.improvements, fb.biggest_improvement, fb.missed, fb.overallFeedback, fb.summary], 'This is a useful instinct, but it needs to be more specific and examiner-visible.');
  const rewrite = warmLeadDashboardRewrite(quote, improvement);
- out.push({ quote, improvement, rewrite });
+ out.push({
+ scenario: warmLeadEmailScenario(review.question_text || review.prompt || review.scenario || ''),
+ quote,
+ improvement,
+ rewrite,
+ learningPoint: warmLeadDashboardLearningPoint(improvement),
+ });
  if (out.length >= 3) break;
  }
  return out;
@@ -3246,20 +3342,20 @@ function firstText(values, fallback) {
 function warmLeadDashboardCorePoint(product) {
  if (String(product || '').includes('GAMSAT')) return 'The bigger point is that S2 rewards controlled thinking, not just fluent writing. A polished paragraph still needs to make the claim, evidence, and implication visible.';
  if (String(product || '').includes('MMI')) return 'The bigger point is that interviewers cannot credit judgement they cannot hear. Strong answers show the wording, sequence, and reason behind the decision.';
- return 'The bigger point is that CASPer markers cannot assume your motivation. If an answer says "I would be non-confrontational", the mark comes from showing how you would do that, why that tone matters, and what risk you are managing.';
+ return 'The bigger point is that CASPer markers cannot assume your motivation. Strong answers make the human skill observable: what you would say, why that tone matters, and what risk you are managing.';
 }
 
 function warmLeadDashboardNextStep(product) {
- if (product === 'Full CASPer Mock') return 'If CASPer is your main focus, the next useful step is probably either live calibration in the Friday class, or a full mock if you want to test consistency across a whole exam. If you reply with where you are in your prep, I can point you to the better fit.';
- if (product === 'CASPer Pro') return 'If CASPer is what you are working on, the Friday class may be more useful than just doing more isolated questions because it lets us unpack exactly why an answer does or does not read as Q4. If useful, reply with your test date and I can suggest what to focus on.';
- if (product === 'MMI AI Feedback') return 'If interviews are coming up, a focused session is usually more useful than another generic resource because the issue is often how the answer sounds under pressure. Reply with your target universities and timing and I can suggest the highest-yield focus.';
- if (product === 'GAMSAT S2 Pro') return 'If Section II is your focus, the useful next step is either repeated feedback on full essays or a short writing session to find the recurring habit holding the mark down. Reply with your rough score target and I can suggest which is more sensible.';
- return 'If you want help turning this into a clearer plan, reply with what exam or interview you are preparing for and I can suggest the next step.';
+ if (product === 'Full CASPer Mock') return 'If you ever want a more structured version of this feedback, the full CASPer mock is the option I would use for checking stamina and consistency across a whole exam. CASPer Pro is better if you want repeated lower-pressure practice and feedback between mocks. Either is only worth it if it fits where you are in prep.';
+ if (product === 'CASPer Pro') return 'If CASPer is your main focus, CASPer Pro is basically the structured version of this kind of feedback: repeated stations, clearer patterns, and less guessing about what to practise next. A full mock is better later if you want to test stamina across the whole format.';
+ if (product === 'MMI AI Feedback') return 'If interviews are coming up, a focused review is useful when the issue is how the answer sounds under pressure, not whether you know the theory. The same principle applies: make the judgement audible and specific.';
+ if (product === 'GAMSAT S2 Pro') return 'If Section II is your focus, the useful next step is repeated feedback on full essays so the same reasoning habit becomes visible across several pieces, not just one paragraph.';
+ return 'If you want help turning this into a clearer plan, send me where you are in prep and I can point you to the most sensible next step.';
 }
 
 function warmLeadDashboardPrimaryLink(product) {
  if (product === 'Full CASPer Mock') return { url: 'https://www.key2md.com/plans.html#full-casper-mock', label: 'Full CASPer mock details' };
- if (product === 'CASPer Pro') return { url: 'https://www.key2md.com/casper-class.html', label: 'CASPer class details' };
+ if (product === 'CASPer Pro') return { url: 'https://www.key2md.com/plans.html#pro-section', label: 'CASPer Pro details' };
  if (product === 'MMI AI Feedback') return { url: 'https://www.key2md.com/mmi-tutor-australia.html', label: 'MMI support details' };
  if (product === 'GAMSAT S2 Pro') return { url: 'https://www.key2md.com/gamsat-s2-practice.html', label: 'GAMSAT Section II practice' };
  return { url: 'https://www.key2md.com/plans.html', label: 'Key2MD options' };
@@ -4008,7 +4104,7 @@ function composeToUser(email, subject = '', body = '', html = '', mode = 'standa
  document.getElementById('ncSubject').value = subject || '';
  document.getElementById('ncBody').value = body || '';
  S.composeMode = mode || 'standard';
- setComposeHtml(S.composeMode === 'warm_lead' ? '' : (html || ''));
+ setComposeHtml(html || '');
  openNewCompose(true);
  nav('inbox');
 }
@@ -4208,6 +4304,31 @@ async function runCasperClassEmailCheck() {
  renderCasperClass();
  if (status) status.textContent = data.message || data.action || 'Email check complete';
  alert(data.message || 'Email check complete.');
+ } catch(e) {
+ if (status) status.textContent = e.message;
+ alert(e.message);
+ }
+}
+
+async function reconcileCasperClass() {
+ if (!confirm('Check recent Stripe checkout sessions and recover any paid $120 CASPer class students into this dashboard? This will not email students.')) return;
+ const status = document.getElementById('ccStatus');
+ if (status) status.textContent = 'Checking Stripe...';
+ try {
+ const res = await api('/admin/casper-class/reconcile', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ days: 14 }) });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not reconcile Stripe payments');
+ S.casperClass = {
+ ...(S.casperClass || {}),
+ settings: data.settings || S.casperClass?.settings,
+ private: data.private || S.casperClass?.private,
+ access: data.access || S.casperClass?.access || [],
+ email_state: data.email_state || S.casperClass?.email_state || {},
+ };
+ renderCasperClass();
+ const message = `Recovered/confirmed ${data.recovered || 0} $120 class payment${Number(data.recovered || 0)===1?'':'s'} from ${data.checked || 0} matching Stripe session${Number(data.checked || 0)===1?'':'s'}.`;
+ if (status) status.textContent = message;
+ alert(message);
  } catch(e) {
  if (status) status.textContent = e.message;
  alert(e.message);
@@ -4827,8 +4948,9 @@ async function loadMockAdmin() {
  const manualData = await manualRes.json().catch(()=>({}));
  if (!attemptRes.ok) throw new Error(attemptData?.error || 'Could not load mock attempts');
  if (!manualRes.ok) throw new Error(manualData?.error || 'Could not load manual review queue');
- S.mockAttempts = attemptData.rows || [];
- S.mockManualReviews = manualData.rows || [];
+ S.mockAttempts = (attemptData.rows || []).map(row => summariseMockForDashboard(row));
+ S.mockManualReviews = (manualData.rows || []).map(row => summariseMockForDashboard(row));
+ await hydrateMockCompletionGaps();
  renderMockAdmin();
  updateDashboard();
  } catch(e) {
@@ -4840,30 +4962,237 @@ async function loadMockAdmin() {
  }
 }
 
-function filterMockRows(rows) {
- const q = (document.getElementById('mockSearch')?.value || '').toLowerCase();
- const scope = document.getElementById('mockScope')?.value || 'all';
- return (rows || []).filter(r => {
- const hay = [r.user_email, r.user_name, r.tier, r.manual_review_status, r.id].join(' ').toLowerCase();
- const matchesQ = !q || hay.includes(q);
- const matchesScope =
- scope === 'all' ||
- (scope === 'manual' && r.manual_review_paid) ||
- (scope === 'pending' && ['pending_review','in_review'].includes(String(r.manual_review_status||''))) ||
- (scope === 'premium' && r.tier === 'premium') ||
- (scope === 'transcript' && r.tier === 'transcript');
- return matchesQ && matchesScope;
+function summariseMockForDashboard(attempt, fallback = {}) {
+ const rows = Array.isArray(attempt?.rows) ? attempt.rows : [];
+ const stationCount = rows.length || Number(attempt?.station_count || fallback?.station_count || 0);
+ const analysedCount = rows.length
+ ? rows.filter(row => row && (row.feedback || row.score !== undefined || row.transcript)).length
+ : Number(attempt?.analysed_count || fallback?.analysed_count || 0);
+ const issueCount = rows.length
+ ? rows.filter(row => row && (row.processing_error || row.reprocess_error)).length
+ : Number(attempt?.issue_count || fallback?.issue_count || 0);
+ const hasReport = !!(attempt?.report || attempt?.has_report || fallback?.has_report);
+ const rawStatus = String(attempt?.status || fallback?.status || '').toLowerCase();
+ const completed = rawStatus === 'completed' || !!(attempt?.completed_at || fallback?.completed_at) || hasReport || stationCount >= 11;
+ return {
+ ...fallback,
+ ...attempt,
+ status: completed ? 'completed' : (rawStatus || 'in_progress'),
+ completed_at: attempt?.completed_at || fallback?.completed_at || (completed ? (attempt?.updated_at || fallback?.updated_at || attempt?.manual_review_paid_at || fallback?.manual_review_paid_at || null) : null),
+ updated_at: attempt?.updated_at || fallback?.updated_at || null,
+ station_count: stationCount,
+ analysed_count: analysedCount,
+ issue_count: issueCount,
+ video_count: rows.length ? rows.filter(row => row?.type === 'video').length : Number(attempt?.video_count || fallback?.video_count || 0),
+ typed_count: rows.length ? rows.filter(row => row?.type !== 'video').length : Number(attempt?.typed_count || fallback?.typed_count || 0),
+ has_report: hasReport,
+ manual_review_status: attempt?.manual_review_status || fallback?.manual_review_status || (attempt?.manual_review_paid || fallback?.manual_review_paid ? 'pending_review' : 'not_requested'),
+ };
+}
+
+function shouldHydrateMockSummary(row) {
+ if (!row?.id) return false;
+ if (!row.status || row.status === 'in_progress') return true;
+ if (!row.completed_at && (row.tier === 'premium' || Number(row.station_count || 0) >= 8)) return true;
+ return false;
+}
+
+async function hydrateMockCompletionGaps() {
+ const byId = new Map();
+ [...(S.mockAttempts || []), ...(S.mockManualReviews || [])].forEach(row => {
+ if (shouldHydrateMockSummary(row) && !byId.has(row.id)) byId.set(row.id, row);
+ });
+ const targets = [...byId.values()].slice(0, 40);
+ if (!targets.length) return;
+ await Promise.allSettled(targets.map(async row => {
+ const res = await api(`/api/admin/casper-mock/attempt/${encodeURIComponent(row.id)}`);
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok || !data.attempt) return;
+ const enriched = summariseMockForDashboard(data.attempt, row);
+ [S.mockAttempts, S.mockManualReviews].forEach(list => {
+ const idx = (list || []).findIndex(item => item.id === row.id);
+ if (idx >= 0) list[idx] = { ...list[idx], ...enriched };
+ });
+ }));
+}
+
+function mockEffectiveStatus(r) {
+ const raw = String(r?.status || '').toLowerCase();
+ const stationCount = Number(r?.station_count || 0);
+ if (raw === 'completed' || r?.completed_at || r?.has_report || stationCount >= 11) return 'completed';
+ if (raw === 'expired') return 'expired';
+ return raw || 'in_progress';
+}
+
+function mockIsCompleted(r) {
+ return mockEffectiveStatus(r) === 'completed';
+}
+
+function mockCompletedAt(r) {
+ return r?.completed_at || (mockIsCompleted(r) ? (r?.updated_at || r?.manual_review_paid_at || null) : null);
+}
+
+function mockManualPending(r) {
+ return ['pending_review','in_review'].includes(String(r?.manual_review_status || ''));
+}
+
+function mockHasIssue(r) {
+ return Number(r?.issue_count || 0) > 0 || String(r?.status || '').toLowerCase() === 'partial' || !!r?.processing_error;
+}
+
+function mockNeedsAttention(r) {
+ if (mockHasIssue(r)) return true;
+ if (r?.manual_review_paid && mockManualPending(r)) return true;
+ const updated = r?.updated_at || r?.manual_review_paid_at || r?.completed_at;
+ return !mockIsCompleted(r) && !!updated && !withinHours(updated, 3);
+}
+
+function mockMatchesScope(r, scope) {
+ if (scope === 'all') return true;
+ if (scope === 'manual') return !!r.manual_review_paid;
+ if (scope === 'pending') return mockManualPending(r);
+ if (scope === 'premium') return r.tier === 'premium';
+ if (scope === 'transcript') return r.tier === 'transcript';
+ if (scope === 'completed') return mockIsCompleted(r);
+ if (scope === 'in_progress') return !mockIsCompleted(r);
+ if (scope === 'issues') return mockHasIssue(r);
+ if (scope === 'needs_attention') return mockNeedsAttention(r);
+ return true;
+}
+
+function mockSearchHay(r) {
+ return [r.user_email, r.user_name, r.tier, r.status, r.manual_review_status, r.id, r.completed_at, r.updated_at]
+ .join(' ')
+ .toLowerCase();
+}
+
+function sortMockRows(rows) {
+ const sort = S.mockSort || 'recent';
+ const time = r => Date.parse((sort === 'completed' ? mockCompletedAt(r) : (r.updated_at || r.completed_at || r.manual_review_paid_at)) || '') || 0;
+ return [...(rows || [])].sort((a,b) => {
+ if (sort === 'oldest') return time(a) - time(b);
+ if (sort === 'student') return String(a.user_name || a.user_email || '').localeCompare(String(b.user_name || b.user_email || ''));
+ if (sort === 'tier') return String(a.tier || '').localeCompare(String(b.tier || '')) || time(b) - time(a);
+ return time(b) - time(a);
  });
 }
 
+function filterMockRows(rows) {
+ const q = (document.getElementById('mockSearch')?.value || '').toLowerCase().trim();
+ const terms = q.split(/\s+/).filter(Boolean);
+ const scope = S.mockScope || 'all';
+ const filtered = (rows || []).filter(r => {
+ const hay = mockSearchHay(r);
+ const matchesQ = !terms.length || terms.every(t => hay.includes(t));
+ return matchesQ && mockMatchesScope(r, scope);
+ });
+ return sortMockRows(filtered);
+}
+
+function setMockScope(scope) {
+ const next = scope === 'all' ? 'all' : (S.mockScope === scope ? 'all' : scope);
+ S.mockScope = next;
+ localStorage.setItem('k2md_mock_admin_scope', next);
+ renderMockAdmin();
+}
+
+function setMockSort(sort) {
+ S.mockSort = sort || 'recent';
+ localStorage.setItem('k2md_mock_admin_sort', S.mockSort);
+ renderMockAdmin();
+}
+
+function clearMockSearch() {
+ const input = document.getElementById('mockSearch');
+ if (input) input.value = '';
+ renderMockAdmin();
+}
+
+function clearMockFilters() {
+ S.mockScope = 'all';
+ S.mockSort = 'recent';
+ localStorage.setItem('k2md_mock_admin_scope', S.mockScope);
+ localStorage.setItem('k2md_mock_admin_sort', S.mockSort);
+ const input = document.getElementById('mockSearch');
+ const sort = document.getElementById('mockSort');
+ if (input) input.value = '';
+ if (sort) sort.value = S.mockSort;
+ renderMockAdmin();
+}
+
+function renderMockFilterState() {
+ document.querySelectorAll('[data-scope]').forEach(btn => {
+ const active = (S.mockScope || 'all') === btn.dataset.scope;
+ btn.classList.toggle('active', active);
+ btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+ });
+ const sort = document.getElementById('mockSort');
+ if (sort && sort.value !== (S.mockSort || 'recent')) sort.value = S.mockSort || 'recent';
+ const q = (document.getElementById('mockSearch')?.value || '').trim();
+ const active = document.getElementById('mockActiveFilters');
+ if (active) {
+ const labels = [];
+ if ((S.mockScope || 'all') !== 'all') labels.push(`<span class="mock-filter-pill">Scope: ${esc(mockScopeLabel(S.mockScope))} <button class="btn" style="padding:1px 6px;font-size:0.62rem;" onclick="setMockScope('all')">x</button></span>`);
+ if (q) labels.push(`<span class="mock-filter-pill">Search: ${esc(q)} <button class="btn" style="padding:1px 6px;font-size:0.62rem;" onclick="clearMockSearch()">x</button></span>`);
+ if ((S.mockSort || 'recent') !== 'recent') labels.push(`<span class="mock-filter-pill">Sort: ${esc(mockSortLabel(S.mockSort))}</span>`);
+ active.innerHTML = labels.length ? labels.join('') : '<span>No active filters. Click any chip once to filter; click it again to clear.</span>';
+ }
+}
+
+function mockScopeLabel(scope) {
+ return ({
+ all:'All saved',
+ manual:'Paid review',
+ pending:'Review pending',
+ premium:'Premium',
+ transcript:'Transcript',
+ completed:'Completed',
+ in_progress:'In progress',
+ issues:'Analysis issues',
+ needs_attention:'Needs attention',
+ }[scope] || scope || 'All saved');
+}
+
+function mockSortLabel(sort) {
+ return ({recent:'Newest activity',completed:'Newest completed',oldest:'Oldest first',student:'Student A-Z',tier:'Tier'}[sort] || sort || 'Newest activity');
+}
+
+function renderMockSummaryCards() {
+ const el = document.getElementById('mockSummaryCards');
+ if (!el) return;
+ const attempts = S.mockAttempts || [];
+ const manual = S.mockManualReviews || [];
+ const completed = attempts.filter(mockIsCompleted).length;
+ const premiumComplete = attempts.filter(r => r.tier === 'premium' && mockIsCompleted(r)).length;
+ const pending = manual.filter(mockManualPending).length;
+ const attention = attempts.filter(mockNeedsAttention).length;
+ el.innerHTML = `
+ <button class="mock-command-card good" type="button" onclick="setMockScope('completed')">
+ <div class="mock-card-label">Completed mocks</div><div class="mock-card-value">${completed}</div><div class="mock-card-sub">${attempts.length} saved attempts total</div>
+ </button>
+ <button class="mock-command-card blue" type="button" onclick="setMockScope('premium')">
+ <div class="mock-card-label">Premium complete</div><div class="mock-card-value">${premiumComplete}</div><div class="mock-card-sub">Camera/presentation mock attempts</div>
+ </button>
+ <button class="mock-command-card action" type="button" onclick="setMockScope('pending')">
+ <div class="mock-card-label">Manual queue</div><div class="mock-card-value">${pending}</div><div class="mock-card-sub">Paid reviews pending or in review</div>
+ </button>
+ <button class="mock-command-card" type="button" onclick="setMockScope('needs_attention')">
+ <div class="mock-card-label">Needs attention</div><div class="mock-card-value">${attention}</div><div class="mock-card-sub">Issues, stale in-progress, or paid review work</div>
+ </button>
+ `;
+}
+
 function renderMockAdmin() {
+ renderMockSummaryCards();
+ renderMockFilterState();
  const manualRows = filterMockRows(S.mockManualReviews);
  const attemptRows = filterMockRows(S.mockAttempts);
- const pending = S.mockManualReviews.filter(r=>['pending_review','in_review'].includes(String(r.manual_review_status||''))).length;
+ const pending = S.mockManualReviews.filter(mockManualPending).length;
+ const completed = S.mockAttempts.filter(mockIsCompleted).length;
  const manualStatus = document.getElementById('mockManualStatus');
  const status = document.getElementById('mockStatus');
  if (manualStatus) manualStatus.textContent = `${manualRows.length} shown | ${pending} pending`;
- if (status) status.textContent = `${attemptRows.length} shown | ${S.mockAttempts.length} saved total`;
+ if (status) status.textContent = `${attemptRows.length} shown | ${completed}/${S.mockAttempts.length} finished`;
  renderMockRows('mockManualBody', manualRows, true);
  renderMockRows('mockBody', attemptRows, false);
 }
@@ -4872,17 +5201,26 @@ function renderMockRows(targetId, rows, manualOnly) {
  const el = document.getElementById(targetId);
  if (!el) return;
  el.innerHTML = rows.length ? rows.map(r => {
- const dt = fmtDate(r.completed_at || r.manual_review_paid_at);
+ const dt = fmtDate(manualOnly ? (r.manual_review_paid_at || mockCompletedAt(r)) : mockCompletedAt(r));
  const status = r.manual_review_status || (r.manual_review_paid ? 'pending_review' : 'not_requested');
  const statusActions = r.manual_review_paid ? `<div class="action-mini-row"><button class="btn amber" onclick="quickMockStatus('${esc(r.id)}','in_review')">In review</button><button class="btn green" onclick="quickMockStatus('${esc(r.id)}','completed')">Complete</button></div>` : '';
+ const countLabel = Number(r.station_count || 0) ? `${Number(r.station_count || 0)}/11 stations` : '';
+ const issueLabel = Number(r.issue_count || 0) ? `<span class="mock-row-flag warn">${Number(r.issue_count || 0)} issue${Number(r.issue_count || 0)===1?'':'s'}</span>` : '';
+ const completeFlag = mockIsCompleted(r) ? '<span class="mock-row-flag good">finished</span>' : '<span class="mock-row-flag warn">not finished</span>';
  return `<tr>
- <td><div class="cell-main">${esc(r.user_name || r.user_email || 'Student')}</div><div class="cell-sub">${esc(r.user_email || r.id || '')}</div></td>
+ <td><div class="cell-main">${esc(r.user_name || r.user_email || 'Student')}</div><div class="cell-sub">${esc(r.user_email || r.id || '')}</div><div class="mock-row-flags">${completeFlag}${countLabel ? `<span class="mock-row-flag blue">${esc(countLabel)}</span>` : ''}${issueLabel}</div></td>
  <td>${tierBadge(r.tier)}</td>
- <td>${mockStatusBadge(status)}${statusActions}</td>
+ <td>${mockAttemptStatusBadge(r)}<div class="cell-sub" style="margin-top:5px;">Manual: ${mockStatusBadge(status)}</div>${statusActions}</td>
  <td><div class="cell-main">${manualOnly ? (r.manual_review_paid ? 'Yes' : 'No') : (dt?.date || '-')}</div><div class="cell-sub">${manualOnly ? (fmtDate(r.manual_review_paid_at)?.date || '-') : (dt?.time || '')}</div></td>
  <td><div class="mock-action-row"><button class="btn blue" onclick="openMockReader('${esc(r.id)}')">Reader</button><button class="btn" onclick="copyMockId('${esc(r.id)}')">Copy ID</button></div></td>
  </tr>`;
  }).join('') : `<tr><td colspan="5" style="text-align:center;padding:22px;color:var(--muted2);">${manualOnly ? 'No manual review requests match this filter.' : 'No saved mock attempts match this filter.'}</td></tr>`;
+}
+
+function mockAttemptStatusBadge(row) {
+ const s = mockEffectiveStatus(row);
+ const cls = s === 'completed' ? 'badge-yes' : s === 'in_progress' ? 'badge-paid' : s === 'expired' ? 'badge-no' : 'badge-default';
+ return `<span class="badge ${cls}">${esc(s.replace(/_/g,' '))}</span>`;
 }
 
 function mockStatusBadge(status) {
