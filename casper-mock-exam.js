@@ -203,6 +203,9 @@ window.FullCasperMock = (() => {
  reviewId: row.review_id || null,
  recordingKey: row.recording_key || null,
  transcriptionAudioKey: row.transcription_audio_key || null,
+ voiceMetrics: row.voice_metrics || null,
+ visualMetrics: row.visual_metrics || null,
+ visualDegraded: !!row.visual_degraded,
  durationSec: row.duration_sec || null,
  processingError: row.processing_error || null,
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
@@ -835,6 +838,9 @@ window.FullCasperMock = (() => {
  row.reviewId = data?.review_id || null;
  row.recordingKey = data?.recording_url || null;
  row.transcriptionAudioKey = data?.transcription_audio_key || null;
+ row.voiceMetrics = data?.voice_metrics || null;
+ row.visualMetrics = data?.visual_metrics || null;
+ row.visualDegraded = !!data?.visual_degraded;
  row.processingError = data?.processing_error || data?.message || null;
  } else {
  row.score = Number.isFinite(Number(data?.score)) ? Number(data.score) : null;
@@ -862,6 +868,9 @@ window.FullCasperMock = (() => {
  review_id: row.reviewId || row.rawFeedback?.review_id || null,
  recording_key: row.recordingKey || row.rawFeedback?.recording_url || null,
  transcription_audio_key: row.transcriptionAudioKey || row.rawFeedback?.transcription_audio_key || null,
+ voice_metrics: row.voiceMetrics || row.rawFeedback?.voice_metrics || null,
+ visual_metrics: row.visualMetrics || row.rawFeedback?.visual_metrics || null,
+ visual_degraded: !!(row.visualDegraded || row.rawFeedback?.visual_degraded),
  duration_sec: row.durationSec || row.duration_sec || row.rawFeedback?.durationSec || null,
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
  processing_error: row.processingError || null,
@@ -1870,6 +1879,62 @@ window.FullCasperMock = (() => {
  ];
  }
 
+ function visualMetricsFor(row) {
+ return row?.visualMetrics || row?.visual_metrics || row?.rawFeedback?.visual_metrics || null;
+ }
+
+ function voiceMetricsFor(row) {
+ return row?.voiceMetrics || row?.voice_metrics || row?.rawFeedback?.voice_metrics || null;
+ }
+
+ function countVisualValues(items, key) {
+ const counts = {};
+ items.forEach(item => {
+ const value = String(item.visual?.[key] || '').trim();
+ if (!value) return;
+ counts[value] = (counts[value] || 0) + 1;
+ });
+ return counts;
+ }
+
+ function formatVisualCounts(counts) {
+ const entries = Object.entries(counts || {});
+ if (!entries.length) return 'No camera signal';
+ return entries
+ .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+ .map(([key, count]) => `${niceKey(key)} ${count}x`)
+ .join(', ');
+ }
+
+ function buildPremiumVisualInterpretation(rows) {
+ const items = rows
+ .filter(row => row?.type === 'video')
+ .map((row, i) => ({
+ row,
+ station: row.localIndex || i + 1,
+ presentation: row.feedback?.presentation || null,
+ visual: visualMetricsFor(row),
+ voice: voiceMetricsFor(row),
+ visualDegraded: !!(row.rawFeedback?.visual_degraded || row.visualDegraded || row.visual_degraded),
+ }))
+ .filter(item => item.presentation || item.visual || item.voice || item.visualDegraded);
+ if (!items.length) return null;
+ return {
+ analysedCount: items.length,
+ eyeContact: countVisualValues(items, 'eye_contact'),
+ posture: countVisualValues(items, 'posture'),
+ composure: countVisualValues(items, 'composure'),
+ items: items.map(item => ({
+ station: item.station,
+ category: item.row.station?.category || 'Video station',
+ visual: item.visual,
+ voice: item.voice,
+ presentation: item.presentation,
+ visualDegraded: item.visualDegraded,
+ })),
+ };
+ }
+
  function buildMockReport(rows) {
  const scored = rows.map(r => r.score10).filter(Number.isFinite);
  const overallAvg = round1(average(scored));
@@ -1878,7 +1943,8 @@ window.FullCasperMock = (() => {
  const patterns = buildPatternReport(rows);
  const categories = buildCategoryReport(rows);
  const interpretation = buildInterpretation(overallAvg);
- const report = { rows, overallAvg, criteria, stamina, patterns, categories, interpretation };
+ const visualInterpretation = buildPremiumVisualInterpretation(rows);
+ const report = { rows, overallAvg, criteria, stamina, patterns, categories, interpretation, visualInterpretation };
  report.oneThing = buildOneThing(report);
  report.actionPlan = buildMockActionPlan(report, rows);
  report.readiness = buildReadinessChecklist(report);
@@ -1922,6 +1988,7 @@ window.FullCasperMock = (() => {
  patterns: report.patterns,
  categories: report.categories,
  interpretation: report.interpretation,
+ visualInterpretation: report.visualInterpretation,
  oneThing: report.oneThing,
  actionPlan: report.actionPlan,
  readiness: report.readiness,
@@ -1956,6 +2023,8 @@ window.FullCasperMock = (() => {
  ${renderCriterionHeatmap(report.criteria)}
  ${renderStamina(report.stamina)}
  </div>
+
+ ${renderPremiumVisualInterpretation(report.visualInterpretation)}
 
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:22px;">
  ${renderPatternReport(report.patterns, report.criteria)}
@@ -2083,14 +2152,74 @@ window.FullCasperMock = (() => {
  return found || 0;
  }
 
- function mockTime(seconds) {
- const total = Math.max(0, Math.round(Number(seconds) || 0));
- const m = Math.floor(total / 60);
- const s = total % 60;
- return `${m}:${String(s).padStart(2, '0')}`;
- }
+	 function mockTime(seconds) {
+	 const total = Math.max(0, Math.round(Number(seconds) || 0));
+	 const m = Math.floor(total / 60);
+	 const s = total % 60;
+	 return `${m}:${String(s).padStart(2, '0')}`;
+	 }
 
- function mockVideoPlayerHtml(row, id = 'mockStationVideoPlayer') {
+	 function mockTranscriptSegments(row) {
+	 const direct = Array.isArray(row?.transcriptSegments) ? row.transcriptSegments : [];
+	 const saved = Array.isArray(row?.transcript_segments) ? row.transcript_segments : [];
+	 const raw = Array.isArray(row?.rawFeedback?.transcript_segments) ? row.rawFeedback.transcript_segments : [];
+	 return (direct.length ? direct : saved.length ? saved : raw)
+	 .map(seg => ({
+	 start: Number(seg.start ?? seg.start_time ?? 0),
+	 end: Number(seg.end ?? seg.end_time ?? seg.start ?? 0),
+	 text: String(seg.text || '').trim(),
+	 }))
+	 .filter(seg => seg.text);
+	 }
+
+	 function mockTranscriptReviewHtml(row, videoId) {
+	 const segments = mockTranscriptSegments(row);
+	 if (segments.length) {
+	 return `
+	 <div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:12px;margin-top:12px;">
+	 <div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;">Synced transcript</div>
+	 <div style="font-size:0.74rem;color:var(--gray400);line-height:1.45;margin-bottom:8px;">Click a line to jump the video. The active line follows playback.</div>
+	 <div data-mock-sync-for="${esc(videoId)}" style="max-height:250px;overflow:auto;display:grid;gap:5px;">
+	 ${segments.map(seg => {
+	 const end = Number.isFinite(seg.end) && seg.end > seg.start ? seg.end : seg.start + 2.5;
+	 return `<button type="button" data-mock-sync-segment data-video-id="${esc(videoId)}" data-start="${esc(seg.start)}" data-end="${esc(end)}" onclick="FullCasperMock.jumpTranscript('${esc(videoId)}', ${Number(seg.start) || 0})" style="width:100%;text-align:left;border:0;background:transparent;border-radius:8px;padding:7px 8px;font-family:inherit;font-size:0.78rem;line-height:1.55;color:var(--gray600);cursor:pointer;"><span style="font-size:0.68rem;color:var(--gray400);font-weight:900;margin-right:7px;font-variant-numeric:tabular-nums;">${esc(mockTime(seg.start))}</span>${esc(seg.text)}</button>`;
+	 }).join('')}
+	 </div>
+	 </div>
+	 `;
+	 }
+	 return row?.transcript ? `<div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:12px;margin-top:12px;"><div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Transcript used for marking</div><div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;max-height:230px;overflow:auto;">${esc(row.transcript)}</div></div>` : '';
+	 }
+
+	 function syncMockTranscript(videoId, time) {
+	 const safeId = window.CSS?.escape ? CSS.escape(videoId) : String(videoId).replace(/["\\]/g, '\\$&');
+	 const wrap = document.querySelector(`[data-mock-sync-for="${safeId}"]`);
+	 if (!wrap) return;
+	 let active = null;
+	 wrap.querySelectorAll('[data-mock-sync-segment]').forEach(btn => {
+	 const start = Number(btn.dataset.start || 0);
+	 const end = Number(btn.dataset.end || start + 2.5);
+	 const on = time >= start && time < Math.max(end, start + 0.8);
+	 btn.style.background = on ? 'rgba(14,165,233,0.11)' : 'transparent';
+	 btn.style.boxShadow = on ? 'inset 3px 0 0 var(--teal3)' : 'none';
+	 btn.style.color = on ? 'var(--navy)' : 'var(--gray600)';
+	 if (on) active = btn;
+	 });
+	 if (active && wrap.dataset.lastActive !== String(active.dataset.start)) {
+	 wrap.dataset.lastActive = String(active.dataset.start);
+	 active.scrollIntoView({ block: 'nearest' });
+	 }
+	 }
+
+	 function jumpTranscript(videoId, start) {
+	 const video = byId(videoId);
+	 if (!video) return;
+	 video.currentTime = Math.max(0, Number(start) || 0);
+	 syncMockTranscript(videoId, video.currentTime || 0);
+	 if (video.getAttribute('src')) video.play().catch(() => {});
+	 }
+
+	 function mockVideoPlayerHtml(row, id = 'mockStationVideoPlayer') {
  const src = row?.recordingUrl || '';
  const duration = mockVideoDuration(row);
  return `
@@ -2136,9 +2265,10 @@ window.FullCasperMock = (() => {
  const pct = d ? Math.max(0, Math.min(1, current / d)) : 0;
  range.value = String(Math.round(pct * 1000));
  fill.style.width = `${pct * 100}%`;
- time.textContent = `${mockTime(current)} / ${d ? mockTime(d) : '--:--'}`;
- btn.textContent = video.paused || video.ended ? 'Play' : 'Pause';
- };
+	 time.textContent = `${mockTime(current)} / ${d ? mockTime(d) : '--:--'}`;
+	 btn.textContent = video.paused || video.ended ? 'Play' : 'Pause';
+	 syncMockTranscript(id, current);
+	 };
  const seek = () => {
  const d = usableDuration();
  if (!d) return;
@@ -2184,12 +2314,12 @@ window.FullCasperMock = (() => {
 	 ${mockVideoPlayerHtml(row, 'mockStationVideoPlayer')}
 	 <div style="font-size:0.76rem;color:var(--gray400);line-height:1.45;margin-top:8px;">${esc(rowScoreLabel(row))} - ${esc(row.station?.category || 'Video station')}</div>
 	 <div style="font-size:0.72rem;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:9px 10px;line-height:1.45;margin-top:10px;">Recording playback is kept for 30 days after the mock. Save any notes you need before it expires.</div>
-	 ${row.transcript ? `<div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:12px;margin-top:12px;"><div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Transcript used for marking</div><div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;max-height:230px;overflow:auto;">${esc(row.transcript)}</div></div>` : ''}
+	 ${mockTranscriptReviewHtml(row, 'mockStationVideoPlayer')}
 	 </div>
  <div style="display:grid;gap:14px;">
  ${scenarioPromptHtml(row)}
  ${videoFeedbackHtml(row)}
- ${presentation ? renderPresentationFeedback(presentation, row.rawFeedback?.visual_degraded) : ''}
+ ${presentation ? renderPresentationFeedback(presentation, row.rawFeedback?.visual_degraded || row.visualDegraded || row.visual_degraded) : ''}
  </div>
  </div>
  `;
@@ -2284,13 +2414,20 @@ window.FullCasperMock = (() => {
  </div>
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px;align-items:start;">
  <div>
- ${mockVideoPlayerHtml(videos[0], 'mockRecordingPlayer')}
- <div id="mockRecordingMeta" style="font-size:0.75rem;color:var(--gray400);line-height:1.45;margin-top:8px;"></div>
- </div>
- <div id="mockRecordingFeedback">${videoFeedbackHtml(videos[0])}</div>
+	 ${mockVideoPlayerHtml(videos[0], 'mockRecordingPlayer')}
+	 <div id="mockRecordingMeta" style="font-size:0.75rem;color:var(--gray400);line-height:1.45;margin-top:8px;"></div>
+	 <div id="mockRecordingTranscript">${mockTranscriptReviewHtml(videos[0], 'mockRecordingPlayer')}</div>
+	 </div>
+ <div id="mockRecordingFeedback">${videoPlaybackFeedbackHtml(videos[0])}</div>
  </div>
  </div>
  `;
+ }
+
+ function videoPlaybackFeedbackHtml(row) {
+ if (!row) return '<div style="font-size:0.84rem;color:var(--gray400);">No video selected.</div>';
+ const presentation = row.feedback?.presentation;
+ return `${videoFeedbackHtml(row)}${presentation ? `<div style="margin-top:10px;">${renderPresentationFeedback(presentation, row.rawFeedback?.visual_degraded || row.visualDegraded || row.visual_degraded)}</div>` : ''}`;
  }
 
  function videoFeedbackHtml(row) {
@@ -2371,10 +2508,12 @@ window.FullCasperMock = (() => {
  if (meta) {
  meta.textContent = row ? `Video ${i + 1} - ${row.station?.category || 'CASPer'} - ${rowScoreLabel(row)}` : '';
  }
- const feedback = byId('mockRecordingFeedback');
- if (feedback) feedback.innerHTML = videoFeedbackHtml(row);
- initMockVideoPlayer('mockRecordingPlayer');
- }
+	 const feedback = byId('mockRecordingFeedback');
+	 if (feedback) feedback.innerHTML = videoPlaybackFeedbackHtml(row);
+	 const transcript = byId('mockRecordingTranscript');
+	 if (transcript) transcript.innerHTML = mockTranscriptReviewHtml(row, 'mockRecordingPlayer');
+	 initMockVideoPlayer('mockRecordingPlayer');
+	 }
 
  function renderInterpretation(report) {
  const toneColor = report.interpretation.tone === 'strong' ? '#16a34a'
@@ -2676,6 +2815,53 @@ window.FullCasperMock = (() => {
  `);
  }
 
+ function renderPremiumVisualInterpretation(summary) {
+ if (!summary) return '';
+ const stationCards = (summary.items || []).map(item => {
+ const visual = item.visual || {};
+ const presentation = item.presentation || {};
+ const voice = item.voice || {};
+ const cameraLimited = item.visualDegraded || !item.visual;
+ return `
+ <div style="background:#fff;border:1px solid var(--gray200);border-radius:12px;padding:13px 14px;">
+ <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;">
+ <div>
+ <div style="font-size:0.8rem;font-weight:900;color:var(--navy);">Video ${esc(item.station)} - ${esc(item.category)}</div>
+ <div style="font-size:0.7rem;color:var(--gray400);line-height:1.35;">${cameraLimited ? 'Camera signal limited or unavailable' : esc(visual.summary || 'Camera signal available')}</div>
+ </div>
+ ${voice?.pace_wpm ? `<div style="font-size:0.72rem;font-weight:900;color:#6d28d9;white-space:nowrap;">${esc(voice.pace_wpm)} wpm</div>` : ''}
+ </div>
+ ${visual?.eye_contact ? visualLine('Eye contact', niceKey(visual.eye_contact)) : ''}
+ ${visual?.posture ? visualLine('Posture', niceKey(visual.posture)) : ''}
+ ${visual?.composure ? visualLine('Composure', niceKey(visual.composure)) : ''}
+ ${Array.isArray(visual?.distractions) && visual.distractions.length ? visualLine('Distractions', visual.distractions.join(', ')) : ''}
+ ${presentation.visual_presence ? visualLine('AI interpretation', presentation.visual_presence) : ''}
+ ${presentation.one_improvement ? visualLine('Practice cue', presentation.one_improvement) : ''}
+ </div>
+ `;
+ }).join('');
+ return card('Premium visual interpretation', `
+ <div style="font-size:0.82rem;color:var(--gray600);line-height:1.62;margin-bottom:12px;">
+ Premium visual feedback uses sampled webcam frames plus voice/transcript signals to interpret delivery: camera gaze/eye contact, posture, composure, distracting gestures, pace, clarity, and confidence. These are presentation cues only, not judgements about appearance, identity, personality, or cultural communication style. Non-Western eye contact patterns and neurodivergent presentation differences should not be penalised.
+ </div>
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px;margin-bottom:13px;">
+ ${visualSummaryTile('Stations analysed', `${summary.analysedCount || 0}`)}
+ ${visualSummaryTile('Eye contact', formatVisualCounts(summary.eyeContact))}
+ ${visualSummaryTile('Posture', formatVisualCounts(summary.posture))}
+ ${visualSummaryTile('Composure', formatVisualCounts(summary.composure))}
+ </div>
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;">${stationCards}</div>
+ `);
+ }
+
+ function visualSummaryTile(label, value) {
+ return `<div style="background:#f8fafc;border:1px solid var(--gray200);border-radius:10px;padding:10px 11px;"><div style="font-size:0.66rem;font-weight:900;color:#6d28d9;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${esc(label)}</div><div style="font-size:0.78rem;color:var(--gray600);line-height:1.4;">${esc(value || '-')}</div></div>`;
+ }
+
+ function visualLine(label, value) {
+ return value ? `<div style="font-size:0.76rem;color:var(--gray600);line-height:1.5;margin-top:5px;"><strong>${esc(label)}:</strong> ${esc(value)}</div>` : '';
+ }
+
  function renderPatternReport(patterns, criteria) {
  let body = '';
  if (patterns.length) {
@@ -2805,11 +2991,12 @@ window.FullCasperMock = (() => {
  proceedAfterRules,
  continueAfterStation,
  enableCameraAndStartVideoStation,
- requestManualReview,
- showReviewStation,
- showRecording,
- downloadLocalRecording,
- copyReportSummary,
+	 requestManualReview,
+	 showReviewStation,
+	 showRecording,
+	 jumpTranscript,
+	 downloadLocalRecording,
+	 copyReportSummary,
  printReport,
  skipBreak,
  };
