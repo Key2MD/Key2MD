@@ -1582,14 +1582,19 @@ async function submitMMIForFeedback() {
 
  // -- Build FormData --------------------------------------------
  // Re-resolve uploadBlob at build time in case audioBlob arrived after initial check.
- // Premium CASPer mock stations send the full webcam recording for video analysis.
+ // Send the audio track for transcription and, when available, include the
+ // full recording as a fallback so a bad audio blob does not waste a student's attempt.
  const buildFormData = () => {
  const finalBlob = requireVideoUpload ? recordingBlob : (audioBlob || recordingBlob);
- const fileName = requireVideoUpload ? 'recording-video.webm' : 'recording.webm';
- const audioFile = new File([finalBlob], fileName, { type: finalBlob.type || (requireVideoUpload ? 'video/webm' : 'audio/webm') });
+ const transcriptBlob = audioBlob || finalBlob;
+ const audioFile = new File([transcriptBlob], 'recording-audio.webm', { type: transcriptBlob.type || 'audio/webm' });
  const fd = new FormData();
  fd.append('audio', audioFile);
- fd.append('media_kind', requireVideoUpload ? 'video' : 'audio');
+ if(recordingBlob && recordingBlob !== transcriptBlob && recordingBlob.size <= 50 * 1024 * 1024) {
+ const videoFile = new File([recordingBlob], 'recording-video.webm', { type: recordingBlob.type || 'video/webm' });
+ fd.append('recording_video', videoFile);
+ }
+ fd.append('media_kind', recordingBlob ? 'video' : 'audio');
  const mmiStationIdx = MMI_STATIONS.indexOf(s);
  const casperStationIdx = typeof STATIONS !== 'undefined' ? STATIONS.indexOf(s) : -1;
  const stationId = s.id || (mmiStationIdx >= 0 ? `mmi_${mmiStationIdx}` : casperStationIdx >= 0 ? `casper_video_${casperStationIdx}` : 'casper_video_mock');
