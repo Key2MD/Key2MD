@@ -2099,6 +2099,7 @@ window.FullCasperMock = (() => {
  <div style="padding:11px 12px 12px;background:linear-gradient(180deg,#0a1628,#07111f);">
  <div style="display:flex;align-items:center;gap:10px;">
  <button type="button" id="${id}Btn" aria-label="Play recording" style="min-width:54px;height:34px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-size:0.72rem;font-weight:900;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0;">Play</button>
+ ${src ? `<button type="button" onclick="FullCasperMock.downloadLocalRecording('${esc(id)}')" style="min-width:78px;height:34px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-size:0.72rem;font-weight:900;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0;">Download</button>` : ''}
  <div style="position:relative;height:18px;flex:1;display:flex;align-items:center;">
  <div style="position:absolute;left:0;right:0;height:5px;border-radius:999px;background:rgba(255,255,255,0.18);overflow:hidden;">
  <div id="${id}Fill" style="height:100%;width:0%;background:#0ea5e9;border-radius:999px;"></div>
@@ -2160,6 +2161,19 @@ window.FullCasperMock = (() => {
  });
  }
  update();
+ }
+
+ function downloadLocalRecording(id = 'mockRecordingPlayer') {
+ const video = byId(id);
+ const src = video?.currentSrc || video?.getAttribute?.('src') || '';
+ if (!src) return;
+ const a = document.createElement('a');
+ a.href = src;
+ a.download = `key2md-casper-mock-${String(id || 'recording').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80) || 'recording'}.webm`;
+ a.rel = 'noopener';
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
  }
 
  function videoStationReviewHtml(row) {
@@ -2794,6 +2808,7 @@ window.FullCasperMock = (() => {
  requestManualReview,
  showReviewStation,
  showRecording,
+ downloadLocalRecording,
  copyReportSummary,
  printReport,
  skipBreak,

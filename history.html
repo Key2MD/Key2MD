@@ -144,6 +144,11 @@
 	 .mock-video-load { width:100%; min-height:150px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; border:0; background:#07111f; color:#fff; cursor:pointer; font-family:inherit; padding:18px; }
 	 .mock-video-load strong { font-size:0.9rem; }
 	 .mock-video-load span { font-size:0.75rem; color:rgba(255,255,255,0.62); line-height:1.45; }
+	 .mock-video-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+	 .mock-recording-download { min-height:34px; padding:8px 12px; border-radius:50px; border:1px solid rgba(14,165,233,0.3); background:#fff; color:var(--teal3); font-size:0.74rem; font-weight:850; font-family:inherit; cursor:pointer; }
+	 .mock-recording-download:hover { background:rgba(14,165,233,0.07); border-color:var(--teal); }
+	 .mock-recording-download:disabled { cursor:not-allowed; opacity:0.65; }
+	 .mock-analysis-issue { background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:10px; padding:9px 10px; font-size:0.76rem; line-height:1.45; margin-top:9px; }
 	 .mock-expiry-note { background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; border-radius:10px; padding:9px 10px; font-size:0.76rem; line-height:1.45; margin:10px 0; }
 	 .mock-feedback-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
 	 .mock-feedback-item { background:var(--gray50); border:1px solid var(--gray200); border-radius:10px; padding:10px 11px; }
@@ -860,12 +865,15 @@ function mockVideoHTML(attempt, row, index) {
  const videoId = `mockvid-${attempt.id}-${index}`.replace(/[^a-zA-Z0-9_-]/g, '');
  const canLoad = row.recording_key && !attempt.expired;
  const segments = Array.isArray(row.transcript_segments) ? row.transcript_segments : [];
+ const issue = row.processing_error ? `<div class="mock-analysis-issue"><strong>Analysis issue.</strong> ${escapeHtml(row.processing_error)}${row.recording_key && !attempt.expired ? ' The recording is still available below during the 30-day window.' : ''}</div>` : '';
  return `
  <div class="mock-video-box">
  <video id="${escapeAttr(videoId)}" controls playsinline preload="metadata" data-attempt-id="${escapeAttr(attempt.id)}" data-recording-key="${escapeAttr(row.recording_key || '')}"></video>
  ${canLoad ? `<button type="button" class="mock-video-load" onclick="loadMockRecording(event,'${escapeAttr(videoId)}')"><strong>Load recording</strong><span>Authenticated playback. Expires ${escapeHtml(formatDate(attempt.expires_at))}.</span></button>` : `<div class="mock-video-load" style="cursor:default;"><strong>${attempt.expired ? 'Recording expired' : 'No recording saved'}</strong><span>${attempt.expired ? 'The 30-day playback window has passed.' : 'Transcript and feedback are still shown below.'}</span></div>`}
  </div>
+ ${canLoad ? `<div class="mock-video-actions"><button type="button" class="mock-recording-download" onclick="downloadMockRecording(event,'${escapeAttr(videoId)}')">Download recording only</button></div>` : ''}
  ${row.duration_sec ? `<div class="mock-card-meta" style="margin-top:7px;">Duration ${escapeHtml(formatDuration(row.duration_sec))}</div>` : ''}
+ ${issue}
  ${segments.length ? `<div class="mock-section-label">Synced transcript</div>${mockSyncedTranscriptHTML(videoId, segments)}` : (row.transcript ? `<div class="mock-section-label">Transcript used for marking</div><div class="mock-transcript mock-text">${escapeHtml(row.transcript)}</div>` : '')}
  `;
 }
@@ -983,6 +991,70 @@ async function loadMockRecording(event, videoId) {
  }
 }
 window.loadMockRecording = loadMockRecording;
+
+function mockRecordingUrl(video) {
+ if (!video?.dataset?.attemptId || !video?.dataset?.recordingKey) {
+ throw new Error('Recording details are missing for this station.');
+ }
+ return `${API_BASE}/api/casper-mock/recording?attempt_id=${encodeURIComponent(video.dataset.attemptId)}&key=${encodeURIComponent(video.dataset.recordingKey)}`;
+}
+
+async function fetchMockRecordingBlob(video) {
+ const token = localStorage.getItem(TOKEN_KEY);
+ if (!token) throw new Error('Please log in again before downloading this recording.');
+ const res = await fetch(mockRecordingUrl(video), { headers: { 'Authorization': `Bearer ${token}` } });
+ if (!res.ok) {
+ const data = await res.json().catch(() => ({}));
+ throw new Error(data.message || data.error || 'Recording unavailable.');
+ }
+ const blob = await res.blob();
+ const type = String(blob.type || '');
+ if (type && !type.startsWith('video/') && type !== 'application/octet-stream') {
+ throw new Error('Download blocked because the saved file is not a video recording.');
+ }
+ return blob;
+}
+
+function recordingDownloadName(video, blob) {
+ const ext = String(blob?.type || '').includes('mp4') ? 'mp4' : 'webm';
+ const station = String(video?.id || 'recording').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80) || 'recording';
+ return `key2md-casper-mock-${station}.${ext}`;
+}
+
+function saveBlobLocally(blob, filename) {
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = filename;
+ a.rel = 'noopener';
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+async function downloadMockRecording(event, videoId) {
+ if (event) event.stopPropagation();
+ const btn = event?.currentTarget || null;
+ const video = document.getElementById(videoId);
+ if (!video) return;
+ const original = btn?.textContent || 'Download recording only';
+ try {
+ if (btn) { btn.disabled = true; btn.textContent = 'Preparing download...'; }
+ const blob = await fetchMockRecordingBlob(video);
+ saveBlobLocally(blob, recordingDownloadName(video, blob));
+ if (btn) btn.textContent = 'Downloaded';
+ setTimeout(() => { if (btn) { btn.disabled = false; btn.textContent = original; } }, 1800);
+ } catch (err) {
+ if (btn) {
+ btn.disabled = false;
+ btn.textContent = 'Download failed';
+ btn.title = err.message || 'Try again later.';
+ setTimeout(() => { btn.textContent = original; }, 2600);
+ }
+ }
+}
+window.downloadMockRecording = downloadMockRecording;
 
 function bindMockTranscriptSync(video) {
  if (!video || video.dataset.syncBound === '1') return;
