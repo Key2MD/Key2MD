@@ -1718,6 +1718,7 @@ function createMMIMockReviewSnapshot() {
  requireVideoUpload,
  uploadBlob,
  recordingBlob: snapshotRecordingBlob,
+ audioBlob: snapshotAudioBlob,
  recordingUrl,
  cfg,
  prompts,
@@ -1728,13 +1729,19 @@ function createMMIMockReviewSnapshot() {
 }
 
 function buildMMIMockFormData(snapshot, frames, visualDegraded) {
- const fileName = snapshot.requireVideoUpload ? 'recording-video.webm' : 'recording.webm';
- const audioFile = new File([snapshot.uploadBlob], fileName, {
- type: snapshot.uploadBlob.type || (snapshot.requireVideoUpload ? 'video/webm' : 'audio/webm')
+ const transcriptBlob = snapshot.audioBlob || snapshot.uploadBlob;
+ const audioFile = new File([transcriptBlob], 'recording-audio.webm', {
+ type: transcriptBlob.type || 'audio/webm'
  });
  const fd = new FormData();
  fd.append('audio', audioFile);
- fd.append('media_kind', snapshot.requireVideoUpload ? 'video' : 'audio');
+ if (snapshot.requireVideoUpload && snapshot.recordingBlob) {
+ const videoFile = new File([snapshot.recordingBlob], 'recording-video.webm', {
+ type: snapshot.recordingBlob.type || 'video/webm'
+ });
+ fd.append('recording_video', videoFile);
+ }
+ fd.append('media_kind', snapshot.recordingBlob ? 'video' : 'audio');
  fd.append('station_id', snapshot.stationId);
  fd.append('station_category', snapshot.station.category || '');
  fd.append('station_scenario', snapshot.station.scenario || '');

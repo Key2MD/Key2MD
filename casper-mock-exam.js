@@ -833,6 +833,7 @@ window.FullCasperMock = (() => {
  row.rawFeedback = data || null;
  row.reviewId = data?.review_id || null;
  row.recordingKey = data?.recording_url || null;
+ row.processingError = data?.processing_error || data?.message || null;
  } else {
  row.score = Number.isFinite(Number(data?.score)) ? Number(data.score) : null;
  row.feedback = data?.feedback || null;

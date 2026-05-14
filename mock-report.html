@@ -64,8 +64,9 @@
  function fmtDate(value){if(!value)return '';try{return new Intl.DateTimeFormat('en-AU',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));}catch{return String(value);}}
  function fmtDuration(sec){const s=Math.max(0,Math.round(Number(sec)||0));return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
  function scoreColor(score){const n=Number(score);if(!Number.isFinite(n))return'var(--gray400)';if(n>=7)return'var(--green)';if(n>=5.5)return'var(--teal3)';if(n>=4.5)return'var(--amber)';return'var(--red)';}
- function rowScore(row){const n=Number(row.score);return Number.isFinite(n)?`${Math.round(n*10)/10}/10`:'-';}
- function feedback(row){const fb=row.feedback||{},overall=fb.overall||{};return{strength:overall.biggest_strength||fb.strengths||fb.strength||'No specific strength returned.',improve:overall.biggest_improvement||fb.improvements||fb.improve||'No specific improvement returned.'};}
+ function hasFeedback(row){return !!(row?.feedback&&typeof row.feedback==='object'&&Object.keys(row.feedback).length);}
+ function rowScore(row){if(!hasFeedback(row))return '-';const n=Number(row.feedback?.overall?.score??row.feedback?.score??row.score);return Number.isFinite(n)&&n>0?`${Math.round(n*10)/10}/10`:'-';}
+ function feedback(row){const fb=row.feedback||{},overall=fb.overall||{};if(!hasFeedback(row)&&row.processing_error)return{strength:'Video analysis did not complete.',improve:row.processing_error};return{strength:overall.biggest_strength||fb.strengths||fb.strength||'No specific strength returned.',improve:overall.biggest_improvement||fb.improvements||fb.improve||'No specific improvement returned.'};}
  function paramsId(){return new URLSearchParams(location.search).get('id')||'';}
  document.addEventListener('DOMContentLoaded',()=>{
  Key2MDAuth.init({tool:'casper',apiBase:API_BASE,onAuthChange:user=>{if(user)loadReport();else showLogin();}});
@@ -113,7 +114,7 @@
  const isVideo=row.type==='video',title=`${isVideo?'Video':'Typed'} ${row.localIndex||index+1}`;
  const fb=feedback(row);
  return `<section class="station">
- <div class="station-head"><div><div class="station-title">${esc(title)} - ${esc(row.station?.category||'CASPer')}</div><div class="text" style="font-size:.75rem;color:var(--gray400);">${esc(row.tier||(isVideo?attempt.tier:'typed'))}</div></div><div class="score" style="color:${scoreColor(row.score)}">${esc(rowScore(row))}</div></div>
+ <div class="station-head"><div><div class="station-title">${esc(title)} - ${esc(row.station?.category||'CASPer')}</div><div class="text" style="font-size:.75rem;color:var(--gray400);">${esc(row.tier||(isVideo?attempt.tier:'typed'))}</div></div><div class="score" style="color:${scoreColor(row.feedback?.overall?.score??row.feedback?.score??row.score)}">${esc(rowScore(row))}</div></div>
  <div class="station-grid">
  <div>${isVideo?videoHTML(row,index):typedHTML(row)}</div>
  <div><div class="label">Scenario</div><div class="text">${esc(row.station?.scenario||'')}</div>${promptsHTML(row)}
@@ -126,7 +127,8 @@
  const id=`reportvid-${attempt.id}-${index}`.replace(/[^a-zA-Z0-9_-]/g,'');
  const canLoad=row.recording_key&&!attempt.expired;
  const segs=Array.isArray(row.transcript_segments)?row.transcript_segments:[];
- return `<div class="video-box"><video id="${attr(id)}" controls playsinline preload="metadata" data-attempt-id="${attr(attempt.id)}" data-recording-key="${attr(row.recording_key||'')}"></video>${canLoad?`<button type="button" class="load-video" onclick="loadRecording(event,'${attr(id)}')"><strong>Load recording</strong><span>Authenticated playback. Expires ${esc(fmtDate(attempt.expires_at))}.</span></button>`:`<div class="load-video" style="cursor:default;"><strong>${attempt.expired?'Recording expired':'No recording saved'}</strong><span>${attempt.expired?'The 30-day playback window has passed.':'Transcript and feedback are still shown below.'}</span></div>`}</div>${row.duration_sec?`<div class="text" style="font-size:.75rem;margin-top:7px;color:var(--gray400);">Duration ${esc(fmtDuration(row.duration_sec))}</div>`:''}${segs.length?`<div class="label">Synced transcript</div>${syncHTML(id,segs)}`:(row.transcript?`<div class="label">Transcript used for marking</div><div class="box text">${esc(row.transcript)}</div>`:'')}`;
+ const issue=row.processing_error?`<div class="box text" style="border-color:#fed7aa;background:#fff7ed;color:#7c2d12;margin-top:10px;">${esc(row.processing_error)}</div>`:'';
+ return `<div class="video-box"><video id="${attr(id)}" controls playsinline preload="metadata" data-attempt-id="${attr(attempt.id)}" data-recording-key="${attr(row.recording_key||'')}"></video>${canLoad?`<button type="button" class="load-video" onclick="loadRecording(event,'${attr(id)}')"><strong>Load recording</strong><span>Authenticated playback. Expires ${esc(fmtDate(attempt.expires_at))}.</span></button>`:`<div class="load-video" style="cursor:default;"><strong>${attempt.expired?'Recording expired':'No recording saved'}</strong><span>${attempt.expired?'The 30-day playback window has passed.':'Transcript and feedback are still shown below.'}</span></div>`}</div>${row.duration_sec?`<div class="text" style="font-size:.75rem;margin-top:7px;color:var(--gray400);">Duration ${esc(fmtDuration(row.duration_sec))}</div>`:''}${issue}${segs.length?`<div class="label">Synced transcript</div>${syncHTML(id,segs)}`:(row.transcript?`<div class="label">Transcript used for marking</div><div class="box text">${esc(row.transcript)}</div>`:'')}`;
  }
  function syncHTML(videoId,segs){return `<div class="sync" data-sync-for="${attr(videoId)}">${segs.map(seg=>`<button type="button" class="seg" data-start="${attr(seg.start||0)}" data-end="${attr(seg.end||seg.start||0)}" onclick="jumpTranscript('${attr(videoId)}',${Number(seg.start||0)})">${esc(seg.text||'')}</button>`).join('')}</div>`;}
  function criteriaHTML(row){

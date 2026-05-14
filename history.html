@@ -888,6 +888,12 @@ function mockTypedAnswerHTML(row) {
 function mockFeedback(row) {
  const fb = row.feedback || {};
  const overall = fb.overall || {};
+ if ((!fb || !Object.keys(fb).length) && row.processing_error) {
+ return {
+ strength: 'Video analysis did not complete.',
+ improve: row.processing_error,
+ };
+ }
  return {
  strength: overall.biggest_strength || fb.strengths || fb.strength || 'No specific strength returned.',
  improve: overall.biggest_improvement || fb.improvements || fb.improve || 'No specific improvement returned.',
