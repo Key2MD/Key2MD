@@ -1119,7 +1119,7 @@
  <div class="page-header">
  <div>
  <div class="page-title">CASPer Class</div>
- <div class="page-sub">One-off, weekly and June package class gate. Students only see the link after payment or manual authorisation.</div>
+ <div class="page-sub">One-off, weekly and 3-class June package class gate. Students only see the link after payment or manual authorisation.</div>
  </div>
  <div class="page-actions">
  <span class="refresh-note" id="ccStatus">Not loaded</span>
@@ -1169,7 +1169,7 @@
  <div class="form-row">
  <label class="form-lbl">Checkout status</label>
  <select class="form-sel" id="ccOpenStatus">
- <option value="open">Open - students can pay $120</option>
+ <option value="open">Open - paid CASPer class checkout enabled</option>
  <option value="closed">Closed - checkout disabled</option>
  </select>
  </div>
@@ -4381,7 +4381,7 @@ function renderCasperClass() {
  const dt = fmtDate(row.created_at);
  const expires = row.expires_at ? fmtDate(row.expires_at) : null;
  const purchaseType = row.purchase_type || (row.source === 'package' ? 'package' : row.source === 'subscription' ? 'ongoing' : row.source === 'stripe' ? 'one_off' : row.source === 'indefinite' ? 'indefinite' : 'manual');
- const planLabel = purchaseType === 'package' ? 'June package' : purchaseType === 'ongoing' ? 'Weekly' : purchaseType === 'one_off' ? 'One-off' : purchaseType === 'indefinite' ? 'Indefinite' : 'Manual';
+ const planLabel = purchaseType === 'package' ? '3-class June package' : purchaseType === 'ongoing' ? 'Weekly' : purchaseType === 'one_off' ? 'One-off' : purchaseType === 'indefinite' ? 'Indefinite' : 'Manual';
  const amount = Number(row.amount_paid || 0);
  const stripeId = row.stripe_session_id || row.stripe_subscription_id || '';
  const stripeShort = stripeId ? `${stripeId.slice(0, 10)}...${stripeId.slice(-4)}` : '-';
@@ -4481,7 +4481,7 @@ async function runCasperClassEmailCheck() {
 }
 
 async function reconcileCasperClass() {
- if (!confirm('Check recent Stripe checkout sessions and recover any paid CASPer class students into this dashboard? This includes one-off, weekly, and package payments. This will not email students.')) return;
+ if (!confirm('Check recent Stripe checkout sessions and recover paid CASPer class students into this dashboard? This includes one-off, weekly, and 3-class package payments. This will not email students.')) return;
  const status = document.getElementById('ccStatus');
  if (status) status.textContent = 'Checking Stripe...';
  try {

@@ -3,11 +3,11 @@
  {
  id: 'casper_class_package',
  area: 'CASPer',
- title: '4-class CASPer sprint',
- price: '$440 upfront',
+ title: '3-class CASPer sprint',
+ price: '$345 upfront',
  href: 'casper-class.html',
- cta: 'Join the June class package',
- bestFor: 'Students aiming for the June 11 CASPer who want live review before the last June 5 class.',
+ cta: 'Join the 3-class June package',
+ bestFor: 'Students aiming for the June 11 CASPer who want the three remaining Friday live reviews before the last June 5 class.',
  tags: ['casper', 'uow', 'notre dame', 'class', 'june']
  },
  {
