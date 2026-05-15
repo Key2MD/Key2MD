@@ -3021,6 +3021,9 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  ? `You have ${p.casperCount} marked CASPer-style response${p.casperCount===1?'':'s'} on Key2MD${p.avgScoreText !== '-' ? `, averaging about ${p.avgScoreText}/10` : ''}.`
  : `You have ${Number(row.review_count || 0)} written practice response${Number(row.review_count || 0)===1?'':'s'} on Key2MD.`;
  const subject = 'A learning note from your Key2MD practice';
+ const scoreText = scorePattern.length
+ ? scorePattern.map(c => `${c.name}: ${Number.isFinite(Number(c.avg)) ? Number(c.avg).toFixed(1) : '-'}/10`).join(', ')
+ : '';
  const exampleText = examples.length
  ? [
  'One or two station examples, so the advice has context:',
@@ -3047,16 +3050,20 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  'I wanted to send something useful while the pattern was fresh. I would not over-read one station on its own, but it can be a good window into a broader answering habit.',
  '',
  'Practice read:',
- `Current average: ${p.avgScoreText}/10. ${p.band}`,
+ `Average: ${p.avgScoreText}/10. Recent average: ${p.recentAvgText}/10. Trend: ${p.trendText}.`,
+ p.band,
+ scoreText ? `Competency pattern: ${scoreText}` : '',
  '',
- 'What looks strong:',
+ "I'll show the station first, then the advice, so you can see exactly what I am reacting to.",
+ '',
+ exampleText,
+ '',
+ 'What that example suggests is strong:',
  p.topStrength,
  '',
  'The main thing I would practise next:',
  primaryFocusSentence(p),
  p.topImprovement,
- '',
- exampleText,
  '',
  'Next few practice attempts:',
  ...p.nextSteps.slice(0, 4).map(x => `- ${x}`),
@@ -3073,7 +3080,7 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  '',
  'Dan',
  'University of Melbourne MD student | Key2MD',
- ].join('\n');
+ ].filter(line => line !== '').join('\n');
  const html = buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern, introScore });
  return { subject, text, html, note };
 }
@@ -3201,20 +3208,21 @@ function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern,
  <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">I had a look over your recent Key2MD practice because you have clearly been putting in the work. ${esc(introScore)}</p>
  <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">I wanted to send something useful while the pattern was fresh. I would not over-read one station on its own, but it can be a good window into a broader answering habit.</p>
 
- <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>What looks strong</strong></p>
- <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(p.topStrength)}</p>
-
- <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>The main thing I would practise next</strong></p>
- <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#334155;">${esc(primaryFocusSentence(p))}</p>
- <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(p.topImprovement)}</p>
-
  <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>Current read</strong></p>
  <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">Average: ${esc(p.avgScoreText)}/10. Recent average: ${esc(p.recentAvgText)}/10. Trend: ${esc(p.trendText)}.</p>
  <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#475569;">${esc(p.band)}</p>
  <p style="margin:0 0 16px;font-size:13px;line-height:1.65;color:#64748b;">${esc(scoreText)}</p>
 
  <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>A station example with context</strong></p>
+ <p style="margin:0 0 12px;font-size:14px;line-height:1.7;color:#475569;">I'll show the station first, then the advice, so you can see exactly what I am reacting to.</p>
  ${exampleHtml}
+
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>What that example suggests is strong</strong></p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(p.topStrength)}</p>
+
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>The main thing I would practise next</strong></p>
+ <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#334155;">${esc(primaryFocusSentence(p))}</p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(p.topImprovement)}</p>
 
  <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>Next few attempts</strong></p>
  <ul style="margin:0 0 16px;padding-left:20px;color:#334155;font-size:15px;line-height:1.7;">
@@ -3268,11 +3276,20 @@ function buildWarmLeadCombinedOutreach(row, det) {
  'I wanted to send something genuinely useful rather than just another link. I would not over-read one station by itself, but it can show a broader habit worth practising.',
  '',
  'Practice read:',
- `- What looks strong: ${strength}`,
- `- What I would focus on next: ${focus}`,
- improvement && improvement !== focus ? `- Repeated feedback signal: ${improvement}` : '',
+ `- Average: ${p.avgScoreText}/10`,
+ `- Recent average: ${p.recentAvgText}/10`,
+ `- Trend: ${p.trendText}`,
+ '',
+ "I'll show the station first, then the advice, so you can see exactly what I am reacting to.",
  '',
  exampleBlock,
+ '',
+ 'What that example suggests is strong:',
+ strength,
+ '',
+ 'The main thing I would practise next:',
+ focus,
+ improvement && improvement !== focus ? improvement : '',
  '',
  'Next few practice attempts:',
  ...plan.slice(0, 3).map(item => `- ${item}`),
