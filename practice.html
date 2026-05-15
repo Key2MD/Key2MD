@@ -725,8 +725,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <span class="station-num" id="stationNum">Station -</span>
  <span class="category-pill phase-idle" id="categoryPill">Select a category &amp; press Start</span>
  <span id="seenBeforePill" style="display:none;"></span>
- <button id="starBtn" class="station-star-btn" onclick="toggleStarStation()" title="Save this station" aria-label="Save this station">&#9734;</button>
- <span id="starHint" class="station-star-hint">&larr; click to save tricky stations</span>
+ <button id="starBtn" onclick="toggleStarStation()" title="Star this station" style="display:none;background:none;border:none;font-size:1rem;cursor:pointer;padding:2px 4px;line-height:1;color:var(--gray400);transition:color 0.2s;" aria-label="Star station">Star</button>
+ <span id="starHint" style="display:none;font-size:0.7rem;color:var(--gray400);font-style:italic;line-height:1;align-self:center;margin-left:-2px;"><- save tricky stations</span>
  <div class="header-spacer"></div>
 <div id="lbRankBadge" style="display:none;align-items:center;gap:6px;padding:5px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:50px;font-size:0.78rem;font-weight:700;color:var(--teal3);"> <span id="lbRankBadgeText">-</span></div>
  <div class="timer-display">
@@ -792,10 +792,6 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="idle-icon">⏱️</div>
  <div class="idle-title">Ready to practise?</div>
  <div class="idle-sub" id="idle-sub-text">CASPer-style timing, AI feedback using Dan's Q1-Q4 practice framework, and a practice calibration score that updates after every station.</div>
- <div class="idle-start-row">
- <button type="button" class="btn-start btn-start-inline" id="startBtnInline"><span>Start Session</span></button>
- <div class="idle-start-hint">Choose a timer mode below, or start with Standard timing.</div>
- </div>
  <!-- Timer mode picker - shown only when idle -->
  <div id="timerModePicker" style="margin-top:28px;text-align:left;max-width:480px;margin-left:auto;margin-right:auto;">
  <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Timer Mode</div>
@@ -865,12 +861,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button class="btn-reveal-next" id="btnRevealNext" style="display:none;" onclick="mmiRevealNextPrompt()">
  Reveal Next Prompt ->
  <span class="reveal-counter" id="revealCounter">1 of 2</span>
+ <span style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-left:6px;">[Space]</span>
  </button>
  </div>
  <div class="answer-section" id="answerSection" style="display:none;">
- <div class="answer-label">
- <span class="answer-label-main">Your response <span class="word-count" id="wordCount">0 words</span></span>
- <span class="answer-label-actions">
+ <div class="answer-label">Your response <span class="word-count" id="wordCount">0 words</span>
  <button class="btn-download" id="btnDownloadResponse" title="Download your response">Download Save Response</button>
  <!-- Self-rating (4.2) -->
  <span id="selfRatingWrap" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;">
@@ -880,10 +875,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button class="self-rate-btn" data-q="Q3" onclick="setSelfRating('Q3')" title="Q3 - Good">Q3</button>
  <button class="self-rate-btn" data-q="Q4" onclick="setSelfRating('Q4')" title="Q4 - Excellent">Q4</button>
  </span>
- <span id="btnGetAITopWrap" class="ai-action-wrap ai-action-wrap-top" style="display:none;align-items:center;gap:6px;">
- <button class="btn-ai-mark-small" id="btnGetAITop" onclick="manualRunAI()" title="Get AI feedback on your response">Mark by AI</button>
- <span id="btnAIRemainingTop" class="ai-action-remaining ai-action-remaining-top"></span>
- </span>
+ <span id="btnGetAIWrap" style="display:none;align-items:center;gap:8px;">
+ <button class="btn-download" id="btnGetAI" onclick="manualRunAI()" title="Get AI feedback on your response" style="background:rgba(14,165,233,0.12);">* Get AI Feedback + Quartile</button>
+ <span id="btnAIRemaining" style="font-size:0.75rem;color:var(--teal3);font-weight:700;white-space:nowrap;"></span>
  </span>
  </div>
  <!-- Strict timing toggle - small, unobtrusive -->
@@ -964,15 +958,14 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 
  <div class="nav-controls">
- <div class="station-action-left">
- <button class="btn-ctrl btn-ctrl-refresh" id="restartSessionBtn" disabled title="Start a fresh set of stations">Restart Session</button>
- <button class="btn-ctrl" id="prevBtn" disabled hidden><- Previous</button>
+ <div class="kbd-hints">
+ <div class="kbd-hint"><kbd><-</kbd> Prev</div>
+ <div class="kbd-hint"><kbd>-></kbd> Next</div>
+ <div class="kbd-hint"><kbd>Space</kbd> Skip reading</div>
  </div>
- <button class="btn-ctrl btn-ctrl-skip" id="skipReadingBtn" disabled title="Skip the reading timer and start answering now">Skip Timer</button>
- <span id="btnGetAIWrap" class="ai-action-wrap" style="display:none;align-items:center;gap:8px;">
- <button class="btn-ctrl btn-ai-mark" id="btnGetAI" onclick="manualRunAI()" title="Get AI feedback on your response">Mark by AI</button>
- <span id="btnAIRemaining" class="ai-action-remaining"></span>
- </span>
+ <div class="ctrl-spacer"></div>
+ <button class="btn-ctrl" id="prevBtn" disabled><- Previous</button>
+ <button class="btn-ctrl btn-ctrl-skip" id="skipReadingBtn" disabled>Skip Reading</button>
  <button class="btn-ctrl btn-ctrl-primary" id="nextBtn" disabled>Next Station -></button>
  </div>
  <div id="historyLinkBar" style="display:none;text-align:center;padding:10px 0 2px;">
@@ -1077,8 +1070,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <article class="practice-action-card dark">
  <div class="practice-action-kicker">Friday CASPer classes</div>
  <div class="practice-action-title">Live CASPer group coaching with Dan</div>
- <p class="practice-action-copy">Fridays at 6pm AEST until the June 11 exam. Choose one-off, weekly, or the $440 four-class package with last class June 5.</p>
- <div class="practice-action-meta"><span class="practice-mini-tag">$120 once</span><span class="practice-mini-tag">$120/week</span><span class="practice-mini-tag">$440 package</span></div>
+ <p class="practice-action-copy">Fridays at 6pm AEST until the June 11 exam. Choose one-off, weekly, or the $345 three-class package with last class June 5.</p>
+ <div class="practice-action-meta"><span class="practice-mini-tag">$120 once</span><span class="practice-mini-tag">$120/week</span><span class="practice-mini-tag">$345 package</span></div>
  <button type="button" class="practice-action-btn" data-track="class_checkout_intent" data-track-detail="practice_insights_next" onclick="location.href='casper-class.html'">Register / Pay</button>
  </article>
  <article class="practice-action-card">
@@ -2499,43 +2492,22 @@ function updateBtns(){
  prevBtn.disabled=!sessionActive||currentIdx===0;
  nextBtn.disabled=!sessionActive;
  skipBtn.disabled=!sessionActive||phase!=='reading';
- const inlineRestart=$('restartSessionBtn');
- if(inlineRestart) inlineRestart.disabled=!sessionActive;
  // Update Next button label based on state
  if(phase==='done')nextBtn.textContent='Next Station ->';
  else if(phase==='writing'&&currentMode===MODE_MMI)nextBtn.textContent='Stop & Review ->';
  else nextBtn.textContent='Next Station ->';
- refreshAiMarkButton();
 }
 
-function setPracticeSessionRunning(isRunning){
- const btn=$('startBtn');
- if(btn){
- btn.disabled=!!isRunning;
- btn.classList.toggle('running',false);
- btn.classList.toggle('session-running',!!isRunning);
- const txt=$('startBtnText'),icon=$('startBtnIcon');
- if(txt) txt.textContent=isRunning?'Session running':'Start Session';
- if(icon) icon.textContent=isRunning?'':'>'; 
- }
- const inlineStart=$('startBtnInline');
- if(inlineStart){
- inlineStart.disabled=!!isRunning;
- inlineStart.classList.toggle('session-running',!!isRunning);
- inlineStart.textContent=isRunning?'Session running':'Start Session';
- }
- const inlineRestart=$('restartSessionBtn');
- if(inlineRestart) inlineRestart.disabled=!isRunning;
-}
-
-function refreshAiMarkButton(){
- const wraps=[$('btnGetAIWrap'),$('btnGetAITopWrap')].filter(Boolean);
- if(!wraps.length||!answerTextarea)return;
+// Answer word count
+answerTextarea.addEventListener('input',()=>{
+ const n=wc(answerTextarea.value);wordCountEl.textContent=n+' word'+(n!==1?'s':'');
+ const aiwrap=$('btnGetAIWrap');
+ if(aiwrap){
+ // Show while writing OR after time expires (done phase with textarea still open).
+ // Hide once this station has already been AI-marked.
  const alreadyMarked = sessionHistory[currentIdx] && sessionHistory[currentIdx].score != null;
- const n=wc(answerTextarea.value);
- const show=(!window.K2_ACTIVE_CASPER_MOCK && currentMode===MODE_CASPER && sessionActive && (phase==='writing' || phase==='done') && !alreadyMarked);
- wraps.forEach(wrap=>{wrap.style.display=show?'inline-flex':'none';});
- if(!show)return;
+ const show=(!window.K2_ACTIVE_CASPER_MOCK && n>20 && (phase==='writing' || phase==='done') && !alreadyMarked);
+ aiwrap.style.display=show?'inline-flex':'none';
  const auth = getK2Auth();
  const limits = auth?.getLimits?.() || {};
  const toolLimits = limits?.casper;
@@ -2544,27 +2516,22 @@ function refreshAiMarkButton(){
  const rem = !loggedIn ? AI_LIMIT_MAX : (isPro ? 99 : (toolLimits ? Math.max(0, toolLimits.limit - toolLimits.used) : AI_LIMIT_MAX));
  const credits = toolLimits?.credits || 0;
  const canUse = isPro || rem > 0 || credits > 0;
- const needsWords = n <= 20;
- [$('btnAIRemaining'),$('btnAIRemainingTop')].filter(Boolean).forEach(remEl=>{
- if(needsWords) remEl.textContent='Write 20+ words to mark';
- else if(!loggedIn) remEl.textContent='Sign up - 1 free review/day';
- else if(isPro) remEl.textContent='Unlimited reviews';
+ const remEl=$('btnAIRemaining');
+ if(remEl){
+ if(!loggedIn) remEl.textContent='Sign up - 1 free review/day';
+ else if(isPro) remEl.textContent='Unlimited unlimited';
  else if(rem > 0) remEl.textContent=rem+' free left today';
  else if(credits > 0) remEl.textContent=credits+' credit'+(credits!==1?'s':'')+' remaining';
  else remEl.textContent='No reviews left today';
- });
- [$('btnGetAI'),$('btnGetAITop')].filter(Boolean).forEach(aibtn=>{
- const blocked = needsWords || (loggedIn && !canUse);
+ }
+ const aibtn=$('btnGetAI');
+ if(aibtn){
+ const blocked = loggedIn && !canUse;
  aibtn.disabled = blocked;
- aibtn.style.opacity = blocked ? '0.58' : '1';
- aibtn.textContent = (!needsWords && loggedIn && rem <= 0 && credits > 0) ? 'Mark by AI (1 credit)' : 'Mark by AI';
- });
-}
-
-// Answer word count
-answerTextarea.addEventListener('input',()=>{
- const n=wc(answerTextarea.value);wordCountEl.textContent=n+' word'+(n!==1?'s':'');
- refreshAiMarkButton();
+ aibtn.style.opacity = blocked ? '0.5' : '1';
+ aibtn.textContent = (loggedIn && rem <= 0 && credits > 0) ? '* Get AI Feedback (1 credit)' : '* Get AI Feedback';
+ }
+ }
  if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;
 });
 
@@ -2672,7 +2639,7 @@ function setMode(mode) {
  promptsLocked.style.display='flex';answerSection.style.display='none';
  $('mmiSpeakingArea').classList.remove('show');
  setPhaseUI('idle');
- setPracticeSessionRunning(false);
+ $('startBtn').classList.remove('running');$('startBtnText').textContent='Start Session';$('startBtnIcon').textContent='>';
  reviewPanel.classList.remove('show');scenarioCard.style.display='';
  updateLimitUI();
  if (currentMode === MODE_MMI) updateMMILimitsUI();
@@ -2954,7 +2921,7 @@ function startSession(){
  pool=buildWeightedPool(filtered);
  sessionPool=[...pool];currentIdx=0;completed=0;sessionHistory=[];
  sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
- setPracticeSessionRunning(true);
+ $('startBtn').classList.add('running');$('startBtnText').textContent='Restart';$('startBtnIcon').textContent='Refresh';
  statAvg.textContent='-';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
  // Init webcam for MMI
  if(currentMode===MODE_MMI&&!webcamReady)initWebcam();
@@ -2995,7 +2962,7 @@ function loadStation(){
  $('aiFeedbackWrapMMI').innerHTML='';
  if(stationReflectionWrap)stationReflectionWrap.style.display='none';
  if(stationReflection)stationReflection.value=sessionHistory[currentIdx].reflection||'';
- [$('btnGetAIWrap'),$('btnGetAITopWrap')].filter(Boolean).forEach(w=>{w.style.display='none';});
+ const _aw=$('btnGetAIWrap');if(_aw)_aw.style.display='none';
  const _srw=document.getElementById('selfRatingWrap');if(_srw)_srw.style.display='none';
  document.querySelectorAll('.self-rate-btn').forEach(b=>b.classList.remove('self-rate-active'));
 
@@ -3236,9 +3203,8 @@ function triggerAutoSave(idx) {
 // AI marking
 async function manualRunAI(){
  saveAnswer();
- const aiButtons=[$('btnGetAI'),$('btnGetAITop')].filter(Boolean);
- const aiWraps=[$('btnGetAIWrap'),$('btnGetAITopWrap')].filter(Boolean);
- aiButtons.forEach(b=>{b.disabled=true;b.textContent='Marking...';});
+ const btn=$('btnGetAI'),wrap=$('btnGetAIWrap'),remEl=$('btnAIRemaining');
+ if(btn){btn.disabled=true;btn.textContent=' Marking...';}
  nextBtn.disabled=true; prevBtn.disabled=true;
  let marked=false;
  try{
@@ -3252,19 +3218,19 @@ async function manualRunAI(){
  fbEl.innerHTML+=`<div style="font-size:0.82rem;color:#dc2626;padding:8px 0;">Marking failed - please try again.</div>`;
  }finally{ updateBtns(); }
 
- aiButtons.forEach(b=>{b.textContent='Mark by AI';});
+ if(btn) btn.textContent='* Get AI Feedback';
 
  if(marked){
- aiWraps.forEach(w=>{w.style.display='none';});
+ if(wrap) wrap.style.display='none';
  if(typeof maybeShowLeaderboardNudge==='function') maybeShowLeaderboardNudge(sessionHistory[currentIdx].score);
  return;
  }
 
  // Not marked - restore button so user can retry / see sign-up prompt
- aiButtons.forEach(b=>{b.disabled=false;b.style.opacity='1';});
+ if(btn){btn.disabled=false;btn.style.opacity='1';}
  const auth = getK2Auth();
  if(!auth || !auth.isLoggedIn()){
- refreshAiMarkButton();
+ if(wrap) wrap.style.display='inline-flex';
  return;
  }
  const limits=auth.getLimits();
@@ -3273,9 +3239,14 @@ async function manualRunAI(){
  const rem=isPro?99:(toolLimits?Math.max(0,toolLimits.limit-toolLimits.used):0);
  const credits=toolLimits?.credits||0;
  const canUse=isPro||rem>0||credits>0;
- if(!canUse){ refreshAiMarkButton(); return; }
- aiButtons.forEach(b=>{b.textContent=(rem<=0&&credits>0)?'Mark by AI (1 credit)':'Mark by AI';});
- refreshAiMarkButton();
+ if(!canUse){ if(wrap)wrap.style.display='none'; return; }
+ if(remEl){
+ if(isPro) remEl.textContent='Unlimited unlimited';
+ else if(rem>0) remEl.textContent=rem+' free left today';
+ else remEl.textContent=credits+' credit'+(credits!==1?'s':'')+' remaining';
+ }
+ if(btn) btn.textContent=(rem<=0&&credits>0)?'* Get AI Feedback (1 credit)':'* Get AI Feedback';
+ if(wrap) wrap.style.display='inline-flex';
 }
 
 async function runAI(idx){
@@ -3687,11 +3658,8 @@ function updateStarBtn(station) {
  btn.style.display = '';
  const id = getStationHistoryId(station, currentMode);
  const h = StationHistory.get(id);
- const starred = !!(h && h.starred);
- btn.innerHTML = starred ? '&#9733;' : '&#9734;';
- btn.classList.toggle('is-starred', starred);
- btn.title = starred ? 'Remove from saved stations' : 'Save this station';
- btn.setAttribute('aria-label', btn.title);
+ btn.textContent = (h && h.starred) ? 'Star' : 'Star';
+ btn.style.color = (h && h.starred) ? '#f59e0b' : 'var(--gray400)';
  btn._stationId = id;
 
  // Star hint - show only until the user has starred their first station ever.
@@ -3709,10 +3677,8 @@ function toggleStarStation() {
  const btn = document.getElementById('starBtn');
  if (!btn || !btn._stationId) return;
  const newState = StationHistory.toggleStar(btn._stationId);
- btn.innerHTML = newState ? '&#9733;' : '&#9734;';
- btn.classList.toggle('is-starred', newState);
- btn.title = newState ? 'Remove from saved stations' : 'Save this station';
- btn.setAttribute('aria-label', btn.title);
+ btn.textContent = newState ? 'Star' : 'Star';
+ btn.style.color = newState ? '#f59e0b' : 'var(--gray400)';
  // Hide the onboarding hint as soon as the user stars anything for the first time.
  const hint = document.getElementById('starHint');
  if (hint && newState) hint.style.display = 'none';
@@ -3734,7 +3700,7 @@ function updateStarredCategoryBtn() {
  cbtn.className = 'cat-btn';
  cbtn.id = 'cat-btn-starred-casper';
  cbtn.setAttribute('data-cat', '__starred');
- cbtn.innerHTML = '&#9733; Starred <span class="cat-count" id="cnt-starred-casper">0</span>';
+ cbtn.innerHTML = 'Star Starred <span class="cat-count" id="cnt-starred-casper">0</span>';
  // Insert after the "All Stations" button
  const allBtn = cFilters.querySelector('.cat-btn');
  if (allBtn && allBtn.nextSibling) cFilters.insertBefore(cbtn, allBtn.nextSibling);
@@ -3757,7 +3723,7 @@ function updateStarredCategoryBtn() {
  mbtn.className = 'cat-btn';
  mbtn.id = 'cat-btn-starred-mmi';
  mbtn.setAttribute('data-cat', '__starred');
- mbtn.innerHTML = '&#9733; Starred <span class="cat-count" id="cnt-starred-mmi">0</span>';
+ mbtn.innerHTML = 'Star Starred <span class="cat-count" id="cnt-starred-mmi">0</span>';
  const allBtnM = mFilters.querySelector('.cat-btn');
  if (allBtnM && allBtnM.nextSibling) mFilters.insertBefore(mbtn, allBtnM.nextSibling);
  else mFilters.appendChild(mbtn);
@@ -3831,7 +3797,7 @@ function startSingleStarredStation(stationId){
  resetAutoSaveState();
  pool=[station];sessionPool=[station];currentIdx=0;completed=0;sessionHistory=[];
  sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
- setPracticeSessionRunning(true);
+ $('startBtn').classList.add('running');$('startBtnText').textContent='Restart';$('startBtnIcon').textContent='Refresh';
  statAvg.textContent='-';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
  loadStation();
 }
@@ -4188,7 +4154,7 @@ function useRecommendedStation(stationId){
  resetAutoSaveState();
  pool=[station];sessionPool=[station];currentIdx=0;completed=0;sessionHistory=[];
  sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
- setPracticeSessionRunning(true);
+ $('startBtn').classList.add('running');$('startBtnText').textContent='Restart';$('startBtnIcon').textContent='Refresh';
  loadStation();
 }
 
@@ -4582,7 +4548,7 @@ function retryStation(){
  answerTextarea.classList.remove('locked');
  aiFeedbackWrap.innerHTML='';
  wordCountEl.textContent='0 words';
- [$('btnGetAIWrap'),$('btnGetAITopWrap')].filter(Boolean).forEach(w=>{w.style.display='none';});
+ const _aw=$('btnGetAIWrap');if(_aw)_aw.style.display='none';
  const _b=$('timeUpBanner');_b.classList.remove('show','open-mode','strict-mode');_b.textContent='';
  answerSection.style.display='block';
  answerTextarea.focus();
@@ -4924,7 +4890,6 @@ function drawChart(canvas,scores,h){
 // End session + review
 function endSession(){
  clearTimer();sessionActive=false;phase='done';scenarioCard.style.display='none';
- setPracticeSessionRunning(false);
  buildReview();reviewPanel.classList.add('show');
  timerNum.textContent='--:--';timerNum.classList.remove('urgent');progressFill.style.width='0%';
  setPhaseUI('done');updateBtns();
@@ -4975,13 +4940,10 @@ function renderList(filter){
 
 // Button handlers
 $('startBtn').addEventListener('click',startSession);
-$('startBtnInline')?.addEventListener('click',startSession);
 $('restartBtn').addEventListener('click',startSession);
-$('restartSessionBtn').addEventListener('click',startSession);
 $('reviewAgainBtn').addEventListener('click',()=>{
  resetAutoSaveState();
  pool=[...sessionPool];currentIdx=0;completed=0;sessionHistory=[];sessionActive=true;
- setPracticeSessionRunning(true);
  reviewPanel.classList.remove('show');scenarioCard.style.display='';
  statAvg.textContent='-';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
  answerTextarea.readOnly=false;answerTextarea.classList.remove('locked','flash-expired');
