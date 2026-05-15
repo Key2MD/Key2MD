@@ -1119,7 +1119,7 @@
  </div>
  <div class="page-actions">
  <span class="refresh-note" id="ccStatus">Not loaded</span>
- <button class="btn blue" onclick="reconcileCasperClass()">Recover Stripe $120</button>
+ <button class="btn blue" onclick="reconcileCasperClass()">Recover Stripe class payments</button>
  <button class="btn" onclick="loadCasperClass()">Refresh</button>
  </div>
  </div>
@@ -3203,7 +3203,7 @@ function warmLeadDashboardLearningPoint(improvement) {
  }
  const lower = text.toLowerCase();
  if (warmLeadRuleSignal(text) && !warmLeadEmpathySignal(text)) {
- return `The useful opportunity is to add the human layer before the rule or escalation step. ${text} Strong CASPer answers usually show how the other person might experience the moment, then move into the ethical or practical action.`;
+ return `The useful opportunity is to add the human layer before the rule or escalation step. ${text} Strong CASPer answers usually show how the other person might experience the moment, then move into the practical action.`;
  }
  if (/specific|concrete|detail|practical|action|step/.test(lower)) {
  return `The learning point is emotional specificity. ${text} In practice, the marker should be able to picture not just what you do, but how the other person feels while you do it.`;
@@ -3212,7 +3212,7 @@ function warmLeadDashboardLearningPoint(improvement) {
  return `The learning point is to demonstrate empathy rather than simply name it. ${text} The strongest answers usually show the opening words, the question you would ask, and why that tone helps the person feel respected.`;
  }
  if (/fair|ethic|professional|policy|safety|confidential/.test(lower)) {
- return `The learning point is putting warmth before procedure. ${text} Good answers can still be ethical and firm, but they first show that the person is more than a problem to manage.`;
+ return `The learning point is putting warmth before procedure. ${text} Good answers can still be firm and responsible, but they first show that the person is more than a problem to manage.`;
  }
  return `The empathy layer to add is this: ${text} Make sure the answer names the person's likely feelings and shows the first sentence you would use to meet them humanely.`;
 }
@@ -3448,7 +3448,7 @@ function warmLeadDashboardRewrite(quote, improvement) {
  if (/support|help/.test(q) || /support|help/.test(imp)) return 'I would first ask what this has been like for them and what support would actually feel helpful, then offer a practical next step that respects their agency rather than assuming I know what they need.';
  if (/empath|feel|emotion/.test(q) || /empath|feel|emotion/.test(imp)) return 'I would name the emotion directly: this may feel stressful, embarrassing, or isolating, and I would ask an open question before moving into advice so they feel heard rather than managed.';
  if (/listen|perspective|side/.test(q) || /listen|perspective|side/.test(imp)) return 'I would ask them to walk me through how they experienced it, listen for pressure or hurt I may have missed, and reflect that back before deciding what should happen next.';
- if (warmLeadRuleSignal(imp)) return 'Before moving to the ethical step, I would add the human sentence: I can see this may be difficult or confronting, and I want to understand your perspective while also being honest about the impact on others.';
+ if (warmLeadRuleSignal(imp)) return 'Before moving to the rule or escalation step, I would add the human sentence: I can see this may be difficult or confronting, and I want to understand your perspective while also being honest about the impact on others.';
  return 'I would add one rich empathy sentence before the action: name what the person may be feeling, why that feeling makes sense in context, and how my first words would help them feel respected.';
 }
 
@@ -4267,8 +4267,12 @@ async function sendNewEmail() {
  const res = await api('/admin/inbox/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject:cleanSubject,body,html:S.composeHtml||'',category})});
  const d = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(d?.error||'Send failed');
+ if (category === 'warm_lead') {
  recordWarmLeadLocalOutreach(to, cleanSubject, d?.outreach || null);
+ if (!d?.outreach?.has_outreach) {
  persistWarmLeadOutreach(to, cleanSubject, body).catch(e => console.warn('Warm lead outreach log failed:', e));
+ }
+ }
  al.className='modal-alert ok'; al.textContent=`OK Sent to ${to}`;
  document.getElementById('ncTo').value=''; document.getElementById('ncSubject').value=''; document.getElementById('ncBody').value=''; S.composeMode='standard'; S.composeContext=null; setComposeHtml('');
  if (stayOnPage) {
@@ -4346,8 +4350,8 @@ function renderCasperClass() {
  body.innerHTML = rows.length ? rows.map(row => {
  const dt = fmtDate(row.created_at);
  const expires = row.expires_at ? fmtDate(row.expires_at) : null;
- const purchaseType = row.purchase_type || (row.source === 'package' ? 'package' : row.source === 'subscription' ? 'ongoing' : row.source === 'stripe' ? 'one_off' : 'manual');
- const planLabel = purchaseType === 'package' ? 'June package' : purchaseType === 'ongoing' ? 'Weekly' : purchaseType === 'one_off' ? 'One-off' : 'Manual';
+ const purchaseType = row.purchase_type || (row.source === 'package' ? 'package' : row.source === 'subscription' ? 'ongoing' : row.source === 'stripe' ? 'one_off' : row.source === 'indefinite' ? 'indefinite' : 'manual');
+ const planLabel = purchaseType === 'package' ? 'June package' : purchaseType === 'ongoing' ? 'Weekly' : purchaseType === 'one_off' ? 'One-off' : purchaseType === 'indefinite' ? 'Indefinite' : 'Manual';
  const amount = Number(row.amount_paid || 0);
  const stripeId = row.stripe_session_id || row.stripe_subscription_id || '';
  const stripeShort = stripeId ? `${stripeId.slice(0, 10)}...${stripeId.slice(-4)}` : '-';
@@ -4360,7 +4364,7 @@ function renderCasperClass() {
  <td><div class="cell-main">${expires?.date || '-'}</div><div class="cell-sub">${row.cancel_requested ? 'Cancels at period end' : ''}</div></td>
  <td><div class="cell-main">${dt?.date || '-'}</div><div class="cell-sub">${dt?.time || ''}</div></td>
  <td><div class="cell-main" title="${esc(stripeId)}">${esc(stripeShort)}</div></td>
- <td><button class="btn" style="font-size:0.68rem;padding:3px 8px;background:var(--red-dim);border-color:var(--red-border);color:var(--red);" onclick='removeCasperClassAccess(${jsArg(row.email || '')}, ${jsArg(row.user_id || '')})'>Remove</button></td>
+ <td>${purchaseType === 'indefinite' ? '<span style="color:var(--muted2);font-size:0.72rem;">Built in</span>' : `<button class="btn" style="font-size:0.68rem;padding:3px 8px;background:var(--red-dim);border-color:var(--red-border);color:var(--red);" onclick='removeCasperClassAccess(${jsArg(row.email || '')}, ${jsArg(row.user_id || '')})'>Remove</button>`}</td>
  </tr>`;
  }).join('') : '<tr><td colspan="8" style="color:var(--muted);padding:16px;">No one is authorised for this class yet.</td></tr>';
 }
@@ -4447,7 +4451,7 @@ async function runCasperClassEmailCheck() {
 }
 
 async function reconcileCasperClass() {
- if (!confirm('Check recent Stripe checkout sessions and recover any paid $120 CASPer class students into this dashboard? This will not email students.')) return;
+ if (!confirm('Check recent Stripe checkout sessions and recover any paid CASPer class students into this dashboard? This includes one-off, weekly, and package payments. This will not email students.')) return;
  const status = document.getElementById('ccStatus');
  if (status) status.textContent = 'Checking Stripe...';
  try {
@@ -4462,7 +4466,7 @@ async function reconcileCasperClass() {
  email_state: data.email_state || S.casperClass?.email_state || {},
  };
  renderCasperClass();
- const message = `Recovered/confirmed ${data.recovered || 0} $120 class payment${Number(data.recovered || 0)===1?'':'s'} from ${data.checked || 0} matching Stripe session${Number(data.checked || 0)===1?'':'s'}.`;
+ const message = `Recovered/confirmed ${data.recovered || 0} class payment${Number(data.recovered || 0)===1?'':'s'} from ${data.checked || 0} matching Stripe session${Number(data.checked || 0)===1?'':'s'}.`;
  if (status) status.textContent = message;
  alert(message);
  } catch(e) {
