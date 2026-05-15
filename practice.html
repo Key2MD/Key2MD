@@ -725,8 +725,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <span class="station-num" id="stationNum">Station -</span>
  <span class="category-pill phase-idle" id="categoryPill">Select a category &amp; press Start</span>
  <span id="seenBeforePill" style="display:none;"></span>
- <button id="starBtn" onclick="toggleStarStation()" title="Star this station" style="display:none;background:none;border:none;font-size:1rem;cursor:pointer;padding:2px 4px;line-height:1;color:var(--gray400);transition:color 0.2s;" aria-label="Star station">Star</button>
- <span id="starHint" style="display:none;font-size:0.7rem;color:var(--gray400);font-style:italic;line-height:1;align-self:center;margin-left:-2px;"><- save tricky stations</span>
+ <button id="starBtn" class="station-star-btn" onclick="toggleStarStation()" title="Save this station" aria-label="Save this station">&#9734;</button>
+ <span id="starHint" class="station-star-hint">&larr; click to save tricky stations</span>
  <div class="header-spacer"></div>
 <div id="lbRankBadge" style="display:none;align-items:center;gap:6px;padding:5px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:50px;font-size:0.78rem;font-weight:700;color:var(--teal3);"> <span id="lbRankBadgeText">-</span></div>
  <div class="timer-display">
@@ -792,6 +792,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="idle-icon">⏱️</div>
  <div class="idle-title">Ready to practise?</div>
  <div class="idle-sub" id="idle-sub-text">CASPer-style timing, AI feedback using Dan's Q1-Q4 practice framework, and a practice calibration score that updates after every station.</div>
+ <div class="idle-start-row">
+ <button type="button" class="btn-start btn-start-inline" id="startBtnInline"><span>Start Session</span></button>
+ <div class="idle-start-hint">Choose a timer mode below, or start with Standard timing.</div>
+ </div>
  <!-- Timer mode picker - shown only when idle -->
  <div id="timerModePicker" style="margin-top:28px;text-align:left;max-width:480px;margin-left:auto;margin-right:auto;">
  <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Timer Mode</div>
@@ -861,7 +865,6 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button class="btn-reveal-next" id="btnRevealNext" style="display:none;" onclick="mmiRevealNextPrompt()">
  Reveal Next Prompt ->
  <span class="reveal-counter" id="revealCounter">1 of 2</span>
- <span style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-left:6px;">[Space]</span>
  </button>
  </div>
  <div class="answer-section" id="answerSection" style="display:none;">
@@ -963,9 +966,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="nav-controls">
  <div class="station-action-left">
  <button class="btn-ctrl btn-ctrl-refresh" id="restartSessionBtn" disabled title="Start a fresh set of stations">Restart Session</button>
- <button class="btn-ctrl" id="prevBtn" disabled><- Previous</button>
+ <button class="btn-ctrl" id="prevBtn" disabled hidden><- Previous</button>
  </div>
- <button class="btn-ctrl btn-ctrl-skip" id="skipReadingBtn" disabled hidden>Skip Reading</button>
+ <button class="btn-ctrl btn-ctrl-skip" id="skipReadingBtn" disabled title="Skip the reading timer and start answering now">Skip Timer</button>
  <span id="btnGetAIWrap" class="ai-action-wrap" style="display:none;align-items:center;gap:8px;">
  <button class="btn-ctrl btn-ai-mark" id="btnGetAI" onclick="manualRunAI()" title="Get AI feedback on your response">Mark by AI</button>
  <span id="btnAIRemaining" class="ai-action-remaining"></span>
@@ -2515,6 +2518,12 @@ function setPracticeSessionRunning(isRunning){
  if(txt) txt.textContent=isRunning?'Session running':'Start Session';
  if(icon) icon.textContent=isRunning?'':'>'; 
  }
+ const inlineStart=$('startBtnInline');
+ if(inlineStart){
+ inlineStart.disabled=!!isRunning;
+ inlineStart.classList.toggle('session-running',!!isRunning);
+ inlineStart.textContent=isRunning?'Session running':'Start Session';
+ }
  const inlineRestart=$('restartSessionBtn');
  if(inlineRestart) inlineRestart.disabled=!isRunning;
 }
@@ -3678,8 +3687,11 @@ function updateStarBtn(station) {
  btn.style.display = '';
  const id = getStationHistoryId(station, currentMode);
  const h = StationHistory.get(id);
- btn.textContent = (h && h.starred) ? 'Star' : 'Star';
- btn.style.color = (h && h.starred) ? '#f59e0b' : 'var(--gray400)';
+ const starred = !!(h && h.starred);
+ btn.innerHTML = starred ? '&#9733;' : '&#9734;';
+ btn.classList.toggle('is-starred', starred);
+ btn.title = starred ? 'Remove from saved stations' : 'Save this station';
+ btn.setAttribute('aria-label', btn.title);
  btn._stationId = id;
 
  // Star hint - show only until the user has starred their first station ever.
@@ -3697,8 +3709,10 @@ function toggleStarStation() {
  const btn = document.getElementById('starBtn');
  if (!btn || !btn._stationId) return;
  const newState = StationHistory.toggleStar(btn._stationId);
- btn.textContent = newState ? 'Star' : 'Star';
- btn.style.color = newState ? '#f59e0b' : 'var(--gray400)';
+ btn.innerHTML = newState ? '&#9733;' : '&#9734;';
+ btn.classList.toggle('is-starred', newState);
+ btn.title = newState ? 'Remove from saved stations' : 'Save this station';
+ btn.setAttribute('aria-label', btn.title);
  // Hide the onboarding hint as soon as the user stars anything for the first time.
  const hint = document.getElementById('starHint');
  if (hint && newState) hint.style.display = 'none';
@@ -3720,7 +3734,7 @@ function updateStarredCategoryBtn() {
  cbtn.className = 'cat-btn';
  cbtn.id = 'cat-btn-starred-casper';
  cbtn.setAttribute('data-cat', '__starred');
- cbtn.innerHTML = 'Star Starred <span class="cat-count" id="cnt-starred-casper">0</span>';
+ cbtn.innerHTML = '&#9733; Starred <span class="cat-count" id="cnt-starred-casper">0</span>';
  // Insert after the "All Stations" button
  const allBtn = cFilters.querySelector('.cat-btn');
  if (allBtn && allBtn.nextSibling) cFilters.insertBefore(cbtn, allBtn.nextSibling);
@@ -3743,7 +3757,7 @@ function updateStarredCategoryBtn() {
  mbtn.className = 'cat-btn';
  mbtn.id = 'cat-btn-starred-mmi';
  mbtn.setAttribute('data-cat', '__starred');
- mbtn.innerHTML = 'Star Starred <span class="cat-count" id="cnt-starred-mmi">0</span>';
+ mbtn.innerHTML = '&#9733; Starred <span class="cat-count" id="cnt-starred-mmi">0</span>';
  const allBtnM = mFilters.querySelector('.cat-btn');
  if (allBtnM && allBtnM.nextSibling) mFilters.insertBefore(mbtn, allBtnM.nextSibling);
  else mFilters.appendChild(mbtn);
@@ -4961,6 +4975,7 @@ function renderList(filter){
 
 // Button handlers
 $('startBtn').addEventListener('click',startSession);
+$('startBtnInline')?.addEventListener('click',startSession);
 $('restartBtn').addEventListener('click',startSession);
 $('restartSessionBtn').addEventListener('click',startSession);
 $('reviewAgainBtn').addEventListener('click',()=>{

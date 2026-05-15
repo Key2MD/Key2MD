@@ -203,6 +203,10 @@
  /* Sticky station header - keeps timer visible while user types/scrolls. */
  .station-header { background:var(--white); border:1px solid var(--gray200); border-radius:14px; padding:15px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; position:sticky; top:76px; z-index:50; box-shadow:0 2px 12px rgba(10,22,40,0.04); }
  .station-num { font-size:0.78rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray400); }
+ .station-star-btn { width:30px; height:30px; border:1px solid transparent; border-radius:50%; background:transparent; color:var(--gray400); display:inline-flex; align-items:center; justify-content:center; font-family:inherit; font-size:1.35rem; line-height:1; cursor:pointer; transition:color 0.18s, background 0.18s, border-color 0.18s, transform 0.18s; }
+ .station-star-btn:hover, .station-star-btn:focus-visible { color:var(--gold); background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.22); transform:translateY(-1px); outline:none; }
+ .station-star-btn.is-starred { color:var(--gold); background:rgba(245,158,11,0.12); border-color:rgba(245,158,11,0.28); }
+ .station-star-hint { display:inline-flex; margin-left:-8px; color:var(--gray400); font-size:0.7rem; font-style:italic; line-height:1; white-space:nowrap; align-self:center; }
  .category-pill { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:50px; font-size:0.78rem; font-weight:700; }
  .cat-ethics { background:rgba(245,158,11,0.12); color:#b45309; }
  .cat-conflict { background:rgba(14,165,233,0.12); color:var(--teal3); }
@@ -233,6 +237,9 @@
  .idle-icon { font-size:3.5rem; margin-bottom:20px; opacity:0.3; }
  .idle-title { font-size:1.4rem; font-weight:700; color:var(--gray800); margin-bottom:8px; }
  .idle-sub { font-size:0.95rem; color:var(--gray400); }
+ .idle-start-row { display:flex; flex-direction:column; align-items:center; gap:7px; margin:22px auto 0; max-width:320px; }
+ .btn-start-inline { width:100%; max-width:300px; min-height:48px; padding:13px 20px; font-size:0.96rem; box-shadow:0 10px 26px rgba(14,165,233,0.28); }
+ .idle-start-hint { font-size:0.72rem; color:var(--gray400); line-height:1.35; }
  .prompts-area { padding:18px 28px; display:flex; flex-direction:column; gap:12px; }
  .prompts-locked { display:flex; align-items:center; gap:12px; color:var(--gray400); font-size:0.9rem; font-style:italic; }
  .lock-icon { width:32px; height:32px; background:var(--gray100); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
@@ -479,7 +486,7 @@
  .practice-trend-bars { gap:7px; }
  .nav-controls { align-items:stretch; }
  .station-action-left, .ai-action-wrap { width:100%; margin-right:0; }
- .station-action-left .btn-ctrl, .ai-action-wrap .btn-ctrl, .nav-controls > .btn-ctrl-primary { width:100%; }
+ .station-action-left .btn-ctrl, .ai-action-wrap .btn-ctrl, .nav-controls > .btn-ctrl-skip, .nav-controls > .btn-ctrl-primary { width:100%; }
  .ai-action-remaining { width:100%; text-align:center; }
  .answer-label-actions { width:100%; justify-content:flex-start; margin-left:0; }
  .ai-action-wrap-top { width:auto; }
