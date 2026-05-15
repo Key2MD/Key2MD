@@ -748,8 +748,12 @@
  detail: data.paid ? 'verified_paid' : 'verified_unpaid'
  };
  window.Key2MDTrack?.track?.('class_payment_return', verified);
- if (data.paid) window.Key2MDTrack?.track?.('class_payment_success', verified);
- else window.Key2MDTrack?.track?.('class_payment_unverified', verified);
+ if (data.paid) {
+ window.Key2MDTrack?.track?.('class_payment_success', verified);
+ await refreshClassStatus();
+ } else {
+ window.Key2MDTrack?.track?.('class_payment_unverified', verified);
+ }
  return;
  }
  } catch(e) {
