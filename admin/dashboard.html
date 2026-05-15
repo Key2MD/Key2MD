@@ -204,6 +204,10 @@
  .badge-yes{background:var(--green-dim);color:var(--green);border-color:var(--green-border);}
  .badge-no{background:var(--surface2);color:var(--muted);border-color:var(--border);}
  .badge-default{background:var(--surface2);color:var(--muted);}
+ .email-flag-line{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;}
+ .dup-flag{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:999px;font-size:0.58rem;font-weight:900;letter-spacing:0.06em;text-transform:uppercase;border:1px solid var(--amber-border);background:var(--amber-dim);color:var(--amber);}
+ .dup-flag.restricted{border-color:var(--red-border);background:var(--red-dim);color:var(--red);}
+ .dup-warning{border:1px solid var(--red-border);background:var(--red-dim);color:var(--red);border-radius:10px;padding:10px 12px;font-size:0.76rem;line-height:1.55;margin:10px 0;}
  .score-box{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;font-size:0.78rem;font-weight:800;}
  .score-h{background:var(--green-dim);color:var(--green);}
  .score-m{background:var(--amber-dim);color:var(--amber);}
@@ -1115,11 +1119,11 @@
  <div class="page-header">
  <div>
  <div class="page-title">CASPer Class</div>
- <div class="page-sub">One-off, weekly and 3-class June package class gate. Students only see the link after payment or manual authorisation.</div>
+ <div class="page-sub">One-off, weekly and June package class gate. Students only see the link after payment or manual authorisation.</div>
  </div>
  <div class="page-actions">
  <span class="refresh-note" id="ccStatus">Not loaded</span>
- <button class="btn blue" onclick="reconcileCasperClass()">Recover Stripe class buyers</button>
+ <button class="btn blue" onclick="reconcileCasperClass()">Recover Stripe class payments</button>
  <button class="btn" onclick="loadCasperClass()">Refresh</button>
  </div>
  </div>
@@ -1534,6 +1538,22 @@
  </div>
 </div>
 
+<!-- DUPLICATE ACCOUNT MODAL -->
+<div class="modal-ov" id="duplicateFlagModal">
+ <div class="modal-card">
+ <div class="modal-title">Duplicate Account Control - <span id="dfEmail" style="color:var(--blue);"></span></div>
+ <p style="color:var(--muted);font-size:0.82rem;margin-bottom:16px;line-height:1.6;">Use this only for clear duplicate/free-trial abuse. It disables future free reviews for the account and its recent hashed networks. Paid credits and subscriptions still work.</p>
+ <div id="dfStatus" class="admin-note amber" style="margin-bottom:12px;"></div>
+ <div class="form-row"><label class="form-lbl">Reason / internal note</label><textarea class="form-ta" id="dfReason" style="min-height:90px;" placeholder="e.g. Clear duplicate account pattern across repeated free trials"></textarea></div>
+ <div class="modal-alert" id="dfAlert"></div>
+ <div class="modal-footer">
+ <button class="btn" onclick="closeDuplicateFlagModal()">Cancel</button>
+ <button class="btn" id="dfClear" onclick="saveDuplicateFlag('clear')">Clear restriction</button>
+ <button class="btn red" id="dfRestrict" onclick="saveDuplicateFlag('restrict')">Disable free trials</button>
+ </div>
+ </div>
+</div>
+
 <!-- == NEW COMPOSE MODAL == -->
 <div class="modal-ov nc-modal" id="ncModal">
  <div class="modal-card">
@@ -1626,12 +1646,15 @@ const S = {
  activeConv: null,
  composeHtml: '',
  composeMode: 'standard',
+ composeContext: null,
  detailCache: new Map(),
  studentReportDetail: null,
  studentReportMode: 'tutor',
  creditModalUserId: null,
  tierModalUserId: null,
  mockPassModalUserId: null,
+ duplicateFlagModalUserId: null,
+ duplicateFlagModalEmail: '',
  mockScope: localStorage.getItem('k2md_mock_admin_scope') || 'all',
  mockSort: localStorage.getItem('k2md_mock_admin_sort') || 'recent',
  userSegment: 'all',
@@ -2112,14 +2135,14 @@ function updateDashboard() {
  const enqEl = document.getElementById('dashRecentEnq');
  enqEl.innerHTML = enqs.slice(0,5).map(e=>`
  <div class="dash-row">
- <span class="dash-row-label">${esc(e.name)} <span style="color:var(--muted2);font-size:0.75rem;">${esc(e.email)}</span></span>
+ <span class="dash-row-label">${esc(e.name)} <span style="color:var(--muted2);font-size:0.75rem;">${emailWithDuplicateFlag(e.email,e)}</span></span>
  <span class="dash-row-val"><span class="enq-type">${esc(e.type||'General')}</span></span>
  </div>`).join('')||'<div style="color:var(--muted2);font-size:0.8rem;">No enquiries yet</div>';
 
  const usrEl = document.getElementById('dashRecentUsers');
  usrEl.innerHTML = users.slice(0,5).map(u=>`
  <div class="dash-row">
- <span class="dash-row-label">${esc(u.name||u.email.split('@')[0])} <span style="color:var(--muted2);font-size:0.75rem;">${esc(u.email)}</span></span>
+ <span class="dash-row-label">${esc(u.name||u.email.split('@')[0])} <span style="color:var(--muted2);font-size:0.75rem;">${emailWithDuplicateFlag(u.email,u)}</span></span>
  <span class="dash-row-val">${subscriptionBadges(u)}</span>
  </div>`).join('')||'<div style="color:var(--muted2);font-size:0.8rem;">No users yet</div>';
 
@@ -2197,7 +2220,7 @@ function renderReviewQuality() {
  <div class="mini-metric"><div>Competency data</div><div>${comps.length}</div></div>
  </div>
  ${weakest.length ? `<div class="competency-list">${weakest.map(c=>competencyRow(c.name,c.avg)).join('')}</div>` : '<div style="color:var(--muted2);font-size:0.8rem;">Competency breakdowns will appear as new CASPer reviews are marked.</div>'}
- ${lows.length ? `<div style="margin-top:12px;">${lows.map(x=>`<div class="dash-row"><span class="dash-row-label">${esc(x.row.email||'Unknown')}</span><span class="score-box ${scoreC(x.fb.score)}">${esc(x.fb.score)}</span></div>`).join('')}</div>` : ''}`;
+ ${lows.length ? `<div style="margin-top:12px;">${lows.map(x=>`<div class="dash-row"><span class="dash-row-label">${emailWithDuplicateFlag(x.row.email||'Unknown',x.row)}</span><span class="score-box ${scoreC(x.fb.score)}">${esc(x.fb.score)}</span></div>`).join('')}</div>` : ''}`;
 }
 
 // ======================================================
@@ -2248,7 +2271,7 @@ function renderReviews() {
  dr.innerHTML = `
  <td><div class="expander">v</div></td>
  <td><div class="cell-main">${dt?.date||'-'}</div><div class="cell-sub">${dt?.time||''}</div></td>
- <td><div class="cell-main">${esc(row.email||'?')}</div><div class="cell-sub">${esc(row.name||'')}</div></td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(row.email,row)}</div><div class="cell-sub">${esc(row.name||'')}</div></td>
  <td>${tierBadge(row.tier)}</td>
  <td>${score?`<div class="score-box ${scoreC(score)}">${score}</div>`:'<span style="color:var(--muted2);">-</span>'}</td>
  <td>${signals}</td>
@@ -2334,7 +2357,7 @@ function renderS2Reviews() {
  dr.innerHTML = `
  <td><div class="expander">v</div></td>
  <td><div class="cell-main">${dt?.date||'--'}</div><div class="cell-sub">${dt?.time||''}</div></td>
- <td><div class="cell-main">${esc(row.email||'?')}</div><div class="cell-sub">${esc(row.name||row.credit_source||'')}</div></td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(row.email,row)}</div><div class="cell-sub">${esc(row.name||row.credit_source||'')}</div></td>
  <td><span class="badge badge-gamsat">${esc(task)}</span></td>
  <td>${Number.isFinite(band)?`<div class="score-box ${s2ScoreC(band)}">${band}</div>`:'<span style="color:var(--muted2);">--</span>'}</td>
  <td><div class="trunc">${esc(evidence)}</div></td>
@@ -2471,7 +2494,7 @@ function renderUsers() {
  dr.innerHTML = `
  <td><div class="expander">v</div></td>
  <td>
- <div class="cell-main">${esc(row.email||'?')}</div>
+ <div class="cell-main">${emailWithDuplicateFlag(row.email,row)}</div>
  <div class="cell-sub">${esc(row.name||'-')} ${spend>0?'<span class="badge badge-yes" style="font-size:0.6rem;"> Paid</span>':''}</div>
  </td>
  <td>${subscriptionBadges(row)}</td>
@@ -2493,6 +2516,7 @@ function renderUsers() {
  <button class="btn blue" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openCreditModal('${esc(row.id)}','${esc(row.email)}',${cbA},${gbA},${mtA},${mpA})">Credits</button>
  <button class="btn amber" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openTierModal('${esc(row.id)}','${esc(row.email)}','${esc(row.tier||'free')}')">Tier</button>
  <button class="btn green" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openMockPassModal('${esc(row.id)}','${esc(row.email)}')">Mock</button>
+ <button class="btn red" style="font-size:0.7rem;padding:4px 9px;" onclick='event.stopPropagation();openDuplicateFlagModal(${jsArg(row.id)},${jsArg(row.email)})'>Restrict</button>
  <button class="btn" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();composeToUser('${esc(row.email)}')"></button>
  </div>
  </td>`;
@@ -2541,7 +2565,8 @@ function renderUserDetail(det) {
  <div class="mini-metric"><div>Reviews</div><div>${reviews.length + mmiReviews.length}</div></div>
  <div class="mini-metric"><div>Avg score</div><div>${avgScore ? avgScore.toFixed(1) : '-'}</div></div>
  </div>
- <div class="detail-box-row"><strong>${esc(u.email||'-')}</strong></div>
+ <div class="detail-box-row"><strong>${emailWithDuplicateFlag(u.email,u)}</strong></div>
+ ${duplicateWarningBox(u.duplicate_flags)}
  <div class="detail-box-row">Name: <strong>${esc(u.name||'-')}</strong></div>
  <div class="detail-box-row">Subscriptions: ${subscriptionBadges(u)}</div>
  <div class="detail-box-row">Stripe: <span style="font-size:0.72rem;">${esc(u.stripe_customer_id||'-')}</span></div>
@@ -2556,6 +2581,7 @@ function renderUserDetail(det) {
  <button class="btn green" onclick="openMockPassModal('${esc(u.id)}','${esc(u.email)}')">Grant Mock</button>
  <button class="btn blue" onclick="openCreditModal('${esc(u.id)}','${esc(u.email)}',${credits.find(c=>c.tool==='casper')?.balance||0},${credits.find(c=>c.tool==='gamsat')?.balance||0},${credits.find(c=>c.tool==='mmi_transcript')?.balance||0},${credits.find(c=>c.tool==='mmi_premium')?.balance||0})"> Credits</button>
  <button class="btn amber" onclick="openTierModal('${esc(u.id)}','${esc(u.email)}','${esc(u.tier||'free')}')">Tier</button>
+ <button class="btn red" onclick='openDuplicateFlagModal(${jsArg(u.id)},${jsArg(u.email)})'>Restrict free use</button>
  <button class="btn" onclick="composeToUser('${esc(u.email)}')"> Email</button>
  </div>
  </div>
@@ -2668,7 +2694,7 @@ function renderWarmLeads() {
  tr.innerHTML = `
  <td><div class="expander">v</div></td>
  <td><span class="warm-lead-score ${level}">${score}</span><div class="cell-sub">${esc(levelLabel(level))}</div></td>
- <td><div class="cell-main">${esc(row.email || '-')}</div><div class="cell-sub">${esc(row.name || '-')} | ${esc(row.tier || 'free')}</div></td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(row.email,row)}</div><div class="cell-sub">${esc(row.name || '-')} | ${esc(row.tier || 'free')}</div></td>
  <td><div class="cell-main">${esc(row.recommended_product || '-')}</div><div class="cell-sub">${row.avg_casper_score ? `CASPer avg ${esc(row.avg_casper_score)}/10` : 'No CASPer average yet'}</div></td>
  <td><div class="cell-main">${Number(row.review_count || 0)} written | ${Number(row.mmi_review_count || 0)} MMI</div><div class="cell-sub">${Number(row.review_count_14d || 0)} recent | ${Number(row.active_review_days || 0)} active days | ${fmtMoney(row.total_spend_aud || 0)} spend</div></td>
  <td><div class="warm-reason-list">${(row.reasons || []).slice(0,5).map(reason => `<span class="warm-reason">${esc(reason)}</span>`).join('')}</div></td>
@@ -2681,6 +2707,7 @@ function renderWarmLeads() {
  <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Mark sent</button>
  <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Report</button>
  <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">User</button>
+ <button class="btn red" data-warm-action="restrict" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Restrict</button>
  </div>
  </td>`;
  const detail = document.createElement('tr');
@@ -2745,6 +2772,7 @@ function renderWarmLeadEmailPlaceholder(row) {
  <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}">Mark sent</button>
  <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}">Open student report</button>
  <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}">Open user</button>
+ <button class="btn red" data-warm-action="restrict" data-warm-id="${esc(row.id)}">Restrict free use</button>
  </div>
  </div>`;
 }
@@ -2882,6 +2910,7 @@ async function runWarmLeadAction(action, id, btn = null) {
  else if (action === 'mark') await markWarmLeadOutreachAction(id);
  else if (action === 'report') await openWarmLeadReport(id);
  else if (action === 'user') viewUserByEmail(row.email || '');
+ else if (action === 'restrict') openDuplicateFlagModal(row.id || '', row.email || '', row.duplicate_flags || {});
  } finally {
  if (btn) { btn.disabled = false; btn.textContent = original; }
  }
@@ -2936,6 +2965,7 @@ function renderWarmLeadReportPanel(row, email) {
  <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}">Mark sent</button>
  <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}">Open report</button>
  <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}">Open user</button>
+ <button class="btn red" data-warm-action="restrict" data-warm-id="${esc(row.id)}">Restrict free use</button>
  </div>
  </div>
  <div class="warm-email-frame-wrap">
@@ -2969,7 +2999,7 @@ async function openWarmLeadEmail(id) {
  const target = document.getElementById(warmLeadDomId(id));
  if (target) target.innerHTML = renderWarmLeadReportPanel(row, email);
  }
- composeToUser(row.email || '', subject, body, html, 'warm_lead');
+ composeToUser(row.email || '', subject, body, html, 'warm_lead', { stayOnPage: true });
 }
 
 async function copyWarmLeadDraft(id) {
@@ -3015,12 +3045,18 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  const hasFullDetail = !!det?.user;
  const p = hasFullDetail ? buildStudentPerformanceProfile(det) : buildWarmLeadSummaryProfile(row);
  const product = row.recommended_product || 'CASPer Pro';
- const examples = hasFullDetail ? warmLeadDetailExamples(det).slice(0, 2) : warmLeadSummaryExamples(row).slice(0, 2);
+ const examples = warmLeadPrioritiseEmpathyExamples(hasFullDetail ? warmLeadDetailExamples(det) : warmLeadSummaryExamples(row)).slice(0, 2);
+ const empathyStrength = warmLeadEmpathyStrengthText(p, examples);
+ const empathyFocus = warmLeadEmpathyFocusText(p, examples);
+ const empathyImprovement = warmLeadEmpathyImprovementText(p, examples);
  const scorePattern = [...(p.weakest || []), ...(p.strongest || [])].slice(0, 4);
  const introScore = p.casperCount
  ? `You have ${p.casperCount} marked CASPer-style response${p.casperCount===1?'':'s'} on Key2MD${p.avgScoreText !== '-' ? `, averaging about ${p.avgScoreText}/10` : ''}.`
  : `You have ${Number(row.review_count || 0)} written practice response${Number(row.review_count || 0)===1?'':'s'} on Key2MD.`;
  const subject = 'A learning note from your Key2MD practice';
+ const scoreText = scorePattern.length
+ ? scorePattern.map(c => `${c.name}: ${Number.isFinite(Number(c.avg)) ? Number(c.avg).toFixed(1) : '-'}/10`).join(', ')
+ : '';
  const exampleText = examples.length
  ? [
  'One or two station examples, so the advice has context:',
@@ -3047,16 +3083,20 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  'I wanted to send something useful while the pattern was fresh. I would not over-read one station on its own, but it can be a good window into a broader answering habit.',
  '',
  'Practice read:',
- `Current average: ${p.avgScoreText}/10. ${p.band}`,
+ `Average: ${p.avgScoreText}/10. Recent average: ${p.recentAvgText}/10. Trend: ${p.trendText}.`,
+ p.band,
+ scoreText ? `Competency pattern: ${scoreText}` : '',
  '',
- 'What looks strong:',
- p.topStrength,
- '',
- 'The main thing I would practise next:',
- primaryFocusSentence(p),
- p.topImprovement,
+ "I'll show the station first, then the advice, so you can see exactly what I am reacting to.",
  '',
  exampleText,
+ '',
+ 'What that example suggests is strong:',
+ empathyStrength,
+ '',
+ 'The main thing I would practise next:',
+ empathyFocus,
+ empathyImprovement,
  '',
  'Next few practice attempts:',
  ...p.nextSteps.slice(0, 4).map(x => `- ${x}`),
@@ -3073,8 +3113,8 @@ function buildWarmLeadReportEmail(row, det, note = '') {
  '',
  'Dan',
  'University of Melbourne MD student | Key2MD',
- ].join('\n');
- const html = buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern, introScore });
+ ].filter(line => line !== '').join('\n');
+ const html = buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern, introScore, empathyStrength, empathyFocus, empathyImprovement });
  return { subject, text, html, note };
 }
 
@@ -3109,14 +3149,14 @@ function buildWarmLeadSummaryProfile(row) {
  : 'This report is based on recent practice activity and answer-level signals. More scored CASPer reviews will make the performance read sharper.',
  weakest: [],
  strongest: [],
- topStrength: report.strength || row.sample?.strength || 'You are doing the most important first step: actually practising and reading feedback, rather than just collecting generic CASPer advice.',
- topImprovement: report.improvement || report.focus || row.sample?.improvement || 'The highest-yield lift is making your reasoning and interpersonal skill visible instead of assuming the marker will infer it.',
+ topStrength: report.strength || row.sample?.strength || 'You are doing the important first step: actually practising and reading feedback. The next lift is making the human layer of each answer more visible.',
+ topImprovement: report.empathy_focus || report.improvement || report.focus || row.sample?.improvement || 'The highest-yield lift is richer empathy: name what the person may be feeling, why that emotion matters in the scenario, and how your next words protect their dignity while still solving the problem.',
  nextSteps: Array.isArray(report.practice_plan) && report.practice_plan.length
  ? report.practice_plan
  : [
- 'For the next three responses, choose one sentence and rewrite it so the marker can see the action, the reason, and the human impact.',
+ 'For the next three responses, write one empathy sentence before the action: who is affected, what they may be feeling, and why your tone matters.',
  'For CASPer, practise one station type twice before switching topics, so you can see whether the same wording habit is improving.',
- 'Do not chase model answers. Keep your own instinct, but make it more observable.',
+ 'Do not chase model answers. Keep your own instinct, but make the human response more observable.',
  ],
  focusAreas: [],
  agenda: [],
@@ -3134,22 +3174,76 @@ function warmLeadEmailScenario(value, max = 2200) {
  return `${text.slice(0, max - 18).trim()}...`;
 }
 
+function warmLeadEmpathySignal(value) {
+ return /empath|emotion|feel|felt|human|person|people|perspective|listen|support|distress|vulnerab|acknowledge|impact|relationship|dignity|fear|embarrass|shame|stress|hurt|uncomfortable|grief|family|agency|trust|tone|compassion|isolat|overwhelm/i.test(String(value || ''));
+}
+
+function warmLeadRuleSignal(value) {
+ return /ethic|professional|policy|confidential|safety|safe|fair|escalat|report|responsib|duty|mandatory|rule|procedure/i.test(String(value || ''));
+}
+
+function warmLeadEmpathyExampleScore(ex) {
+ const text = [ex?.scenario, ex?.quote, ex?.improvement, ex?.learningPoint, ex?.rewrite].join(' ');
+ let score = 0;
+ if (warmLeadEmpathySignal(text)) score += 8;
+ if (/empath|feel|emotion|human|dignity|hurt|uncomfortable|overwhelm|grief|family/i.test(text)) score += 5;
+ if (/listen|support|private|non[-\s]?confrontational|talk|speak|ask/i.test(text)) score += 2;
+ if (warmLeadRuleSignal(text) && !warmLeadEmpathySignal(text)) score += 3;
+ return score;
+}
+
+function warmLeadPrioritiseEmpathyExamples(examples) {
+ return (examples || [])
+ .map((example, index) => ({ example, index, score: warmLeadEmpathyExampleScore(example) }))
+ .sort((a, b) => b.score - a.score || a.index - b.index)
+ .map(item => item.example);
+}
+
+function warmLeadEmpathyStrengthText(p, examples = []) {
+ const ex = examples[0];
+ if (ex?.quote) {
+ return 'The useful instinct is that you are already trying to respond constructively rather than aggressively. The opportunity is to make the other person feel seen before you move into the practical step.';
+ }
+ if (warmLeadEmpathySignal(p.topStrength)) return p.topStrength;
+ return 'You are doing the important first step: practising consistently and responding to feedback. The next lift is making the human layer of each answer more visible.';
+}
+
+function warmLeadEmpathyFocusText(p, examples = []) {
+ const ex = examples[0];
+ if (ex?.learningPoint && warmLeadEmpathySignal(ex.learningPoint)) return 'The next few stations should focus on rich empathy: not just being kind, but naming the person, emotion, and human consequence before moving into action.';
+ if (p.weakest?.some(c => String(c.name || '').toLowerCase() === 'empathy')) return 'The next few stations should focus on empathy - making that skill visible in every answer, not just implied.';
+ return 'The next few stations should focus on the human layer of the answer: who is affected, what they might be feeling, and why your tone matters before the practical solution.';
+}
+
+function warmLeadEmpathyImprovementText(p, examples = []) {
+ const ex = examples[0];
+ const raw = ex?.improvement || ex?.learningPoint || p.topImprovement || '';
+ if (warmLeadRuleSignal(raw) && !warmLeadEmpathySignal(raw)) {
+ return 'Even when there is a rule or escalation piece, the answer should not sound like a policy memo. Start by showing what the person might be feeling, why the situation may be hard for them, and how you would preserve dignity while still doing the right thing.';
+ }
+ if (raw && warmLeadEmpathySignal(raw)) return raw;
+ return 'A stronger answer would add one sentence of emotional specificity: what the person may be feeling, why that matters in this exact scenario, and the first words you would use so they feel respected rather than managed.';
+}
+
 function warmLeadDashboardLearningPoint(improvement) {
  const text = String(improvement || '').replace(/\s+/g, ' ').trim();
  if (!text) {
- return 'This is a good place to practise turning an instinct into visible behaviour: what you would say, why it matters, and what risk or value you are protecting.';
+ return 'This is a good place to practise rich empathy: name what the person may be feeling, why that emotion matters, and how your first words would protect their dignity.';
  }
  const lower = text.toLowerCase();
+ if (warmLeadRuleSignal(text) && !warmLeadEmpathySignal(text)) {
+ return `The useful opportunity is to add the human layer before the rule or escalation step. ${text} Strong CASPer answers usually show how the other person might experience the moment, then move into the practical action.`;
+ }
  if (/specific|concrete|detail|practical|action|step/.test(lower)) {
- return `The learning point is specificity. ${text} In practice, the marker should be able to picture the conversation or decision, not just infer your intention.`;
+ return `The learning point is emotional specificity. ${text} In practice, the marker should be able to picture not just what you do, but how the other person feels while you do it.`;
  }
  if (/empath|emotion|feel|support|listen/.test(lower)) {
- return `The learning point is to demonstrate empathy rather than simply name it. ${text} The strongest answers usually show the opening words, the question you would ask, and why that tone protects the person.`;
+ return `The learning point is to demonstrate empathy rather than simply name it. ${text} The strongest answers usually show the opening words, the question you would ask, and why that tone helps the person feel respected.`;
  }
  if (/fair|ethic|professional|policy|safety|confidential/.test(lower)) {
- return `The learning point is balancing warmth with responsibility. ${text} Good answers make the competing duties explicit, so the response feels fair rather than merely kind.`;
+ return `The learning point is putting warmth before procedure. ${text} Good answers can still be firm and responsible, but they first show that the person is more than a problem to manage.`;
  }
- return text;
+ return `The empathy layer to add is this: ${text} Make sure the answer names the person's likely feelings and shows the first sentence you would use to meet them humanely.`;
 }
 
 function warmLeadSummaryExamples(row) {
@@ -3157,24 +3251,24 @@ function warmLeadSummaryExamples(row) {
  const examples = reportExamples.map(ex => ({
  scenario: warmLeadEmailScenario(ex.scenario || ex.question || ex.prompt || row.sample?.question_preview || ''),
  quote: ex.quote || ex.response || '',
- improvement: ex.improvement || row.student_report?.improvement || 'This is a useful instinct, but it needs to be more specific and examiner-visible.',
- rewrite: ex.rewrite || ex.suggestion || warmLeadDashboardRewrite(ex.quote || '', ex.improvement || ''),
+ improvement: ex.improvement || row.student_report?.improvement || 'This is a useful instinct, but it needs a more visible human layer: name the emotion, the impact, and the first words you would use.',
+ rewrite: warmLeadDashboardRewrite(ex.quote || '', ex.improvement || ex.learning_point || ex.learningPoint || ''),
  learningPoint: ex.learning_point || ex.learningPoint || warmLeadDashboardLearningPoint(ex.improvement || row.student_report?.improvement || ''),
  })).filter(ex => String(ex.quote || '').trim().length >= 20);
- if (examples.length) return examples;
+ if (examples.length) return warmLeadPrioritiseEmpathyExamples(examples);
  if (row.sample?.quote || row.sample?.improvement || row.sample?.rewrite) {
  return [{
  scenario: warmLeadEmailScenario(row.sample.question_preview || ''),
  quote: row.sample.quote || row.sample.response_preview || '',
- improvement: row.sample.improvement || 'This is a useful instinct, but it needs to be more specific and examiner-visible.',
- rewrite: row.sample.rewrite || warmLeadDashboardRewrite(row.sample.quote || row.sample.response_preview || '', row.sample.improvement || ''),
+ improvement: row.sample.improvement || 'This is a useful instinct, but it needs a more visible human layer: name the emotion, the impact, and the first words you would use.',
+ rewrite: warmLeadDashboardRewrite(row.sample.quote || row.sample.response_preview || '', row.sample.improvement || ''),
  learningPoint: warmLeadDashboardLearningPoint(row.sample.improvement || ''),
  }];
  }
  return [];
 }
 
-function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern, introScore }) {
+function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern, introScore, empathyStrength, empathyFocus, empathyImprovement }) {
  const plan = (p.nextSteps || []).slice(0, 4);
  const exampleHtml = examples.length
  ? examples.map((ex, index) => `
@@ -3201,20 +3295,21 @@ function buildWarmLeadReportEmailHtml({ p, row, product, examples, scorePattern,
  <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">I had a look over your recent Key2MD practice because you have clearly been putting in the work. ${esc(introScore)}</p>
  <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">I wanted to send something useful while the pattern was fresh. I would not over-read one station on its own, but it can be a good window into a broader answering habit.</p>
 
- <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>What looks strong</strong></p>
- <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(p.topStrength)}</p>
-
- <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>The main thing I would practise next</strong></p>
- <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#334155;">${esc(primaryFocusSentence(p))}</p>
- <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(p.topImprovement)}</p>
-
  <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>Current read</strong></p>
  <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">Average: ${esc(p.avgScoreText)}/10. Recent average: ${esc(p.recentAvgText)}/10. Trend: ${esc(p.trendText)}.</p>
  <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#475569;">${esc(p.band)}</p>
  <p style="margin:0 0 16px;font-size:13px;line-height:1.65;color:#64748b;">${esc(scoreText)}</p>
 
  <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>A station example with context</strong></p>
+ <p style="margin:0 0 12px;font-size:14px;line-height:1.7;color:#475569;">I'll show the station first, then the advice, so you can see exactly what I am reacting to.</p>
  ${exampleHtml}
+
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>What that example suggests is strong</strong></p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(empathyStrength || p.topStrength)}</p>
+
+ <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>The main thing I would practise next</strong></p>
+ <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#334155;">${esc(empathyFocus || primaryFocusSentence(p))}</p>
+ <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#334155;">${esc(empathyImprovement || p.topImprovement)}</p>
 
  <p style="margin:22px 0 6px;font-size:15px;line-height:1.7;"><strong>Next few attempts</strong></p>
  <ul style="margin:0 0 16px;padding-left:20px;color:#334155;font-size:15px;line-height:1.7;">
@@ -3238,9 +3333,9 @@ function buildWarmLeadCombinedOutreach(row, det) {
  const p = buildStudentPerformanceProfile(det);
  const examples = warmLeadDetailExamples(det).slice(0, 2);
  const serverReport = row.student_report || {};
- const strength = serverReport.strength || p.topStrength;
- const focus = serverReport.focus || primaryFocusSentence(p);
- const improvement = serverReport.improvement || p.topImprovement;
+ const strength = warmLeadEmpathyStrengthText(p, examples);
+ const focus = warmLeadEmpathyFocusText(p, examples);
+ const improvement = warmLeadEmpathyImprovementText(p, examples);
  const plan = serverReport.practice_plan?.length ? serverReport.practice_plan : p.nextSteps;
  const product = row.recommended_product || 'next step';
  const nextStep = warmLeadDashboardNextStep(product);
@@ -3268,11 +3363,20 @@ function buildWarmLeadCombinedOutreach(row, det) {
  'I wanted to send something genuinely useful rather than just another link. I would not over-read one station by itself, but it can show a broader habit worth practising.',
  '',
  'Practice read:',
- `- What looks strong: ${strength}`,
- `- What I would focus on next: ${focus}`,
- improvement && improvement !== focus ? `- Repeated feedback signal: ${improvement}` : '',
+ `- Average: ${p.avgScoreText}/10`,
+ `- Recent average: ${p.recentAvgText}/10`,
+ `- Trend: ${p.trendText}`,
+ '',
+ "I'll show the station first, then the advice, so you can see exactly what I am reacting to.",
  '',
  exampleBlock,
+ '',
+ 'What that example suggests is strong:',
+ strength,
+ '',
+ 'The main thing I would practise next:',
+ focus,
+ improvement && improvement !== focus ? improvement : '',
  '',
  'Next few practice attempts:',
  ...plan.slice(0, 3).map(item => `- ${item}`),
@@ -3293,13 +3397,17 @@ function buildWarmLeadCombinedOutreach(row, det) {
 function warmLeadDetailExamples(det) {
  const reviews = det?.reviews || [];
  const out = [];
- for (const review of reviews) {
+ const ranked = reviews
+ .map((review, index) => ({ review, index, score: warmLeadEmpathyReviewScore(review) }))
+ .sort((a, b) => b.score - a.score || a.index - b.index);
+ for (const item of ranked) {
+ const review = item.review;
  const response = String(review.response_text || '').replace(/\s+/g, ' ').trim();
  if (response.length < 35) continue;
  const fb = parseFb(review.ai_feedback) || {};
  const quote = warmLeadDashboardQuote(response);
  if (!quote) continue;
- const improvement = firstText([fb.improvements, fb.biggest_improvement, fb.missed, fb.overallFeedback, fb.summary], 'This is a useful instinct, but it needs to be more specific and examiner-visible.');
+ const improvement = warmLeadEmpathyFeedbackText(fb) || firstText([fb.improvements, fb.biggest_improvement, fb.missed, fb.overallFeedback, fb.summary], 'This is a useful instinct, but it needs richer empathy and more specific human context.');
  const rewrite = warmLeadDashboardRewrite(quote, improvement);
  out.push({
  scenario: warmLeadEmailScenario(review.question_text || review.prompt || review.scenario || ''),
@@ -3313,6 +3421,47 @@ function warmLeadDetailExamples(det) {
  return out;
 }
 
+function warmLeadEmpathyReviewScore(review) {
+ const fb = parseFb(review.ai_feedback) || {};
+ const responseText = String(review.response_text || '');
+ const empathyFeedback = warmLeadEmpathyFeedbackText(fb);
+ const text = [
+ review.question_text,
+ responseText,
+ empathyFeedback,
+ fb.empathy,
+ fb.improvements,
+ fb.missed,
+ fb.overallFeedback,
+ ].map(v => Array.isArray(v) ? v.join(' ') : String(v || '')).join(' ');
+ let score = warmLeadEmpathySignal(text) ? 10 : 0;
+ if (String(review.tool || '').toLowerCase() === 'casper') score += 4;
+ const comps = Array.isArray(fb.competencies) ? fb.competencies : [];
+ const emp = comps.find(c => String(c.name || '').toLowerCase() === 'empathy');
+ const empScore = Number(emp?.score);
+ if (Number.isFinite(empScore)) score += Math.max(0, 10 - empScore);
+ if (/non[-\s]?confrontational|listen|support|talk|speak|private|understand|perspective/i.test(responseText)) score += 3;
+ if (warmLeadRuleSignal(responseText) && !warmLeadEmpathySignal(responseText)) score += 6;
+ if (warmLeadRuleSignal(fb.improvements || fb.missed || '') && !empathyFeedback) score += 3;
+ return score;
+}
+
+function warmLeadEmpathyFeedbackText(fb) {
+ if (!fb) return '';
+ const pieces = [];
+ if (fb.empathy) pieces.push(fb.empathy);
+ const comps = Array.isArray(fb.competencies) ? fb.competencies : [];
+ const emp = comps.find(c => String(c.name || '').toLowerCase() === 'empathy');
+ if (emp) pieces.push(emp.evidence, emp.improve, emp.comment);
+ if (Array.isArray(fb.per_prompt)) {
+ for (const pp of fb.per_prompt) {
+ const crit = pp?.scores?.empathy || pp?.empathy;
+ if (crit) pieces.push(crit.comment, crit.evidence, crit.improve);
+ }
+ }
+ return pieces.map(v => Array.isArray(v) ? v.join(' ') : String(v || '')).filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+}
+
 function warmLeadDashboardQuote(response) {
  const text = String(response || '').replace(/\s+/g, ' ').trim();
  const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
@@ -3324,11 +3473,12 @@ function warmLeadDashboardQuote(response) {
 function warmLeadDashboardRewrite(quote, improvement) {
  const q = String(quote || '').toLowerCase();
  const imp = String(improvement || '').toLowerCase();
- if (/non[-\s]?confrontational/.test(q)) return 'I would speak with them privately, ask what happened before assuming intent, explain the impact I am worried about, and keep the tone calm so they can respond honestly.';
- if (/support|help/.test(q) || /support|help/.test(imp)) return 'I would offer practical support by asking what they need, helping them access the right person or service, and still being clear about any fairness or safety concern.';
- if (/empath|feel|emotion/.test(q) || /empath|feel|emotion/.test(imp)) return 'I would first acknowledge that this may feel stressful or embarrassing, then ask open questions so they do not feel judged before deciding the next step.';
- if (/listen|perspective|side/.test(q) || /listen|perspective|side/.test(imp)) return 'I would ask them to walk me through what happened, listen for any pressure or misunderstanding I have missed, then explain my concern and agree on a fair next step.';
- return 'I would make the action explicit: speak privately, ask what happened, name the concern, explain why it matters, and agree on the safest next step rather than leaving the intention implied.';
+ if (/non[-\s]?confrontational/.test(q)) return 'I would speak with them privately and start by acknowledging this may be uncomfortable to hear, because my aim is not to shame them but to help them understand the impact and feel able to respond honestly.';
+ if (/support|help/.test(q) || /support|help/.test(imp)) return 'I would first ask what this has been like for them and what support would actually feel helpful, then offer a practical next step that respects their agency rather than assuming I know what they need.';
+ if (/empath|feel|emotion/.test(q) || /empath|feel|emotion/.test(imp)) return 'I would name the emotion directly: this may feel stressful, embarrassing, or isolating, and I would ask an open question before moving into advice so they feel heard rather than managed.';
+ if (/listen|perspective|side/.test(q) || /listen|perspective|side/.test(imp)) return 'I would ask them to walk me through how they experienced it, listen for pressure or hurt I may have missed, and reflect that back before deciding what should happen next.';
+ if (warmLeadRuleSignal(imp)) return 'Before moving to the rule or escalation step, I would add the human sentence: I can see this may be difficult or confronting, and I want to understand your perspective while also being honest about the impact on others.';
+ return 'I would add one rich empathy sentence before the action: name what the person may be feeling, why that feeling makes sense in context, and how my first words would help them feel respected.';
 }
 
 function firstText(values, fallback) {
@@ -3341,8 +3491,8 @@ function firstText(values, fallback) {
 
 function warmLeadDashboardCorePoint(product) {
  if (String(product || '').includes('GAMSAT')) return 'The bigger point is that S2 rewards controlled thinking, not just fluent writing. A polished paragraph still needs to make the claim, evidence, and implication visible.';
- if (String(product || '').includes('MMI')) return 'The bigger point is that interviewers cannot credit judgement they cannot hear. Strong answers show the wording, sequence, and reason behind the decision.';
- return 'The bigger point is that CASPer markers cannot assume your motivation. Strong answers make the human skill observable: what you would say, why that tone matters, and what risk you are managing.';
+ if (String(product || '').includes('MMI')) return 'The bigger point is that interviewers cannot credit empathy they cannot hear. Strong answers show the wording, sequence, and reason behind the decision, but they also make the other person feel real.';
+ return 'The bigger point is that CASPer markers cannot assume empathy. Strong answers show what the person might be feeling, why that feeling matters, what you would say first, and then what action you would take.';
 }
 
 function warmLeadDashboardNextStep(product) {
@@ -3449,7 +3599,7 @@ function renderSharingWatchlist() {
  <td><div class="expander">v</div></td>
  <td>${riskBadge(risk)}</td>
  <td>
- <div class="cell-main">${esc(row.email || 'Unknown student')}</div>
+ <div class="cell-main">${emailWithDuplicateFlag(row.email || 'Unknown student',row)}</div>
  <div class="cell-sub">${esc(row.name || '-')} ${tierBadge(row.tier || 'free')}</div>
  </td>
  <td><strong>${row.devices_30d || 0}</strong><div class="cell-sub">${row.devices_7d || 0} in 7d</div></td>
@@ -3481,6 +3631,7 @@ function renderSharingDetail(row, agents = []) {
  <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
  <button class="btn blue" onclick="event.stopPropagation();openSharingUser(${jsArg(row.user_id || '')},${jsArg(row.email || '')})">Open user</button>
  <button class="btn" onclick="event.stopPropagation();composeToUser(${jsArg(row.email || '')})">Email student</button>
+ <button class="btn red" onclick='event.stopPropagation();openDuplicateFlagModal(${jsArg(row.user_id || '')},${jsArg(row.email || '')})'>Restrict free use</button>
  </div>
  </div>
  <div class="detail-box">
@@ -3853,7 +4004,7 @@ function renderEnquiries() {
  <td><div class="cell-main">${dt?.date||'-'}</div><div class="cell-sub">${dt?.time||''}</div></td>
  <td><div class="cell-main">${esc(row.name||'-')}</div></td>
  <td>
- <div class="cell-main">${esc(row.email||'-')}</div>
+ <div class="cell-main">${emailWithDuplicateFlag(row.email,row)}</div>
  <div class="action-mini-row">
  <button class="btn blue" onclick="event.stopPropagation();replyToEnquiry('${esc(row.id||'')}')">Reply</button>
  <button class="btn" onclick="event.stopPropagation();copyText('${esc(row.email||'')}','Email copied')">Copy</button>
@@ -3868,7 +4019,7 @@ function renderEnquiries() {
  xr.innerHTML = `<td colspan="7" class="detail-panel"><div class="detail-inner" style="grid-template-columns:1fr 1fr;">
  <div class="detail-box"><div class="detail-box-hd">Contact Details</div>
  <div class="detail-box-row">Name: <strong>${esc(row.name||'-')}</strong></div>
- <div class="detail-box-row">Email: <strong>${esc(row.email||'-')}</strong></div>
+ <div class="detail-box-row">Email: <strong>${emailWithDuplicateFlag(row.email,row)}</strong></div>
  <div class="detail-box-row">Type: <strong>${esc(row.type||'-')}</strong></div>
  <div class="detail-box-row">Universities: <strong>${esc(row.universities||'-')}</strong></div>
  <div class="detail-box-row">Exam date: <strong>${esc(row.exam_date||'-')}</strong></div>
@@ -3966,7 +4117,7 @@ function renderConvList() {
  const time = last ? relTime(last.created_at) : '';
  const unread = conv.messages?.some(m=>m.direction==='inbound'&&!m.read);
  return `<div class="conv-item${S.activeConv===conv.email?' active':''}${unread?' unread':''}" onclick="openConv('${esc(conv.email)}')">
- <div class="conv-name">${esc(conv.name||conv.email)}</div>
+ <div class="conv-name">${conv.name ? `${esc(conv.name)} ${emailWithDuplicateFlag(conv.email,conv)}` : emailWithDuplicateFlag(conv.email,conv)}</div>
  <div class="conv-preview">${esc(preview)}</div>
  <div class="conv-time">${time}</div>
  </div>`;
@@ -4098,15 +4249,21 @@ function openNewCompose(preserveHtml = false) {
  document.getElementById('ncModal').classList.add('open');
  document.getElementById('ncTo').focus();
 }
-function closeNewCompose() { document.getElementById('ncModal').classList.remove('open'); document.getElementById('ncAlert').className='modal-alert'; S.composeMode='standard'; setComposeHtml(''); }
-function composeToUser(email, subject = '', body = '', html = '', mode = 'standard') {
+function closeNewCompose() { document.getElementById('ncModal').classList.remove('open'); document.getElementById('ncAlert').className='modal-alert'; S.composeMode='standard'; S.composeContext=null; setComposeHtml(''); }
+function composeToUser(email, subject = '', body = '', html = '', mode = 'standard', options = {}) {
  document.getElementById('ncTo').value = email;
  document.getElementById('ncSubject').value = subject || '';
  document.getElementById('ncBody').value = body || '';
  S.composeMode = mode || 'standard';
+ S.composeContext = {
+ mode: S.composeMode,
+ stayOnPage: options.stayOnPage === true,
+ returnPage: currentHashPage(),
+ scrollTop: document.querySelector('.main')?.scrollTop || 0,
+ };
  setComposeHtml(html || '');
  openNewCompose(true);
- nav('inbox');
+ if (!S.composeContext.stayOnPage) nav('inbox');
 }
 
 function replyToEnquiry(id) {
@@ -4134,14 +4291,27 @@ async function sendNewEmail() {
  try {
  const cleanSubject = subj || 'Message from Key2MD';
  const category = S.composeMode || 'standard';
+ const stayOnPage = S.composeContext?.stayOnPage === true;
+ const returnPage = S.composeContext?.returnPage || currentHashPage();
+ const scrollTop = S.composeContext?.scrollTop || 0;
  const res = await api('/admin/inbox/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject:cleanSubject,body,html:S.composeHtml||'',category})});
  const d = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(d?.error||'Send failed');
+ if (category === 'warm_lead') {
  recordWarmLeadLocalOutreach(to, cleanSubject, d?.outreach || null);
+ if (!d?.outreach?.has_outreach) {
  persistWarmLeadOutreach(to, cleanSubject, body).catch(e => console.warn('Warm lead outreach log failed:', e));
+ }
+ }
  al.className='modal-alert ok'; al.textContent=`OK Sent to ${to}`;
- document.getElementById('ncTo').value=''; document.getElementById('ncSubject').value=''; document.getElementById('ncBody').value=''; S.composeMode='standard'; setComposeHtml('');
+ document.getElementById('ncTo').value=''; document.getElementById('ncSubject').value=''; document.getElementById('ncBody').value=''; S.composeMode='standard'; S.composeContext=null; setComposeHtml('');
+ if (stayOnPage) {
+ if (currentHashPage() !== returnPage) nav(returnPage, { replace: true, scroll: false });
+ requestAnimationFrame(() => document.querySelector('.main')?.scrollTo?.({ top: scrollTop, behavior: 'auto' }));
+ loadInbox().catch(e => console.warn('Inbox refresh after warm lead send failed:', e));
+ } else {
  await loadInbox();
+ }
  setTimeout(closeNewCompose, 1800);
  } catch(e) { al.className='modal-alert err'; al.textContent=e.message; }
  finally { btn.disabled=false; sp.style.display='none'; }
@@ -4210,21 +4380,21 @@ function renderCasperClass() {
  body.innerHTML = rows.length ? rows.map(row => {
  const dt = fmtDate(row.created_at);
  const expires = row.expires_at ? fmtDate(row.expires_at) : null;
- const purchaseType = row.purchase_type || (row.source === 'package' ? 'package' : row.source === 'subscription' ? 'ongoing' : row.source === 'stripe' ? 'one_off' : 'manual');
- const planLabel = purchaseType === 'package' ? 'June 3-class package' : purchaseType === 'ongoing' ? 'Weekly' : purchaseType === 'one_off' ? 'One-off' : 'Manual';
+ const purchaseType = row.purchase_type || (row.source === 'package' ? 'package' : row.source === 'subscription' ? 'ongoing' : row.source === 'stripe' ? 'one_off' : row.source === 'indefinite' ? 'indefinite' : 'manual');
+ const planLabel = purchaseType === 'package' ? 'June package' : purchaseType === 'ongoing' ? 'Weekly' : purchaseType === 'one_off' ? 'One-off' : purchaseType === 'indefinite' ? 'Indefinite' : 'Manual';
  const amount = Number(row.amount_paid || 0);
  const stripeId = row.stripe_session_id || row.stripe_subscription_id || '';
  const stripeShort = stripeId ? `${stripeId.slice(0, 10)}...${stripeId.slice(-4)}` : '-';
  const paidSource = ['stripe', 'subscription', 'package'].includes(String(row.source || '').toLowerCase());
  return `<tr class="data-row">
- <td><div class="cell-main">${esc(row.email || row.user_id || '?')}</div><div class="cell-sub">${esc(row.name || '')}</div></td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(row.email || row.user_id || '?',row)}</div><div class="cell-sub">${esc(row.name || '')}</div></td>
  <td><div class="cell-main">${esc(planLabel)}</div><div class="cell-sub">${row.class_count ? `${row.class_count} classes` : esc(row.exam_date || '')}</div></td>
  <td><span class="badge ${paidSource?'badge-paid':'badge-default'}">${esc(row.source || 'admin')}</span></td>
  <td><span class="spend ${amount>0?'has':'none'}">${amount ? fmtMoney(amount / 100) : '-'}</span></td>
  <td><div class="cell-main">${expires?.date || '-'}</div><div class="cell-sub">${row.cancel_requested ? 'Cancels at period end' : ''}</div></td>
  <td><div class="cell-main">${dt?.date || '-'}</div><div class="cell-sub">${dt?.time || ''}</div></td>
  <td><div class="cell-main" title="${esc(stripeId)}">${esc(stripeShort)}</div></td>
- <td><button class="btn" style="font-size:0.68rem;padding:3px 8px;background:var(--red-dim);border-color:var(--red-border);color:var(--red);" onclick='removeCasperClassAccess(${jsArg(row.email || '')}, ${jsArg(row.user_id || '')})'>Remove</button></td>
+ <td>${purchaseType === 'indefinite' ? '<span style="color:var(--muted2);font-size:0.72rem;">Built in</span>' : `<button class="btn" style="font-size:0.68rem;padding:3px 8px;background:var(--red-dim);border-color:var(--red-border);color:var(--red);" onclick='removeCasperClassAccess(${jsArg(row.email || '')}, ${jsArg(row.user_id || '')})'>Remove</button>`}</td>
  </tr>`;
  }).join('') : '<tr><td colspan="8" style="color:var(--muted);padding:16px;">No one is authorised for this class yet.</td></tr>';
 }
@@ -4311,7 +4481,7 @@ async function runCasperClassEmailCheck() {
 }
 
 async function reconcileCasperClass() {
- if (!confirm('Check recent Stripe checkout sessions and recover any paid CASPer class students into this dashboard? This will not email students.')) return;
+ if (!confirm('Check recent Stripe checkout sessions and recover any paid CASPer class students into this dashboard? This includes one-off, weekly, and package payments. This will not email students.')) return;
  const status = document.getElementById('ccStatus');
  if (status) status.textContent = 'Checking Stripe...';
  try {
@@ -4326,7 +4496,7 @@ async function reconcileCasperClass() {
  email_state: data.email_state || S.casperClass?.email_state || {},
  };
  renderCasperClass();
- const message = `Recovered/confirmed ${data.recovered || 0} $120 class payment${Number(data.recovered || 0)===1?'':'s'} from ${data.checked || 0} matching Stripe session${Number(data.checked || 0)===1?'':'s'}.`;
+ const message = `Recovered/confirmed ${data.recovered || 0} class payment${Number(data.recovered || 0)===1?'':'s'} from ${data.checked || 0} matching Stripe session${Number(data.checked || 0)===1?'':'s'}.`;
  if (status) status.textContent = message;
  alert(message);
  } catch(e) {
@@ -4900,7 +5070,7 @@ function renderSubscribers() {
  ? rows.map((s,i) => {
  const sIdx = S.subscribers.indexOf(s);
  return `<tr>
- <td><div class="cell-main">${esc(s.email)}</div></td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(s.email,s)}</div></td>
  <td><div class="cell-sub">${fmtDate(s.created_at)?.date||'-'}</div></td>
  <td style="text-align:center;">
  <div style="display:flex;gap:4px;justify-content:center;">
@@ -5208,7 +5378,7 @@ function renderMockRows(targetId, rows, manualOnly) {
  const issueLabel = Number(r.issue_count || 0) ? `<span class="mock-row-flag warn">${Number(r.issue_count || 0)} issue${Number(r.issue_count || 0)===1?'':'s'}</span>` : '';
  const completeFlag = mockIsCompleted(r) ? '<span class="mock-row-flag good">finished</span>' : '<span class="mock-row-flag warn">not finished</span>';
  return `<tr>
- <td><div class="cell-main">${esc(r.user_name || r.user_email || 'Student')}</div><div class="cell-sub">${esc(r.user_email || r.id || '')}</div><div class="mock-row-flags">${completeFlag}${countLabel ? `<span class="mock-row-flag blue">${esc(countLabel)}</span>` : ''}${issueLabel}</div></td>
+ <td><div class="cell-main">${esc(r.user_name || r.user_email || 'Student')}</div><div class="cell-sub">${emailWithDuplicateFlag(r.user_email || r.id || '',r)}</div><div class="mock-row-flags">${completeFlag}${countLabel ? `<span class="mock-row-flag blue">${esc(countLabel)}</span>` : ''}${issueLabel}</div></td>
  <td>${tierBadge(r.tier)}</td>
  <td>${mockAttemptStatusBadge(r)}<div class="cell-sub" style="margin-top:5px;">Manual: ${mockStatusBadge(status)}</div>${statusActions}</td>
  <td><div class="cell-main">${manualOnly ? (r.manual_review_paid ? 'Yes' : 'No') : (dt?.date || '-')}</div><div class="cell-sub">${manualOnly ? (fmtDate(r.manual_review_paid_at)?.date || '-') : (dt?.time || '')}</div></td>
@@ -5324,7 +5494,7 @@ function renderMMI() {
  dr.innerHTML = `
  <td><div class="expander">v</div></td>
  <td><div class="cell-main">${dt?.date||'-'}</div><div class="cell-sub">${dt?.time||''}</div></td>
- <td><div class="cell-main">${esc(row.email||'?')}</div><div class="cell-sub">${esc(row.name||'')}</div></td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(row.email,row)}</div><div class="cell-sub">${esc(row.name||'')}</div></td>
  <td><span class="badge badge-default">${esc(row.station_category||'-')}</span></td>
  <td><span class="badge badge-${row.tier==='premium'?'pro':'casper'}">${esc(row.tier||'-')}</span></td>
  <td>${score ? `<div class="score-box ${mmiScoreC(score)}" title="${esc(scoreLabel)}">${score}</div>` : '<span style="color:var(--muted2);">-</span>'}</td>
@@ -5512,7 +5682,7 @@ function renderPayers() {
  const dt = fmtDate(p.last_payment_at);
  return `<tr class="data-row">
  <td>
- <div class="cell-main">#${i+1} ${esc(display)}</div>
+ <div class="cell-main">#${i+1} ${email ? emailWithDuplicateFlag(email,p) : esc(display)}</div>
  <div class="cell-sub">${esc(p.name && email ? p.name : '')} ${subscriptionBadges(p)} ${i<3?`<span class="badge badge-yes" style="font-size:0.58rem;">Top ${i+1}</span>`:''}</div>
  </td>
  <td><span class="spend has">${fmtMoney(p.total_spend_aud)}</span></td>
@@ -5567,7 +5737,7 @@ function renderRevenue() {
  const sIdx = S.revenue.indexOf(r);
  return `<tr class="data-row">
  <td><div class="cell-main">${dt?.date||'-'}</div><div class="cell-sub">${dt?.time||''}</div></td>
- <td><div class="cell-main">${esc(r.email||'?')}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(r.email,r)}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
  <td><span class="badge badge-default" style="font-size:0.62rem;">${esc(r.type||'-')}</span></td>
  <td><span class="spend has">$${Number(r.amount_aud||0).toFixed(2)}</span></td>
  <td><span class="badge badge-yes">Completed</span></td>
@@ -5699,7 +5869,7 @@ function renderMonitoring() {
  ? `<span class="badge" style="background:var(--purple-dim);color:var(--purple);font-size:0.62rem;">founding</span>`
  : `<span class="badge badge-default" style="font-size:0.62rem;">credits</span>`;
  return `<tr class="data-row" onclick="composeToUser('${esc(r.email||'')}')">
- <td><div class="cell-main">${esc(r.email||'-')}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(r.email,r)}</div><div class="cell-sub">${esc(r.name||'')}</div></td>
  <td><span class="spend has">$${(rev/100).toFixed(2)}</span></td>
  <td><span style="color:var(--red);font-size:0.82rem;font-weight:600;">${cogs}</span></td>
  <td><span style="color:${profitColor};font-weight:700;">$${(profit/100).toFixed(2)}</span></td>
@@ -5734,6 +5904,101 @@ function renderMonitoring() {
  <td>${f.duration_sec ? `${Math.floor(f.duration_sec/60)}m ${f.duration_sec%60}s` : '-'}</td>
  <td><div class="trunc" style="max-width:320px;">${esc(f.error_msg||'-')}</div></td>
  </tr>`).join('');
+}
+
+// ======================================================
+// DUPLICATE ACCOUNT CONTROL
+// ======================================================
+function parseDuplicateModalFlags(flags) {
+ if (!flags) return null;
+ if (typeof flags === 'string') {
+ try { return JSON.parse(flags); } catch { return null; }
+ }
+ return flags;
+}
+
+function openDuplicateFlagModal(id, email, flags = null) {
+ const suppliedFlags = parseDuplicateModalFlags(flags);
+ const parsedFlags = suppliedFlags?.has_warning ? suppliedFlags : (duplicateFlagsForEmail(email, { id, email }) || suppliedFlags || {});
+ S.duplicateFlagModalUserId = id || '';
+ S.duplicateFlagModalEmail = email || '';
+ document.getElementById('dfEmail').textContent = email || id || 'student';
+ document.getElementById('dfReason').value = parsedFlags.reason || 'Clear duplicate account pattern: disable free reviews while leaving paid credits/subscriptions active.';
+ const status = document.getElementById('dfStatus');
+ if (status) {
+ status.className = parsedFlags.has_warning ? 'admin-note amber' : 'admin-note blue';
+ status.innerHTML = parsedFlags.has_warning
+ ? `<strong>${esc(parsedFlags.label || 'Warning active')}</strong><br>${esc(parsedFlags.reason || 'Free-use restriction or flagged network is active.')}${parsedFlags.matched_networks?.length ? `<br>Network hint: ${esc(parsedFlags.matched_networks.join(', '))}` : ''}`
+ : '<strong>No duplicate restriction active.</strong><br>Disable free trials only when you are confident this is duplicate/free-trial abuse.';
+ }
+ const clearBtn = document.getElementById('dfClear');
+ if (clearBtn) clearBtn.style.display = parsedFlags.has_warning ? 'inline-flex' : 'none';
+ document.getElementById('dfAlert').className = 'modal-alert';
+ document.getElementById('duplicateFlagModal').classList.add('open');
+}
+
+function closeDuplicateFlagModal() {
+ document.getElementById('duplicateFlagModal').classList.remove('open');
+}
+
+function patchDuplicateStatusInState(id, email, status) {
+ const key = String(email || '').trim().toLowerCase();
+ const patchRow = row => {
+ if (String(row?.id || row?.user_id || '') === String(id || '') || String(row?.email || '').trim().toLowerCase() === key) {
+ return { ...row, duplicate_flags: status };
+ }
+ return row;
+ };
+ S.users = (S.users || []).map(patchRow);
+ S.warmLeads = (S.warmLeads || []).map(patchRow);
+ S.sharingWatchlist = (S.sharingWatchlist || []).map(patchRow);
+ for (const [cacheId, det] of S.detailCache.entries()) {
+ if (String(cacheId) === String(id) && det?.user) det.user.duplicate_flags = status;
+ }
+}
+
+async function saveDuplicateFlag(action) {
+ const id = S.duplicateFlagModalUserId;
+ const email = S.duplicateFlagModalEmail;
+ const reason = document.getElementById('dfReason')?.value || '';
+ const alertBox = document.getElementById('dfAlert');
+ const restrictBtn = document.getElementById('dfRestrict');
+ const clearBtn = document.getElementById('dfClear');
+ if (alertBox) alertBox.className = 'modal-alert';
+ if (restrictBtn) restrictBtn.disabled = true;
+ if (clearBtn) clearBtn.disabled = true;
+ try {
+ const res = await api('/admin/users/duplicate-flag', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ user_id: id, email, action, reason }),
+ });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not update duplicate restriction');
+ patchDuplicateStatusInState(data.user_id || id, data.email || email, data.duplicate_flags || {});
+ renderUsers();
+ renderWarmLeads();
+ renderSharingWatchlist();
+ updateDashboard();
+ if (alertBox) {
+ alertBox.className = 'modal-alert ok';
+ alertBox.textContent = action === 'clear' ? 'Restriction cleared.' : `Free trials disabled. ${data.flagged_network_count || 0} recent network signal${Number(data.flagged_network_count || 0)===1?'':'s'} flagged.`;
+ }
+ const updatedFlags = data.duplicate_flags || {};
+ const status = document.getElementById('dfStatus');
+ if (status) {
+ status.className = updatedFlags.has_warning ? 'admin-note amber' : 'admin-note blue';
+ status.innerHTML = updatedFlags.has_warning
+ ? `<strong>${esc(updatedFlags.label || 'Warning active')}</strong><br>${esc(updatedFlags.reason || 'Free-use restriction or flagged network is active.')}${updatedFlags.matched_networks?.length ? `<br>Network hint: ${esc(updatedFlags.matched_networks.join(', '))}` : ''}`
+ : '<strong>No duplicate restriction active.</strong><br>Disable free trials only when you are confident this is duplicate/free-trial abuse.';
+ }
+ if (clearBtn) clearBtn.style.display = updatedFlags.has_warning ? 'inline-flex' : 'none';
+ } catch(e) {
+ if (alertBox) { alertBox.className = 'modal-alert err'; alertBox.textContent = e.message; }
+ } finally {
+ if (restrictBtn) restrictBtn.disabled = false;
+ if (clearBtn) clearBtn.disabled = false;
+ }
 }
 
 // ======================================================
@@ -5883,6 +6148,7 @@ restoreBroadcastDraft();
 document.getElementById('creditModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCreditModal();});
 document.getElementById('tierModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeTierModal();});
 document.getElementById('mockPassModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeMockPassModal();});
+document.getElementById('duplicateFlagModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeDuplicateFlagModal();});
 document.getElementById('ncModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeNewCompose();});
 document.getElementById('cmdModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCommandPalette();});
 document.getElementById('studentReportModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStudentReport();});
@@ -5929,6 +6195,40 @@ function mmiTierMonthlyValue(t) {
 function formatMillisDate(ms) {
  const n = Number(ms||0);
  return n ? new Date(n).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '-';
+}
+function duplicateFlagsForEmail(email, row = null) {
+ const direct = row?.duplicate_flags;
+ if (direct?.has_warning) return direct;
+ const key = String(email || '').trim().toLowerCase();
+ if (!key) return direct || null;
+ const pools = [S.users, S.warmLeads, S.sharingWatchlist].filter(Array.isArray);
+ for (const pool of pools) {
+ const found = pool.find(item => String(item?.email || '').trim().toLowerCase() === key && item?.duplicate_flags?.has_warning);
+ if (found) return found.duplicate_flags;
+ }
+ return direct || null;
+}
+function duplicateFlagTitle(flags) {
+ if (!flags?.has_warning) return '';
+ const bits = [flags.label || 'Duplicate warning'];
+ if (flags.reason) bits.push(flags.reason);
+ if (flags.matched_networks?.length) bits.push(`Networks: ${flags.matched_networks.join(', ')}`);
+ return bits.join(' | ');
+}
+function duplicateFlagBadge(flags) {
+ if (!flags?.has_warning) return '';
+ const cls = flags.restricted ? 'restricted' : 'network';
+ const label = flags.restricted ? 'Free off' : 'Flagged IP';
+ return `<span class="dup-flag ${cls}" title="${esc(duplicateFlagTitle(flags))}">! ${label}</span>`;
+}
+function emailWithDuplicateFlag(email, row = null) {
+ const flags = duplicateFlagsForEmail(email, row);
+ return `<span class="email-flag-line"><span>${esc(email || '?')}</span>${duplicateFlagBadge(flags)}</span>`;
+}
+function duplicateWarningBox(flags) {
+ if (!flags?.has_warning) return '';
+ const network = flags.matched_networks?.length ? `<br>Matched network hint${flags.matched_networks.length===1?'':'s'}: ${esc(flags.matched_networks.join(', '))}` : '';
+ return `<div class="dup-warning"><strong>${esc(flags.label || 'Duplicate warning')}</strong>${flags.reason ? `<br>${esc(flags.reason)}` : ''}${network}</div>`;
 }
 function subscriptionBadges(u) {
  const badges = [];
