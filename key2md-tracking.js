@@ -23,6 +23,7 @@
  }
 
  var FUNNEL_KEY = 'key2md_funnel_v1';
+ var FUNNEL_ENDPOINT = 'https://key2md-api.brittainmbbs.workers.dev/api/funnel-event';
 
  function cleanParams(params) {
  var out = {};
@@ -37,9 +38,11 @@
  function readFunnel() {
  try {
  var raw = localStorage.getItem(FUNNEL_KEY);
- return raw ? JSON.parse(raw) : { first_seen: new Date().toISOString(), events: [], milestones: {} };
+ var parsed = raw ? JSON.parse(raw) : { first_seen: new Date().toISOString(), events: [], milestones: {} };
+ if (!parsed.funnel_id) parsed.funnel_id = 'fn_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+ return parsed;
  } catch (e) {
- return { first_seen: new Date().toISOString(), events: [], milestones: {} };
+ return { funnel_id: 'fn_' + Math.random().toString(36).slice(2) + Date.now().toString(36), first_seen: new Date().toISOString(), events: [], milestones: {} };
  }
  }
 
@@ -64,6 +67,31 @@
  data.last_seen = event.at;
  writeFunnel(data);
  track('k2_funnel_stage', Object.assign({ event_category: 'funnel', event_label: event.stage }, cleanParams(params || {})));
+ sendServerFunnel(data.funnel_id, event, params || {});
+ }
+
+ function sendServerFunnel(funnelId, event, params) {
+ try {
+ var payload = Object.assign({
+ funnel_id: funnelId,
+ stage: event.stage,
+ path: event.path,
+ title: event.title,
+ at: event.at
+ }, cleanParams(params || {}));
+ var json = JSON.stringify(payload);
+ if (navigator.sendBeacon) {
+ var blob = new Blob([json], { type: 'application/json' });
+ navigator.sendBeacon(FUNNEL_ENDPOINT, blob);
+ return;
+ }
+ fetch(FUNNEL_ENDPOINT, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: json,
+ keepalive: true
+ }).catch(function () {});
+ } catch (e) {}
  }
 
  function textLabel(target) {

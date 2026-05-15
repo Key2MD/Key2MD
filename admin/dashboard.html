@@ -323,6 +323,26 @@
 .warm-rewrite{border-left:3px solid var(--green);background:rgba(34,197,94,0.08);padding:10px 12px;border-radius:10px;color:var(--text);font-size:0.78rem;line-height:1.55;}
 .warm-detail-grid{display:grid;grid-template-columns:minmax(280px,0.62fr) minmax(420px,1.38fr);gap:14px;}
 @media(max-width:900px){.warm-detail-grid{grid-template-columns:1fr;}}
+.growth-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px;}
+.growth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.growth-card-title{font-size:0.76rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.growth-card-value{font-size:1.75rem;font-weight:900;color:var(--text);letter-spacing:-0.04em;overflow-wrap:anywhere;}
+.growth-card-sub{font-size:0.74rem;color:var(--muted);line-height:1.45;margin-top:4px;}
+.pipeline-board{display:grid;grid-template-columns:repeat(5,minmax(220px,1fr));gap:12px;align-items:start;overflow-x:auto;padding-bottom:8px;}
+.pipeline-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);min-height:180px;}
+.pipeline-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-bottom:1px solid var(--border);font-size:0.76rem;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);}
+.pipeline-body{display:flex;flex-direction:column;gap:8px;padding:10px;max-height:620px;overflow:auto;}
+.pipeline-card{border:1px solid var(--border);background:var(--surface2);border-radius:10px;padding:10px;cursor:pointer;}
+.pipeline-card:hover{border-color:var(--blue-border);}
+.pipeline-card-main{font-size:0.8rem;font-weight:850;color:var(--text);word-break:break-word;}
+.pipeline-card-sub{font-size:0.68rem;color:var(--muted);line-height:1.45;margin-top:4px;}
+.timeline-list{display:flex;flex-direction:column;gap:10px;}
+.timeline-item{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:11px 12px;border:1px solid var(--border);background:var(--surface);border-radius:10px;}
+.timeline-type{font-size:0.66rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);}
+.timeline-title{font-size:0.84rem;font-weight:850;color:var(--text);}
+.timeline-detail{font-size:0.74rem;color:var(--muted);line-height:1.5;margin-top:3px;}
+@media(max-width:1100px){.growth-grid{grid-template-columns:1fr 1fr}.pipeline-board{grid-template-columns:repeat(3,minmax(220px,1fr));}}
+@media(max-width:760px){.growth-grid{grid-template-columns:1fr}.timeline-item{grid-template-columns:1fr}.pipeline-board{grid-template-columns:1fr;overflow:visible;}}
 .template-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
 
  /* == CONTROLS == */
@@ -541,8 +561,17 @@
  <button class="nav-item" data-page="mocks" onclick="nav('mocks')"><span class="icon">M</span> Mock Exams <span class="nav-badge" id="mockBadge">0</span></button>
  <button class="nav-item" data-page="users" onclick="nav('users')"><span class="icon"></span> Users</button>
  <button class="nav-item" data-page="warmleads" onclick="nav('warmleads')"><span class="icon">$</span> Warm Leads <span class="nav-badge" id="warmLeadBadge">0</span></button>
+ <button class="nav-item" data-page="pipeline" onclick="nav('pipeline')"><span class="icon">P</span> Pipeline</button>
+ <button class="nav-item" data-page="timeline" onclick="nav('timeline')"><span class="icon">T</span> Timeline</button>
  <button class="nav-item" data-page="sharing" onclick="nav('sharing')"><span class="icon">ID</span> Sharing Watchlist <span class="nav-badge" id="sharingBadge">0</span></button>
  <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')"><span class="icon"></span> Enquiries <span class="nav-badge" id="enqBadge">0</span></button>
+
+ <div class="sidebar-section">Growth</div>
+ <button class="nav-item" data-page="actions" onclick="nav('actions')"><span class="icon">!</span> Next Actions</button>
+ <button class="nav-item" data-page="outreach" onclick="nav('outreach')"><span class="icon">ROI</span> Outreach ROI</button>
+ <button class="nav-item" data-page="funnel" onclick="nav('funnel')"><span class="icon">F</span> Product Funnel</button>
+ <button class="nav-item" data-page="abandoned" onclick="nav('abandoned')"><span class="icon">A</span> Abandoned</button>
+ <button class="nav-item" data-page="retention" onclick="nav('retention')"><span class="icon">R</span> Retention</button>
 
  <div class="sidebar-section">Finance</div>
  <button class="nav-item" data-page="revenue" onclick="nav('revenue')"><span class="icon"></span> Revenue</button>
@@ -836,6 +865,205 @@
  <th style="width:26px;"></th><th>Lead</th><th>Student</th><th>Recommendation</th><th>Practice signal</th><th>Why warm</th><th>Outreach</th><th>Last active</th><th>Actions</th>
  </tr></thead><tbody id="warmBody"></tbody></table></div>
  <div class="empty hidden" id="warmEmpty">No warm leads match this filter yet.</div>
+ </div>
+ </div>
+
+ <!-- -- LEAD PIPELINE -- -->
+ <div id="pagePipeline" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Lead Pipeline</div>
+ <div class="page-sub">A board view of students from first signal through warm lead, abandoned checkout, paid, and retention risk.</div>
+ </div>
+ <div class="page-actions">
+ <span class="refresh-note" id="pipelineUpdated">Not refreshed yet</span>
+ <button class="btn blue" onclick="loadPipeline()">Refresh</button>
+ </div>
+ </div>
+ <div class="growth-grid">
+ <div class="growth-card"><div class="growth-card-title">Open Leads</div><div class="growth-card-value" id="pipelineOpen">-</div><div class="growth-card-sub">not yet paid or retained</div></div>
+ <div class="growth-card"><div class="growth-card-title">Hot / Warm</div><div class="growth-card-value" id="pipelineWarm">-</div><div class="growth-card-sub">active signals worth action</div></div>
+ <div class="growth-card"><div class="growth-card-title">At Risk</div><div class="growth-card-value" id="pipelineRisk">-</div><div class="growth-card-sub">paid students needing attention</div></div>
+ </div>
+ <div class="pipeline-board" id="pipelineBoard"></div>
+ </div>
+
+ <!-- -- STUDENT TIMELINE -- -->
+ <div id="pageTimeline" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Student Timeline</div>
+ <div class="page-sub">One student view across account, reviews, payments, enquiries, outreach, abandoned checkout, and funnel events.</div>
+ </div>
+ </div>
+ <div class="controls">
+ <input class="ctrl-in" id="timelineSearch" type="text" placeholder=" Search by email or user ID..." onkeydown="if(event.key==='Enter') loadStudentTimeline()">
+ <button class="btn blue" onclick="loadStudentTimeline()">Load Timeline</button>
+ </div>
+ <div class="growth-grid">
+ <div class="growth-card"><div class="growth-card-title">Student</div><div class="growth-card-value" id="timelineStudent">-</div><div class="growth-card-sub" id="timelineStudentSub">Enter an email to load.</div></div>
+ <div class="growth-card"><div class="growth-card-title">Spend</div><div class="growth-card-value" id="timelineSpend">-</div><div class="growth-card-sub" id="timelineSpendSub">completed payments</div></div>
+ <div class="growth-card"><div class="growth-card-title">Events</div><div class="growth-card-value" id="timelineEvents">-</div><div class="growth-card-sub">last 365 days</div></div>
+ </div>
+ <div class="tbl-wrap">
+ <div class="tbl-toolbar"><span class="tbl-status" id="timelineStatus">Enter a student email to see their timeline.</span></div>
+ <div class="timeline-list" id="timelineBody" style="padding:14px;"></div>
+ </div>
+ </div>
+
+ <!-- -- NEXT ACTIONS -- -->
+ <div id="pageActions" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Next Best Actions</div>
+ <div class="page-sub">A prioritised operating queue across abandoned checkouts, warm leads, churn risk, enquiries, and active paid students.</div>
+ </div>
+ <div class="page-actions">
+ <span class="refresh-note" id="actionsUpdated">Not refreshed yet</span>
+ <button class="btn blue" onclick="loadNextActions()">Refresh</button>
+ </div>
+ </div>
+ <div class="growth-grid">
+ <div class="growth-card"><div class="growth-card-title">Actions</div><div class="growth-card-value" id="actionTotal">-</div><div class="growth-card-sub">ranked by urgency and value</div></div>
+ <div class="growth-card"><div class="growth-card-title">High Priority</div><div class="growth-card-value" id="actionHigh">-</div><div class="growth-card-sub">score 75+</div></div>
+ <div class="growth-card"><div class="growth-card-title">Potential Revenue</div><div class="growth-card-value" id="actionValue">-</div><div class="growth-card-sub">from abandoned checkout rows</div></div>
+ </div>
+ <div class="tbl-wrap">
+ <div class="tbl-toolbar"><span class="tbl-status" id="actionsStatus">-</span></div>
+ <div class="tbl-scroller"><table style="min-width:980px;"><thead><tr>
+ <th>Priority</th><th>Student</th><th>Action</th><th>Reason</th><th>When</th><th>Commands</th>
+ </tr></thead><tbody id="actionsBody"></tbody></table></div>
+ <div class="empty hidden" id="actionsEmpty">No urgent actions right now.</div>
+ </div>
+ </div>
+
+ <!-- -- OUTREACH ROI -- -->
+ <div id="pageOutreach" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Outreach ROI</div>
+ <div class="page-sub">Tracks who buys after tutor emails, broadcasts, and warm-lead notes inside 7-day and 30-day windows.</div>
+ </div>
+ <div class="page-actions">
+ <span class="refresh-note" id="outreachUpdated">Not refreshed yet</span>
+ <button class="btn blue" onclick="loadOutreachRoi()">Refresh</button>
+ </div>
+ </div>
+ <div class="controls">
+ <select class="ctrl-sel" id="outreachDays" onchange="loadOutreachRoi()">
+ <option value="30">30 days</option>
+ <option value="90" selected>90 days</option>
+ <option value="180">180 days</option>
+ <option value="365">365 days</option>
+ </select>
+ </div>
+ <div class="growth-grid">
+ <div class="growth-card"><div class="growth-card-title">Sent</div><div class="growth-card-value" id="outreachSent">-</div><div class="growth-card-sub">tracked outreach emails</div></div>
+ <div class="growth-card"><div class="growth-card-title">7-Day Revenue</div><div class="growth-card-value" id="outreachRev7">-</div><div class="growth-card-sub" id="outreachBuyers7">buyers within a week</div></div>
+ <div class="growth-card"><div class="growth-card-title">30-Day Revenue</div><div class="growth-card-value" id="outreachRev30">-</div><div class="growth-card-sub" id="outreachBuyers30">buyers within 30 days</div></div>
+ </div>
+ <div class="tbl-wrap" style="margin-bottom:16px;">
+ <div class="tbl-toolbar"><span class="tbl-status" id="outreachCampaignStatus">Campaign performance</span></div>
+ <div class="tbl-scroller"><table style="min-width:980px;"><thead><tr>
+ <th>Campaign</th><th>Sent</th><th>7-Day Buyers</th><th>7-Day Revenue</th><th>30-Day Buyers</th><th>30-Day Revenue</th><th>Last Sent</th>
+ </tr></thead><tbody id="outreachCampaignBody"></tbody></table></div>
+ </div>
+ <div class="tbl-wrap">
+ <div class="tbl-toolbar"><span class="tbl-status" id="outreachSendStatus">Recent tracked sends</span></div>
+ <div class="tbl-scroller"><table style="min-width:1040px;"><thead><tr>
+ <th>Sent</th><th>Student</th><th>Campaign</th><th>Subject</th><th>7-Day Result</th><th>30-Day Result</th><th>Commands</th>
+ </tr></thead><tbody id="outreachSendBody"></tbody></table></div>
+ </div>
+ </div>
+
+ <!-- -- PRODUCT FUNNEL -- -->
+ <div id="pageFunnel" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Product Funnel</div>
+ <div class="page-sub">Server-side funnel events by product, including product-page views, pricing clicks, checkout starts, and purchases.</div>
+ </div>
+ <div class="page-actions">
+ <span class="refresh-note" id="funnelUpdated">Not refreshed yet</span>
+ <button class="btn blue" onclick="loadProductFunnel()">Refresh</button>
+ </div>
+ </div>
+ <div class="controls">
+ <select class="ctrl-sel" id="funnelDays" onchange="loadProductFunnel()">
+ <option value="7">7 days</option>
+ <option value="30" selected>30 days</option>
+ <option value="90">90 days</option>
+ </select>
+ </div>
+ <div class="growth-grid">
+ <div class="growth-card"><div class="growth-card-title">Product Views</div><div class="growth-card-value" id="funnelViews">-</div><div class="growth-card-sub">tracked server events</div></div>
+ <div class="growth-card"><div class="growth-card-title">Checkout Starts</div><div class="growth-card-value" id="funnelCheckouts">-</div><div class="growth-card-sub">pricing intent</div></div>
+ <div class="growth-card"><div class="growth-card-title">Purchases</div><div class="growth-card-value" id="funnelPurchases">-</div><div class="growth-card-sub">completed payments</div></div>
+ </div>
+ <div class="tbl-wrap">
+ <div class="tbl-toolbar"><span class="tbl-status" id="funnelStatus">-</span></div>
+ <div class="tbl-scroller"><table style="min-width:980px;"><thead><tr>
+ <th>Product</th><th>Views</th><th>Pricing Clicks</th><th>Checkout Starts</th><th>Purchases</th><th>View -> Checkout</th><th>Checkout -> Paid</th><th>Revenue</th>
+ </tr></thead><tbody id="funnelBody"></tbody></table></div>
+ </div>
+ </div>
+
+ <!-- -- ABANDONED CHECKOUTS -- -->
+ <div id="pageAbandoned" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Abandoned Checkout Center</div>
+ <div class="page-sub">Expired Stripe checkout sessions with product, amount, follow-up status, and quick student actions.</div>
+ </div>
+ <div class="page-actions">
+ <span class="refresh-note" id="abandonedUpdated">Not refreshed yet</span>
+ <button class="btn blue" onclick="loadAbandonedCheckouts()">Refresh</button>
+ </div>
+ </div>
+ <div class="controls">
+ <select class="ctrl-sel" id="abandonedDays" onchange="loadAbandonedCheckouts()">
+ <option value="7">7 days</option>
+ <option value="30" selected>30 days</option>
+ <option value="90">90 days</option>
+ </select>
+ </div>
+ <div class="growth-grid">
+ <div class="growth-card"><div class="growth-card-title">Open</div><div class="growth-card-value" id="abandonedOpen">-</div><div class="growth-card-sub">not recovered yet</div></div>
+ <div class="growth-card"><div class="growth-card-title">Recovered</div><div class="growth-card-value" id="abandonedRecovered">-</div><div class="growth-card-sub">later paid</div></div>
+ <div class="growth-card"><div class="growth-card-title">Open Value</div><div class="growth-card-value" id="abandonedValue">-</div><div class="growth-card-sub">estimated checkout value</div></div>
+ </div>
+ <div class="tbl-wrap">
+ <div class="tbl-toolbar"><span class="tbl-status" id="abandonedStatus">-</span></div>
+ <div class="tbl-scroller"><table style="min-width:1080px;"><thead><tr>
+ <th>Expired</th><th>Student</th><th>Product</th><th>Amount</th><th>Status</th><th>Follow-Up</th><th>Commands</th>
+ </tr></thead><tbody id="abandonedBody"></tbody></table></div>
+ <div class="empty hidden" id="abandonedEmpty">No abandoned checkout rows in this window.</div>
+ </div>
+ </div>
+
+ <!-- -- RETENTION RISK -- -->
+ <div id="pageRetention" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Retention Risk</div>
+ <div class="page-sub">Paid students and subscribers whose usage pattern suggests they may need a useful nudge or support email.</div>
+ </div>
+ <div class="page-actions">
+ <span class="refresh-note" id="retentionUpdated">Not refreshed yet</span>
+ <button class="btn blue" onclick="loadRetentionRisk()">Refresh</button>
+ </div>
+ </div>
+ <div class="growth-grid">
+ <div class="growth-card"><div class="growth-card-title">At Risk</div><div class="growth-card-value" id="retentionRisk">-</div><div class="growth-card-sub">score 50+</div></div>
+ <div class="growth-card"><div class="growth-card-title">High Risk</div><div class="growth-card-value" id="retentionHigh">-</div><div class="growth-card-sub">score 75+</div></div>
+ <div class="growth-card"><div class="growth-card-title">Paid Value</div><div class="growth-card-value" id="retentionValue">-</div><div class="growth-card-sub">historical spend represented</div></div>
+ </div>
+ <div class="tbl-wrap">
+ <div class="tbl-toolbar"><span class="tbl-status" id="retentionStatus">-</span></div>
+ <div class="tbl-scroller"><table style="min-width:1040px;"><thead><tr>
+ <th>Risk</th><th>Student</th><th>Product</th><th>Spend</th><th>Last Activity</th><th>Reasons</th><th>Commands</th>
+ </tr></thead><tbody id="retentionBody"></tbody></table></div>
+ <div class="empty hidden" id="retentionEmpty">No paid students look at-risk right now.</div>
  </div>
  </div>
 
@@ -1639,6 +1867,7 @@ const WARM_OUTREACH_LOCAL_KEY = 'k2md_warm_outreach_local_v1';
 const S = {
  token: null,
  reviews: [], s2Reviews: [], users: [], warmLeads: [], sharingWatchlist: [], enquiries: [], subscribers: [],
+ pipeline: null, outreachRoi: null, abandonedCheckouts: null, studentTimeline: null, nextActions: [], productFunnel: null, retentionRisks: [],
  conversations: [], filteredConvs: [],
  mmiReviews: [], mockAttempts: [], mockManualReviews: [], revenue: [], payers: [], payersFromServer: false, revenueSummary: null, monitoring: null,
  casperClass: null,
@@ -1744,7 +1973,7 @@ async function api(path, opts={}) {
 // ======================================================
 // NAVIGATION
 // ======================================================
-const ADMIN_PAGES = new Set(['dashboard','reviews','s2','mmi','mocks','users','warmleads','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','subscribers']);
+const ADMIN_PAGES = new Set(['dashboard','reviews','s2','mmi','mocks','users','warmleads','pipeline','timeline','actions','outreach','funnel','abandoned','retention','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','subscribers']);
 
 function normalisePage(page) {
  const key = String(page || 'dashboard').replace(/^#/, '').trim().toLowerCase();
@@ -1792,6 +2021,12 @@ function nav(page, opts={}) {
  if (target==='enquiries' && !S.enquiries.length) loadEnquiries();
  if (target==='users' && !S.users.length) loadUsers();
  if (target==='warmleads' && !S.warmLeads.length) loadWarmLeads();
+ if (target==='pipeline' && !S.pipeline) loadPipeline();
+ if (target==='actions' && !S.nextActions.length) loadNextActions();
+ if (target==='outreach' && !S.outreachRoi) loadOutreachRoi();
+ if (target==='funnel' && !S.productFunnel) loadProductFunnel();
+ if (target==='abandoned' && !S.abandonedCheckouts) loadAbandonedCheckouts();
+ if (target==='retention' && !S.retentionRisks.length) loadRetentionRisk();
  if (target==='sharing' && !S.sharingWatchlist.length) loadSharingWatchlist();
  if (target==='broadcast') { updateBcStats(); if (!S.broadcastHistory.length) loadBroadcastHistory(); }
  if (target==='class') loadCasperClass();
@@ -1843,6 +2078,13 @@ function buildCommandItems() {
  {kind:'Page', title:'Dashboard', sub:'Owner priorities, revenue, workload, and activity', action:()=>nav('dashboard'), hint:'Open'},
  {kind:'Page', title:'Users', sub:'Search students, adjust credits, and change tiers', action:()=>nav('users'), hint:'Open'},
  {kind:'Page', title:'Warm Leads', sub:'Active non-subscribers with tailored outreach drafts', action:()=>nav('warmleads'), hint:'Open'},
+ {kind:'Page', title:'Lead Pipeline', sub:'Board view from first signal to paid or retention risk', action:()=>nav('pipeline'), hint:'Open'},
+ {kind:'Page', title:'Student Timeline', sub:'One-student history across reviews, payments, outreach, enquiries, and checkout', action:()=>nav('timeline'), hint:'Open'},
+ {kind:'Page', title:'Next Actions', sub:'Prioritised growth and student-success queue', action:()=>nav('actions'), hint:'Open'},
+ {kind:'Page', title:'Outreach ROI', sub:'Track who buys after tutor emails and broadcasts', action:()=>nav('outreach'), hint:'Open'},
+ {kind:'Page', title:'Product Funnel', sub:'Product views, pricing clicks, checkout starts, purchases, and revenue', action:()=>nav('funnel'), hint:'Open'},
+ {kind:'Page', title:'Abandoned Checkouts', sub:'Expired Stripe checkout sessions and recovery actions', action:()=>nav('abandoned'), hint:'Open'},
+ {kind:'Page', title:'Retention Risk', sub:'Paid students who may need a useful nudge', action:()=>nav('retention'), hint:'Open'},
  {kind:'Page', title:'Sharing Watchlist', sub:'Check possible account sharing by device, network, and region signals', action:()=>nav('sharing'), hint:'Open'},
  {kind:'Page', title:'S2 Essay Reviews', sub:'GAMSAT essays, band scores, evidence critique, and feedback', action:()=>nav('s2'), hint:'Open'},
  {kind:'Page', title:'Inbox', sub:'Student conversations and replies', action:()=>nav('inbox'), hint:'Open'},
@@ -1868,6 +2110,24 @@ function buildCommandItems() {
  keywords:[row.email,row.name,row.recommended_product,(row.reasons||[]).join(' '),row.outreach?.body].join(' '),
  action:()=>openWarmLeadEmail(row.id),
  hint:'Compose',
+ }));
+
+ S.nextActions.forEach(row => items.push({
+ kind:'Action',
+ title:row.email || row.title || 'Next action',
+ sub:`${row.priority || 0}/100 | ${row.title || row.suggested || 'Follow up'} | ${row.reason || ''}`,
+ keywords:[row.email,row.name,row.type,row.title,row.reason,row.suggested].join(' '),
+ action:()=>openTimelineForEmail(row.email || ''),
+ hint:'Timeline',
+ }));
+
+ (S.retentionRisks || []).forEach(row => items.push({
+ kind:'Retention',
+ title:row.email || row.name || 'Retention risk',
+ sub:`${row.risk_score || 0}/100 | ${(row.reasons || []).slice(0,2).join(' | ')}`,
+ keywords:[row.email,row.name,row.risk_level,(row.reasons||[]).join(' ')].join(' '),
+ action:()=>openTimelineForEmail(row.email || ''),
+ hint:'Timeline',
  }));
 
  S.sharingWatchlist.forEach(row => items.push({
@@ -3533,6 +3793,397 @@ async function openWarmLeadReport(id) {
 }
 
 // ======================================================
+// GROWTH OPERATIONS
+// ======================================================
+function fmtGrowthMoney(value) {
+ const n = Number(value || 0);
+ if (!Number.isFinite(n)) return '$0';
+ const rounded = Math.round(n * 100) / 100;
+ return `$${rounded.toLocaleString('en-AU', { minimumFractionDigits: rounded % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
+}
+
+function fmtGrowthPct(value) {
+ const n = Number(value || 0);
+ if (!Number.isFinite(n)) return '0%';
+ return `${n.toFixed(n % 1 ? 1 : 0)}%`;
+}
+
+function growthProductName(value) {
+ const key = String(value || '').toLowerCase();
+ if (key.includes('class')) return 'CASPer class';
+ if (key.includes('mock')) return 'Full CASPer mock';
+ if (key.includes('casper')) return 'CASPer Pro';
+ if (key.includes('gamsat') || key.includes('s2')) return 'GAMSAT S2';
+ if (key.includes('mmi')) return 'MMI';
+ return value ? String(value).replace(/_/g, ' ') : 'General';
+}
+
+function growthStageLabel(id) {
+ const labels = {
+ new_enquiry: 'New enquiry',
+ warm_lead: 'Warm lead',
+ emailed: 'Emailed',
+ follow_up_due: 'Follow-up due',
+ bought: 'Bought',
+ cold: 'Cold',
+ };
+ return labels[id] || String(id || '').replace(/_/g, ' ');
+}
+
+function growthScoreBadge(score) {
+ const n = Number(score || 0);
+ const level = n >= 75 ? 'high' : n >= 50 ? 'medium' : n >= 30 ? 'watch' : 'low';
+ return `<span class="risk-pill ${level}">${n}</span>`;
+}
+
+function growthCommandButtons(email, opts = {}) {
+ const clean = String(email || '').trim();
+ if (!clean) return '<span style="color:var(--muted2);font-size:0.72rem;">No email</span>';
+ const subject = opts.subject || '';
+ const body = opts.body || '';
+ return `<div class="action-mini-row">
+ <button class="btn blue" onclick='event.stopPropagation();openTimelineForEmail(${jsArg(clean)})'>Timeline</button>
+ <button class="btn" onclick='event.stopPropagation();viewUserByEmail(${jsArg(clean)})'>User</button>
+ <button class="btn green" onclick='event.stopPropagation();composeToUser(${jsArg(clean)},${jsArg(subject)},${jsArg(body)})'>Email</button>
+ </div>`;
+}
+
+function updateGrowthStamp(id) {
+ const el = document.getElementById(id);
+ if (el) el.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
+}
+
+async function loadPipeline() {
+ setText('pipelineOpen', '-');
+ const board = document.getElementById('pipelineBoard');
+ if (board) board.innerHTML = '<div class="empty">Loading pipeline...</div>';
+ try {
+ const res = await api('/admin/pipeline');
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Could not load pipeline');
+ S.pipeline = data;
+ updateGrowthStamp('pipelineUpdated');
+ renderPipeline();
+ if (!S.retentionRisks.length) loadRetentionRisk({ silent: true });
+ } catch(e) {
+ if (board) board.innerHTML = `<div class="empty" style="color:var(--red);">${esc(e.message)}</div>`;
+ }
+}
+
+function renderPipeline() {
+ const data = S.pipeline || {};
+ const stages = data.stages || [];
+ const rows = data.rows || [];
+ const open = rows.filter(row => !['bought','cold'].includes(row.stage)).length;
+ const warm = rows.filter(row => ['warm_lead','follow_up_due'].includes(row.stage)).length;
+ const risk = S.retentionRisks?.length ? S.retentionRisks.length : '-';
+ setText('pipelineOpen', open || '-');
+ setText('pipelineWarm', warm || '-');
+ setText('pipelineRisk', risk);
+ const board = document.getElementById('pipelineBoard');
+ if (!board) return;
+ if (!stages.length) {
+ board.innerHTML = '<div class="empty">No pipeline rows yet.</div>';
+ return;
+ }
+ board.innerHTML = stages.map(stage => `
+ <div class="pipeline-col">
+ <div class="pipeline-hd"><span>${esc(stage.label || growthStageLabel(stage.id))}</span><span>${Number(stage.count || 0)}</span></div>
+ <div class="pipeline-body">
+ ${(stage.rows || []).length ? (stage.rows || []).map(row => `
+ <div class="pipeline-card" onclick='openTimelineForEmail(${jsArg(row.email || '')})'>
+ <div class="pipeline-card-main">${emailWithDuplicateFlag(row.email || 'Unknown', row)}</div>
+ <div class="pipeline-card-sub">${esc(row.name || '-')} | ${growthProductName(row.product_hint || row.enquiry_type || '')}</div>
+ <div class="pipeline-card-sub">${esc(row.suggested || '')}</div>
+ <div class="pipeline-card-sub">Last: ${relTime(row.last_activity_at)}</div>
+ ${growthCommandButtons(row.email, {
+ subject: row.stage === 'follow_up_due' ? 'Quick follow-up from Key2MD' : '',
+ body: row.stage === 'follow_up_due' ? 'Hi, just wanted to check whether this was still useful for your prep.' : ''
+ })}
+ </div>`).join('') : '<div class="pipeline-card-sub" style="padding:4px;">No rows in this stage.</div>'}
+ </div>
+ </div>`).join('');
+}
+
+async function loadNextActions() {
+ setText('actionsStatus', 'Loading next actions...');
+ try {
+ const res = await api('/admin/actions');
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Could not load actions');
+ S.nextActions = data.rows || [];
+ updateGrowthStamp('actionsUpdated');
+ renderNextActions();
+ } catch(e) {
+ setText('actionsStatus', e.message);
+ const tbody = document.getElementById('actionsBody');
+ if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="color:var(--red);">${esc(e.message)}</td></tr>`;
+ }
+}
+
+function renderNextActions() {
+ const rows = S.nextActions || [];
+ const high = rows.filter(row => Number(row.priority || 0) >= 75).length;
+ const value = rows.reduce((sum, row) => sum + Number(row.amount_aud || row.open_value_aud || 0), 0);
+ setText('actionTotal', rows.length || '-');
+ setText('actionHigh', high || '-');
+ setText('actionValue', value ? fmtGrowthMoney(value) : '-');
+ setText('actionsStatus', `${rows.length} recommended action${rows.length === 1 ? '' : 's'}`);
+ document.getElementById('actionsEmpty')?.classList.toggle('hidden', rows.length > 0);
+ const tbody = document.getElementById('actionsBody');
+ if (!tbody) return;
+ tbody.innerHTML = rows.map(row => `
+ <tr>
+ <td>${growthScoreBadge(row.priority)}</td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(row.email || 'Unknown', row)}</div><div class="cell-sub">${esc(row.name || '-')}</div></td>
+ <td><div class="cell-main">${esc(row.title || row.suggested || '-')}</div><div class="cell-sub">${esc(String(row.type || '').replace(/_/g, ' '))}</div></td>
+ <td><div class="trunc">${esc(row.reason || '-')}</div></td>
+ <td>${row.created_at || row.expired_at || row.last_activity_at ? relTime(row.created_at || row.expired_at || row.last_activity_at) : '-'}</td>
+ <td>${growthCommandButtons(row.email, {
+ subject: row.title || 'Quick Key2MD follow-up',
+ body: row.suggested || ''
+ })}</td>
+ </tr>`).join('');
+}
+
+async function loadOutreachRoi() {
+ const days = document.getElementById('outreachDays')?.value || '90';
+ setText('outreachCampaignStatus', 'Loading outreach attribution...');
+ try {
+ const res = await api(`/admin/outreach/roi?days=${encodeURIComponent(days)}`);
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Could not load outreach ROI');
+ S.outreachRoi = data;
+ updateGrowthStamp('outreachUpdated');
+ renderOutreachRoi();
+ } catch(e) {
+ setText('outreachCampaignStatus', e.message);
+ }
+}
+
+function renderOutreachRoi() {
+ const data = S.outreachRoi || {};
+ const summary = data.summary || {};
+ const campaigns = data.campaigns || [];
+ const sends = data.sends || [];
+ setText('outreachSent', summary.sends || '-');
+ setText('outreachRev7', fmtGrowthMoney(summary.revenue_7 || 0));
+ setText('outreachRev30', fmtGrowthMoney(summary.revenue_30 || 0));
+ setText('outreachBuyers7', `${summary.buyers_7 || 0} buyer${summary.buyers_7 === 1 ? '' : 's'} within a week`);
+ setText('outreachBuyers30', `${summary.buyers_30 || 0} buyer${summary.buyers_30 === 1 ? '' : 's'} within 30 days`);
+ setText('outreachCampaignStatus', `${campaigns.length} campaign${campaigns.length === 1 ? '' : 's'} attributed`);
+ setText('outreachSendStatus', `${sends.length} tracked send${sends.length === 1 ? '' : 's'}`);
+ const campaignBody = document.getElementById('outreachCampaignBody');
+ if (campaignBody) campaignBody.innerHTML = campaigns.length ? campaigns.map(c => `
+ <tr>
+ <td><div class="cell-main">${esc(c.subject || c.campaign_type || '-')}</div><div class="cell-sub">${esc(c.campaign_type || '-')} | ${growthProductName(c.target_product)}</div></td>
+ <td>${Number(c.sent_count || 0)}<div class="cell-sub">${Number(c.unique_recipients || 0)} recipients</div></td>
+ <td>${Number(c.buyers_7 || 0)}<div class="cell-sub">${fmtGrowthPct(c.conversion_7)} conversion</div></td>
+ <td><strong>${fmtGrowthMoney(c.revenue_7 || 0)}</strong></td>
+ <td>${Number(c.buyers_30 || 0)}<div class="cell-sub">${fmtGrowthPct(c.conversion_30)} conversion</div></td>
+ <td><strong>${fmtGrowthMoney(c.revenue_30 || 0)}</strong></td>
+ <td>${relTime(c.last_sent_at)}</td>
+ </tr>`).join('') : '<tr><td colspan="7" style="color:var(--muted2);">No tracked outreach in this window.</td></tr>';
+ const sendBody = document.getElementById('outreachSendBody');
+ if (sendBody) sendBody.innerHTML = sends.length ? sends.map(send => `
+ <tr>
+ <td>${relTime(send.sent_at)}</td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(send.recipient_email || 'Unknown', send)}</div><div class="cell-sub">${esc(send.recipient_name || '-')}</div></td>
+ <td><div class="cell-main">${esc(send.campaign_type || '-')}</div><div class="cell-sub">${growthProductName(send.target_product)}</div></td>
+ <td><div class="trunc">${esc(send.subject || '-')}</div></td>
+ <td>${Number(send.buyers_7 || 0)} buyer${Number(send.buyers_7 || 0) === 1 ? '' : 's'}<div class="cell-sub">${fmtGrowthMoney(send.revenue_7 || 0)}</div></td>
+ <td>${Number(send.buyers_30 || 0)} buyer${Number(send.buyers_30 || 0) === 1 ? '' : 's'}<div class="cell-sub">${fmtGrowthMoney(send.revenue_30 || 0)}</div></td>
+ <td>${growthCommandButtons(send.recipient_email, { subject: send.subject || '', body: '' })}</td>
+ </tr>`).join('') : '<tr><td colspan="7" style="color:var(--muted2);">No recent tracked sends.</td></tr>';
+}
+
+async function loadProductFunnel() {
+ const days = document.getElementById('funnelDays')?.value || '30';
+ setText('funnelStatus', 'Loading product funnel...');
+ try {
+ const res = await api(`/admin/funnel?days=${encodeURIComponent(days)}`);
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Could not load product funnel');
+ S.productFunnel = data;
+ updateGrowthStamp('funnelUpdated');
+ renderProductFunnel();
+ } catch(e) {
+ setText('funnelStatus', e.message);
+ }
+}
+
+function renderProductFunnel() {
+ const rows = S.productFunnel?.rows || [];
+ const views = rows.reduce((s, r) => s + Number(r.page_views || 0), 0);
+ const checkouts = rows.reduce((s, r) => s + Number(r.checkout_starts || 0), 0);
+ const purchases = rows.reduce((s, r) => s + Number(r.purchases || 0), 0);
+ setText('funnelViews', views || '-');
+ setText('funnelCheckouts', checkouts || '-');
+ setText('funnelPurchases', purchases || '-');
+ setText('funnelStatus', `${rows.length} product funnel${rows.length === 1 ? '' : 's'}`);
+ const tbody = document.getElementById('funnelBody');
+ if (!tbody) return;
+ tbody.innerHTML = rows.length ? rows.map(row => {
+ const viewCheckout = Number(row.page_views || 0) ? (Number(row.checkout_starts || 0) / Number(row.page_views || 0)) * 100 : 0;
+ const checkoutPaid = Number(row.checkout_starts || 0) ? (Number(row.purchases || 0) / Number(row.checkout_starts || 0)) * 100 : 0;
+ return `<tr>
+ <td><div class="cell-main">${esc(row.product_label || growthProductName(row.product))}</div><div class="cell-sub">${esc(row.product || 'general')}</div></td>
+ <td>${Number(row.page_views || 0)}</td>
+ <td>${Number(row.intents || 0)}</td>
+ <td>${Number(row.checkout_starts || 0)}</td>
+ <td>${Number(row.purchases || 0)}</td>
+ <td>${fmtGrowthPct(viewCheckout)}</td>
+ <td>${fmtGrowthPct(checkoutPaid)}</td>
+ <td><strong>${fmtGrowthMoney(row.revenue_aud || 0)}</strong></td>
+ </tr>`;
+ }).join('') : '<tr><td colspan="8" style="color:var(--muted2);">No server-side funnel events yet. New tracked visits will appear after deployment.</td></tr>';
+}
+
+async function loadAbandonedCheckouts() {
+ const days = document.getElementById('abandonedDays')?.value || '30';
+ setText('abandonedStatus', 'Loading abandoned checkouts...');
+ try {
+ const res = await api(`/admin/abandoned-checkouts?days=${encodeURIComponent(days)}`);
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Could not load abandoned checkouts');
+ S.abandonedCheckouts = data;
+ updateGrowthStamp('abandonedUpdated');
+ renderAbandonedCheckouts();
+ } catch(e) {
+ setText('abandonedStatus', e.message);
+ const tbody = document.getElementById('abandonedBody');
+ if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="color:var(--red);">${esc(e.message)}</td></tr>`;
+ }
+}
+
+function renderAbandonedCheckouts() {
+ const rows = S.abandonedCheckouts?.rows || [];
+ const openRows = rows.filter(row => !row.recovered);
+ const recovered = rows.filter(row => row.recovered).length;
+ const openValue = openRows.reduce((s, row) => s + Number(row.amount_cents || 0) / 100, 0);
+ setText('abandonedOpen', openRows.length || '-');
+ setText('abandonedRecovered', recovered || '-');
+ setText('abandonedValue', openValue ? fmtGrowthMoney(openValue) : '-');
+ setText('abandonedStatus', `${rows.length} abandoned checkout${rows.length === 1 ? '' : 's'}`);
+ document.getElementById('abandonedEmpty')?.classList.toggle('hidden', rows.length > 0);
+ const tbody = document.getElementById('abandonedBody');
+ if (!tbody) return;
+ tbody.innerHTML = rows.map(row => `
+ <tr>
+ <td><div class="cell-main">${fmtDate(row.expired_at)?.date || '-'}</div><div class="cell-sub">${relTime(row.expired_at)}</div></td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(row.email || 'Unknown', row)}</div><div class="cell-sub">${esc(row.stripe_session_id || '')}</div></td>
+ <td>${esc(row.product_label || growthProductName(row.product))}</td>
+ <td><strong>${fmtGrowthMoney(Number(row.amount_cents || 0) / 100)}</strong><div class="cell-sub">${esc(String(row.currency || 'aud').toUpperCase())}</div></td>
+ <td>${row.recovered ? '<span class="badge badge-yes">Recovered</span>' : '<span class="badge badge-no">Open</span>'}<div class="cell-sub">${row.recovered_at ? relTime(row.recovered_at) : esc(row.reason || '')}</div></td>
+ <td>${Number(row.recovery_sent || 0) ? '<span class="badge badge-yes">Sent</span>' : '<span class="badge badge-no">Not sent</span>'}</td>
+ <td>${growthCommandButtons(row.email, {
+ subject: 'Quick note about your Key2MD checkout',
+ body: 'Hi, I saw your checkout did not finish. If anything broke or the product was not quite right, reply here and I can help.'
+ })}</td>
+ </tr>`).join('');
+}
+
+async function loadRetentionRisk(opts = {}) {
+ if (!opts.silent) setText('retentionStatus', 'Loading retention risk...');
+ try {
+ const res = await api('/admin/retention');
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Could not load retention risk');
+ S.retentionRisks = data.rows || [];
+ updateGrowthStamp('retentionUpdated');
+ renderRetentionRisk();
+ renderPipeline();
+ } catch(e) {
+ if (!opts.silent) setText('retentionStatus', e.message);
+ }
+}
+
+function renderRetentionRisk() {
+ const rows = S.retentionRisks || [];
+ const high = rows.filter(row => String(row.risk_level || '') === 'high' || Number(row.risk_score || 0) >= 75).length;
+ const value = rows.reduce((s, row) => s + Number(row.total_spend_aud || 0), 0);
+ setText('retentionRisk', rows.length || '-');
+ setText('retentionHigh', high || '-');
+ setText('retentionValue', value ? fmtGrowthMoney(value) : '-');
+ setText('retentionStatus', `${rows.length} retention risk row${rows.length === 1 ? '' : 's'}`);
+ document.getElementById('retentionEmpty')?.classList.toggle('hidden', rows.length > 0);
+ const tbody = document.getElementById('retentionBody');
+ if (!tbody) return;
+ tbody.innerHTML = rows.map(row => `
+ <tr>
+ <td>${growthScoreBadge(row.risk_score)}<div class="cell-sub">${esc(row.risk_level || 'watch')}</div></td>
+ <td><div class="cell-main">${emailWithDuplicateFlag(row.email || 'Unknown', row)}</div><div class="cell-sub">${esc(row.name || '-')}</div></td>
+ <td><div class="cell-main">${row.active_subscription ? 'Active subscription' : row.credits ? 'Unused credits' : 'Paid student'}</div><div class="cell-sub">${Number(row.credits || 0)} credit${Number(row.credits || 0) === 1 ? '' : 's'}</div></td>
+ <td><strong>${fmtGrowthMoney(row.total_spend_aud || 0)}</strong></td>
+ <td><div class="cell-main">${relTime(row.last_practice_at || row.last_payment_at)}</div><div class="cell-sub">paid ${relTime(row.last_payment_at)}</div></td>
+ <td><div class="reason-list">${(row.reasons || []).map(r => `<span class="reason-chip">${esc(r)}</span>`).join('')}</div></td>
+ <td>${growthCommandButtons(row.email, {
+ subject: 'Checking in on your Key2MD prep',
+ body: row.suggested || 'Hi, just checking whether you want a hand getting the most out of the practice you already have.'
+ })}</td>
+ </tr>`).join('');
+}
+
+function openTimelineForEmail(email) {
+ nav('timeline');
+ const input = document.getElementById('timelineSearch');
+ if (input) input.value = email || '';
+ if (email) loadStudentTimeline();
+}
+
+async function loadStudentTimeline() {
+ const raw = (document.getElementById('timelineSearch')?.value || '').trim();
+ if (!raw) {
+ setText('timelineStatus', 'Enter a student email or user ID.');
+ return;
+ }
+ const qs = raw.includes('@') ? `email=${encodeURIComponent(raw)}` : `user_id=${encodeURIComponent(raw)}`;
+ setText('timelineStatus', 'Loading student timeline...');
+ try {
+ const res = await api(`/admin/student-timeline?${qs}`);
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.error || 'Could not load timeline');
+ S.studentTimeline = data;
+ renderStudentTimeline();
+ } catch(e) {
+ setText('timelineStatus', e.message);
+ const body = document.getElementById('timelineBody');
+ if (body) body.innerHTML = `<div class="empty" style="color:var(--red);">${esc(e.message)}</div>`;
+ }
+}
+
+function renderStudentTimeline() {
+ const data = S.studentTimeline || {};
+ const user = data.user || {};
+ const events = data.events || [];
+ const spend = Number(user.total_spend_aud || 0);
+ setText('timelineStudent', user.email || 'Unknown');
+ setText('timelineStudentSub', user.name ? `${user.name} | ${user.tier || 'free'}` : (user.id || 'No account row found'));
+ setText('timelineSpend', spend ? fmtGrowthMoney(spend) : '-');
+ setText('timelineSpendSub', `${Number(user.payment_count || 0)} payment${Number(user.payment_count || 0) === 1 ? '' : 's'}`);
+ setText('timelineEvents', events.length || '-');
+ setText('timelineStatus', `${events.length} event${events.length === 1 ? '' : 's'} for ${user.email || document.getElementById('timelineSearch')?.value || 'student'}`);
+ const body = document.getElementById('timelineBody');
+ if (!body) return;
+ if (!events.length) {
+ body.innerHTML = '<div class="empty">No timeline events found for this student.</div>';
+ return;
+ }
+ body.innerHTML = events.map(event => `
+ <div class="timeline-item">
+ <div>
+ <div class="timeline-type">${esc(String(event.type || 'event').replace(/_/g, ' '))}</div>
+ <div class="cell-sub">${fmtDate(event.at)?.date || '-'}</div>
+ </div>
+ <div>
+ <div class="timeline-title">${esc(event.title || 'Event')}</div>
+ <div class="timeline-detail">${esc(event.detail || '')}</div>
+ <div class="cell-sub">${relTime(event.at)}</div>
+ </div>
+ </div>`).join('');
+}
+
+// ======================================================
 // ACCOUNT SHARING WATCHLIST
 // ======================================================
 async function loadSharingWatchlist() {
@@ -3629,8 +4280,8 @@ function renderSharingDetail(row, agents = []) {
  <div class="detail-box-row">This is a <strong>manual review signal</strong>, not proof of sharing.</div>
  <div class="detail-box-row">Good first step: check whether the pattern could be travel, mobile data, family devices, or a VPN.</div>
  <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
- <button class="btn blue" onclick="event.stopPropagation();openSharingUser(${jsArg(row.user_id || '')},${jsArg(row.email || '')})">Open user</button>
- <button class="btn" onclick="event.stopPropagation();composeToUser(${jsArg(row.email || '')})">Email student</button>
+ <button class="btn blue" onclick='event.stopPropagation();openSharingUser(${jsArg(row.user_id || '')},${jsArg(row.email || '')})'>Open user</button>
+ <button class="btn" onclick='event.stopPropagation();composeToUser(${jsArg(row.email || '')})'>Email student</button>
  <button class="btn red" onclick='event.stopPropagation();openDuplicateFlagModal(${jsArg(row.user_id || '')},${jsArg(row.email || '')})'>Restrict free use</button>
  </div>
  </div>
