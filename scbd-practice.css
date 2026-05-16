@@ -416,6 +416,77 @@ a { color: inherit; text-decoration: none; }
  text-align: center;
 }
 .step-chip.active { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+.phase-kicker {
+ display: inline-flex;
+ align-items: center;
+ margin-bottom: 9px;
+ border: 1px solid #bae6fd;
+ background: #f0f9ff;
+ color: #075985;
+ border-radius: 999px;
+ padding: 5px 10px;
+ font-size: 0.72rem;
+ font-weight: 900;
+ letter-spacing: 0.08em;
+ text-transform: uppercase;
+}
+.phase-stepper {
+ display: grid;
+ gap: 8px;
+}
+.phase-step {
+ display: grid;
+ grid-template-columns: 30px 1fr;
+ gap: 8px;
+ align-items: center;
+ width: 100%;
+ border: 1px solid var(--line);
+ border-radius: var(--radius);
+ background: #f8fafc;
+ color: var(--ink);
+ padding: 9px;
+ text-align: left;
+}
+.phase-step:disabled {
+ cursor: not-allowed;
+ opacity: 0.58;
+}
+.phase-step span {
+ grid-row: 1 / 3;
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ width: 28px;
+ height: 28px;
+ border-radius: 999px;
+ background: #e2e8f0;
+ color: #475569;
+ font-size: 0.8rem;
+ font-weight: 900;
+}
+.phase-step strong {
+ color: var(--navy);
+ font-size: 0.84rem;
+ line-height: 1.2;
+}
+.phase-step em {
+ color: var(--muted);
+ font-size: 0.68rem;
+ font-style: normal;
+ font-weight: 760;
+}
+.phase-step.active {
+ border-color: #7dd3fc;
+ background: #f0f9ff;
+}
+.phase-step.active span {
+ background: var(--teal);
+ color: var(--white);
+}
+.phase-step.done span {
+ background: var(--green);
+ color: var(--white);
+}
 .section-grid {
  display: grid;
  gap: 14px;
@@ -429,6 +500,29 @@ a { color: inherit; text-decoration: none; }
  margin: 0 0 9px;
  color: var(--navy);
  font-size: 0.98rem;
+}
+.compact-card {
+ padding: 14px 16px;
+}
+.ddx-card {
+ min-height: 100%;
+}
+.draft-note {
+ padding: 10px 11px;
+ border: 1px solid #fed7aa;
+ background: #fff7ed;
+ border-radius: var(--radius);
+ color: #9a3412!important;
+}
+.micro-copy {
+ margin: 8px 0 0;
+ color: var(--muted);
+ font-size: 0.76rem;
+ line-height: 1.5;
+}
+.save-panel .muted {
+ font-weight: 850;
+ color: var(--teal-dark);
 }
 .helper {
  margin: 6px 0 0;
@@ -455,6 +549,60 @@ a { color: inherit; text-decoration: none; }
 .ddx-chip span {
  min-width: 0;
  overflow-wrap: anywhere;
+}
+.ddx-review-row {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 7px;
+}
+.ddx-review-chip {
+ display: inline-flex;
+ align-items: center;
+ border: 1px solid #dbeafe;
+ background: #eff6ff;
+ color: #1e3a8a;
+ border-radius: 999px;
+ padding: 5px 9px;
+ font-size: 0.76rem;
+ font-weight: 850;
+}
+.phase-instruction {
+ display: grid;
+ gap: 3px;
+ margin-bottom: 10px;
+ padding: 10px 12px;
+ border: 1px solid #e8eef6;
+ border-radius: var(--radius);
+ background: #f8fafc;
+}
+.phase-instruction strong {
+ color: var(--navy);
+ font-size: 0.82rem;
+}
+.phase-instruction span {
+ color: var(--muted);
+ font-size: 0.8rem;
+}
+.phase-actions-card {
+ border-color: #bae6fd;
+}
+.textarea.tall {
+ min-height: 220px;
+}
+.management-prompts {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 6px;
+ margin-top: 9px;
+}
+.management-prompts span {
+ border: 1px solid #e8eef6;
+ background: #f8fafc;
+ color: var(--muted);
+ border-radius: 999px;
+ padding: 4px 8px;
+ font-size: 0.7rem;
+ font-weight: 820;
 }
 .icon-btn {
  width: 28px;
@@ -614,6 +762,31 @@ a { color: inherit; text-decoration: none; }
 .missed-item.green { border-left-color: var(--green); background: #f0fdf4; }
 .missed-item strong { color: var(--navy); }
 .missed-item p { margin: 4px 0 0; color: #334155; }
+.reasoning-trail {
+ display: grid;
+ grid-template-columns: repeat(4, minmax(0,1fr));
+ gap: 10px;
+}
+.trail-box {
+ border: 1px solid #e8eef6;
+ background: #f8fafc;
+ border-radius: var(--radius);
+ padding: 11px;
+}
+.trail-box strong {
+ display: block;
+ color: var(--teal-dark);
+ font-size: 0.72rem;
+ letter-spacing: 0.08em;
+ text-transform: uppercase;
+ margin-bottom: 5px;
+}
+.trail-box p {
+ margin: 0;
+ color: #334155;
+ font-size: 0.82rem;
+ line-height: 1.5;
+}
 .source-list a {
  color: var(--teal-dark);
  text-decoration: underline;
@@ -670,7 +843,7 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 1080px) {
  .page-grid, .practice-layout, .two-col { grid-template-columns: 1fr; }
  .side-panel { position: static; }
- .case-grid, .framework-grid { grid-template-columns: 1fr; }
+ .case-grid, .framework-grid, .reasoning-trail { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
  .scbd-topbar {

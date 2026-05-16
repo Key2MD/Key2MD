@@ -4,7 +4,16 @@
  const REFERENCES = window.SCBD_REFERENCES || [];
  const API_BASE = window.API_BASE || "https://key2md-api.brittainmbbs.workers.dev";
  const STORAGE_KEY = "key2md-scbd-progress-v1";
+ const DRAFT_STORAGE_KEY = "key2md-scbd-drafts-v2";
  const app = document.getElementById("scbdApp");
+ let lastDraftSaveAt = 0;
+
+ const PHASES = [
+  { id: "history", number: 1, title: "History", scope: "history", verb: "Ask history", next: "examination" },
+  { id: "examination", number: 2, title: "Examination", scope: "examination", verb: "Examine", next: "investigations" },
+  { id: "investigations", number: 3, title: "Investigations", scope: "investigations", verb: "Order tests", next: "management" },
+  { id: "management", number: 4, title: "Management", scope: "", verb: "Manage", next: "debrief" }
+ ];
 
  const CONCEPTS = {
   anaemia: ["anaemia", "anemia", "pale", "pallor", "iron", "ferritin", "microcytic", "breathless", "fatigue", "tired", "pica"],
@@ -121,6 +130,10 @@
   summary: "",
   ddxInput: "",
   ddx: [],
+  postHistoryDdxInput: "",
+  postHistoryDdx: [],
+  postExamDdxInput: "",
+  postExamDdx: [],
   management: "",
   workingDiagnosis: "",
   revealed: { history: [], examination: [], investigations: [] },
@@ -129,6 +142,7 @@
   stationRemaining: 900,
   timerMode: "",
   timer: null,
+  lastSavedAt: "",
   lastDebrief: null
  };
 
@@ -144,12 +158,174 @@
   localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
  }
 
+ function loadDrafts() {
+  try {
+   const parsed = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY) || "{}");
+   return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+   return {};
+  }
+ }
+
+ function saveDrafts(drafts) {
+  localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts || {}));
+ }
+
+ function draftForCase(caseId) {
+  return loadDrafts()[caseId] || null;
+ }
+
+ function deleteDraft(caseId = state.activeCaseId) {
+  if (!caseId) return;
+  const drafts = loadDrafts();
+  delete drafts[caseId];
+  saveDrafts(drafts);
+ }
+
+ function draftablePhase() {
+  return state.route === "practice" && state.activeCaseId && !["library", "debrief"].includes(state.phase);
+ }
+
+ function serialiseDraft() {
+  return {
+   version: 2,
+   activeCaseId: state.activeCaseId,
+   phase: state.phase,
+   trainingMode: state.trainingMode,
+   aiCoach: state.aiCoach,
+   semanticFallback: state.semanticFallback,
+   semanticUnavailable: state.semanticUnavailable,
+   strictness: state.strictness,
+   askScope: state.askScope,
+   askText: state.askText,
+   notes: state.notes,
+   summary: state.summary,
+   ddxInput: state.ddxInput,
+   ddx: state.ddx,
+   postHistoryDdxInput: state.postHistoryDdxInput,
+   postHistoryDdx: state.postHistoryDdx,
+   postExamDdxInput: state.postExamDdxInput,
+   postExamDdx: state.postExamDdx,
+   management: state.management,
+   workingDiagnosis: state.workingDiagnosis,
+   revealed: state.revealed,
+   log: state.log,
+   noteRemaining: state.noteRemaining,
+   stationRemaining: state.stationRemaining,
+   savedAt: new Date().toISOString()
+  };
+ }
+
+ function saveCurrentDraft(force = false) {
+  if (!draftablePhase()) return;
+  const now = Date.now();
+  if (!force && now - lastDraftSaveAt < 600) return;
+  const drafts = loadDrafts();
+  const draft = serialiseDraft();
+  drafts[state.activeCaseId] = draft;
+  saveDrafts(drafts);
+  lastDraftSaveAt = now;
+  state.lastSavedAt = draft.savedAt;
+  updateSavedDom();
+ }
+
+ function restoreDraft(draft) {
+  if (!draft?.activeCaseId) return false;
+  stopTimer();
+  state.activeCaseId = draft.activeCaseId;
+  state.route = "practice";
+  state.phase = ["notes", "history", "examination", "investigations", "management", "debrief"].includes(draft.phase) ? draft.phase : "history";
+  state.trainingMode = Boolean(draft.trainingMode);
+  state.aiCoach = Boolean(draft.aiCoach);
+  state.semanticFallback = draft.semanticFallback !== false;
+  state.semanticUnavailable = Boolean(draft.semanticUnavailable);
+  state.examinerLoading = false;
+  state.coachLoading = false;
+  state.coachMessage = "";
+  state.coachError = "";
+  state.strictness = draft.strictness || "balanced";
+  state.askScope = draft.askScope || phaseScope(state.phase) || "history";
+  state.askText = draft.askText || "";
+  state.notes = draft.notes || "";
+  state.summary = draft.summary || "";
+  state.ddxInput = draft.ddxInput || "";
+  state.ddx = Array.isArray(draft.ddx) ? draft.ddx : [];
+  state.postHistoryDdxInput = draft.postHistoryDdxInput || "";
+  state.postHistoryDdx = Array.isArray(draft.postHistoryDdx) ? draft.postHistoryDdx : [];
+  state.postExamDdxInput = draft.postExamDdxInput || "";
+  state.postExamDdx = Array.isArray(draft.postExamDdx) ? draft.postExamDdx : [];
+  state.management = draft.management || "";
+  state.workingDiagnosis = draft.workingDiagnosis || "";
+  state.revealed = {
+   history: Array.isArray(draft.revealed?.history) ? draft.revealed.history : [],
+   examination: Array.isArray(draft.revealed?.examination) ? draft.revealed.examination : [],
+   investigations: Array.isArray(draft.revealed?.investigations) ? draft.revealed.investigations : []
+  };
+  state.log = Array.isArray(draft.log) ? draft.log : [];
+  state.noteRemaining = Number.isFinite(Number(draft.noteRemaining)) ? Number(draft.noteRemaining) : 900;
+  state.stationRemaining = Number.isFinite(Number(draft.stationRemaining)) ? Number(draft.stationRemaining) : 900;
+  state.lastSavedAt = draft.savedAt || "";
+  state.lastDebrief = null;
+  render();
+  if (state.phase === "notes") startTimer("notes");
+  else if (["history", "examination", "investigations", "management"].includes(state.phase)) startTimer("station");
+  return true;
+ }
+
  function getCase() {
   return CASES.find(c => c.id === state.activeCaseId) || CASES[0];
  }
 
  function getFramework(id) {
   return FRAMEWORKS.find(f => f.id === id) || FRAMEWORKS[0];
+ }
+
+ function phaseMeta(phase = state.phase) {
+  return PHASES.find(item => item.id === phase) || PHASES[0];
+ }
+
+ function phaseLabel(phase = state.phase) {
+  if (phase === "notes") return "Viewing notes";
+  if (phase === "debrief") return "Debrief";
+  return phaseMeta(phase).title;
+ }
+
+ function phaseScope(phase = state.phase) {
+  return phaseMeta(phase)?.scope || "";
+ }
+
+ function phaseIndex(phase = state.phase) {
+  const index = PHASES.findIndex(item => item.id === phase);
+  return index >= 0 ? index : 0;
+ }
+
+ function phaseHasStarted(phase) {
+  if (state.phase === "debrief") return true;
+  return phaseIndex(phase) <= phaseIndex(state.phase);
+ }
+
+ function scopeAttemptCount(scope) {
+  return state.log.filter(entry => entry.scope === scope).length;
+ }
+
+ function scopeRevealCount(scope) {
+  return state.revealed[scope]?.length || 0;
+ }
+
+ function allStudentDdx() {
+  return unique([...state.ddx, ...state.postHistoryDdx, ...state.postExamDdx]);
+ }
+
+ function formatSavedAt(iso) {
+  if (!iso) return "Not saved yet";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "Saved locally";
+  return `Saved ${date.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" })}`;
+ }
+
+ function updateSavedDom() {
+  const el = document.querySelector("[data-saved-status]");
+  if (el) el.textContent = formatSavedAt(state.lastSavedAt);
  }
 
  function escapeHtml(value) {
@@ -375,6 +551,7 @@
    if (mode === "notes") state.noteRemaining = Math.max(0, state.noteRemaining - 1);
    if (mode === "station") state.stationRemaining = Math.max(0, state.stationRemaining - 1);
    updateTimerDom();
+   if (Date.now() - lastDraftSaveAt > 15000) saveCurrentDraft(true);
    if ((mode === "notes" && state.noteRemaining === 0) || (mode === "station" && state.stationRemaining === 0)) {
     stopTimer();
    }
@@ -400,6 +577,7 @@
  }
 
  function routeTo(route) {
+  saveCurrentDraft(true);
   stopTimer();
   state.route = route;
   if (route !== "practice") state.phase = route;
@@ -408,6 +586,7 @@
 
  function startCase(caseId) {
   stopTimer();
+  deleteDraft(caseId);
   state.activeCaseId = caseId;
   state.route = "practice";
   state.phase = "notes";
@@ -423,23 +602,78 @@
   state.summary = "";
   state.ddxInput = "";
   state.ddx = [];
+  state.postHistoryDdxInput = "";
+  state.postHistoryDdx = [];
+  state.postExamDdxInput = "";
+  state.postExamDdx = [];
   state.management = "";
   state.workingDiagnosis = "";
   state.revealed = { history: [], examination: [], investigations: [] };
   state.log = [];
   state.noteRemaining = 900;
   state.stationRemaining = 900;
+  state.lastSavedAt = "";
   state.lastDebrief = null;
   render();
   startTimer("notes");
+  saveCurrentDraft(true);
+ }
+
+ function resumeCase(caseId) {
+  const draft = draftForCase(caseId);
+  if (!draft) {
+   startCase(caseId);
+   return;
+  }
+  restoreDraft(draft);
+ }
+
+ function canAdvancePhase(phase = state.phase) {
+  if (phase === "history") {
+   return state.postHistoryDdx.length > 0 && scopeAttemptCount("history") > 0;
+  }
+  if (phase === "examination") return scopeAttemptCount("examination") > 0;
+  if (phase === "investigations") return scopeAttemptCount("investigations") > 0;
+  return true;
+ }
+
+ function phaseBlockerText(phase = state.phase) {
+  if (phase === "history") {
+   if (scopeAttemptCount("history") === 0) return "Ask at least one history question before moving to examination.";
+   if (!state.postHistoryDdx.length) return "Add at least one updated differential based on the history before moving to examination.";
+  }
+  if (phase === "examination" && scopeAttemptCount("examination") === 0) return "Record at least one examination request before ordering investigations.";
+  if (phase === "investigations" && scopeAttemptCount("investigations") === 0) return "Order at least one investigation before moving to management.";
+  return "";
+ }
+
+ function goToPhase(nextPhase) {
+  if (!["history", "examination", "investigations", "management"].includes(nextPhase)) return;
+  const nextIndex = phaseIndex(nextPhase);
+  const currentIndex = phaseIndex(state.phase);
+  if (nextIndex > currentIndex && !canAdvancePhase(state.phase)) {
+   state.coachMessage = phaseBlockerText(state.phase);
+   state.coachError = "";
+   render();
+   return;
+  }
+  state.phase = nextPhase;
+  state.askScope = phaseScope(nextPhase) || state.askScope;
+  state.askText = "";
+  state.coachMessage = "";
+  state.coachError = "";
+  render();
+  saveCurrentDraft(true);
  }
 
  function beginStation() {
   stopTimer();
-  state.phase = "station";
+  state.phase = "history";
+  state.askScope = "history";
   state.stationRemaining = 900;
   render();
   startTimer("station");
+  saveCurrentDraft(true);
  }
 
  async function askExaminer() {
@@ -480,6 +714,7 @@
   state.coachMessage = "";
   state.coachError = "";
   render();
+  saveCurrentDraft(true);
  }
 
  async function semanticExaminerMatch(caseData, scope, query) {
@@ -650,17 +885,27 @@
   }
  }
 
- function addDdx() {
-  const value = state.ddxInput.trim();
-  if (!value) return;
-  if (!state.ddx.some(existing => normalize(existing) === normalize(value))) state.ddx.push(value);
-  state.ddxInput = "";
-  render();
+ function ddxField(kind = "initial") {
+  if (kind === "postHistory") return { input: "postHistoryDdxInput", list: "postHistoryDdx" };
+  if (kind === "postExam") return { input: "postExamDdxInput", list: "postExamDdx" };
+  return { input: "ddxInput", list: "ddx" };
  }
 
- function removeDdx(index) {
-  state.ddx.splice(index, 1);
+ function addDdx(kind = "initial") {
+  const fields = ddxField(kind);
+  const value = state[fields.input].trim();
+  if (!value) return;
+  if (!state[fields.list].some(existing => normalize(existing) === normalize(value))) state[fields.list].push(value);
+  state[fields.input] = "";
   render();
+  saveCurrentDraft(true);
+ }
+
+ function removeDdx(kind = "initial", index) {
+  const fields = ddxField(kind);
+  state[fields.list].splice(index, 1);
+  render();
+  saveCurrentDraft(true);
  }
 
  function scoreDomain(caseData, scope, maxPoints) {
@@ -717,9 +962,9 @@
   ];
   const matchedExpected = expected.filter(entry => {
    const terms = [entry.name, ...(entry.aliases || [])];
-   return state.ddx.some(user => matchFreeText(user, terms));
+   return allStudentDdx().some(user => matchFreeText(user, terms));
   });
-  const unmatchedUser = state.ddx.filter(user => {
+  const unmatchedUser = allStudentDdx().filter(user => {
    return !expected.some(entry => matchFreeText(user, [entry.name, ...(entry.aliases || [])]));
   });
   return {
@@ -761,10 +1006,15 @@
    caseTitle: debrief.caseTitle,
    total: debrief.total,
    completedAt: debrief.completedAt,
-   diagnosisCorrect: debrief.diagnosisCorrect
+   diagnosisCorrect: debrief.diagnosisCorrect,
+   historyAsked: scopeAttemptCount("history"),
+   examAsked: scopeAttemptCount("examination"),
+   investigationsAsked: scopeAttemptCount("investigations"),
+   ddxCount: allStudentDdx().length
   });
   progress.attempts = progress.attempts.slice(0, 80);
   saveProgress(progress);
+  deleteDraft(debrief.caseId);
   state.phase = "debrief";
   state.route = "practice";
   render();
@@ -772,6 +1022,7 @@
 
  function clearProgress() {
   saveProgress({ attempts: [] });
+  saveDrafts({});
   render();
  }
 
@@ -851,19 +1102,25 @@
 
  function renderCaseCard(caseData) {
   const difficultyClass = caseData.difficulty === "hard" ? "red" : caseData.difficulty === "medium" ? "amber" : "green";
+  const draft = draftForCase(caseData.id);
   return `
    <article class="case-card">
     <div class="case-meta">
      <span class="pill blue">${escapeHtml(caseData.setting)}</span>
      <span class="pill ${difficultyClass}">${escapeHtml(caseData.difficulty)}</span>
      ${caseData.hidden ? `<span class="pill purple">hidden diagnosis</span>` : ""}
+     ${draft ? `<span class="pill amber">draft saved</span>` : ""}
     </div>
     <h2>${escapeHtml(caseData.title)}</h2>
     <p>${escapeHtml(caseData.stem)}</p>
     <p><strong>Presentation:</strong> ${escapeHtml(caseData.presentation)}</p>
+    ${draft ? `<p class="draft-note"><strong>Resume:</strong> ${escapeHtml(phaseLabel(draft.phase))} - ${escapeHtml(formatSavedAt(draft.savedAt))}</p>` : ""}
     <footer>
      <span class="muted">${escapeHtml(getFramework(caseData.frameworkId)?.title || "Framework")}</span>
-     <button class="btn" type="button" data-start-case="${escapeHtml(caseData.id)}">Start case</button>
+     <div class="btn-row">
+      ${draft ? `<button class="btn secondary" type="button" data-resume-case="${escapeHtml(caseData.id)}">Resume</button>` : ""}
+      <button class="btn" type="button" data-start-case="${escapeHtml(caseData.id)}">${draft ? "Start new" : "Start case"}</button>
+     </div>
     </footer>
    </article>
   `;
@@ -871,7 +1128,7 @@
 
  function renderPractice() {
   if (state.phase === "notes") return renderNotes();
-  if (state.phase === "station") return renderStation();
+  if (["history", "examination", "investigations", "management"].includes(state.phase)) return renderStation();
   if (state.phase === "debrief") return renderDebrief();
   renderLibrary();
  }
@@ -930,6 +1187,15 @@
       </div>
       <p class="muted">${escapeHtml(caseData.stem)}</p>
      </section>
+     <section class="panel save-panel">
+      <h2 class="panel-title">Local Progress</h2>
+      <p class="muted" data-saved-status>${escapeHtml(formatSavedAt(state.lastSavedAt))}</p>
+      <p class="micro-copy">Notes autosave to this browser before you enter the station.</p>
+      <div class="btn-row" style="margin-top:10px">
+       <button class="btn secondary small" type="button" data-action="save-draft">Save now</button>
+       <button class="btn danger small" type="button" data-action="discard-draft">Discard draft</button>
+      </div>
+     </section>
      ${renderAttemptMode()}
     </aside>
     <section class="practice-card">
@@ -955,34 +1221,8 @@
 
  function renderStation() {
   const caseData = getCase();
-  const historyDone = state.revealed.history.length;
-  const examDone = state.revealed.examination.length;
-  const invDone = state.revealed.investigations.length;
-  const stepper = state.trainingMode ? `
-      <div class="station-stepper">
-       <div class="step-chip active">1 Summary</div>
-       <div class="step-chip active">2 DDx</div>
-       <div class="step-chip active">3 Ask</div>
-       <div class="step-chip active">4 Ix</div>
-       <div class="step-chip active">5 Manage</div>
-      </div>
-  ` : "";
-  const revealedPanel = state.trainingMode ? `
-     <section class="panel">
-      <h2 class="panel-title">Training Coverage</h2>
-      <div class="mini-stat-grid">
-       <div class="mini-stat"><strong>${historyDone}</strong><span>history</span></div>
-       <div class="mini-stat"><strong>${examDone}</strong><span>exam</span></div>
-       <div class="mini-stat"><strong>${invDone}</strong><span>investigations</span></div>
-       <div class="mini-stat"><strong>${state.ddx.length}</strong><span>DDx</span></div>
-      </div>
-     </section>
-  ` : `
-     <section class="panel mode-note">
-      <h2 class="panel-title">Simulation</h2>
-      <p class="muted">Coverage, score and missed items stay hidden until the debrief. The examiner only answers what you ask.</p>
-     </section>
-  `;
+  const meta = phaseMeta();
+  if (meta.scope) state.askScope = meta.scope;
   renderShell(`
    <div class="practice-layout">
     <aside class="side-panel">
@@ -998,70 +1238,216 @@
        <button class="btn secondary small" type="button" data-action="reset-station">Reset</button>
       </div>
      </section>
-     ${renderAttemptMode(true)}
+     <section class="panel save-panel">
+      <h2 class="panel-title">Local Progress</h2>
+      <p class="muted" data-saved-status>${escapeHtml(formatSavedAt(state.lastSavedAt))}</p>
+      <p class="micro-copy">This attempt autosaves in this browser. Refreshing or leaving the page will preserve the current phase, notes, DDx and revealed findings.</p>
+      <div class="btn-row" style="margin-top:10px">
+       <button class="btn secondary small" type="button" data-action="save-draft">Save now</button>
+       <button class="btn danger small" type="button" data-action="discard-draft">Discard draft</button>
+      </div>
+     </section>
      <section class="panel">
+      <h2 class="panel-title">Phase Map</h2>
+      ${renderPhaseStepper()}
+     </section>
+     ${renderAttemptMode(true)}
+     ${meta.scope ? `<section class="panel">
       <h2 class="panel-title">Examiner Strictness</h2>
       <div class="strictness-grid">
        ${renderStrictness("generous", "Generous", "Broad systems questions reveal clusters.")}
        ${renderStrictness("balanced", "Balanced", "Specific phrases or close synonyms reveal prepared items.")}
        ${renderStrictness("strict", "Strict", "You need to name what you are looking for.")}
       </div>
-     </section>
-     ${revealedPanel}
+     </section>` : ""}
+     ${renderPhaseStatsPanel()}
     </aside>
     <div class="section-grid">
      <section class="practice-card">
-      ${stepper}
+      <div class="phase-kicker">Phase ${meta.number}: ${escapeHtml(meta.title)}</div>
       <h1 class="station-title">${escapeHtml(caseData.title)}</h1>
       <p class="stem">${escapeHtml(caseData.stem)}</p>
       ${state.notes.trim() ? `<div class="notice"><strong>Your notes:</strong> ${escapeHtml(state.notes).replace(/\n/g, "<br>")}</div>` : ""}
      </section>
-     <section class="two-col">
-      <div class="practice-card">
-       <h2 class="subhead">Referral-style summary</h2>
-       <textarea class="textarea" data-field="summary" placeholder="Briefly summarise the patient before opening your DDx...">${escapeHtml(state.summary)}</textarea>
-      </div>
-      <div class="practice-card">
-       <h2 class="subhead">Working DDx tracker</h2>
-       <div class="examiner-row">
-        <input class="input" data-field="ddxInput" value="${escapeHtml(state.ddxInput)}" placeholder="Add a differential, including red flags first">
-        <button class="btn secondary" type="button" data-action="add-ddx">Add</button>
-       </div>
-       <ul class="ddx-list">
-        ${state.ddx.map((d, idx) => `<li class="ddx-chip"><span>${escapeHtml(d)}</span><button class="icon-btn" type="button" aria-label="Remove ${escapeHtml(d)}" data-remove-ddx="${idx}">x</button></li>`).join("") || `<li class="answer-card empty">Add 5-10 possibilities. You can revise freely; wrong ideas are handled in the debrief.</li>`}
-       </ul>
-      </div>
-     </section>
-     <section class="practice-card">
-      <h2 class="subhead">Ask the examiner</h2>
-      <div class="segmented" role="tablist" aria-label="Examiner query type">
-       ${["history", "examination", "investigations"].map(scope => `<button type="button" class="${state.askScope === scope ? "active" : ""}" data-scope="${scope}">${scope === "examination" ? "Examination" : scope[0].toUpperCase() + scope.slice(1)}</button>`).join("")}
-      </div>
-      <div class="examiner-row">
-       <input class="input" data-field="askText" value="${escapeHtml(state.askText)}" placeholder="${escapeHtml(placeholderForScope(state.askScope))}">
-       <button class="btn" type="button" data-action="ask-examiner" ${state.examinerLoading ? "disabled" : ""}>${state.examinerLoading ? "Checking..." : "Ask / order"}</button>
-      </div>
-      <p class="helper">${helperForScope(state.askScope)}</p>
-      ${renderCoachPanel()}
-      <ul class="answer-log">
-       ${renderRevealed(caseData)}
-      </ul>
-     </section>
-     <section class="practice-card">
-      <h2 class="subhead">Working diagnosis</h2>
-      <input class="input" data-field="workingDiagnosis" value="${escapeHtml(state.workingDiagnosis)}" placeholder="State your current working diagnosis before management">
-     </section>
-     <section class="practice-card">
-      <h2 class="subhead">Management plan</h2>
-      <textarea class="textarea" data-field="management" placeholder="Disposition, education, referrals, treatment, investigations, monitoring and safety-netting if useful. Use your own structure.">${escapeHtml(state.management)}</textarea>
-      <div class="btn-row" style="margin-top:14px">
-       <button class="btn" type="button" data-action="finish-attempt">Finish and debrief</button>
-       <button class="btn secondary" type="button" data-start-case="${escapeHtml(caseData.id)}">Restart case</button>
-      </div>
-     </section>
+     ${renderPhaseWorkspace(caseData, meta)}
     </div>
    </div>
   `);
+ }
+
+ function renderPhaseStepper() {
+  return `
+   <div class="phase-stepper">
+    ${PHASES.map(item => {
+     const active = item.id === state.phase;
+     const done = phaseIndex(item.id) < phaseIndex(state.phase) || state.phase === "debrief";
+     const locked = phaseIndex(item.id) > phaseIndex(state.phase) + 1;
+     return `<button type="button" class="phase-step ${active ? "active" : ""} ${done ? "done" : ""}" data-phase-nav="${item.id}" ${locked ? "disabled" : ""}>
+      <span>${item.number}</span><strong>${escapeHtml(item.title)}</strong><em>${phaseStepStatus(item.id)}</em>
+     </button>`;
+    }).join("")}
+   </div>
+  `;
+ }
+
+ function phaseStepStatus(phase) {
+  if (phase === "history") return `${scopeAttemptCount("history")} asked`;
+  if (phase === "examination") return `${scopeAttemptCount("examination")} examined`;
+  if (phase === "investigations") return `${scopeAttemptCount("investigations")} ordered`;
+  if (phase === "management") return state.management.trim() ? "plan drafted" : "pending";
+  return "";
+ }
+
+ function renderPhaseStatsPanel() {
+  return `
+   <section class="panel ${state.trainingMode ? "" : "mode-note"}">
+    <h2 class="panel-title">${state.trainingMode ? "Training Coverage" : "Station State"}</h2>
+    <div class="mini-stat-grid">
+     <div class="mini-stat"><strong>${scopeAttemptCount("history")}</strong><span>history asks</span></div>
+     <div class="mini-stat"><strong>${scopeAttemptCount("examination")}</strong><span>exam asks</span></div>
+     <div class="mini-stat"><strong>${scopeAttemptCount("investigations")}</strong><span>tests ordered</span></div>
+     <div class="mini-stat"><strong>${allStudentDdx().length}</strong><span>DDx entries</span></div>
+    </div>
+    ${state.trainingMode ? `<p class="micro-copy">Revealed findings: ${scopeRevealCount("history")} history, ${scopeRevealCount("examination")} exam, ${scopeRevealCount("investigations")} investigations.</p>` : `<p class="micro-copy">Coverage, score and missed items stay hidden until debrief. Your visible log only shows examiner answers to questions you actually asked.</p>`}
+   </section>
+  `;
+ }
+
+ function renderPhaseWorkspace(caseData, meta) {
+  if (meta.id === "history") {
+   return `
+    <section class="two-col">
+     <div class="practice-card">
+      <h2 class="subhead">Referral-style summary</h2>
+      <textarea class="textarea" data-field="summary" placeholder="Open with the one-line problem representation you would give the examiner.">${escapeHtml(state.summary)}</textarea>
+      <p class="helper">Keep this short. Age, key symptom, time course, acuity, and what worries you.</p>
+     </div>
+     ${renderDdxEditor("initial", "Initial DDx before history", "Add your starting differentials, including must-not-miss diagnoses first", "This is your pre-history problem list. It can be wrong; the point is to make your reasoning visible.")}
+    </section>
+    ${renderExaminerCard(caseData, "history", "Phase 1 - History")}
+    ${renderDdxEditor("postHistory", "Updated DDx based on the history", "Add what moved up or down after the history", "Required before Phase 2. Force yourself to change the list before examining.")}
+    ${renderPhaseActions("examination", "Move to Phase 2: Examination")}
+   `;
+  }
+  if (meta.id === "examination") {
+   return `
+    ${renderDdxReview("History-driven DDx", state.postHistoryDdx.length ? state.postHistoryDdx : state.ddx)}
+    ${renderExaminerCard(caseData, "examination", "Phase 2 - Examination")}
+    ${renderDdxEditor("postExam", "Updated DDx after examination", "Optional: refine your differentials again after examination", "Use this if the examination materially changes your probability ranking.")}
+    ${renderPhaseActions("investigations", "Move to Phase 3: Investigations")}
+   `;
+  }
+  if (meta.id === "investigations") {
+   return `
+    ${renderDdxReview("Current DDx before investigations", state.postExamDdx.length ? state.postExamDdx : (state.postHistoryDdx.length ? state.postHistoryDdx : state.ddx))}
+    ${renderExaminerCard(caseData, "investigations", "Phase 3 - Investigations")}
+    ${renderPhaseActions("management", "Move to Phase 4: Management")}
+   `;
+  }
+  return `
+   ${renderDdxReview("Final DDx entering management", allStudentDdx())}
+   <section class="practice-card">
+    <h2 class="subhead">Working diagnosis</h2>
+    <input class="input" data-field="workingDiagnosis" value="${escapeHtml(state.workingDiagnosis)}" placeholder="State your current working diagnosis before management">
+    <p class="helper">Commit before writing management. The debrief will compare this with the seed diagnosis and aliases.</p>
+   </section>
+   <section class="practice-card">
+    <h2 class="subhead">Phase 4 - Management plan</h2>
+    <textarea class="textarea tall" data-field="management" placeholder="Disposition, immediate safety, treatment, referrals, monitoring, patient communication and safety-netting.">${escapeHtml(state.management)}</textarea>
+    <div class="management-prompts">
+     <span>Disposition</span><span>Immediate risks</span><span>Treatment / referral</span><span>Monitoring</span><span>Safety-net</span>
+    </div>
+    <div class="btn-row" style="margin-top:14px">
+     <button class="btn" type="button" data-action="finish-attempt">Finish and debrief</button>
+     <button class="btn secondary" type="button" data-phase-nav="investigations">Back to investigations</button>
+     <button class="btn secondary" type="button" data-start-case="${escapeHtml(caseData.id)}">Restart case</button>
+    </div>
+   </section>
+  `;
+ }
+
+ function renderExaminerCard(caseData, scope, title) {
+  return `
+   <section class="practice-card">
+    <h2 class="subhead">${escapeHtml(title)}</h2>
+    <div class="phase-instruction">
+     <strong>${escapeHtml(phaseMeta().verb)} only.</strong>
+     <span>${escapeHtml(helperForScope(scope))}</span>
+    </div>
+    <div class="examiner-row">
+     <input class="input" data-field="askText" value="${escapeHtml(state.askText)}" placeholder="${escapeHtml(placeholderForScope(scope))}">
+     <button class="btn" type="button" data-action="ask-examiner" ${state.examinerLoading ? "disabled" : ""}>${state.examinerLoading ? "Checking..." : scope === "investigations" ? "Order" : "Ask"}</button>
+    </div>
+    ${renderCoachPanel()}
+    <ul class="answer-log">
+     ${renderRevealedForScope(caseData, scope)}
+    </ul>
+   </section>
+  `;
+ }
+
+ function renderDdxEditor(kind, title, placeholder, helper) {
+  const fields = ddxField(kind);
+  const rows = state[fields.list] || [];
+  return `
+   <div class="practice-card ddx-card">
+    <h2 class="subhead">${escapeHtml(title)}</h2>
+    <div class="examiner-row">
+     <input class="input" data-field="${fields.input}" value="${escapeHtml(state[fields.input])}" placeholder="${escapeHtml(placeholder)}">
+     <button class="btn secondary" type="button" data-action="add-ddx" data-ddx-kind="${escapeHtml(kind)}">Add</button>
+    </div>
+    <p class="helper">${escapeHtml(helper)}</p>
+    <ul class="ddx-list">
+     ${rows.map((d, idx) => `<li class="ddx-chip"><span>${escapeHtml(d)}</span><button class="icon-btn" type="button" aria-label="Remove ${escapeHtml(d)}" data-ddx-kind="${escapeHtml(kind)}" data-remove-ddx="${idx}">x</button></li>`).join("") || `<li class="answer-card empty">No differentials added yet.</li>`}
+    </ul>
+   </div>
+  `;
+ }
+
+ function renderDdxReview(title, rows) {
+  const items = rows && rows.length ? rows : [];
+  return `
+   <section class="practice-card compact-card">
+    <h2 class="subhead">${escapeHtml(title)}</h2>
+    <div class="ddx-review-row">
+     ${items.map(item => `<span class="ddx-review-chip">${escapeHtml(item)}</span>`).join("") || `<span class="muted">No differentials recorded yet.</span>`}
+    </div>
+   </section>
+  `;
+ }
+
+ function renderPhaseActions(nextPhase, label) {
+  const blocker = phaseBlockerText(state.phase);
+  return `
+   <section class="practice-card phase-actions-card">
+    ${blocker ? `<div class="notice warning"><strong>Before moving on:</strong> ${escapeHtml(blocker)}</div>` : `<div class="notice"><strong>Ready:</strong> You can move forward, or go back to tighten this phase before continuing.</div>`}
+    <div class="btn-row" style="margin-top:14px">
+     <button class="btn" type="button" data-phase-nav="${escapeHtml(nextPhase)}" ${blocker ? "disabled" : ""}>${escapeHtml(label)}</button>
+     ${phaseIndex(state.phase) > 0 ? `<button class="btn secondary" type="button" data-phase-nav="${PHASES[phaseIndex(state.phase) - 1].id}">Back to ${escapeHtml(PHASES[phaseIndex(state.phase) - 1].title)}</button>` : ""}
+     <button class="btn secondary" type="button" data-action="save-draft">Save and stay here</button>
+    </div>
+   </section>
+  `;
+ }
+
+ function renderRevealedForScope(caseData, scope) {
+  const ids = state.revealed[scope] || [];
+  const items = allItems(caseData, scope).filter(item => ids.includes(item.id));
+  const blocks = items.map(item => {
+   const answer = scope === "investigations" ? item.result : item.answer;
+   return `
+    <li class="answer-card">
+     <strong>${escapeHtml(scopeLabel(scope))}: ${escapeHtml(item.label)}</strong>
+     <p>${escapeHtml(answer)}</p>
+    </li>
+   `;
+  });
+  const latest = state.log.find(entry => entry.scope === scope);
+  const missed = latest && latest.matchedIds.length === 0
+   ? `<li class="answer-card empty"><strong>Examiner:</strong> ${fallbackNoMatch(scope)}${state.trainingMode ? " You can rephrase or ask for a nudge." : ""}</li>`
+   : "";
+  if (!blocks.length) return missed || `<li class="answer-card empty">No ${escapeHtml(scopeLabel(scope).toLowerCase())} findings have been revealed in this phase yet.</li>`;
+  return missed + blocks.join("");
  }
 
  function renderStrictness(value, title, copy) {
@@ -1172,6 +1558,16 @@
    </section>
 
    <section class="debrief-card">
+    <h2 class="subhead">Phase-by-phase reasoning trail</h2>
+    <div class="reasoning-trail">
+     ${renderDebriefDdxSnapshot("Initial DDx", state.ddx)}
+     ${renderDebriefDdxSnapshot("After history", state.postHistoryDdx)}
+     ${renderDebriefDdxSnapshot("After examination", state.postExamDdx)}
+     <div class="trail-box"><strong>Requests made</strong><p>${scopeAttemptCount("history")} history, ${scopeAttemptCount("examination")} exam, ${scopeAttemptCount("investigations")} investigation.</p></div>
+    </div>
+   </section>
+
+   <section class="debrief-card">
     <h2 class="subhead">Highest-yield missed items</h2>
     <ul class="missed-list">
      ${missedCritical.map(renderMissed).join("") || `<li class="missed-item"><strong>No major misses:</strong> You covered the prepared checklist well.</li>`}
@@ -1218,6 +1614,10 @@
 
  function renderScore(label, score, max, bonus = 0) {
   return `<div class="score-tile"><strong>${score}/${max}</strong><span>${label}${bonus > 0 ? `, +${bonus} reasoning` : ""}</span></div>`;
+ }
+
+ function renderDebriefDdxSnapshot(label, rows) {
+  return `<div class="trail-box"><strong>${escapeHtml(label)}</strong><p>${(rows || []).map(escapeHtml).join(", ") || "No entries recorded."}</p></div>`;
  }
 
  function renderReasoningCredit(domains) {
@@ -1280,15 +1680,34 @@
 
  function renderProgress() {
   const progress = loadProgress();
+  const drafts = Object.values(loadDrafts()).sort((a, b) => String(b.savedAt || "").localeCompare(String(a.savedAt || "")));
   renderShell(`
    <section class="hero-panel">
     <span class="eyebrow">Progress</span>
-    <h1>Your saved attempts on this browser.</h1>
-    <p>Progress is stored locally in this browser only. It is deliberately lightweight so the app remains self-contained.</p>
+    <h1>Your saved SCBD work on this browser.</h1>
+    <p>Completed attempts and in-progress drafts are stored locally in this browser only. Drafts preserve phase, notes, DDx, examiner log and timers.</p>
     <div class="btn-row" style="margin-top:14px">
      <button class="btn danger" type="button" data-action="clear-progress">Clear progress</button>
      <button class="btn secondary" type="button" data-route="library">Back to cases</button>
     </div>
+   </section>
+   <section class="debrief-card">
+    <h2 class="subhead">In-progress drafts</h2>
+    <ul class="answer-log">
+     ${drafts.map(draft => {
+      const caseData = CASES.find(c => c.id === draft.activeCaseId);
+      return `
+       <li class="answer-card">
+        <strong>${escapeHtml(caseData?.title || draft.activeCaseId)} - ${escapeHtml(phaseLabel(draft.phase))}</strong>
+        <p>${escapeHtml(formatSavedAt(draft.savedAt))} - ${Number(draft.log?.length || 0)} examiner request${Number(draft.log?.length || 0) === 1 ? "" : "s"} - ${Number((draft.ddx || []).length + (draft.postHistoryDdx || []).length + (draft.postExamDdx || []).length)} DDx entries</p>
+        <div class="btn-row" style="margin-top:10px">
+         <button class="btn small" type="button" data-resume-case="${escapeHtml(draft.activeCaseId)}">Resume draft</button>
+         <button class="btn secondary small" type="button" data-start-case="${escapeHtml(draft.activeCaseId)}">Start new</button>
+        </div>
+       </li>
+      `;
+     }).join("") || `<li class="answer-card empty">No active drafts. Start a case and your work will autosave here.</li>`}
+    </ul>
    </section>
    <section class="debrief-card">
     <h2 class="subhead">Attempt history</h2>
@@ -1296,7 +1715,7 @@
      ${progress.attempts.map(a => `
       <li class="answer-card">
        <strong>${escapeHtml(a.caseTitle)} - ${escapeHtml(a.total)}/20</strong>
-       <p>${new Date(a.completedAt).toLocaleString()} - diagnosis ${a.diagnosisCorrect ? "matched" : "did not match"}</p>
+       <p>${new Date(a.completedAt).toLocaleString()} - diagnosis ${a.diagnosisCorrect ? "matched" : "did not match"}${a.historyAsked != null ? ` - ${a.historyAsked} history / ${a.examAsked} exam / ${a.investigationsAsked} ix requests` : ""}</p>
       </li>
      `).join("") || `<li class="answer-card empty">No attempts saved yet.</li>`}
     </ul>
@@ -1323,6 +1742,16 @@
    startCase(startButton.dataset.startCase);
    return;
   }
+  const resumeButton = event.target.closest("[data-resume-case]");
+  if (resumeButton) {
+   resumeCase(resumeButton.dataset.resumeCase);
+   return;
+  }
+  const phaseButton = event.target.closest("[data-phase-nav]");
+  if (phaseButton) {
+   goToPhase(phaseButton.dataset.phaseNav);
+   return;
+  }
   const scopeButton = event.target.closest("[data-scope]");
   if (scopeButton) {
    state.askScope = scopeButton.dataset.scope;
@@ -1333,7 +1762,7 @@
   }
   const removeButton = event.target.closest("[data-remove-ddx]");
   if (removeButton) {
-   removeDdx(Number(removeButton.dataset.removeDdx));
+   removeDdx(removeButton.dataset.ddxKind || "initial", Number(removeButton.dataset.removeDdx));
    return;
   }
   const action = event.target.closest("[data-action]")?.dataset.action;
@@ -1361,7 +1790,19 @@
   if (action === "begin-station") beginStation();
   if (action === "ask-examiner") askExaminer();
   if (action === "coach-nudge") requestCoachNudge();
-  if (action === "add-ddx") addDdx();
+  if (action === "add-ddx") addDdx(event.target.closest("[data-action]")?.dataset.ddxKind || "initial");
+  if (action === "save-draft") {
+   saveCurrentDraft(true);
+   render();
+  }
+  if (action === "discard-draft") {
+   deleteDraft();
+   state.lastSavedAt = "";
+   stopTimer();
+   state.route = "library";
+   state.phase = "library";
+   render();
+  }
   if (action === "finish-attempt") finishAttempt();
   if (action === "clear-progress") clearProgress();
  });
@@ -1375,6 +1816,8 @@
   if (field === "notes") state.notes = event.target.value;
   if (field === "summary") state.summary = event.target.value;
   if (field === "ddxInput") state.ddxInput = event.target.value;
+  if (field === "postHistoryDdxInput") state.postHistoryDdxInput = event.target.value;
+  if (field === "postExamDdxInput") state.postExamDdxInput = event.target.value;
   if (field === "askText") state.askText = event.target.value;
   if (field === "management") state.management = event.target.value;
   if (field === "workingDiagnosis") state.workingDiagnosis = event.target.value;
@@ -1390,6 +1833,7 @@
    state.semanticFallback = event.target.checked;
    state.semanticUnavailable = false;
   }
+  if (!field.startsWith("filter-")) saveCurrentDraft();
   if (field && field.startsWith("filter-")) render();
  });
 
@@ -1415,6 +1859,7 @@
    state.semanticUnavailable = false;
    render();
   }
+  if (!field.startsWith("filter-")) saveCurrentDraft(true);
   if (field.startsWith("filter-")) render();
  });
 
@@ -1422,7 +1867,15 @@
   if (event.key !== "Enter" || event.shiftKey) return;
   if (event.target?.dataset?.field === "ddxInput") {
    event.preventDefault();
-   addDdx();
+   addDdx("initial");
+  }
+  if (event.target?.dataset?.field === "postHistoryDdxInput") {
+   event.preventDefault();
+   addDdx("postHistory");
+  }
+  if (event.target?.dataset?.field === "postExamDdxInput") {
+   event.preventDefault();
+   addDdx("postExam");
   }
   if (event.target?.dataset?.field === "askText") {
    event.preventDefault();
