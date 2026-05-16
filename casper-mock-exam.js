@@ -47,6 +47,8 @@ window.FullCasperMock = (() => {
  let serverCheckpointBusy = false;
  let queuedCheckpointReason = null;
  let lastRescueRecording = null;
+ let mockStatusCache = null;
+ let mockStatusRefreshToken = 0;
 
  function byId(id) {
  return document.getElementById(id);
@@ -253,7 +255,7 @@ window.FullCasperMock = (() => {
  rulesAccepted = true;
  syncActiveMockContext();
  byId('casperMockMainArea')?.style.setProperty('display', 'none');
- setTier(config.tier);
+ setTier(config.tier, { skipIdleRender: true });
  startDraftMonitor();
  launchCurrent();
  }
@@ -313,7 +315,17 @@ window.FullCasperMock = (() => {
  headers: { 'Authorization': `Bearer ${token}` },
  });
  if (!res.ok) return null;
- return await res.json().catch(() => null);
+ const status = await res.json().catch(() => null);
+ if (status) mockStatusCache = status;
+ return status;
+ }
+
+ async function refreshMockPassStatus() {
+ const token = ++mockStatusRefreshToken;
+ const status = await fetchMockPassStatus().catch(() => null);
+ if (token !== mockStatusRefreshToken) return;
+ mockStatusCache = status;
+ if (active && !started) renderIdle();
  }
 
  async function hasMockPass(tier = config.tier) {
@@ -370,7 +382,7 @@ window.FullCasperMock = (() => {
 
  async function loadServerMockAttempt(attemptId) {
  const token = authTokenOrThrow();
- const res = await fetch(`${apiBase()}/api/casper-mock/attempts/${encodeURIComponent(attemptId)}`, {
+ const res = await fetch(`${apiBase()}/api/casper-mock/attempt/${encodeURIComponent(attemptId)}`, {
  method: 'GET',
  headers: { 'Authorization': `Bearer ${token}` },
  });
@@ -404,6 +416,12 @@ window.FullCasperMock = (() => {
  }
 
  function checkoutButtonText() {
+ if (mockStatusCache?.active_attempt_id && mockStatusCache?.tier === config.tier) {
+ return `Resume ${tierLabel(config.tier)} Mock`;
+ }
+ if (hasFullMockPass(mockStatusCache, config.tier)) {
+ return `Enter ${tierLabel(config.tier)} Mock`;
+ }
  return `Buy & Enter ${tierLabel(config.tier)} Mock`;
  }
 
@@ -462,7 +480,7 @@ window.FullCasperMock = (() => {
  function init() {
  applyTierFromUrl();
  renderConfigPanel();
- setTier(config.tier);
+ setTier(config.tier, { skipIdleRender: true });
  bindNavigation();
  bindPracticeNudge();
  if (window.location.search.includes('tab=mock') || window.location.hash === '#full-casper-mock') {
@@ -545,7 +563,7 @@ window.FullCasperMock = (() => {
  sidebar.appendChild(panel);
  }
 
- function setTier(tier) {
+ function setTier(tier, options = {}) {
  config.tier = tier === 'premium' ? 'premium' : 'transcript';
  rulesAccepted = false;
  document.querySelectorAll('[data-mock-tier]').forEach(btn => {
@@ -571,16 +589,17 @@ window.FullCasperMock = (() => {
  price.innerHTML = renderPriceLine(config.tier);
  });
  setCheckoutState(false);
+ if (!options.skipIdleRender && active && !started) renderIdle();
  }
 
  function refreshPricing() {
- setTier(config.tier);
+ setTier(config.tier, { skipIdleRender: true });
  }
 
  function activateMockMode() {
  active = true;
  renderConfigPanel();
- setTier(config.tier);
+ setTier(config.tier, { skipIdleRender: true });
  document.querySelectorAll('.mode-pill').forEach(pill => pill.classList.remove('active-casper', 'active-mmi', 'active-mock'));
  byId('modeMock')?.classList.add('active-mock');
  hideNormalPanels();
@@ -588,6 +607,7 @@ window.FullCasperMock = (() => {
  byId('casperMockConfigPanel')?.style.setProperty('display', 'block');
  ensureMainArea();
  renderIdle();
+ refreshMockPassStatus();
  }
 
  function deactivateMockMode() {
@@ -653,6 +673,37 @@ window.FullCasperMock = (() => {
  return area;
  }
 
+ function mockServerBanner(status = mockStatusCache) {
+ if (!status?.active) return '';
+ const isSelectedTier = status.tier === config.tier;
+ if (status.active_attempt_id && isSelectedTier) {
+ const order = Math.max(1, Math.min(VIDEO_COUNT + TYPED_COUNT, Number(status.active_attempt_current_station_order || 1)));
+ return `
+ <div style="max-width:720px;margin:0 auto 18px;background:#ecfdf5;border:1px solid rgba(22,163,74,0.24);border-radius:12px;padding:13px 15px;text-align:left;">
+ <div style="font-size:0.75rem;font-weight:900;color:#14532d;">Active mock found</div>
+ <div style="font-size:0.74rem;color:#166534;line-height:1.45;margin-top:3px;">Your ${esc(tierLabel(status.tier))} mock is saved on the server at station ${order}. Press Resume to continue from the latest saved station.</div>
+ </div>
+ `;
+ }
+ if (isSelectedTier && hasFullMockPass(status, config.tier)) {
+ return `
+ <div style="max-width:720px;margin:0 auto 18px;background:#eff6ff;border:1px solid rgba(14,165,233,0.24);border-radius:12px;padding:13px 15px;text-align:left;">
+ <div style="font-size:0.75rem;font-weight:900;color:var(--navy);">Mock pass ready</div>
+ <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;margin-top:3px;">Your ${esc(tierLabel(status.tier))} mock pass is active. Press Enter to read the rules and begin.</div>
+ </div>
+ `;
+ }
+ if (status.tier && !isSelectedTier) {
+ return `
+ <div style="max-width:720px;margin:0 auto 18px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:13px 15px;text-align:left;">
+ <div style="font-size:0.75rem;font-weight:900;color:#9a3412;">Different mock pass active</div>
+ <div style="font-size:0.74rem;color:#7c2d12;line-height:1.45;margin-top:3px;">Your active pass is for the ${esc(tierLabel(status.tier))} mock. Select that version above to resume or start it.</div>
+ </div>
+ `;
+ }
+ return '';
+ }
+
  function renderIdle() {
  const area = ensureMainArea();
  if (!area) return;
@@ -669,12 +720,14 @@ window.FullCasperMock = (() => {
  </div>
  </div>
  ` : '';
+ const serverBanner = mockServerBanner();
  area.innerHTML = `
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:34px 32px;text-align:center;">
  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Full CASPer Mock Exam</div>
  <h2 style="font-size:1.7rem;line-height:1.2;color:var(--navy);margin:0 0 10px;">Practise the full sequence in one sitting.</h2>
  <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with the optional breaks built in. The stations are completely new and handwritten by Dan, so it feels like a fresh exam rather than recycled practice.</p>
  ${draftBanner}
+ ${serverBanner}
  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:720px;margin:0 auto 26px;text-align:left;">
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
  <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">4 video stations</div>
@@ -715,7 +768,7 @@ window.FullCasperMock = (() => {
  <div data-mock-tier-copy="short" style="max-width:620px;margin:13px auto 0;font-size:0.78rem;color:var(--gray500);line-height:1.55;">Transcript analyses what you said in the video stations, without voice or presentation review. <a href="plans.html#mock" style="color:var(--teal3);font-weight:800;text-decoration:none;">See full details</a>.</div>
  </div>
  `;
- setTier(config.tier);
+ setTier(config.tier, { skipIdleRender: true });
  }
 
  async function startMock() {
@@ -753,6 +806,9 @@ window.FullCasperMock = (() => {
  alert(err.message || 'Could not start checkout. Please try again.');
  });
  return;
+ }
+ if (mockStatusCache?.active_attempt_id && mockStatusCache?.tier === config.tier) {
+ rulesAccepted = true;
  }
  setCheckoutState(false);
 
@@ -899,6 +955,25 @@ window.FullCasperMock = (() => {
  if (!row || row.feedbackSettled) return;
  row.feedbackSettled = true;
  row.processingError = err?.message || 'Feedback processing failed.';
+ }
+
+ function prepareMockFeedbackTask(row) {
+ if (!row?.feedbackTask) return Promise.resolve(null);
+ if (row.feedbackTaskPrepared) return row.feedbackTask;
+ row.feedbackTaskPrepared = true;
+ const task = Promise.resolve(row.feedbackTask)
+ .then(data => {
+ applyMockFeedbackData(row, data);
+ saveMockDraft({ phase: 'analysis_saved' });
+ return data;
+ })
+ .catch(err => {
+ applyMockFeedbackError(row, err);
+ saveMockDraft({ phase: 'analysis_failed' });
+ throw err;
+ });
+ row.feedbackTask = task;
+ return task;
  }
 
  function serialiseAttemptRows(rows = buildRows()) {
@@ -1410,13 +1485,14 @@ window.FullCasperMock = (() => {
  };
  results.push(submittedRow);
  if (submittedRow.feedbackTask) {
+ const feedbackTask = prepareMockFeedbackTask(submittedRow);
+ if (submittedRow.type === 'typed') {
+ feedbackTask.catch(() => {});
+ } else {
  renderStationSaving(item.type);
  try {
- const data = await submittedRow.feedbackTask;
- applyMockFeedbackData(submittedRow, data);
- saveMockDraft({ phase: 'analysis_saved' });
+ await feedbackTask;
  } catch (err) {
- applyMockFeedbackError(submittedRow, err);
  if (submittedRow.type === 'video' && !submittedRow.recordingKey && !submittedRow.reviewId) {
  submittedRow.localRescuePending = true;
  submittedRow.processingError = `${submittedRow.processingError || 'Video upload did not complete.'} Ping SOS to Dan.`;
@@ -1427,7 +1503,7 @@ window.FullCasperMock = (() => {
  renderStationSaveError(submittedRow, err, 'local_rescue');
  return;
  }
- saveMockDraft({ phase: 'analysis_failed' });
+ }
  }
  }
  bridge?.completeCurrentStation?.();

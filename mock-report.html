@@ -25,6 +25,8 @@
  .panel{background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px;margin-bottom:16px}
  .panel h2{font-size:1.05rem;color:var(--navy);margin-bottom:8px}.panel p{font-size:.86rem;color:var(--gray600)}
  .overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.tile{background:var(--gray50);border:1px solid var(--gray200);border-radius:12px;padding:14px}.tile strong{display:block;color:var(--navy);font-size:.82rem;margin-bottom:5px}.tile p{font-size:.82rem}
+ .readiness{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.ready-item{background:var(--gray50);border:1px solid var(--gray200);border-radius:12px;padding:12px}.ready-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}.ready-head strong{font-size:.82rem;color:var(--navy)}.status{font-size:.64rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}.status.ready{color:var(--green)}.status.work{color:var(--red)}.status.watch{color:var(--amber)}
+ .action-list{display:grid;gap:10px}.action-row{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;border-top:1px solid var(--gray100);padding-top:10px}.action-row:first-child{border-top:0;padding-top:0}.action-num{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900}.action-kicker{font-size:.66rem;font-weight:900;color:var(--teal3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}.action-title{font-size:.86rem;font-weight:900;color:var(--navy);line-height:1.35}
  .notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:11px 13px;font-size:.8rem;margin-top:12px}
  .manual{background:#f0fdf4;border-color:#bbf7d0}.manual strong{color:#14532d}.manual p{color:#166534;white-space:pre-wrap}
  .station{background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:18px;margin-bottom:14px}
@@ -67,6 +69,11 @@
  function hasFeedback(row){return !!(row?.feedback&&typeof row.feedback==='object'&&Object.keys(row.feedback).length);}
  function rowScore(row){if(!hasFeedback(row))return '-';const n=Number(row.feedback?.overall?.score??row.feedback?.score??row.score);return Number.isFinite(n)&&n>0?`${Math.round(n*10)/10}/10`:'-';}
  function feedback(row){const fb=row.feedback||{},overall=fb.overall||{};if(!hasFeedback(row)&&row.processing_error)return{strength:'Video analysis did not complete.',improve:row.processing_error};return{strength:overall.biggest_strength||fb.strengths||fb.strength||'No specific strength returned.',improve:overall.biggest_improvement||fb.improvements||fb.improve||'No specific improvement returned.'};}
+ function numericScore(row){const n=Number(row?.feedback?.overall?.score??row?.feedback?.score??row?.score);return Number.isFinite(n)?n:null;}
+ function avgScore(rows){const values=rows.map(numericScore).filter(Number.isFinite);return values.length?Math.round((values.reduce((sum,n)=>sum+n,0)/values.length)*10)/10:'-';}
+ function statusLabel(status){return status==='ready'?'Ready':status==='work'?'Needs work':'Watch';}
+ function readinessHTML(items){const rows=Array.isArray(items)&&items.length?items:[{label:'Overall repeatability',status:'watch',detail:'Open the station detail below and check whether the same weakness repeats.'}];return `<div class="readiness">${rows.map(item=>`<div class="ready-item"><div class="ready-head"><strong>${esc(item.label||'Readiness')}</strong><span class="status ${esc(item.status||'watch')}">${esc(statusLabel(item.status))}</span></div><p>${esc(item.detail||'Review the station evidence before deciding what to practise next.')}</p></div>`).join('')}</div>`;}
+ function actionPlanHTML(actions){const rows=Array.isArray(actions)&&actions.length?actions:[{label:'Next practice move',title:'Repeat the weakest station type under timing',detail:'Use the station breakdown below to choose what to practise next.'}];return `<div class="action-list">${rows.map((action,i)=>`<div class="action-row"><div class="action-num">${i+1}</div><div><div class="action-kicker">${esc(action.label||'Next step')}</div><div class="action-title">${esc(action.title||'Practice under timing')}</div><p>${esc(action.detail||'Keep the focus narrow so the next station has one clear target.')}</p></div></div>`).join('')}</div>`;}
  function paramsId(){return new URLSearchParams(location.search).get('id')||'';}
  document.addEventListener('DOMContentLoaded',()=>{
  Key2MDAuth.init({tool:'casper',apiBase:API_BASE,onAuthChange:user=>{if(user)loadReport();else showLogin();}});
@@ -93,8 +100,8 @@
  <div class="stats">
  <div class="stat"><strong>${esc(report.overallAvg??'-')}</strong><span>Overall /10</span></div>
  <div class="stat"><strong>${rows.length}</strong><span>Stations</span></div>
- <div class="stat"><strong>${videoRows.length}</strong><span>Video</span></div>
- <div class="stat"><strong>${typedRows.length}</strong><span>Typed</span></div>
+ <div class="stat"><strong>${esc(avgScore(videoRows))}</strong><span>Video avg</span></div>
+ <div class="stat"><strong>${esc(avgScore(typedRows))}</strong><span>Typed avg</span></div>
  <div class="stat"><strong>${esc(fmtDate(attempt.completed_at)||'-')}</strong><span>Completed</span></div>
  </div>
  </section>
@@ -107,6 +114,14 @@
  </div>
  ${manual?`<div class="tile manual" style="margin-top:12px;"><strong>Dan's manual review result</strong><p>${esc(manual)}</p></div>`:''}
  <div class="notice">Video recordings expire 30 days after the mock. Transcripts and feedback remain available so you can still understand the marking.</div>
+ </section>
+ <section class="panel">
+ <h2>Readiness dashboard</h2>
+ ${readinessHTML(report.readiness)}
+ </section>
+ <section class="panel">
+ <h2>Next practice block</h2>
+ ${actionPlanHTML(report.actionPlan)}
  </section>
  ${rows.map(stationHTML).join('')}`;
  }

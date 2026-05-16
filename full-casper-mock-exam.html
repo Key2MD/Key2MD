@@ -74,7 +74,7 @@
  "price": "59",
  "priceCurrency": "AUD",
  "availability": "https://schema.org/InStock",
- "url": "https://www.key2md.com/practice.html?tab=mock"
+ "url": "https://www.key2md.com/practice.html?tab=mock&mock_tier=transcript"
  },
  {
  "@type": "Offer",
@@ -82,7 +82,7 @@
  "price": "79",
  "priceCurrency": "AUD",
  "availability": "https://schema.org/InStock",
- "url": "https://www.key2md.com/practice.html?tab=mock"
+ "url": "https://www.key2md.com/practice.html?tab=mock&mock_tier=premium"
  }
  ]
  },
@@ -168,6 +168,10 @@
  .sequence-block{border:1px solid var(--gray200);border-radius:8px;padding:22px;background:#fff}
  .sequence-label{font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);margin-bottom:8px}
  .arrow{font-size:1.5rem;color:var(--gray500);font-weight:900}
+ .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+ .step{background:#fff;border:1px solid var(--gray200);border-radius:8px;padding:20px}
+ .step-num{width:30px;height:30px;border-radius:999px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.82rem;margin-bottom:12px}
+ .step h3{font-size:1rem;color:var(--navy);margin-bottom:8px}.step p{font-size:.9rem;color:var(--gray600)}
  .plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
  .plan{border:1px solid var(--gray200);border-radius:8px;padding:24px;background:#fff}
  .plan.premium{border-color:rgba(124,58,237,.35);box-shadow:0 18px 40px rgba(124,58,237,.12)}
@@ -202,7 +206,7 @@
  .nav-dropdown-menu{position:static;opacity:1;visibility:visible;transform:none;width:100%;min-width:0;margin-top:0;padding:6px;display:grid;gap:4px;background:#0a1628;border-color:rgba(14,165,233,.16);box-shadow:none}
  .nav-dropdown-menu a{padding:9px 10px;white-space:normal}
  .hero{min-height:82vh;padding-top:126px}
- .grid,.plans,.report,.sequence{grid-template-columns:1fr}
+ .grid,.plans,.report,.sequence,.steps{grid-template-columns:1fr}
  .arrow{display:none}
  }
  </style>
@@ -248,8 +252,8 @@
  <h1>Practise the whole test in one sitting.</h1>
  <p class="hero-sub">A realistic CASPer mock exam for Australian medical applicants: 4 video scenarios first, then 7 typed scenarios, using 11 completely new stations handwritten by Dan.</p>
  <div class="hero-actions">
- <a class="btn btn-primary" href="practice.html?tab=mock">Buy and start the mock</a>
- <a class="btn btn-secondary" href="plans.html#mock">Compare mock plans</a>
+ <a class="btn btn-primary" href="practice.html?tab=mock&mock_tier=transcript">Start Transcript Mock</a>
+ <a class="btn btn-secondary" href="practice.html?tab=mock&mock_tier=premium">Start Premium Mock</a>
  </div>
  <div class="hero-proof">
  <div class="proof-pill">4 video stations</div>
@@ -318,8 +322,25 @@
  <div class="metric"><strong>Criterion heatmap</strong><span>Empathy, reasoning, reflection</span></div>
  <div class="metric"><strong>Stamina pattern</strong><span>Early vs late station quality</span></div>
  <div class="metric"><strong>Category weaknesses</strong><span>Role-play, policy, motivation, conflict</span></div>
+ <div class="metric"><strong>Readiness dashboard</strong><span>Ready, watch, or needs work</span></div>
+ <div class="metric"><strong>Next practice block</strong><span>What to do in the next 7 days</span></div>
  <div class="metric"><strong>Cohort interpretation</strong><span>Against Key2MD's competitive prep cohort</span></div>
  <div class="metric"><strong>One priority</strong><span>The highest-yield fix before test day</span></div>
+ </div>
+ </div>
+ </section>
+
+ <section>
+ <div class="container">
+ <div class="section-head">
+ <div class="kicker">After checkout</div>
+ <h2>Pay once, start when ready, resume if interrupted.</h2>
+ <p class="lead">The mock is built for a proper sitting, but students still need a safety net if the browser closes or a video upload needs time.</p>
+ </div>
+ <div class="steps">
+ <div class="step"><div class="step-num">1</div><h3>Choose a tier</h3><p>Transcript reviews what you said. Premium adds voice, pacing, and presentation feedback for video stations.</p></div>
+ <div class="step"><div class="step-num">2</div><h3>Complete the sequence</h3><p>The mock opens 4 video stations first, then 7 typed stations, with the same breaks students need to practise.</p></div>
+ <div class="step"><div class="step-num">3</div><h3>Use the report</h3><p>At the end, students get a private report with readiness signals, station detail, and the next practice block.</p></div>
  </div>
  </div>
  </section>
@@ -342,7 +363,7 @@
  <li>Full mock report and cohort interpretation</li>
  <li>11 new stations handwritten by Dan</li>
  </ul>
- <a class="btn btn-primary" href="practice.html?tab=mock">Start Transcript Mock</a>
+ <a class="btn btn-primary" href="practice.html?tab=mock&mock_tier=transcript">Start Transcript Mock</a>
  </div>
  <div class="plan premium">
  <div class="plan-name">Premium Mock</div>
@@ -354,7 +375,7 @@
  <li>Presentation feedback from video stations</li>
  <li>Premium full mock debrief</li>
  </ul>
- <a class="btn btn-primary" href="practice.html?tab=mock">Start Premium Mock</a>
+ <a class="btn btn-primary" href="practice.html?tab=mock&mock_tier=premium">Start Premium Mock</a>
  </div>
  </div>
  </div>
@@ -365,7 +386,7 @@
  <div class="kicker">Ready when you are</div>
  <h2>Use it after 5-10 single stations.</h2>
  <p class="lead">Warm up with ordinary practice first. When your answers are no longer blank-page panic, run the full mock to test endurance, format familiarity, and repeatable performance.</p>
- <a class="btn btn-primary" href="practice.html?tab=mock">Open the Full CASPer Mock</a>
+ <a class="btn btn-primary" href="practice.html?tab=mock&mock_tier=transcript">Open the Full CASPer Mock</a>
  </div>
  </section>
  </main>
