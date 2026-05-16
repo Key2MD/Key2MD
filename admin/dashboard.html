@@ -308,6 +308,8 @@
 .warm-outreach.recent{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.25);color:var(--red);}
 .warm-outreach.contacted{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.28);color:var(--amber);}
 .warm-outreach.ready_followup{background:rgba(56,189,248,0.12);border-color:rgba(56,189,248,0.24);color:var(--blue);}
+.warm-filter-check{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:0.78rem;font-weight:800;white-space:nowrap;cursor:pointer;}
+.warm-filter-check input{accent-color:var(--blue);}
 .warm-draft{white-space:pre-wrap;background:#06111f;border:1px solid var(--border2);border-radius:12px;padding:14px;color:#dbeafe;font-size:0.78rem;line-height:1.6;max-height:360px;overflow:auto;}
 .warm-email-panel{background:#06111f;border:1px solid var(--border2);border-radius:14px;overflow:hidden;}
 .warm-email-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(56,189,248,0.06);}
@@ -838,8 +840,15 @@
  <option value="not_contacted">Not contacted</option>
  <option value="ready_followup">Ready follow-up</option>
  <option value="contacted">Already contacted</option>
- <option value="recent">Contacted last 7 days</option>
+ <option value="recent">Contacted last 10 days</option>
  </select>
+ <select class="ctrl-sel" id="warmActivity" onchange="loadWarmLeads()">
+ <option value="7">Active last 7 days</option>
+ <option value="14" selected>Active last 14 days</option>
+ <option value="30">Active last 30 days</option>
+ <option value="0">All activity</option>
+ </select>
+ <label class="warm-filter-check"><input id="warmHideRecentContact" type="checkbox" checked onchange="loadWarmLeads()"> Hide contacted last 10 days</label>
  <select class="ctrl-sel" id="warmScore" onchange="loadWarmLeads()">
  <option value="25">Watch+</option>
  <option value="35" selected>Warm+</option>
@@ -2889,18 +2898,22 @@ async function loadWarmLeads() {
  const limit = document.getElementById('warmLimit')?.value || '50';
  const minScore = document.getElementById('warmScore')?.value || '35';
  const product = document.getElementById('warmProduct')?.value || '';
+ const activeDays = document.getElementById('warmActivity')?.value || '14';
+ const hideRecentContact = document.getElementById('warmHideRecentContact')?.checked !== false;
  const status = document.getElementById('warmStatus');
  const tbody = document.getElementById('warmBody');
  const empty = document.getElementById('warmEmpty');
  if (status) status.textContent = 'Loading warm leads...';
  if (empty) empty.classList.add('hidden');
- let url = `/admin/warm-leads?limit=${encodeURIComponent(limit)}&min_score=${encodeURIComponent(minScore)}`;
+ let url = `/admin/warm-leads?limit=${encodeURIComponent(limit)}&min_score=${encodeURIComponent(minScore)}&active_days=${encodeURIComponent(activeDays)}`;
+ if (hideRecentContact) url += '&exclude_contacted_days=10';
  if (product) url += `&product=${encodeURIComponent(product)}`;
  try {
  const res = await api(url);
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.error || 'Failed');
  S.warmLeads = applyWarmLeadLocalOutreach(data.rows || []);
+ S.warmLeadSummary = data.summary || {};
  const updated = document.getElementById('warmLeadUpdated');
  if (updated) updated.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
  renderWarmLeads();
@@ -2916,8 +2929,14 @@ async function loadWarmLeads() {
 function renderWarmLeads() {
  const q = (document.getElementById('warmSearch')?.value || '').trim().toLowerCase();
  const outreachFilter = document.getElementById('warmOutreach')?.value || '';
+ const hideRecentContact = document.getElementById('warmHideRecentContact')?.checked !== false;
+ let hiddenRecentContact = 0;
  const rows = (S.warmLeads || []).filter(row => {
  const outreach = row.outreach_history || {};
+ if (hideRecentContact && warmLeadRecentlyContacted(outreach, 10)) {
+ hiddenRecentContact += 1;
+ return false;
+ }
  const status = outreach.status || 'not_contacted';
  const outreachMatch = !outreachFilter
  || status === outreachFilter
@@ -2928,9 +2947,9 @@ function renderWarmLeads() {
  row.email,row.name,row.recommended_product,row.lead_level,
  ...(row.reasons || []),
  row.sample?.question_preview,row.sample?.quote,row.sample?.rewrite,row.sample?.improvement,row.outreach?.body,
- outreach.label,outreach.last_outreach_subject,
+ outreach.label,outreach.last_outreach_subject,row.activity_label,row.last_activity_at,row.last_practice_at,
  ].some(value => String(value || '').toLowerCase().includes(q));
- });
+ }).sort(warmLeadClientSort);
  const hot = rows.filter(row => Number(row.lead_score || 0) >= 75).length;
  const warm = rows.filter(row => Number(row.lead_score || 0) >= 55 && Number(row.lead_score || 0) < 75).length;
  const watch = rows.filter(row => Number(row.lead_score || 0) < 55).length;
@@ -2940,15 +2959,21 @@ function renderWarmLeads() {
  setText('warmWatch', watch || '-');
  setText('warmReached', reached || '-');
  setText('warmTotal', rows.length || '-');
- setText('warmStatus', `${rows.length} warm lead${rows.length===1?'':'s'}`);
+ const activeLabel = document.getElementById('warmActivity')?.selectedOptions?.[0]?.textContent || 'Recent activity';
+ const hiddenNote = hideRecentContact && hiddenRecentContact ? ` | ${hiddenRecentContact} contacted <10d hidden` : '';
+ setText('warmStatus', `${rows.length} warm lead${rows.length===1?'':'s'} | ${activeLabel}${hiddenNote}`);
  document.getElementById('warmEmpty')?.classList.toggle('hidden', rows.length > 0);
  const tbody = document.getElementById('warmBody');
  if (!tbody) return;
  tbody.innerHTML = '';
  rows.forEach(row => {
- const dt = fmtDate(row.last_review_at);
+ const lastActiveAt = row.last_activity_at || row.last_review_at;
+ const dt = fmtDate(lastActiveAt);
  const score = Number(row.lead_score || 0);
  const level = warmLeadLevel(row);
+ const recentActivity = Number(row.recent_activity_count ?? (Number(row.review_count_14d || 0) + Number(row.mmi_review_count_30d || 0)));
+ const activeDays = Number(row.active_review_days || 0);
+ const siteDays = Number(row.activity_days_30d || 0);
  const tr = document.createElement('tr');
  tr.className = 'data-row';
  tr.innerHTML = `
@@ -2956,10 +2981,10 @@ function renderWarmLeads() {
  <td><span class="warm-lead-score ${level}">${score}</span><div class="cell-sub">${esc(levelLabel(level))}</div></td>
  <td><div class="cell-main">${emailWithDuplicateFlag(row.email,row)}</div><div class="cell-sub">${esc(row.name || '-')} | ${esc(row.tier || 'free')}</div></td>
  <td><div class="cell-main">${esc(row.recommended_product || '-')}</div><div class="cell-sub">${row.avg_casper_score ? `CASPer avg ${esc(row.avg_casper_score)}/10` : 'No CASPer average yet'}</div></td>
- <td><div class="cell-main">${Number(row.review_count || 0)} written | ${Number(row.mmi_review_count || 0)} MMI</div><div class="cell-sub">${Number(row.review_count_14d || 0)} recent | ${Number(row.active_review_days || 0)} active days | ${fmtMoney(row.total_spend_aud || 0)} spend</div></td>
+ <td><div class="cell-main">${recentActivity} recent | ${Number(row.review_count || 0)} written | ${Number(row.mmi_review_count || 0)} MMI</div><div class="cell-sub">${activeDays} practice days | ${siteDays} site days | ${fmtMoney(row.total_spend_aud || 0)} spend</div></td>
  <td><div class="warm-reason-list">${(row.reasons || []).slice(0,5).map(reason => `<span class="warm-reason">${esc(reason)}</span>`).join('')}</div></td>
  <td>${outreachBadge(row.outreach_history)}</td>
- <td><div class="cell-main">${dt?.date || '-'}</div><div class="cell-sub">${row.last_review_at ? relTime(row.last_review_at) : ''}</div></td>
+ <td><div class="cell-main">${dt?.date || '-'}</div><div class="cell-sub">${esc(row.activity_label || (lastActiveAt ? relTime(lastActiveAt) : ''))}</div></td>
  <td>
  <div style="display:flex;gap:5px;flex-wrap:wrap;">
  <button class="btn blue" data-warm-action="compose" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Compose</button>
@@ -3002,7 +3027,7 @@ function renderWarmLeadDetail(row) {
  <div class="mini-metric-row">
  <div class="mini-metric"><div>Lead score</div><div>${Number(row.lead_score || 0)}</div></div>
  <div class="mini-metric"><div>Practice</div><div>${Number(row.review_count || 0) + Number(row.mmi_review_count || 0)}</div></div>
- <div class="mini-metric"><div>Recent</div><div>${Number(row.review_count_14d || 0)}</div></div>
+ <div class="mini-metric"><div>Recent</div><div>${Number(row.recent_activity_count ?? (Number(row.review_count_14d || 0) + Number(row.mmi_review_count_30d || 0)))}</div></div>
  </div>
  <div class="detail-box-row"><strong>Outreach:</strong> ${outreachBadge(row.outreach_history)} ${row.outreach_history?.last_outreach_subject ? `<span style="color:var(--muted2);font-size:0.74rem;">${esc(row.outreach_history.last_outreach_subject)}</span>` : ''}</div>
  <div class="warm-reason-list" style="margin:10px 0;">${(row.reasons || []).map(reason => `<span class="warm-reason">${esc(reason)}</span>`).join('')}</div>
@@ -3081,12 +3106,29 @@ function warmLeadDaysSinceLocal(value) {
  return Math.max(0, (Date.now() - t) / 86400000);
 }
 
+function warmLeadRecentlyContacted(history, days = 10) {
+ const h = history || {};
+ if (!h.has_outreach) return false;
+ const elapsed = warmLeadDaysSinceLocal(h.last_outreach_at);
+ return elapsed !== null && elapsed <= days;
+}
+
+function warmLeadActivityTime(row) {
+ return Date.parse(row?.last_activity_at || row?.last_review_at || row?.last_practice_at || '') || 0;
+}
+
+function warmLeadClientSort(a, b) {
+ return Number(b?.activity_priority || 0) - Number(a?.activity_priority || 0)
+ || Number(b?.lead_score || 0) - Number(a?.lead_score || 0)
+ || warmLeadActivityTime(b) - warmLeadActivityTime(a);
+}
+
 function warmLeadStatusFromLocal(record) {
  const at = record?.last_outreach_at || record?.at || new Date().toISOString();
  const days = warmLeadDaysSinceLocal(at);
  const rounded = days === null ? null : Math.round(days);
  const label = days === null ? 'Contacted' : days < 1 ? 'Contacted today' : `${rounded} day${rounded === 1 ? '' : 's'} ago`;
- const status = days !== null && days <= 7 ? 'recent' : days !== null && days <= 21 ? 'contacted' : 'ready_followup';
+ const status = days !== null && days <= 10 ? 'recent' : days !== null && days <= 21 ? 'contacted' : 'ready_followup';
  return {
  has_outreach: true,
  outreach_count: Number(record?.outreach_count || record?.count || 1),

@@ -1,3 +1,11 @@
 FULL_CASPER_MOCK_BUILD_BRIEF.md
 *_BUILD_BRIEF.md
 *.local.md
+
+# Sensitive Cloudflare Worker exports must never be committed.
+worker*.js
+worker*.txt
+cloudflare-worker*.js
+cloudflare-worker*.txt
+private-worker/
+.private-worker/
