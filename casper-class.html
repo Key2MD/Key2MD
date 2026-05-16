@@ -24,6 +24,18 @@
  align-items: start;
  padding: 54px 0 80px;
  }
+ .practice-context {
+ display: none;
+ border: 1px solid rgba(14,165,233,.24);
+ background: #eff6ff;
+ color: #0f172a;
+ border-radius: 14px;
+ padding: 16px 18px;
+ margin: 24px auto 0;
+ font-size: .92rem;
+ line-height: 1.6;
+ }
+ .practice-context strong { color: #075985; }
 
  /* -- Benefits strip -- */
  .benefits-strip {
@@ -247,6 +259,14 @@
 
  /* action buttons */
  .actions { display: flex; flex-direction: column; gap: 9px; }
+ .class-question-link {
+ display: block;
+ margin-top: 12px;
+ text-align: center;
+ color: #0284c7;
+ font-size: .82rem;
+ font-weight: 800;
+ }
  .btn-primary {
  min-height: 48px;
  border: 0;
@@ -373,6 +393,11 @@
  </div>
  </div>
  </header>
+ <div class="wrap">
+ <div class="practice-context" id="practiceClassContext">
+ <strong>Coming from the practice tool?</strong> The Friday class is not a repeat of the free practice bank. Dan uses separate, more realistic CASPer tutoring stations, then marks and discusses student answers so you can see where these kinds of responses go wrong.
+ </div>
+ </div>
 
  <!-- Main content -->
  <main>
@@ -498,6 +523,7 @@
  <button class="btn-secondary" id="cancelBtn" onclick="cancelWeeklyAccess()" style="display:none;">Cancel weekly access</button>
  <button class="btn-secondary" onclick="refreshClassStatus()">Refresh access</button>
  </div>
+ <a class="class-question-link" href="mailto:brittainmbbs@gmail.com?subject=CASPer%20class%20question">Have questions before committing? Ask Dan here.</a>
  </div>
  </div>
  </aside>
@@ -764,10 +790,19 @@
  window.Key2MDTrack?.track?.(
  paymentState === 'success' ? 'class_payment_success' : 'class_payment_cancelled',
  base
- );
+  );
+  }
+
+ function showPracticeContext(){
+ const params = new URLSearchParams(location.search);
+ const from = String(params.get('from') || params.get('source') || '');
+ if (!from.startsWith('practice')) return;
+ const el = document.getElementById('practiceClassContext');
+ if (el) el.style.display = 'block';
  }
 
 	 document.addEventListener('DOMContentLoaded', () => {
+	 showPracticeContext();
 	 trackClassPaymentReturn();
 	 initClassAuth();
 	 refreshClassStatus();

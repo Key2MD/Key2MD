@@ -226,7 +226,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <nav class="k2-nav" aria-label="Primary navigation">
  <a href="index.html" class="k2-logo">Key<span>2</span>MD</a>
  <ul class="k2-nav-links">
- <li><a href="casper-class.html" class="k2-gold" data-nav="classes">Friday Classes</a></li>
+ <li><a href="casper-class.html?from=practice_nav" class="k2-gold" data-nav="classes">Friday Classes</a></li>
  <li><a href="testimonials.html" data-nav="results">Results</a></li>
  <li><a href="student-journey.html" data-nav="journey">My Journey</a></li>
  <li><a href="plans.html" data-nav="plans">Plans</a></li>
@@ -256,7 +256,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </nav>
  <nav class="k2-mobile-nav" id="k2MobileNav" aria-label="Mobile navigation">
  <a href="index.html">Home</a>
- <a href="casper-class.html" class="k2-gold">Friday Classes</a>
+ <a href="casper-class.html?from=practice_mobile_nav" class="k2-gold">Friday Classes</a>
  <a href="testimonials.html">Results</a>
  <a href="student-journey.html">My Journey</a>
  <a href="plans.html">Plans &amp; Pricing</a>
@@ -422,6 +422,19 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">-</span></button>
  </div>
  </div>
+ </div>
+
+ <div class="sidebar-card casper-class-card" id="casperClassCard">
+ <div class="casper-class-kicker">Next live class</div>
+ <div class="casper-class-title">Want to see where these answers go wrong?</div>
+ <p class="casper-class-copy">Friday class uses Dan's own CASPer tutoring stations, not the free practice-bank prompts. They are different, more realistic, and your answers to those class stations are marked and discussed live.</p>
+ <div class="casper-class-tags">
+ <span>Fridays 6pm AEST</span>
+ <span>Dan's stations</span>
+ <span>Live marking</span>
+ </div>
+ <button type="button" class="casper-class-btn" data-track="class_checkout_intent" data-track-detail="practice_sidebar" onclick="location.href='casper-class.html?from=practice_sidebar'">Save my spot</button>
+ <button type="button" class="casper-class-link" onclick="openEnquiry('CASPer Class Question')">Questions before committing?</button>
  </div>
 
  <div class="sidebar-card question-submit-card" id="questionSubmitCard">
@@ -987,18 +1000,18 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="practice-insights-area" id="bottomRail">
  <section class="practice-coach-strip" aria-label="Recommended next step">
  <div class="practice-coach-copy">
- <div class="practice-coach-kicker">Recommended next</div>
- <div class="practice-coach-title">Practise once, then decide whether you need reps, a full mock, or human feedback.</div>
- <p class="practice-coach-body">Use this page for fast CASPer/MMI reps. If your exam is close, the Friday CASPer class and full mock are the two highest-yield paid next steps; if your answer feels stuck, submit one response to Dan.</p>
+ <div class="practice-coach-kicker">Friday class next</div>
+ <div class="practice-coach-title">Want to see where these sorts of answers go wrong?</div>
+ <p class="practice-coach-body">The Friday CASPer class uses Dan's own tutoring stations, not the free practice-bank prompts. They are different, more realistic, and your answers to those class stations are marked and discussed live so you can see the patterns solo practice hides.</p>
  <div class="practice-coach-tags">
- <span class="practice-coach-tag">Friday classes until June 11</span>
- <span class="practice-coach-tag">11-station full mock</span>
- <span class="practice-coach-tag">Dan marking available</span>
+ <span class="practice-coach-tag">Fridays 6pm AEST</span>
+ <span class="practice-coach-tag">Dan's tutoring stations</span>
+ <span class="practice-coach-tag">Different from the free bank</span>
  </div>
  </div>
  <div class="practice-coach-actions">
- <button type="button" class="practice-coach-btn" data-track="class_checkout_intent" data-track-detail="practice_insights_strip" onclick="location.href='casper-class.html'">Join Friday CASPer class</button>
- <a class="practice-coach-link" href="full-casper-mock-exam.html">View full mock details</a>
+ <button type="button" class="practice-coach-btn" data-track="class_checkout_intent" data-track-detail="practice_insights_strip" onclick="location.href='casper-class.html?from=practice_strip'">Save my spot</button>
+ <button type="button" class="practice-coach-link practice-coach-link-btn" onclick="openEnquiry('CASPer Class Question')">Questions before committing?</button>
  </div>
  </section>
 
@@ -1076,10 +1089,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="practice-action-grid">
  <article class="practice-action-card dark">
  <div class="practice-action-kicker">Friday CASPer classes</div>
- <div class="practice-action-title">Live CASPer group coaching with Dan</div>
- <p class="practice-action-copy">Fridays at 6pm AEST until the June 11 exam. Choose one-off, weekly, or the $345 3-class package with last class June 5.</p>
- <div class="practice-action-meta"><span class="practice-mini-tag">$120 once</span><span class="practice-mini-tag">$120/week</span><span class="practice-mini-tag">$345 package</span></div>
- <button type="button" class="practice-action-btn" data-track="class_checkout_intent" data-track-detail="practice_insights_next" onclick="location.href='casper-class.html'">Register / Pay</button>
+ <div class="practice-action-title">Dan's tutoring stations, marked live</div>
+ <p class="practice-action-copy">Want your answers to Dan's CASPer tutoring stations marked? The class questions are different from the free bank, more realistic, and designed to show where good-looking answers break under pressure.</p>
+ <div class="practice-action-meta"><span class="practice-mini-tag">Fridays 6pm AEST</span><span class="practice-mini-tag">$120 once</span><span class="practice-mini-tag">$345 package</span></div>
+ <button type="button" class="practice-action-btn" data-track="class_checkout_intent" data-track-detail="practice_insights_next" onclick="location.href='casper-class.html?from=practice_next'">Register / Pay</button>
  </article>
  <article class="practice-action-card">
  <div class="practice-action-kicker">Full CASPer mock</div>
@@ -1143,6 +1156,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <label>What are you interested in?</label>
  <select id="eqType">
  <option value="General Enquiry">General Enquiry</option>
+ <option value="CASPer Class Question">CASPer Class Question</option>
  <option value="Bug Report">Bug Report</option>
  </select>
  </div>
@@ -2239,8 +2253,9 @@ function syncPracticeSidebarOrder(){
  if(!category) return;
  let anchor = category;
  [
- document.getElementById('aiMarkingCard'),
- document.getElementById('leaderboardCard'),
+  document.getElementById('aiMarkingCard'),
+  document.getElementById('casperClassCard'),
+  document.getElementById('leaderboardCard'),
  document.getElementById('starredQueueCard'),
  document.getElementById('mmiOptionsCard')
  ].forEach(function(card){
@@ -2604,10 +2619,12 @@ function applyModeUI(mode) {
  const cc = $('casperCategoryCard'), mc = $('mmiCategoryCard'), mo = $('mmiOptionsCard');
  const ccard = $('categoryCard'), chdr = $('categoryCardHeader');
  const sq = $('starredQueueCard');
+ const classCard = $('casperClassCard');
  if (cc) cc.style.display = isCasper ? '' : 'none';
  if (mc) mc.style.display = isMMI ? '' : 'none';
  if (mo) mo.style.display = isMMI ? '' : 'none';
  if (sq) sq.style.display = isCasper ? '' : 'none';
+ if (classCard) classCard.style.display = isCasper ? '' : 'none';
  if (ccard) ccard.style.display = isMock ? 'none' : ''; // the mock has its own dedicated setup card
  if (chdr) chdr.textContent = isCasper ? 'Category' : isMMI ? 'MMI Station Type' : 'Full Mock';
 
@@ -3309,10 +3326,10 @@ async function runAI(idx){
  else {
  getAiFbEl().innerHTML=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-top:10px;">
  <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">Free AI review used for today</strong>
- <span style="font-size:0.82rem;color:#78350f;">Buy credits for more AI reviews, or wait until midnight AEST.</span>
+ <span style="font-size:0.82rem;color:#78350f;">Buy credits for more AI reviews, or use Friday class to see Dan's more realistic tutoring stations marked live.</span>
  <br><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
  <button onclick="openCreditShop()" style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Buy AI Credits -></button>
- <button onclick="openMarkingModal()" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Submit to Dan ($35) -></button>
+ <button onclick="location.href='casper-class.html?from=practice_free_used'" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Join Friday class -></button>
  </div>
  </div>`;
  updateLimitUI(); return;
@@ -3381,8 +3398,11 @@ ${h.answer}
  const d = await res.json().catch(()=>({}));
  container.innerHTML=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-top:10px;">
  <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">Free AI review used for today</strong>
- <span style="font-size:0.82rem;color:#78350f;">${d.message||'Buy credits or wait until midnight AEST.'}</span>
- <br><button onclick="openCreditShop()" style="margin-top:10px;background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Buy AI Credits -></button>
+ <span style="font-size:0.82rem;color:#78350f;">${d.message||'Buy credits, join Friday class, or wait until midnight AEST.'}</span>
+ <br><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+ <button onclick="openCreditShop()" style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Buy AI Credits -></button>
+ <button onclick="location.href='casper-class.html?from=practice_limit'" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Join Friday class -></button>
+ </div>
  </div>`;
  updateLimitUI(); return;
  }
@@ -5072,11 +5092,11 @@ function openEnquiry(type){
  var bugRow=document.getElementById('eqBugRow');
  if(bugRow) bugRow.style.display=(type==='Bug Report')?'block':'none';
  if(type&&select){for(var i=0;i<select.options.length;i++){if(select.options[i].value===type){select.selectedIndex=i;break;}}}
- if(false){
- badge.textContent=' Group Session';
+ if(type==='CASPer Class Question'){
+ badge.textContent=' CASPer Class';
  badge.style.cssText='background:rgba(14,165,233,0.15);color:#38bdf8;border:1px solid rgba(14,165,233,0.3);';
- title.textContent='Join Friday CASPer Group';
- sub.textContent='Dan usually replies within 24 hours.';
+ title.textContent='Questions before committing?';
+ sub.textContent='Ask Dan anything about the Friday class before you pay.';
  } else if(type==='Bug Report'){
  badge.textContent=' Bug Report';
  badge.style.cssText='background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);';
@@ -5559,6 +5579,7 @@ function k2RenderNudge(){
  const count = p.count || 0;
  const scores = (p.scores || []).map(s => s.score).filter(s => s != null);
  const avgScore = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
+ const latestScore = scores.length ? Number(scores[scores.length - 1]) : null;
 
  // Remove any existing nudge
  const existing = document.getElementById('k2Nudge');
@@ -5570,11 +5591,22 @@ function k2RenderNudge(){
  if (count >= 4 && !dismissed['plateau'] && k2DetectPlateau(p.scores)) {
  nudge = {
  key: 'plateau',
- badge: ' Progress Insight',
+ badge: ' Class next step',
  title: "Your last few scores are clustered around the same mark.",
- body: "Most students hit this wall - and it's usually the same 2-3 habits causing it. A 1-hour session with Dan will identify exactly what's holding your score steady. Students typically see a 1-2 quartile jump in their next 5 stations.",
- cta: {text:'Book a 1-Hour Session - $300 ->', href:'https://calendly.com/brittainmbbs/1-1-tutoring-1-hour'},
- secondary: {text:'Or 15-min chat (free)', href:'https://calendly.com/brittainmbbs/30min'},
+ body: "This is where live class helps: you see where these sorts of answers go wrong, then answer Dan's own CASPer tutoring stations. Those stations are different from the free bank, more realistic, and marked live so the pattern is harder to miss.",
+ cta: {text:'Join Friday CASPer class ->', href:'#', onclick:"location.href='casper-class.html?from=practice_plateau';return false;"},
+ secondary: {text:'Questions before committing?', href:'#', onclick:"openEnquiry('CASPer Class Question');return false;"},
+ };
+ }
+ // Low-score check-in after repeated CASPer practice
+ else if (count >= 2 && Number.isFinite(latestScore) && latestScore < 6 && !dismissed['class_low']) {
+ nudge = {
+ key: 'class_low',
+ badge: ' Class next step',
+ title: "Want to see where these sorts of answers go wrong?",
+ body: "Friday class is not a re-mark of the free-bank prompt you just did. You work through Dan's own tutoring stations instead: different prompts, more realistic pressure, and live marking of the answers students produce in class.",
+ cta: {text:'Save my Friday spot ->', href:'#', onclick:"location.href='casper-class.html?from=practice_low_score';return false;"},
+ secondary: {text:'Ask a question first', href:'#', onclick:"openEnquiry('CASPer Class Question');return false;"},
  };
  }
  // 15+ sessions - serious learner
@@ -5592,22 +5624,22 @@ function k2RenderNudge(){
  else if (count >= 8 && count < 15 && !dismissed['regular']) {
  nudge = {
  key: 'regular',
- badge: '* You\'ve been practising',
- title: `${count} stations done. Want Dan to mark one personally?`,
- body: "AI feedback is great for pattern recognition, but for the nuance that moves you from Q3 to Q4, nothing beats an MD student who's coached 200+ students across MMI and CASPer. $35 per CASPer response, 48hr turnaround.",
- cta: {text:'Submit a Response - $35', href:'#', onclick:"openMarkingModal();return false;"},
- secondary: {text:'Or book a full session', href:'https://calendly.com/brittainmbbs/1-1-tutoring-1-hour'},
+ badge: ' You\'ve been practising',
+ title: `${count} stations done. Time to compare against better stations?`,
+ body: "The free bank is useful for reps. Friday class is where Dan's more realistic tutoring stations come out, and the class works through why strong-looking CASPer answers still miss the mark.",
+ cta: {text:'Join Friday CASPer class ->', href:'#', onclick:"location.href='casper-class.html?from=practice_regular';return false;"},
+ secondary: {text:'Questions before committing?', href:'#', onclick:"openEnquiry('CASPer Class Question');return false;"},
  };
  }
  // 3-7 sessions - first real check-in
  else if (count >= 3 && count < 8 && !dismissed['first']) {
  nudge = {
  key: 'first',
- badge: ' Tip',
- title: `${count} sessions in. Know where you actually stand?`,
- body: "The AI score is a rough guide. If you want Dan (University of Melbourne MD student | 72 med offers in 2024-25 | 93%+ offer rate) to personally tell you what a Q4 response would look like for your answer - that's what expert marking is for.",
- cta: {text:'Expert Marking - $35', href:'#', onclick:"openMarkingModal();return false;"},
- secondary: null,
+ badge: ' Class next step',
+ title: `${count} stations in. Want to see the mistakes live?`,
+ body: "In Friday class, Dan uses his own CASPer tutoring stations, not these free practice prompts. They are more realistic and the group sees how answers to those stations are marked, where they drift, and what stronger reasoning sounds like.",
+ cta: {text:'Save my spot ->', href:'#', onclick:"location.href='casper-class.html?from=practice_first_nudge';return false;"},
+ secondary: {text:'Ask Dan a question first', href:'#', onclick:"openEnquiry('CASPer Class Question');return false;"},
  };
  }
 

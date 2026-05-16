@@ -24,10 +24,11 @@
  .sidebar > .btn-start { order:2; }
  #aiMarkingCard { order:3; }
  #categoryCard { order:4; }
- #questionSubmitCard { order:5; }
- #leaderboardCard { order:6; }
- #starredQueueCard { order:7; }
- #mmiOptionsCard { order:8; }
+ #casperClassCard { order:5; }
+ #questionSubmitCard { order:6; }
+ #leaderboardCard { order:7; }
+ #starredQueueCard { order:8; }
+ #mmiOptionsCard { order:9; }
  .account-card { border-color:rgba(14,165,233,0.26); box-shadow:0 14px 34px rgba(14,165,233,0.08); }
  .account-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
  .account-card-kicker { font-size:0.68rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal3); margin-bottom:4px; }
@@ -44,6 +45,16 @@
  .question-submit-btn { width:100%; border:0; border-radius:999px; background:var(--gold); color:var(--navy); padding:10px 13px; font-family:inherit; font-size:0.8rem; font-weight:900; cursor:pointer; transition:transform 0.18s, background 0.18s; }
  .question-submit-btn:hover { background:#fbbf24; transform:translateY(-1px); }
 
+ .casper-class-card { border-color:rgba(14,165,233,0.28); background:linear-gradient(180deg,#ffffff,#eff6ff); box-shadow:0 14px 34px rgba(14,165,233,0.08); }
+ .casper-class-kicker { font-size:0.66rem; font-weight:900; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal3); margin-bottom:5px; }
+ .casper-class-title { font-size:1rem; line-height:1.3; font-weight:900; color:var(--navy); margin-bottom:7px; }
+ .casper-class-copy { font-size:0.76rem; color:var(--gray600); line-height:1.52; margin-bottom:11px; }
+ .casper-class-tags { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:12px; }
+ .casper-class-tags span { font-size:0.62rem; font-weight:850; border-radius:999px; padding:3px 7px; color:#075985; background:#e0f2fe; border:1px solid rgba(14,165,233,0.18); }
+ .casper-class-btn { width:100%; border:0; border-radius:999px; background:var(--navy); color:#fff; padding:10px 13px; font-family:inherit; font-size:0.8rem; font-weight:900; cursor:pointer; transition:transform 0.18s, background 0.18s; }
+ .casper-class-btn:hover { background:var(--navy2); transform:translateY(-1px); }
+ .casper-class-link { width:100%; border:0; background:transparent; color:var(--teal3); padding:9px 8px 0; font-family:inherit; font-size:0.76rem; font-weight:850; cursor:pointer; text-align:center; }
+
  /* Practice insights - replaces the old clunky bottom-card grid with one coach-led panel. */
  .practice-insights-area { display:flex; flex-direction:column; gap:14px; margin-top:24px; }
  .practice-coach-strip { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:18px; align-items:center; padding:18px 20px; border-radius:var(--radius); background:linear-gradient(135deg,#071326,#0d2a52); border:1px solid rgba(14,165,233,0.25); color:#fff; overflow:hidden; position:relative; }
@@ -58,6 +69,7 @@
  .practice-coach-btn { display:flex; align-items:center; justify-content:center; border:0; border-radius:999px; padding:11px 16px; background:var(--teal); color:#fff; font-size:0.84rem; font-weight:900; cursor:pointer; font-family:inherit; white-space:nowrap; transition:background 0.18s, transform 0.18s; }
  .practice-coach-btn:hover { background:var(--teal2); transform:translateY(-1px); }
  .practice-coach-link { display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.16); border-radius:999px; padding:9px 13px; color:rgba(255,255,255,0.72); font-size:0.78rem; font-weight:800; background:rgba(255,255,255,0.04); }
+ .practice-coach-link-btn { cursor:pointer; font-family:inherit; }
  .practice-insights { background:#fff; border:1px solid var(--gray200); border-radius:var(--radius); overflow:hidden; }
  .practice-insights-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; padding:18px 20px; border-bottom:1px solid var(--gray100); }
  .practice-insights-title { font-size:1.05rem; font-weight:900; color:var(--navy); line-height:1.3; margin-bottom:3px; }
