@@ -72,9 +72,29 @@
    "vte risk": ["vte"]
   },
   examination: {
+   "inspection": ["inspection"],
+   "inspect": ["inspection"],
+   "first look": ["inspection"],
+   "general appearance": ["inspection"],
+   "appearance": ["inspection"],
+   "how does the patient look": ["inspection"],
+   "how do they look": ["inspection"],
+   "look unwell": ["inspection"],
+   "looks unwell": ["inspection"],
+   "work of breathing": ["inspection", "respiratory"],
+   "tripod": ["inspection", "respiratory"],
+   "tripodding": ["inspection", "respiratory"],
+   "pallor": ["inspection", "general"],
    "full exam": ["general", "cardiovascular", "respiratory", "abdomen", "neurological"],
-   "vitals": ["general", "bedside"],
-   "observations": ["general", "bedside"],
+   "vitals": ["vitals", "general", "bedside"],
+   "vital signs": ["vitals", "general", "bedside"],
+   "observations": ["vitals", "general", "bedside"],
+   "obs": ["vitals", "general", "bedside"],
+   "blood pressure": ["vitals", "cardiovascular"],
+   "heart rate": ["vitals", "cardiovascular"],
+   "respiratory rate": ["vitals", "respiratory"],
+   "oxygen saturation": ["vitals", "respiratory"],
+   "sats": ["vitals", "respiratory"],
    "cardio exam": ["cardiovascular"],
    "cardiovascular exam": ["cardiovascular"],
    "resp exam": ["respiratory"],
@@ -89,13 +109,12 @@
    "rectal exam": ["rectal"]
   },
   investigations: {
-   "bedside": ["bedside"],
-   "bloods": ["bloods"],
-   "imaging": ["imaging"],
-   "special": ["special"],
-   "baseline bloods": ["bloods"],
-   "urine": ["bedside", "special"],
-   "ecg": ["bedside"]
+   "bedside": ["tier:bedside"],
+   "bedside tests": ["tier:bedside"],
+   "bloods": ["tier:bloods"],
+   "baseline bloods": ["tier:bloods"],
+   "imaging": ["tier:imaging"],
+   "special tests": ["tier:special"]
   }
  };
 
@@ -188,7 +207,7 @@
 
  function serialiseDraft() {
   return {
-   version: 2,
+   version: 3,
    activeCaseId: state.activeCaseId,
    phase: state.phase,
    trainingMode: state.trainingMode,
@@ -214,6 +233,16 @@
    stationRemaining: state.stationRemaining,
    savedAt: new Date().toISOString()
   };
+ }
+
+ function latestDraftDdx(draft, phase) {
+  const initial = Array.isArray(draft.ddx) ? draft.ddx : [];
+  const afterHistory = Array.isArray(draft.postHistoryDdx) ? draft.postHistoryDdx : [];
+  const afterExam = Array.isArray(draft.postExamDdx) ? draft.postExamDdx : [];
+  if (Number(draft.version) >= 3) return initial;
+  if (["investigations", "management", "debrief"].includes(phase)) return afterExam.length ? afterExam : afterHistory.length ? afterHistory : initial;
+  if (phase === "examination") return afterHistory.length ? afterHistory : initial;
+  return initial;
  }
 
  function saveCurrentDraft(force = false) {
@@ -249,7 +278,7 @@
   state.notes = draft.notes || "";
   state.summary = draft.summary || "";
   state.ddxInput = draft.ddxInput || "";
-  state.ddx = Array.isArray(draft.ddx) ? draft.ddx : [];
+  state.ddx = latestDraftDdx(draft, state.phase);
   state.postHistoryDdxInput = draft.postHistoryDdxInput || "";
   state.postHistoryDdx = Array.isArray(draft.postHistoryDdx) ? draft.postHistoryDdx : [];
   state.postExamDdxInput = draft.postExamDdxInput || "";
@@ -313,7 +342,7 @@
  }
 
  function allStudentDdx() {
-  return unique([...state.ddx, ...state.postHistoryDdx, ...state.postExamDdx]);
+  return unique(state.ddx);
  }
 
  function formatSavedAt(iso) {
@@ -441,9 +470,14 @@
 
  function broadMatches(scope, queryNorm) {
   const map = BROAD_TERMS[scope] || {};
+  const queryWords = queryNorm.split(" ").filter(Boolean);
   const found = [];
   for (const [term, groups] of Object.entries(map)) {
-   if (queryNorm.includes(normalize(term))) found.push(...groups);
+   const termWords = normalize(term).split(" ").filter(Boolean);
+   const matched = termWords.length && queryWords.some((_, index) =>
+    termWords.every((word, offset) => queryWords[index + offset] === word)
+   );
+   if (matched) found.push(...groups);
   }
   return found;
  }
@@ -459,8 +493,12 @@
    if ((item.concepts || []).some(c => groups.includes(c))) return 0.62;
   }
   if (scope === "investigations") {
-   if (groups.includes(item.tier)) return 0.78;
-   if ((item.concepts || []).some(c => groups.includes(c))) return 0.62;
+   const tierGroups = groups
+    .filter(group => group.startsWith("tier:"))
+    .map(group => group.slice(5));
+   const conceptGroups = groups.filter(group => !group.startsWith("tier:"));
+   if (tierGroups.includes(item.tier)) return 0.78;
+   if ((item.concepts || []).some(c => conceptGroups.includes(c))) return 0.62;
   }
   return 0;
  }
@@ -630,7 +668,7 @@
 
  function canAdvancePhase(phase = state.phase) {
   if (phase === "history") {
-   return state.postHistoryDdx.length > 0 && scopeAttemptCount("history") > 0;
+   return state.ddx.length > 0 && scopeAttemptCount("history") > 0;
   }
   if (phase === "examination") return scopeAttemptCount("examination") > 0;
   if (phase === "investigations") return scopeAttemptCount("investigations") > 0;
@@ -640,11 +678,16 @@
  function phaseBlockerText(phase = state.phase) {
   if (phase === "history") {
    if (scopeAttemptCount("history") === 0) return "Ask at least one history question before moving to examination.";
-   if (!state.postHistoryDdx.length) return "Add at least one updated differential based on the history before moving to examination.";
+   if (!state.ddx.length) return "Keep at least one working differential before moving to examination.";
   }
   if (phase === "examination" && scopeAttemptCount("examination") === 0) return "Record at least one examination request before ordering investigations.";
   if (phase === "investigations" && scopeAttemptCount("investigations") === 0) return "Order at least one investigation before moving to management.";
   return "";
+ }
+
+ function captureDdxCheckpoint(phase = state.phase) {
+  if (phase === "history") state.postHistoryDdx = state.ddx.slice();
+  if (phase === "examination") state.postExamDdx = state.ddx.slice();
  }
 
  function goToPhase(nextPhase) {
@@ -657,6 +700,7 @@
    render();
    return;
   }
+  if (nextIndex > currentIndex) captureDdxCheckpoint(state.phase);
   state.phase = nextPhase;
   state.askScope = phaseScope(nextPhase) || state.askScope;
   state.askText = "";
@@ -885,13 +929,11 @@
   }
  }
 
- function ddxField(kind = "initial") {
-  if (kind === "postHistory") return { input: "postHistoryDdxInput", list: "postHistoryDdx" };
-  if (kind === "postExam") return { input: "postExamDdxInput", list: "postExamDdx" };
+ function ddxField(kind = "working") {
   return { input: "ddxInput", list: "ddx" };
  }
 
- function addDdx(kind = "initial") {
+ function addDdx(kind = "working") {
   const fields = ddxField(kind);
   const value = state[fields.input].trim();
   if (!value) return;
@@ -901,7 +943,7 @@
   saveCurrentDraft(true);
  }
 
- function removeDdx(kind = "initial", index) {
+ function removeDdx(kind = "working", index) {
   const fields = ddxField(kind);
   state[fields.list].splice(index, 1);
   render();
@@ -1187,6 +1229,7 @@
       </div>
       <p class="muted">${escapeHtml(caseData.stem)}</p>
      </section>
+     ${renderWorkingDdxPanel()}
      <section class="panel save-panel">
       <h2 class="panel-title">Local Progress</h2>
       <p class="muted" data-saved-status>${escapeHtml(formatSavedAt(state.lastSavedAt))}</p>
@@ -1251,6 +1294,7 @@
       <h2 class="panel-title">Phase Map</h2>
       ${renderPhaseStepper()}
      </section>
+     ${renderWorkingDdxPanel()}
      ${renderAttemptMode(true)}
      ${meta.scope ? `<section class="panel">
       <h2 class="panel-title">Examiner Strictness</h2>
@@ -1322,30 +1366,28 @@
       <textarea class="textarea" data-field="summary" placeholder="Open with the one-line problem representation you would give the examiner.">${escapeHtml(state.summary)}</textarea>
       <p class="helper">Keep this short. Age, key symptom, time course, acuity, and what worries you.</p>
      </div>
-     ${renderDdxEditor("initial", "Initial DDx before history", "Add your starting differentials, including must-not-miss diagnoses first", "This is your pre-history problem list. It can be wrong; the point is to make your reasoning visible.")}
+     ${renderDdxReview("Working DDx", state.ddx)}
     </section>
     ${renderExaminerCard(caseData, "history", "Phase 1 - History")}
-    ${renderDdxEditor("postHistory", "Updated DDx based on the history", "Add what moved up or down after the history", "Required before Phase 2. Force yourself to change the list before examining.")}
     ${renderPhaseActions("examination", "Move to Phase 2: Examination")}
    `;
   }
   if (meta.id === "examination") {
    return `
-    ${renderDdxReview("History-driven DDx", state.postHistoryDdx.length ? state.postHistoryDdx : state.ddx)}
+    ${renderDdxReview("Working DDx after history", state.postHistoryDdx.length ? state.postHistoryDdx : state.ddx)}
     ${renderExaminerCard(caseData, "examination", "Phase 2 - Examination")}
-    ${renderDdxEditor("postExam", "Updated DDx after examination", "Optional: refine your differentials again after examination", "Use this if the examination materially changes your probability ranking.")}
     ${renderPhaseActions("investigations", "Move to Phase 3: Investigations")}
    `;
   }
   if (meta.id === "investigations") {
    return `
-    ${renderDdxReview("Current DDx before investigations", state.postExamDdx.length ? state.postExamDdx : (state.postHistoryDdx.length ? state.postHistoryDdx : state.ddx))}
+    ${renderDdxReview("Working DDx after examination", state.postExamDdx.length ? state.postExamDdx : state.ddx)}
     ${renderExaminerCard(caseData, "investigations", "Phase 3 - Investigations")}
     ${renderPhaseActions("management", "Move to Phase 4: Management")}
    `;
   }
   return `
-   ${renderDdxReview("Final DDx entering management", allStudentDdx())}
+   ${renderDdxReview("Final working DDx", state.ddx)}
    <section class="practice-card">
     <h2 class="subhead">Working diagnosis</h2>
     <input class="input" data-field="workingDiagnosis" value="${escapeHtml(state.workingDiagnosis)}" placeholder="State your current working diagnosis before management">
@@ -1386,21 +1428,20 @@
   `;
  }
 
- function renderDdxEditor(kind, title, placeholder, helper) {
-  const fields = ddxField(kind);
-  const rows = state[fields.list] || [];
+ function renderWorkingDdxPanel() {
+  const rows = state.ddx || [];
   return `
-   <div class="practice-card ddx-card">
-    <h2 class="subhead">${escapeHtml(title)}</h2>
-    <div class="examiner-row">
-     <input class="input" data-field="${fields.input}" value="${escapeHtml(state[fields.input])}" placeholder="${escapeHtml(placeholder)}">
-     <button class="btn secondary" type="button" data-action="add-ddx" data-ddx-kind="${escapeHtml(kind)}">Add</button>
+   <section class="panel working-ddx-panel">
+    <h2 class="panel-title">Working DDx</h2>
+    <div class="ddx-quick-row">
+     <input class="input" data-field="ddxInput" value="${escapeHtml(state.ddxInput)}" placeholder="Add diagnosis to rule in/out">
+     <button class="btn secondary small" type="button" data-action="add-ddx" data-ddx-kind="working">Add</button>
     </div>
-    <p class="helper">${escapeHtml(helper)}</p>
+    <p class="micro-copy">This list follows you through the station. Add or remove diagnoses as evidence changes.</p>
     <ul class="ddx-list">
-     ${rows.map((d, idx) => `<li class="ddx-chip"><span>${escapeHtml(d)}</span><button class="icon-btn" type="button" aria-label="Remove ${escapeHtml(d)}" data-ddx-kind="${escapeHtml(kind)}" data-remove-ddx="${idx}">x</button></li>`).join("") || `<li class="answer-card empty">No differentials added yet.</li>`}
+     ${rows.map((d, idx) => `<li class="ddx-chip"><span>${escapeHtml(d)}</span><button class="icon-btn" type="button" aria-label="Remove ${escapeHtml(d)}" data-ddx-kind="working" data-remove-ddx="${idx}">x</button></li>`).join("") || `<li class="answer-card empty">No differentials added yet.</li>`}
     </ul>
-   </div>
+   </section>
   `;
  }
 
@@ -1484,7 +1525,7 @@
 
  function helperForScope(scope) {
   if (scope === "history") return state.trainingMode ? "Ask freely. If you get stuck, request one Socratic nudge." : "Ask the history you would ask in the room. The debrief will map what you missed.";
-  if (scope === "examination") return "State what you are looking for before the examiner reveals findings.";
+  if (scope === "examination") return "Start with inspection and vital signs, then state the focused findings you are looking for.";
   return "Order tests in a safe sequence: bedside, bloods, imaging, then special tests.";
  }
 
@@ -1560,9 +1601,9 @@
    <section class="debrief-card">
     <h2 class="subhead">Phase-by-phase reasoning trail</h2>
     <div class="reasoning-trail">
-     ${renderDebriefDdxSnapshot("Initial DDx", state.ddx)}
-     ${renderDebriefDdxSnapshot("After history", state.postHistoryDdx)}
-     ${renderDebriefDdxSnapshot("After examination", state.postExamDdx)}
+     ${renderDebriefDdxSnapshot("Working DDx after history", state.postHistoryDdx)}
+     ${renderDebriefDdxSnapshot("Working DDx after examination", state.postExamDdx)}
+     ${renderDebriefDdxSnapshot("Final working DDx", state.ddx)}
      <div class="trail-box"><strong>Requests made</strong><p>${scopeAttemptCount("history")} history, ${scopeAttemptCount("examination")} exam, ${scopeAttemptCount("investigations")} investigation.</p></div>
     </div>
    </section>
@@ -1618,6 +1659,11 @@
 
  function renderDebriefDdxSnapshot(label, rows) {
   return `<div class="trail-box"><strong>${escapeHtml(label)}</strong><p>${(rows || []).map(escapeHtml).join(", ") || "No entries recorded."}</p></div>`;
+ }
+
+ function draftDdxCount(draft) {
+  if (Number(draft.version) >= 3) return Number((draft.ddx || []).length);
+  return unique([...(draft.ddx || []), ...(draft.postHistoryDdx || []), ...(draft.postExamDdx || [])]).length;
  }
 
  function renderReasoningCredit(domains) {
@@ -1699,7 +1745,7 @@
       return `
        <li class="answer-card">
         <strong>${escapeHtml(caseData?.title || draft.activeCaseId)} - ${escapeHtml(phaseLabel(draft.phase))}</strong>
-        <p>${escapeHtml(formatSavedAt(draft.savedAt))} - ${Number(draft.log?.length || 0)} examiner request${Number(draft.log?.length || 0) === 1 ? "" : "s"} - ${Number((draft.ddx || []).length + (draft.postHistoryDdx || []).length + (draft.postExamDdx || []).length)} DDx entries</p>
+        <p>${escapeHtml(formatSavedAt(draft.savedAt))} - ${Number(draft.log?.length || 0)} examiner request${Number(draft.log?.length || 0) === 1 ? "" : "s"} - ${draftDdxCount(draft)} DDx entries</p>
         <div class="btn-row" style="margin-top:10px">
          <button class="btn small" type="button" data-resume-case="${escapeHtml(draft.activeCaseId)}">Resume draft</button>
          <button class="btn secondary small" type="button" data-start-case="${escapeHtml(draft.activeCaseId)}">Start new</button>
@@ -1762,7 +1808,7 @@
   }
   const removeButton = event.target.closest("[data-remove-ddx]");
   if (removeButton) {
-   removeDdx(removeButton.dataset.ddxKind || "initial", Number(removeButton.dataset.removeDdx));
+   removeDdx(removeButton.dataset.ddxKind || "working", Number(removeButton.dataset.removeDdx));
    return;
   }
   const action = event.target.closest("[data-action]")?.dataset.action;
@@ -1790,7 +1836,7 @@
   if (action === "begin-station") beginStation();
   if (action === "ask-examiner") askExaminer();
   if (action === "coach-nudge") requestCoachNudge();
-  if (action === "add-ddx") addDdx(event.target.closest("[data-action]")?.dataset.ddxKind || "initial");
+  if (action === "add-ddx") addDdx(event.target.closest("[data-action]")?.dataset.ddxKind || "working");
   if (action === "save-draft") {
    saveCurrentDraft(true);
    render();
@@ -1816,8 +1862,6 @@
   if (field === "notes") state.notes = event.target.value;
   if (field === "summary") state.summary = event.target.value;
   if (field === "ddxInput") state.ddxInput = event.target.value;
-  if (field === "postHistoryDdxInput") state.postHistoryDdxInput = event.target.value;
-  if (field === "postExamDdxInput") state.postExamDdxInput = event.target.value;
   if (field === "askText") state.askText = event.target.value;
   if (field === "management") state.management = event.target.value;
   if (field === "workingDiagnosis") state.workingDiagnosis = event.target.value;
@@ -1867,15 +1911,7 @@
   if (event.key !== "Enter" || event.shiftKey) return;
   if (event.target?.dataset?.field === "ddxInput") {
    event.preventDefault();
-   addDdx("initial");
-  }
-  if (event.target?.dataset?.field === "postHistoryDdxInput") {
-   event.preventDefault();
-   addDdx("postHistory");
-  }
-  if (event.target?.dataset?.field === "postExamDdxInput") {
-   event.preventDefault();
-   addDdx("postExam");
+   addDdx("working");
   }
   if (event.target?.dataset?.field === "askText") {
    event.preventDefault();

@@ -507,6 +507,24 @@ a { color: inherit; text-decoration: none; }
 .ddx-card {
  min-height: 100%;
 }
+.working-ddx-panel {
+ border-color: #bae6fd;
+ background: #f8fbff;
+}
+.ddx-quick-row {
+ display: grid;
+ grid-template-columns: minmax(0, 1fr) auto;
+ gap: 8px;
+ align-items: start;
+}
+.working-ddx-panel .ddx-list {
+ max-height: 240px;
+ overflow: auto;
+ padding-right: 2px;
+}
+.working-ddx-panel .ddx-chip {
+ background: var(--white);
+}
 .draft-note {
  padding: 10px 11px;
  border: 1px solid #fed7aa;
@@ -854,7 +872,7 @@ a { color: inherit; text-decoration: none; }
  .top-actions { justify-content: flex-start; }
  .app-shell { width: min(100% - 20px, 1480px); padding-top: 14px; }
  .station-stepper, .score-grid, .framework-columns { grid-template-columns: 1fr; }
- .examiner-row { grid-template-columns: 1fr; }
+ .examiner-row, .ddx-quick-row { grid-template-columns: 1fr; }
  .btn { width: 100%; }
  .btn.small { width: auto; }
 }

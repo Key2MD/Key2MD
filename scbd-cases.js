@@ -1394,6 +1394,80 @@
   }
  ];
 
+ const SCBD_INSPECTION_FINDINGS = {
+  "cp-acs-001": "On inspection, the patient looks pale, clammy and uncomfortable, sitting still with a hand over the central chest.",
+  "sob-pe-002": "On inspection, the patient looks anxious and breathless at rest, sitting forward and speaking in short sentences.",
+  "abdo-ectopic-003": "On inspection, the patient looks pale, anxious and uncomfortable, with guarded movement because of lower abdominal pain.",
+  "headache-sah-004": "On inspection, the patient looks severely distressed, photophobic and nauseated, preferring to lie still.",
+  "fatigue-crc-005": "On inspection, the patient looks tired and pale but is not acutely distressed.",
+  "falls-orthostatic-006": "On inspection, the patient appears frail and cautious when standing, with minor bruising from recent falls.",
+  "bowel-crc-007": "On inspection, the patient looks mildly pale and tired, without acute distress or obvious cachexia.",
+  "constipation-parkinson-008": "On inspection, the patient has reduced facial expression, reduced blink rate and a slightly stooped posture.",
+  "palp-thyroid-af-009": "On inspection, the patient looks anxious, warm and sweaty, with visible fine tremor and weight loss.",
+  "back-cauda-010": "On inspection, the patient looks very uncomfortable, moves cautiously and struggles to stand fully upright.",
+  "fever-pyelo-sepsis-011": "On inspection, the patient looks unwell, flushed, rigoring and dehydrated.",
+  "dizzy-stroke-012": "On inspection, the patient looks nauseated and unsafe sitting unsupported, with visible imbalance.",
+  "cough-pneumonia-013": "On inspection, the patient looks unwell and breathless, splinting the right side with pleuritic pain.",
+  "polyuria-diabetes-014": "On inspection, the patient looks thirsty with dry mucous membranes and mild dehydration.",
+  "mood-suicide-015": "On inspection, the patient has poor eye contact, slowed movements and a tearful, withdrawn affect.",
+  "vomit-dka-016": "On inspection, the patient looks very unwell, dehydrated and is breathing deeply with a Kussmaul pattern.",
+  "fatigue-variceal-017": "On inspection, the patient looks pale and fatigued with subtle jaundice and chronic liver disease stigmata.",
+  "chest-pericarditis-018": "On inspection, the patient looks uncomfortable and prefers to sit forward because lying flat worsens the pain.",
+  "fever-endocarditis-019": "On inspection, the patient looks febrile and unwell, with visible track marks and a tired appearance.",
+  "cough-aspiration-stroke-020": "On inspection, the patient looks unwell, breathless and confused, with a wet cough and subtle dysarthria."
+ };
+
+ const SCBD_VITAL_FINDINGS = {
+  "falls-orthostatic-006": "T 36.7, HR 74 lying and 88 standing, BP 138/76 lying and 102/62 standing, RR 14, SpO2 98% room air.",
+  "constipation-parkinson-008": "T 36.6, HR 72, BP 132/78, RR 14, SpO2 98% room air.",
+  "back-cauda-010": "T 36.8, HR 92, BP 145/86, RR 18, SpO2 99% room air.",
+  "mood-suicide-015": "T 36.6, HR 76, BP 118/72, RR 14, SpO2 99% room air."
+ };
+
+ function examText(item) {
+  return [item.id, item.label, item.answer, ...(item.keywords || [])].join(" ").toLowerCase();
+ }
+
+ function hasVitalSigns(caseData) {
+  return (caseData.examination || []).some(entry => /vital|observ/.test([entry.id, entry.label].join(" ").toLowerCase()));
+ }
+
+ function addCoreExaminationItems(cases) {
+  for (const caseData of cases) {
+   caseData.examination = Array.isArray(caseData.examination) ? caseData.examination : [];
+   const additions = [];
+   if (!caseData.examination.some(entry => entry.id === "general-inspection")) {
+    additions.push(item(
+     "general-inspection",
+     "General inspection / first look",
+     SCBD_INSPECTION_FINDINGS[caseData.id] || "On inspection, note the patient's general appearance, distress, work of breathing, colour, hydration and ability to engage.",
+     ["inspection", "inspect", "first look", "general appearance", "appearance", "look", "looks", "how do they look", "unwell", "distress", "pale", "pallor", "work of breathing", "tripod", "tripodding"],
+     2,
+     "The first look is a score-bearing safety step: it identifies distress, pallor, respiratory effort, dehydration, delirium and other instability before focused system examination.",
+     ["vitals"],
+     "exam",
+     "inspection"
+    ));
+   }
+   if (!hasVitalSigns(caseData)) {
+    additions.push(item(
+     "vitals",
+     "Vital signs",
+     SCBD_VITAL_FINDINGS[caseData.id] || "Vital signs are available and should be requested explicitly.",
+     ["vitals", "vital signs", "observations", "obs", "blood pressure", "bp", "heart rate", "hr", "pulse", "respiratory rate", "rr", "temperature", "sats", "spo2", "oxygen saturation"],
+     2,
+     "Vital signs are a score-bearing safety step because they separate stable presentations from shock, hypoxia, sepsis physiology and other immediate escalation triggers.",
+     ["vitals"],
+     "exam",
+     "vitals"
+    ));
+   }
+   caseData.examination = [...additions, ...caseData.examination];
+  }
+ }
+
+ addCoreExaminationItems(SCBD_CASES);
+
  window.SCBD_REFERENCES = SCBD_REFERENCES;
  window.SCBD_FRAMEWORKS = SCBD_FRAMEWORKS;
  window.SCBD_CASES = SCBD_CASES;
