@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-AU">
 <head>
- <!-- Google tag (gtag.js) -->
+
  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BZ01FP28PC"></script>
  <script>
  window.dataLayer = window.dataLayer || [];
@@ -14,13 +14,13 @@
 <title>Free GAMSAT Section 2 Practice - AI Essay Feedback | Key2MD</title>
 <meta name="description" content="Free GAMSAT S2 essay practice. 50 Task A &amp; Task B stimuli, 30-min timed sessions, AI feedback and optional expert marking by a University of Melbourne MD student.">
 <link rel="canonical" href="https://www.key2md.com/gamsat-s2-practice.html">
- <!-- Favicon (inline SVG, matches Key2MD brand) -->
+
  <link rel="icon" type="image/x-icon" href="/favicon.ico">
  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<!-- Open Graph -->
+
 <meta property="og:title" content="Free GAMSAT Section 2 Practice - AI Essay Feedback">
 <meta property="og:description" content="Free GAMSAT S2 essay practice. 50 Task A &amp; Task B stimuli, 30-min timed sessions, AI feedback and optional expert marking by a University of Melbourne MD student.">
 <meta property="og:url" content="https://www.key2md.com/gamsat-s2-practice.html">
@@ -98,9 +98,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-/* ===============================================
- CSS VARIABLES - matches Key2MD theme
-=============================================== */
+
+
+
 :root {
  --black: #0a0a0a;
  --white: #ffffff;
@@ -132,9 +132,9 @@
  --radius-lg: 20px;
 }
 
-/* ===============================================
- RESET & BASE
-=============================================== */
+
+
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
@@ -145,13 +145,13 @@ body {
  min-height: 100vh;
 }
 
-/* ===============================================
- NAV - replaced with fixed header (see HTML)
-=============================================== */
 
-/* ===============================================
- HERO SECTION
-=============================================== */
+
+
+
+
+
+
 .hero {
  background: var(--black);
  color: var(--white);
@@ -224,9 +224,9 @@ body {
  letter-spacing: 0.06em;
 }
 
-/* ===============================================
- HOW IT WORKS STRIP
-=============================================== */
+
+
+
 .how-it-works {
  background: var(--white);
  border-bottom: 1px solid var(--border);
@@ -272,9 +272,9 @@ body {
  padding: 0 4px;
 }
 
-/* ===============================================
- API KEY NOTICE
-=============================================== */
+
+
+
 .api-notice {
  background: #fffbeb;
  border: 1px solid #fcd34d;
@@ -292,18 +292,18 @@ body {
 .api-notice p { color: #78350f; line-height: 1.55; }
 .api-notice a { color: var(--accent); font-weight: 600; }
 
-/* ===============================================
- MAIN TOOL LAYOUT
-=============================================== */
+
+
+
 .tool-wrapper {
  max-width: 1100px;
  margin: 40px auto;
  padding: 0 5%;
 }
 
-/* ===============================================
- PAID MARKING CARD - always visible, non-intrusive
-=============================================== */
+
+
+
 .marking-card {
  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
  border-radius: var(--radius-lg);
@@ -385,9 +385,9 @@ body {
 }
 .btn-marking:hover { background: #b8923c; transform: translateY(-1px); }
 
-/* ===============================================
- TASK SELECTOR
-=============================================== */
+
+
+
 .task-selector {
  display: grid;
  grid-template-columns: 1fr 1fr;
@@ -446,9 +446,9 @@ body {
  line-height: 1.55;
 }
 
-/* ===============================================
- CONTROLS BAR
-=============================================== */
+
+
+
 .controls-bar {
  background: var(--white);
  border: 1px solid var(--border);
@@ -486,13 +486,13 @@ body {
  padding-right: 36px;
 }
 .station-select:focus { border-color: var(--accent); }
-.btn { 
- padding: 9px 18px; 
- border-radius: var(--radius-sm); 
+.btn {
+ padding: 9px 18px;
+ border-radius: var(--radius-sm);
  font-family: 'DM Sans', sans-serif;
- font-size: 0.875rem; 
- font-weight: 600; 
- cursor: pointer; 
+ font-size: 0.875rem;
+ font-weight: 600;
+ cursor: pointer;
  border: none;
  transition: all 0.2s;
  display: inline-flex;
@@ -507,9 +507,9 @@ body {
 .btn-random { background: var(--black); color: var(--white); }
 .btn-random:hover { background: #333; }
 
-/* ===============================================
- STATION DISPLAY
-=============================================== */
+
+
+
 .station-display {
  display: none;
 }
@@ -552,7 +552,7 @@ body {
 .badge-a { background: var(--task-a-light); color: var(--task-a); }
 .badge-b { background: var(--task-b-light); color: var(--task-b); }
 
-/* Timer */
+
 .timer-display {
  display: flex;
  align-items: center;
@@ -585,7 +585,7 @@ body {
 .timer-btn:hover { border-color: var(--accent); color: var(--accent); }
 .timer-btn.running { border-color: var(--success); color: var(--success); }
 
-/* Stimulus Card */
+
 .stimulus-card {
  background: var(--white);
  border: 1px solid var(--border);
@@ -640,7 +640,7 @@ body {
  text-transform: uppercase;
 }
 
-/* Prompt box */
+
 .task-prompt-box {
  background: var(--surface-alt);
  border: 1.5px solid var(--border);
@@ -656,7 +656,7 @@ body {
 .task-prompt-box strong { color: var(--accent); }
 .task-prompt-box.task-b-prompt strong { color: var(--task-b); }
 
-/* Essay Area */
+
 .essay-section { margin-bottom: 24px; }
 .essay-section-header {
  display: flex;
@@ -695,7 +695,7 @@ body {
 .essay-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
 .essay-textarea::placeholder { color: var(--text-light); }
 
-/* Essay action buttons */
+
 .essay-actions {
  display: flex;
  gap: 10px;
@@ -708,9 +708,9 @@ body {
 .btn-ai-feedback:hover { background: var(--accent-dark); }
 .btn-ai-feedback:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-/* ===============================================
- HUMAN MARKING INLINE CTA
-=============================================== */
+
+
+
 .inline-marking-cta {
  background: var(--gold-light);
  border: 1.5px solid rgba(201,168,76,0.35);
@@ -751,9 +751,9 @@ body {
 }
 .btn-submit-marking:hover { background: #333; transform: translateY(-1px); }
 
-/* ===============================================
- API KEY SETUP
-=============================================== */
+
+
+
 .api-setup-section {
  background: var(--white);
  border: 1px solid var(--border);
@@ -810,9 +810,9 @@ body {
 }
 .api-key-status.set { color: var(--success); display: block; }
 
-/* ===============================================
- AI FEEDBACK PANEL
-=============================================== */
+
+
+
 .feedback-panel {
  display: none;
  margin-top: 24px;
@@ -855,7 +855,7 @@ body {
  padding: 28px;
 }
 
-/* Score breakdown */
+
 .score-breakdown {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -897,7 +897,7 @@ body {
  color: var(--text);
 }
 
-/* Examiner's Lens */
+
 .examiners-lens {
  margin-bottom: 28px;
 }
@@ -973,7 +973,7 @@ body {
  padding: 1px 2px;
 }
 
-/* Feedback sections */
+
 .feedback-sections {
  display: flex;
  flex-direction: column;
@@ -996,7 +996,7 @@ body {
 .feedback-section ul { padding-left: 18px; }
 .feedback-section ul li { margin-bottom: 4px; }
 
-/* Band 70 hint */
+
 .band70-box {
  background: linear-gradient(135deg, #fdf6e3 0%, #fef9ed 100%);
  border: 1.5px solid rgba(201,168,76,0.4);
@@ -1034,7 +1034,7 @@ body {
  font-weight: 700;
 }
 
-/* Loading state */
+
 .feedback-loading {
  display: none;
  padding: 40px 28px;
@@ -1053,9 +1053,9 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 .feedback-loading p { color: var(--text-muted); font-size: 0.875rem; }
 
-/* ===============================================
- SUBMIT FOR MARKING MODAL
-=============================================== */
+
+
+
 .modal-overlay {
  position: fixed;
  inset: 0;
@@ -1155,9 +1155,9 @@ body {
 }
 .btn-modal-submit:hover { background: #333; }
 
-/* ===============================================
- SEO CONTENT SECTION
-=============================================== */
+
+
+
 .seo-section {
  background: var(--white);
  border-top: 1px solid var(--border);
@@ -1207,9 +1207,9 @@ body {
 }
 .seo-card p { font-size: 0.85rem; margin-bottom: 0; }
 
-/* ===============================================
- FOOTER
-=============================================== */
+
+
+
 footer {
  background: var(--black);
  color: rgba(255,255,255,0.5);
@@ -1235,9 +1235,9 @@ footer a:hover { color: var(--white); }
  margin-bottom: 16px;
 }
 
-/* ===============================================
- RESPONSIVE
-=============================================== */
+
+
+
 @media (max-width: 700px) {
  .task-selector { grid-template-columns: 1fr; }
  .marking-card { flex-direction: column; }
@@ -1249,7 +1249,7 @@ footer a:hover { color: var(--white); }
  .hero-stats { gap: 24px; }
 }
 
-/* Daily limit */
+
 .daily-limit-note { font-size: 0.78rem; color: var(--text-muted); margin-left: 8px; }
 .daily-limit-note.used { color: var(--warning); font-weight: 600; }
 .limit-banner { display: none; background: #fffbeb; border: 1.5px solid #fcd34d; border-radius: var(--radius); padding: 20px 24px; margin-top: 12px; }
@@ -1257,9 +1257,9 @@ footer a:hover { color: var(--white); }
 .limit-banner h4 { font-size: 0.95rem; font-weight: 700; color: #92400e; margin-bottom: 6px; }
 .limit-banner p { font-size: 0.875rem; color: #78350f; line-height: 1.6; margin-bottom: 14px; }
 
-/* ===============================================
- AI MARKING PANEL (sidebar-style inline card)
-=============================================== */
+
+
+
 .ai-panel {
  background: var(--white);
  border: 1px solid var(--border);
@@ -1302,7 +1302,7 @@ footer a:hover { color: var(--white); }
 }
 .ai-status-badge.exhausted::before { background: var(--warning); }
 
-/* AI Explainer */
+
 .ai-explainer-toggle {
  background: none;
  border: none;
@@ -1328,7 +1328,7 @@ footer a:hover { color: var(--white); }
 }
 .ai-explainer-content strong { color: var(--text); display: block; margin-bottom: 4px; }
 
-/* Limit bar */
+
 .ai-limit-bar {
  display: flex;
  align-items: center;
@@ -1361,7 +1361,7 @@ footer a:hover { color: var(--white); }
 }
 .ai-limit-fill.exhausted { background: var(--warning); }
 
-/* Credit balance */
+
 .credit-balance-wrap {
  margin-top: 8px;
  padding: 8px 10px;
@@ -1381,7 +1381,7 @@ footer a:hover { color: var(--white); }
  line-height: 1.5;
 }
 
-/* Buy credits button */
+
 .buy-credits-btn {
  width: 100%;
  padding: 10px;
@@ -1398,9 +1398,9 @@ footer a:hover { color: var(--white); }
 }
 .buy-credits-btn:hover { background: rgba(37,99,235,0.12); }
 
-/* ===============================================
- MAILING LIST PANEL
-=============================================== */
+
+
+
 .mailing-panel {
  background: var(--white);
  border: 1px solid var(--border);
@@ -1463,9 +1463,9 @@ footer a:hover { color: var(--white); }
  margin-top: 6px;
 }
 
-/* ===============================================
- TWO-COLUMN LAYOUT for panels
-=============================================== */
+
+
+
 .panels-row {
  display: grid;
  grid-template-columns: 1fr 1fr;
@@ -1476,7 +1476,7 @@ footer a:hover { color: var(--white); }
  .panels-row { grid-template-columns: 1fr; }
 }
 
-/* Credit shop pack button (reused from CASPer) */
+
 .credit-pack-btn { display:flex; align-items:center; justify-content:space-between; width:100%; padding:14px 16px; border-radius:10px; border:1.5px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#fff; font-size:0.88rem; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; text-align:left; }
 .credit-pack-btn:hover { border-color:rgba(37,99,235,0.4); background:rgba(37,99,235,0.08); }
 .credit-pack-btn.selected { border-color:var(--accent); background:rgba(37,99,235,0.12); box-shadow:0 0 0 1px var(--accent); }
@@ -1490,11 +1490,11 @@ footer a:hover { color: var(--white); }
  <meta name="robots" content="index, follow">
  <script src="auth.js" defer></script>
 <style id="k2-nav-styles">
-/* =======================================================
- KEY2MD CANONICAL NAVIGATION - do not edit per page
- Applied identically across all pages. If you need to
- change nav, change it here and re-sync to all pages.
- ======================================================= */
+
+
+
+
+
 .k2-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,22,40,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s,box-shadow 0.3s;overflow:visible;}
 .k2-header.scrolled{background:rgba(10,22,40,0.98);box-shadow:0 2px 24px rgba(0,0,0,0.4);}
 .k2-nav{display:flex;align-items:center;justify-content:space-between;height:68px;max-width:1200px;margin:0 auto;padding:0 24px;}
@@ -1512,7 +1512,7 @@ footer a:hover { color: var(--white); }
 .k2-mobile-nav a.k2-green{color:#22c55e;font-weight:700;}
 .k2-btn-nav{padding:9px 20px;border-radius:50px;background:#0ea5e9;color:#fff!important;font-size:0.88rem;font-weight:600;transition:all 0.2s;white-space:nowrap;text-decoration:none;display:inline-block;border:none;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;}
 .k2-btn-nav:hover{background:#38bdf8;transform:translateY(-1px);}
-/* Active page highlight */
+
 body[data-page="home"] .k2-nav-links a[data-nav="home"],
 body[data-page="about"] .k2-nav-links a[data-nav="about"],
 body[data-page="results"] .k2-nav-links a[data-nav="results"],
@@ -1523,13 +1523,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"],
 body[data-page="blog"] .k2-nav-links a[data-nav="blog"]{color:#0ea5e9;}
 body[data-page="practice"] .k2-nav-links a[data-nav="practice"]{color:#fbbf24;}
 body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
-/* Hamburger */
+
 .k2-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;flex-shrink:0;}
 .k2-hamburger span{display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s ease;}
 .k2-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
 .k2-hamburger.open span:nth-child(2){opacity:0;}
 .k2-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-/* Mobile nav panel */
+
 .k2-mobile-nav{display:none;position:absolute;top:100%;left:0;right:0;background:#060f1e;background-color:#060f1e;border-bottom:2px solid rgba(14,165,233,0.25);padding:12px 16px 18px;z-index:10000;flex-direction:column;gap:0;box-shadow:0 12px 40px rgba(0,0,0,0.8);-webkit-backdrop-filter:none!important;backdrop-filter:none!important;}
 .k2-mobile-nav.open{display:flex;}
 .k2-mobile-nav a{color:rgba(255,255,255,0.92);font-size:1rem;font-weight:500;padding:13px 14px;border-radius:10px;transition:background 0.2s,color 0.2s;border-bottom:1px solid rgba(255,255,255,0.06);display:block;text-decoration:none;font-family:'DM Sans',system-ui,sans-serif;}
@@ -1543,7 +1543,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="gamsat"]{color:#c4b5fd;}
  .k2-hamburger{display:flex;}
  .k2-header{background:#0a1628!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;overflow:visible!important;}
 }
-/* "More tools" dropdown */
+
 .k2-nav-links li.k2-dropdown{position:relative;}
 .k2-nav-links li.k2-dropdown > a{cursor:pointer;}
 .k2-nav-links li.k2-dropdown > a::after{content:' v';font-size:0.75em;opacity:0.7;margin-left:2px;}
@@ -1594,7 +1594,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 </style>
 </head>
 <body data-page="gamsat">
-<!-- === KEY2MD CANONICAL NAV - do not edit per page === -->
+
 <header class="k2-header" id="k2Header">
  <nav class="k2-nav" aria-label="Primary navigation">
  <a href="index.html" class="k2-logo">Key<span>2</span>MD</a>
@@ -1664,7 +1664,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  if (hdr) {
  window.addEventListener('scroll', function(){ hdr.classList.toggle('scrolled', window.scrollY > 40); }, {passive:true});
  }
- // Close "More tools" dropdown on outside click
+
  document.addEventListener('click', function(e){
  document.querySelectorAll('.k2-dropdown.open').forEach(function(d){
  if (!d.contains(e.target)) d.classList.remove('open');
@@ -1672,16 +1672,16 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  });
 })();
 </script>
-<!-- === END CANONICAL NAV === -->
 
-<!-- NAV -->
+
+
 
 <style>
 
  body { padding-top: 68px; }
 </style>
 
-<!-- HERO -->
+
 <section class="hero" style="padding:56px 5% 40px;">
  <div class="hero-badge">* Free Practice Tool - Key2MD</div>
  <h1 style="margin-bottom:10px;">GAMSAT Section II<br><em>Essay Practice</em></h1>
@@ -1695,20 +1695,20 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <a href="#practice-area" style="display:inline-block;margin-top:24px;padding:14px 32px;background:var(--accent);color:#fff;font-weight:700;font-size:0.95rem;border-radius:100px;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 20px rgba(37,99,235,0.3);" onmouseover="this.style.background='var(--accent-dark)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='var(--accent)';this.style.transform='none'">Start Writing </a>
 </section>
 
-<!-- MAIN TOOL -->
+
 <div class="tool-wrapper" id="practice-area">
 
- <!-- Auth / Account -->
+
  <div id="k2mdAuthBar" style="margin-bottom:16px;"></div>
 
- <!-- QUICK START: Task + Station selector -->
+
  <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px 32px;margin-bottom:24px;box-shadow:var(--shadow-sm);">
  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
  <h2 style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--text);margin:0;">Choose your essay</h2>
  <button class="btn btn-random" onclick="loadRandom()" style="font-size:0.82rem;padding:8px 16px;"> Random Station</button>
  </div>
 
- <!-- Task toggle -->
+
  <div class="task-selector" style="margin-bottom:16px;">
  <div class="task-card active" onclick="selectTask('A')" style="padding:16px 20px;">
  <div class="task-tag tag-a">Writing Task A</div>
@@ -1722,7 +1722,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
 
- <!-- Station dropdown -->
+
  <div style="display:flex;align-items:center;gap:10px;">
  <select class="station-select" id="stationSelect" onchange="loadStation()" style="flex:1;">
  <option value="">- Select a station -</option>
@@ -1732,10 +1732,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 
 
- <!-- STATION DISPLAY -->
+
  <div class="station-display" id="stationDisplay">
 
- <!-- Station header -->
+
  <div class="station-header">
  <div class="station-meta">
  <span class="station-num" id="stationNumLabel"></span>
@@ -1748,7 +1748,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
 
- <!-- Stimulus -->
+
  <div class="stimulus-card">
  <div class="stimulus-instruction">
  <strong>For each Writing Test, follow these directions:</strong><br>
@@ -1760,15 +1760,15 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="task-prompt-box" id="taskPromptBox"></div>
  </div>
 
- <!-- Essay -->
+
  <div class="essay-section">
  <div class="essay-section-header">
  <h3>Your Essay</h3>
  <span class="word-count" id="wordCount">0 words</span>
  </div>
- <textarea 
- class="essay-textarea" 
- id="essayTextarea" 
+ <textarea
+ class="essay-textarea"
+ id="essayTextarea"
  placeholder="Begin writing your essay here. Aim for approximately 600 words - roughly 2 pages of handwritten A4 in exam conditions..."
  oninput="updateWordCount()"
  ></textarea>
@@ -1780,7 +1780,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 
 
- <!-- Limit banner -->
+
  <div class="limit-banner" id="limitBanner">
  <h4>You've used your free AI essay review</h4>
  <p>Your free GAMSAT S2 review resets weekly. Buy credits for occasional essays, upgrade to S2 Pro for fair-use unlimited AI marking, or submit your essay to Dan for expert human marking and an estimated band score within 48 hours.</p>
@@ -1791,7 +1791,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
 
- <!-- Human marking inline CTA -->
+
  <div style="background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);border-radius:var(--radius-lg);padding:24px 28px;margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
  <div style="flex:1;min-width:220px;">
  <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Expert Human Marking</div>
@@ -1804,13 +1804,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
 
- <!-- AI Feedback loading -->
+
  <div class="feedback-loading" id="feedbackLoading">
  <div class="loading-spinner"></div>
  <p>Analysing your essay through the examiner's lens...</p>
  </div>
 
- <!-- AI Feedback Panel -->
+
  <div class="feedback-panel" id="feedbackPanel">
  <div class="feedback-panel-header">
  <div>
@@ -1820,9 +1820,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="band-score-badge" id="bandScoreBadge">-</div>
  </div>
  <div class="feedback-body">
- <!-- Score breakdown -->
+
  <div class="score-breakdown" id="scoreBreakdown"></div>
- <!-- Examiner's lens -->
+
  <div class="examiners-lens" id="examinersLens">
  <h4>Examiner's Lens - Annotated Essay</h4>
  <div class="lens-legend">
@@ -1832,9 +1832,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div class="essay-annotated" id="annotatedEssay"></div>
  </div>
- <!-- Feedback sections -->
+
  <div class="feedback-sections" id="feedbackSections"></div>
- <!-- Band 70 box -->
+
  <div class="band70-box" id="band70Box">
  <h4> How to move this into the next band</h4>
  <ul id="band70List"></ul>
@@ -1842,11 +1842,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
 
- </div><!-- end station-display -->
+ </div>
 
-</div><!-- end tool-wrapper -->
+</div>
 
-<!-- SUBMIT FOR MARKING MODAL -->
+
 <div class="modal-overlay" id="markingModal">
  <div class="modal">
  <h3>Submit for Expert Marking</h3>
@@ -1861,19 +1861,19 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div style="font-size:0.74rem;color:var(--text-muted);margin-top:8px;">Bundles use the email below. After purchase, use "Use Bundle Credit" to submit without paying again.</div>
  </div>
 
- <!-- Source toggle -->
+
  <div style="display:flex;gap:0;margin-bottom:16px;border:1.5px solid var(--border-dark);border-radius:100px;overflow:hidden;">
  <button id="markSrcCurrent" onclick="setMarkingSource('current')" style="flex:1;padding:10px;border:none;background:var(--black);color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;">Current Essay</button>
  <button id="markSrcPaste" onclick="setMarkingSource('paste')" style="flex:1;padding:10px;border:none;background:var(--surface-alt);color:var(--text-muted);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;">Paste Your Own</button>
  </div>
 
- <!-- Current essay preview -->
+
  <div id="markCurrentPreview" style="background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:14px;max-height:180px;overflow-y:auto;">
  <div style="font-size:0.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Attached from current station</div>
  <div id="markCurrentContent" style="font-size:0.82rem;color:var(--text-muted);line-height:1.6;white-space:pre-wrap;">No essay written yet. Write your essay first, or switch to "Paste Your Own".</div>
  </div>
 
- <!-- Paste your own (hidden by default) -->
+
  <div id="markPasteWrap" style="display:none;">
  <div class="modal-field">
  <label>Stimulus / Theme</label>
@@ -1901,17 +1901,17 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 </div>
 
-<!-- AI MARKING + MAILING LIST PANELS -->
+
  <div class="panels-row">
 
- <!-- AI Marking Panel -->
+
  <div class="ai-panel">
  <div class="ai-panel-header">
  <span class="ai-panel-title">* AI Essay Marking</span>
  <span class="ai-status-badge" id="gamsatAiStatus">1 free/week</span>
  </div>
 
- <!-- Why our AI is different -->
+
  <div style="margin-top:4px;">
  <button class="ai-explainer-toggle" id="aiExplainerBtn" onclick="toggleAiExplainer()">Why is this different from ChatGPT? ></button>
  <div class="ai-explainer-content" id="aiExplainer">
@@ -1926,7 +1926,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
 
- <!-- Limits + Credits -->
+
  <div id="aiLimitWrap" style="margin-top:14px;">
  <div class="ai-limit-bar">
  <span class="ai-limit-label">Free weekly review</span>
@@ -1934,7 +1934,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div class="ai-limit-track"><div class="ai-limit-fill" id="aiLimitFill" style="width:100%"></div></div>
 
- <!-- Credit balance -->
+
  <div class="credit-balance-wrap" id="creditBalanceWrap" style="display:none;">
  <span class="credit-balance-label">Purchased credits</span>
  <span class="credit-balance-num" id="creditCount">0</span>
@@ -1943,12 +1943,12 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <p class="ai-limit-note" id="aiLimitNote">Create a free account to unlock AI reviews.</p>
  </div>
 
- <!-- Buy credits button -->
+
  <div id="buyCreditsBtnWrap" style="display:none;">
  <button class="buy-credits-btn" onclick="openCreditShop()">Buy More AI Reviews -></button>
  </div>
 
- <!-- GAMSAT S2 Pro -->
+
  <div style="margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(124,58,237,0.08) 0%,rgba(167,139,250,0.04) 100%);border:1.5px solid rgba(124,58,237,0.2);border-radius:10px;">
  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
  <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:rgba(124,58,237,0.15);color:#7c3aed;padding:2px 9px;border-radius:50px;">Live</span>
@@ -1962,7 +1962,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
 
- <!-- Mailing List Panel -->
+
  <div class="mailing-panel">
  <h3> Weekly GAMSAT Tips</h3>
  <p>Get Dan's weekly GAMSAT Section II tips - essay breakdowns, common mistakes, what examiners actually look for, and Band 70 strategies.</p>
@@ -1976,7 +1976,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  </div>
 
-<!-- SEO CONTENT SECTION -->
+
 <section class="seo-section">
  <div class="seo-inner">
  <h2>About GAMSAT Section II - Task A &amp; Task B Essay Writing</h2>
@@ -2010,7 +2010,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 </div>
 
-<!-- FOOTER -->
+
 <footer>
  <span class="footer-logo" style="font-family:'DM Sans',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;">Key<span style="color:#0ea5e9;">2</span>MD</span>
  <div class="footer-links">
@@ -2028,9 +2028,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 </footer>
 
 <script>
-/* ===============================================
- STATION DATA - 50 stations (25 Task A, 25 Task B)
-=============================================== */
+
+
+
 const stations = {
  A: [
  {
@@ -2538,24 +2538,24 @@ const stations = {
  ]
 };
 
-/* ===============================================
- STATE
-=============================================== */
+
+
+
 let currentTask = 'A';
 let currentStation = null;
 let timerInterval = null;
 let timerSeconds = 30 * 60;
 let timerRunning = false;
-// -- API handled by Key2MDAuth module --
-const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev'; // Change if using workers.dev URL
 
-/* ===============================================
- INIT
-=============================================== */
+const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+
+
+
+
 window.addEventListener('DOMContentLoaded', () => {
  populateDropdown();
 
- // -- Initialize Auth --
+
  Key2MDAuth.init({
  tool: 'gamsat',
  apiBase: API_BASE,
@@ -2575,7 +2575,7 @@ function updateLimitUI() {
  const limits = Key2MDAuth.getLimits();
  const loggedIn = Key2MDAuth.isLoggedIn();
 
- // Panel elements
+
  const statusBadge = document.getElementById('gamsatAiStatus');
  const countEl = document.getElementById('aiLimitCount');
  const fillEl = document.getElementById('aiLimitFill');
@@ -2585,7 +2585,7 @@ function updateLimitUI() {
  const buyBtn = document.getElementById('buyCreditsBtnWrap');
 
  if (!loggedIn) {
- // Not logged in
+
  if (btn) { btn.disabled = false; btn.textContent = ' Get Free AI Feedback'; }
  if (inlineNote) { inlineNote.textContent = 'Create a free account to unlock AI reviews'; inlineNote.className = 'daily-limit-note'; }
  if (statusBadge) { statusBadge.textContent = '1 free/week'; statusBadge.className = 'ai-status-badge'; }
@@ -2618,7 +2618,7 @@ function updateLimitUI() {
  const pct = tool.unlimited ? 100 : (rem / tool.limit * 100);
  const credits = tool.credits || 0;
 
- // Update panel limit count
+
  if (countEl) {
  if (tool.unlimited) {
  countEl.textContent = 'Fair-use unlimited (Pro)';
@@ -2633,7 +2633,7 @@ function updateLimitUI() {
  }
  if (fillEl) { fillEl.style.width = pct + '%'; fillEl.className = 'ai-limit-fill' + ((rem === 0 && credits === 0) ? ' exhausted' : ''); }
 
- // Status badge
+
  if (statusBadge) {
  if (rem > 0) {
  statusBadge.textContent = rem + ' free remaining';
@@ -2647,7 +2647,7 @@ function updateLimitUI() {
  }
  }
 
- // Credit balance
+
  if (creditWrap && creditCountEl) {
  if (credits > 0) {
  creditWrap.style.display = 'flex';
@@ -2657,10 +2657,10 @@ function updateLimitUI() {
  }
  }
 
- // Buy button (show if logged in)
+
  if (buyBtn) buyBtn.style.display = loggedIn ? 'block' : 'none';
 
- // Panel note
+
  if (noteEl) {
  if (rem > 0) {
  noteEl.textContent = '1 free AI review per week. Buy credits for more.';
@@ -2671,7 +2671,7 @@ function updateLimitUI() {
  }
  }
 
- // Main feedback button
+
  if (rem > 0 || credits > 0) {
  if (btn) { btn.disabled = false; btn.textContent = credits > 0 && rem <= 0 ? ' Get AI Feedback (1 credit)' : ' Get Free AI Feedback'; }
  if (inlineNote) { inlineNote.textContent = rem > 0 ? rem + ' free AI review per week' : credits + ' credits remaining'; inlineNote.className = 'daily-limit-note'; }
@@ -2683,7 +2683,7 @@ function updateLimitUI() {
 
 function populateDropdown() {
  const select = document.getElementById('stationSelect');
- // Clear existing options except placeholder
+
  while (select.options.length > 1) select.remove(1);
  const list = stations[currentTask];
  list.forEach((s, i) => {
@@ -2694,16 +2694,16 @@ function populateDropdown() {
  });
 }
 
-/* ===============================================
- TASK SELECTION
-=============================================== */
+
+
+
 function selectTask(task) {
  currentTask = task;
  currentStation = null;
- // Update UI
+
  document.querySelectorAll('.task-card').forEach(c => c.classList.remove('active'));
  document.querySelectorAll('.task-card')[task === 'A' ? 0 : 1].classList.add('active');
- // Reset
+
  populateDropdown();
  document.getElementById('stationSelect').value = '';
  document.getElementById('stationDisplay').classList.remove('active');
@@ -2711,9 +2711,9 @@ function selectTask(task) {
  hideFeedback();
 }
 
-/* ===============================================
- LOAD STATION
-=============================================== */
+
+
+
 function loadStation() {
  const idx = document.getElementById('stationSelect').value;
  if (idx === '') return;
@@ -2730,15 +2730,15 @@ function loadRandom() {
 }
 
 function renderStation(station, idx) {
- // Labels
- document.getElementById('stationNumLabel').textContent = 
+
+ document.getElementById('stationNumLabel').textContent =
  `${currentTask === 'A' ? 'Task A' : 'Task B'} | Station ${idx + 1} of 25`;
- 
+
  const badge = document.getElementById('stationBadge');
  badge.textContent = station.theme;
  badge.className = `station-theme-badge ${currentTask === 'A' ? 'badge-a' : 'badge-b'}`;
 
- // Quotes
+
  const list = document.getElementById('quotesList');
  list.innerHTML = '';
  station.quotes.forEach((q, i) => {
@@ -2753,7 +2753,7 @@ function renderStation(station, idx) {
  list.appendChild(li);
  });
 
- // Task prompt
+
  const prompt = document.getElementById('taskPromptBox');
  if (currentTask === 'A') {
  prompt.className = 'task-prompt-box';
@@ -2763,7 +2763,7 @@ function renderStation(station, idx) {
  prompt.innerHTML = `<strong>Task B - Reflective/Personal Essay:</strong> Respond to the theme of <em>${station.theme}</em> through a personal, reflective, or discursive piece. You may use narrative, personal experience, or imagination. Depth of insight and authenticity of voice are paramount. Aim for approximately 600 words.`;
  }
 
- // Show station
+
  document.getElementById('stationDisplay').classList.add('active');
  resetTimer();
  hideFeedback();
@@ -2771,9 +2771,9 @@ function renderStation(station, idx) {
  updateWordCount();
 }
 
-/* ===============================================
- TIMER
-=============================================== */
+
+
+
 function toggleTimer() {
  if (timerRunning) {
  pauseTimer();
@@ -2788,14 +2788,14 @@ function startTimer() {
  document.getElementById('timerBtn').classList.add('running');
  timerInterval = setInterval(() => {
  timerSeconds++;
- // Show as countdown from 30 min: display 30:00 - elapsed
+
  const remaining = Math.max(0, 30 * 60 - timerSeconds + 1);
- // Actually track elapsed and show remaining
+
  updateTimerDisplay();
  }, 1000);
 }
 
-// Fix: track elapsed separately
+
 let elapsedSeconds = 0;
 function startTimer() {
  timerRunning = true;
@@ -2843,9 +2843,9 @@ function updateTimerDisplay() {
  }
 }
 
-/* ===============================================
- WORD COUNT
-=============================================== */
+
+
+
 function updateWordCount() {
  const text = document.getElementById('essayTextarea').value.trim();
  const words = text ? text.split(/\s+/).length : 0;
@@ -2854,9 +2854,9 @@ function updateWordCount() {
  el.className = words >= 450 && words <= 750 ? 'word-count good' : 'word-count';
 }
 
-/* ===============================================
- SAVE ESSAY
-=============================================== */
+
+
+
 function clearEssay() {
  if (confirm('Clear your essay? This cannot be undone.')) {
  document.getElementById('essayTextarea').value = '';
@@ -2868,7 +2868,7 @@ function saveEssay() {
  const essay = document.getElementById('essayTextarea').value;
  if (!essay.trim()) { alert('Nothing to save yet.'); return; }
  const station = currentStation !== null ? stations[currentTask][currentStation] : null;
- const header = station 
+ const header = station
  ? `GAMSAT Section II Practice - Key2MD\nTask ${currentTask}: ${station.theme}\nDate: ${new Date().toLocaleDateString('en-AU')}\n${'-'.repeat(60)}\n\n`
  : '';
  const blob = new Blob([header + essay], { type: 'text/plain' });
@@ -2878,25 +2878,25 @@ function saveEssay() {
  a.click();
 }
 
-/* ===============================================
- API KEY
-=============================================== */
 
-/* ===============================================
- AI FEEDBACK
-=============================================== */
+
+
+
+
+
+
 async function requestAIFeedback() {
  const essay = document.getElementById('essayTextarea').value.trim();
  if (!essay) { alert('Please write your essay first.'); return; }
  if (essay.split(/\s+/).length < 50) { alert('Your essay is too short for meaningful feedback. Aim for at least 300 words.'); return; }
 
- // -- Auth check --
+
  if (!Key2MDAuth.isLoggedIn()) {
  Key2MDAuth.showAuthModal('signup');
  return;
  }
 
- // -- Check limits + credits --
+
  const limits = Key2MDAuth.getLimits();
  const toolLimits = limits?.gamsat;
  const remaining = toolLimits ? Math.max(0, toolLimits.limit - toolLimits.used) : 1;
@@ -2912,10 +2912,10 @@ async function requestAIFeedback() {
 
  if (!hasUnlimited && remaining <= 0) {
  if (credits > 0) {
- // Auto-use a purchased credit
+
  useCredit = true;
  } else {
- // No free reviews, no credits
+
  document.getElementById('limitBanner').classList.add('active');
  document.getElementById('limitBanner').scrollIntoView({ behavior: 'smooth', block: 'center' });
  updateLimitUI();
@@ -2926,13 +2926,13 @@ async function requestAIFeedback() {
  if (currentStation === null) { alert('Please load a station first.'); return; }
 
  const station = stations[currentTask][currentStation];
- 
- // Show loading
+
+
  document.getElementById('feedbackLoading').classList.add('active');
  document.getElementById('feedbackPanel').classList.remove('active');
  document.getElementById('aiFeedbackBtn').disabled = true;
 
- const taskDesc = currentTask === 'A' 
+ const taskDesc = currentTask === 'A'
  ? 'Task A (expository/persuasive essay)'
  : 'Task B (discursive/reflective/creative essay)';
 
@@ -3142,10 +3142,10 @@ function renderFeedback(f, essayText) {
  document.getElementById('feedbackLoading').classList.remove('active');
  document.getElementById('aiFeedbackBtn').disabled = false;
 
- // Band score
+
  document.getElementById('bandScoreBadge').textContent = f.bandScore || 'Review';
 
- // Score breakdown
+
  const scoreBreakdown = document.getElementById('scoreBreakdown');
  const criteriaMap = {
  thoughtContent: 'Thought & Content',
@@ -3171,7 +3171,7 @@ function renderFeedback(f, essayText) {
  </div>`;
  }
 
- // Annotated essay (Examiner's Lens)
+
  let annotated = escapeHtml(essayText);
  const hasAnnotations = Array.isArray(f.annotations) && f.annotations.length;
  const lensTitle = document.querySelector('#examinersLens h4');
@@ -3189,7 +3189,7 @@ function renderFeedback(f, essayText) {
  }
  document.getElementById('annotatedEssay').innerHTML = annotated;
 
- // Feedback sections
+
  const sections = document.getElementById('feedbackSections');
  sections.innerHTML = `
  <div class="feedback-section">
@@ -3213,7 +3213,7 @@ function renderFeedback(f, essayText) {
  ${renderEvidenceCritique(f.evidenceCritique)}
  ${renderContradictions(f.contradictions)}`;
 
- // Band-up hints
+
  const band70List = document.getElementById('band70List');
  const bandHints = Array.isArray(f.bandUpHints) ? f.bandUpHints : (Array.isArray(f.band70Hints) ? f.band70Hints : []);
  band70List.innerHTML = bandHints.map(h=>`<li>${escapeHtml(h)}</li>`).join('');
@@ -3421,7 +3421,7 @@ document.getElementById('markingModal').addEventListener('click', function(e) {
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookModal();closeCreditShop();}});
 </script>
 
-<!-- CREDIT SHOP MODAL -->
+
 <div id="creditShopOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);z-index:2001;display:none;align-items:center;justify-content:center;padding:20px;">
  <div style="background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:32px 28px;max-width:440px;width:92%;position:relative;max-height:90vh;overflow-y:auto;">
  <button onclick="closeCreditShop()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">x</button>
@@ -3430,7 +3430,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookMo
  <div style="font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:4px;">Buy AI Review Credits</div>
  <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:20px;">Credits never expire. Use them anytime.</div>
 
- <!-- GAMSAT packs -->
+
  <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">Writing GAMSAT Essay Reviews</div>
  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
  <button class="credit-pack-btn" onclick="selectPack('gamsat_1')" data-pack="gamsat_1">
@@ -3445,7 +3445,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookMo
  </button>
  </div>
 
- <!-- CASPer packs -->
+
  <div style="font-size:0.72rem;font-weight:700;color:var(--accent,#2563eb);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;"> CASPer Station Reviews</div>
  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
  <button class="credit-pack-btn" onclick="selectPack('casper_1')" data-pack="casper_1">
@@ -3460,16 +3460,16 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookMo
  </button>
  </div>
 
- <!-- Purchase button -->
+
  <button id="creditBuyBtn" onclick="purchaseCredits()" disabled style="width:100%;padding:14px;border-radius:50px;border:none;background:var(--accent,#2563eb);color:#fff;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;opacity:0.5;">Select a pack to continue</button>
 
- <!-- Refund policy -->
+
  <div style="font-size:0.68rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:12px;line-height:1.5;">
  Credits are generally non-refundable once purchased or used, except where required by Australian Consumer Law or approved for a technical or billing issue.<br>Credits are tied to your account and cannot be transferred. Unused credits do not expire.
  </div>
  </div>
 
- <!-- Purchase success -->
+
  <div id="creditShopSuccess" style="display:none;text-align:center;padding:20px 0;">
  <div style="font-size:2.5rem;margin-bottom:12px;">OK</div>
  <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:6px;">Credits added!</div>
@@ -3480,7 +3480,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeBookMo
 </div>
 
 <script>
-// == CREDIT SHOP ==
+
 let selectedPackId = null;
 
 function openCreditShop(){
@@ -3613,7 +3613,7 @@ function startGamsatProCheckout(tier, btn) {
 }
 window.startGamsatProCheckout = startGamsatProCheckout;
 
-// \u2550\u2550 HANDLE STRIPE RETURN \u2550\u2550
+
 (function handlePaymentReturn(){
  const params = new URLSearchParams(window.location.search);
  if(params.get('payment') === 'success'){
@@ -3641,7 +3641,7 @@ window.startGamsatProCheckout = startGamsatProCheckout;
  }
 })();
 
-// == AI EXPLAINER TOGGLE ==
+
 function toggleAiExplainer(){
  const el = document.getElementById('aiExplainer');
  const btn = document.getElementById('aiExplainerBtn');
@@ -3655,7 +3655,7 @@ function toggleAiExplainer(){
 }
 window.toggleAiExplainer = toggleAiExplainer;
 
-// == MAILING LIST (GAMSAT) ==
+
 function subscribeGamsat(){
  var input=document.getElementById('gamsatEmailInput');
  var email=input.value.trim();
@@ -3675,7 +3675,7 @@ window.subscribeGamsat=subscribeGamsat;
  <a href="https://www.key2md.com/testimonials.html">Student Results</a>
  <a href="https://www.key2md.com/about.html">About Dan</a>
  </div>
-<!-- === KEY2MD CANONICAL BOOK MODAL === -->
+
 <div id="bookModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
  <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:40px 36px;max-width:480px;width:100%;position:relative;font-family:'DM Sans',system-ui,sans-serif;">
  <button onclick="closeBookModal()" aria-label="Close" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">x</button>
@@ -3705,7 +3705,7 @@ function closeBookModal(){ var m=document.getElementById('bookModal'); if(m){ m.
 document.addEventListener('click', function(e){ var m=document.getElementById('bookModal'); if(m && e.target===m) closeBookModal(); });
 document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=document.getElementById('bookModal'); if(m && m.style.display==='flex') closeBookModal(); } });
 </script>
-<!-- === END CANONICAL BOOK MODAL === -->
+
 <script src="key2md-tracking.js" defer></script>
 </body>
 </html>

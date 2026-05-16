@@ -42,14 +42,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 a { text-decoration: none; color: inherit; }
 img { max-width: 100%; display: block; }
 
-/* Footer */
+
 footer { background:var(--navy); color:rgba(255,255,255,0.5); padding:40px 5%; text-align:center; font-size:0.82rem; }
 footer a { color:rgba(255,255,255,0.6); text-decoration:none; }
 footer a:hover { color:var(--white); }
 .footer-logo { font-size:1.2rem; font-weight:800; color:var(--white); display:block; margin-bottom:12px; }
 .footer-links { display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-bottom:16px; }
 
-/* Blog article */
+
 .blog-hero { background:var(--navy); color:var(--white); padding:100px 5% 60px; text-align:center; position:relative; overflow:hidden; }
 .blog-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(14,165,233,0.15) 0%,transparent 70%); pointer-events:none; }
 .blog-hero .badge { display:inline-flex; align-items:center; gap:6px; background:rgba(14,165,233,0.12); border:1px solid rgba(14,165,233,0.3); color:var(--teal2); font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:5px 14px; border-radius:100px; margin-bottom:20px; }
@@ -69,7 +69,7 @@ footer a:hover { color:var(--white); }
 .article-wrap li { font-size:0.95rem; color:var(--gray600); line-height:1.85; margin-bottom:8px; }
 .article-wrap li strong { color:var(--gray800); }
 
-/* Callout box */
+
 .callout { border:1px solid var(--gray200); border-left-width:5px; border-radius:18px; padding:22px 24px; margin:26px 0; box-shadow:0 14px 32px rgba(15,23,42,0.06); }
 .callout-teal { background:linear-gradient(135deg,rgba(14,165,233,0.08),#fff); border-color:rgba(14,165,233,0.18); border-left-color:var(--teal); }
 .callout-gold { background:linear-gradient(135deg,rgba(245,158,11,0.09),#fff); border-color:rgba(245,158,11,0.2); border-left-color:var(--gold); }
@@ -78,13 +78,13 @@ footer a:hover { color:var(--white); }
 .callout-title { font-size:0.88rem; font-weight:800; color:var(--gray800); margin-bottom:6px; }
 .callout p { font-size:0.88rem; color:var(--gray600); line-height:1.7; margin-bottom:0; }
 
-/* Formula box */
+
 .formula-box { background:var(--navy); border-radius:var(--radius); padding:24px 28px; margin:24px 0; text-align:center; }
 .formula-label { font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal2); margin-bottom:8px; }
 .formula-eq { font-size:1.3rem; font-weight:700; color:var(--white); font-family:Georgia,serif; margin-bottom:8px; }
 .formula-note { font-size:0.82rem; color:rgba(255,255,255,0.5); }
 
-/* CTA banner */
+
 .cta-banner { position:relative; overflow:hidden; background:radial-gradient(circle at 86% 12%,rgba(56,189,248,0.22),transparent 32%),linear-gradient(135deg,#071326 0%,#0d2a52 100%); border:1px solid rgba(56,189,248,0.18); border-radius:22px; padding:40px 34px; margin:44px 0; text-align:center; box-shadow:0 24px 60px rgba(15,23,42,0.18); }
 .cta-banner::before { content:''; position:absolute; inset:0 0 auto; height:3px; background:linear-gradient(90deg,var(--teal),var(--teal2),var(--gold)); }
 .cta-banner h3 { position:relative; font-size:1.24rem; font-weight:800; color:var(--white); margin-bottom:8px; }
@@ -95,7 +95,7 @@ footer a:hover { color:var(--white); }
 .cta-banner .btn-outline { border:1.5px solid rgba(255,255,255,0.22); color:rgba(255,255,255,0.82); background:rgba(255,255,255,0.05); }
 .cta-banner .btn-outline:hover { border-color:rgba(56,189,248,0.5); color:var(--white); background:rgba(14,165,233,0.14); }
 
-/* Decision-tool CTA */
+
 .tool-nudge { margin:28px 0; padding:22px; border:1px solid rgba(14,165,233,0.22); border-radius:18px; background:radial-gradient(circle at 96% 12%,rgba(14,165,233,0.12),transparent 30%),linear-gradient(135deg,#fff 0%,#f8fafc 100%); box-shadow:0 16px 38px rgba(15,23,42,0.08); display:flex; align-items:center; justify-content:space-between; gap:20px; }
 .tool-nudge-kicker { display:inline-flex; align-items:center; min-height:24px; padding:0 10px; border-radius:999px; background:rgba(14,165,233,0.1); color:var(--teal3); font-size:0.68rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; }
 .tool-nudge strong { display:block; color:var(--navy); font-size:1.02rem; line-height:1.35; margin:8px 0 4px; }
@@ -121,12 +121,12 @@ footer a:hover { color:var(--white); }
 .topic-link-grid a { display:flex; align-items:center; min-height:52px; border:1px solid var(--gray200); border-radius:14px; padding:14px 16px; text-decoration:none; color:var(--navy); font-weight:800; background:linear-gradient(135deg,#fff 0%,#f8fafc 100%); box-shadow:0 10px 24px rgba(15,23,42,0.05); transition:transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
 .topic-link-grid a:hover { transform:translateY(-1px); border-color:rgba(14,165,233,0.35); box-shadow:0 16px 34px rgba(14,165,233,0.12); color:var(--teal3); }
 
-/* Breadcrumb */
+
 .breadcrumb { font-size:0.78rem; color:rgba(255,255,255,0.35); margin-bottom:16px; }
 .breadcrumb a { color:rgba(255,255,255,0.5); text-decoration:none; }
 .breadcrumb a:hover { color:var(--teal2); }
 
-/* Related articles */
+
 .related { margin-top:52px; padding-top:34px; border-top:1px solid rgba(226,232,240,0.9); }
 .related h3 { font-size:1rem; font-weight:800; color:var(--navy); margin-bottom:16px; }
 .related-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; }
@@ -142,7 +142,7 @@ footer a:hover { color:var(--white); }
 .related-card.featured.gold { border-color:rgba(245,158,11,0.34); }
 .related-card.featured.gold h4 { color:#fcd34d; }
 
-/* Student card */
+
 .student-card { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius-sm); padding:16px 20px; margin:12px 0; }
 .student-card h5 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:6px; }
 .student-card .calc { font-size:0.85rem; color:var(--gray600); font-family:'Courier New',monospace; line-height:1.6; margin-bottom:4px; }
@@ -150,7 +150,7 @@ footer a:hover { color:var(--white); }
 .result-pass { color:var(--green); }
 .result-fail { color:var(--red); }
 
-/* Book item */
+
 .book-item { background:var(--white); border:1px solid var(--gray200); border-radius:var(--radius-sm); padding:18px 22px; margin:12px 0; }
 .book-title { font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:2px; }
 .book-author { font-size:0.82rem; color:var(--gray400); margin-bottom:8px; }
@@ -158,7 +158,7 @@ footer a:hover { color:var(--white); }
 .book-theme { font-size:0.68rem; font-weight:600; padding:3px 10px; border-radius:50px; background:rgba(14,165,233,0.08); color:var(--teal3); }
 .book-note { font-size:0.82rem; color:var(--gray600); line-height:1.6; margin:0; font-style:italic; }
 
-/* Quartile cards */
+
 .quartile-grid { display:grid; gap:12px; margin:20px 0; }
 .quartile-card { border-radius:var(--radius-sm); padding:16px 20px; }
 .quartile-card.q1 { background:#fef2f2; border:1px solid #fecaca; }
@@ -297,7 +297,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 </style>
 </head>
 <body>
-<!-- === KEY2MD CANONICAL NAV === -->
+
 <header class="k2-header" id="k2Header">
  <nav class="k2-nav" aria-label="Primary navigation">
  <a href="index.html" class="k2-logo">Key<span>2</span>MD</a>
@@ -515,7 +515,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <a href="https://www.key2md.com/guide.html">Australian Medical Entrance Guide</a>
  <a href="https://www.key2md.com/blog.html">Key2MD Blog</a>
 </div>
-<!-- === KEY2MD CANONICAL BOOK MODAL === -->
+
 <div id="bookModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
  <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:40px 36px;max-width:480px;width:100%;position:relative;font-family:'DM Sans',system-ui,sans-serif;">
  <button onclick="closeBookModal()" aria-label="Close" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">x</button>

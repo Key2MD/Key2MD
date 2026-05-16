@@ -78,7 +78,7 @@
  margin-bottom: 32px;
  }
 
- /* States */
+
  #successState, #alreadyState, #errorState { display: none; }
 
  .field { margin-bottom: 16px; text-align: left; }
@@ -159,7 +159,7 @@
 
  .keep-btn:hover { background: var(--teal2); transform: translateY(-1px); }
 
- /* Success / already / error */
+
  .info-box {
  background: rgba(255,255,255,0.04);
  border: 1px solid rgba(255,255,255,0.08);
@@ -210,7 +210,7 @@
 
 <div class="card">
 
- <!-- FORM STATE -->
+
  <div id="formState">
  <span class="icon"></span>
  <h1>Unsubscribe</h1>
@@ -231,7 +231,7 @@
  <a class="keep-btn" href="https://key2md.com">Keep me subscribed -></a>
  </div>
 
- <!-- SUCCESS STATE -->
+
  <div id="successState">
  <span class="icon"></span>
  <h1>Done - you're off the list.</h1>
@@ -242,7 +242,7 @@
  <a class="home-btn" href="https://key2md.com">Back to Key2MD</a>
  </div>
 
- <!-- ALREADY STATE (not on list) -->
+
  <div id="alreadyState">
  <span class="icon">OK</span>
  <h1>You're already off the list.</h1>
@@ -250,7 +250,7 @@
  <a class="home-btn" href="https://key2md.com">Back to Key2MD</a>
  </div>
 
- <!-- ERROR STATE -->
+
  <div id="errorState">
  <span class="icon">!</span>
  <h1>Something went wrong.</h1>
@@ -268,7 +268,7 @@
 <script>
  const API = 'https://key2md-api.brittainmbbs.workers.dev';
 
- // Pre-fill email from ?email= URL param (useful for one-click unsub links in emails)
+
  (function() {
  const params = new URLSearchParams(window.location.search);
  const e = params.get('email');
