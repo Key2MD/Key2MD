@@ -1633,6 +1633,9 @@ async function submitMMIForFeedback() {
  if (isCasperMockReview) {
  fd.append('mock_exam', '1');
  fd.append('mock_tier', window.K2_ACTIVE_CASPER_MOCK.tier || tier);
+ fd.append('mock_attempt_id', window.K2_ACTIVE_CASPER_MOCK.attempt_id || '');
+ fd.append('mock_station_order', String(window.K2_ACTIVE_CASPER_MOCK.station_order || currentIdx + 1));
+ fd.append('mock_station_id', window.K2_ACTIVE_CASPER_MOCK.station_id || stationId);
  }
  fd.append('visual_degraded', visualDegraded ? '1' : '0');
 
@@ -1732,8 +1735,9 @@ function createMMIMockReviewSnapshot() {
  const durationSec = Math.round(mmiRecordingDurationSec || 0);
  const mmiStationIdx = MMI_STATIONS.indexOf(s);
  const casperStationIdx = typeof STATIONS !== 'undefined' ? STATIONS.indexOf(s) : -1;
- const stationId = window.K2_ACTIVE_CASPER_MOCK
- ? `casper_video_${currentIdx + 1}_${String(s.id || 'private').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 48)}`
+ const mockContext = window.K2_ACTIVE_CASPER_MOCK || null;
+ const stationId = mockContext?.station_id
+ ? String(mockContext.station_id)
  : (s.id || (mmiStationIdx >= 0 ? `mmi_${mmiStationIdx}` : casperStationIdx >= 0 ? `casper_video_${casperStationIdx}` : 'casper_video_mock'));
  const recordingUrl = snapshotRecordingBlob ? URL.createObjectURL(snapshotRecordingBlob) : null;
 
@@ -1781,6 +1785,9 @@ function buildMMIMockFormData(snapshot, frames, visualDegraded) {
  fd.append('use_credit', '1');
  fd.append('mock_exam', '1');
  fd.append('mock_tier', window.K2_ACTIVE_CASPER_MOCK?.tier || snapshot.tier);
+ fd.append('mock_attempt_id', window.K2_ACTIVE_CASPER_MOCK?.attempt_id || '');
+ fd.append('mock_station_order', String(window.K2_ACTIVE_CASPER_MOCK?.station_order || currentIdx + 1));
+ fd.append('mock_station_id', window.K2_ACTIVE_CASPER_MOCK?.station_id || snapshot.stationId);
  fd.append('visual_degraded', visualDegraded ? '1' : '0');
  frames.forEach((frame, i) => fd.append(`frame_${i}`, frame, `frame_${i}.jpg`));
  return fd;
@@ -1889,6 +1896,9 @@ function submitWrittenMockReviewSilently(idx) {
  user_response: answer,
  mock_exam: true,
  mock_tier: window.K2_ACTIVE_CASPER_MOCK?.tier || 'transcript',
+ mock_attempt_id: window.K2_ACTIVE_CASPER_MOCK?.attempt_id || '',
+ mock_station_order: window.K2_ACTIVE_CASPER_MOCK?.station_order || idx + 1,
+ mock_station_id: window.K2_ACTIVE_CASPER_MOCK?.station_id || station.id || '',
  }),
  });
  if(!res.ok) {
@@ -2714,7 +2724,7 @@ function startRecording(){
  const opts=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
  MediaRecorder.isTypeSupported('video/webm')?{mimeType:'video/webm'}:{};
  const recorderOpts = { ...opts };
- if (window.K2_ACTIVE_CASPER_MOCK && mmiPremiumMode) {
+ if (window.K2_ACTIVE_CASPER_MOCK) {
  recorderOpts.videoBitsPerSecond = 850000;
  recorderOpts.audioBitsPerSecond = 96000;
  }

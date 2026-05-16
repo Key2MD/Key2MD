@@ -46,6 +46,7 @@ window.FullCasperMock = (() => {
  let pendingDraftAnswer = null;
  let serverCheckpointBusy = false;
  let queuedCheckpointReason = null;
+ let lastRescueRecording = null;
 
  function byId(id) {
  return document.getElementById(id);
@@ -103,6 +104,17 @@ window.FullCasperMock = (() => {
  const token = auth?.getToken?.();
  if (!token) throw new Error('Please log in before starting the mock.');
  return token;
+ }
+
+ function syncActiveMockContext(item = sequence[index] || null) {
+ if (!mockAttemptId) return;
+ window.K2_ACTIVE_CASPER_MOCK = {
+ tier: config.tier,
+ attempt_id: mockAttemptId,
+ station_order: Number(item?.order || index + 1),
+ station_id: item?.station?.id || null,
+ station_type: item?.type || null,
+ };
  }
 
  function clearDoneMonitor() {
@@ -208,8 +220,15 @@ window.FullCasperMock = (() => {
  visualDegraded: !!row.visual_degraded,
  durationSec: row.duration_sec || null,
  processingError: row.processing_error || null,
+ localRescuePending: !!row.local_rescue_pending,
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
  }));
+ }
+
+ function rowHasSecureEvidence(row) {
+ if (!row) return false;
+ if (row.type === 'video') return !!(row.reviewId || row.recordingKey);
+ return String(row.answer || '').trim().length >= 20;
  }
 
  function restoreDraft() {
@@ -232,7 +251,7 @@ window.FullCasperMock = (() => {
  stationToken += 1;
  advancing = false;
  rulesAccepted = true;
- window.K2_ACTIVE_CASPER_MOCK = { tier: config.tier, attempt_id: mockAttemptId };
+ syncActiveMockContext();
  byId('casperMockMainArea')?.style.setProperty('display', 'none');
  setTier(config.tier);
  startDraftMonitor();
@@ -244,9 +263,14 @@ window.FullCasperMock = (() => {
  renderIdle();
  }
 
- async function checkpointMockAttempt(reason = 'station') {
+ async function checkpointMockAttempt(reason = 'station', options = {}) {
  if (!mockAttemptId || !results.length) return;
  if (serverCheckpointBusy) {
+ if (options.throwOnError) {
+ for (let i = 0; i < 10 && serverCheckpointBusy; i++) await sleep(300);
+ if (serverCheckpointBusy) throw new Error('A previous save is still finishing. Please try again in a moment.');
+ return checkpointMockAttempt(reason, options);
+ }
  queuedCheckpointReason = reason;
  return;
  }
@@ -256,6 +280,7 @@ window.FullCasperMock = (() => {
  saveMockDraft({ phase: reason, checkpointed_at: new Date().toISOString() });
  } catch (err) {
  saveMockDraft({ phase: reason, checkpoint_error: err.message || 'Checkpoint failed' });
+ if (options.throwOnError) throw err;
  } finally {
  serverCheckpointBusy = false;
  const nextReason = queuedCheckpointReason;
@@ -274,8 +299,9 @@ window.FullCasperMock = (() => {
  function hasFullMockPass(status, tier = config.tier) {
  return !!status?.active
  && status.tier === tier
- && Number(status.video_remaining || 0) >= VIDEO_COUNT
- && Number(status.typed_remaining || 0) >= TYPED_COUNT;
+ && (status.active_attempt_id
+ || (Number(status.video_remaining || 0) >= VIDEO_COUNT
+ && Number(status.typed_remaining || 0) >= TYPED_COUNT));
  }
 
  async function fetchMockPassStatus() {
@@ -340,6 +366,17 @@ window.FullCasperMock = (() => {
  throw new Error('The private mock bank is not ready yet. Check the D1 seed import.');
  }
  return data;
+ }
+
+ async function loadServerMockAttempt(attemptId) {
+ const token = authTokenOrThrow();
+ const res = await fetch(`${apiBase()}/api/casper-mock/attempts/${encodeURIComponent(attemptId)}`, {
+ method: 'GET',
+ headers: { 'Authorization': `Bearer ${token}` },
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) throw new Error(data.message || data.error || 'Could not restore your saved mock attempt.');
+ return data.attempt || null;
  }
 
  async function loadPrivateMockStation(item) {
@@ -738,18 +775,28 @@ window.FullCasperMock = (() => {
  order: Number(entry.order || i + 1),
  station: null,
  }));
- results = [];
- index = 0;
  mockAttemptId = mock.attempt_id;
- savedAttemptId = null;
+ savedAttemptId = mock.attempt_id;
+ let restoredAttempt = null;
+ if (mock.resumed) {
+ try {
+ restoredAttempt = await loadServerMockAttempt(mock.attempt_id);
+ } catch (err) {
+ console.warn('Could not load server mock attempt for resume:', err);
+ }
+ }
+ results = restoredAttempt?.rows ? hydrateResultsFromDraft(restoredAttempt.rows) : [];
+ const resumeOrder = Number(mock.current_station_order || results.length + 1 || 1);
+ const readyForReport = results.length >= sequence.length && results.slice(0, sequence.length).every(rowHasSecureEvidence);
+ index = readyForReport ? sequence.length : Math.max(0, Math.min(resumeOrder - 1, sequence.length - 1));
  latestReport = null;
  pendingDraftAnswer = null;
  stationToken = 0;
  advancing = false;
  started = true;
- window.K2_ACTIVE_CASPER_MOCK = { tier: config.tier, attempt_id: mockAttemptId };
+ syncActiveMockContext();
  startDraftMonitor();
- saveMockDraft({ phase: 'started' });
+ saveMockDraft({ phase: mock.resumed ? 'resumed' : 'started' });
  setCheckoutState(false);
  byId('casperMockMainArea')?.style.setProperty('display', 'none');
  launchCurrent();
@@ -871,9 +918,10 @@ window.FullCasperMock = (() => {
  voice_metrics: row.voiceMetrics || row.rawFeedback?.voice_metrics || null,
  visual_metrics: row.visualMetrics || row.rawFeedback?.visual_metrics || null,
  visual_degraded: !!(row.visualDegraded || row.rawFeedback?.visual_degraded),
- duration_sec: row.durationSec || row.duration_sec || row.rawFeedback?.durationSec || null,
+ duration_sec: row.durationSec || row.duration_sec || row.rawFeedback?.durationSec || (row.localRescuePending ? 1 : null),
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
  processing_error: row.processingError || null,
+ local_rescue_pending: !!row.localRescuePending,
  }));
  }
 
@@ -996,6 +1044,7 @@ window.FullCasperMock = (() => {
  byId('casperMockMainArea')?.style.setProperty('display', 'none');
  }
 
+ syncActiveMockContext(item);
  stationToken += 1;
  advancing = false;
  transitionActive = false;
@@ -1235,6 +1284,73 @@ window.FullCasperMock = (() => {
  return true;
  }
 
+ function downloadRecordingUrl(url, label = 'recording') {
+ if (!url) return;
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = `key2md-casper-mock-${String(label || 'recording').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80) || 'recording'}.webm`;
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ }
+
+ function downloadRescueRecording() {
+ downloadRecordingUrl(lastRescueRecording?.url, lastRescueRecording?.label || 'sos-recording');
+ }
+
+ function renderStationSaving(type = 'video') {
+ restoreSubmit();
+ setStationChrome(false);
+ hideStationReflection();
+ byId('webcamPanel')?.style.setProperty('display', 'none');
+ byId('scenarioCard')?.style.setProperty('display', 'none');
+ const area = ensureMainArea();
+ if (!area) return;
+ area.style.display = 'block';
+ area.innerHTML = `
+ <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:36px 32px;text-align:center;">
+ <div style="font-size:0.72rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:8px;">Saving station</div>
+ <h2 style="font-size:1.45rem;color:var(--navy);line-height:1.25;margin:0 0 8px;">Keeping this station locked in.</h2>
+ <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;max-width:560px;margin:0 auto 18px;">${type === 'video' ? 'Uploading the recording and preparing the transcript before the next prompt opens.' : 'Saving the written response and preparing feedback before the next prompt opens.'}</p>
+ <div style="width:42px;height:42px;border-radius:50%;border:4px solid rgba(14,165,233,0.18);border-top-color:var(--teal3);margin:0 auto;animation:spin 0.9s linear infinite;"></div>
+ </div>
+ `;
+ }
+
+ function renderStationSaveError(row, err, mode = 'save_failed') {
+ restoreSubmit();
+ window.K2PracticeBridge?.hardStopSession?.();
+ setStationChrome(false);
+ hideStationReflection();
+ byId('webcamPanel')?.style.setProperty('display', 'none');
+ byId('scenarioCard')?.style.setProperty('display', 'none');
+ const area = ensureMainArea();
+ if (!area) return;
+ const stationLabel = `${row?.type === 'video' ? 'Video' : 'Typed'} station ${row?.order || index + 1}`;
+ const canDownload = !!row?.recordingUrl;
+ if (canDownload) {
+ lastRescueRecording = {
+ url: row.recordingUrl,
+ label: `station-${row?.order || index + 1}-sos`,
+ };
+ }
+ area.style.display = 'block';
+ area.innerHTML = `
+ <div style="background:#fff;border:1px solid #fecaca;border-radius:16px;padding:34px 32px;text-align:center;">
+ <div style="font-size:0.72rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:#b91c1c;margin-bottom:8px;">SOS save path</div>
+ <h2 style="font-size:1.45rem;color:var(--navy);line-height:1.25;margin:0 0 8px;">${esc(stationLabel)} needs help saving.</h2>
+ <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;max-width:620px;margin:0 auto 18px;">${esc(err?.message || 'The station did not save cleanly.')} ${mode === 'local_rescue' ? 'Save the recording locally, then ping SOS to Dan. Dan can upload it from admin and restart processing for this exact mock station.' : 'Your browser draft is still here; ping SOS to Dan if this keeps happening.'}</p>
+ <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;color:#7c2d12;font-size:0.82rem;line-height:1.55;max-width:620px;margin:0 auto 18px;text-align:left;">
+ <strong>Ping SOS to Dan.</strong> If he is around, an on-the-spot fix may be possible. The safest rescue is to keep this page open and save the local recording file now.
+ </div>
+ <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+ ${canDownload ? `<button type="button" onclick="FullCasperMock.downloadRescueRecording()" style="padding:11px 20px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.86rem;font-weight:850;cursor:pointer;font-family:inherit;">Save local recording</button>` : ''}
+ <button type="button" onclick="FullCasperMock.checkpointMockAttempt('retry_save')" style="padding:11px 20px;border-radius:50px;border:1px solid rgba(14,165,233,0.28);background:#fff;color:var(--teal3);font-size:0.86rem;font-weight:850;cursor:pointer;font-family:inherit;">Try saving again</button>
+ </div>
+ </div>
+ `;
+ }
+
  async function beginStationTransition(token = stationToken) {
  if (token !== stationToken || transitionActive || advancing) return;
  const bridge = window.K2PracticeBridge;
@@ -1254,7 +1370,7 @@ window.FullCasperMock = (() => {
  bridge.saveAnswer?.();
  submission = bridge.submitMockWrittenReview?.() || bridge.getCurrentHistory?.();
  }
- completeAndAdvance(submission, token);
+ await completeAndAdvance(submission, token);
  } catch (err) {
  transitionActive = false;
  const wrap = item.type === 'video' ? byId('aiFeedbackWrapMMI') : byId('aiFeedbackWrap');
@@ -1265,7 +1381,7 @@ window.FullCasperMock = (() => {
  }
  }
 
- function completeAndAdvance(payload, token = stationToken) {
+ async function completeAndAdvance(payload, token = stationToken) {
  if (token !== stationToken || advancing) return;
  advancing = true;
  stationToken += 1;
@@ -1289,23 +1405,41 @@ window.FullCasperMock = (() => {
  recordingUrl: isVideoSubmission ? payload.recordingUrl : null,
  durationSec: isVideoSubmission ? payload.durationSec : null,
  processingError: null,
+ localRescuePending: false,
  tier: item.type === 'video' ? config.tier : 'typed',
  };
  results.push(submittedRow);
  if (submittedRow.feedbackTask) {
- submittedRow.feedbackTask.then(data => {
+ renderStationSaving(item.type);
+ try {
+ const data = await submittedRow.feedbackTask;
  applyMockFeedbackData(submittedRow, data);
  saveMockDraft({ phase: 'analysis_saved' });
- checkpointMockAttempt('analysis_saved');
- }).catch(err => {
+ } catch (err) {
  applyMockFeedbackError(submittedRow, err);
+ if (submittedRow.type === 'video' && !submittedRow.recordingKey && !submittedRow.reviewId) {
+ submittedRow.localRescuePending = true;
+ submittedRow.processingError = `${submittedRow.processingError || 'Video upload did not complete.'} Ping SOS to Dan.`;
  saveMockDraft({ phase: 'analysis_failed' });
- checkpointMockAttempt('analysis_failed');
- });
+ await checkpointMockAttempt('local_rescue_pending').catch(() => {});
+ advancing = false;
+ transitionActive = false;
+ renderStationSaveError(submittedRow, err, 'local_rescue');
+ return;
+ }
+ saveMockDraft({ phase: 'analysis_failed' });
+ }
  }
  bridge?.completeCurrentStation?.();
  saveMockDraft({ phase: 'station_saved' });
- checkpointMockAttempt('station_saved');
+ try {
+ await checkpointMockAttempt('station_saved', { throwOnError: true });
+ } catch (err) {
+ advancing = false;
+ transitionActive = false;
+ renderStationSaveError(submittedRow, err, 'save_failed');
+ return;
+ }
 
  const nextIndex = index + 1;
  renderStationTransition(nextIndex, item.type);
@@ -2996,6 +3130,8 @@ window.FullCasperMock = (() => {
 	 showRecording,
 	 jumpTranscript,
 	 downloadLocalRecording,
+	 downloadRescueRecording,
+	 checkpointMockAttempt,
 	 copyReportSummary,
  printReport,
  skipBreak,

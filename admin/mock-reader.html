@@ -673,11 +673,22 @@
           <button id="reprocessBtn" class="secondary" type="button" onclick="reprocessCurrentStation()">Reprocess saved recording</button>
           <div id="reprocessStatus" class="muted" style="margin-top:8px;"></div>
         </div>`:'';
+        const uploadRescue=`<div class="review-box" style="border-color:#bbf7d0;background:#f0fdf4;">
+          <div class="section-label" style="color:#15803d;">SOS upload</div>
+          <div class="text-block" style="margin-bottom:10px;">If the student saved a local recording after a crash, upload it here. The worker attaches it to this station, runs the same AI processing, and unlocks the next station when this was the blocked station.</div>
+          <input id="adminRecordingUpload" type="file" accept="video/webm,video/mp4,video/quicktime,audio/webm,audio/mpeg,audio/mp4,video/*,audio/*">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:9px;align-items:center;">
+            <input id="adminRecordingDuration" type="number" min="1" step="1" placeholder="Duration seconds, optional" value="${esc(r.duration_sec||'')}">
+            <button id="uploadRecordingBtn" class="secondary" type="button" onclick="uploadRecordingForCurrentStation()">Upload & process</button>
+          </div>
+          <div id="uploadRecordingStatus" class="muted" style="margin-top:8px;"></div>
+        </div>`;
         return `<div class="station-grid">
           <div>
             ${videoPlayerHtml(key,r)}
             ${issue}
             ${reprocess}
+            ${uploadRescue}
             ${transcriptPanelHtml(r,'adminVideoPlayer')}
           </div>
           <div>
@@ -867,6 +878,42 @@
       }catch(err){
         if(btn){btn.disabled=false;btn.textContent='Reprocess saved recording';}
         if(status)status.textContent=err.message||'Reprocess failed.';
+      }
+    }
+
+    async function uploadRecordingForCurrentStation(){
+      if(!currentAttempt)return;
+      const fileInput=document.getElementById('adminRecordingUpload');
+      const durationInput=document.getElementById('adminRecordingDuration');
+      const btn=document.getElementById('uploadRecordingBtn');
+      const status=document.getElementById('uploadRecordingStatus');
+      const file=fileInput?.files?.[0]||null;
+      if(!file){
+        if(status)status.textContent='Choose the student recording file first.';
+        return;
+      }
+      if(btn){btn.disabled=true;btn.textContent='Uploading...';}
+      if(status)status.textContent='Uploading the rescue recording and running AI processing. Keep this tab open.';
+      try{
+        const fd=new FormData();
+        fd.append('row_index',String(currentStation));
+        fd.append('recording',file,file.name||'student-rescue-recording.webm');
+        if(durationInput?.value)fd.append('duration_sec',durationInput.value);
+        const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/upload-recording',{
+          method:'POST',
+          headers:authHeaders(),
+          body:fd
+        });
+        const data=await res.json().catch(()=>({}));
+        if(!res.ok)throw new Error(data.message||data.error||'Upload failed');
+        currentAttempt=data.attempt||currentAttempt;
+        const processed=!!data.processed;
+        renderAttempt();
+        const nextStatus=document.getElementById('uploadRecordingStatus');
+        if(nextStatus)nextStatus.textContent=processed?'Uploaded and processed.':'Uploaded, but AI processing still needs a reprocess run.';
+      }catch(err){
+        if(btn){btn.disabled=false;btn.textContent='Upload & process';}
+        if(status)status.textContent=err.message||'Upload failed.';
       }
     }
 
