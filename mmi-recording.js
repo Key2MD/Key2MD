@@ -243,7 +243,7 @@ const MMIRecording = (() => {
  if (res.status === 429) {
  const data = await res.json().catch(() => ({}));
  setState('error');
- onErrorCallback({ code: 'daily_limit_reached', message: data.message || 'Daily limit reached. Come back tomorrow or buy credits.' });
+ onErrorCallback({ code: data.error || 'payment_required', message: data.message || 'MMI AI feedback requires paid credits or active MMI Pro access.' });
  return;
  }
 
