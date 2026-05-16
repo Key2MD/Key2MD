@@ -215,7 +215,7 @@
  <header class="nav">
  <div class="container nav-inner">
  <a class="logo" href="index.html">Key<span>2</span>MD</a>
- <nav class="nav-links" aria-label="Primary">
+ <nav class="nav-links" id="primaryNav" aria-label="Primary">
  <a class="nav-gold" href="casper-class.html" data-nav="classes">Friday Classes</a>
  <a href="testimonials.html" data-nav="results">Results</a>
  <a href="student-journey.html" data-nav="journey">My Journey</a>
@@ -242,6 +242,7 @@
  </div>
  <a class="nav-cta" href="index.html#book" data-track="book_modal_open">Book a Session</a>
  </nav>
+ <button class="nav-menu-toggle" id="navMenuToggle" type="button" aria-label="Toggle navigation menu" aria-controls="primaryNav" aria-expanded="false"><span></span><span></span><span></span></button>
  </div>
  </header>
 
@@ -397,6 +398,22 @@
  <div><a href="practice.html">Practice tool</a> | <a href="plans.html#mock">Mock pricing</a></div>
  </div>
  </footer>
+ <script>
+ (() => {
+ const toggle = document.getElementById('navMenuToggle');
+ const nav = document.getElementById('primaryNav');
+ if (!toggle || !nav) return;
+ const setOpen = open => {
+ toggle.classList.toggle('open', open);
+ nav.classList.toggle('open', open);
+ toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+ };
+ toggle.addEventListener('click', () => setOpen(!nav.classList.contains('open')));
+ nav.addEventListener('click', event => {
+ if (event.target.closest('a')) setOpen(false);
+ });
+ })();
+ </script>
 <script src="key2md-tracking.js" defer></script>
 </body>
 </html>
