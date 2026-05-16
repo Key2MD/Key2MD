@@ -592,7 +592,7 @@ window.FullCasperMock = (() => {
  }
 
  function hideNormalPanels() {
- ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','webcamPanel','startBtn','scenarioCard','bottomRail','reviewPanel'].forEach(id => {
+ ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','casperClassCard','webcamPanel','startBtn','scenarioCard','bottomRail','reviewPanel'].forEach(id => {
  const el = byId(id);
  if (!el) return;
  if (id === 'reviewPanel') el.classList.remove('show');

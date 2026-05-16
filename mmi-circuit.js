@@ -95,7 +95,7 @@ const MMICircuit = (() => {
  // legacy callers continue to work even if the outer ID isn't present.
  // 'bottomRail' is the new under-main-content rail (Stats, Heatmap,
  // Friday Classes, Weekly Tips) - must be hidden during a circuit.
- const panels = ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','webcamPanel','startBtn','scenarioCard','bottomRail'];
+ const panels = ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','casperClassCard','webcamPanel','startBtn','scenarioCard','bottomRail'];
  panels.forEach(id => {
  const el = document.getElementById(id);
  if (el) el.style.display = 'none';

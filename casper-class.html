@@ -16,7 +16,7 @@
  <script src="key2md-tracking.js" defer></script>
  <link rel="stylesheet" href="admissions-pages.css">
  <style>
- /* -- Page-specific overrides -- */
+
  .class-grid {
  display: grid;
  grid-template-columns: minmax(0, 1fr) 360px;
@@ -24,8 +24,20 @@
  align-items: start;
  padding: 54px 0 80px;
  }
+ .practice-context {
+ display: none;
+ border: 1px solid rgba(14,165,233,.24);
+ background: #eff6ff;
+ color: #0f172a;
+ border-radius: 14px;
+ padding: 16px 18px;
+ margin: 24px auto 0;
+ font-size: .92rem;
+ line-height: 1.6;
+ }
+ .practice-context strong { color: #075985; }
 
- /* -- Benefits strip -- */
+
  .benefits-strip {
  display: grid;
  grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -52,7 +64,7 @@
  line-height: 1.5;
  }
 
- /* -- How it works -- */
+
  .steps {
  margin: 36px 0 0;
  display: grid;
@@ -104,7 +116,7 @@
  line-height: 1.5;
  }
 
- /* -- Booking card -- */
+
  .booking-card {
  border: 1px solid var(--line);
  border-radius: 16px;
@@ -120,7 +132,7 @@
  color: #fff;
  }
  .booking-card-header .eyebrow {
- /* reset hero eyebrow */
+
  display: inline-flex;
  border: 1px solid rgba(56,189,248,.3);
  background: rgba(14,165,233,.12);
@@ -149,7 +161,7 @@
  padding: 22px 24px;
  }
 
- /* plan options */
+
  .plan-options { display: grid; gap: 10px; margin: 0 0 18px; }
  .plan-option {
  width: 100%;
@@ -205,7 +217,7 @@
  letter-spacing: 0;
  }
 
- /* status */
+
  .status {
  border-radius: 10px;
  padding: 12px 14px;
@@ -220,7 +232,7 @@
  .status.warn{ border-color: rgba(217,119,6,.28); background: rgba(217,119,6,.07); color: #92400e; }
  .status.err { border-color: rgba(220,38,38,.22); background: rgba(220,38,38,.06); color: #991b1b; }
 
- /* deliverability tip */
+
  .deliverability-tip {
  border: 1px solid #fde68a;
  background: #fffbeb;
@@ -233,7 +245,7 @@
  }
  .deliverability-tip strong { color: #78350f; }
 
- /* link box */
+
  .linkbox {
  display: none;
  border: 1px solid rgba(14,165,233,.28);
@@ -245,8 +257,16 @@
  .linkbox p { margin: 0 0 8px; color: #0369a1; font-weight: 900; font-size: 0.88rem; }
  .linkbox a { word-break: break-word; color: #0369a1; font-weight: 900; font-size: 0.92rem; }
 
- /* action buttons */
+
  .actions { display: flex; flex-direction: column; gap: 9px; }
+ .class-question-link {
+ display: block;
+ margin-top: 12px;
+ text-align: center;
+ color: #0284c7;
+ font-size: .82rem;
+ font-weight: 800;
+ }
  .btn-primary {
  min-height: 48px;
  border: 0;
@@ -282,10 +302,10 @@
  }
  .btn-secondary:hover { border-color: var(--teal); }
 
- /* auth bar hide */
+
  #k2mdAuthBar { display: none; }
 
- /* -- Section title -- */
+
  .section-label {
  font-size: 0.72rem;
  font-weight: 900;
@@ -327,7 +347,7 @@
 </head>
 <body>
 
- <!-- Nav -->
+
  <nav class="simple-nav" aria-label="Primary navigation">
  <div class="simple-nav-inner">
  <a class="simple-logo" href="index.html">Key<span>2</span>MD</a>
@@ -361,7 +381,7 @@
 </div>
  </nav>
 
- <!-- Hero -->
+
  <header class="page-hero">
  <div class="wrap">
  <div class="eyebrow">Live CASPer class</div>
@@ -373,15 +393,20 @@
  </div>
  </div>
  </header>
+ <div class="wrap">
+ <div class="practice-context" id="practiceClassContext">
+ <strong>Coming from the practice tool?</strong> The Friday class is not a repeat of the free practice bank. Dan uses separate, more realistic CASPer tutoring stations, then marks and discusses student answers so you can see where these kinds of responses go wrong.
+ </div>
+ </div>
 
- <!-- Main content -->
+
  <main>
  <div class="wrap class-grid">
 
- <!-- Left column -->
+
  <div>
 
- <!-- Why the class works -->
+
  <div class="section-label">Why it works</div>
  <h2 class="section-h2">More than practice - it's calibration.</h2>
  <p class="section-sub">Most CASPer prep happens in isolation. You answer, you guess, you move on. The live class fixes that by adding the one thing solo practice can't: context.</p>
@@ -413,7 +438,7 @@
  </div>
  </div>
 
- <!-- How it works -->
+
  <div style="margin-top:44px;">
  <div class="section-label">How to join</div>
  <h2 class="section-h2">Three steps and you're in.</h2>
@@ -442,14 +467,14 @@
  </div>
  </div>
 
- <!-- Email tip -->
+
  <div class="warning-box" style="margin-top:0;">
  <strong>Email deliverability note.</strong> Add <strong>dan@key2md.net</strong> and <strong>brittainmbbs@gmail.com</strong> to your contacts before Friday. If the reminder email goes to junk, this page still shows the class link once Dan releases it - you're not dependent on one email landing.
  </div>
 
  </div>
 
- <!-- Right column - booking card -->
+
  <aside id="booking">
  <div class="booking-card">
  <div class="booking-card-header">
@@ -498,6 +523,7 @@
  <button class="btn-secondary" id="cancelBtn" onclick="cancelWeeklyAccess()" style="display:none;">Cancel weekly access</button>
  <button class="btn-secondary" onclick="refreshClassStatus()">Refresh access</button>
  </div>
+ <a class="class-question-link" href="mailto:brittainmbbs@gmail.com?subject=CASPer%20class%20question">Have questions before committing? Ask Dan here.</a>
  </div>
  </div>
  </aside>
@@ -505,7 +531,7 @@
  </div>
  </main>
 
- <!-- Footer -->
+
  <footer>
  <div class="wrap footer-row">
  <span>(c) 2026 Key2MD</span>
@@ -597,7 +623,7 @@
  const data = await res.json();
  const cls = data.class || {};
  document.getElementById('classTitle').textContent = cls.title || 'Key2MD CASPer Live Class';
- // Always show 6pm regardless of API response for the time label
+
  document.getElementById('classTime').textContent = 'Fridays at 6pm AEST';
  const payBtn = document.getElementById('payBtn');
  const loginBtn = document.getElementById('loginBtn');
@@ -764,10 +790,19 @@
  window.Key2MDTrack?.track?.(
  paymentState === 'success' ? 'class_payment_success' : 'class_payment_cancelled',
  base
- );
+  );
+  }
+
+ function showPracticeContext(){
+ const params = new URLSearchParams(location.search);
+ const from = String(params.get('from') || params.get('source') || '');
+ if (!from.startsWith('practice')) return;
+ const el = document.getElementById('practiceClassContext');
+ if (el) el.style.display = 'block';
  }
 
 	 document.addEventListener('DOMContentLoaded', () => {
+	 showPracticeContext();
 	 trackClassPaymentReturn();
 	 initClassAuth();
 	 refreshClassStatus();
