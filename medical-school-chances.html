@@ -1490,7 +1490,7 @@ const BONUS_RULES = {
  },
  griffith: {
  summary: 'Griffith has several degree-specific GPA treatments. Completed PhDs receive an overall GPA of 7.0.',
- foot: 'Masters by Research handling depends on FTE and graded/research components, so it is shown as a note rather than a fake exact combo.',
+ foot: 'Masters by Research handling depends on FTE and graded/research components, so it is shown as a note rather than an invented exact combo.',
  items: [
  { id:'phd', label:'Completed PhD by 31 July', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'griffithGpa', detail:'Griffith states completed PhDs receive an overall GPA of 7.0.' },
  { id:'mastersResearch', label:'Completed Masters by Research', type:'qualitative', meta:'component GPA 7', detail:'Research components may receive GPA 7.0 for their equivalent full-time study, but the full effect depends on the degree structure.' },
@@ -2009,7 +2009,6 @@ function renderBonusPicker() {
 
 initBonusPicker();
 
-// UI: rural toggle
 document.getElementById('toggleNonRural').addEventListener('click', () => {
  state.rural = false;
  document.getElementById('toggleNonRural').classList.add('active');
@@ -2028,7 +2027,6 @@ document.getElementById('toggleRural').addEventListener('click', () => {
  renderBonusPicker();
 });
 
-// UI: CASPer pills
 document.querySelectorAll('.casper-pill').forEach(p => {
  p.addEventListener('click', () => {
  document.querySelectorAll('.casper-pill').forEach(x => x.classList.remove('active'));
@@ -2036,10 +2034,8 @@ document.querySelectorAll('.casper-pill').forEach(p => {
  state.casper = p.dataset.c;
  });
 });
-// Default: Unknown pill active
 document.querySelector('.casper-pill[data-c=""]').classList.add('active');
 
-// UI: GAMSAT score input mode
 function setScoreMode(mode) {
  state.scoreMode = mode === 'sections' ? 'sections' : 'overall';
  const overallBtn = document.getElementById('scoreModeOverall');
@@ -2058,9 +2054,6 @@ function setScoreMode(mode) {
 document.getElementById('scoreModeOverall').addEventListener('click', () => setScoreMode('overall'));
 document.getElementById('scoreModeSections').addEventListener('click', () => setScoreMode('sections'));
 
-// =======================================================================
-// CALCULATE
-// =======================================================================
 const calcBtn = document.getElementById('calcBtn');
 const recalcBtn = document.getElementById('recalcBtn');
 const gpaIn = document.getElementById('gpaInput');
@@ -2328,7 +2321,6 @@ recalcBtn.addEventListener('click', () => {
  document.getElementById('comboDisplay').classList.remove('show');
  document.getElementById('unisWrap').classList.remove('show');
  document.getElementById('postResult').classList.remove('show');
- // scroll back to top of calculator
  document.getElementById('calcCard').scrollIntoView({behavior:'smooth', block:'start'});
 });
 
@@ -2341,7 +2333,6 @@ function calculate(gpa, scores) {
  const unweightedCombo = (gpa / 7) + (scores.unweighted / 100);
  const sameCombo = !scores.unweightedEstimated && Math.abs(weightedCombo - unweightedCombo) < 0.00005;
 
- // Display combo
  document.getElementById('comboLabel').textContent = sameCombo ? 'Base Combo' : 'Base Weighted Combo';
  document.getElementById('comboNum').textContent = weightedCombo.toFixed(4);
  document.getElementById('comboBreakdown').innerHTML = `
@@ -2359,22 +2350,18 @@ function calculate(gpa, scores) {
  `;
  document.getElementById('smartInsights').innerHTML = renderSmartInsights(gpa, scores);
 
- // Hide inputs, show results (except keep recalc button visible inside unisWrap)
  document.getElementById('calcCard').classList.add('calc-hide-on-results');
  document.getElementById('comboDisplay').classList.add('show');
 
- // Render unis
  renderUnis(gpa, scores);
  updatePostResultSummary(gpa, scores);
  document.getElementById('unisWrap').classList.add('show');
  document.getElementById('postResult').classList.add('show');
 
- // Scroll to combo display
  setTimeout(() => {
  document.getElementById('comboDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
  }, 100);
 
- // Analytics event
  if (typeof gtag === 'function') {
  gtag('event', 'calculate_chances', {
  event_category: 'calculator',
@@ -2698,7 +2685,6 @@ function renderUnis(gpa, scores) {
  document.getElementById('unisHeadTitle').textContent = 'Per-university breakdown';
  document.getElementById('unisHeadSub').textContent = sub;
 
- // Show/hide rural disclaimer
  document.getElementById('ruralDisclaimer').innerHTML = '<strong>Note: rural data is sparse.</strong> Very few students submit rural-category data, sample sizes are small, and many fields are incomplete. Treat these results as a <strong>very loose guide</strong>. With a valid combo, a strong application, and appropriate bonuses, outcomes vary widely and rural applicants regularly receive interviews at scores that would be uncompetitive in the non-rural cohort.';
  document.getElementById('ruralDisclaimer').style.display = state.rural ? 'block' : 'none';
 
@@ -2747,10 +2733,10 @@ function getGraduateStrategyAdvice(gpa, scores, ranked) {
  nextStep: 'Key area to work on: your GEMSAS GPA is currently the limiting factor. Look seriously at UoW if you clear the GPA/GAMSAT hurdles and can build a strong CASPer plus bonus profile. Separately, consider a new bachelor if GPA repair is realistic, or Honours only if you can reliably aim for First Class and are specifically trying to improve UQ-style GPA treatment.',
  insight: 'A GEMSAS GPA below about 5.8 makes most normal combo schools very difficult because GAMSAT has to do too much lifting. This does not mean the application is dead, but the strategy changes: UoW, Notre Dame with strong CASPer, a deliberate GPA-repair pathway, or a very carefully chosen Honours year become more important than simply hoping another small GAMSAT lift fixes everything. CASPer only helps for UoW, UNDS and UNDF; the other postgraduate schools do not consider it.',
  example: 'Example: a modest combo may be nowhere near enough for UoM, where CASPer is not considered, but UoW does not rank applicants on the normal combo after hurdles. UoW is driven by CASPer and bonuses.',
- primaryHref: 'practice.html',
- primaryText: 'Practise CASPer',
- secondaryHref: 'gemsas-gpa-calculator.html',
- secondaryText: 'Estimate GPA options',
+ primaryHref: 'casper-class.html?from=calculator_gpa_casper',
+ primaryText: 'Join Friday CASPer class',
+ secondaryHref: 'practice.html',
+ secondaryText: 'Practise CASPer free',
  watchouts: ['GEMSAS GPA below 5.8 is a major constraint for most combo-ranked schools.', 'Honours only helps if the likely outcome is genuinely strong; a weak Honours result can waste time without solving the bottleneck.'],
  };
  }
@@ -2764,10 +2750,10 @@ function getGraduateStrategyAdvice(gpa, scores, ranked) {
  nextStep: 'Key area to work on: CASPer, if UoW, UNDS or UNDF are realistic targets. If your combo is below about 1.70, or only barely competitive for the normal GPA/GAMSAT schools, a strong CASPer can change the application much more efficiently than another tiny GPA or GAMSAT movement at those three schools.',
  insight: 'This is the big strategic asymmetry: students spend years protecting GPA, then one to three years chasing GAMSAT, but many do almost no CASPer preparation. Because the field is underprepared, CASPer is often one of the highest-return parts of the application at the three postgraduate CASPer schools: UoW, UNDS and UNDF. It does not help at the other postgraduate universities because they do not factor it in.',
  example: `Example: a 1.65 combo is not very comfortable for UoM, but it can be extremely live at UNDS or UNDF with Q4 CASPer. ${ndLine} UoW is even more direct: once hurdles are cleared, CASPer and bonuses drive the ranking.`,
- primaryHref: 'practice.html',
- primaryText: 'Practise CASPer',
- secondaryHref: 'casper-tutor-australia.html',
- secondaryText: 'Get CASPer help',
+ primaryHref: 'casper-class.html?from=calculator_casper_roi',
+ primaryText: 'Join Friday CASPer class',
+ secondaryHref: 'practice.html',
+ secondaryText: 'Practise CASPer free',
  watchouts: [`Displayed combo is around ${bestDisplayedCombo.toFixed(3)}, so UoW/UNDS/UNDF deserve serious attention if you can build a strong CASPer result.`, `UoW: ${state.casper || 'unknown CASPer'} plus ${uowBonusCount} selected bonus${uowBonusCount === 1 ? '' : 'es'}.`],
  };
  }
@@ -3094,8 +3080,6 @@ function renderUni(u, gpa, scores) {
  verdictDetail = `Combo is substantially below the 2026 cut-off (${cutoff.toFixed(4)}). Your combo suggests this school would be a very long shot based on combo alone.`;
  }
 
- // Build range bar - map combo score to 0-100% position on bar
- // Domain: [cutoff - 2*std, median + 2*std] roughly captures the interview cohort
  let rangeHtml = '';
  let low = (cutoff === null || cutoff === undefined ? iv.med : cutoff) - 2 * iv.std;
  let high = iv.med + 2 * iv.std;
@@ -3132,7 +3116,6 @@ function renderUni(u, gpa, scores) {
  `;
  }
 
- // Notes
  const noteHtml = [];
  if (state.rural && u.noteRural) noteHtml.push(u.noteRural);
  if (!state.rural && u.noteNR) noteHtml.push(u.noteNR);
@@ -3185,7 +3168,7 @@ function renderCasperBadge(u) {
  }
  if (state.casper) {
  if (state.casper === 'Q4') {
- txt += ' OK You reported Q4.';
+ txt += ' Q4 reported.';
  } else if (state.casper === 'Q3' && state.rural) {
  txt += ' Your Q3 meets the rural threshold.';
  } else if (state.casper === 'Q2' && state.rural) {
@@ -3279,9 +3262,6 @@ function renderUoWCard(u, gpa, scores) {
  `;
 }
 
-// =======================================================================
-// EMAIL CAPTURE
-// =======================================================================
 document.getElementById('emailForm').addEventListener('submit', (e) => {
  e.preventDefault();
  const input = document.getElementById('emailInput');

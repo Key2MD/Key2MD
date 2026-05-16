@@ -1118,7 +1118,6 @@ function renderReviews() {
  const list = document.getElementById('reviewsList');
  list.innerHTML = filtered.map((r, i) => reviewCardHTML(r, i)).join('');
 
- // Attach toggle listeners
  list.querySelectorAll('.review-card-header').forEach(header => {
  header.addEventListener('click', () => {
  header.closest('.review-card').classList.toggle('open');
@@ -1319,7 +1318,6 @@ function plainBodyHTML(r) {
  return savedBodyHTML(r);
 }
 
-// Track which response IDs have been edited (to enable save button)
 const _editedIds = new Set();
 function markEdited(id) { _editedIds.add(id); }
 window.markEdited = markEdited;
@@ -1363,7 +1361,6 @@ async function saveEditedResponse(reviewId, textareaId, statusId, btnId) {
 }
 window.saveEditedResponse = saveEditedResponse;
 
-// -- Helpers --
 function showState(state) {
 	 document.getElementById('loadingState').style.display = state === 'loading' ? 'flex' : 'none';
 	 document.getElementById('errorState').style.display = state === 'error' ? 'block' : 'none';

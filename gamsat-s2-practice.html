@@ -3255,7 +3255,6 @@ function setMarkingSource(src) {
 }
 
 function openMarkingModal() {
- // Populate preview with current essay
  const essay = document.getElementById('essayTextarea').value.trim();
  const station = currentStation !== null ? stations[currentTask][currentStation] : null;
  const preview = document.getElementById('markCurrentContent');
@@ -3265,7 +3264,6 @@ function openMarkingModal() {
  } else {
  preview.textContent = 'No essay written yet. Write your essay first, or switch to "Paste Your Own".';
  }
- // Pre-fill email
  const user = Key2MDAuth.getUser();
  if (user && user.email) {
  document.getElementById('markingEmail').value = user.email;
@@ -3393,7 +3391,6 @@ function submitMarkingPayment() {
  });
 }
 
-// Handle marking payment return
 (function handleMarkingReturn(){
  const params = new URLSearchParams(window.location.search);
  if(params.get('marking') === 'success'){
@@ -3413,7 +3410,6 @@ function submitMarkingPayment() {
  }
 })();
 
-// Close modal on overlay click
 document.getElementById('markingModal').addEventListener('click', function(e) {
  if (e.target === this) closeMarkingModal();
 });

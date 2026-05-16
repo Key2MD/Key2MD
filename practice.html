@@ -48,7 +48,7 @@
  "browserRequirements": "Requires JavaScript and a modern browser",
  "isAccessibleForFree": true,
  "inLanguage": "en-AU",
- "learningResourceType": ["Practice", "Simulation", "Assessment"],
+ "learningResourceType": ["Practice", "Timed station", "Assessment"],
  "educationalLevel": "Higher Education",
  "educationalUse": ["Practice", "Self-assessment", "Test preparation"],
  "teaches": "CASPer situational judgement test response strategy, MMI interview ethics and communication, and Q1-Q4 practice self-assessment for Australian medical school admissions preparation",
@@ -564,7 +564,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div style="width:1px;height:12px;background:var(--gray200);"></div>
  <div style="display:flex;align-items:baseline;gap:5px;">
- <span style="font-size:0.62rem;color:var(--gray400);letter-spacing:0.04em;text-transform:uppercase;">Active today</span>
+ <span style="font-size:0.62rem;color:var(--gray400);letter-spacing:0.04em;text-transform:uppercase;">Practised yesterday</span>
  <span style="font-size:0.85rem;font-weight:700;color:var(--navy);" id="lbParticipantsPreview">-</span>
  </div>
  </div>
@@ -636,9 +636,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 
 
- <div style="font-size:0.68rem;color:var(--gray400);margin-top:10px;text-align:center;" id="lbParticipants">- students practising today</div>
+ <div style="font-size:0.68rem;color:var(--gray400);margin-top:10px;text-align:center;" id="lbParticipants">Yesterday's practice count is loading.</div>
  <div style="font-size:0.64rem;color:var(--gray400);margin-top:6px;line-height:1.5;padding:8px 10px;background:var(--gray50);border-radius:6px;">
- Leaderboard shows opted-in students only - participation is limited. Quartile estimates are based on Key2MD's standardised score distribution for self-selecting med applicants.
+ Yesterday's count uses recorded Key2MD practice activity. Leaderboard rows show opted-in students only - participation is limited. Quartile estimates are based on Key2MD's standardised score distribution for self-selecting med applicants.
  <br><br>
  The leaderboard is sparse by design. Many students have chosen to keep their scores private, which we fully support - your data is yours. To those who opted out: apologies for the previous format. This one respects that.
  </div>
@@ -1185,7 +1185,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <div id="eqSuccess" style="display:none;">
  <div class="eq-success">
- <div class="eq-success-icon">OK</div>
+ <div class="eq-success-icon">&#10003;</div>
  <div class="eq-success-title">Sent!</div>
  <div class="eq-success-sub">Dan usually replies within 24 hours. Keep an eye on your inbox.</div>
  <button class="eq-btn-submit" onclick="closeEnquiry()" style="margin-top:20px;width:100%;">Got it -></button>
@@ -1240,7 +1240,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div id="questionSubmitSuccess" style="display:none;">
  <div class="eq-success">
- <div class="eq-success-icon">OK</div>
+ <div class="eq-success-icon">&#10003;</div>
  <div class="eq-success-title">Question submitted</div>
  <div class="eq-success-sub">Dan will review it personally. The useful part for you is already happening: you are training yourself to see what CASPer is actually assessing.</div>
  <button class="eq-btn-submit" onclick="closeQuestionSubmitModal()" style="margin-top:20px;width:100%;">Done</button>
@@ -2451,7 +2451,6 @@ function escInline(v){
  return String(v??'').replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});
 }
 
-// Timer
 function runTimer(secs,done){
  clearTimer();let left=secs;
  timerNum.textContent=fmt(left);timerNum.classList.remove('urgent');progressFill.style.width='100%';
@@ -2473,7 +2472,6 @@ function beep(vol,long){
  try{
  const ctx=new(window.AudioContext||window.webkitAudioContext)();
  if(long){
- // Writing time over - two soft descending tones
  [0,0.35].forEach((delay,i)=>{
  const osc=ctx.createOscillator();
  const gain=ctx.createGain();
@@ -2487,7 +2485,6 @@ function beep(vol,long){
  osc.stop(ctx.currentTime+delay+0.6);
  });
  } else {
- // Reading time over - single soft chime
  const osc=ctx.createOscillator();
  const gain=ctx.createGain();
  osc.connect(gain);gain.connect(ctx.destination);
@@ -2516,7 +2513,6 @@ function updateBtns(){
  skipBtn.disabled=!sessionActive||phase!=='reading';
  const inlineRestart=$('restartSessionBtn');
  if(inlineRestart) inlineRestart.disabled=!sessionActive;
- // Update Next button label based on state
  if(phase==='done')nextBtn.textContent='Next Station ->';
  else if(phase==='writing'&&currentMode===MODE_MMI)nextBtn.textContent='Stop & Review ->';
  else nextBtn.textContent='Next Station ->';
@@ -2576,7 +2572,6 @@ function refreshAiMarkButton(){
  });
 }
 
-// Answer word count
 answerTextarea.addEventListener('input',()=>{
  const n=wc(answerTextarea.value);wordCountEl.textContent=n+' word'+(n!==1?'s':'');
  refreshAiMarkButton();
@@ -2601,21 +2596,16 @@ if(stationReflection){
  });
 }
 
-// == MODE SWITCHING ==
 function applyModeUI(mode) {
  const isCasper = mode === MODE_CASPER;
  const isMMI = mode === MODE_MMI;
  const isMock = mode === MODE_MOCK;
 
- // Pills
  const pillC = $('modeCasper'), pillM = $('modeMMI'), pillR = $('modeMock');
  if (pillC) pillC.className = 'mode-pill' + (isCasper ? ' active-casper' : '');
  if (pillM) pillM.className = 'mode-pill' + (isMMI ? ' active-mmi' : '');
  if (pillR) pillR.className = 'mode-pill mode-pill-mock' + (isMock ? ' active-mock' : '');
 
- // Cards visibility (use style.display consistently)
- // The unified #categoryCard wraps both blocks; toggle the inner blocks only.
- // Header text swaps with mode. mmiOptionsCard remains a separate card below.
  const cc = $('casperCategoryCard'), mc = $('mmiCategoryCard'), mo = $('mmiOptionsCard');
  const ccard = $('categoryCard'), chdr = $('categoryCardHeader');
  const sq = $('starredQueueCard');
@@ -2625,17 +2615,15 @@ function applyModeUI(mode) {
  if (mo) mo.style.display = isMMI ? '' : 'none';
  if (sq) sq.style.display = isCasper ? '' : 'none';
  if (classCard) classCard.style.display = isCasper ? '' : 'none';
- if (ccard) ccard.style.display = isMock ? 'none' : ''; // the mock has its own dedicated setup card
+ if (ccard) ccard.style.display = isMock ? 'none' : '';
  if (chdr) chdr.textContent = isCasper ? 'Category' : isMMI ? 'MMI Station Type' : 'Full Mock';
 
- // Webcam
  const wp = $('webcamPanel');
  if (wp) {
  wp.className = 'webcam-panel' + (isMMI ? ' show' : '');
  wp.style.display = isMMI ? '' : 'none';
  }
 
- // Timer mode picker (only idle CASPer)
  const tmp = $('timerModePicker');
  if (tmp) tmp.style.display = (isCasper && phase === 'idle') ? '' : 'none';
 }
@@ -2648,19 +2636,16 @@ function setMode(mode) {
  const isMMI = mode === MODE_MMI;
  const isMock = mode === MODE_MOCK;
 
- // Update page title
  const pt = document.getElementById('pageTitle');
  if (pt) pt.textContent = (isCasper ? 'CASPer Practice' : isMMI ? 'MMI Practice' : 'Full CASPer Mock Exam: new stations handwritten by Dan') + ' - Key2MD';
 
- // Update idle text
  const ist = $('idle-sub-text');
  if (ist) ist.textContent = isCasper
- ? 'Choose a category and press Start Session to begin your CASPer practice simulation.'
+ ? 'Choose a category and press Start Session to begin your CASPer practice session.'
  : isMMI
- ? 'Choose a station type and press Start Session to begin your MMI simulation.'
+ ? 'Choose a station type and press Start Session to begin your MMI practice session.'
  : 'Configure your full CASPer mock exam below: 11 completely new stations handwritten by Dan.';
 
- // Update timer defaults
  if (!isCasper) {
  if (isMMI && mmiActivePreset === 'casperVideo') mmiActivePreset = 'quickfire';
  $('readingSlider').min=30;$('readingSlider').max=180;$('readingSlider').value=120;
@@ -2682,7 +2667,6 @@ function setMode(mode) {
  selectedCategory='All';
  }
 
- // Reset session state
  clearTimer();sessionActive=false;phase='idle';
  scenarioIdle.style.display='';scenarioText.style.display='none';
  prompt1Wrap.style.display='none';prompt2Wrap.style.display='none';
@@ -2701,7 +2685,6 @@ function setMode(mode) {
  }
 }
 
-// == WEBCAM ==
 async function initWebcam(){
  if(webcamReady)return true;
  try{
@@ -2719,7 +2702,6 @@ function startRecording(){
  recordedChunks=[];recordingBlob=null;
  audioChunks=[];audioBlob=null;
 
- // Switch to recording controls, hide playback controls
  const rc=$('recordingControls');const pc=$('playbackControls');
  if(rc)rc.style.display='flex';if(pc)pc.style.display='none';
  const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='none';
@@ -2728,9 +2710,7 @@ function startRecording(){
  $('webcamPlayback').style.display='none';
  $('webcamLive').style.display='block';
 
- // (elapsed timer removed - central question timer near prompts replaces this)
 
- // -- Video recorder (full quality, local playback only) --
  const opts=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
  MediaRecorder.isTypeSupported('video/webm')?{mimeType:'video/webm'}:{};
  const recorderOpts = { ...opts };
@@ -2746,9 +2726,6 @@ function startRecording(){
  const url=URL.createObjectURL(recordingBlob);
  const pv=$('webcamPlayback');
 
- // -- Fix WebM duration bug --
- // MediaRecorder WebM metadata can report an invalid duration, so the player
- // uses the recording timer as its fallback duration.
  pv.src=url;
  pv.dataset.duration=String(Math.max(0,Math.round(mmiRecordingDurationSec||0)));
  pv.style.display='block';
@@ -2759,13 +2736,11 @@ function startRecording(){
  $('recDot').style.display='none';$('recLabel').style.display='none';
  $('webcamTitle').textContent='Review your response';
 
- // Switch control bars
  const rc=$('recordingControls');const pc=$('playbackControls');
  if(rc)rc.style.display='none';if(pc)pc.style.display='block';
  const ppo=$('playbackPlayOverlay');
  if(ppo){ppo.style.display='flex';}
 
- // Enable buttons in both panels
  $('btnDownloadVideo').disabled=false;
  $('btnRestartRecording').disabled=false;
  const dl2=$('btnDownloadVideo2');if(dl2)dl2.disabled=false;
@@ -2775,7 +2750,6 @@ function startRecording(){
  };
  mediaRecorder.start(1000);
 
- // -- Audio-only recorder (Tier 1 MMI upload - small file, safe for Whisper) --
  if(currentMode===MODE_MMI){
  try{
  const audioTrack = webcamStream.getAudioTracks()[0];
@@ -2808,13 +2782,11 @@ function stopRecording(){
  webcamActive=false;
 }
 
-// -- Playback UI --------------------------------------------------
 function initPlaybackUI(vid) {
  const dur = getPlaybackDuration(vid);
  if(dur){
  $('pbDuration').textContent = fmt(Math.round(dur));
  }
- // Update progress on timeupdate
  vid.addEventListener('timeupdate', updatePlaybackProgress);
  updatePlaybackProgress();
  vid.addEventListener('ended', ()=>{
@@ -2874,13 +2846,11 @@ function confirmRestartRecording() {
  if(recordingBlob){
  if(!confirm('Re-record this station? Your current recording will be erased.'))return;
  }
- // Trigger the restart logic
  if(!sessionActive||currentMode!==MODE_MMI)return;
  if(typeof mmiResetForRestart==='function') mmiResetForRestart();
  stopRecording();
  const pv=$('webcamPlayback');pv.src='';pv.style.display='none';
  $('webcamLive').style.display='block';
- // Reset control panels
  const rc=$('recordingControls');const pc=$('playbackControls');
  if(rc)rc.style.display='flex';if(pc)pc.style.display='none';
  const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='none';
@@ -2922,7 +2892,6 @@ $('btnDownloadVideo').addEventListener('click', downloadRecording);
 const _dl2 = document.getElementById('btnDownloadVideo2');
 if(_dl2) _dl2.addEventListener('click', downloadRecording);
 
-// == DOWNLOAD RESPONSE ==
 $('btnDownloadResponse').addEventListener('click',()=>{
  if(!pool[currentIdx])return;
  const s=pool[currentIdx];
@@ -2945,7 +2914,6 @@ $('btnDownloadResponse').addEventListener('click',()=>{
  a.download=`Key2MD-CASPer-${cat}-${dateStr}.txt`;a.click();
 });
 
-// == SESSION ==
 function startSession(){
  clearTimer();
  if(currentMode===MODE_MOCK){
@@ -2957,7 +2925,7 @@ function startSession(){
  }
  return;
  }
- _sessionRecordedIds = new Set(); // reset per-session recording tracker
+ _sessionRecordedIds = new Set();
  resetAutoSaveState();
  const stations=currentMode===MODE_CASPER?STATIONS:MMI_STATIONS;
  let filtered;
@@ -2973,7 +2941,6 @@ function startSession(){
  sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
  setPracticeSessionRunning(true);
  statAvg.textContent='-';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
- // Init webcam for MMI
  if(currentMode===MODE_MMI&&!webcamReady)initWebcam();
  loadStation();
  scrollActiveStationIntoView();
@@ -3000,7 +2967,6 @@ function loadStation(){
  updateLibraryCoverage();
  scenarioIdle.style.display='none';scenarioText.style.display='';scenarioText.textContent=s.scenario;
 
- // Reset answer area
  answerSection.style.display='none';
  $('mmiSpeakingArea').classList.remove('show');
  const _b=$('timeUpBanner');_b.classList.remove('show','open-mode','strict-mode');_b.textContent='';
@@ -3016,33 +2982,26 @@ function loadStation(){
  const _srw=document.getElementById('selfRatingWrap');if(_srw)_srw.style.display='none';
  document.querySelectorAll('.self-rate-btn').forEach(b=>b.classList.remove('self-rate-active'));
 
- // Hide prompt3/4 wraps always on load
  const p3w=$('prompt3Wrap'),p4w=$('prompt4Wrap');
  if(p3w)p3w.style.display='none';
  if(p4w)p4w.style.display='none';
- // Reset submit wrap
  const sw=$('mmiSubmitWrap');if(sw)sw.style.display='none';
  const rs=$('mmiRecordingStatus');if(rs)rs.style.display='none';
  const bnr=$('btnRevealNext');if(bnr)bnr.style.display='none';
  if(typeof mmiEngineReset==='function') mmiEngineReset();
 
- // MMI mode: show prompts based on preset format
  const isMmi=currentMode===MODE_MMI;
  if(isMmi){
  const cfg=getMMIConfig();
  const allPrompts=getPrompts(s).slice(0,cfg.promptCount);
- // Populate all text content
  allPrompts.forEach((p,i)=>{ const t=$(`prompt${i+1}Text`); if(t)t.textContent=p; });
- // Hide all prompt wraps initially
  ['prompt1Wrap','prompt2Wrap','prompt3Wrap','prompt4Wrap'].forEach(id=>{ const w=$(id); if(w)w.style.display='none'; });
 
  if(mmiHidePrompts){
- // User toggled hide-prompts - show locked placeholder only
  promptsLocked.style.display='flex';
  } else {
  promptsLocked.style.display='none';
  if(cfg.revealMode==='quickfire'){
- // Show reading hint - questions appear one at a time after initial read
  const hint=document.createElement('div');
  hint.id='qfReadingHint';
  hint.style.cssText='background:rgba(14,165,233,0.06);border:1px dashed rgba(14,165,233,0.25);border-radius:10px;padding:10px 16px;font-size:0.78rem;color:var(--teal3);font-weight:600;text-align:center;margin-top:8px;';
@@ -3050,17 +3009,12 @@ function loadStation(){
  const pa=$('promptsArea');
  if(pa && !$('qfReadingHint')) pa.appendChild(hint);
  } else if(cfg.revealMode==='all_at_once'){
- // Standard: show ALL questions during reading
  allPrompts.forEach((_,i)=>{ const w=$(`prompt${i+1}Wrap`); if(w)w.style.display='block'; });
  } else {
- // Extended / random: show Q1 only during reading
  if($('prompt1Wrap')) $('prompt1Wrap').style.display='block';
  }
  }
  } else if(!mmiHidePrompts){
- // CASPer: pre-load text but keep prompts hidden during reading phase.
- // startWriting() will reveal them once reading time ends.
- // Exception: timer-off mode reveals immediately (handled below).
  prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
  promptsLocked.style.display='flex';
  prompt1Wrap.style.display='none';prompt2Wrap.style.display='none';
@@ -3073,13 +3027,11 @@ function loadStation(){
 
  const rt=isMmi?mmiReadingTime:readingTime;
  if(currentTimerMode==='off'&&!isMmi){
- // No timer - show prompts immediately and go straight to writing
  promptsLocked.style.display='none';
  prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
  prompt1Wrap.style.display='block';prompt2Wrap.style.display='block';
  answerSection.style.display='block';answerTextarea.focus();
  setPhaseUI('writing');
- // No timer running - user clicks Next when done
  } else {
  setPhaseUI('reading');
  if(isMmi && typeof mmiShowCentralTimer==='function') mmiShowCentralTimer(rt,'Reading','purple');
@@ -3088,29 +3040,24 @@ function loadStation(){
 }
 
 function startWriting(){
- beep(0.5,false); // soft single chime - reading time over
+ beep(0.5,false);
  const s=pool[currentIdx];
  const isMmi=currentMode===MODE_MMI;
  promptsLocked.style.display='none';
 
  if(isMmi){
- // Delegate to mmi-engine.js per-format timing engine
  if(typeof mmiDispatchStartWriting==='function') mmiDispatchStartWriting();
  setPhaseUI('writing');
  } else {
- // CASPer: always show both prompts
  prompt1Text.textContent=s.prompt1;prompt2Text.textContent=s.prompt2;
  prompt1Wrap.style.display='block';prompt2Wrap.style.display='block';
- // CASPer: show text area
  answerSection.style.display='block';
  answerTextarea.focus();
- // Show self-rating row
  const srw = document.getElementById('selfRatingWrap');
  if(srw) srw.style.display = 'inline-flex';
  document.querySelectorAll('.self-rate-btn').forEach(b=>b.classList.remove('self-rate-active'));
  setPhaseUI('writing');
  if(currentTimerMode==='off'){
- // No timer - user manually advances
  timerNum.textContent='-:--';progressFill.style.width='0%';
  } else {
  runTimer(writingTime,()=>finishStation());
@@ -3126,28 +3073,23 @@ async function finishStation(){
  stopRecording();
  } else {
  const banner=$('timeUpBanner');
- // Flash the textarea red briefly regardless of mode
  answerTextarea.classList.remove('flash-expired');
- void answerTextarea.offsetWidth; // force reflow to restart animation
+ void answerTextarea.offsetWidth;
  answerTextarea.classList.add('flash-expired');
  setTimeout(()=>answerTextarea.classList.remove('flash-expired'),1200);
 
  if(isStrict){
- // Strict mode: lock textarea
  answerTextarea.readOnly=true;
  answerTextarea.classList.add('locked');
  banner.className='time-up-banner show strict-mode';
  banner.textContent='Timer Time up - typing disabled (strict mode)';
  } else {
- // Default: keep open, just notify
  banner.className='time-up-banner show open-mode';
  banner.textContent='Timer Time\'s up - finish your thought, then hit Next when ready.';
  }
  saveAnswer();
  }
  setPhaseUI('done');updateBtns();
- // Re-evaluate AI button visibility - textarea may stay open in non-strict mode,
- // so user must still be able to get AI feedback even if they stop typing.
  if(!isMmi){
  const aiwrap=$('btnGetAIWrap');
  if(aiwrap){
@@ -3160,10 +3102,9 @@ async function finishStation(){
 
 function saveAnswer(){if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;}
 
-// -- Auto-save response to server ----------------------------------
 let _saveDebounceTimer = null;
 let _autoSaveSessionId = Date.now().toString(36);
-let _savedReviewIds = {}; // maps session/station keys -> review id for PATCH updates
+let _savedReviewIds = {};
 
 function resetAutoSaveState() {
  clearTimeout(_saveDebounceTimer);
@@ -3192,7 +3133,7 @@ async function autoSaveResponse(saveRequest) {
  if (!auth?.isLoggedIn?.()) return;
  const req = typeof saveRequest === 'object' ? saveRequest : buildAutoSaveRequest(saveRequest);
  if (!req || req.sessionId !== _autoSaveSessionId) return;
- if (!req.answer || req.answer.trim().split(/\s+/).length < 20) return; // min 20 words
+ if (!req.answer || req.answer.trim().split(/\s+/).length < 20) return;
  const s = req.station;
  if (!s) return;
 
@@ -3209,14 +3150,12 @@ async function autoSaveResponse(saveRequest) {
  try {
  let res;
  if (existingId) {
- // PATCH - update existing
  res = await fetch(`${API_BASE}/api/responses/${existingId}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
  body: JSON.stringify({ user_response: req.answer }),
  });
  } else {
- // POST - create new
  res = await fetch(`${API_BASE}/api/responses`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -3250,7 +3189,6 @@ function triggerAutoSave(idx) {
  _saveDebounceTimer = setTimeout(() => autoSaveResponse(req), 800);
 }
 
-// AI marking
 async function manualRunAI(){
  saveAnswer();
  const aiButtons=[$('btnGetAI'),$('btnGetAITop')].filter(Boolean);
@@ -3277,7 +3215,6 @@ async function manualRunAI(){
  return;
  }
 
- // Not marked - restore button so user can retry / see sign-up prompt
  aiButtons.forEach(b=>{b.disabled=false;b.style.opacity='1';});
  const auth = getK2Auth();
  if(!auth || !auth.isLoggedIn()){
@@ -3360,7 +3297,6 @@ ${h.answer}
  try{
  const token = auth.getToken();
 
- // Show a linear progress sequence. It should never loop back to earlier steps.
  const container = getAiFbEl();
  container.innerHTML = `<div class="ai-loading" id="aiStreamStatus"><div class="spinner"></div><span id="aiStreamMsg">Reading your response...</span></div>`;
  const msgEl = () => document.getElementById('aiStreamMsg');
@@ -3418,15 +3354,12 @@ ${h.answer}
  return;
  }
 
- // Read full response
  const reader = res.body.getReader();
  const decoder = new TextDecoder();
  let buffer = '';
  while(true){ const {done,value} = await reader.read(); if(done) break; buffer += decoder.decode(value,{stream:true}); }
- buffer += decoder.decode(); // flush any remaining buffered bytes
+        buffer += decoder.decode();
 
- // Parse JSON - robustly extract from AI response.
- // Handles clean JSON, ```json fences, plain fences, preamble/postamble text.
  function extractCleanJson(text){
  if(!text) return null;
  const t=text.trim();
@@ -3445,7 +3378,6 @@ ${h.answer}
  h.feedback = fb;
  h.aiSaved = true;
  recordCompetencyProgress(h.station,fb);
- // Record attempt with AI score
  const _sid = getStationHistoryId(h.station, currentMode);
  if(!_sessionRecordedIds.has(_sid)){_sessionRecordedIds.add(_sid);StationHistory.record(_sid,fb.score);}
  updateLimitUI();
@@ -3478,7 +3410,6 @@ function renderAiBusyMessage(target,data){
  if(copy) copy.textContent=data?.message||'Please wait 30 seconds and try again. Your answer has not been lost and no credit/free attempt was used.';
 }
 function getCalibrationQuartile(){
- // Returns calibration based on ALL scored stations so far
  const scores=sessionHistory.filter(h=>h&&h.score!=null).map(h=>h.score);
  if(!scores.length)return null;
  const avg=scores.reduce((a,b)=>a+b,0)/scores.length;
@@ -3489,11 +3420,9 @@ function getCalibrationQuartile(){
 function showFeedback(score,fb,options){
  if(!fb)return;
  const forceScoreDisclaimer = !!(options && options.forceScoreDisclaimer);
- // Confetti for high scores
  if(score>=8) triggerConfetti();
  const qi=getQuartile(score);
  const cal=getCalibrationQuartile();
- // Calibration bar
  const calHtml=cal?`
  <div style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid rgba(14,165,233,0.15);">
  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -3522,7 +3451,6 @@ qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus 
  }</div>
  </div>
  `:'';
- // Check if disclaimer has been permanently dismissed, unless this is the every-5-marking reminder.
  const disclaimerDismissed = forceScoreDisclaimer ? false : (() => { try { return localStorage.getItem('k2_score_disclaimer_dismissed') === '1'; } catch { return false; } })();
  const scoreReminderHtml = forceScoreDisclaimer ? `<div style="display:inline-block;margin-bottom:8px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.22);border-radius:50px;padding:4px 9px;color:var(--teal3);font-size:0.68rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;">Calibration reminder - shown every 5 AI markings</div>` : '';
  const disclaimerHtml = `
@@ -3593,7 +3521,6 @@ qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus 
  <button id="retryStationBtn" onclick="retryStation()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:50px;border:1.5px solid var(--gray200);background:var(--white);color:var(--gray600);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--navy)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">Refresh Retry this station</button>
  <a href="https:
  </div>`;
- // Auto-expand disclaimer on first ever score (not dismissed yet)
  if(!disclaimerDismissed){
  const btn=document.getElementById('k2ScoreDisclaimerBtn');
  if(btn) btn.innerHTML='About this score &#9660;';
@@ -3637,7 +3564,6 @@ function restoreFeedback(idx){
  }
 }
 
-// Trend chart
 function clearTrend(){if(trendEmpty)trendEmpty.style.display='block';if(trendCanvas)trendCanvas.style.display='none';if(trendAvgLine)trendAvgLine.style.display='none';}
 function updateTrend(){
  const sc=sessionHistory.filter(h=>h&&h.score!=null).map(h=>h.score);
@@ -3649,9 +3575,7 @@ function updateTrend(){
 }
 function updateAvgStat(){const avg=avgScores();if(avg!==null){statAvg.textContent=avg+'/10';statAvg.style.color=avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';} updateLeaderboard(); updateCategoryHeatmap();}
 
-// == LIBRARY COVERAGE BAR (4.3) ===============================================
 function updateLibraryCoverage() {
- // CASPer
  if(typeof STATIONS !== 'undefined') {
  const total = STATIONS.length;
  const seen = STATIONS.filter(s => {
@@ -3665,7 +3589,6 @@ function updateLibraryCoverage() {
  if (bar) bar.style.width = pct + '%';
  if (lbl) lbl.textContent = seen + ' of ' + total + ' stations seen';
  }
- // MMI
  if(typeof MMI_STATIONS !== 'undefined') {
  const total = MMI_STATIONS.length;
  const seen = MMI_STATIONS.filter(s => {
@@ -3679,11 +3602,9 @@ function updateLibraryCoverage() {
  if (bar) bar.style.width = pct + '%';
  if (lbl) lbl.textContent = seen + ' of ' + total + ' stations seen';
  }
- // Update starred button visibility
  updateStarredCategoryBtn();
 }
 
-// == SEEN-BEFORE PILL (4.4) ====================================================
 function updateSeenPill(station) {
  const pill = document.getElementById('seenBeforePill');
  if (!pill) return;
@@ -3700,7 +3621,6 @@ function updateSeenPill(station) {
  }
 }
 
-// == STAR BUTTON (4.5) =========================================================
 function updateStarBtn(station) {
  const btn = document.getElementById('starBtn');
  if (!btn || !station) return;
@@ -3714,8 +3634,6 @@ function updateStarBtn(station) {
  btn.setAttribute('aria-label', btn.title);
  btn._stationId = id;
 
- // Star hint - show only until the user has starred their first station ever.
- // Once any station is starred, hide forever for this browser.
  const hint = document.getElementById('starHint');
  if (hint) {
  const starredCount = (typeof StationHistory.getStarred === 'function')
@@ -3733,7 +3651,6 @@ function toggleStarStation() {
  btn.classList.toggle('is-starred', newState);
  btn.title = newState ? 'Remove from saved stations' : 'Save this station';
  btn.setAttribute('aria-label', btn.title);
- // Hide the onboarding hint as soon as the user stars anything for the first time.
  const hint = document.getElementById('starHint');
  if (hint && newState) hint.style.display = 'none';
  updateStarredCategoryBtn();
@@ -3744,7 +3661,6 @@ function updateStarredCategoryBtn() {
  const starred = StationHistory.getStarred();
  const casperStarred = getCasperStarredStations();
  const mmiStarred = getMmiStarredStations();
- // CASPer starred btn
  let cbtn = document.getElementById('cat-btn-starred-casper');
  const cFilters = document.getElementById('categoryFilters');
  if (cFilters) {
@@ -3755,7 +3671,6 @@ function updateStarredCategoryBtn() {
  cbtn.id = 'cat-btn-starred-casper';
  cbtn.setAttribute('data-cat', '__starred');
  cbtn.innerHTML = '&#9733; Starred <span class="cat-count" id="cnt-starred-casper">0</span>';
- // Insert after the "All Stations" button
  const allBtn = cFilters.querySelector('.cat-btn');
  if (allBtn && allBtn.nextSibling) cFilters.insertBefore(cbtn, allBtn.nextSibling);
  else cFilters.appendChild(cbtn);
@@ -3767,7 +3682,6 @@ function updateStarredCategoryBtn() {
  cbtn.style.display = 'none';
  }
  }
- // MMI starred btn
  let mbtn = document.getElementById('cat-btn-starred-mmi');
  const mFilters = document.getElementById('mmiCategoryFilters');
  if (mFilters) {
@@ -3856,10 +3770,8 @@ function startSingleStarredStation(stationId){
  loadStation();
 }
 
-// == SELF-RATING (4.2) ========================================================
 function setSelfRating(q) {
  if (sessionHistory[currentIdx]) sessionHistory[currentIdx].selfRating = q;
- // Update button active states
  document.querySelectorAll('.self-rate-btn').forEach(b => {
  b.classList.toggle('self-rate-active', b.getAttribute('data-q') === q);
  });
@@ -3884,7 +3796,6 @@ function getSelfRatingComparisonHtml(selfRating, aiScore) {
  return `<div style="font-size:0.78rem;font-weight:600;color:${col};background:${col}12;border:1px solid ${col}30;border-radius:8px;padding:8px 12px;margin-bottom:10px;">${msg}</div>`;
 }
 
-// == PER-CATEGORY Q1-Q4 BREAKDOWN (4.1) =======================================
 function buildCategoryBreakdown() {
  const catScores = {};
  sessionHistory.forEach(h => {
@@ -3916,8 +3827,6 @@ function buildCategoryBreakdown() {
 }
 
 function updateCategoryHeatmap(){
- // Build per-competency average from AI feedback. Older saved responses may not
- // have competency data, so ignore them instead of guessing.
  const compData={};
  sessionHistory.forEach(h=>{
  if(!h||!h.feedback)return;
@@ -3938,7 +3847,6 @@ function updateCategoryHeatmap(){
  document.getElementById('categoryHeatmapCard').style.display='block';
  if(heatmapEmpty) heatmapEmpty.style.display='none';
 
- // Sort by avg ascending (worst first)
  const sorted=comps.map(c=>({name:c,avg:compData[c].sum/compData[c].n,n:compData[c].n,improve:compData[c].improve}))
  .sort((a,b)=>a.avg-b.avg);
 
@@ -3958,7 +3866,6 @@ function updateCategoryHeatmap(){
  </div>`;
  }).join('');
 
- // Show weak alert if enough data and weakest is below Q3
  const weakest=sorted[0];
  const alertEl=document.getElementById('heatmapWeakAlert');
  const weakLabel=document.getElementById('heatmapWeakLabel');
@@ -4212,28 +4119,6 @@ function useRecommendedStation(stationId){
  loadStation();
 }
 
-// ======================================
-// LEADERBOARD + STREAKS
-// ======================================
-
-// Simulated student pool - deterministic per day so it looks consistent
-function seededRandom(seed){let s=seed;return function(){s=(s*16807+0)%2147483647;return(s-1)/2147483646;};}
-
-function getTodaysSeed(){
- const d=new Date();
- // Pack date into integer, then hash with multiplicative mixer.
- // Without the hash, adjacent days produce near-identical seeds and the LCG's first output
-
- const dateInt = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
- let h = dateInt;
- h = ((h ^ (h >>> 16)) * 0x85ebca6b) >>> 0;
- h = ((h ^ (h >>> 13)) * 0xc2b2ae35) >>> 0;
- h = (h ^ (h >>> 16)) >>> 0;
- return (h % 2147483646) + 1;
-}
-
-
-
 
 const LB_DIST = { q1: 0.08, q2: 0.22, q3: 0.42, q4: 0.28 };
 
@@ -4249,13 +4134,6 @@ function getQuartileFromDist(score) {
 
 
 
-function getDailyStudentCount() {
- const rng = seededRandom(getTodaysSeed());
-
- const roll = rng();
- return 18 + Math.floor(roll * roll * 35);
-}
-
 function getQuartile(score){ return getQuartileFromDist(score); }
 
 const LB_TOOL='casper';
@@ -4266,6 +4144,7 @@ const LB_BAD_WORDS=[
  'fag','faggot','nigger','nigga','kike','spic','chink','retard'
 ];
 let leaderboardRows=[];
+let leaderboardSummary={yesterdayCount:null};
 let leaderboardSettings={opt_in:false,display_name:''};
 let savedLeaderboardSettings={opt_in:false,display_name:''};
 let leaderboardLoaded=false;
@@ -4386,6 +4265,7 @@ async function refreshLeaderboardData(opts){
  try{
  const data=await leaderboardFetch('/api/leaderboard?tool='+encodeURIComponent(LB_TOOL));
  leaderboardRows=Array.isArray(data.rows)?data.rows:[];
+ leaderboardSummary={yesterdayCount:readYesterdayPracticeCount(data)};
  leaderboardLoaded=true;
  leaderboardError='';
  }catch(err){
@@ -4453,6 +4333,52 @@ function handleLeaderboardToggle(checked){
  saveLeaderboardSettings(checked,name);
 }
 
+function readYesterdayPracticeCount(data){
+ if(!data || typeof data !== 'object') return null;
+ const buckets=[
+ data,
+ data.stats,
+ data.summary,
+ data.activity,
+ data.counts
+ ].filter(Boolean);
+ const keys=[
+ 'yesterday_practised',
+ 'yesterday_practiced',
+ 'yesterday_count',
+ 'yesterdayCount',
+ 'practised_yesterday',
+ 'practiced_yesterday',
+ 'completed_yesterday',
+ 'yesterday_completed',
+ 'practice_count_yesterday',
+ 'total_yesterday'
+ ];
+ for(const bucket of buckets){
+ for(const key of keys){
+ const value=bucket[key];
+ const numeric=Number(value);
+ if(Number.isFinite(numeric) && numeric>=0) return Math.floor(numeric);
+ }
+ }
+ if(data.yesterday && typeof data.yesterday==='object'){
+ for(const key of ['practised','practiced','completed','practice_count','count','total']){
+ const numeric=Number(data.yesterday[key]);
+ if(Number.isFinite(numeric) && numeric>=0) return Math.floor(numeric);
+ }
+ }
+ return null;
+}
+
+function formatYesterdayPracticeCount(){
+ const count=leaderboardSummary&&Number.isFinite(Number(leaderboardSummary.yesterdayCount))
+ ? Number(leaderboardSummary.yesterdayCount)
+ : null;
+ if(count===null) return {preview:'-', detail:'Yesterday practice count unavailable.'};
+ const noun=count===1?'student':'students';
+ return {preview:String(count), detail:`${count} ${noun} practised yesterday`};
+}
+
 function saveLeaderboardSettingsFromUI(){
  const input=document.getElementById('lbDisplayName');
  saveLeaderboardSettings(leaderboardSettings.opt_in, input?input.value:'');
@@ -4477,19 +4403,17 @@ function getRemoteLeaderboardStudents(){
 }
 
 function updateLeaderboard(){
- // Only real opted-in students - no fake rows ever
  const students = getRemoteLeaderboardStudents();
  students.sort((a,b)=>b.score-a.score);
 
  const userIdx = students.findIndex(s=>s.isYou);
  const hasSharedScore = userIdx >= 0;
- const dailyCount = getDailyStudentCount();
+ const practiceCount = formatYesterdayPracticeCount();
 
- // -- Collapsed preview --
  const yourRankNumEl = document.getElementById('lbYourRankNum');
  const yourQPillEl = document.getElementById('lbYourQPill');
  const previewPartEl = document.getElementById('lbParticipantsPreview');
- if(previewPartEl) previewPartEl.textContent = dailyCount;
+ if(previewPartEl) previewPartEl.textContent = practiceCount.preview;
 
  if(hasSharedScore && yourRankNumEl){
  const qi = getQuartile(students[userIdx].score);
@@ -4509,10 +4433,8 @@ function updateLeaderboard(){
  const badge = document.getElementById('lbRankBadge');
  if(badge) badge.style.display = 'none';
  }
- // Refresh collapsed-state expand-button label/chip now that rank may have changed
  if(typeof updateLeaderboardCollapsedLabel === 'function') updateLeaderboardCollapsedLabel();
 
- // -- Your quartile block --
  const rankWrap = document.getElementById('lbYourRank');
  const posEl = document.getElementById('lbYourPos');
  const qEl = document.getElementById('lbYourQ');
@@ -4521,7 +4443,6 @@ function updateLeaderboard(){
  rankWrap.style.display = 'block';
  posEl.textContent = qi.label;
  posEl.style.color = qi.color;
- // Rank within opted-in students
  qEl.textContent = students.length > 1
  ? '#' + (userIdx + 1) + ' of ' + students.length + ' opted-in'
  : 'Only opted-in student today';
@@ -4531,7 +4452,6 @@ function updateLeaderboard(){
  rankWrap.style.display = 'none';
  }
 
- // -- Student rows (opted-in only) --
  const rowsEl = document.getElementById('lbRows');
  if(!rowsEl) return;
  rowsEl.innerHTML = '<div style="font-size:0.72rem;color:var(--gray400);padding:0 4px 4px;display:flex;justify-content:space-between;"><span>Student</span><span>Avg Score</span></div>';
@@ -4548,9 +4468,6 @@ function updateLeaderboard(){
  }
  }
 
- // -- Distribution bar - always standardised, never from fake data --
- // Fixed proportions: Q1 8%, Q2 22%, Q3 42%, Q4 28%
- // Bar is static - represents the Key2MD cohort distribution, not today's opt-ins
  const bar = document.getElementById('lbDistBar');
  if(bar){
  bar.innerHTML =
@@ -4560,9 +4477,8 @@ function updateLeaderboard(){
  `<div style="flex:28;background:#22c55e;border-radius:0 3px 3px 0;" title="Q4 (~28%)"></div>`;
  }
 
- // -- Participant count - date-seeded random, not fake student count --
  const partEl = document.getElementById('lbParticipants');
- if(partEl) partEl.textContent = dailyCount + ' students practising today';
+ if(partEl) partEl.textContent = practiceCount.detail;
 }
 
 function lbRowHTML(rank,s){
@@ -4584,14 +4500,12 @@ function lbRowHTML(rank,s){
  </div>`;
 }
 
-// -- Retry station --
 let retryUsed=false;
 function retryStation(){
  if(retryUsed){showPracticeNotice('You can only retry a station once.', 'error');return;}
  retryUsed=true;
  const btn=document.getElementById('retryStationBtn');
  if(btn){btn.textContent='Refresh Retried (1/1)';btn.disabled=true;btn.style.opacity='0.4';}
- // Reset this station's history entry
  if(sessionHistory[currentIdx]){
  sessionHistory[currentIdx].answer='';
  sessionHistory[currentIdx].score=null;
@@ -4610,7 +4524,6 @@ function retryStation(){
  runTimer(writingTime,()=>finishStation());
 }
 
-// -- Confetti --
 function triggerConfetti(){
  const canvas=document.createElement('canvas');
  canvas.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
@@ -4642,20 +4555,16 @@ function triggerConfetti(){
  }
 
  const pieces=[];
- // First burst - from top center spread
  for(let i=0;i<120;i++) pieces.push(makeParticle(canvas.width/2+(Math.random()-0.5)*200,-10,false));
- // Side cannons
  for(let i=0;i<60;i++) pieces.push(makeParticle(0,canvas.height*0.4,false));
  for(let i=0;i<60;i++) pieces.push(makeParticle(canvas.width,canvas.height*0.4,false));
 
- // Second burst delayed
  let secondBurstDone=false;
 
  let frame=0;
  const totalFrames=220;
 
  function draw(){
- // Second burst at frame 40
  if(frame===40&&!secondBurstDone){
  secondBurstDone=true;
  for(let i=0;i<80;i++) pieces.push(makeParticle(canvas.width*0.25+(Math.random()-0.5)*100,-10,false));
@@ -4695,7 +4604,6 @@ function triggerConfetti(){
  }
  draw();
 
- // Q4 flash message
  const msg=document.createElement('div');
  msg.textContent='Q4';
  msg.style.cssText=`position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.5);
@@ -4715,7 +4623,6 @@ function triggerConfetti(){
  },1200);
 }
 
-// -- Leaderboard toggle --
 let lbOpen=false;
 function toggleLeaderboard(){
  lbOpen=!lbOpen;
@@ -4724,7 +4631,6 @@ function toggleLeaderboard(){
  const lbl=document.getElementById('lbExpandLabel');
  if(exp)exp.style.display=lbOpen?'block':'none';
  if(icon)icon.style.transform=lbOpen?'rotate(180deg)':'rotate(0deg)';
- // Flip the button label between expand and collapse phrasing
  if(lbl && lbl.dataset){
  if(lbOpen){
  lbl.dataset.cachedLabel = lbl.textContent;
@@ -4735,21 +4641,15 @@ function toggleLeaderboard(){
  }
 }
 
-// Compose the collapsed-state expand-button label and (optional) chip,
-// based on whether the user has shared a Q-score and current streak length.
-// Called from refreshLeaderboardData (Q changes) and updateStreakUI (streak changes).
 function updateLeaderboardCollapsedLabel(){
  const lbl = document.getElementById('lbExpandLabel');
  const chip = document.getElementById('lbExpandChip');
  if(!lbl) return;
- // Don't override the "Hide..." label while expanded.
  if(typeof lbOpen !== 'undefined' && lbOpen) return;
 
- // Streak (read directly from localStorage so this works regardless of call order)
  let streak = 0;
  try{ streak = parseInt(localStorage.getItem('k2md_streak')||'0',10) || 0; }catch(e){}
 
- // Q-score state - derived from #lbYourRankNum textContent (set by refreshLeaderboardData)
  const rankEl = document.getElementById('lbYourRankNum');
  const hasQ = rankEl && rankEl.textContent && rankEl.textContent.trim() !== '-' && rankEl.textContent.trim() !== '';
 
@@ -4769,7 +4669,6 @@ function updateLeaderboardCollapsedLabel(){
  }
 }
 
-// -- Timer modes --
 const TIMER_MODES={
  off:{read:0,write:0,hint:'Write at your own pace. Ideal for first attempts or when you want to focus purely on content.'},
  standard:{read:60,write:210,hint:'60s read, 3:30 write. Mirrors real CASPer conditions. Best for regular practice.'},
@@ -4846,10 +4745,9 @@ function updateTimerModeHint(){
 }
 
 function setTimerMode(mode){
- if(currentMode !== MODE_CASPER) return; // guard: CASPer only
+  if(currentMode !== MODE_CASPER) return;
  currentTimerMode=mode;
  applyCasperTiming();
- // Update UI
  ['off','standard','rapid','deep'].forEach(k=>{
  const el=document.getElementById('timerMode'+k.charAt(0).toUpperCase()+k.slice(1));
  if(el)el.className='timer-mode-card'+(k===mode?' timer-mode-active':'');
@@ -4872,13 +4770,10 @@ function loadStreak(){
  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
 
  if(lastDate===today){
- // Already practised today
  updateStreakUI(streak);
  } else if(lastDate===yesterday){
- // Streak continues but not yet logged today
  updateStreakUI(streak);
  } else if(lastDate){
- // Streak broken
  localStorage.setItem(STREAK_KEY,'0');
  updateStreakUI(0);
  } else {
@@ -4893,7 +4788,6 @@ function recordPractice(){
  let streak=parseInt(localStorage.getItem(STREAK_KEY)||'0');
 
  if(lastDate===today){
- // Already counted today
  return;
  } else if(lastDate===yesterday){
  streak++;
@@ -4919,11 +4813,9 @@ function updateStreakUI(streak){
  textEl.textContent=streak+' day streak ';
  subEl.textContent='Practise daily to keep it alive';
  }
- // Refresh the collapsed-state expand-button label/chip to reflect new streak
  if(typeof updateLeaderboardCollapsedLabel === 'function') updateLeaderboardCollapsedLabel();
 }
 
-// Init leaderboard + streak on page load
 setTimeout(()=>{loadStreak();loadLeaderboardSettings();refreshLeaderboardData({silent:true});if(typeof updateLeaderboardCollapsedLabel === 'function') updateLeaderboardCollapsedLabel();},200);
 
 function drawChart(canvas,scores,h){
@@ -4941,7 +4833,6 @@ function drawChart(canvas,scores,h){
  pts.forEach((p,i)=>{ctx.fillStyle=scores[i]>=7?'#22c55e':scores[i]>=5?'#f59e0b':'#ef4444';ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();});
 }
 
-// End session + review
 function endSession(){
  clearTimer();sessionActive=false;phase='done';scenarioCard.style.display='none';
  setPracticeSessionRunning(false);
@@ -4993,7 +4884,6 @@ function renderList(filter){
  }).join('');
 }
 
-// Button handlers
 $('startBtn').addEventListener('click',startSession);
 $('startBtnInline')?.addEventListener('click',startSession);
 $('restartBtn').addEventListener('click',startSession);
@@ -5027,12 +4917,8 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
  if(phase==='writing'&&currentMode===MODE_MMI){
  clearTimer();stopRecording();setPhaseUI('done');updateBtns();return;
  }
- // Advance to next
  if(phase==='done'||phase==='reading'||currentMode===MODE_MMI){
- // Auto-save before advancing (CASPer only - MMI handled via submit button)
- // Auto-save before advancing - skip if AI already saved this station
  if(currentMode===MODE_CASPER && !sessionHistory[currentIdx]?.aiSaved) triggerAutoSave(currentIdx);
- // Record attempt without AI score if response has substance but no AI feedback
  const _advH = sessionHistory[currentIdx];
  if(_advH && _advH.station){
  const _advId = getStationHistoryId(_advH.station, currentMode);
@@ -5041,11 +4927,10 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
  StationHistory.record(_advId, _advH.score!=null?_advH.score:null);
  }
  }
- // Unlock textarea for next station
  answerTextarea.readOnly=false;answerTextarea.classList.remove('locked','flash-expired');
  const _b=$('timeUpBanner');_b.classList.remove('show','open-mode','strict-mode');_b.textContent='';
  completed++;statCompleted.textContent=completed;
- recordPractice(); // Track streak
+    recordPractice();
  currentIdx++;loadStation();
  }
 });
@@ -5055,27 +4940,22 @@ skipBtn.addEventListener('click',()=>{
  clearTimer();startWriting();
 });
 
-// Keyboard shortcuts
 document.addEventListener('keydown',e=>{
  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
  if(e.key==='ArrowRight'&&!nextBtn.disabled)nextBtn.click();
  if(e.key==='ArrowLeft'&&!prevBtn.disabled)prevBtn.click();
  if(e.key===' '){
  e.preventDefault();
- // During MMI recording: delegate spacebar to engine
  if(currentMode===MODE_MMI && phase==='writing' && webcamActive){
  if(typeof mmiEngineSpacebar==='function' && mmiEngineSpacebar()) return;
- // fallback for custom/sequential modes
  const bnr=$('btnRevealNext');
  if(bnr && bnr.style.display!=='none' && !bnr.disabled){ mmiRevealNextPrompt(); return; }
  return;
  }
- // Otherwise: skip reading
  if(!skipBtn.disabled) skipBtn.click();
  }
 });
 
-// -- Enquiry modal (matches live site) --
 function openEnquiry(type){
  var modal=document.getElementById('enquiryModal');
  var select=document.getElementById('eqType');
@@ -5088,7 +4968,6 @@ function openEnquiry(type){
  document.getElementById('eqError').style.display='none';
  document.getElementById('eqSubmitBtn').disabled=false;
  document.getElementById('eqSubmitBtn').textContent='Send to Dan ->';
- // Show/hide bug-specific field
  var bugRow=document.getElementById('eqBugRow');
  if(bugRow) bugRow.style.display=(type==='Bug Report')?'block':'none';
  if(type&&select){for(var i=0;i<select.options.length;i++){if(select.options[i].value===type){select.selectedIndex=i;break;}}}
@@ -5146,7 +5025,6 @@ function submitEnquiry(){
  if(typeof gtag==='function')gtag('event','enquiry_submit',{event_category:'conversion',event_label:type});
  })
  .catch(function(){
- // Fallback: open mailto
  var subject=encodeURIComponent(type+' - '+name);
  var body=encodeURIComponent(type+'\n\nName: '+name+'\nEmail: '+email+'\nType: '+type+'\nTarget Unis: '+(unis||'N/A')+'\nExam Date: '+(date||'N/A')+'\nNotes: '+(notes||'None'));
  window.open('mailto:brittainmbbs@gmail.com?subject='+subject+'&body='+body);
@@ -5239,9 +5117,7 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeEnquiry();closeQuestionSubmitModal();}});
 
-// Hamburger
 
-// -- DAN MARKING MODAL --
 let markingSource = 'current';
 
 function setMarkingSource(src) {
@@ -5263,7 +5139,6 @@ function setMarkingSource(src) {
 
 function openMarkingModal() {
  const auth = getK2Auth();
- // Populate current station preview
  const h = sessionHistory[currentIdx];
  const s = h?.station;
  const preview = document.getElementById('markCurrentContent');
@@ -5272,7 +5147,6 @@ function openMarkingModal() {
  } else {
  preview.textContent = 'No station loaded yet. Start a station first, or switch to "Paste Your Own".';
  }
- // Pre-fill email if logged in
  const user = auth?.getUser?.();
  if (user && user.email) {
  document.getElementById('mEmail').value = user.email;
@@ -5288,10 +5162,8 @@ window.addEventListener('DOMContentLoaded',function(){
  var overlay=document.getElementById('markingModalOverlay');
  if(overlay)overlay.addEventListener('click',function(e){if(e.target===this)closeMarkingModal();});
 
- // -- Enforce clean initial state (bug fix 2.1) --
  setMode(MODE_CASPER);
 
- // -- Initialize Auth --
  const auth = getK2Auth();
  if(!auth?.init) return;
  auth.init({
@@ -5305,7 +5177,6 @@ window.addEventListener('DOMContentLoaded',function(){
  refreshLeaderboardData({silent:true});
  var hlb = document.getElementById('historyLinkBar');
  if(hlb) hlb.style.display = user ? 'block' : 'none';
- // Update AI status indicator
  var statusEl = document.getElementById('aiStatusEl');
  if(statusEl){
  if(user){
@@ -5370,7 +5241,6 @@ function submitMarkingPayment() {
  });
 }
 
-// Handle marking payment return
 (function handleMarkingReturn(){
  const params = new URLSearchParams(window.location.search);
  if(params.get('marking') === 'success'){
@@ -5383,7 +5253,6 @@ function submitMarkingPayment() {
  }
 })();
 
-// == CREDIT SHOP ==
 let selectedPackId = null;
 
 function openCreditShop(){
@@ -5466,7 +5335,6 @@ function purchaseCredits(){
  .then(r => r.json())
  .then(data => {
  if(data.checkout_url){
- // Redirect to Stripe Checkout
  window.location.href = data.checkout_url;
  } else {
  btn.textContent = data.error || 'Error \u2014 try again';
@@ -5482,16 +5350,12 @@ function purchaseCredits(){
 }
 window.purchaseCredits = purchaseCredits;
 
-// \u2550\u2550 HANDLE STRIPE RETURN \u2550\u2550
 (function handlePaymentReturn(){
  const params = new URLSearchParams(window.location.search);
  if(params.get('payment') === 'success'){
- // Clean URL
  window.history.replaceState({}, '', window.location.pathname);
- // Wait for auth to init, then show success
  setTimeout(function(){
  Key2MDAuth.checkSession();
- // Show credit shop success state
  const overlay = document.getElementById('creditShopOverlay');
  if(overlay){
  overlay.style.display = 'flex';
@@ -5505,7 +5369,6 @@ window.purchaseCredits = purchaseCredits;
  }
 })();
 
-// == MAILING LIST (sidebar) ==
 function subscribePractice(){
  var input=document.getElementById('practiceEmailInput');
  var email=input.value.trim();
@@ -5517,8 +5380,6 @@ function subscribePractice(){
 }
 window.subscribePractice=subscribePractice;
 
-// ===========================================================
-// PROGRESS TRACKING & CONVERSION NUDGES
 const K2_PROGRESS_KEY = 'k2md_practice_progress_v1';
 const K2_NUDGE_DISMISSED_KEY = 'k2md_nudge_dismissed_v1';
 
@@ -5549,7 +5410,6 @@ function k2TrackCompletion(score){
  p.count = (p.count || 0) + 1;
  p.scores = p.scores || [];
  p.scores.push({score:score, at:Date.now()});
- // Keep last 20
  if (p.scores.length > 20) p.scores = p.scores.slice(-20);
  k2SaveProgress(p);
  if(window.Key2MDTrack&&typeof window.Key2MDTrack.funnel==='function'){
@@ -5557,13 +5417,11 @@ function k2TrackCompletion(score){
  const avg=nums.length?Math.round(nums.reduce((a,b)=>a+b,0)/nums.length*10)/10:null;
  window.Key2MDTrack.funnel('ai_mark_success',{score:score,count:p.count,average:avg});
  }
- // Render appropriate nudge
- setTimeout(() => k2RenderNudge(), 400); // after feedback animates in
+  setTimeout(() => k2RenderNudge(), 400);
  return p.count > 0 && p.count % 5 === 0;
 }
 
 function k2DetectPlateau(scores){
- // Look at last 4 sessions; if std dev < 0.8 AND avg < 7, it's a plateau
  if (scores.length < 4) return false;
  const last = scores.slice(-4).map(s => s.score).filter(s => s != null);
  if (last.length < 4) return false;
@@ -5581,13 +5439,11 @@ function k2RenderNudge(){
  const avgScore = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : null;
  const latestScore = scores.length ? Number(scores[scores.length - 1]) : null;
 
- // Remove any existing nudge
  const existing = document.getElementById('k2Nudge');
  if (existing) existing.remove();
 
  let nudge = null;
 
- // Plateau detection (highest priority after 4+ sessions)
  if (count >= 4 && !dismissed['plateau'] && k2DetectPlateau(p.scores)) {
  nudge = {
  key: 'plateau',
@@ -5598,7 +5454,6 @@ function k2RenderNudge(){
  secondary: {text:'Questions before committing?', href:'#', onclick:"openEnquiry('CASPer Class Question');return false;"},
  };
  }
- // Low-score check-in after repeated CASPer practice
  else if (count >= 2 && Number.isFinite(latestScore) && latestScore < 6 && !dismissed['class_low']) {
  nudge = {
  key: 'class_low',
@@ -5609,7 +5464,6 @@ function k2RenderNudge(){
  secondary: {text:'Ask a question first', href:'#', onclick:"openEnquiry('CASPer Class Question');return false;"},
  };
  }
- // 15+ sessions - serious learner
  else if (count >= 15 && !dismissed['serious']) {
  nudge = {
  key: 'serious',
@@ -5620,7 +5474,6 @@ function k2RenderNudge(){
  secondary: {text:'Submit 1 response for expert marking ($35)', href:'#', onclick:"openMarkingModal();return false;"},
  };
  }
- // 8-14 sessions - regular user
  else if (count >= 8 && count < 15 && !dismissed['regular']) {
  nudge = {
  key: 'regular',
@@ -5631,7 +5484,6 @@ function k2RenderNudge(){
  secondary: {text:'Questions before committing?', href:'#', onclick:"openEnquiry('CASPer Class Question');return false;"},
  };
  }
- // 3-7 sessions - first real check-in
  else if (count >= 3 && count < 8 && !dismissed['first']) {
  nudge = {
  key: 'first',
@@ -5645,7 +5497,6 @@ function k2RenderNudge(){
 
  if (!nudge) return;
 
- // Find the right container - the AI feedback panel on the active mode
  const container = getAiFbEl ? getAiFbEl() : null;
  if (!container) return;
 
@@ -5665,7 +5516,6 @@ function k2RenderNudge(){
  container.appendChild(el);
 }
 
-// Animation keyframes - inject once
 (function(){
  if (document.getElementById('k2NudgeStyles')) return;
  const s = document.createElement('style');
@@ -5674,11 +5524,9 @@ function k2RenderNudge(){
  document.head.appendChild(s);
 })();
 
-// Expose to global scope so they can be called after AI finishes scoring
 window.k2TrackCompletion = k2TrackCompletion;
 window.k2RenderNudge = k2RenderNudge;
 
-// Render any eligible nudge on page load (if user has past progress)
 document.addEventListener('DOMContentLoaded', function(){
  setTimeout(function(){ try{ k2RenderNudge(); }catch(e){} }, 1200);
 });
@@ -5775,7 +5623,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
  <div id="creditShopSuccess" style="display:none;text-align:center;padding:20px 0;">
- <div style="font-size:2.5rem;margin-bottom:12px;">OK</div>
+ <div style="font-size:2.5rem;margin-bottom:12px;">&#10003;</div>
  <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:6px;">Credits added!</div>
  <div style="font-size:0.85rem;color:rgba(255,255,255,0.5);" id="creditSuccessMsg">Your credits are ready to use.</div>
  <button onclick="closeCreditShop()" style="margin-top:20px;width:100%;padding:12px;border-radius:50px;border:none;background:#0ea5e9;color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;">Start Practising -></button>
@@ -5850,7 +5698,7 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=do
 
 </div>
 
-<div id="autoSaveToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.8rem;font-weight:600;padding:8px 18px;border-radius:50px;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:9999;pointer-events:none;transition:opacity 0.3s;">OK Response saved to your account</div>
+<div id="autoSaveToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.8rem;font-weight:600;padding:8px 18px;border-radius:50px;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:9999;pointer-events:none;transition:opacity 0.3s;">Response saved to your account</div>
 
 <script src="key2md-tracking.js" defer></script>
 </body>
