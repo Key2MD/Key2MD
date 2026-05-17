@@ -422,11 +422,18 @@
       return row?.type!=='video' && String(row?.answer||'').trim().length>=20 && (!hasFeedback(row) || !!row.processing_error || !!row.reprocess_error);
     }
 
-function stationScore(row){
+    function stationScore(row){
       if(!hasFeedback(row))return null;
       const fb=row.feedback||{}, overall=fb.overall||{};
       const score=Number(overall.score ?? fb.score ?? row.score);
       return Number.isFinite(score)&&score>0 ? score : null;
+    }
+
+    function adminRecordingUrl(recordingKey){
+      const url=new URL(API_BASE+'/api/admin/casper-mock/recording');
+      url.searchParams.set('key',recordingKey||'');
+      url.searchParams.set('admin_token',adminToken||'');
+      return url.toString();
     }
 
     function legacyVideoPlayerHtml(recordingKey,r,id='adminVideoPlayer'){
@@ -477,33 +484,13 @@ function stationScore(row){
           </div>
         </div>`;
       }
-      const keyAttr = recordingKey ? ` data-recording-key="${esc(recordingKey)}"` : '';
+      const src=adminRecordingUrl(recordingKey);
       return `<div class="mock-video-shell">
-        <div class="mock-video-stage">
-          <video id="${id}" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="cursor:pointer"></video>
-          <button type="button" id="${id}Overlay" class="mock-video-overlay" data-video-action="play" data-video-id="${esc(id)}">
-            <span>
-              <span class="mock-video-playmark">&#9658;</span>
-              <span class="mock-video-overlay-title" id="${id}OverlayTitle">Load recording</span>
-              <span class="mock-video-overlay-sub" id="${id}OverlaySub">Creates a short-lived secure stream so the video can play normally instead of waiting for a full download.</span>
-            </span>
-          </button>
-        </div>
-        <div class="mock-video-bar">
-          <div class="mock-video-row">
-            <button type="button" id="${id}Btn" class="mock-video-btn" data-video-action="play" data-video-id="${esc(id)}" aria-label="Play recording">&#9658;</button>
-            <div class="mock-video-track">
-              <div class="mock-video-bg"><div id="${id}Fill" class="mock-video-fill"></div></div>
-              <input id="${id}Range" class="mock-video-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording">
-            </div>
-            <div id="${id}Time" class="mock-video-time">0:00 / ${duration?fmtTime(duration):'--:--'}</div>
-          </div>
-          <div id="${id}Status" class="mock-video-status">Recording is ready to load.</div>
-        </div>
+        <video id="${id}" controls playsinline preload="metadata" src="${esc(src)}" data-loaded="1" data-recording-key="${esc(recordingKey)}" data-duration="${duration||''}"></video>
+        <div class="mock-video-status">Native secure playback. If it does not play in-page, open the raw recording below.</div>
         <div class="mock-video-actions">
-          <button type="button" id="${id}LoadBtn" class="mock-video-action" data-video-action="load" data-video-id="${esc(id)}">Load stream</button>
-          <button type="button" id="${id}RetryBtn" class="mock-video-action" data-video-action="retry" data-video-id="${esc(id)}" hidden>Retry</button>
-          <a id="${id}Download" class="mock-video-action" href="#" target="_blank" rel="noopener" download hidden>Download original</a>
+          <a class="mock-video-action" href="${esc(src)}" target="_blank" rel="noopener">Open raw video</a>
+          <a class="mock-video-action" href="${esc(src)}" target="_blank" rel="noopener" download>Download original</a>
           <button type="button" class="mock-video-action" data-video-action="copy" data-video-id="${esc(id)}">Copy key</button>
         </div>
       </div>`;
