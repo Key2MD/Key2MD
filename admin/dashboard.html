@@ -93,6 +93,14 @@
  display:none;align-items:center;justify-content:center;padding:0 5px;
  }
  .nav-badge.show{display:flex;}
+ .nav-details{margin:2px 8px 0;}
+ .nav-details summary{list-style:none;cursor:pointer;padding:8px 12px;border-radius:9px;color:var(--muted2);font-size:0.74rem;font-weight:800;display:flex;align-items:center;justify-content:space-between;}
+ .nav-details summary::-webkit-details-marker{display:none;}
+ .nav-details summary:hover{background:var(--surface2);color:var(--muted);}
+ .nav-details summary::after{content:'+';font-size:0.82rem;color:var(--muted2);}
+ .nav-details[open] summary::after{content:'-';}
+ .nav-details .nav-item{margin-left:0;margin-right:0;width:100%;font-size:0.76rem;padding-left:14px;}
+ .nav-item.compact{font-size:0.78rem;}
 
  .sidebar-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid var(--border);}
  .btn-logout{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:left;}
@@ -146,6 +154,39 @@
  .queue-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--surface2);font-size:0.9rem;}
  .queue-title{font-size:0.84rem;font-weight:750;}
  .queue-sub{font-size:0.72rem;color:var(--muted2);margin-top:2px;}
+ .dash-totals{margin:0 0 18px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,0.025);overflow:hidden;}
+ .dash-totals summary{cursor:pointer;padding:11px 14px;color:var(--muted);font-size:0.75rem;font-weight:850;text-transform:uppercase;letter-spacing:0.07em;display:flex;align-items:center;justify-content:space-between;}
+ .dash-totals summary::after{content:'Show';font-size:0.68rem;color:var(--muted2);text-transform:none;letter-spacing:0;}
+ .dash-totals[open] summary::after{content:'Hide';}
+ .dash-totals .stats-grid{padding:0 14px 14px;margin-bottom:0;}
+ .focus-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px;}
+ .focus-card{border:1px solid var(--border);border-radius:var(--radius);padding:14px;background:rgba(255,255,255,0.045);min-height:94px;}
+ .focus-card.red{border-color:var(--red-border);background:var(--red-dim);}
+ .focus-card.amber{border-color:var(--amber-border);background:var(--amber-dim);}
+ .focus-card.green{border-color:var(--green-border);background:var(--green-dim);}
+ .focus-card.blue{border-color:var(--blue-border);background:var(--blue-dim);}
+ .focus-kicker{font-size:0.62rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+ .focus-value{font-size:1.6rem;font-weight:900;letter-spacing:-0.04em;margin-top:5px;}
+ .focus-copy{font-size:0.72rem;color:var(--muted);line-height:1.45;margin-top:3px;}
+ .queue-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+ .queue-filter{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+ .queue-filter .ctrl-sel{padding:6px 9px;font-size:0.72rem;}
+ .action-list{display:flex;flex-direction:column;gap:8px;}
+ .action-card{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--border);border-radius:11px;background:rgba(255,255,255,0.035);}
+ .action-card:hover{border-color:var(--blue-border);background:rgba(56,189,248,0.055);}
+ .action-score{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:900;background:var(--surface2);border:1px solid var(--border2);}
+ .action-score.red{color:var(--red);border-color:var(--red-border);background:var(--red-dim);}
+ .action-score.amber{color:var(--amber);border-color:var(--amber-border);background:var(--amber-dim);}
+ .action-score.green{color:var(--green);border-color:var(--green-border);background:var(--green-dim);}
+ .action-score.blue{color:var(--blue);border-color:var(--blue-border);background:var(--blue-dim);}
+ .action-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px;}
+ .action-buttons{display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:wrap;}
+ .action-status{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:999px;padding:2px 8px;font-size:0.62rem;font-weight:850;color:var(--muted);background:var(--surface2);white-space:nowrap;}
+ .action-status.new{border-color:var(--green-border);background:var(--green-dim);color:var(--green);}
+ .action-status.contacted,.action-status.waiting{border-color:var(--amber-border);background:var(--amber-dim);color:var(--amber);}
+ .action-status.snoozed{border-color:var(--blue-border);background:var(--blue-dim);color:var(--blue);}
+ .action-status.won{border-color:var(--green-border);background:var(--green-dim);color:var(--green);}
+ .action-status.ignore{opacity:0.65;}
  .insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
  .insight{border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.14);padding:12px;}
  .insight-label{font-size:0.62rem;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;}
@@ -327,10 +368,23 @@
 @media(max-width:900px){.warm-detail-grid{grid-template-columns:1fr;}}
 .growth-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px;}
 .growth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
-.growth-card-title{font-size:0.76rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
-.growth-card-value{font-size:1.75rem;font-weight:900;color:var(--text);letter-spacing:-0.04em;overflow-wrap:anywhere;}
-.growth-card-sub{font-size:0.74rem;color:var(--muted);line-height:1.45;margin-top:4px;}
-.pipeline-board{display:grid;grid-template-columns:repeat(5,minmax(220px,1fr));gap:12px;align-items:start;overflow-x:auto;padding-bottom:8px;}
+ .growth-card-title{font-size:0.76rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+ .growth-card-value{font-size:1.75rem;font-weight:900;color:var(--text);letter-spacing:-0.04em;overflow-wrap:anywhere;}
+ .growth-card-sub{font-size:0.74rem;color:var(--muted);line-height:1.45;margin-top:4px;}
+ .growth-hub-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px;}
+ .growth-hub-card{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:15px;cursor:pointer;transition:all 0.16s;}
+ .growth-hub-card:hover{border-color:var(--blue-border);background:rgba(56,189,248,0.06);}
+ .growth-hub-title{font-size:0.84rem;font-weight:900;color:var(--text);}
+ .growth-hub-sub{font-size:0.72rem;color:var(--muted);line-height:1.45;margin-top:4px;}
+ .growth-hub-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px;}
+ .tracking-health{display:flex;flex-direction:column;gap:8px;}
+ .health-row{display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);}
+ .health-row:last-child{border-bottom:none;}
+ .health-level{font-size:0.62rem;font-weight:900;letter-spacing:0.06em;text-transform:uppercase;}
+ .health-level.ok{color:var(--green);}
+ .health-level.warn{color:var(--amber);}
+ .health-level.bad{color:var(--red);}
+ .pipeline-board{display:grid;grid-template-columns:repeat(5,minmax(220px,1fr));gap:12px;align-items:start;overflow-x:auto;padding-bottom:8px;}
 .pipeline-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);min-height:180px;}
 .pipeline-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-bottom:1px solid var(--border);font-size:0.76rem;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);}
 .pipeline-body{display:flex;flex-direction:column;gap:8px;padding:10px;max-height:620px;overflow:auto;}
@@ -343,8 +397,8 @@
 .timeline-type{font-size:0.66rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);}
 .timeline-title{font-size:0.84rem;font-weight:850;color:var(--text);}
 .timeline-detail{font-size:0.74rem;color:var(--muted);line-height:1.5;margin-top:3px;}
-@media(max-width:1100px){.growth-grid{grid-template-columns:1fr 1fr}.pipeline-board{grid-template-columns:repeat(3,minmax(220px,1fr));}}
-@media(max-width:760px){.growth-grid{grid-template-columns:1fr}.timeline-item{grid-template-columns:1fr}.pipeline-board{grid-template-columns:1fr;overflow:visible;}}
+ @media(max-width:1100px){.growth-grid,.growth-hub-grid,.focus-grid{grid-template-columns:1fr 1fr}.pipeline-board{grid-template-columns:repeat(3,minmax(220px,1fr));}}
+ @media(max-width:760px){.growth-grid,.growth-hub-grid,.focus-grid{grid-template-columns:1fr}.timeline-item{grid-template-columns:1fr}.pipeline-board{grid-template-columns:1fr;overflow:visible;}.action-card{grid-template-columns:1fr}.action-score{width:auto;height:auto;justify-content:flex-start;padding:8px}.action-buttons{justify-content:flex-start;}}
 .template-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
 
  /* == CONTROLS == */
@@ -458,6 +512,35 @@
 
  /* == NEW COMPOSE MODAL == */
  .nc-modal .modal-card{max-width:520px;}
+ .compose-context{display:none;margin:-4px 0 14px;padding:11px 12px;border:1px solid var(--blue-border);border-radius:10px;background:var(--blue-dim);}
+ .compose-context.show{display:block;}
+ .compose-context-title{font-size:0.72rem;font-weight:900;color:var(--blue);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;}
+ .compose-context-line{font-size:0.74rem;color:var(--muted);line-height:1.45;margin-top:3px;}
+ .compose-context-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
+
+ /* == STUDENT DRAWER == */
+ .student-drawer-ov{justify-content:flex-end;padding:0;background:rgba(3,7,18,0.72);}
+ .student-drawer{width:min(760px,100vw);height:100vh;background:#0b1627;border-left:1px solid var(--border2);box-shadow:-24px 0 70px rgba(0,0,0,0.45);display:flex;flex-direction:column;overflow:hidden;}
+ .student-drawer-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;background:rgba(255,255,255,0.035);}
+ .student-drawer-title{font-size:1.02rem;font-weight:900;line-height:1.25;word-break:break-word;}
+ .student-drawer-sub{font-size:0.76rem;color:var(--muted);margin-top:4px;line-height:1.45;}
+ .student-drawer-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;}
+ .student-drawer-body{padding:16px 18px 24px;overflow:auto;display:flex;flex-direction:column;gap:14px;}
+ .drawer-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;}
+ .drawer-kpi{border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.04);padding:10px;}
+ .drawer-kpi-label{font-size:0.6rem;color:var(--muted2);font-weight:900;letter-spacing:0.08em;text-transform:uppercase;}
+ .drawer-kpi-value{font-size:1rem;font-weight:900;margin-top:4px;overflow-wrap:anywhere;}
+ .drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+ .drawer-section{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.035);padding:13px;}
+ .drawer-section-title{font-size:0.68rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+ .drawer-list{display:flex;flex-direction:column;gap:8px;}
+ .drawer-row{display:grid;grid-template-columns:88px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
+ .drawer-row:last-child{border-bottom:none;}
+ .drawer-row-type{font-size:0.62rem;color:var(--muted2);font-weight:900;letter-spacing:0.06em;text-transform:uppercase;}
+ .drawer-row-main{font-size:0.78rem;font-weight:800;color:var(--text);line-height:1.35;}
+ .drawer-row-sub{font-size:0.7rem;color:var(--muted);line-height:1.45;margin-top:2px;}
+ .drawer-empty{font-size:0.76rem;color:var(--muted2);line-height:1.55;}
+ @media(max-width:760px){.student-drawer{width:100vw}.drawer-grid,.drawer-kpis{grid-template-columns:1fr}.student-drawer-head{flex-direction:column}.student-drawer-actions{justify-content:flex-start}}
 
  /* == QUICK SEARCH == */
  .cmd-ov{align-items:flex-start;padding-top:8vh;}
@@ -554,36 +637,40 @@
  </div>
 
  <div class="sidebar-section">Overview</div>
- <button class="nav-item active" data-page="dashboard" onclick="nav('dashboard')"><span class="icon"></span> Dashboard</button>
+ <button class="nav-item active" data-page="dashboard" onclick="nav('dashboard')"><span class="icon"></span> Command</button>
+
+ <div class="sidebar-section">Work Queues</div>
+ <button class="nav-item" data-page="growth" onclick="nav('growth')"><span class="icon">$</span> Growth Command <span class="nav-badge" id="growthBadge">0</span></button>
+ <button class="nav-item" data-page="inbox" onclick="nav('inbox')"><span class="icon"></span> Inbox <span class="nav-badge" id="inboxBadge">0</span></button>
+ <button class="nav-item" data-page="mocks" onclick="nav('mocks')"><span class="icon">M</span> Mock Exams <span class="nav-badge" id="mockBadge">0</span></button>
+ <button class="nav-item" data-page="sharing" onclick="nav('sharing')"><span class="icon">ID</span> Sharing Watchlist <span class="nav-badge" id="sharingBadge">0</span></button>
 
  <div class="sidebar-section">Students</div>
- <button class="nav-item" data-page="reviews" onclick="nav('reviews')"><span class="icon"></span> CASPer Reviews</button>
- <button class="nav-item" data-page="s2" onclick="nav('s2')"><span class="icon">S2</span> S2 Essay Reviews <span class="nav-badge" id="s2Badge">0</span></button>
- <button class="nav-item" data-page="mmi" onclick="nav('mmi')"><span class="icon"></span> MMI Reviews <span class="nav-badge" id="mmiBadge">0</span></button>
- <button class="nav-item" data-page="mocks" onclick="nav('mocks')"><span class="icon">M</span> Mock Exams <span class="nav-badge" id="mockBadge">0</span></button>
  <button class="nav-item" data-page="users" onclick="nav('users')"><span class="icon"></span> Users</button>
- <button class="nav-item" data-page="warmleads" onclick="nav('warmleads')"><span class="icon">$</span> Warm Leads <span class="nav-badge" id="warmLeadBadge">0</span></button>
- <button class="nav-item" data-page="pipeline" onclick="nav('pipeline')"><span class="icon">P</span> Pipeline</button>
+ <button class="nav-item" data-page="reviews" onclick="nav('reviews')"><span class="icon"></span> CASPer Reviews</button>
+ <button class="nav-item" data-page="s2" onclick="nav('s2')"><span class="icon">S2</span> S2 Essays <span class="nav-badge" id="s2Badge">0</span></button>
+ <button class="nav-item" data-page="mmi" onclick="nav('mmi')"><span class="icon"></span> MMI Reviews <span class="nav-badge" id="mmiBadge">0</span></button>
  <button class="nav-item" data-page="timeline" onclick="nav('timeline')"><span class="icon">T</span> Timeline</button>
- <button class="nav-item" data-page="sharing" onclick="nav('sharing')"><span class="icon">ID</span> Sharing Watchlist <span class="nav-badge" id="sharingBadge">0</span></button>
- <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')"><span class="icon"></span> Enquiries <span class="nav-badge" id="enqBadge">0</span></button>
-
- <div class="sidebar-section">Growth</div>
- <button class="nav-item" data-page="actions" onclick="nav('actions')"><span class="icon">!</span> Next Actions</button>
- <button class="nav-item" data-page="outreach" onclick="nav('outreach')"><span class="icon">ROI</span> Outreach ROI</button>
- <button class="nav-item" data-page="funnel" onclick="nav('funnel')"><span class="icon">F</span> Product Funnel</button>
- <button class="nav-item" data-page="abandoned" onclick="nav('abandoned')"><span class="icon">A</span> Abandoned</button>
- <button class="nav-item" data-page="retention" onclick="nav('retention')"><span class="icon">R</span> Retention</button>
-
- <div class="sidebar-section">Finance</div>
- <button class="nav-item" data-page="revenue" onclick="nav('revenue')"><span class="icon"></span> Revenue</button>
- <button class="nav-item" data-page="monitoring" onclick="nav('monitoring')"><span class="icon"></span> Monitoring</button>
 
  <div class="sidebar-section">Comms</div>
- <button class="nav-item" data-page="inbox" onclick="nav('inbox')"><span class="icon"></span> Inbox <span class="nav-badge" id="inboxBadge">0</span></button>
+ <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')"><span class="icon"></span> Enquiries <span class="nav-badge" id="enqBadge">0</span></button>
  <button class="nav-item" data-page="broadcast" onclick="nav('broadcast')"><span class="icon"></span> Broadcast</button>
  <button class="nav-item" data-page="class" onclick="nav('class')"><span class="icon">C</span> CASPer Class</button>
  <button class="nav-item" data-page="subscribers" onclick="nav('subscribers')"><span class="icon"></span> Subscribers</button>
+
+ <div class="sidebar-section">Reports</div>
+ <button class="nav-item" data-page="revenue" onclick="nav('revenue')"><span class="icon"></span> Revenue</button>
+ <button class="nav-item" data-page="monitoring" onclick="nav('monitoring')"><span class="icon"></span> Monitoring</button>
+ <details class="nav-details">
+ <summary>Growth reports</summary>
+ <button class="nav-item compact" data-page="actions" onclick="nav('actions')"><span class="icon">!</span> Next Actions</button>
+ <button class="nav-item compact" data-page="warmleads" onclick="nav('warmleads')"><span class="icon">$</span> Warm Leads <span class="nav-badge" id="warmLeadBadge">0</span></button>
+ <button class="nav-item compact" data-page="pipeline" onclick="nav('pipeline')"><span class="icon">P</span> Pipeline</button>
+ <button class="nav-item compact" data-page="outreach" onclick="nav('outreach')"><span class="icon">ROI</span> Outreach ROI</button>
+ <button class="nav-item compact" data-page="funnel" onclick="nav('funnel')"><span class="icon">F</span> Product Funnel</button>
+ <button class="nav-item compact" data-page="abandoned" onclick="nav('abandoned')"><span class="icon">A</span> Abandoned</button>
+ <button class="nav-item compact" data-page="retention" onclick="nav('retention')"><span class="icon">R</span> Retention</button>
+ </details>
 
  <div class="sidebar-bottom">
  <button class="btn-command" onclick="openCommandPalette()">Quick search <kbd>Ctrl K</kbd></button>
@@ -620,6 +707,9 @@
  <button class="btn amber" onclick="nav('inbox')">Open inbox</button>
  </div>
  </div>
+ <div class="focus-grid" id="dashFocusGrid"></div>
+ <details class="dash-totals">
+ <summary>Platform totals and slower-moving metrics</summary>
  <div class="stats-grid" id="dashStats">
  <div class="stat"><div class="stat-label">Total Users</div><div class="stat-val" id="dUsers">-</div><div class="stat-sub" id="dUsersSub">registered</div></div>
  <div class="stat amber"><div class="stat-label">Paying Customers</div><div class="stat-val" id="dPaying">-</div><div class="stat-sub" id="dPayingSub">ever paid</div></div>
@@ -637,9 +727,22 @@
  <div class="stat"><div class="stat-label">Subscribers</div><div class="stat-val" id="dSubs">-</div><div class="stat-sub">newsletter list</div></div>
  <div class="stat amber"><div class="stat-label">Inbox</div><div class="stat-val" id="dUnread">-</div><div class="stat-sub">unread conversations</div></div>
  </div>
+ </details>
  <div class="ops-grid">
  <div class="ops-card">
- <div class="dash-card-title">Priority Queue <span class="badge badge-default" id="dashQueueCount">-</span></div>
+ <div class="dash-card-title">Daily Action Queue <span class="badge badge-default" id="dashQueueCount">-</span></div>
+ <div class="queue-toolbar">
+ <div class="queue-filter">
+ <select class="ctrl-sel" id="dashActionFilter" onchange="renderActionQueue()">
+ <option value="active">Active only</option>
+ <option value="new">New only</option>
+ <option value="waiting">Waiting/contacted</option>
+ <option value="snoozed">Snoozed</option>
+ <option value="all">All except ignored</option>
+ </select>
+ </div>
+ <button class="btn" style="font-size:0.7rem;padding:5px 9px;" onclick="nav('growth')">Growth workspace</button>
+ </div>
  <div id="dashActionQueue"><div style="color:var(--muted2);font-size:0.8rem;">Loading...</div></div>
  </div>
  <div class="ops-card">
@@ -668,6 +771,48 @@
  </div>
  </div>
  <div class="err-banner" id="dashErr"></div>
+ </div>
+
+ <!-- -- GROWTH COMMAND -- -->
+ <div id="pageGrowth" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Growth Command</div>
+ <div class="page-sub">One workspace for recent warm leads, checkout recovery, retention risk, funnel health, and outreach follow-up.</div>
+ </div>
+ <div class="page-actions">
+ <span class="refresh-note" id="growthUpdated">Uses the latest loaded dashboard data</span>
+ <button class="btn blue" onclick="refreshGrowthWorkspace()">Refresh growth data</button>
+ </div>
+ </div>
+ <div class="growth-grid">
+ <div class="growth-card"><div class="growth-card-title">Active Actions</div><div class="growth-card-value" id="growthActiveActions">-</div><div class="growth-card-sub">not snoozed, won, or ignored</div></div>
+ <div class="growth-card"><div class="growth-card-title">Recent Warm Leads</div><div class="growth-card-value" id="growthWarmNow">-</div><div class="growth-card-sub">fresh non-subscriber intent</div></div>
+ <div class="growth-card"><div class="growth-card-title">Open Checkout Value</div><div class="growth-card-value" id="growthCheckoutValue">-</div><div class="growth-card-sub">unrecovered abandoned checkouts</div></div>
+ </div>
+ <div class="ops-grid">
+ <div class="ops-card">
+ <div class="dash-card-title">What To Work Next <span class="badge badge-default" id="growthQueueCount">-</span></div>
+ <div class="queue-toolbar">
+ <div class="queue-filter">
+ <select class="ctrl-sel" id="growthActionFilter" onchange="renderGrowthHub()">
+ <option value="active">Active only</option>
+ <option value="new">New only</option>
+ <option value="waiting">Waiting/contacted</option>
+ <option value="snoozed">Snoozed</option>
+ <option value="all">All except ignored</option>
+ </select>
+ </div>
+ <button class="btn" onclick="nav('actions')">Full action table</button>
+ </div>
+ <div id="growthActionQueue"><div style="color:var(--muted2);font-size:0.8rem;">Loading...</div></div>
+ </div>
+ <div class="ops-card">
+ <div class="dash-card-title">Tracking Health <span class="badge badge-default" id="growthTrackingCount">-</span></div>
+ <div class="tracking-health" id="growthTrackingHealth"></div>
+ </div>
+ </div>
+ <div class="growth-hub-grid" id="growthHubCards"></div>
  </div>
 
  <!-- -- REVIEWS -- -->
@@ -940,7 +1085,7 @@
  <div class="tbl-wrap">
  <div class="tbl-toolbar"><span class="tbl-status" id="actionsStatus">-</span></div>
  <div class="tbl-scroller"><table style="min-width:980px;"><thead><tr>
- <th>Priority</th><th>Student</th><th>Action</th><th>Reason</th><th>When</th><th>Commands</th>
+ <th>Priority</th><th>Status</th><th>Student</th><th>Action</th><th>Reason</th><th>When</th><th>Commands</th>
  </tr></thead><tbody id="actionsBody"></tbody></table></div>
  <div class="empty hidden" id="actionsEmpty">No urgent actions right now.</div>
  </div>
@@ -1797,6 +1942,7 @@
  <div class="modal-title"> New Email</div>
  <div class="form-row"><label class="form-lbl">To</label><input class="form-in" type="email" id="ncTo" placeholder="student@email.com"></div>
  <div class="form-row"><label class="form-lbl">Subject</label><input class="form-in" type="text" id="ncSubject" placeholder="Re: your CASPer prep..."></div>
+ <div class="compose-context" id="ncContext"></div>
  <div class="form-row"><label class="form-lbl" id="ncBodyLabel">Message</label><textarea class="form-ta" id="ncBody" style="min-height:140px;" placeholder="Write your message..."></textarea></div>
  <div id="ncHtmlWrap" style="display:none;margin:-4px 0 14px;padding:10px;border:1px solid var(--border2);border-radius:10px;background:rgba(56,189,248,0.06);">
  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
@@ -1807,6 +1953,9 @@
  </div>
  <div class="template-row">
  <button class="btn" onclick="insertEmailTemplate('enquiry')">Enquiry follow-up</button>
+ <button class="btn" onclick="insertEmailTemplate('warm')">Warm lead</button>
+ <button class="btn" onclick="insertEmailTemplate('checkout')">Checkout help</button>
+ <button class="btn" onclick="insertEmailTemplate('retention')">Retention</button>
  <button class="btn" onclick="insertEmailTemplate('mock')">Mock review</button>
  <button class="btn" onclick="insertEmailTemplate('support')">Support reply</button>
  </div>
@@ -1814,6 +1963,24 @@
  <div class="modal-footer">
  <button class="btn" onclick="closeNewCompose()">Cancel</button>
  <button class="btn-send" id="ncSendBtn" onclick="sendNewEmail()"><span class="spinner" id="ncSpinner"></span>Send</button>
+ </div>
+ </div>
+</div>
+
+<!-- STUDENT DRAWER -->
+<div class="modal-ov student-drawer-ov" id="studentDrawer">
+ <div class="student-drawer">
+ <div class="student-drawer-head">
+ <div>
+ <div class="student-drawer-title" id="studentDrawerTitle">Student</div>
+ <div class="student-drawer-sub" id="studentDrawerSub">Loading student context...</div>
+ </div>
+ <div class="student-drawer-actions" id="studentDrawerActions">
+ <button class="btn" onclick="closeStudentDrawer()">Close</button>
+ </div>
+ </div>
+ <div class="student-drawer-body" id="studentDrawerBody">
+ <div class="drawer-empty">Loading...</div>
  </div>
  </div>
 </div>
@@ -1873,7 +2040,8 @@ const LEGACY_HANDOFF_KEY = 'k2md_admin_token_handoff';
 const MOCK_READER_CHANNEL_PREFIX = 'k2md_mock_reader_handoff_';
 const WARM_OUTREACH_LOCAL_KEY = 'k2md_warm_outreach_local_v1';
 const NAV_SEEN_KEY = 'k2md_admin_nav_seen_v1';
-const NAV_NOTIFY_PAGES = new Set(['s2','mmi','mocks','warmleads','sharing','enquiries']);
+const ACTION_STATUS_KEY = 'k2md_admin_action_status_v1';
+const NAV_NOTIFY_PAGES = new Set(['s2','mmi','mocks','warmleads','sharing','enquiries','growth']);
 
 const S = {
  token: null,
@@ -1901,6 +2069,9 @@ const S = {
  userSearchTimer: null,
  commandItems: [],
  commandIndex: 0,
+ adminActions: [],
+ actionStatusMap: null,
+ drawerTimelineCache: new Map(),
 };
 
 // ======================================================
@@ -1984,7 +2155,7 @@ async function api(path, opts={}) {
 // ======================================================
 // NAVIGATION
 // ======================================================
-const ADMIN_PAGES = new Set(['dashboard','reviews','s2','mmi','mocks','users','warmleads','pipeline','timeline','actions','outreach','funnel','abandoned','retention','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','subscribers']);
+const ADMIN_PAGES = new Set(['dashboard','growth','reviews','s2','mmi','mocks','users','warmleads','pipeline','timeline','actions','outreach','funnel','abandoned','retention','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','subscribers']);
 
 function normalisePage(page) {
  const key = String(page || 'dashboard').replace(/^#/, '').trim().toLowerCase();
@@ -2007,6 +2178,9 @@ function nav(page, opts={}) {
  pageEl.classList.add('active');
  const navEl = document.querySelector(`[data-page="${target}"]`);
  if (navEl) navEl.classList.add('active');
+ document.querySelectorAll('.nav-details').forEach(group => {
+  if (group.querySelector(`[data-page="${target}"]`)) group.open = true;
+ });
 
  if (opts.updateHash !== false) {
  const nextHash = `#${target}`;
@@ -2032,6 +2206,7 @@ function nav(page, opts={}) {
  if (target==='enquiries' && !S.enquiries.length) loadEnquiries();
  if (target==='users' && !S.users.length) loadUsers();
  if (target==='warmleads' && !S.warmLeads.length) loadWarmLeads();
+ if (target==='growth') refreshGrowthWorkspace({ silent: true });
  if (target==='pipeline' && !S.pipeline) loadPipeline();
  if (target==='actions' && !S.nextActions.length) loadNextActions();
  if (target==='outreach' && !S.outreachRoi) loadOutreachRoi();
@@ -2090,7 +2265,8 @@ function commandHay(item) {
 
 function buildCommandItems() {
  const items = [
- {kind:'Page', title:'Dashboard', sub:'Owner priorities, revenue, workload, and activity', action:()=>nav('dashboard'), hint:'Open'},
+ {kind:'Page', title:'Command', sub:'Owner priorities, daily actions, revenue, workload, and activity', action:()=>nav('dashboard'), hint:'Open'},
+ {kind:'Page', title:'Growth Command', sub:'Daily warm leads, checkout recovery, retention risk, funnel health, and outreach', action:()=>nav('growth'), hint:'Open'},
  {kind:'Page', title:'Users', sub:'Search students, adjust credits, and change tiers', action:()=>nav('users'), hint:'Open'},
  {kind:'Page', title:'Warm Leads', sub:'Active non-subscribers with tailored outreach drafts', action:()=>nav('warmleads'), hint:'Open'},
  {kind:'Page', title:'Lead Pipeline', sub:'Board view from first signal to paid or retention risk', action:()=>nav('pipeline'), hint:'Open'},
@@ -2114,8 +2290,8 @@ function buildCommandItems() {
  title:u.email || u.name || 'Student',
  sub:`${u.name || 'No name'} | ${u.tier || 'free'}${isMmiProActive(u) ? ` | ${mmiTierLabel(u.mmi_pro_tier)}` : ''} | ${Number(u.review_count||0)} reviews | ${fmtMoney(u.total_spend_aud||0)} spend`,
  keywords:[u.id,u.name,u.email,u.tier,u.mmi_pro_tier].join(' '),
- action:()=>viewUserByEmail(u.email || ''),
- hint:'Open user',
+ action:()=>openStudentDrawer(u.email || ''),
+ hint:'Student',
  }));
 
  S.warmLeads.forEach(row => items.push({
@@ -2261,6 +2437,7 @@ function runCommand(index = S.commandIndex) {
 }
 
 function openInboxCommand(email) {
+ closeStudentDrawer();
  nav('inbox');
  const search = document.getElementById('convSearch');
  if (search) search.value = email || '';
@@ -2283,6 +2460,8 @@ function openReviewCommand(query) {
 document.addEventListener('keydown', e => {
  const cmdOpen = document.getElementById('cmdModal')?.classList.contains('open');
  const reportOpen = document.getElementById('studentReportModal')?.classList.contains('open');
+ const drawerOpen = document.getElementById('studentDrawer')?.classList.contains('open');
+ if (drawerOpen && e.key === 'Escape') { e.preventDefault(); closeStudentDrawer(); return; }
  if (reportOpen && e.key === 'Escape') { e.preventDefault(); closeStudentReport(); return; }
  if (cmdOpen) {
  if (e.key === 'Escape') { e.preventDefault(); closeCommandPalette(); return; }
@@ -2303,6 +2482,7 @@ async function bootLoad() {
  await Promise.all([
  loadReviews(), loadS2Reviews(), loadUsers(), loadEnquiries(),
  loadSubscribers(), loadInbox(), loadMMI(), loadMockAdmin(), loadRevenue(), loadMonitoring(), loadBroadcastHistory(), loadWarmLeads(), loadSharingWatchlist(),
+ loadNextActions(), loadProductFunnel(), loadAbandonedCheckouts(), loadRetentionRisk({ silent: true }), loadOutreachRoi(),
  ]);
  const lu = document.getElementById('lastUpdated');
  if (lu) lu.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
@@ -2403,6 +2583,317 @@ function updateNavBadges() {
  setNavBadge('sharingBadge', newItemCount('sharing', data.sharing.rows, data.sharing.fields, null, seen), 'New account-sharing signals since you opened Sharing Watchlist');
  setNavBadge('enqBadge', newItemCount('enquiries', data.enquiries.rows, data.enquiries.fields, null, seen), 'New enquiries since you opened Enquiries');
  setNavBadge('inboxBadge', unread, 'Unread inbox conversations');
+ setNavBadge('growthBadge', filterAdminActions(buildAdminActions(), 'active').length, 'Active growth and student-success actions');
+}
+
+// ======================================================
+// ACTION STATUS + OPERATING QUEUES
+// ======================================================
+function readActionStatusMap() {
+ if (S.actionStatusMap) return S.actionStatusMap;
+ try { S.actionStatusMap = JSON.parse(localStorage.getItem(ACTION_STATUS_KEY) || '{}') || {}; }
+ catch { S.actionStatusMap = {}; }
+ return S.actionStatusMap;
+}
+
+function writeActionStatusMap(map) {
+ S.actionStatusMap = map || {};
+ try { localStorage.setItem(ACTION_STATUS_KEY, JSON.stringify(S.actionStatusMap)); } catch {}
+}
+
+function actionStatusRecord(key) {
+ const map = readActionStatusMap();
+ const rec = map[key] || {};
+ const until = Date.parse(rec.snooze_until || '');
+ if ((rec.status === 'snoozed' || rec.status === 'waiting') && until && until <= Date.now()) {
+  rec.status = 'new';
+  rec.snooze_until = '';
+  rec.note = rec.note || 'Follow-up due';
+  map[key] = rec;
+  writeActionStatusMap(map);
+ }
+ return rec;
+}
+
+function setActionStatus(key, status, days = 0) {
+ if (!key) return;
+ const map = readActionStatusMap();
+ const now = new Date();
+ const rec = { ...(map[key] || {}), status, updated_at: now.toISOString() };
+ if (status === 'waiting' || status === 'contacted') {
+  rec.status = 'waiting';
+  rec.snooze_until = new Date(now.getTime() + (days || 10) * 86400000).toISOString();
+  rec.note = 'Contacted';
+ } else if (status === 'snoozed') {
+  rec.snooze_until = new Date(now.getTime() + (days || 3) * 86400000).toISOString();
+  rec.note = 'Snoozed';
+ } else {
+  rec.snooze_until = '';
+ }
+ map[key] = rec;
+ writeActionStatusMap(map);
+ rerenderActionSurfaces();
+}
+
+function actionStatusLabel(action) {
+ const rec = actionStatusRecord(action.key);
+ const status = rec.status || 'new';
+ if (status === 'waiting') return rec.snooze_until ? `Waiting until ${fmtDate(rec.snooze_until)?.date || 'later'}` : 'Waiting';
+ if (status === 'snoozed') return rec.snooze_until ? `Snoozed until ${fmtDate(rec.snooze_until)?.date || 'later'}` : 'Snoozed';
+ if (status === 'won') return 'Won';
+ if (status === 'ignore') return 'Ignored';
+ return 'New';
+}
+
+function actionStatusBadge(action) {
+ const rec = actionStatusRecord(action.key);
+ const status = rec.status || 'new';
+ return `<span class="action-status ${esc(status)}">${esc(actionStatusLabel(action))}</span>`;
+}
+
+function actionIsActive(action) {
+ const rec = actionStatusRecord(action.key);
+ if (['ignore','won'].includes(rec.status)) return false;
+ const until = Date.parse(rec.snooze_until || '');
+ if ((rec.status === 'snoozed' || rec.status === 'waiting') && until > Date.now()) return false;
+ return true;
+}
+
+function filterAdminActions(actions, filter = 'active') {
+ return (actions || []).filter(action => {
+  const rec = actionStatusRecord(action.key);
+  if (['ignore','won'].includes(rec.status)) return false;
+  const waiting = rec.status === 'waiting';
+  const snoozed = rec.status === 'snoozed' && Date.parse(rec.snooze_until || '') > Date.now();
+  if (filter === 'new') return !rec.status || rec.status === 'new';
+  if (filter === 'waiting') return waiting;
+  if (filter === 'snoozed') return snoozed;
+  if (filter === 'all') return true;
+  return actionIsActive(action);
+ });
+}
+
+function actionTone(priority, fallback = 'blue') {
+ const p = Number(priority || 0);
+ if (p >= 90) return 'red';
+ if (p >= 75) return 'amber';
+ if (p >= 55) return 'green';
+ return fallback;
+}
+
+function pushAction(list, seen, item) {
+ if (!item?.key || seen.has(item.key)) return;
+ seen.add(item.key);
+ const priority = Number(item.priority || 0);
+ list.push({ tone: item.tone || actionTone(priority, item.type === 'warm' ? 'green' : 'blue'), ...item, priority });
+}
+
+function buildAdminActions() {
+ const list = [];
+ const seen = new Set();
+ (S.conversations || []).forEach(conv => {
+  const unread = (conv.messages || []).some(m => m.direction === 'inbound' && !m.read);
+  if (!unread) return;
+  const last = (conv.messages || [])[conv.messages.length - 1] || {};
+  pushAction(list, seen, {
+   key: `inbox:${String(conv.email || '').toLowerCase()}`,
+   type: 'inbox',
+   priority: 98,
+   title: conv.email || conv.name || 'Unread student reply',
+   sub: `${conv.name || 'Conversation'} | ${last.subject || last.body?.slice?.(0, 80) || 'Unread message'}`,
+   email: conv.email,
+   at: last.created_at,
+   open: () => openInboxCommand(conv.email),
+   messageSubject: last.subject ? (String(last.subject).startsWith('Re:') ? last.subject : `Re: ${last.subject}`) : 'Re: Key2MD',
+   messageBody: '',
+   contextLines: [`Unread conversation`, `${(conv.messages || []).length} total message${(conv.messages || []).length === 1 ? '' : 's'}`],
+  });
+ });
+
+ (S.enquiries || []).filter(e => withinDays(e.created_at, 30)).forEach(e => {
+  pushAction(list, seen, {
+   key: `enquiry:${e.id || e.email || e.created_at}`,
+   type: 'enquiry',
+   priority: withinDays(e.created_at, 2) ? 92 : 72,
+   title: e.email || e.name || 'New enquiry',
+   sub: `${e.type || 'General'} enquiry${e.universities ? ` | ${e.universities}` : ''}${e.exam_date ? ` | exam ${e.exam_date}` : ''}`,
+   email: e.email,
+   at: e.created_at,
+   open: () => replyToEnquiry(e.id || e.email),
+   messageSubject: `Re: your ${e.type || 'Key2MD'} enquiry`,
+   messageBody: '',
+   contextLines: [e.notes || '', e.universities ? `Universities: ${e.universities}` : '', e.exam_date ? `Exam date: ${e.exam_date}` : ''].filter(Boolean),
+  });
+ });
+
+ (S.mockManualReviews || []).filter(r => ['pending_review','in_review'].includes(String(r.manual_review_status || ''))).forEach(r => {
+  const paidAt = r.manual_review_paid_at || r.completed_at;
+  const aging = paidAt && !withinHours(paidAt, 24);
+  pushAction(list, seen, {
+   key: `mock:${r.id}`,
+   type: 'mock',
+   priority: aging ? 97 : 84,
+   title: r.user_email || r.user_name || 'Mock review pending',
+   sub: `${String(r.manual_review_status || 'pending').replace(/_/g, ' ')} | ${aging ? 'over 24h' : relTime(paidAt)}`,
+   email: r.user_email,
+   at: paidAt,
+   tone: aging ? 'red' : 'amber',
+   open: () => openMockReader(r.id),
+   messageSubject: 'Re: your Full CASPer Mock',
+   messageBody: 'Hi, I am reviewing your Full CASPer Mock now and will focus on the repeated patterns across the whole attempt first.\n\n- Dan',
+   contextLines: [`Mock ID: ${r.id}`, `Status: ${String(r.manual_review_status || 'pending').replace(/_/g, ' ')}`],
+  });
+ });
+
+ const parseFailures = S.monitoring?.parse_failures?.length || 0;
+ const whisperFailures = S.monitoring?.whisper_failures?.length || 0;
+ if (parseFailures) pushAction(list, seen, { key:'monitoring:parse', type:'ops', priority:96, tone:'red', title:`${parseFailures} AI parse failure${parseFailures===1?'':'s'}`, sub:'Review before students notice missing or broken feedback.', open:()=>nav('monitoring') });
+ if (whisperFailures) pushAction(list, seen, { key:'monitoring:whisper', type:'ops', priority:94, tone:'red', title:`${whisperFailures} video/audio processing issue${whisperFailures===1?'':'s'}`, sub:'Check recordings and transcript generation.', open:()=>nav('monitoring') });
+
+ (S.warmLeads || []).filter(row => Number(row.lead_score || 0) >= 55 && !warmLeadRecentlyContacted(row.outreach_history, 10)).slice().sort(warmLeadClientSort).slice(0, 12).forEach(row => {
+  const product = row.recommended_product || 'CASPer Pro';
+  pushAction(list, seen, {
+   key: `warm:${String(row.email || row.id || '').toLowerCase()}`,
+   type: 'warm',
+   priority: Number(row.lead_score || 0),
+   title: row.email || row.name || 'Warm lead',
+   sub: `${product} | ${(row.reasons || []).slice(0, 2).join(' | ') || row.activity_label || 'recent practice intent'}`,
+   email: row.email,
+   at: row.last_activity_at || row.last_review_at,
+   open: () => openWarmLeadEmail(row.id),
+   messageSubject: row.outreach?.subject || 'A learning note from your Key2MD practice',
+   messageBody: row.outreach?.body || '',
+   contextLines: [`Lead score ${Number(row.lead_score || 0)}/100`, product, row.activity_label || 'Recently active'].filter(Boolean),
+  });
+ });
+
+ ((S.abandonedCheckouts && S.abandonedCheckouts.rows) || []).filter(row => !row.recovered).slice(0, 12).forEach(row => {
+  const value = Number(row.amount_cents || 0) / 100;
+  pushAction(list, seen, {
+   key: `checkout:${row.stripe_session_id || row.email || row.expired_at}`,
+   type: 'checkout',
+   priority: Math.min(93, 70 + Math.round(value / 20)),
+   title: row.email || 'Abandoned checkout',
+   sub: `${row.product_label || growthProductName(row.product)} | ${fmtGrowthMoney(value)} | ${relTime(row.expired_at)}`,
+   email: row.email,
+   at: row.expired_at,
+   open: () => row.email ? composeToUser(row.email, 'Quick note about your Key2MD checkout', 'Hi, I saw your checkout did not finish. If anything broke or the product was not quite right, reply here and I can help.\n\n- Dan', '', 'checkout_recovery', { stayOnPage:true, actionKey:`checkout:${row.stripe_session_id || row.email || row.expired_at}` }) : nav('abandoned'),
+   messageSubject: 'Quick note about your Key2MD checkout',
+   messageBody: 'Hi, I saw your checkout did not finish. If anything broke or the product was not quite right, reply here and I can help.\n\n- Dan',
+   contextLines: [`${row.product_label || growthProductName(row.product)}`, `${fmtGrowthMoney(value)} ${String(row.currency || 'AUD').toUpperCase()}`, `Expired ${relTime(row.expired_at)}`],
+  });
+ });
+
+ (S.retentionRisks || []).slice(0, 12).forEach(row => {
+  pushAction(list, seen, {
+   key: `retention:${String(row.email || row.user_id || '').toLowerCase()}`,
+   type: 'retention',
+   priority: Number(row.risk_score || 0),
+   title: row.email || row.name || 'Retention risk',
+   sub: `${row.risk_level || 'watch'} | ${(row.reasons || []).slice(0, 2).join(' | ') || 'usage pattern changed'}`,
+   email: row.email,
+   at: row.last_practice_at || row.last_payment_at,
+   open: () => openStudentDrawer(row.email || '', { source: 'Retention risk' }),
+   messageSubject: 'Checking in on your Key2MD prep',
+   messageBody: row.suggested || 'Hi, just checking whether you want a hand getting the most out of the practice you already have.\n\n- Dan',
+   contextLines: [`Risk score ${Number(row.risk_score || 0)}/100`, `${Number(row.credits || 0)} unused credit${Number(row.credits || 0) === 1 ? '' : 's'}`, `Paid ${relTime(row.last_payment_at)}`],
+  });
+ });
+
+ (S.sharingWatchlist || []).filter(row => ['high','medium'].includes(String(row.risk?.level || ''))).slice(0, 8).forEach(row => {
+  pushAction(list, seen, {
+   key: `sharing:${row.user_id || row.email || row.id}`,
+   type: 'sharing',
+   priority: Number(row.risk?.score || 0),
+   tone: row.risk?.level === 'high' ? 'red' : 'amber',
+   title: row.email || row.name || 'Account-sharing signal',
+   sub: `${riskLabel(row.risk?.level)} ${Number(row.risk?.score || 0)}/100 | ${(row.risk?.reasons || []).slice(0, 2).join(' | ')}`,
+   email: row.email,
+   at: row.last_seen_at || row.updated_at,
+   open: () => openSharingUser(row.user_id || '', row.email || ''),
+   contextLines: row.risk?.reasons || [],
+  });
+ });
+
+ (S.nextActions || []).slice(0, 20).forEach(row => {
+  pushAction(list, seen, {
+   key: `next:${row.type || 'action'}:${row.email || row.id || row.created_at || row.title}`,
+   type: row.type || 'next',
+   priority: Number(row.priority || 0),
+   title: row.email || row.title || 'Next action',
+   sub: `${row.title || row.suggested || 'Follow up'} | ${row.reason || ''}`,
+   email: row.email,
+   at: row.created_at || row.expired_at || row.last_activity_at,
+   open: () => row.email ? openStudentDrawer(row.email, { source: row.title || 'Next action' }) : nav('actions'),
+   messageSubject: row.title || 'Quick Key2MD follow-up',
+   messageBody: row.suggested || '',
+   contextLines: [row.reason || '', row.type || ''].filter(Boolean),
+  });
+ });
+
+ return list.sort((a,b) => Number(b.priority || 0) - Number(a.priority || 0) || (Date.parse(b.at || '') || 0) - (Date.parse(a.at || '') || 0));
+}
+
+function renderActionCards(targetId, filterValue, limit = 8) {
+ const target = document.getElementById(targetId);
+ if (!target) return [];
+ const actions = buildAdminActions();
+ S.adminActions = actions;
+ const rows = filterAdminActions(actions, filterValue).slice(0, limit);
+ if (!rows.length) {
+  target.innerHTML = '<div style="color:var(--muted2);font-size:0.8rem;line-height:1.55;">No matching actions. The useful work queue is clear for this filter.</div>';
+  return rows;
+ }
+ target.innerHTML = `<div class="action-list">${rows.map(action => `
+ <div class="action-card">
+ <div class="action-score ${esc(action.tone)}">${Math.round(Number(action.priority || 0))}</div>
+ <div>
+ <div class="queue-title">${esc(action.title || 'Action')}</div>
+ <div class="queue-sub">${esc(action.sub || '')}</div>
+ <div class="action-meta">
+ ${actionStatusBadge(action)}
+ ${action.email ? `<span class="reason-chip">${esc(action.email)}</span>` : ''}
+ ${action.at ? `<span class="reason-chip">${relTime(action.at)}</span>` : ''}
+ </div>
+ </div>
+ <div class="action-buttons">
+ <button class="btn blue" onclick='runAdminAction(${jsArg(action.key)}, "open")'>Open</button>
+ ${action.email ? `<button class="btn green" onclick='runAdminAction(${jsArg(action.key)}, "message")'>Message</button>` : ''}
+ ${action.email ? `<button class="btn" onclick='runAdminAction(${jsArg(action.key)}, "student")'>Student</button>` : ''}
+ <button class="btn amber" onclick='runAdminAction(${jsArg(action.key)}, "contacted")'>Contacted</button>
+ <button class="btn" onclick='runAdminAction(${jsArg(action.key)}, "snooze")'>Snooze</button>
+ <button class="btn" onclick='runAdminAction(${jsArg(action.key)}, "won")'>Won</button>
+ <button class="btn red" onclick='runAdminAction(${jsArg(action.key)}, "ignore")'>Ignore</button>
+ </div>
+ </div>`).join('')}</div>`;
+ return rows;
+}
+
+function runAdminAction(key, verb) {
+ const action = buildAdminActions().find(row => row.key === key);
+ if (!action && !['snooze','won','ignore','contacted'].includes(verb)) return;
+ if (verb === 'open') { action?.open?.(); return; }
+ if (verb === 'student') { if (action?.email) openStudentDrawer(action.email, { source: action.type || 'Action' }); return; }
+ if (verb === 'message') {
+  if (!action?.email) return;
+  composeToUser(action.email, action.messageSubject || 'Quick Key2MD follow-up', action.messageBody || '', '', action.type || 'admin_action', {
+   stayOnPage: true,
+   actionKey: action.key,
+   contextTitle: action.title,
+   contextLines: action.contextLines || [action.sub || ''],
+  });
+  return;
+ }
+ if (verb === 'contacted') { setActionStatus(key, 'waiting', 10); return; }
+ if (verb === 'snooze') { setActionStatus(key, 'snoozed', 3); return; }
+ if (verb === 'won') { setActionStatus(key, 'won'); return; }
+ if (verb === 'ignore') { setActionStatus(key, 'ignore'); }
+}
+
+function rerenderActionSurfaces() {
+ renderActionQueue();
+ renderGrowthHub();
+ updateNavBadges();
 }
 
 // ======================================================
@@ -2475,7 +2966,10 @@ function updateDashboard() {
  document.getElementById('dashHeadline').textContent = `${todayReviews} CASPer + ${todayS2} S2 reviews today | ${mmi.filter(r=>isToday(r.created_at)).length} MMI sessions | ${manualPending} mock review${manualPending===1?'':'s'} pending | ${unread} unread message${unread===1?'':'s'}`;
  document.getElementById('dashBrief').textContent =
  `${users.length} registered students | ${paying} paying customers | ${pro} CASPer Pro | ${mmiPro} MMI Pro | ${reviews.length} CASPer reviews | ${s2.length} S2 essays | ${mocks.length} saved mock exams | ${enqs7} enquiries in 7 days`;
- renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length,manualPending,manualAging,parseFailures,whisperFailures,paying7,sharingHigh,sharingMedium,warmHot,warmStrong});
+ const dashMetrics = {unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length,manualPending,manualAging,parseFailures,whisperFailures,paying7,sharingHigh,sharingMedium,warmHot,warmStrong};
+ renderDashboardFocus(dashMetrics);
+ renderActionQueue(dashMetrics);
+ renderGrowthHub();
  renderBusinessInsights({conversion,pro,mmiPro,paying,users,credits,reviews,s2,todayReviews,todayS2,signups7,enqs7,avgScore,mmi});
  renderActivityFeed();
  renderReviewQuality();
@@ -2497,26 +2991,109 @@ function updateDashboard() {
  </div>`).join('')||'<div style="color:var(--muted2);font-size:0.8rem;">No users yet</div>';
 }
 
-function renderActionQueue(m) {
- const items = [
- {icon:'ID', title:`${(m.sharingHigh||0)+(m.sharingMedium||0)} account-sharing signal${((m.sharingHigh||0)+(m.sharingMedium||0))===1?'':'s'}`, sub:`${m.sharingHigh||0} high risk, ${m.sharingMedium||0} medium risk. Review before acting.`, page:'sharing', show:((m.sharingHigh||0)+(m.sharingMedium||0))>0, tone:(m.sharingHigh||0)>0?'red':'amber'},
- {icon:'$', title:`${m.warmStrong||0} warm lead${(m.warmStrong||0)===1?'':'s'} ready`, sub:`${m.warmHot||0} hot, ${Math.max(0,(m.warmStrong||0)-(m.warmHot||0))} strong warm. Send tailored outreach while practice intent is high.`, page:'warmleads', show:(m.warmStrong||0)>0, tone:(m.warmHot||0)>0?'green':'blue'},
- {icon:'24h', title:`${m.manualAging||0} mock review${m.manualAging===1?'':'s'} waiting over 24h`, sub:'Prioritise these first so paid manual reviews feel premium.', page:'mocks', show:(m.manualAging||0)>0, tone:'red'},
- {icon:'M', title:`${m.manualPending||0} mock review${m.manualPending===1?'':'s'} pending`, sub:'Open the saved full mock and update manual notes/status.', page:'mocks', show:(m.manualPending||0)>0, tone:'amber'},
- {icon:'ERR', title:`${(m.parseFailures||0)+(m.whisperFailures||0)} AI processing issue${((m.parseFailures||0)+(m.whisperFailures||0))===1?'':'s'}`, sub:'Check parse/Whisper failures before they become student-facing friction.', page:'monitoring', show:((m.parseFailures||0)+(m.whisperFailures||0))>0, tone:'red'},
- {icon:'!', title:`${m.unread} unread inbox thread${m.unread===1?'':'s'}`, sub:'Reply quickly to keep coaching leads warm.', page:'inbox', show:m.unread>0, tone:'red'},
- {icon:'$', title:`${m.paying7||0} payment${m.paying7===1?'':'s'} in 7 days`, sub:'Good moment to check onboarding and post-purchase experience.', page:'revenue', show:(m.paying7||0)>0, tone:'green'},
- {icon:'$', title:`${m.enqs7} fresh enquir${m.enqs7===1?'y':'ies'} this week`, sub:'Follow up while intent is highest.', page:'enquiries', show:m.enqs7>0, tone:'amber'},
- {icon:'AI', title:`${m.freeToday} student${m.freeToday===1?'':'s'} used free reviews today`, sub:'Good moment to invite credit purchase or Pro.', page:'users', show:m.freeToday>0, tone:'blue'},
- {icon:'0', title:`${m.noReviews} account${m.noReviews===1?'':'s'} with no reviews`, sub:'Candidates for onboarding or activation email.', page:'users', show:m.noReviews>0, tone:'amber'},
- ].filter(item=>item.show).slice(0,5);
- if (!items.length) items.push({icon:'OK', title:'No urgent owner actions', sub:'Inbox, enquiries, and student usage look calm.', page:'dashboard', show:true, tone:'green'});
- document.getElementById('dashQueueCount').textContent = `${items.length}`;
- document.getElementById('dashActionQueue').innerHTML = items.map(item=>`
- <div class="queue-item">
- <div class="queue-icon" style="color:var(--${item.tone});">${esc(item.icon)}</div>
- <div><div class="queue-title">${esc(item.title)}</div><div class="queue-sub">${esc(item.sub)}</div></div>
- <button class="btn ${item.tone==='green'?'green':item.tone==='red'?'red':item.tone==='amber'?'amber':'blue'}" onclick="nav('${item.page}')">Open</button>
+function renderDashboardFocus(m) {
+ const active = filterAdminActions(buildAdminActions(), 'active');
+ const checkoutRows = ((S.abandonedCheckouts && S.abandonedCheckouts.rows) || []).filter(row => !row.recovered);
+ const checkoutValue = checkoutRows.reduce((sum, row) => sum + Number(row.amount_cents || 0) / 100, 0);
+ const problems = (m.manualAging || 0) + (m.parseFailures || 0) + (m.whisperFailures || 0);
+ const cards = [
+  { tone: active.length ? 'amber' : 'green', label: 'Next actions', value: active.length || '0', copy: active.length ? 'active student or growth items' : 'queue is clear' },
+  { tone: m.unread ? 'red' : 'blue', label: 'Unread replies', value: m.unread || '0', copy: m.unread ? 'student conversations need reply' : 'inbox is calm' },
+  { tone: checkoutValue ? 'green' : 'blue', label: 'Open checkout', value: checkoutValue ? fmtGrowthMoney(checkoutValue) : '$0', copy: `${checkoutRows.length} unrecovered checkout${checkoutRows.length === 1 ? '' : 's'}` },
+  { tone: problems ? 'red' : 'green', label: 'Ops issues', value: problems || '0', copy: problems ? 'mock or AI processing items' : 'no urgent system issues' },
+ ];
+ const target = document.getElementById('dashFocusGrid');
+ if (!target) return;
+ target.innerHTML = cards.map(card => `
+ <div class="focus-card ${card.tone}">
+ <div class="focus-kicker">${esc(card.label)}</div>
+ <div class="focus-value">${esc(card.value)}</div>
+ <div class="focus-copy">${esc(card.copy)}</div>
+ </div>`).join('');
+}
+
+function renderActionQueue() {
+ const filter = document.getElementById('dashActionFilter')?.value || 'active';
+ const rows = renderActionCards('dashActionQueue', filter, 7);
+ const count = filterAdminActions(buildAdminActions(), filter).length;
+ setText('dashQueueCount', count || '-');
+ return rows;
+}
+
+async function refreshGrowthWorkspace(opts = {}) {
+ if (!S.token) return;
+ const stamp = document.getElementById('growthUpdated');
+ if (stamp && !opts.silent) stamp.textContent = 'Refreshing growth data...';
+ const tasks = [];
+ const force = !opts.silent;
+ if (force || !S.warmLeads.length) tasks.push(loadWarmLeads());
+ if (force || !S.nextActions.length) tasks.push(loadNextActions());
+ if (force || !S.pipeline) tasks.push(loadPipeline());
+ if (force || !S.productFunnel) tasks.push(loadProductFunnel());
+ if (force || !S.abandonedCheckouts) tasks.push(loadAbandonedCheckouts());
+ if (force || !S.retentionRisks.length) tasks.push(loadRetentionRisk());
+ if (force || !S.outreachRoi) tasks.push(loadOutreachRoi());
+ if (tasks.length) await Promise.allSettled(tasks);
+ if (stamp) stamp.textContent = `Growth data refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
+ renderGrowthHub();
+}
+
+function renderGrowthHub() {
+ const actions = buildAdminActions();
+ const filter = document.getElementById('growthActionFilter')?.value || 'active';
+ const filtered = filterAdminActions(actions, filter);
+ const warmNow = (S.warmLeads || []).filter(row => Number(row.lead_score || 0) >= 55 && !warmLeadRecentlyContacted(row.outreach_history, 10)).length;
+ const checkoutRows = ((S.abandonedCheckouts && S.abandonedCheckouts.rows) || []).filter(row => !row.recovered);
+ const checkoutValue = checkoutRows.reduce((sum, row) => sum + Number(row.amount_cents || 0) / 100, 0);
+ setText('growthActiveActions', filterAdminActions(actions, 'active').length || '-');
+ setText('growthWarmNow', warmNow || '-');
+ setText('growthCheckoutValue', checkoutValue ? fmtGrowthMoney(checkoutValue) : '-');
+ setText('growthQueueCount', filtered.length || '-');
+ renderActionCards('growthActionQueue', filter, 12);
+ renderTrackingHealth();
+ const cards = [
+  { title:'Warm Leads', sub:'Recent non-paying students with practice intent and tailored outreach drafts.', page:'warmleads', meta:[`${warmNow} active`, 'freshness first'] },
+  { title:'Pipeline', sub:'Board view from first signal through paid, follow-up due, or cold.', page:'pipeline', meta:[`${S.pipeline?.rows?.length || 0} rows`] },
+  { title:'Abandoned Checkouts', sub:'Unfinished checkout sessions with value and recovery messaging.', page:'abandoned', meta:[`${checkoutRows.length} open`, checkoutValue ? fmtGrowthMoney(checkoutValue) : '$0'] },
+  { title:'Retention Risk', sub:'Paid students whose usage pattern suggests they need a useful nudge.', page:'retention', meta:[`${S.retentionRisks?.length || 0} rows`] },
+  { title:'Outreach ROI', sub:'Who buys after emails, warm-lead notes, and broadcasts.', page:'outreach', meta:[`${S.outreachRoi?.summary?.sends || 0} sends`] },
+  { title:'Product Funnel', sub:'Views, checkout starts, purchases, and tracking quality by product.', page:'funnel', meta:[`${S.productFunnel?.rows?.length || 0} products`] },
+ ];
+ const target = document.getElementById('growthHubCards');
+ if (target) {
+  target.innerHTML = cards.map(card => `
+  <div class="growth-hub-card" onclick="nav('${card.page}')">
+  <div class="growth-hub-title">${esc(card.title)}</div>
+  <div class="growth-hub-sub">${esc(card.sub)}</div>
+  <div class="growth-hub-meta">${card.meta.map(m => `<span class="reason-chip">${esc(m)}</span>`).join('')}</div>
+  </div>`).join('');
+ }
+}
+
+function renderTrackingHealth() {
+ const target = document.getElementById('growthTrackingHealth');
+ const countEl = document.getElementById('growthTrackingCount');
+ if (!target) return;
+ const funnelRows = S.productFunnel?.rows || [];
+ const abandonedRows = S.abandonedCheckouts?.rows || [];
+ const revenueRows = S.revenue || [];
+ const unknownProducts = funnelRows.filter(row => !row.product || String(row.product).toLowerCase() === 'general' || String(row.product).toLowerCase().includes('unknown')).length;
+ const checkoutNoEmail = abandonedRows.filter(row => !row.email).length;
+ const revenueNoEmail = revenueRows.filter(row => !row.email && !row.user_id).length;
+ const noFunnel = !funnelRows.length;
+ const rows = [
+  { level: noFunnel ? 'warn' : 'ok', title:'Product funnel', sub:noFunnel ? 'No funnel rows loaded yet; refresh Growth or check tracking events.' : `${funnelRows.length} product funnel row${funnelRows.length===1?'':'s'} loaded.` },
+  { level: unknownProducts ? 'warn' : 'ok', title:'Product attribution', sub: unknownProducts ? `${unknownProducts} funnel row${unknownProducts===1?'':'s'} have unclear product labels.` : 'Products look attributable.' },
+  { level: checkoutNoEmail ? 'warn' : 'ok', title:'Checkout identity', sub: checkoutNoEmail ? `${checkoutNoEmail} abandoned checkout${checkoutNoEmail===1?'':'s'} missing email.` : 'Open checkouts have usable student identity.' },
+  { level: revenueNoEmail ? 'warn' : 'ok', title:'Revenue matching', sub: revenueNoEmail ? `${revenueNoEmail} payment row${revenueNoEmail===1?'':'s'} lack email/user ID.` : 'Revenue rows are matchable to students.' },
+ ];
+ const issueCount = rows.filter(row => row.level !== 'ok').length;
+ if (countEl) countEl.textContent = issueCount || 'OK';
+ target.innerHTML = rows.map(row => `
+ <div class="health-row">
+ <div class="health-level ${row.level}">${row.level === 'ok' ? 'OK' : 'Check'}</div>
+ <div><div class="queue-title">${esc(row.title)}</div><div class="queue-sub">${esc(row.sub)}</div></div>
+ <button class="btn" onclick="nav('${row.title.includes('funnel') || row.title.includes('Product') ? 'funnel' : row.title.includes('Checkout') ? 'abandoned' : 'revenue'}')">Open</button>
  </div>`).join('');
 }
 
@@ -2628,10 +3205,63 @@ function renderReviews() {
  <div class="detail-box"><div class="detail-box-hd">Scenario & Prompts</div>${renderQBox(row.question_text)}</div>
  <div class="detail-box"><div class="detail-box-hd">Student Response</div><div class="detail-box-body">${esc(row.response_text||'-')}</div></div>
  <div class="detail-box"><div class="detail-box-hd">AI Feedback</div>${renderFbBox(row.ai_feedback)}</div>
+ <div class="detail-box">
+ <div class="detail-box-hd">Admin correction</div>
+ <div class="detail-box-body">Remove this station from the student's saved history and leaderboard score if it was a misclick or false mark.</div>
+ <div class="detail-box-row" style="margin-top:8px;"><strong>Review ID:</strong> ${esc(row.id || '-')}</div>
+ <button class="btn red" style="margin-top:10px;" onclick='removeReviewFromHistory(${jsArg(row.id)}, "casper")'>Remove from history</button>
+ </div>
  </div></td>`;
  dr.addEventListener('click', () => { xr.classList.toggle('open'); dr.classList.toggle('expanded'); });
  tbody.appendChild(dr); tbody.appendChild(xr);
  });
+}
+
+function findReviewById(reviewId) {
+ const id = String(reviewId || '');
+ return (S.reviews || []).find(row => String(row.id || '') === id)
+ || (S.s2Reviews || []).find(row => String(row.id || '') === id)
+ || null;
+}
+
+async function removeReviewFromHistory(reviewId, tool = '') {
+ const row = findReviewById(reviewId);
+ if (!row?.id) {
+  alert('Could not find that review row in the currently loaded admin table.');
+  return;
+ }
+ const fb = parseFb(row.ai_feedback);
+ const score = row.tool === 'gamsat' ? s2BandScore(fb) : fb?.score;
+ const label = [
+  row.email || 'unknown student',
+  row.tool || tool || 'review',
+  score ? `score ${score}` : 'no score',
+  row.created_at ? fmtDate(row.created_at)?.date : '',
+  `ID ${row.id}`,
+ ].filter(Boolean).join(' | ');
+ const reason = prompt(`Remove this station from the student's saved history?\n\n${label}\n\nThis also removes any matching leaderboard score. It does not refund, credit, or message the student.`, 'Student misclicked; false score');
+ if (reason === null) return;
+ if (!confirm(`Final check: permanently remove this review/station from history?\n\n${label}`)) return;
+ const statusId = row.tool === 'gamsat' ? 's2Status' : 'revStatus';
+ setText(statusId, 'Removing review from history...');
+ try {
+  const res = await api('/admin/reviews/remove', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify({ id: row.id, reason }),
+  });
+  const data = await res.json().catch(()=>({}));
+  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not remove review');
+  S.reviews = (S.reviews || []).filter(item => String(item.id || '') !== String(row.id));
+  S.s2Reviews = (S.s2Reviews || []).filter(item => String(item.id || '') !== String(row.id));
+  renderReviews();
+  renderS2Reviews();
+  updateDashboard();
+  setText(statusId, 'Removed from student history.');
+ } catch(e) {
+  setText(statusId, `Remove failed: ${e.message}`);
+  alert(`Could not remove this review: ${e.message}`);
+ }
 }
 
 // ======================================================
@@ -2755,6 +3385,12 @@ function renderS2Detail(row, fb) {
  <div class="detail-box">
  <div class="detail-box-hd">Overall Feedback</div>
  <div class="detail-box-body">${esc(s2Text(fb?.overallFeedback)||'--')}</div>
+ </div>
+ <div class="detail-box">
+ <div class="detail-box-hd">Admin correction</div>
+ <div class="detail-box-body">Remove this essay review from the student's saved history if it was submitted by mistake or produced a false mark.</div>
+ <div class="detail-box-row" style="margin-top:8px;"><strong>Review ID:</strong> ${esc(row.id || '-')}</div>
+ <button class="btn red" style="margin-top:10px;" onclick='removeReviewFromHistory(${jsArg(row.id)}, "gamsat")'>Remove from history</button>
  </div>
  ${rawFallback}
  </div>`;
@@ -3067,7 +3703,7 @@ function renderWarmLeads() {
  <button class="btn" data-warm-action="copy" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Copy</button>
  <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Mark sent</button>
  <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Report</button>
- <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">User</button>
+ <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Student</button>
  <button class="btn red" data-warm-action="restrict" data-warm-id="${esc(row.id)}" style="font-size:0.68rem;padding:4px 8px;">Restrict</button>
  </div>
  </td>`;
@@ -3132,7 +3768,7 @@ function renderWarmLeadEmailPlaceholder(row) {
  <button class="btn" data-warm-action="copy" data-warm-id="${esc(row.id)}">Copy text fallback</button>
  <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}">Mark sent</button>
  <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}">Open student report</button>
- <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}">Open user</button>
+ <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}">Student drawer</button>
  <button class="btn red" data-warm-action="restrict" data-warm-id="${esc(row.id)}">Restrict free use</button>
  </div>
  </div>`;
@@ -3287,7 +3923,7 @@ async function runWarmLeadAction(action, id, btn = null) {
  else if (action === 'copy') await copyWarmLeadDraft(id);
  else if (action === 'mark') await markWarmLeadOutreachAction(id);
  else if (action === 'report') await openWarmLeadReport(id);
- else if (action === 'user') viewUserByEmail(row.email || '');
+ else if (action === 'user') openStudentDrawer(row.email || '', { source: 'Warm lead' });
  else if (action === 'restrict') openDuplicateFlagModal(row.id || '', row.email || '', row.duplicate_flags || {});
  } finally {
  if (btn) { btn.disabled = false; btn.textContent = original; }
@@ -3342,7 +3978,7 @@ function renderWarmLeadReportPanel(row, email) {
  <button class="btn" data-warm-action="copy" data-warm-id="${esc(row.id)}">Copy text</button>
  <button class="btn green" data-warm-action="mark" data-warm-id="${esc(row.id)}">Mark sent</button>
  <button class="btn green" data-warm-action="report" data-warm-id="${esc(row.id)}">Open report</button>
- <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}">Open user</button>
+ <button class="btn amber" data-warm-action="user" data-warm-id="${esc(row.id)}">Student drawer</button>
  <button class="btn red" data-warm-action="restrict" data-warm-id="${esc(row.id)}">Restrict free use</button>
  </div>
  </div>
@@ -3377,7 +4013,12 @@ async function openWarmLeadEmail(id) {
  const target = document.getElementById(warmLeadDomId(id));
  if (target) target.innerHTML = renderWarmLeadReportPanel(row, email);
  }
- composeToUser(row.email || '', subject, body, html, 'warm_lead', { stayOnPage: true });
+ composeToUser(row.email || '', subject, body, html, 'warm_lead', {
+ stayOnPage: true,
+ actionKey: `warm:${String(row.email || row.id || '').toLowerCase()}`,
+ contextTitle: 'Warm lead outreach',
+ contextLines: [`Lead score ${Number(row.lead_score || 0)}/100`, row.recommended_product || 'Next step', ...(row.reasons || []).slice(0, 3)],
+ });
 }
 
 async function copyWarmLeadDraft(id) {
@@ -3959,10 +4600,11 @@ function growthCommandButtons(email, opts = {}) {
  if (!clean) return '<span style="color:var(--muted2);font-size:0.72rem;">No email</span>';
  const subject = opts.subject || '';
  const body = opts.body || '';
+ const actionKey = opts.actionKey || '';
  return `<div class="action-mini-row">
- <button class="btn blue" onclick='event.stopPropagation();openTimelineForEmail(${jsArg(clean)})'>Timeline</button>
- <button class="btn" onclick='event.stopPropagation();viewUserByEmail(${jsArg(clean)})'>User</button>
- <button class="btn green" onclick='event.stopPropagation();composeToUser(${jsArg(clean)},${jsArg(subject)},${jsArg(body)})'>Email</button>
+ <button class="btn blue" onclick='event.stopPropagation();openStudentDrawer(${jsArg(clean)})'>Student</button>
+ <button class="btn" onclick='event.stopPropagation();openTimelineForEmail(${jsArg(clean)})'>Timeline</button>
+ <button class="btn green" onclick='event.stopPropagation();composeToUser(${jsArg(clean)},${jsArg(subject)},${jsArg(body)},"","admin_action",{stayOnPage:true,actionKey:${jsArg(actionKey)}})'>Message</button>
  </div>`;
 }
 
@@ -4035,7 +4677,7 @@ async function loadNextActions() {
  } catch(e) {
  setText('actionsStatus', e.message);
  const tbody = document.getElementById('actionsBody');
- if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="color:var(--red);">${esc(e.message)}</td></tr>`;
+ if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="color:var(--red);">${esc(e.message)}</td></tr>`;
  }
 }
 
@@ -4050,18 +4692,24 @@ function renderNextActions() {
  document.getElementById('actionsEmpty')?.classList.toggle('hidden', rows.length > 0);
  const tbody = document.getElementById('actionsBody');
  if (!tbody) return;
- tbody.innerHTML = rows.map(row => `
- <tr>
- <td>${growthScoreBadge(row.priority)}</td>
- <td><div class="cell-main">${emailWithDuplicateFlag(row.email || 'Unknown', row)}</div><div class="cell-sub">${esc(row.name || '-')}</div></td>
- <td><div class="cell-main">${esc(row.title || row.suggested || '-')}</div><div class="cell-sub">${esc(String(row.type || '').replace(/_/g, ' '))}</div></td>
- <td><div class="trunc">${esc(row.reason || '-')}</div></td>
- <td>${row.created_at || row.expired_at || row.last_activity_at ? relTime(row.created_at || row.expired_at || row.last_activity_at) : '-'}</td>
- <td>${growthCommandButtons(row.email, {
- subject: row.title || 'Quick Key2MD follow-up',
- body: row.suggested || ''
- })}</td>
- </tr>`).join('');
+ tbody.innerHTML = rows.map(row => {
+  const key = `next:${row.type || 'action'}:${row.email || row.id || row.created_at || row.title}`;
+  const action = { key };
+  return `
+  <tr>
+  <td>${growthScoreBadge(row.priority)}</td>
+  <td>${actionStatusBadge(action)}</td>
+  <td><div class="cell-main">${emailWithDuplicateFlag(row.email || 'Unknown', row)}</div><div class="cell-sub">${esc(row.name || '-')}</div></td>
+  <td><div class="cell-main">${esc(row.title || row.suggested || '-')}</div><div class="cell-sub">${esc(String(row.type || '').replace(/_/g, ' '))}</div></td>
+  <td><div class="trunc">${esc(row.reason || '-')}</div></td>
+  <td>${row.created_at || row.expired_at || row.last_activity_at ? relTime(row.created_at || row.expired_at || row.last_activity_at) : '-'}</td>
+  <td>${growthCommandButtons(row.email, {
+  actionKey: key,
+  subject: row.title || 'Quick Key2MD follow-up',
+  body: row.suggested || ''
+  })}</td>
+  </tr>`;
+ }).join('');
 }
 
 async function loadOutreachRoi() {
@@ -4186,7 +4834,9 @@ function renderAbandonedCheckouts() {
  document.getElementById('abandonedEmpty')?.classList.toggle('hidden', rows.length > 0);
  const tbody = document.getElementById('abandonedBody');
  if (!tbody) return;
- tbody.innerHTML = rows.map(row => `
+ tbody.innerHTML = rows.map(row => {
+ const actionKey = `checkout:${row.stripe_session_id || row.email || row.expired_at}`;
+ return `
  <tr>
  <td><div class="cell-main">${fmtDate(row.expired_at)?.date || '-'}</div><div class="cell-sub">${relTime(row.expired_at)}</div></td>
  <td><div class="cell-main">${emailWithDuplicateFlag(row.email || 'Unknown', row)}</div><div class="cell-sub">${esc(row.stripe_session_id || '')}</div></td>
@@ -4195,10 +4845,12 @@ function renderAbandonedCheckouts() {
  <td>${row.recovered ? '<span class="badge badge-yes">Recovered</span>' : '<span class="badge badge-no">Open</span>'}<div class="cell-sub">${row.recovered_at ? relTime(row.recovered_at) : esc(row.reason || '')}</div></td>
  <td>${Number(row.recovery_sent || 0) ? '<span class="badge badge-yes">Sent</span>' : '<span class="badge badge-no">Not sent</span>'}</td>
  <td>${growthCommandButtons(row.email, {
+ actionKey,
  subject: 'Quick note about your Key2MD checkout',
  body: 'Hi, I saw your checkout did not finish. If anything broke or the product was not quite right, reply here and I can help.'
  })}</td>
- </tr>`).join('');
+ </tr>`;
+ }).join('');
 }
 
 async function loadRetentionRisk(opts = {}) {
@@ -4227,7 +4879,9 @@ function renderRetentionRisk() {
  document.getElementById('retentionEmpty')?.classList.toggle('hidden', rows.length > 0);
  const tbody = document.getElementById('retentionBody');
  if (!tbody) return;
- tbody.innerHTML = rows.map(row => `
+ tbody.innerHTML = rows.map(row => {
+ const actionKey = `retention:${String(row.email || row.user_id || '').toLowerCase()}`;
+ return `
  <tr>
  <td>${growthScoreBadge(row.risk_score)}<div class="cell-sub">${esc(row.risk_level || 'watch')}</div></td>
  <td><div class="cell-main">${emailWithDuplicateFlag(row.email || 'Unknown', row)}</div><div class="cell-sub">${esc(row.name || '-')}</div></td>
@@ -4236,13 +4890,16 @@ function renderRetentionRisk() {
  <td><div class="cell-main">${relTime(row.last_practice_at || row.last_payment_at)}</div><div class="cell-sub">paid ${relTime(row.last_payment_at)}</div></td>
  <td><div class="reason-list">${(row.reasons || []).map(r => `<span class="reason-chip">${esc(r)}</span>`).join('')}</div></td>
  <td>${growthCommandButtons(row.email, {
+ actionKey,
  subject: 'Checking in on your Key2MD prep',
  body: row.suggested || 'Hi, just checking whether you want a hand getting the most out of the practice you already have.'
  })}</td>
- </tr>`).join('');
+ </tr>`;
+ }).join('');
 }
 
 function openTimelineForEmail(email) {
+ closeStudentDrawer();
  nav('timeline');
  const input = document.getElementById('timelineSearch');
  if (input) input.value = email || '';
@@ -4299,6 +4956,141 @@ function renderStudentTimeline() {
  <div class="cell-sub">${relTime(event.at)}</div>
  </div>
  </div>`).join('');
+}
+
+// ======================================================
+// UNIVERSAL STUDENT DRAWER
+// ======================================================
+function closeStudentDrawer() {
+ document.getElementById('studentDrawer')?.classList.remove('open');
+}
+
+function normEmail(email) {
+ return String(email || '').trim().toLowerCase();
+}
+
+function findUserByEmail(email) {
+ const key = normEmail(email);
+ return (S.users || []).find(u => normEmail(u.email) === key) || null;
+}
+
+function rowsForEmail(rows, email, fields = ['email']) {
+ const key = normEmail(email);
+ if (!key) return [];
+ return (rows || []).filter(row => fields.some(field => normEmail(row?.[field]) === key));
+}
+
+function studentDrawerRows(title, rows, mapper, empty = 'No rows yet.') {
+ return `<div class="drawer-section">
+ <div class="drawer-section-title">${esc(title)} <span class="badge badge-default">${rows.length}</span></div>
+ <div class="drawer-list">
+ ${rows.length ? rows.slice(0, 6).map(mapper).join('') : `<div class="drawer-empty">${esc(empty)}</div>`}
+ </div>
+ </div>`;
+}
+
+function drawerEvent(type, main, sub = '', at = '') {
+ return `<div class="drawer-row">
+ <div><div class="drawer-row-type">${esc(type)}</div><div class="cell-sub">${at ? relTime(at) : ''}</div></div>
+ <div><div class="drawer-row-main">${main}</div>${sub ? `<div class="drawer-row-sub">${esc(sub)}</div>` : ''}</div>
+ </div>`;
+}
+
+function buildStudentContext(email) {
+ const key = normEmail(email);
+ const user = findUserByEmail(key) || {};
+ const casper = rowsForEmail(S.reviews, key);
+ const s2 = rowsForEmail(S.s2Reviews, key);
+ const mmi = rowsForEmail(S.mmiReviews, key);
+ const revenue = rowsForEmail(S.revenue, key);
+ const enquiries = rowsForEmail(S.enquiries, key);
+ const warm = rowsForEmail(S.warmLeads, key);
+ const retention = rowsForEmail(S.retentionRisks, key);
+ const sharing = rowsForEmail(S.sharingWatchlist, key);
+ const conv = (S.conversations || []).find(c => normEmail(c.email) === key);
+ const mocks = (S.mockAttempts || []).filter(m => normEmail(m.user_email) === key);
+ const manualMocks = (S.mockManualReviews || []).filter(m => normEmail(m.user_email) === key);
+ return { email:key || email, user, casper, s2, mmi, revenue, enquiries, warm, retention, sharing, conv, mocks, manualMocks };
+}
+
+function openStudentDrawer(email, opts = {}) {
+ const clean = normEmail(email);
+ if (!clean) return;
+ const drawer = document.getElementById('studentDrawer');
+ if (!drawer) return;
+ drawer.classList.add('open');
+ renderStudentDrawer(clean, opts);
+ loadStudentDrawerTimeline(clean);
+}
+
+function renderStudentDrawer(email, opts = {}) {
+ const ctx = buildStudentContext(email);
+ const user = ctx.user || {};
+ const spend = Number(user.total_spend_aud || ctx.revenue.reduce((s,row)=>s+Number(row.amount_aud || 0),0));
+ const totalReviews = ctx.casper.length + ctx.s2.length + ctx.mmi.length;
+ const lastActivity = [
+  ...ctx.casper.map(r=>r.created_at),
+  ...ctx.s2.map(r=>r.created_at),
+  ...ctx.mmi.map(r=>r.created_at),
+  ...ctx.enquiries.map(r=>r.created_at),
+  ...ctx.revenue.map(r=>r.created_at),
+  ...ctx.mocks.map(r=>r.completed_at || r.updated_at),
+ ].filter(Boolean).sort((a,b)=>Date.parse(b)-Date.parse(a))[0];
+ const titleEl = document.getElementById('studentDrawerTitle');
+ if (titleEl) titleEl.innerHTML = emailWithDuplicateFlag(ctx.email || email, user);
+ setText('studentDrawerSub', `${user.name || opts.source || 'Student context'} | ${user.tier || 'free'} | ${spend ? fmtGrowthMoney(spend) : '$0'} spend | last ${lastActivity ? relTime(lastActivity) : 'unknown'}`);
+ const actions = document.getElementById('studentDrawerActions');
+ if (actions) actions.innerHTML = `
+ <button class="btn green" onclick='composeToUser(${jsArg(ctx.email)}, "", "", "", "student_drawer", {stayOnPage:true, contextTitle:"Student context"})'>Message</button>
+ <button class="btn blue" onclick='openTimelineForEmail(${jsArg(ctx.email)})'>Timeline</button>
+ <button class="btn" onclick='viewUserByEmail(${jsArg(ctx.email)})'>Users page</button>
+ <button class="btn" onclick='copyText(${jsArg(ctx.email)}, "Email copied")'>Copy email</button>
+ <button class="btn" onclick="closeStudentDrawer()">Close</button>`;
+ const latestConv = ctx.conv?.messages?.[ctx.conv.messages.length - 1];
+ const body = document.getElementById('studentDrawerBody');
+ if (!body) return;
+ body.innerHTML = `
+ <div class="drawer-kpis">
+ <div class="drawer-kpi"><div class="drawer-kpi-label">Spend</div><div class="drawer-kpi-value">${spend ? fmtGrowthMoney(spend) : '$0'}</div></div>
+ <div class="drawer-kpi"><div class="drawer-kpi-label">Reviews</div><div class="drawer-kpi-value">${totalReviews}</div></div>
+ <div class="drawer-kpi"><div class="drawer-kpi-label">Credits</div><div class="drawer-kpi-value">${Number(user.casper_balance || 0) + Number(user.gamsat_balance || 0) + Number(user.mmi_transcript_balance || 0) + Number(user.mmi_premium_balance || 0)}</div></div>
+ <div class="drawer-kpi"><div class="drawer-kpi-label">Last active</div><div class="drawer-kpi-value">${lastActivity ? relTime(lastActivity) : '-'}</div></div>
+ </div>
+ ${duplicateWarningBox(duplicateFlagsForEmail(ctx.email, user))}
+ <div class="drawer-grid">
+ ${studentDrawerRows('Lead + Risk', [...ctx.warm, ...ctx.retention, ...ctx.sharing], row => drawerEvent(row.lead_score ? 'Warm lead' : row.risk_score ? 'Retention' : 'Sharing', esc(row.recommended_product || row.risk_level || row.risk?.level || 'Signal'), (row.reasons || row.risk?.reasons || []).slice(0, 3).join(' | '), row.last_activity_at || row.last_practice_at || row.last_seen_at), 'No current lead, retention, or sharing signal.')}
+ ${studentDrawerRows('Messages', latestConv ? [latestConv] : [], row => drawerEvent(row.direction === 'outbound' ? 'Outbound' : 'Inbound', esc(row.subject || 'Conversation'), String(row.body || '').slice(0, 160), row.created_at), 'No inbox conversation loaded.')}
+ ${studentDrawerRows('Payments', ctx.revenue, row => drawerEvent('Payment', `<strong>${fmtGrowthMoney(row.amount_aud || 0)}</strong>`, row.type || row.stripe_session_id || '', row.created_at), 'No payment rows found.')}
+ ${studentDrawerRows('Enquiries', ctx.enquiries, row => drawerEvent(row.type || 'Enquiry', esc(row.name || row.email || 'Website enquiry'), row.notes || row.universities || '', row.created_at), 'No website enquiries.')}
+ ${studentDrawerRows('CASPer + S2', [...ctx.casper, ...ctx.s2], row => {
+  const fb = parseFb(row.ai_feedback);
+  const score = row.tool === 'gamsat' ? s2BandScore(fb) : fb?.score;
+  return drawerEvent(row.tool === 'gamsat' ? 'S2' : 'CASPer', esc(score ? `Score ${score}` : row.tool || 'Review'), String(row.question_text || row.response_text || '').slice(0, 150), row.created_at);
+ }, 'No CASPer/S2 reviews loaded.')}
+ ${studentDrawerRows('Mocks + MMI', [...ctx.manualMocks, ...ctx.mocks, ...ctx.mmi], row => drawerEvent(row.manual_review_status ? 'Mock' : row.station_category ? 'MMI' : 'Mock', esc(row.manual_review_status || row.status || row.station_category || 'Attempt'), row.id || row.station_scenario || '', row.completed_at || row.created_at), 'No mock/MMI rows loaded.')}
+ </div>
+ <div class="drawer-section">
+ <div class="drawer-section-title">Timeline preview <button class="btn" onclick='openTimelineForEmail(${jsArg(ctx.email)})'>Open full timeline</button></div>
+ <div class="drawer-list" id="studentDrawerTimeline"><div class="drawer-empty">Loading timeline preview...</div></div>
+ </div>`;
+}
+
+async function loadStudentDrawerTimeline(email) {
+ const target = document.getElementById('studentDrawerTimeline');
+ if (!target) return;
+ try {
+  let data = S.drawerTimelineCache.get(email);
+  if (!data) {
+   const res = await api(`/admin/student-timeline?email=${encodeURIComponent(email)}`);
+   data = await res.json().catch(()=>({}));
+   if (!res.ok) throw new Error(data?.error || 'Could not load timeline');
+   S.drawerTimelineCache.set(email, data);
+  }
+  const events = data.events || [];
+  target.innerHTML = events.length ? events.slice(0, 8).map(event => drawerEvent(String(event.type || 'event').replace(/_/g, ' '), esc(event.title || 'Event'), event.detail || '', event.at)).join('') : '<div class="drawer-empty">No timeline events found.</div>';
+ } catch(e) {
+  target.innerHTML = `<div class="drawer-empty">Timeline preview unavailable: ${esc(e.message || 'failed')}</div>`;
+ }
 }
 
 // ======================================================
@@ -4777,7 +5569,7 @@ function renderEnquiries() {
  <div class="action-mini-row">
  <button class="btn blue" onclick="event.stopPropagation();replyToEnquiry('${esc(row.id||'')}')">Reply</button>
  <button class="btn" onclick="event.stopPropagation();copyText('${esc(row.email||'')}','Email copied')">Copy</button>
- <button class="btn" onclick="event.stopPropagation();viewUserByEmail('${esc(row.email||'')}')">User</button>
+  <button class="btn" onclick='event.stopPropagation();openStudentDrawer(${jsArg(row.email||"")})'>Student</button>
  </div>
  </td>
  <td><span class="enq-type">${esc(row.type||'General')}</span></td>
@@ -4976,11 +5768,23 @@ async function markRead() {
 // ======================================================
 function insertEmailTemplate(kind) {
  const templates = {
- enquiry: {
- subject: 'Re: your Key2MD enquiry',
- body: `Hi there,\n\nThanks for reaching out. I can definitely help with this.\n\nThe best next step is to tell me your target schools, current timeline, and what part of the process feels most uncertain right now. I can then point you toward the most useful prep option rather than giving you a generic plan.\n\n- Dan`,
- },
- mock: {
+  enquiry: {
+  subject: 'Re: your Key2MD enquiry',
+  body: `Hi there,\n\nThanks for reaching out. I can definitely help with this.\n\nThe best next step is to tell me your target schools, current timeline, and what part of the process feels most uncertain right now. I can then point you toward the most useful prep option rather than giving you a generic plan.\n\n- Dan`,
+  },
+  warm: {
+  subject: 'A learning note from your Key2MD practice',
+  body: `Hi there,\n\nI had a look at your recent practice pattern and there is a useful learning theme showing up.\n\nThe main thing I would focus on is making the judgement more explicit, then backing it with a realistic action that protects the people affected by the scenario.\n\nIf you want help turning that into a clearer plan, reply here with your test date and I can point you toward the most sensible next step.\n\n- Dan`,
+  },
+  checkout: {
+  subject: 'Quick note about your Key2MD checkout',
+  body: `Hi there,\n\nI saw your checkout did not finish. If anything broke, or if you were unsure which option fits your prep, reply here and I can help.\n\n- Dan`,
+  },
+  retention: {
+  subject: 'Checking in on your Key2MD prep',
+  body: `Hi there,\n\nJust checking whether you want a hand getting the most out of the practice you already have.\n\nIf you tell me what you are trying to improve this week, I can point you to the highest-yield next station or review type.\n\n- Dan`,
+  },
+  mock: {
  subject: 'Re: your Full CASPer Mock',
  body: `Hi there,\n\nThanks for completing the Full CASPer Mock. I will review the whole attempt as a single exam, not just isolated stations, so I can look for repeated patterns across your typed and video responses.\n\nI will focus on the highest-yield change first, then the station-specific details.\n\n- Dan`,
  },
@@ -5012,22 +5816,63 @@ function setComposeHtml(html = '') {
 }
 
 function openNewCompose(preserveHtml = false) {
- if (!preserveHtml) setComposeHtml('');
+ if (!preserveHtml) { setComposeHtml(''); setComposeContextPanel(null); S.composeContext = null; S.composeMode = 'standard'; }
  document.getElementById('ncModal').classList.add('open');
  document.getElementById('ncTo').focus();
 }
-function closeNewCompose() { document.getElementById('ncModal').classList.remove('open'); document.getElementById('ncAlert').className='modal-alert'; S.composeMode='standard'; S.composeContext=null; setComposeHtml(''); }
+
+function setComposeContextPanel(context) {
+ const box = document.getElementById('ncContext');
+ if (!box) return;
+ if (!context) {
+  box.classList.remove('show');
+  box.innerHTML = '';
+  return;
+ }
+ const lines = (context.lines || []).filter(Boolean).slice(0, 5);
+ box.classList.add('show');
+ box.innerHTML = `
+ <div class="compose-context-title">${esc(context.title || 'Student context')}</div>
+ ${lines.map(line => `<div class="compose-context-line">${esc(line)}</div>`).join('')}
+ <div class="compose-context-actions">
+ ${context.email ? `<button class="btn" type="button" onclick='openStudentDrawer(${jsArg(context.email)})'>Student drawer</button>` : ''}
+ ${context.email ? `<button class="btn" type="button" onclick='openTimelineForEmail(${jsArg(context.email)})'>Timeline</button>` : ''}
+ </div>`;
+}
+
+function closeNewCompose() {
+ document.getElementById('ncModal').classList.remove('open');
+ document.getElementById('ncAlert').className='modal-alert';
+ S.composeMode='standard';
+ S.composeContext=null;
+ setComposeHtml('');
+ setComposeContextPanel(null);
+}
+
 function composeToUser(email, subject = '', body = '', html = '', mode = 'standard', options = {}) {
  document.getElementById('ncTo').value = email;
  document.getElementById('ncSubject').value = subject || '';
  document.getElementById('ncBody').value = body || '';
  S.composeMode = mode || 'standard';
+ const clean = normEmail(email);
+ const ctx = buildStudentContext(clean);
+ const lastMsg = ctx.conv?.messages?.[ctx.conv.messages.length - 1];
+ const contextLines = options.contextLines || [
+  ctx.user?.name ? `Name: ${ctx.user.name}` : '',
+  ctx.user?.tier ? `Tier: ${ctx.user.tier}` : '',
+  ctx.user?.total_spend_aud ? `Spend: ${fmtGrowthMoney(ctx.user.total_spend_aud)}` : '',
+  ctx.warm[0]?.lead_score ? `Warm lead score: ${ctx.warm[0].lead_score}/100` : '',
+  lastMsg ? `Last message: ${relTime(lastMsg.created_at)} (${lastMsg.direction || 'message'})` : '',
+ ].filter(Boolean);
  S.composeContext = {
  mode: S.composeMode,
- stayOnPage: options.stayOnPage === true,
+ stayOnPage: options.stayOnPage !== false,
  returnPage: currentHashPage(),
  scrollTop: document.querySelector('.main')?.scrollTop || 0,
+ actionKey: options.actionKey || '',
+ email: clean,
  };
+ setComposeContextPanel({ title: options.contextTitle || 'Message context', lines: contextLines, email: clean });
  setComposeHtml(html || '');
  openNewCompose(true);
  if (!S.composeContext.stayOnPage) nav('inbox');
@@ -5043,7 +5888,12 @@ function replyToEnquiry(id) {
  row.exam_date ? `Exam date: ${row.exam_date}` : '',
  ].filter(Boolean).join('\n');
  const body = `Hi ${first},\n\nThanks for reaching out. I can help with this.\n\n${context ? `${context}\n\n` : ''}The most useful next step is to tell me where you feel least confident at the moment, and I can point you toward the prep option that fits best rather than giving you generic advice.\n\n- Dan`;
- composeToUser(row.email || '', `Re: your ${row.type || 'Key2MD'} enquiry`, body);
+ composeToUser(row.email || '', `Re: your ${row.type || 'Key2MD'} enquiry`, body, '', 'enquiry', {
+ stayOnPage: true,
+ actionKey: `enquiry:${row.id || row.email || row.created_at}`,
+ contextTitle: `${row.type || 'General'} enquiry`,
+ contextLines: [row.notes || '', row.universities ? `Universities: ${row.universities}` : '', row.exam_date ? `Exam date: ${row.exam_date}` : ''].filter(Boolean),
+ });
 }
 async function sendNewEmail() {
  const to = document.getElementById('ncTo').value.trim();
@@ -5070,6 +5920,7 @@ async function sendNewEmail() {
  persistWarmLeadOutreach(to, cleanSubject, body).catch(e => console.warn('Warm lead outreach log failed:', e));
  }
  }
+  if (S.composeContext?.actionKey) setActionStatus(S.composeContext.actionKey, 'waiting', 10);
  al.className='modal-alert ok'; al.textContent=`OK Sent to ${to}`;
  document.getElementById('ncTo').value=''; document.getElementById('ncSubject').value=''; document.getElementById('ncBody').value=''; S.composeMode='standard'; S.composeContext=null; setComposeHtml('');
  if (stayOnPage) {
@@ -6550,6 +7401,7 @@ async function deleteRevenueRow(idx) {
 
 function viewUserByEmail(email) {
  // Navigate to users page and search for this email
+ closeStudentDrawer();
  nav('users');
  const searchEl = document.getElementById('usrSearch');
  if (searchEl) { searchEl.value = email; loadUsers(); }
@@ -6919,6 +7771,7 @@ document.getElementById('duplicateFlagModal').addEventListener('click',e=>{if(e.
 document.getElementById('ncModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeNewCompose();});
 document.getElementById('cmdModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCommandPalette();});
 document.getElementById('studentReportModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStudentReport();});
+document.getElementById('studentDrawer').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStudentDrawer();});
 
 // ======================================================
 // HELPERS
