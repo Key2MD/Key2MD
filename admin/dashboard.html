@@ -1872,6 +1872,8 @@ const SS_KEY = 'k2md_admin_token';
 const LEGACY_HANDOFF_KEY = 'k2md_admin_token_handoff';
 const MOCK_READER_CHANNEL_PREFIX = 'k2md_mock_reader_handoff_';
 const WARM_OUTREACH_LOCAL_KEY = 'k2md_warm_outreach_local_v1';
+const NAV_SEEN_KEY = 'k2md_admin_nav_seen_v1';
+const NAV_NOTIFY_PAGES = new Set(['s2','mmi','mocks','warmleads','sharing','enquiries']);
 
 const S = {
  token: null,
@@ -2043,6 +2045,10 @@ function nav(page, opts={}) {
  if (target==='s2' && !S.s2Reviews.length) loadS2Reviews();
  if (target==='revenue' && !S.revenue.length) loadRevenue();
  if (target==='monitoring') loadMonitoring();
+ if (NAV_NOTIFY_PAGES.has(target)) {
+ markNavSeen(target);
+ updateNavBadges();
+ }
 }
 
 window.addEventListener('hashchange', () => {
@@ -2309,6 +2315,96 @@ async function refreshAll() {
  await bootLoad();
 }
 
+function readNavSeen() {
+ try { return JSON.parse(localStorage.getItem(NAV_SEEN_KEY) || '{}') || {}; }
+ catch { return {}; }
+}
+
+function writeNavSeen(seen) {
+ localStorage.setItem(NAV_SEEN_KEY, JSON.stringify(seen || {}));
+}
+
+function markNavSeen(page) {
+ if (!NAV_NOTIFY_PAGES.has(page)) return;
+ const seen = readNavSeen();
+ seen[page] = new Date().toISOString();
+ writeNavSeen(seen);
+}
+
+function itemTime(item, fields) {
+ for (const field of fields) {
+ const value = item?.[field];
+ const time = Date.parse(value || '');
+ if (Number.isFinite(time)) return time;
+ }
+ return 0;
+}
+
+function latestItemIso(rows, fields) {
+ let best = 0;
+ for (const row of rows || []) best = Math.max(best, itemTime(row, fields));
+ return best ? new Date(best).toISOString() : '';
+}
+
+function ensureNavSeenBaselines(data) {
+ const seen = readNavSeen();
+ let changed = false;
+ for (const [page, config] of Object.entries(data)) {
+ if (seen[page]) continue;
+ const latest = latestItemIso(config.rows || [], config.fields || ['created_at']);
+ seen[page] = latest || new Date().toISOString();
+ changed = true;
+ }
+ if (changed) writeNavSeen(seen);
+ return seen;
+}
+
+function newItemCount(page, rows, fields, filter = null, seen = readNavSeen()) {
+ const after = Date.parse(seen[page] || '') || 0;
+ return (rows || []).filter(row => (!filter || filter(row)) && itemTime(row, fields) > after).length;
+}
+
+function setNavBadge(id, count, label) {
+ const el = document.getElementById(id);
+ if (!el) return;
+ el.textContent = count > 99 ? '99+' : String(count || 0);
+ el.title = label || '';
+ el.classList.toggle('show', count > 0);
+}
+
+function uniqueMockNotificationRows() {
+ const map = new Map();
+ [...(S.mockAttempts || []), ...(S.mockManualReviews || [])].forEach(row => {
+ if (!row?.id) return;
+ const prev = map.get(row.id) || {};
+ map.set(row.id, { ...prev, ...row });
+ });
+ return [...map.values()].filter(row => mockNeedsAttention(row));
+}
+
+function updateNavBadges() {
+ const unread = S.conversations.filter(c=>c.messages?.some(m=>m.direction==='inbound'&&!m.read)).length;
+ const mockRows = uniqueMockNotificationRows();
+ const warmRows = (S.warmLeads || []).filter(row => Number(row.lead_score || 0) >= 55);
+ const sharingRows = (S.sharingWatchlist || []).filter(row => ['high','medium'].includes(String(row.risk?.level || '')));
+ const data = {
+ s2: { rows: S.s2Reviews || [], fields: ['created_at'] },
+ mmi: { rows: S.mmiReviews || [], fields: ['created_at'] },
+ mocks: { rows: mockRows, fields: ['manual_review_paid_at','completed_at','updated_at','created_at'] },
+ warmleads: { rows: warmRows, fields: ['last_activity_at','last_review_at','last_mmi_at','updated_at','created_at'] },
+ sharing: { rows: sharingRows, fields: ['last_seen_at','updated_at','created_at'] },
+ enquiries: { rows: S.enquiries || [], fields: ['created_at'] },
+ };
+ const seen = ensureNavSeenBaselines(data);
+ setNavBadge('s2Badge', newItemCount('s2', data.s2.rows, data.s2.fields, null, seen), 'New S2 reviews since you opened S2');
+ setNavBadge('mmiBadge', newItemCount('mmi', data.mmi.rows, data.mmi.fields, null, seen), 'New MMI reviews since you opened MMI');
+ setNavBadge('mockBadge', newItemCount('mocks', data.mocks.rows, data.mocks.fields, null, seen), 'New mock items needing attention');
+ setNavBadge('warmLeadBadge', newItemCount('warmleads', data.warmleads.rows, data.warmleads.fields, null, seen), 'New warm leads since you opened Warm Leads');
+ setNavBadge('sharingBadge', newItemCount('sharing', data.sharing.rows, data.sharing.fields, null, seen), 'New account-sharing signals since you opened Sharing Watchlist');
+ setNavBadge('enqBadge', newItemCount('enquiries', data.enquiries.rows, data.enquiries.fields, null, seen), 'New enquiries since you opened Enquiries');
+ setNavBadge('inboxBadge', unread, 'Unread inbox conversations');
+}
+
 // ======================================================
 // DASHBOARD
 // ======================================================
@@ -2378,28 +2474,13 @@ function updateDashboard() {
  document.getElementById('dUnread').textContent = unread;
  document.getElementById('dashHeadline').textContent = `${todayReviews} CASPer + ${todayS2} S2 reviews today | ${mmi.filter(r=>isToday(r.created_at)).length} MMI sessions | ${manualPending} mock review${manualPending===1?'':'s'} pending | ${unread} unread message${unread===1?'':'s'}`;
  document.getElementById('dashBrief').textContent =
- `${users.length} registered students | ${paying} paying customers | ${pro} CASPer Pro | ${mmi.length} MMI sessions total | ${mocks.length} saved mock exams | ${enqs7} enquiries in the last 7 days`;
-
- document.getElementById('dashBrief').textContent =
- `${users.length} registered students | ${paying} paying customers | ${pro} CASPer Pro | ${mmiPro} MMI Pro | ${mmi.length} MMI sessions total | ${mocks.length} saved mock exams | ${enqs7} enquiries in the last 7 days`;
- document.getElementById('dashBrief').textContent =
- `${users.length} registered students - ${paying} paying customers - ${reviews.length} CASPer - ${s2.length} S2 essays - ${mmi.length} MMI sessions - ${mocks.length} saved mock exams - ${enqs7} enquiries in the last 7 days`;
+ `${users.length} registered students | ${paying} paying customers | ${pro} CASPer Pro | ${mmiPro} MMI Pro | ${reviews.length} CASPer reviews | ${s2.length} S2 essays | ${mocks.length} saved mock exams | ${enqs7} enquiries in 7 days`;
  renderActionQueue({unread,enqs7,noReviews,credits,freeToday,avgScore,scoredCount:scored.length,manualPending,manualAging,parseFailures,whisperFailures,paying7,sharingHigh,sharingMedium,warmHot,warmStrong});
  renderBusinessInsights({conversion,pro,mmiPro,paying,users,credits,reviews,s2,todayReviews,todayS2,signups7,enqs7,avgScore,mmi});
  renderActivityFeed();
  renderReviewQuality();
 
- // MMI badge
- const s2b = document.getElementById('s2Badge');
- if (s2b) { s2b.textContent = s2.length; s2b.classList.toggle('show', s2.length>0); }
- const mb = document.getElementById('mmiBadge');
- if (mb) { mb.textContent = mmi.length; mb.classList.toggle('show', mmi.length>0); }
- const mockBadge = document.getElementById('mockBadge');
- if (mockBadge) { mockBadge.textContent = manualPending || mocks.length; mockBadge.classList.toggle('show', manualPending>0 || mocks.length>0); }
- const sharingBadge = document.getElementById('sharingBadge');
- if (sharingBadge) { sharingBadge.textContent = sharingHigh || sharingMedium || 0; sharingBadge.classList.toggle('show', sharingHigh>0 || sharingMedium>0); }
- const warmBadge = document.getElementById('warmLeadBadge');
- if (warmBadge) { warmBadge.textContent = warmStrong || 0; warmBadge.classList.toggle('show', warmStrong>0); }
+ updateNavBadges();
 
  const enqEl = document.getElementById('dashRecentEnq');
  enqEl.innerHTML = enqs.slice(0,5).map(e=>`
@@ -2414,11 +2495,6 @@ function updateDashboard() {
  <span class="dash-row-label">${esc(u.name||u.email.split('@')[0])} <span style="color:var(--muted2);font-size:0.75rem;">${emailWithDuplicateFlag(u.email,u)}</span></span>
  <span class="dash-row-val">${subscriptionBadges(u)}</span>
  </div>`).join('')||'<div style="color:var(--muted2);font-size:0.8rem;">No users yet</div>';
-
- const ib = document.getElementById('inboxBadge');
- ib.textContent = unread; ib.classList.toggle('show', unread>0);
- const eb = document.getElementById('enqBadge');
- eb.textContent = enqs.length; eb.classList.toggle('show', enqs.length>0);
 }
 
 function renderActionQueue(m) {
@@ -4816,9 +4892,7 @@ function renderConvList() {
  </div>`;
  }).join('');
  // Update badge
- const unreadCt = S.conversations.filter(c=>c.messages?.some(m=>m.direction==='inbound'&&!m.read)).length;
- const badge = document.getElementById('inboxBadge');
- badge.textContent = unreadCt; badge.classList.toggle('show', unreadCt>0);
+ updateNavBadges();
 }
 
 function filterConvs() {
