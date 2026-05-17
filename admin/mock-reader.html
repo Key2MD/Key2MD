@@ -481,7 +481,7 @@ function stationScore(row){
       return `<div class="mock-video-shell">
         <div class="mock-video-stage">
           <video id="${id}" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="cursor:pointer"></video>
-          <button type="button" id="${id}Overlay" class="mock-video-overlay" onclick="playAdminRecording('${esc(id)}')">
+          <button type="button" id="${id}Overlay" class="mock-video-overlay" data-video-action="play" data-video-id="${esc(id)}">
             <span>
               <span class="mock-video-playmark">&#9658;</span>
               <span class="mock-video-overlay-title" id="${id}OverlayTitle">Load recording</span>
@@ -491,7 +491,7 @@ function stationScore(row){
         </div>
         <div class="mock-video-bar">
           <div class="mock-video-row">
-            <button type="button" id="${id}Btn" class="mock-video-btn" aria-label="Play recording">&#9658;</button>
+            <button type="button" id="${id}Btn" class="mock-video-btn" data-video-action="play" data-video-id="${esc(id)}" aria-label="Play recording">&#9658;</button>
             <div class="mock-video-track">
               <div class="mock-video-bg"><div id="${id}Fill" class="mock-video-fill"></div></div>
               <input id="${id}Range" class="mock-video-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording">
@@ -501,10 +501,10 @@ function stationScore(row){
           <div id="${id}Status" class="mock-video-status">Recording is ready to load.</div>
         </div>
         <div class="mock-video-actions">
-          <button type="button" id="${id}LoadBtn" class="mock-video-action" onclick="loadAdminRecording('${esc(id)}')">Load stream</button>
-          <button type="button" id="${id}RetryBtn" class="mock-video-action" onclick="reloadAdminRecording('${esc(id)}')" hidden>Retry</button>
+          <button type="button" id="${id}LoadBtn" class="mock-video-action" data-video-action="load" data-video-id="${esc(id)}">Load stream</button>
+          <button type="button" id="${id}RetryBtn" class="mock-video-action" data-video-action="retry" data-video-id="${esc(id)}" hidden>Retry</button>
           <a id="${id}Download" class="mock-video-action" href="#" target="_blank" rel="noopener" download hidden>Download original</a>
-          <button type="button" class="mock-video-action" onclick="copyRecordingKey('${esc(id)}')">Copy key</button>
+          <button type="button" class="mock-video-action" data-video-action="copy" data-video-id="${esc(id)}">Copy key</button>
         </div>
       </div>`;
     }
@@ -682,6 +682,30 @@ function stationScore(row){
       if(retry)retry.hidden=state!=='error';
     }
 
+    function bindVideoButton(id,suffix,handler){
+      const el=document.getElementById(id+suffix);
+      if(!el || el.dataset.bound==='1')return;
+      el.dataset.bound='1';
+      el.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        handler();
+      });
+    }
+
+    document.addEventListener('click',event=>{
+      const control=event.target.closest('[data-video-action]');
+      if(!control)return;
+      const id=control.dataset.videoId||'adminVideoPlayer';
+      const action=control.dataset.videoAction;
+      event.preventDefault();
+      event.stopPropagation();
+      if(action==='play')playAdminRecording(id);
+      else if(action==='load')loadAdminRecording(id);
+      else if(action==='retry')reloadAdminRecording(id);
+      else if(action==='copy')copyRecordingKey(id);
+    });
+
     function attachVideoDownload(id,url,key){
       const link=document.getElementById(id+'Download');
       if(!link)return;
@@ -713,6 +737,7 @@ function stationScore(row){
       try{
         const data=await createAdminPlaybackUrl(key);
         video.src=data.playback_url;
+        video.dataset.playbackMode='stream';
         video.dataset.loaded='1';
         video.dataset.loading='';
         video.dataset.playbackExpires=String(Date.now()+Number(data.expires_in||600)*1000);
@@ -725,12 +750,45 @@ function stationScore(row){
         video.dataset.playWhenReady='';
         if(shouldPlay)await playAdminRecording(id);
       }catch(err){
+        await loadAdminRecordingFallback(id,key,opts,err);
+      }
+    }
+
+    async function loadAdminRecordingFallback(id,key,opts={},streamErr=null){
+      const video=document.getElementById(id);
+      if(!video)return;
+      setVideoState(id,'loading','Trying fallback...','The streaming endpoint did not respond, so admin is trying the older secure download path.');
+      try{
+        const res=await fetch(API_BASE+'/api/admin/casper-mock/recording?key='+encodeURIComponent(key),{headers:authHeaders()});
+        if(!res.ok){
+          const data=await res.json().catch(()=>({}));
+          throw new Error(data.message||data.error||`Fallback recording fetch failed (${res.status}).`);
+        }
+        const blob=await res.blob();
+        if(video.dataset.blobUrl)URL.revokeObjectURL(video.dataset.blobUrl);
+        const url=URL.createObjectURL(blob);
+        video.dataset.blobUrl=url;
+        video.dataset.playbackMode='blob';
+        video.src=url;
+        video.dataset.loaded='1';
+        video.dataset.loading='';
+        attachVideoDownload(id,url,key);
+        video.load();
+        initVideoPlayer(id);
+        setVideoActionState(id,'ready');
+        setVideoState(id,'ready','Ready to play','Loaded by fallback. If streaming is still not deployed, this mode may take longer for large recordings.');
+        const shouldPlay=opts.playAfterLoad || video.dataset.playWhenReady==='1';
+        video.dataset.playWhenReady='';
+        if(shouldPlay)await playAdminRecording(id);
+      }catch(fallbackErr){
         video.dataset.loading='';
         video.dataset.loaded='';
         video.removeAttribute('src');
         attachVideoDownload(id,'',key);
         setVideoActionState(id,'error');
-        setVideoState(id,'error','Recording could not be loaded',err.message||'Refresh the admin session, then try again.');
+        const first = streamErr?.message ? `Stream: ${streamErr.message}` : 'Stream endpoint did not complete.';
+        const second = fallbackErr?.message ? ` Fallback: ${fallbackErr.message}` : '';
+        setVideoState(id,'error','Recording could not be loaded',`${first}${second}`);
       }
     }
 
@@ -766,7 +824,6 @@ function stationScore(row){
       const toggle=()=>{if(video.paused||video.ended)playAdminRecording(id);else video.pause();};
       if(!video.dataset.bound){
         video.dataset.bound='1';
-        btn.addEventListener('click',toggle);
         video.addEventListener('click',toggle);
         range.addEventListener('input',seek);
         ['loadedmetadata','loadeddata'].forEach(ev=>video.addEventListener(ev,()=>{tryCaptureAdminPoster(video);update();}));
