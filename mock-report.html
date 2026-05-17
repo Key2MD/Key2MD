@@ -66,10 +66,11 @@
  function fmtDate(value){if(!value)return '';try{return new Intl.DateTimeFormat('en-AU',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));}catch{return String(value);}}
  function fmtDuration(sec){const s=Math.max(0,Math.round(Number(sec)||0));return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
  function scoreColor(score){const n=Number(score);if(!Number.isFinite(n))return'var(--gray400)';if(n>=7)return'var(--green)';if(n>=5.5)return'var(--teal3)';if(n>=4.5)return'var(--amber)';return'var(--red)';}
+ function safeScore(value){if(value===null||value===undefined||value==='')return null;const n=Number(value);return Number.isFinite(n)&&n>0?Math.round(n*10)/10:null;}
  function hasFeedback(row){return !!(row?.feedback&&typeof row.feedback==='object'&&Object.keys(row.feedback).length);}
- function rowScore(row){if(!hasFeedback(row))return '-';const n=Number(row.feedback?.overall?.score??row.feedback?.score??row.score);return Number.isFinite(n)&&n>0?`${Math.round(n*10)/10}/10`:'-';}
- function feedback(row){const fb=row.feedback||{},overall=fb.overall||{};if(!hasFeedback(row)&&row.processing_error)return{strength:'Video analysis did not complete.',improve:row.processing_error};return{strength:overall.biggest_strength||fb.strengths||fb.strength||'No specific strength returned.',improve:overall.biggest_improvement||fb.improvements||fb.improve||'No specific improvement returned.'};}
- function numericScore(row){const n=Number(row?.feedback?.overall?.score??row?.feedback?.score??row?.score);return Number.isFinite(n)?n:null;}
+ function rowScore(row){if(!hasFeedback(row))return '-';const n=safeScore(row.feedback?.overall?.score??row.feedback?.score??row.score);return Number.isFinite(n)?`${n}/10`:'-';}
+ function feedback(row){const fb=row.feedback||{},overall=fb.overall||{},issue=row.processing_error||row.reprocess_error;if(!hasFeedback(row)&&issue)return{strength:'AI analysis did not complete.',improve:issue};return{strength:overall.biggest_strength||fb.strengths||fb.strength||'No specific strength returned.',improve:overall.biggest_improvement||fb.improvements||fb.improve||'No specific improvement returned.'};}
+ function numericScore(row){return safeScore(row?.feedback?.overall?.score??row?.feedback?.score??row?.score);}
  function avgScore(rows){const values=rows.map(numericScore).filter(Number.isFinite);return values.length?Math.round((values.reduce((sum,n)=>sum+n,0)/values.length)*10)/10:'-';}
  function statusLabel(status){return status==='ready'?'Ready':status==='work'?'Needs work':'Watch';}
  function readinessHTML(items){const rows=Array.isArray(items)&&items.length?items:[{label:'Overall repeatability',status:'watch',detail:'Open the station detail below and check whether the same weakness repeats.'}];return `<div class="readiness">${rows.map(item=>`<div class="ready-item"><div class="ready-head"><strong>${esc(item.label||'Readiness')}</strong><span class="status ${esc(item.status||'watch')}">${esc(statusLabel(item.status))}</span></div><p>${esc(item.detail||'Review the station evidence before deciding what to practise next.')}</p></div>`).join('')}</div>`;}
@@ -92,13 +93,17 @@
  function renderReport(){
  const rows=attempt.rows||[],report=attempt.report||{};
  const videoRows=rows.filter(r=>r.type==='video'),typedRows=rows.filter(r=>r.type!=='video');
+ const reviewedCount=rows.map(numericScore).filter(Number.isFinite).length;
+ const overallScore=avgScore(rows);
+ const reportTitle=reviewedCount<rows.length?`Reviewed stations: ${overallScore}/10`:report.interpretation?.band||'Your mock report';
+ const reportText=reviewedCount<rows.length?`${reviewedCount}/${rows.length} stations currently have AI feedback. Dan can reprocess the missing stations from admin.`:report.interpretation?.text||'Review your score pattern, station feedback, recordings, and transcripts from this full mock attempt.';
  const manual=String(attempt.manual_review_notes||'').trim();
  content.className='';
  content.innerHTML=`
  <section class="hero">
- <div class="hero-main"><div class="kicker">Full CASPer mock report</div><h1>${esc(report.interpretation?.band||'Your mock report')}</h1><p>${esc(report.interpretation?.text||'Review your score pattern, station feedback, recordings, and transcripts from this full mock attempt.')}</p></div>
+ <div class="hero-main"><div class="kicker">Full CASPer mock report</div><h1>${esc(reportTitle)}</h1><p>${esc(reportText)}</p></div>
  <div class="stats">
- <div class="stat"><strong>${esc(report.overallAvg??'-')}</strong><span>Overall /10</span></div>
+ <div class="stat"><strong>${esc(overallScore)}</strong><span>${reviewedCount<rows.length?'Reviewed avg':'Overall'} /10</span></div>
  <div class="stat"><strong>${rows.length}</strong><span>Stations</span></div>
  <div class="stat"><strong>${esc(avgScore(videoRows))}</strong><span>Video avg</span></div>
  <div class="stat"><strong>${esc(avgScore(typedRows))}</strong><span>Typed avg</span></div>
@@ -149,11 +154,11 @@
  function criteriaHTML(row){
  const fb=row.feedback||{};
  if(row.type==='video'){
- const items=[];(fb.per_prompt||[]).forEach((prompt,i)=>{Object.entries(prompt.scores||{}).forEach(([key,value])=>{const score=Number(value?.score);items.push(`<div class="criterion"><div class="criterion-head"><span>Prompt ${i+1} ${esc(key.replace(/_/g,' '))}</span><span style="color:${scoreColor(score)}">${Number.isFinite(score)?score+'/10':'-'}</span></div><p>${esc(value?.comment||value?.label||'')}</p></div>`);});});
+ const items=[];(fb.per_prompt||[]).forEach((prompt,i)=>{Object.entries(prompt.scores||{}).forEach(([key,value])=>{const score=safeScore(value?.score);items.push(`<div class="criterion"><div class="criterion-head"><span>Prompt ${i+1} ${esc(key.replace(/_/g,' '))}</span><span style="color:${scoreColor(score)}">${Number.isFinite(score)?score+'/10':'-'}</span></div><p>${esc(value?.comment||value?.label||'')}</p></div>`);});});
  return items.length?`<div class="criteria">${items.join('')}</div>`:'';
  }
  const raw=fb.competencies,items=Array.isArray(raw)?raw:(raw?Object.entries(raw).map(([key,value])=>typeof value==='object'?{name:key,...value}:{name:key,score:value}):[]);
- return items.length?`<div class="criteria">${items.map(item=>{const score=Number(item.score);return`<div class="criterion"><div class="criterion-head"><span>${esc(item.name||item.competency||'Competency')}</span><span style="color:${scoreColor(score)}">${Number.isFinite(score)?score+'/10':'-'}</span></div><p>${esc(item.improve||item.improvement||item.evidence||item.reason||item.note||'')}</p></div>`;}).join('')}</div>`:'';
+ return items.length?`<div class="criteria">${items.map(item=>{const score=safeScore(item.score);return`<div class="criterion"><div class="criterion-head"><span>${esc(item.name||item.competency||'Competency')}</span><span style="color:${scoreColor(score)}">${Number.isFinite(score)?score+'/10':'-'}</span></div><p>${esc(item.improve||item.improvement||item.evidence||item.reason||item.note||'')}</p></div>`;}).join('')}</div>`:'';
  }
  async function loadRecording(event,videoId){
  event?.stopPropagation?.();const video=document.getElementById(videoId),btn=event?.currentTarget;if(!video)return;

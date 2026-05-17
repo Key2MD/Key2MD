@@ -103,6 +103,10 @@
     .mock-video-range{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}
     .mock-video-time{min-width:74px;text-align:right;color:rgba(255,255,255,.72);font-size:.72rem;font-weight:800;font-variant-numeric:tabular-nums}
     .mock-video-status{padding:7px 12px 0;color:rgba(255,255,255,.62);font-size:.72rem;line-height:1.35}
+    .mock-video-actions{display:flex;gap:8px;flex-wrap:wrap;padding:0 12px 12px;background:#07111f}
+    .mock-video-action{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:7px 10px;font-size:.72rem;font-weight:850;text-decoration:none;cursor:pointer}
+    .mock-video-action:hover{background:rgba(255,255,255,.14)}
+    .mock-video-action[hidden]{display:none}
     .mock-sync-transcript{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:#fff;padding:8px;display:grid;gap:5px}
     .mock-sync-segment{width:100%;text-align:left;border:0;background:transparent;color:var(--ink);padding:8px 9px;border-radius:7px;font-weight:650;line-height:1.55;font-size:.84rem}
     .mock-sync-segment:hover{background:#f1f7fc;color:var(--navy)}
@@ -361,14 +365,18 @@
       const avg=scored.length?Math.round((scored.reduce((sum,n)=>sum+n,0)/scored.length)*10)/10:'-';
       const videoCount=rows.filter(r=>r.type==='video').length;
       const typedCount=rows.filter(r=>r.type!=='video').length;
-      const tabs=rows.map((r,i)=>{const score=stationScore(r);return `<button class="${i===currentStation?'active':''}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}${Number.isFinite(score)?` - ${Math.round(score*10)/10}`:r.processing_error?' - issue':''}</button>`;}).join('');
+      const typedIssueCount=rows.filter(needsTypedReprocess).length;
+      const tabs=rows.map((r,i)=>{const score=stationScore(r);return `<button class="${i===currentStation?'active':''}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}${Number.isFinite(score)?` - ${Math.round(score*10)/10}`:(r.processing_error||r.reprocess_error)?' - issue':''}</button>`;}).join('');
       document.getElementById('attemptPanel').innerHTML=`
         <div class="attempt-head">
           <div>
             <h2 style="margin:0">${esc(a.user_name||a.user_email||'Student')}</h2>
             <div class="muted">${esc(a.user_email||'No email')} | <span class="pill">${esc(a.tier||'mock')}</span> | ${esc(statusText(a.manual_review_status||'pending_review'))}</div>
           </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+          ${typedIssueCount?`<button id="reprocessTypedIssuesBtn" class="secondary" onclick="reprocessTypedIssues()">Reprocess ${typedIssueCount} typed issue${typedIssueCount===1?'':'s'}</button>`:''}
           <button class="secondary" onclick="saveNotes()">Save notes</button>
+          </div>
         </div>
         <div class="metric-row">
           <div class="metric"><strong>${esc(avg)}</strong><span>Average reviewed score</span></div>
@@ -377,6 +385,7 @@
           <div class="metric"><strong>${typedCount}</strong><span>Typed stations</span></div>
           <div class="metric"><strong>${esc(fmtDateTime(a.completed_at)||'-')}</strong><span>Completed</span></div>
         </div>
+        ${typedIssueCount?`<div id="bulkReprocessStatus" class="muted" style="margin:0 0 12px;"></div>`:''}
         <div class="tabs">${tabs}</div>
         <div>${stationHtml(rows[currentStation])}</div>
         <div class="review-box" style="margin-top:16px">
@@ -390,7 +399,7 @@
           <div id="saveStatus" class="muted" style="margin-top:8px"></div>
         </div>
       `;
-      if(rows[currentStation]?.type==='video') setTimeout(()=>loadAdminRecording('adminVideoPlayer'),0);
+      if(rows[currentStation]?.type==='video') setTimeout(()=>initVideoPlayer('adminVideoPlayer'),0);
     }
 
     function fmtTime(seconds){
@@ -409,14 +418,18 @@
       return !!(row?.feedback && typeof row.feedback==='object' && Object.keys(row.feedback).length);
     }
 
-    function stationScore(row){
+    function needsTypedReprocess(row){
+      return row?.type!=='video' && String(row?.answer||'').trim().length>=20 && (!hasFeedback(row) || !!row.processing_error || !!row.reprocess_error);
+    }
+
+function stationScore(row){
       if(!hasFeedback(row))return null;
       const fb=row.feedback||{}, overall=fb.overall||{};
       const score=Number(overall.score ?? fb.score ?? row.score);
       return Number.isFinite(score)&&score>0 ? score : null;
     }
 
-    function videoPlayerHtml(recordingKey,r,id='adminVideoPlayer'){
+    function legacyVideoPlayerHtml(recordingKey,r,id='adminVideoPlayer'){
       const duration=rowDuration(r);
       if(!recordingKey){
         return `<div class="mock-video-shell" style="min-height:190px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:18px;">
@@ -449,6 +462,49 @@
             <div id="${id}Time" class="mock-video-time">0:00 / ${duration?fmtTime(duration):'--:--'}</div>
           </div>
           <div id="${id}Status" class="mock-video-status">Loading secure recording...</div>
+        </div>
+      </div>`;
+    }
+
+    function videoPlayerHtml(recordingKey,r,id='adminVideoPlayer'){
+      const duration=rowDuration(r);
+      if(!recordingKey){
+        return `<div class="mock-video-shell" style="min-height:190px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:18px;">
+          <div>
+            <div class="mock-video-playmark" style="background:rgba(255,255,255,.12);color:#fff;">!</div>
+            <div style="font-weight:850;margin-bottom:6px;">No recording key saved</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.68);line-height:1.5;">${duration?`The browser captured about ${fmtTime(duration)}, but the analysis/upload did not return a playable recording.`:'The video upload did not complete for this station.'}</div>
+          </div>
+        </div>`;
+      }
+      const keyAttr = recordingKey ? ` data-recording-key="${esc(recordingKey)}"` : '';
+      return `<div class="mock-video-shell">
+        <div class="mock-video-stage">
+          <video id="${id}" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="cursor:pointer"></video>
+          <button type="button" id="${id}Overlay" class="mock-video-overlay" onclick="playAdminRecording('${esc(id)}')">
+            <span>
+              <span class="mock-video-playmark">&#9658;</span>
+              <span class="mock-video-overlay-title" id="${id}OverlayTitle">Load recording</span>
+              <span class="mock-video-overlay-sub" id="${id}OverlaySub">Creates a short-lived secure stream so the video can play normally instead of waiting for a full download.</span>
+            </span>
+          </button>
+        </div>
+        <div class="mock-video-bar">
+          <div class="mock-video-row">
+            <button type="button" id="${id}Btn" class="mock-video-btn" aria-label="Play recording">&#9658;</button>
+            <div class="mock-video-track">
+              <div class="mock-video-bg"><div id="${id}Fill" class="mock-video-fill"></div></div>
+              <input id="${id}Range" class="mock-video-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording">
+            </div>
+            <div id="${id}Time" class="mock-video-time">0:00 / ${duration?fmtTime(duration):'--:--'}</div>
+          </div>
+          <div id="${id}Status" class="mock-video-status">Recording is ready to load.</div>
+        </div>
+        <div class="mock-video-actions">
+          <button type="button" id="${id}LoadBtn" class="mock-video-action" onclick="loadAdminRecording('${esc(id)}')">Load stream</button>
+          <button type="button" id="${id}RetryBtn" class="mock-video-action" onclick="reloadAdminRecording('${esc(id)}')" hidden>Retry</button>
+          <a id="${id}Download" class="mock-video-action" href="#" target="_blank" rel="noopener" download hidden>Download original</a>
+          <button type="button" class="mock-video-action" onclick="copyRecordingKey('${esc(id)}')">Copy key</button>
         </div>
       </div>`;
     }
@@ -516,7 +572,7 @@
       try{ video.currentTime=target; }catch{ video.removeEventListener('seeked',onSeeked); }
     }
 
-    async function loadAdminRecording(id='adminVideoPlayer',opts={}){
+    async function legacyLoadAdminRecording(id='adminVideoPlayer',opts={}){
       const video=document.getElementById(id);
       if(!video)return;
       const key=video.dataset.recordingKey||'';
@@ -556,7 +612,7 @@
       if(shouldPlay && video.dataset.loaded==='1')await playAdminRecording(id);
     }
 
-    function initVideoPlayer(id='adminVideoPlayer'){
+    function legacyInitVideoPlayer(id='adminVideoPlayer'){
       const video=document.getElementById(id), btn=document.getElementById(id+'Btn'), range=document.getElementById(id+'Range'), fill=document.getElementById(id+'Fill'), time=document.getElementById(id+'Time');
       if(!video||!btn||!range||!fill||!time)return;
       setAdminFallbackPoster(video);
@@ -589,7 +645,7 @@
       update();
     }
 
-    async function playAdminRecording(id='adminVideoPlayer'){
+    async function legacyPlayAdminRecording(id='adminVideoPlayer'){
       const video=document.getElementById(id);
       if(!video)return;
       if(video.dataset.loaded!=='1' || !video.getAttribute('src')){
@@ -602,6 +658,147 @@
       }catch{
         setVideoState(id,'ready','Ready to play','Your browser blocked autoplay. Press the play button once more.');
       }
+    }
+
+    async function createAdminPlaybackUrl(key){
+      const res=await fetch(API_BASE+'/api/admin/casper-mock/recording-token',{
+        method:'POST',
+        headers:{...authHeaders(),'Content-Type':'application/json'},
+        body:JSON.stringify({key})
+      });
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok || !data.playback_url)throw new Error(data.message||data.error||'Could not create secure playback URL.');
+      return data;
+    }
+
+    function setVideoActionState(id,state){
+      const load=document.getElementById(id+'LoadBtn');
+      const retry=document.getElementById(id+'RetryBtn');
+      if(load){
+        load.hidden=state==='ready'||state==='playing';
+        load.disabled=state==='loading';
+        load.textContent=state==='loading'?'Creating stream...':'Load stream';
+      }
+      if(retry)retry.hidden=state!=='error';
+    }
+
+    function attachVideoDownload(id,url,key){
+      const link=document.getElementById(id+'Download');
+      if(!link)return;
+      link.href=url||'#';
+      link.download=`key2md-casper-mock-${String(key||'recording').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,80)||'recording'}.webm`;
+      link.hidden=!url;
+    }
+
+    async function loadAdminRecording(id='adminVideoPlayer',opts={}){
+      const video=document.getElementById(id);
+      if(!video)return;
+      const key=video.dataset.recordingKey||'';
+      setAdminFallbackPoster(video);
+      if(!key){initVideoPlayer(id);return;}
+      if(video.dataset.loaded==='1' && video.getAttribute('src')){
+        initVideoPlayer(id);
+        if(opts.playAfterLoad)await playAdminRecording(id);
+        return;
+      }
+      if(video.dataset.loading==='1'){
+        if(opts.playAfterLoad)video.dataset.playWhenReady='1';
+        setVideoState(id,'loading','Creating stream...','The secure playback URL is being prepared.');
+        setVideoActionState(id,'loading');
+        return;
+      }
+      video.dataset.loading='1';
+      setVideoActionState(id,'loading');
+      setVideoState(id,'loading','Creating stream...','Preparing a short-lived secure stream for this recording.');
+      try{
+        const data=await createAdminPlaybackUrl(key);
+        video.src=data.playback_url;
+        video.dataset.loaded='1';
+        video.dataset.loading='';
+        video.dataset.playbackExpires=String(Date.now()+Number(data.expires_in||600)*1000);
+        attachVideoDownload(id,data.playback_url,key);
+        video.load();
+        initVideoPlayer(id);
+        setVideoActionState(id,'ready');
+        setVideoState(id,'ready','Ready to play','Click play. The video now streams through the browser player instead of waiting for a full download.');
+        const shouldPlay=opts.playAfterLoad || video.dataset.playWhenReady==='1';
+        video.dataset.playWhenReady='';
+        if(shouldPlay)await playAdminRecording(id);
+      }catch(err){
+        video.dataset.loading='';
+        video.dataset.loaded='';
+        video.removeAttribute('src');
+        attachVideoDownload(id,'',key);
+        setVideoActionState(id,'error');
+        setVideoState(id,'error','Recording could not be loaded',err.message||'Refresh the admin session, then try again.');
+      }
+    }
+
+    async function reloadAdminRecording(id='adminVideoPlayer'){
+      const video=document.getElementById(id);
+      if(!video)return;
+      video.pause?.();
+      video.dataset.loaded='';
+      video.dataset.loading='';
+      video.removeAttribute('src');
+      await loadAdminRecording(id);
+    }
+
+    function initVideoPlayer(id='adminVideoPlayer'){
+      const video=document.getElementById(id), btn=document.getElementById(id+'Btn'), range=document.getElementById(id+'Range'), fill=document.getElementById(id+'Fill'), time=document.getElementById(id+'Time');
+      if(!video||!btn||!range||!fill||!time)return;
+      setAdminFallbackPoster(video);
+      const hint=()=>{const n=Number(video.dataset.duration||0);return Number.isFinite(n)&&n>0?n:0;};
+      const dur=()=>{const d=Number(video.duration);return Number.isFinite(d)&&d>0&&d<86400?d:hint();};
+      const update=()=>{
+        const d=dur(), cur=Math.max(0,Number(video.currentTime)||0), pct=d?Math.max(0,Math.min(1,cur/d)):0;
+        range.value=String(Math.round(pct*1000));
+        fill.style.width=(pct*100)+'%';
+        time.textContent=`${fmtTime(cur)} / ${d?fmtTime(d):'--:--'}`;
+        btn.innerHTML=video.paused||video.ended?'&#9658;':'&#10074;&#10074;';
+        if(video.dataset.loaded==='1'){
+          if(video.paused||video.ended)setVideoState(id,'ready','Ready to play','Click play to review the recording with the transcript.');
+          else setVideoState(id,'playing','Playing','Transcript highlighting follows the current playback time.');
+        }
+        syncAdminTranscript(id,cur);
+      };
+      const seek=()=>{const d=dur();if(!d)return;video.currentTime=(Number(range.value)/1000)*d;update();};
+      const toggle=()=>{if(video.paused||video.ended)playAdminRecording(id);else video.pause();};
+      if(!video.dataset.bound){
+        video.dataset.bound='1';
+        btn.addEventListener('click',toggle);
+        video.addEventListener('click',toggle);
+        range.addEventListener('input',seek);
+        ['loadedmetadata','loadeddata'].forEach(ev=>video.addEventListener(ev,()=>{tryCaptureAdminPoster(video);update();}));
+        ['durationchange','timeupdate','play','pause','ended','seeked'].forEach(ev=>video.addEventListener(ev,update));
+        video.addEventListener('error',()=>{setVideoActionState(id,'error');setVideoState(id,'error','Playback failed','Use Retry to create a fresh secure stream, or download the original file.');});
+      }
+      setVideoActionState(id,video.dataset.loaded==='1'?'ready':'idle');
+      update();
+    }
+
+    async function playAdminRecording(id='adminVideoPlayer'){
+      const video=document.getElementById(id);
+      if(!video)return;
+      if(video.dataset.loaded!=='1' || !video.getAttribute('src')){
+        await loadAdminRecording(id,{playAfterLoad:true});
+        return;
+      }
+      try{
+        await video.play();
+        setVideoActionState(id,'playing');
+        setVideoState(id,'playing','Playing','Transcript highlighting follows the current playback time.');
+      }catch{
+        setVideoState(id,'ready','Ready to play','Your browser blocked autoplay. Press the play button once more.');
+      }
+    }
+
+    async function copyRecordingKey(id='adminVideoPlayer'){
+      const video=document.getElementById(id);
+      const key=video?.dataset?.recordingKey||'';
+      if(!key)return;
+      try{await navigator.clipboard.writeText(key);setVideoState(id,video.dataset.loaded==='1'?'ready':'idle','Recording key copied','Paste it into notes or SOS if needed.');}
+      catch{setVideoState(id,video.dataset.loaded==='1'?'ready':'idle','Recording key',key);}
     }
 
     function transcriptSegments(row){
@@ -663,7 +860,8 @@
     function stationHtml(r){
       if(!r)return '<div class="muted">No station selected.</div>';
       const station=r.station||{};
-      const issue=r.processing_error?`<div class="review-box" style="border-color:#fed7aa;background:#fff7ed;color:#7c2d12;"><div class="section-label" style="color:#c2410c;">Analysis issue</div><div class="text-block">${esc(r.processing_error)}</div></div>`:'';
+      const issueText=r.processing_error||r.reprocess_error||'';
+      const issue=issueText?`<div class="review-box" style="border-color:#fed7aa;background:#fff7ed;color:#7c2d12;"><div class="section-label" style="color:#c2410c;">Analysis issue</div><div class="text-block">${esc(issueText)}</div></div>`:'';
       if(r.type==='video'){
         const key=r.recording_key;
         const canReprocess=key && (!hasFeedback(r) || r.processing_error || !r.transcript);
@@ -697,9 +895,18 @@
           </div>
         </div>`;
       }
+      const canReprocessTyped=needsTypedReprocess(r);
+      const typedReprocess=canReprocessTyped?`<div class="review-box" style="border-color:#bae6fd;background:#f0f9ff;">
+        <div class="section-label" style="color:#0369a1;">Safety net</div>
+        <div class="text-block" style="margin-bottom:10px;">Re-run AI feedback from the saved typed answer. Use this when a mock typed station shows a credit/pass issue or no feedback.</div>
+        <button id="reprocessBtn" class="secondary" type="button" onclick="reprocessCurrentStation()">Reprocess typed answer</button>
+        <div id="reprocessStatus" class="muted" style="margin-top:8px;"></div>
+      </div>`:'';
       return `<div class="station-grid">
         <div>
           ${scenarioHtml(station)}
+          ${issue}
+          ${typedReprocess}
           ${textPanel('Typed answer', r.answer, 'No typed answer captured.')}
         </div>
         <div>${feedbackHtml(r.feedback||{}, r)}</div>
@@ -729,7 +936,7 @@
 
     function feedbackHtml(fb,row){
       if(!fb || !Object.keys(fb).length){
-        const issue=row?.processing_error || 'No AI feedback returned for this station.';
+        const issue=row?.processing_error || row?.reprocess_error || 'No AI feedback returned for this station.';
         return `<div class="feedback-shell"><h3>AI Feedback</h3><div class="muted">${esc(issue)}</div></div>`;
       }
       const overall=fb.overall||{};
@@ -861,10 +1068,12 @@
 
     async function reprocessCurrentStation(){
       if(!currentAttempt)return;
+      const row=(currentAttempt.rows||[])[currentStation]||{};
+      const isTyped=row.type!=='video';
       const btn=document.getElementById('reprocessBtn');
       const status=document.getElementById('reprocessStatus');
       if(btn){btn.disabled=true;btn.textContent='Reprocessing...';}
-      if(status)status.textContent='Running transcript and AI feedback from the saved recording. This may take a minute.';
+      if(status)status.textContent=isTyped?'Running AI feedback from the saved typed answer. This may take a minute.':'Running transcript and AI feedback from the saved recording. This may take a minute.';
       try{
         const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/reprocess',{
           method:'POST',
@@ -876,8 +1085,39 @@
         currentAttempt=data.attempt||currentAttempt;
         renderAttempt();
       }catch(err){
-        if(btn){btn.disabled=false;btn.textContent='Reprocess saved recording';}
+        if(btn){btn.disabled=false;btn.textContent=isTyped?'Reprocess typed answer':'Reprocess saved recording';}
         if(status)status.textContent=err.message||'Reprocess failed.';
+      }
+    }
+
+    async function reprocessTypedIssues(){
+      if(!currentAttempt)return;
+      const btn=document.getElementById('reprocessTypedIssuesBtn');
+      const status=document.getElementById('bulkReprocessStatus');
+      const rows=currentAttempt.rows||[];
+      const indexes=rows.map((row,index)=>needsTypedReprocess(row)?index:null).filter(Number.isInteger);
+      if(!indexes.length)return;
+      if(btn){btn.disabled=true;btn.textContent='Reprocessing typed issues...';}
+      try{
+        for(let i=0;i<indexes.length;i++){
+          const rowIndex=indexes[i];
+          currentStation=rowIndex;
+          if(status)status.textContent=`Reprocessing typed issue ${i+1}/${indexes.length}...`;
+          const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/reprocess',{
+            method:'POST',
+            headers:{...authHeaders(),'Content-Type':'application/json'},
+            body:JSON.stringify({row_index:rowIndex})
+          });
+          const data=await res.json().catch(()=>({}));
+          if(!res.ok)throw new Error(data.message||data.error||`Typed ${rowIndex+1} failed`);
+          currentAttempt=data.attempt||currentAttempt;
+        }
+        if(status)status.textContent='Typed issue reprocessing complete.';
+        renderAttempt();
+      }catch(err){
+        if(btn){btn.disabled=false;btn.textContent=`Reprocess ${indexes.length} typed issue${indexes.length===1?'':'s'}`;}
+        if(status)status.textContent=err.message||'Bulk reprocess failed.';
+        renderAttempt();
       }
     }
 

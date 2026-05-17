@@ -666,6 +666,12 @@ function normalizeCompetencyName(name) {
  return COMPETENCY_LOOKUP[key] || null;
 }
 
+function safeNumericScore(value) {
+ if (value === null || value === undefined || value === '') return null;
+ const score = Number(value);
+ return Number.isFinite(score) && score > 0 ? Math.round(score * 10) / 10 : null;
+}
+
 function normalizeCompetencies(raw) {
  if (!raw) return [];
  let items = [];
@@ -681,11 +687,11 @@ function normalizeCompetencies(raw) {
  const byName = {};
  items.forEach(item => {
  const name = normalizeCompetencyName(item.name || item.competency || item.label);
- const score = Number(item.score);
+ const score = safeNumericScore(item.score);
  if (!name || !Number.isFinite(score)) return;
  byName[name] = {
  name,
- score: Math.max(1, Math.min(10, Math.round(score * 10) / 10)),
+ score: Math.max(1, Math.min(10, score)),
  evidence: String(item.evidence || item.reason || item.note || '').trim(),
  improve: String(item.improve || item.improvement || item.next_step || item.nextStep || '').trim(),
  };
@@ -784,7 +790,8 @@ function mockCardHTML(attempt) {
  const report = attempt.report || {};
  const completed = formatDate(attempt.completed_at);
  const expires = mockExpiryText(attempt);
- const score = Number.isFinite(Number(report.overallAvg)) ? `${Math.round(Number(report.overallAvg) * 10) / 10}/10` : '-';
+ const avg = mockAttemptAverage(attempt);
+ const score = Number.isFinite(avg) ? `${avg}/10` : '-';
  const manual = attempt.manual_review_paid ? 'Manual review requested' : 'AI report';
  const statusClass = attempt.expired ? ' warn' : '';
  const stationCount = attempt.station_count || rows.length || 11;
@@ -896,10 +903,11 @@ function mockTypedAnswerHTML(row) {
 function mockFeedback(row) {
  const fb = row.feedback || {};
  const overall = fb.overall || {};
- if ((!fb || !Object.keys(fb).length) && row.processing_error) {
+ const issue = row.processing_error || row.reprocess_error;
+ if ((!fb || !Object.keys(fb).length) && issue) {
  return {
- strength: 'Video analysis did not complete.',
- improve: row.processing_error,
+ strength: 'AI analysis did not complete.',
+ improve: issue,
  };
  }
  return {
@@ -914,7 +922,7 @@ function mockCriteriaHTML(row) {
  const items = [];
  (fb.per_prompt || []).forEach((prompt, i) => {
  Object.entries(prompt.scores || {}).forEach(([key, value]) => {
- const score = Number(value?.score);
+ const score = safeNumericScore(value?.score);
  items.push(`<div class="competency-row"><div class="competency-row-head"><span class="competency-row-name">Prompt ${i + 1} ${escapeHtml(niceMockKey(key))}</span><span class="competency-row-score" style="color:${scoreColor(Number.isFinite(score) ? score : 0)};">${Number.isFinite(score) ? score + '/10' : '-'}</span></div><div class="competency-row-detail">${escapeHtml(value?.comment || value?.label || '')}</div></div>`);
  });
  });
@@ -1394,9 +1402,16 @@ function mockExpiryText(attempt) {
  return `${days} days left`;
 }
 
+function mockAttemptAverage(attempt) {
+ const rows = Array.isArray(attempt?.rows) ? attempt.rows : [];
+ const scores = rows.map(row => safeNumericScore(row?.feedback?.overall?.score ?? row?.feedback?.score ?? row?.score)).filter(Number.isFinite);
+ if (scores.length) return Math.round((scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10) / 10;
+ return safeNumericScore(attempt?.report?.overallAvg);
+}
+
 function mockRowScore(row) {
- const score = Number(row?.score);
- return Number.isFinite(score) ? `${Math.round(score * 10) / 10}/10` : 'No score';
+ const score = safeNumericScore(row?.feedback?.overall?.score ?? row?.feedback?.score ?? row?.score);
+ return Number.isFinite(score) ? `${score}/10` : 'No score';
 }
 
 function formatDuration(seconds) {

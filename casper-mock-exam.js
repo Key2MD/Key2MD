@@ -946,7 +946,7 @@ window.FullCasperMock = (() => {
  row.visualDegraded = !!data?.visual_degraded;
  row.processingError = data?.processing_error || data?.message || null;
  } else {
- row.score = Number.isFinite(Number(data?.score)) ? Number(data.score) : null;
+ row.score = scoreValue(data?.score);
  row.feedback = data?.feedback || null;
  }
  }
@@ -1629,10 +1629,9 @@ window.FullCasperMock = (() => {
  return `${mins}:${String(secs).padStart(2, '0')}`;
  }
 
- function videoScore(feedback) {
- const score = Number(feedback?.overall?.score);
- return Number.isFinite(score) ? Math.max(1, Math.min(10, round1(score))) : null;
- }
+function videoScore(feedback) {
+ return scoreValue(feedback?.overall?.score);
+}
 
  const CRITERION_DEFS = [
  { key: 'empathy', label: 'Empathy', typed: ['Empathy'], video: ['empathy'] },
@@ -1706,14 +1705,25 @@ window.FullCasperMock = (() => {
  },
  ];
 
- function round1(value) {
- return Number.isFinite(value) ? Math.round(value * 10) / 10 : null;
- }
+function round1(value) {
+return Number.isFinite(value) ? Math.round(value * 10) / 10 : null;
+}
 
- function average(values) {
- const nums = values.map(Number).filter(Number.isFinite);
- return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : null;
- }
+function finiteNumber(value) {
+if (value === null || value === undefined || value === '') return null;
+const number = Number(value);
+return Number.isFinite(number) ? number : null;
+}
+
+function scoreValue(value) {
+const score = finiteNumber(value);
+return Number.isFinite(score) ? Math.max(1, Math.min(10, round1(score))) : null;
+}
+
+function average(values) {
+const nums = values.map(finiteNumber).filter(Number.isFinite);
+return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : null;
+}
 
  function normaliseCompName(name) {
  const key = String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -1731,7 +1741,7 @@ window.FullCasperMock = (() => {
  });
  return list.map(item => {
  const name = normaliseCompName(item.name || item.competency || item.label);
- const score = Number(item.score);
+ const score = finiteNumber(item.score);
  if (!name || !Number.isFinite(score)) return null;
  return {
  name,
@@ -1747,8 +1757,7 @@ window.FullCasperMock = (() => {
  const score = videoScore(row.feedback);
  return Number.isFinite(score) ? score : null;
  }
- const score = Number(row.score);
- return Number.isFinite(score) ? Math.max(1, Math.min(10, score)) : null;
+ return scoreValue(row.score);
  }
 
  function rowScoreLabel(row) {
@@ -1756,8 +1765,8 @@ window.FullCasperMock = (() => {
  const score = videoScore(row.feedback);
  return Number.isFinite(score) ? `${score}/10` : 'No score';
  }
- const score = Number(row.score);
- return Number.isFinite(score) ? `${round1(score)}/10` : 'No score';
+ const score = scoreValue(row.score);
+ return Number.isFinite(score) ? `${score}/10` : 'No score';
  }
 
  function stationShort(row) {
@@ -2145,16 +2154,18 @@ window.FullCasperMock = (() => {
  };
  }
 
- function buildMockReport(rows) {
- const scored = rows.map(r => r.score10).filter(Number.isFinite);
- const overallAvg = round1(average(scored));
- const criteria = buildCriterionReport(rows);
- const stamina = buildStaminaReport(rows);
- const patterns = buildPatternReport(rows);
- const categories = buildCategoryReport(rows);
- const interpretation = buildInterpretation(overallAvg);
- const visualInterpretation = buildPremiumVisualInterpretation(rows);
- const report = { rows, overallAvg, criteria, stamina, patterns, categories, interpretation, visualInterpretation };
+function buildMockReport(rows) {
+const scored = rows.map(r => r.score10).filter(Number.isFinite);
+const overallAvg = round1(average(scored));
+const scoredCount = scored.length;
+const expectedCount = rows.length;
+const criteria = buildCriterionReport(rows);
+const stamina = buildStaminaReport(rows);
+const patterns = buildPatternReport(rows);
+const categories = buildCategoryReport(rows);
+const interpretation = buildInterpretation(overallAvg);
+const visualInterpretation = buildPremiumVisualInterpretation(rows);
+const report = { rows, overallAvg, scoredCount, expectedCount, isPartial: scoredCount < expectedCount, criteria, stamina, patterns, categories, interpretation, visualInterpretation };
  report.oneThing = buildOneThing(report);
  report.actionPlan = buildMockActionPlan(report, rows);
  report.readiness = buildReadinessChecklist(report);
@@ -2185,14 +2196,17 @@ window.FullCasperMock = (() => {
  const videos = rows.filter(r => r.type === 'video');
  finalVideoRows = videos;
  finalReviewRows = rows;
- const typedScores = typed.map(r => Number(r.score)).filter(Number.isFinite);
+ const typedScores = typed.map(r => scoreValue(r.score)).filter(Number.isFinite);
  const videoScores = videos.map(r => videoScore(r.feedback)).filter(Number.isFinite);
  const typedAvg = typedScores.length ? round1(average(typedScores)) : '-';
  const videoAvg = videoScores.length ? round1(average(videoScores)) : '-';
  const answeredTyped = typed.filter(r => r.answer && r.answer.trim().length > 30).length;
  const report = buildMockReport(rows);
- latestReport = {
+latestReport = {
  overallAvg: report.overallAvg,
+ scoredCount: report.scoredCount,
+ expectedCount: report.expectedCount,
+ isPartial: report.isPartial,
  criteria: report.criteria,
  stamina: report.stamina,
  patterns: report.patterns,
@@ -2204,7 +2218,8 @@ window.FullCasperMock = (() => {
  readiness: report.readiness,
  };
  const completedAnalyses = rows.filter(r => Number.isFinite(r.score10)).length;
- const failedAnalyses = rows.filter(r => r.processingError).length;
+const failedAnalyses = rows.filter(r => r.processingError).length;
+const partialAnalyses = completedAnalyses < rows.length;
 
  area.innerHTML = `
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;overflow:hidden;">
@@ -2215,14 +2230,14 @@ window.FullCasperMock = (() => {
  </div>
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;padding:24px 32px;border-bottom:1px solid var(--gray100);">
  <div class="stat-mini"><span class="stat-mini-num">${results.length}</span><span class="stat-mini-label">Stations done</span></div>
- <div class="stat-mini"><span class="stat-mini-num">${report.overallAvg ?? '-'}</span><span class="stat-mini-label">Overall /10</span></div>
+<div class="stat-mini"><span class="stat-mini-num">${report.overallAvg ?? '-'}</span><span class="stat-mini-label">${partialAnalyses ? 'Reviewed avg' : 'Overall'} /10</span></div>
  <div class="stat-mini"><span class="stat-mini-num">${videoAvg}</span><span class="stat-mini-label">Video avg /10</span></div>
  <div class="stat-mini"><span class="stat-mini-num">${typedAvg}</span><span class="stat-mini-label">Typed avg /10</span></div>
  <div class="stat-mini"><span class="stat-mini-num">${answeredTyped}/7</span><span class="stat-mini-label">Typed answered</span></div>
  <div class="stat-mini"><span class="stat-mini-num">${completedAnalyses}/${rows.length}</span><span class="stat-mini-label">AI analysed</span></div>
  </div>
  <div style="padding:24px 32px;">
- ${failedAnalyses ? renderPartialReportNotice(rows) : ''}
+${failedAnalyses || partialAnalyses ? renderPartialReportNotice(rows) : ''}
  ${renderInterpretation(report)}
  ${renderOneThing(report.oneThing)}
  ${renderReportActions()}
@@ -2276,19 +2291,19 @@ window.FullCasperMock = (() => {
  `;
  }
 
- function renderPartialReportNotice(rows) {
- const failed = rows
- .filter(row => row.processingError)
- .map(row => `${stationShort(row)}: ${row.processingError}`)
- .join(' | ');
- return `
- <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;margin-bottom:18px;">
- <div style="font-size:0.78rem;font-weight:900;color:#9a3412;margin-bottom:5px;">Partial analysis warning</div>
- <div style="font-size:0.82rem;color:#7c2d12;line-height:1.55;">Some station analyses did not finish in time, so the overall estimate is based only on completed AI feedback. You can still review the recordings and responses captured in the mock.</div>
- <div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-top:7px;">${esc(failed)}</div>
- </div>
- `;
- }
+function renderPartialReportNotice(rows) {
+const failed = rows
+.filter(row => row.processingError || !Number.isFinite(row.score10))
+.map(row => `${stationShort(row)}: ${row.processingError || 'analysis not returned yet'}`)
+.join(' | ');
+return `
+<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;margin-bottom:18px;">
+<div style="font-size:0.78rem;font-weight:900;color:#9a3412;margin-bottom:5px;">Partial analysis warning</div>
+<div style="font-size:0.82rem;color:#7c2d12;line-height:1.55;">Some station analyses did not finish in time, so the overall estimate is based only on completed AI feedback. You can still review the recordings and responses captured in the mock.</div>
+${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-top:7px;">${esc(failed)}</div>` : ''}
+</div>
+`;
+}
 
  function renderStationExplorer(rows) {
  if (!rows.length) return '';
@@ -2951,7 +2966,7 @@ window.FullCasperMock = (() => {
 	 const rows = [];
 	 (prompts || []).forEach((prompt, i) => {
 	 Object.entries(prompt?.scores || {}).forEach(([key, value]) => {
-	 const score = Number(value?.score);
+	 const score = scoreValue(value?.score);
 	 const label = key.replace(/_/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase());
 	 rows.push(`<div class="criterion"><b>Prompt ${i + 1} ${esc(label)}${Number.isFinite(score) ? ` (${score}/10)` : ''}</b><span>${esc(value?.comment || value?.label || '')}</span></div>`);
 	 });
@@ -2971,7 +2986,7 @@ window.FullCasperMock = (() => {
 	 if (!raw) return [];
 	 const list = Array.isArray(raw) ? raw : Object.entries(raw).map(([key, value]) => typeof value === 'object' ? { name: key, ...value } : { name: key, score: value });
 	 return list.map(item => {
-	 const score = Number(item.score);
+	 const score = finiteNumber(item.score);
 	 return {
 	 name: item.name || item.competency || item.label || 'Competency',
 	 score: Number.isFinite(score) ? Math.round(score * 10) / 10 : null,
