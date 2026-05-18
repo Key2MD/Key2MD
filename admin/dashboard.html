@@ -511,12 +511,31 @@
  .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
 
  /* == NEW COMPOSE MODAL == */
- .nc-modal .modal-card{max-width:520px;}
+ .nc-modal{align-items:flex-start;overflow-y:auto;padding:12px;}
+ .nc-modal .modal-card{width:min(640px,calc(100vw - 24px));max-width:640px;max-height:calc(100dvh - 24px);overflow-y:auto;padding:20px 20px 0;}
+ .nc-modal .modal-footer{position:sticky;bottom:0;z-index:5;margin:14px -20px 0;padding:12px 20px;background:linear-gradient(180deg,rgba(13,26,45,0.82),#0d1a2d 42%);border-top:1px solid var(--border2);box-shadow:0 -14px 28px rgba(0,0,0,0.28);}
+ .nc-modal #ncHtmlPreview{max-height:min(320px,34vh)!important;}
+ .nc-modal #ncHtmlPreview .warm-email-frame{height:min(320px,34vh)!important;min-height:220px;}
  .compose-context{display:none;margin:-4px 0 14px;padding:11px 12px;border:1px solid var(--blue-border);border-radius:10px;background:var(--blue-dim);}
  .compose-context.show{display:block;}
  .compose-context-title{font-size:0.72rem;font-weight:900;color:var(--blue);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;}
  .compose-context-line{font-size:0.74rem;color:var(--muted);line-height:1.45;margin-top:3px;}
  .compose-context-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
+ @media (max-height:760px){
+ .nc-modal{padding:8px;}
+ .nc-modal .modal-card{width:min(620px,calc(100vw - 16px));max-height:calc(100dvh - 16px);padding:16px 16px 0;}
+ .nc-modal .modal-title{margin-bottom:10px;}
+ .nc-modal .form-row{margin-bottom:9px;}
+ .nc-modal .form-lbl{margin-bottom:4px;}
+ .nc-modal #ncBody{min-height:96px!important;}
+ .nc-modal .compose-context.show{max-height:132px;overflow-y:auto;margin-bottom:10px;}
+ .nc-modal #ncHtmlWrap{margin-bottom:10px!important;}
+ .nc-modal #ncHtmlPreview{max-height:min(230px,30vh)!important;}
+ .nc-modal #ncHtmlPreview .warm-email-frame{height:min(230px,30vh)!important;min-height:180px;}
+ .nc-modal .template-row{gap:5px;margin-top:6px;}
+ .nc-modal .template-row .btn{padding:5px 8px;font-size:0.68rem;}
+ .nc-modal .modal-footer{margin-left:-16px;margin-right:-16px;padding:10px 16px;}
+ }
 
  /* == STUDENT DRAWER == */
  .student-drawer-ov{justify-content:flex-end;padding:0;background:rgba(3,7,18,0.72);}
