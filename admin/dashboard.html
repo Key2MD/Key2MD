@@ -3552,6 +3552,7 @@ function renderUserDetail(det) {
  <div class="detail-box-row">Subscriptions: ${subscriptionBadges(u)}</div>
  <div class="detail-box-row">Stripe: <span style="font-size:0.72rem;">${esc(u.stripe_customer_id||'-')}</span></div>
  <div class="detail-box-row">CASPer sub ID: <span style="font-size:0.72rem;">${esc(u.stripe_subscription_id||'-')}</span></div>
+ <div class="detail-box-row">CASPer Pro status: <strong>${esc(casperProStatusText(u))}</strong></div>
  <div class="detail-box-row">MMI Pro: <strong>${isMmiProActive(u) ? esc(mmiTierLabel(u.mmi_pro_tier)) : '-'}</strong>${u.mmi_pro_expires_at ? ` | until ${esc(formatMillisDate(u.mmi_pro_expires_at))}` : ''}</div>
  <div class="detail-box-row">Joined: ${esc(u.created_at?.slice(0,10)||'-')}</div>
  <div class="detail-box-row">CASPer free today: ${u.usage_today?.casper?.used||0}/${u.usage_today?.casper?.limit||1}</div>
@@ -7816,6 +7817,19 @@ function formatMillisDate(ms) {
  const n = Number(ms||0);
  return n ? new Date(n).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : '-';
 }
+function formatProPeriodEndAdmin(value) {
+ const n = Number(value||0);
+ if (!n) return '-';
+ const ms = n > 100000000000 ? n : n * 1000;
+ return new Date(ms).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit'});
+}
+function casperProStatusText(u) {
+ const isPro = String(u?.tier||'').toLowerCase()==='pro';
+ if (isPro && u?.cancel_requested) return `Cancelling - access ends ${formatProPeriodEndAdmin(u.pro_period_end)}`;
+ if (isPro) return 'Active';
+ if (u?.stripe_subscription_id) return 'Free locally, Stripe subscription ID still present';
+ return 'Free';
+}
 function duplicateFlagsForEmail(email, row = null) {
  const direct = row?.duplicate_flags;
  if (direct?.has_warning) return direct;
@@ -7852,7 +7866,10 @@ function duplicateWarningBox(flags) {
 }
 function subscriptionBadges(u) {
  const badges = [];
- if (String(u?.tier||'').toLowerCase()==='pro') badges.push('<span class="badge badge-pro">CASPer Pro</span>');
+ if (String(u?.tier||'').toLowerCase()==='pro') {
+ const cancelling = !!u?.cancel_requested;
+ badges.push(`<span class="badge ${cancelling?'badge-paid':'badge-pro'}">CASPer Pro${cancelling ? ` ends ${esc(formatProPeriodEndAdmin(u.pro_period_end))}` : ''}</span>`);
+ }
  else badges.push(tierBadge(u?.tier));
  if (isMmiProActive(u)) badges.push(`<span class="badge badge-pro">${esc(mmiTierLabel(u.mmi_pro_tier))}</span>`);
  else if (u?.mmi_pro_tier) badges.push(`<span class="badge badge-default">MMI expired ${esc(formatMillisDate(u.mmi_pro_expires_at))}</span>`);

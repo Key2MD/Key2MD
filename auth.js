@@ -103,6 +103,8 @@ const Key2MDAuth = (() => {
  function getLimits() { return _limits; }
  function isLoggedIn() { return !!_user; }
  function isPro() { return _user?.tier === 'pro'; }
+ function isProCancelling() { return _user?.tier === 'pro' && !!_user.cancel_requested; }
+ function getProPeriodEnd() { return _user?.pro_period_end || null; }
  function getToken() { return localStorage.getItem(TOKEN_KEY); }
 
  /**
@@ -423,11 +425,15 @@ const Key2MDAuth = (() => {
  if (!bar) return;
 
  if (_user) {
+ const proEndsAt = formatPeriodEnd(_user.pro_period_end);
+ const accountLabel = _user.tier === 'pro'
+ ? (_user.cancel_requested ? `CASPer Pro cancelling - access ends ${proEndsAt}` : 'CASPer Pro')
+ : 'Free account';
  bar.innerHTML = `
  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:10px;">
  <div>
  <div style="font-size:0.82rem;font-weight:700;color:var(--navy,#0a1628);">${_user.name || _user.email.split('@')[0]}</div>
- <div style="font-size:0.72rem;color:var(--gray400,#94a3b8);">${_user.tier === 'pro' ? 'Star Pro' : 'Free account'}</div>
+ <div style="font-size:0.72rem;color:var(--gray400,#94a3b8);">${accountLabel}</div>
  </div>
  <button onclick="Key2MDAuth.logout()" style="background:none;border:1px solid var(--gray200,#e2e8f0);border-radius:6px;padding:5px 10px;font-size:0.72rem;color:var(--gray600,#475569);cursor:pointer;font-family:inherit;">Log out</button>
  </div>
@@ -442,6 +448,17 @@ const Key2MDAuth = (() => {
  </div>
  </div>
  `;
+ }
+ }
+
+ function formatPeriodEnd(value) {
+ const seconds = Number(value || 0);
+ if (!seconds) return 'soon';
+ const date = new Date(seconds > 100000000000 ? seconds : seconds * 1000);
+ try {
+ return date.toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+ } catch {
+ return date.toLocaleString();
  }
  }
 
@@ -575,6 +592,8 @@ const Key2MDAuth = (() => {
  getLimits,
  isLoggedIn,
  isPro,
+ isProCancelling,
+ getProPeriodEnd,
  getToken,
  getTrackingHeaders,
  getApiBase,

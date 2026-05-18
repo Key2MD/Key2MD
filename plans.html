@@ -257,12 +257,16 @@
  .pro-amount{font-size:3rem;font-weight:800;color:var(--teal2);letter-spacing:-0.04em;font-family:'DM Serif Display',Georgia,serif;}
  .pro-period{font-size:0.95rem;color:rgba(255,255,255,0.4);}
  .pro-note{font-size:0.73rem;color:rgba(255,255,255,0.3);margin-bottom:22px;}
- .pro-active-wrap{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
- .pro-active-label{font-size:0.85rem;font-weight:700;color:#4ade80;display:flex;align-items:center;gap:8px;}
- .pro-active-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;}
- .pro-active-sub{font-size:0.73rem;color:rgba(255,255,255,0.45);margin-top:2px;}
- .btn-cancel-sm{padding:6px 14px;border-radius:50px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.06);color:#f87171;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;}
- .btn-cancel-sm:hover{background:rgba(239,68,68,0.14);}
+.pro-active-wrap{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.pro-active-wrap.cancelling{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.28);}
+.pro-active-label{font-size:0.85rem;font-weight:700;color:#4ade80;display:flex;align-items:center;gap:8px;}
+.pro-active-wrap.cancelling .pro-active-label{color:#fbbf24;}
+.pro-active-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;}
+.pro-active-wrap.cancelling .pro-active-dot{background:#f59e0b;}
+.pro-active-sub{font-size:0.73rem;color:rgba(255,255,255,0.45);margin-top:2px;}
+.btn-cancel-sm{padding:6px 14px;border-radius:50px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.06);color:#f87171;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;}
+.btn-cancel-sm:hover{background:rgba(239,68,68,0.14);}
+.btn-cancel-sm:disabled{opacity:0.62;cursor:default;background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.25);color:#fbbf24;}
  .btn-pro{width:100%;padding:15px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--teal),var(--teal3));color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.25s;box-shadow:0 4px 20px rgba(14,165,233,0.28);}
  .btn-pro:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(14,165,233,0.42);}
  .btn-pro:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
@@ -635,10 +639,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <div class="pro-active-wrap" id="proActiveBanner" style="display:none;">
  <div>
- <div class="pro-active-label"><span class="pro-active-dot"></span> CASPer Pro - Active</div>
- <div class="pro-active-sub">You have unlimited CASPer AI reviews.</div>
+ <div class="pro-active-label"><span class="pro-active-dot"></span><span id="proActiveLabelText">CASPer Pro - Active</span></div>
+ <div class="pro-active-sub" id="proActiveSub">You have unlimited CASPer AI reviews.</div>
  </div>
- <button class="btn-cancel-sm" onclick="handleCancel()">Cancel</button>
+ <button class="btn-cancel-sm" id="proCancelBtn" onclick="handleCancel()">Cancel</button>
  </div>
 
  <div class="pro-price-row">
@@ -1222,7 +1226,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 <div class="modal-ov" id="cancelModal">
  <div class="modal-card">
  <div class="modal-title">Cancel CASPer Pro</div>
- <div class="modal-sub">Your access continues until the end of the current billing week, then reverts to the free tier. You can resubscribe anytime.</div>
+ <div class="modal-sub" id="cancelModalSub">This stops the next renewal. Your current paid access stays active until the end of this billing week, then your account returns to Free.</div>
  <div class="modal-alert" id="cancelAlert"></div>
  <button class="modal-btn" id="cancelConfirmBtn" onclick="confirmCancel()" style="background:var(--red);">Confirm Cancellation</button>
  <span class="modal-cancel-link" onclick="document.getElementById('cancelModal').classList.remove('open')">Keep my Pro subscription</span>
@@ -1242,17 +1246,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function updateUI() {
  const isPro = Key2MDAuth.isPro();
- const proBtn = document.getElementById('proBtn');
+ const user = Key2MDAuth.getUser() || {};
  const banner = document.getElementById('proActiveBanner');
+ const labelText = document.getElementById('proActiveLabelText');
+ const subText = document.getElementById('proActiveSub');
+ const cancelBtn = document.getElementById('proCancelBtn');
+ const cancelRequested = isPro && !!user.cancel_requested;
+ const endLabel = formatProPeriodEnd(user.pro_period_end);
  banner.style.display = isPro ? 'flex' : 'none';
+ banner.classList.toggle('cancelling', cancelRequested);
  if (isPro) {
- proBtn.textContent = 'Active: CASPer Pro';
- proBtn.disabled = true;
- proBtn.style.opacity = '0.55';
+ if (labelText) labelText.textContent = cancelRequested ? 'CASPer Pro - cancellation scheduled' : 'CASPer Pro - Active';
+ if (subText) subText.textContent = cancelRequested
+ ? `Cancellation confirmed. Access ends ${endLabel}, then your account returns to Free.`
+ : 'You have unlimited CASPer AI reviews.';
+ if (cancelBtn) {
+ cancelBtn.textContent = cancelRequested ? 'Cancellation scheduled' : 'Cancel';
+ cancelBtn.disabled = cancelRequested;
+ }
+ setProButtons(cancelRequested ? `Access ends ${endLabel}` : 'Active: CASPer Pro', true, '0.55');
  } else {
- proBtn.textContent = 'Start CASPer Pro ->';
- proBtn.disabled = false;
- proBtn.style.opacity = '1';
+ if (cancelBtn) {
+ cancelBtn.textContent = 'Cancel';
+ cancelBtn.disabled = false;
+ }
+ setProButtons('Start CASPer Pro ->', false, '1');
+ }
+}
+
+function setProButtons(text, disabled, opacity) {
+ document.querySelectorAll('[onclick="handleBuyPro()"]').forEach(btn => {
+ btn.textContent = text;
+ btn.disabled = disabled;
+ btn.style.opacity = opacity;
+ });
+}
+
+function formatProPeriodEnd(value) {
+ const seconds = Number(value || 0);
+ if (!seconds) return 'at the end of your paid period';
+ const date = new Date(seconds > 100000000000 ? seconds : seconds * 1000);
+ try {
+ return date.toLocaleString([], { weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+ } catch {
+ return date.toLocaleString();
  }
 }
 
@@ -1391,7 +1428,26 @@ async function confirmCheckout() {
  }
 }
 
-function handleCancel() { document.getElementById('cancelModal').classList.add('open'); }
+function handleCancel() {
+ const user = Key2MDAuth.getUser() || {};
+ const endLabel = formatProPeriodEnd(user.pro_period_end);
+ const modal = document.getElementById('cancelModal');
+ const sub = document.getElementById('cancelModalSub');
+ const alertBox = document.getElementById('cancelAlert');
+ const btn = document.getElementById('cancelConfirmBtn');
+ if (sub) sub.textContent = user.pro_period_end
+ ? `This stops the next renewal. Your current paid access stays active until ${endLabel}, then your account returns to Free.`
+ : 'This stops the next renewal. Your current paid access stays active until the end of this billing week, then your account returns to Free.';
+ if (alertBox) {
+ alertBox.className = 'modal-alert';
+ alertBox.textContent = '';
+ }
+ if (btn) {
+ btn.disabled = false;
+ btn.textContent = 'Confirm Cancellation';
+ }
+ modal.classList.add('open');
+}
 
 async function confirmCancel() {
  const btn = document.getElementById('cancelConfirmBtn');
@@ -1402,9 +1458,13 @@ async function confirmCancel() {
  const res = await fetch(`${API_BASE}/api/pro/cancel`, {method:'POST',headers:{'Authorization':`Bearer ${Key2MDAuth.getToken()}`}});
  const data = await res.json();
  if (!res.ok) throw new Error(data.error || 'Cancellation failed');
- al.className = 'modal-alert ok'; al.textContent = 'Cancelled. Access continues until your billing week ends.';
- btn.textContent = 'Done';
- setTimeout(() => { document.getElementById('cancelModal').classList.remove('open'); Key2MDAuth.checkSession(); }, 2500);
+ const endLabel = formatProPeriodEnd(data.period_end);
+ al.className = 'modal-alert ok';
+ al.textContent = `Cancellation confirmed. You will not be billed again. CASPer Pro remains active until ${endLabel}, then your account returns to Free automatically.`;
+ btn.textContent = 'Cancellation scheduled';
+ await Key2MDAuth.checkSession();
+ updateUI();
+ setTimeout(() => { document.getElementById('cancelModal').classList.remove('open'); }, 4500);
  } catch(e) {
  al.className = 'modal-alert err'; al.textContent = e.message;
  btn.disabled = false; btn.textContent = 'Confirm Cancellation';
