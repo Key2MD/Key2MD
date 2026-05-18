@@ -118,11 +118,6 @@
   }
  };
 
- const CONCEPT_TERM_MATCHES = new Set([
-  "anaemia", "thyroid", "cardiac", "vte", "pregnancy", "headache", "bowel",
-  "urinary", "backPain", "diabetes", "mood", "parkinson", "falls", "meds"
- ]);
-
  const MATCH_STOPWORDS = new Set([
  "a", "an", "and", "any", "are", "ask", "about", "check", "do", "does", "exam", "examination",
   "ever", "for", "had", "has", "happened", "have", "i", "in", "is", "it", "look", "looking", "of",
@@ -393,24 +388,6 @@
   return [...new Set(values.filter(Boolean))];
  }
 
- function conceptTerms(item) {
-  return (item.concepts || [])
-   .filter(concept => CONCEPT_TERM_MATCHES.has(concept))
-   .flatMap(concept => CONCEPTS[concept] || []);
- }
-
- function itemTerms(item, scope) {
-  return unique([
-   item.label,
-   item.answer,
-   item.result,
-   ...(item.keywords || []),
-   ...(item.aliases || []),
-   ...(scope === "investigations" ? [] : (item.concepts || [])),
-   ...(scope === "investigations" ? [] : conceptTerms(item))
-  ]);
- }
-
  function editDistanceWithinOne(a, b) {
   if (Math.abs(a.length - b.length) > 1) return false;
   let edits = 0;
@@ -457,7 +434,27 @@
    if (t.length > 4 && queryTokens.some(q => editDistanceWithinOne(q, t))) return 0.58;
    return 0;
   }
+  if (queryTokens.length === 1 && termTokens.includes(queryTokens[0])) return 0.78;
+  if (queryTokens.length === 2 && queryTokens.every(t => termTokens.includes(t))) return 0.82;
   return tokenOverlapScore(queryTokens, termTokens) * 0.68;
+ }
+
+ function scoreTermList(queryNorm, queryTokens, terms, { boost = 1, cap = 1 } = {}) {
+  let best = 0;
+  for (const term of terms || []) {
+   best = Math.max(best, scoreTerm(queryNorm, queryTokens, term));
+  }
+  return Math.min(cap, best * boost);
+ }
+
+ function scoreItemDirectMatch(item, scope, queryNorm, queryTokens) {
+  const labelScore = scoreTermList(queryNorm, queryTokens, [item.label, ...(item.aliases || [])], { boost: 1.25, cap: 1.2 });
+  const keywordScore = scoreTermList(queryNorm, queryTokens, item.keywords || [], { boost: 1, cap: 0.84 });
+  const conceptTerms = scope === "investigations" ? [item.tier] : (item.concepts || []);
+  const conceptScore = scoreTermList(queryNorm, queryTokens, conceptTerms, { boost: 0.55, cap: 0.44 });
+  const score = Math.max(labelScore, keywordScore, conceptScore);
+  const source = score === labelScore && labelScore > 0 ? "label" : score === keywordScore && keywordScore > 0 ? "keyword" : score > 0 ? "concept" : "";
+  return { score, source };
  }
 
  function allItems(caseData, scope) {
@@ -504,33 +501,39 @@
  }
 
  function thresholdFor(scope) {
-  const base = state.strictness === "strict" ? 0.72 : state.strictness === "generous" ? 0.32 : 0.48;
-  if (scope === "investigations" && state.strictness === "balanced") return 0.42;
+  const base = state.strictness === "strict" ? 0.72 : state.strictness === "generous" ? 0.38 : 0.58;
+  if (scope === "investigations" && state.strictness === "balanced") return 0.5;
   return base;
  }
 
  function maxMatchesFor(scope) {
-  if (state.strictness === "strict") return scope === "investigations" ? 3 : 2;
-  if (state.strictness === "generous") return scope === "investigations" ? 7 : 6;
-  return scope === "investigations" ? 5 : 4;
+  if (state.strictness === "strict") return scope === "investigations" ? 2 : 1;
+  if (state.strictness === "generous") return scope === "investigations" ? 5 : 3;
+  return scope === "investigations" ? 3 : 1;
  }
 
- function findMatches(caseData, scope, query) {
+ function rankedMatches(caseData, scope, query) {
   const queryNorm = normalize(query);
   const queryTokens = tokens(query);
   if (!queryNorm || queryNorm.length < 2) return [];
   const groups = broadMatches(scope, queryNorm);
   const scored = allItems(caseData, scope).map(item => {
-   const termScore = Math.max(0, ...itemTerms(item, scope).map(term => scoreTerm(queryNorm, queryTokens, term)));
+   const direct = scoreItemDirectMatch(item, scope, queryNorm, queryTokens);
+   const termScore = direct.score;
    const broadScore = state.strictness === "strict" ? 0 : itemBroadScore(item, groups, scope);
    const score = Math.max(termScore, broadScore);
-   return { item, score, termScore, broadScore };
+   const source = termScore >= broadScore ? direct.source : "broad";
+   return { item, score, termScore, broadScore, source };
   });
   const threshold = thresholdFor(scope);
   const hasDirectMatch = scored.some(entry => entry.termScore >= threshold);
   return scored
    .filter(entry => hasDirectMatch ? entry.termScore >= threshold : entry.score >= threshold)
-   .sort((a, b) => b.score - a.score || itemWeight(b.item) - itemWeight(a.item))
+   .sort((a, b) => b.score - a.score || itemWeight(b.item) - itemWeight(a.item));
+ }
+
+ function findMatches(caseData, scope, query) {
+  return rankedMatches(caseData, scope, query)
    .slice(0, maxMatchesFor(scope))
    .map(entry => entry.item);
  }
@@ -721,44 +724,58 @@
  }
 
  async function askExaminer() {
-  if (state.examinerLoading) return;
-  const caseData = getCase();
-  const scope = state.askScope;
-  const query = state.askText.trim();
-  if (!query) return;
-  let matches = findMatches(caseData, scope, query);
-  let source = "local";
-  let apiError = "";
-  if (!matches.length && state.semanticFallback && !state.semanticUnavailable) {
-   state.examinerLoading = true;
-   render();
-   try {
-    matches = await semanticExaminerMatch(caseData, scope, query);
-    source = matches.length ? "semantic" : "none";
-   } catch (err) {
-    apiError = err.message || "Semantic fallback unavailable";
-    state.semanticUnavailable = true;
-    source = "none";
-   } finally {
-    state.examinerLoading = false;
-   }
-  }
-  const newMatches = matches.filter(item => !isRevealed(scope, item.id));
-  for (const item of newMatches) reveal(scope, item.id);
-  state.log.unshift({
-   scope,
-   query,
-   source,
-   apiError,
-   matchedIds: matches.map(m => m.id),
-   newIds: newMatches.map(m => m.id),
-   at: new Date().toISOString()
-  });
-  state.askText = "";
-  state.coachMessage = "";
-  state.coachError = "";
+ if (state.examinerLoading) return;
+ const caseData = getCase();
+ const scope = state.askScope;
+ const query = state.askText.trim();
+ if (!query) return;
+ let matches = findMatches(caseData, scope, query);
+ const localMatches = matches;
+ let source = "local";
+ let apiError = "";
+ if (shouldUseSemanticRouter(caseData, scope, query, localMatches)) {
+  state.examinerLoading = true;
   render();
-  saveCurrentDraft(true);
+  try {
+   const routed = await semanticExaminerMatch(caseData, scope, query);
+   matches = routed;
+   source = routed.length ? "semantic" : "none";
+  } catch (err) {
+   apiError = err.message || "Semantic fallback unavailable";
+   state.semanticUnavailable = true;
+   matches = localMatches;
+   source = localMatches.length ? "local" : "none";
+  } finally {
+   state.examinerLoading = false;
+  }
+ }
+ const newMatches = matches.filter(item => !isRevealed(scope, item.id));
+ for (const item of newMatches) reveal(scope, item.id);
+ state.log.unshift({
+  scope,
+  query,
+  source,
+  apiError,
+  matchedIds: matches.map(m => m.id),
+  newIds: newMatches.map(m => m.id),
+  at: new Date().toISOString()
+ });
+ state.askText = "";
+ state.coachMessage = "";
+ state.coachError = "";
+ render();
+ saveCurrentDraft(true);
+ }
+
+ function shouldUseSemanticRouter(caseData, scope, query, localMatches) {
+  if (!state.semanticFallback || state.semanticUnavailable) return false;
+  if (!localMatches.length) return true;
+  if (state.strictness === "generous") return false;
+  if (!["history", "examination"].includes(scope)) return false;
+  const ranked = rankedMatches(caseData, scope, query);
+  if (!ranked.length) return true;
+  if (ranked[0].source !== "label") return true;
+  return ranked.length > 1 && ranked[1].score >= ranked[0].score - 0.1;
  }
 
  async function semanticExaminerMatch(caseData, scope, query) {
