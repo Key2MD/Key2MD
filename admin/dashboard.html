@@ -1955,6 +1955,7 @@
  <button class="btn" onclick="insertEmailTemplate('enquiry')">Enquiry follow-up</button>
  <button class="btn" onclick="insertEmailTemplate('warm')">Warm lead</button>
  <button class="btn" onclick="insertEmailTemplate('checkout')">Checkout help</button>
+ <button class="btn" onclick="insertEmailTemplate('payment')">Payment retry</button>
  <button class="btn" onclick="insertEmailTemplate('retention')">Retention</button>
  <button class="btn" onclick="insertEmailTemplate('mock')">Mock review</button>
  <button class="btn" onclick="insertEmailTemplate('support')">Support reply</button>
@@ -5780,6 +5781,10 @@ function insertEmailTemplate(kind) {
   checkout: {
   subject: 'Quick note about your Key2MD checkout',
   body: `Hi there,\n\nI saw your checkout did not finish. If anything broke, or if you were unsure which option fits your prep, reply here and I can help.\n\n- Dan`,
+  },
+  payment: {
+  subject: 'Quick payment retry for Key2MD',
+  body: `Hi there,\n\nJust a quick note: Stripe could not process your latest Key2MD payment.\n\nYour access has not been cancelled automatically. Stripe may retry automatically, but the fastest fix is usually to retry the payment or update the card details through the secure Stripe link.\n\nRetry/update payment here:\n[paste Stripe invoice or retry link]\n\nIf the payment should have gone through, reply here and I will help.\n\n- Dan`,
   },
   retention: {
   subject: 'Checking in on your Key2MD prep',
