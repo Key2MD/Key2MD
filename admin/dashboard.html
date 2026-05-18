@@ -1034,8 +1034,8 @@
  </div>
  <div class="tbl-wrap">
  <div class="tbl-toolbar"><span class="tbl-status" id="warmStatus">-</span></div>
- <div class="tbl-scroller"><table style="min-width:1120px;"><thead><tr>
- <th style="width:26px;"></th><th>Lead</th><th>Student</th><th>Recommendation</th><th>Practice signal</th><th>Why warm</th><th>Outreach</th><th>Last active</th><th>Actions</th>
+ <div class="tbl-scroller"><table style="min-width:1320px;"><thead><tr>
+ <th style="width:26px;"></th><th>Lead</th><th>Student</th><th>Access / Purchases</th><th>Recommendation</th><th>Practice signal</th><th>Why warm</th><th>Outreach</th><th>Last active</th><th>Actions</th>
  </tr></thead><tbody id="warmBody"></tbody></table></div>
  <div class="empty hidden" id="warmEmpty">No warm leads match this filter yet.</div>
  </div>
@@ -3627,6 +3627,114 @@ function setText(id, value) {
  if (el) el.textContent = value;
 }
 
+function paymentTypeLabel(type) {
+ const key = String(type || '').trim().toLowerCase();
+ if (!key) return '';
+ if (key.includes('casper_class_subscription')) return 'CASPer class sub';
+ if (key.includes('casper_class_package')) return 'CASPer class package';
+ if (key.includes('casper_class')) return 'CASPer class';
+ if (key.includes('casper_mock_manual_review')) return 'Mock manual review';
+ if (key.includes('casper_mock_premium')) return 'Full mock premium';
+ if (key.includes('casper_mock_transcript')) return 'Full mock transcript';
+ if (key.includes('casper_mock')) return 'Full mock';
+ if (key.includes('gamsat_s2_pro_subscription')) return 'GAMSAT S2 Pro';
+ if (key.includes('mmi_pro_subscription')) return 'MMI Pro';
+ if (key.includes('mmi_credits')) return 'MMI credits';
+ if (key.includes('pro_subscription')) return 'CASPer Pro';
+ if (key.includes('marking_bundle')) return 'Marking bundle';
+ if (key.includes('marking_gamsat')) return 'GAMSAT marking';
+ if (key.includes('marking_casper')) return 'CASPer marking';
+ if (key.includes('credits_')) {
+  if (key.includes('gamsat')) return 'GAMSAT credits';
+  if (key.includes('casper')) return 'CASPer credits';
+  return 'Practice credits';
+ }
+ return growthProductName(type);
+}
+
+function paymentTypeLabels(row) {
+ const types = String(row?.payment_types || row?.type || '')
+  .split(',')
+  .map(type => paymentTypeLabel(type))
+  .filter(Boolean);
+ return unique(types);
+}
+
+function accessCreditLabels(row) {
+ const items = [
+  ['CASPer', row?.casper_balance],
+  ['GAMSAT', row?.gamsat_balance],
+  ['MMI transcript', row?.mmi_transcript_balance],
+  ['MMI premium', row?.mmi_premium_balance],
+ ];
+ return items
+  .map(([label, value]) => [label, Number(value || 0)])
+  .filter(([, value]) => value > 0)
+  .map(([label, value]) => `${value} ${label}`);
+}
+
+function currentAccessLabels(row) {
+ const labels = [];
+ if (String(row?.tier || '').toLowerCase() === 'pro') labels.push('CASPer Pro active');
+ if (isMmiProActive(row)) labels.push(`${mmiTierLabel(row.mmi_pro_tier)} active`);
+ if (row?.casper_mock_pass_active) {
+  const remaining = Number(row.casper_mock_typed_remaining || 0) + Number(row.casper_mock_video_remaining || 0);
+  labels.push(`Full mock pass${remaining ? ` (${remaining} left)` : ''}`);
+ }
+ const credits = accessCreditLabels(row);
+ if (credits.length) labels.push(`Credits: ${credits.join(', ')}`);
+ return labels.length ? labels : ['No active paid access'];
+}
+
+function currentAccessText(row) {
+ return currentAccessLabels(row).join(' | ');
+}
+
+function everBoughtText(row) {
+ const labels = paymentTypeLabels(row);
+ const spend = Number(row?.total_spend_aud || 0);
+ const payments = Number(row?.payment_count || 0);
+ const bits = [];
+ if (labels.length) bits.push(labels.slice(0, 4).join(', '));
+ else if (spend > 0 || payments > 0) bits.push('Paid item recorded');
+ else bits.push('Never bought');
+ if (spend > 0) bits.push(fmtGrowthMoney(spend));
+ if (payments > 0) bits.push(`${payments} payment${payments === 1 ? '' : 's'}`);
+ return bits.join(' | ');
+}
+
+function paymentHistoryText(row) {
+ const bits = [];
+ const subCount = Number(row?.subscription_payment_count || 0);
+ const subSpend = Number(row?.subscription_spend_aud || 0);
+ if (subCount > 0) bits.push(`${subCount} subscription payment${subCount === 1 ? '' : 's'}${subSpend > 0 ? ` (${fmtGrowthMoney(subSpend)})` : ''}`);
+ if (row?.last_subscription_at) bits.push(`last sub ${relTime(row.last_subscription_at)}`);
+ if (row?.last_payment_at) bits.push(`last paid ${relTime(row.last_payment_at)}`);
+ return bits.join(' | ') || 'No payment rows';
+}
+
+function accessBadgeList(labels, cls = 'badge-default') {
+ return `<div style="display:flex;gap:4px;flex-wrap:wrap;">${(labels || []).map(label => `<span class="badge ${cls}">${esc(label)}</span>`).join('')}</div>`;
+}
+
+function warmLeadAccessCell(row) {
+ const current = currentAccessText(row);
+ const ever = everBoughtText(row);
+ const last = row?.last_payment_at ? ` | last ${relTime(row.last_payment_at)}` : '';
+ return `<div class="cell-main">${esc(current)}</div><div class="cell-sub">${esc(ever)}${esc(last)}</div>`;
+}
+
+function warmLeadAccessDetail(row) {
+ const paymentLabels = paymentTypeLabels(row);
+ const currentLabels = currentAccessLabels(row);
+ const creditLabels = accessCreditLabels(row);
+ return `
+ <div class="detail-box-row"><strong>Current access:</strong> ${accessBadgeList(currentLabels, currentLabels[0] === 'No active paid access' ? 'badge-default' : 'badge-pro')}</div>
+ <div class="detail-box-row"><strong>Ever bought:</strong> ${paymentLabels.length ? accessBadgeList(paymentLabels, 'badge-paid') : '<span style="color:var(--muted2);">No purchase rows found</span>'}</div>
+ <div class="detail-box-row"><strong>Credits now:</strong> ${creditLabels.length ? esc(creditLabels.join(' | ')) : '-'}</div>
+ <div class="detail-box-row"><strong>Payments:</strong> ${esc(paymentHistoryText(row))}</div>`;
+}
+
 async function loadWarmLeads() {
  const limit = document.getElementById('warmLimit')?.value || '50';
  const minScore = document.getElementById('warmScore')?.value || '35';
@@ -3654,7 +3762,7 @@ async function loadWarmLeads() {
  } catch(e) {
  console.error('Warm leads load error:', e);
  if (status) status.textContent = `Warm leads failed: ${e.message}`;
- if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="padding:18px;color:var(--red);font-size:0.82rem;">${esc(e.message)}. Refresh once after deploying the Worker; if it persists, check the Worker logs.</td></tr>`;
+ if (tbody) tbody.innerHTML = `<tr><td colspan="10" style="padding:18px;color:var(--red);font-size:0.82rem;">${esc(e.message)}. Refresh once after deploying the Worker; if it persists, check the Worker logs.</td></tr>`;
  if (empty) empty.classList.add('hidden');
  }
 }
@@ -3678,6 +3786,8 @@ function renderWarmLeads() {
  if (!q) return true;
  return [
  row.email,row.name,row.recommended_product,row.lead_level,
+ row.payment_types,row.last_payment_at,row.last_subscription_at,
+ currentAccessText(row),everBoughtText(row),
  ...(row.reasons || []),
  row.sample?.question_preview,row.sample?.quote,row.sample?.rewrite,row.sample?.improvement,row.outreach?.body,
  outreach.label,outreach.last_outreach_subject,row.activity_label,row.last_activity_at,row.last_practice_at,
@@ -3713,6 +3823,7 @@ function renderWarmLeads() {
  <td><div class="expander">v</div></td>
  <td><span class="warm-lead-score ${level}">${score}</span><div class="cell-sub">${esc(levelLabel(level))}</div></td>
  <td><div class="cell-main">${emailWithDuplicateFlag(row.email,row)}</div><div class="cell-sub">${esc(row.name || '-')} | ${esc(row.tier || 'free')}</div></td>
+ <td>${warmLeadAccessCell(row)}</td>
  <td><div class="cell-main">${esc(row.recommended_product || '-')}</div><div class="cell-sub">${row.avg_casper_score ? `CASPer avg ${esc(row.avg_casper_score)}/10` : 'No CASPer average yet'}</div></td>
  <td><div class="cell-main">${recentActivity} recent | ${Number(row.review_count || 0)} written | ${Number(row.mmi_review_count || 0)} MMI</div><div class="cell-sub">${activeDays} practice days | ${siteDays} site days | ${fmtMoney(row.total_spend_aud || 0)} spend</div></td>
  <td><div class="warm-reason-list">${(row.reasons || []).slice(0,5).map(reason => `<span class="warm-reason">${esc(reason)}</span>`).join('')}</div></td>
@@ -3730,7 +3841,7 @@ function renderWarmLeads() {
  </td>`;
  const detail = document.createElement('tr');
  detail.className = 'detail-row';
- detail.innerHTML = `<td colspan="9" class="detail-panel">${renderWarmLeadDetail(row)}</td>`;
+ detail.innerHTML = `<td colspan="10" class="detail-panel">${renderWarmLeadDetail(row)}</td>`;
  tr.addEventListener('click', event => {
  if (event.target.closest('[data-warm-action]')) return;
  const open = detail.classList.contains('open');
@@ -3762,6 +3873,8 @@ function renderWarmLeadDetail(row) {
  <div class="mini-metric"><div>Practice</div><div>${Number(row.review_count || 0) + Number(row.mmi_review_count || 0)}</div></div>
  <div class="mini-metric"><div>Recent</div><div>${Number(row.recent_activity_count ?? (Number(row.review_count_14d || 0) + Number(row.mmi_review_count_30d || 0)))}</div></div>
  </div>
+ <div class="detail-box-hd" style="margin-top:14px;">Access and purchase check</div>
+ ${warmLeadAccessDetail(row)}
  <div class="detail-box-row"><strong>Outreach:</strong> ${outreachBadge(row.outreach_history)} ${row.outreach_history?.last_outreach_subject ? `<span style="color:var(--muted2);font-size:0.74rem;">${esc(row.outreach_history.last_outreach_subject)}</span>` : ''}</div>
  <div class="warm-reason-list" style="margin:10px 0;">${(row.reasons || []).map(reason => `<span class="warm-reason">${esc(reason)}</span>`).join('')}</div>
  ${sample.question_preview ? `<div class="detail-box-row"><strong>Station reference</strong></div><div class="warm-station">${esc(sample.question_preview)}</div>` : ''}
@@ -5047,7 +5160,21 @@ function openStudentDrawer(email, opts = {}) {
 function renderStudentDrawer(email, opts = {}) {
  const ctx = buildStudentContext(email);
  const user = ctx.user || {};
- const spend = Number(user.total_spend_aud || ctx.revenue.reduce((s,row)=>s+Number(row.amount_aud || 0),0));
+ const warmRow = ctx.warm[0] || {};
+ const revenueRows = (ctx.revenue || []).slice().sort((a,b)=>Date.parse(b.created_at || 0)-Date.parse(a.created_at || 0));
+ const revenueSpend = ctx.revenue.reduce((s,row)=>s+Number(row.amount_aud || 0),0);
+ const spend = Number(user.total_spend_aud || warmRow.total_spend_aud || revenueSpend);
+ const accountRow = {
+  ...warmRow,
+  ...user,
+  total_spend_aud: spend,
+  payment_count: Number(user.payment_count || warmRow.payment_count || ctx.revenue.length || 0),
+  payment_types: user.payment_types || warmRow.payment_types || unique(ctx.revenue.map(row => row.type)).join(','),
+  last_payment_at: user.last_payment_at || warmRow.last_payment_at || revenueRows[0]?.created_at || null,
+  last_subscription_at: user.last_subscription_at || warmRow.last_subscription_at || revenueRows.find(row => String(row.type || '').includes('subscription'))?.created_at || null,
+  subscription_payment_count: Number(user.subscription_payment_count || warmRow.subscription_payment_count || ctx.revenue.filter(row => String(row.type || '').includes('subscription')).length || 0),
+  subscription_spend_aud: Number(user.subscription_spend_aud || warmRow.subscription_spend_aud || ctx.revenue.filter(row => String(row.type || '').includes('subscription')).reduce((s,row)=>s+Number(row.amount_aud || 0),0)),
+ };
  const totalReviews = ctx.casper.length + ctx.s2.length + ctx.mmi.length;
  const lastActivity = [
   ...ctx.casper.map(r=>r.created_at),
@@ -5059,7 +5186,7 @@ function renderStudentDrawer(email, opts = {}) {
  ].filter(Boolean).sort((a,b)=>Date.parse(b)-Date.parse(a))[0];
  const titleEl = document.getElementById('studentDrawerTitle');
  if (titleEl) titleEl.innerHTML = emailWithDuplicateFlag(ctx.email || email, user);
- setText('studentDrawerSub', `${user.name || opts.source || 'Student context'} | ${user.tier || 'free'} | ${spend ? fmtGrowthMoney(spend) : '$0'} spend | last ${lastActivity ? relTime(lastActivity) : 'unknown'}`);
+ setText('studentDrawerSub', `${user.name || opts.source || 'Student context'} | ${currentAccessText(accountRow)} | ${spend ? fmtGrowthMoney(spend) : '$0'} spend | last ${lastActivity ? relTime(lastActivity) : 'unknown'}`);
  const actions = document.getElementById('studentDrawerActions');
  if (actions) actions.innerHTML = `
  <button class="btn green" onclick='composeToUser(${jsArg(ctx.email)}, "", "", "", "student_drawer", {stayOnPage:true, contextTitle:"Student context"})'>Message</button>
@@ -5074,13 +5201,20 @@ function renderStudentDrawer(email, opts = {}) {
  <div class="drawer-kpis">
  <div class="drawer-kpi"><div class="drawer-kpi-label">Spend</div><div class="drawer-kpi-value">${spend ? fmtGrowthMoney(spend) : '$0'}</div></div>
  <div class="drawer-kpi"><div class="drawer-kpi-label">Reviews</div><div class="drawer-kpi-value">${totalReviews}</div></div>
- <div class="drawer-kpi"><div class="drawer-kpi-label">Credits</div><div class="drawer-kpi-value">${Number(user.casper_balance || 0) + Number(user.gamsat_balance || 0) + Number(user.mmi_transcript_balance || 0) + Number(user.mmi_premium_balance || 0)}</div></div>
+ <div class="drawer-kpi"><div class="drawer-kpi-label">Credits</div><div class="drawer-kpi-value">${Number(accountRow.casper_balance || 0) + Number(accountRow.gamsat_balance || 0) + Number(accountRow.mmi_transcript_balance || 0) + Number(accountRow.mmi_premium_balance || 0)}</div></div>
  <div class="drawer-kpi"><div class="drawer-kpi-label">Last active</div><div class="drawer-kpi-value">${lastActivity ? relTime(lastActivity) : '-'}</div></div>
  </div>
  ${duplicateWarningBox(duplicateFlagsForEmail(ctx.email, user))}
  <div class="drawer-grid">
  ${studentDrawerRows('Lead + Risk', [...ctx.warm, ...ctx.retention, ...ctx.sharing], row => drawerEvent(row.lead_score ? 'Warm lead' : row.risk_score ? 'Retention' : 'Sharing', esc(row.recommended_product || row.risk_level || row.risk?.level || 'Signal'), (row.reasons || row.risk?.reasons || []).slice(0, 3).join(' | '), row.last_activity_at || row.last_practice_at || row.last_seen_at), 'No current lead, retention, or sharing signal.')}
  ${studentDrawerRows('Messages', latestConv ? [latestConv] : [], row => drawerEvent(row.direction === 'outbound' ? 'Outbound' : 'Inbound', esc(row.subject || 'Conversation'), String(row.body || '').slice(0, 160), row.created_at), 'No inbox conversation loaded.')}
+ <div class="drawer-section">
+ <div class="drawer-section-title">Access + Purchases</div>
+ <div class="drawer-list">
+ ${drawerEvent('Current', esc(currentAccessText(accountRow)), accessCreditLabels(accountRow).join(' | ') || '', '')}
+ ${drawerEvent('Ever bought', esc(everBoughtText(accountRow)), paymentHistoryText(accountRow), accountRow.last_payment_at)}
+ </div>
+ </div>
  ${studentDrawerRows('Payments', ctx.revenue, row => drawerEvent('Payment', `<strong>${fmtGrowthMoney(row.amount_aud || 0)}</strong>`, row.type || row.stripe_session_id || '', row.created_at), 'No payment rows found.')}
  ${studentDrawerRows('Enquiries', ctx.enquiries, row => drawerEvent(row.type || 'Enquiry', esc(row.name || row.email || 'Website enquiry'), row.notes || row.universities || '', row.created_at), 'No website enquiries.')}
  ${studentDrawerRows('CASPer + S2', [...ctx.casper, ...ctx.s2], row => {
