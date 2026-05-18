@@ -1391,6 +1391,338 @@
     "Aspiration pneumonia antibiotic choices and stroke secondary prevention should be checked against current local Victorian hospital and Australian stroke guidance.",
     ...commonDoubleCheck
    ]
+  },
+
+  // ── NEW HARD CASE 1 ── Palpitations ──────────────────────────────────────
+  {
+   id: "palp-phaeochromocytoma-001",
+   title: "Palpitations In A Shift Worker",
+   presentation: "Palpitations",
+   frameworkId: "palpitations",
+   setting: "GP",
+   difficulty: "hard",
+   hidden: true,
+   stem: "A 34-year-old woman presents to your GP clinic saying she has been having palpitations.",
+   finalDiagnosis: "Phaeochromocytoma",
+   diagnosisAliases: ["phaeochromocytoma", "pheo", "phaeo", "paraganglioma", "catecholamine-secreting tumour", "chromaffin tumour"],
+   recording: [
+    "She describes episodic palpitations lasting five to twenty minutes, occurring two to four times per week for the past three months.",
+    "During episodes she also feels profoundly sweaty and notices a pounding headache, but has attributed all of this to her rotating-shift nursing roster.",
+    "She looks well between episodes and her only previous contact with this clinic was for oral contraceptive renewal two years ago.",
+    "She is visibly reluctant to elaborate on her home life and gives single-word answers to questions about stress and relationships; she has a concealer-covered bruise on her left forearm."
+   ],
+   ddx: {
+    must: [
+     ddx("Phaeochromocytoma", "The triad of episodic palpitations, diaphoresis and headache has >90% positive predictive value when all three are present. A must-not-miss even though rare.", true, ["pheo", "phaeo", "paraganglioma"]),
+     ddx("Paroxysmal supraventricular tachycardia", "Most common cause of episodic palpitations in young women; must be excluded with ambulatory monitoring.", true, ["SVT", "AVNRT", "AVRT"]),
+     ddx("Panic disorder", "Episodic sympathetic surge can mimic phaeochromocytoma exactly; but panic does not explain sustained hypertension between attacks.", false, ["panic attack", "anxiety attack"]),
+     ddx("Hyperthyroidism", "Persistent rather than episodic, but a mandatory metabolic screen item.", false, ["thyroid", "Graves disease", "thyrotoxicosis"]),
+     ddx("Ventricular tachycardia", "Must-not-miss with structural heart disease; less likely here but warrants ECG.", true, ["VT", "ventricular tachycardia"])
+    ],
+    bonus: [
+     ddx("Carcinoid syndrome", "Episodic flushing and tachycardia; distinguish by flushing character and urinary 5-HIAA."),
+     ddx("Substance use — cocaine or stimulants", "Episodic sympathomimetic surges; relevant given occupational stress and the concealed home situation."),
+     ddx("Mastocytosis", "Episodic flushing, urticaria, hypotension; rare but sometimes confused with phaeochromocytoma."),
+     ddx("Hypoglycaemia", "Adrenergic symptoms during episodes; less likely without diabetes or relevant medications.")
+    ]
+   },
+   history: [
+    item("h-episode-character", "Episode character — all co-occurring symptoms", "Each episode begins abruptly: her heart pounds, she sweats profusely, gets a severe throbbing headache and feels as if something terrible is about to happen. Episodes resolve over twenty minutes.", ["episode", "attacks", "palpitations character", "describe episodes", "what happens", "sweating during", "headache during", "all symptoms"], 3, "The palpitation–diaphoresis–headache triad is the classic phaeochromocytoma presentation. Candidates who ask about each symptom separately score less than those who elicit the triad together.", ["cardiac", "autonomic"], "episode"),
+    item("h-triggers", "Triggers and posture", "Episodes can come on bending to make a bed, after eating cheese or dark chocolate, or without any clear trigger. Never with exercise alone.", ["trigger", "precipitant", "position", "exercise", "what brings on", "food", "bend", "strain"], 3, "Postural triggers and tyramine-containing foods suggest catecholamine release from a tumour compressed by movement or dietary tyramine.", ["cardiac", "autonomic"], "episode"),
+    item("h-bp-between", "Blood pressure between episodes", "She has never been told she has high blood pressure. She donates blood regularly and was told her BP was 'a bit high' twice in the past year but assumed it was white-coat.", ["blood pressure", "hypertension", "bp between episodes", "high bp", "resting blood pressure"], 3, "Episodic or sustained hypertension between attacks is present in ~50% of phaeochromocytoma; she has subtle sustained hypertension she has rationalised.", ["cardiac", "autonomic"], "cardiovascular"),
+    item("h-medications", "Current medications", "Microgynon 30 (combined OCP). No herbal supplements. No recreational drugs. Rarely drinks.", ["medications", "drugs", "pill", "contraception", "ocp", "supplements", "herbal"], 2, "Combined OCP can modestly raise BP; she takes no MAOIs so there is no tyramine–MAOI interaction risk.", ["cardiac"], "medications"),
+    item("h-family-history", "Family history of hypertension, tumours or sudden death", "Her maternal uncle had a 'kidney tumour' removed at age 40 and carries a genetic condition she cannot name. Her mother has hypertension.", ["family history", "hereditary", "relatives", "genetics", "kidney tumour", "sudden death", "family cancer"], 3, "A family history of renal tumours in a young relative raises VHL syndrome or MEN2; phaeochromocytoma is hereditary in ~25% of cases.", ["cardiac", "autonomic", "malignancy"], "family"),
+    item("h-systems-review", "Associated symptoms: weight, appetite, heat tolerance, tremor", "She has lost about 3 kg over three months without trying. No tremor at rest. Tolerates heat poorly — has always been 'warm' but it seems worse recently.", ["weight loss", "appetite", "heat", "heat intolerance", "tremor", "thyroid symptoms", "systems review"], 2, "Weight loss and heat intolerance overlap with thyrotoxicosis; catecholamine excess also drives hypermetabolism.", ["thyroid", "autonomic"], "systems"),
+    item("h-ipv-screen", "Safety at home — relationship and injury", "After building rapport, she discloses that her partner becomes 'rough' when he drinks, approximately weekly. She is not ready to leave and has not told anyone. The bruise on her arm is from last week.", ["safety", "home", "domestic", "partner", "relationship", "violence", "abuse", "bruise", "ipv", "safe at home"], 3, "IPV is present and must be addressed sensitively alongside the medical workup. Disclosure at the GP is a critical opportunity; mandatory reporting does not apply to adult IPV in Victoria but duty-of-care safety planning does.", ["safety", "psychosocial"], "psychosocial"),
+    item("h-shift-work", "Work and sleep pattern", "Night-shift nursing on a ten-week rotating roster. Significant sleep disruption. Has normalised her symptoms as shift-work-related.", ["work", "shift", "sleep", "stress", "nursing", "occupation", "roster"], 1, "Shift-work attribution is a classic cognitive anchor that delays phaeochromocytoma diagnosis.", ["autonomic"], "social"),
+    item("h-syncope", "Syncope, near-syncope or chest pain during episodes", "No syncope. Chest pressure occurs during the worst episodes but she has not sought help for it.", ["syncope", "faint", "collapse", "chest pain", "chest pressure", "blackout"], 2, "Chest pressure during episodic hypertensive surges raises risk of demand ischaemia or Takotsubo cardiomyopathy.", ["cardiac"], "episode")
+   ],
+   examination: [
+    item("ex-vitals", "Vital signs including bilateral arm BP", "BP right arm 158/98, left arm 156/96. HR 88 and regular. SpO2 99%. Temp 36.8. RR 14.", ["vitals", "blood pressure", "bp", "pulse", "heart rate", "sats", "temperature", "bilateral bp", "both arms"], 3, "Sustained hypertension between episodes is found in roughly half of phaeochromocytoma cases; bilateral BP excludes coarctation.", ["cardiac", "autonomic"], "cardiovascular"),
+    item("ex-cardiac", "Cardiovascular and precordial examination", "Regular rhythm. No murmurs. No signs of heart failure. Normal apex beat.", ["cardiac exam", "heart sounds", "murmur", "precordial", "jvp", "oedema", "auscultation"], 2, "Sustained catecholamine excess can cause catecholamine cardiomyopathy; baseline cardiac exam guides further investigation.", ["cardiac"], "cardiovascular"),
+    item("ex-thyroid", "Thyroid examination", "No goitre palpable. No lid lag, no tremor, no proptosis.", ["thyroid exam", "goitre", "lid lag", "tremor", "proptosis", "thyroid"], 2, "Thyroid examination is a mandatory part of the sympathetic-surge differential; normal exam reduces but does not exclude hyperthyroidism.", ["thyroid"], "endocrine"),
+    item("ex-abdominal", "Abdominal examination including flanks", "No palpable mass. No flank tenderness. Mild epigastric discomfort on deep palpation.", ["abdominal exam", "abdomen", "flank", "mass", "adrenal", "kidney", "epigastric", "palpate"], 3, "Adrenal tumours are usually non-palpable but flank tenderness or epigastric discomfort on deep pressure prompts imaging. Avoid vigorous palpation if phaeochromocytoma is suspected — risk of hypertensive crisis.", ["autonomic"], "abdominal"),
+    item("ex-skin", "Skin: neurofibromas, café-au-lait spots, bruising", "Three café-au-lait macules on trunk >15 mm. No axillary freckling. No neurofibromas. Resolving bruise left forearm consistent with blunt trauma.", ["skin", "cafe au lait", "neurofibromas", "bruising", "marks", "spots", "skin exam"], 3, "Café-au-lait spots raise NF1-associated phaeochromocytoma (NF1 affects ~10% of patients with the condition). The forearm bruise is corroborating evidence for IPV — document precisely.", ["autonomic", "malignancy"], "skin")
+   ],
+   investigations: [
+    ix("urinary-metanephrines", "24-hour urinary metanephrines and catecholamines", "Urinary metanephrines markedly elevated at 4× upper limit of normal. Catecholamines elevated.", ["urinary metanephrines", "24 hour urine", "catecholamines", "vma", "vanillylmandelic acid", "metanephrines", "urine catecholamines"], "special", 3, "24-hour urinary metanephrines are preferred first-line biochemical test for phaeochromocytoma in Australian practice (sensitivity ~98%).", ["autonomic"]),
+    ix("plasma-metanephrines", "Plasma free metanephrines", "Plasma free metanephrines elevated: normetanephrine 2.8× ULN, metanephrine 3.1× ULN.", ["plasma metanephrines", "plasma free metanephrines", "free metanephrines", "blood metanephrines"], "special", 3, "Plasma free metanephrines have high sensitivity and are an acceptable first-line alternative; both tests are valid per Endocrine Society guidelines.", ["autonomic"]),
+    ix("ecg-palp", "12-lead ECG", "Sinus rhythm 86 bpm. Left ventricular hypertrophy voltage criteria met. No ischaemic changes.", ["ecg", "electrocardiogram", "12 lead", "rhythm", "cardiac", "ecg palp"], "bedside", 2, "LVH on ECG reflects sustained hypertensive load. ECG is essential to exclude arrhythmic cause of palpitations.", ["cardiac"]),
+    ix("holter", "48-hour Holter or ambulatory ECG monitor", "Sinus rhythm throughout. No SVT or VT captured. No arrhythmia correlating with symptoms.", ["holter", "ambulatory ecg", "monitor", "loop recorder", "event monitor", "24 hour ecg", "ambulatory monitoring"], "special", 2, "Holter distinguishes phaeochromocytoma from arrhythmia-driven palpitations; absence of arrhythmia strengthens the catecholamine hypothesis.", ["cardiac"]),
+    ix("tft-palp", "Thyroid function tests (TSH, free T4)", "TSH 1.2 mU/L (normal). Free T4 15 pmol/L (normal).", ["tsh", "thyroid function", "t4", "tft", "thyroid blood test", "thyroid function test"], "bloods", 2, "Thyrotoxicosis is a clinical mimic; normal TFTs remove it from the differential.", ["thyroid"]),
+    ix("fbe-uec-glucose", "FBE, UEC, fasting glucose, LFTs", "FBE normal. UEC normal. Fasting glucose 5.1 mmol/L. LFTs mildly elevated (ALT 52).", ["fbe", "uec", "glucose", "lft", "bloods", "renal function", "liver function", "baseline bloods"], "bloods", 1, "Baseline bloods required; mild LFT elevation may reflect catecholamine-related hepatic effects.", ["cardiac"]),
+    ix("ct-abdomen-adrenal", "CT abdomen and pelvis with contrast (only after alpha-blockade is established)", "Right adrenal mass 4.2 cm with heterogeneous enhancement. No distant metastases.", ["ct abdomen", "ct adrenal", "adrenal imaging", "mri abdomen", "imaging", "adrenal mass"], "imaging", 3, "CT localises the tumour. Contrast is safe after adequate alpha-blockade; giving contrast before biochemical confirmation and alpha-blockade risks a hypertensive crisis.", ["autonomic"]),
+    ix("genetics-nf1", "Genetic counselling and mutation panel (NF1, VHL, RET, SDHB/C/D)", "Referred for genetic counselling; NF1 mutation detected.", ["genetics", "genetic testing", "hereditary", "nf1", "vhl", "ret", "sdh", "mutation", "genetic panel"], "special", 2, "~25% of phaeochromocytomas are hereditary. NF1 mutation confirms syndromic phaeochromocytoma; cascade family screening is required.", ["malignancy"])
+   ],
+   management: [
+    mx("urgent-endocrine-ref", "Urgent endocrinology referral — same week", ["endocrine referral", "endocrinologist", "urgent referral", "specialist", "endocrine"], 3, "Phaeochromocytoma requires specialist-led medical preparation before any surgical intervention; GP-only management is unsafe."),
+    mx("alpha-blockade", "Initiate alpha-adrenergic blockade (phenoxybenzamine or doxazosin) prior to surgery — under endocrine guidance", ["alpha blockade", "phenoxybenzamine", "doxazosin", "prazosin", "alpha blocker", "pre-op blockade"], 3, "Alpha-blockade for 10–14 days pre-operatively prevents intraoperative hypertensive crisis. Beta-blockade must never precede alpha-blockade — risk of unopposed alpha surge and fatal hypertension."),
+    mx("no-beta-first", "Do NOT start beta-blocker before alpha-blocker is established", ["beta blocker", "metoprolol", "atenolol", "bisoprolol", "no beta first", "avoid beta blocker first"], 3, "Prescribing a beta-blocker first in phaeochromocytoma is a recognised dangerous error — causes unopposed alpha vasoconstriction and severe hypertension."),
+    mx("ipv-safety-plan", "Address IPV: safety planning, document findings, offer 1800RESPECT and DV Victoria referral", ["domestic violence", "ipv", "safety plan", "1800respect", "dv victoria", "family violence", "abuse", "safeguarding", "safe steps"], 3, "IPV disclosure at a GP visit is a critical safety window. In Victoria, document sensitively, offer safety planning and warm referral; Safe Steps 1800 015 188 and 1800RESPECT 1800 737 732."),
+    mx("bp-diary", "Regular BP monitoring and symptom diary of episodes until specialist seen", ["blood pressure monitoring", "bp diary", "symptom diary", "home bp", "episode diary"], 2, "Episode documentation guides surgical timing and confirms correlation with biochemical surges."),
+    mx("avoid-triggers", "Advise avoidance of tyramine-rich foods, vigorous abdominal palpation and dopaminergic drugs pending specialist review", ["avoid tyramine", "food advice", "tyramine foods", "avoid palpation", "metoclopramide", "trigger avoidance"], 2, "Avoidable catecholamine surges can cause a hypertensive crisis before surgery."),
+    mx("genetic-counsel", "Arrange genetics referral given family history of renal tumour", ["genetics referral", "genetic counselling", "family screening", "hereditary tumour", "nf1"], 2, "Hereditary phaeochromocytoma requires cascade family screening; NF1 mutation has additional multisystem surveillance implications.")
+   ],
+   examinerNotes: "This is a hard case because the stem gives only 'palpitations' and the diagnosis requires the candidate to proactively elicit the headache–diaphoresis–hypertension triad rather than stopping at a cardiac or anxiety explanation. Most candidates default to SVT and panic disorder without completing a sympathetic-surge systems review. The IPV thread is embedded as a concealer-covered bruise in the recording clip and on skin examination — it only surfaces if the candidate asks a trauma-informed safety question. Key errors to watch for: (1) not asking about co-occurring symptoms during episodes, (2) ordering CT before biochemical confirmation and alpha-blockade, (3) prescribing beta-blocker without first establishing alpha-blockade, (4) not addressing IPV despite the visible bruise.",
+   discriminators: [
+    "Asks specifically about headache and diaphoresis co-occurring with palpitations — not just palpitation character alone",
+    "Elicits the family history of a 'kidney tumour' in a young relative and connects it to hereditary phaeochromocytoma syndromes",
+    "Names urinary or plasma metanephrines as the preferred biochemical test — not a simple adrenaline level or adrenaline/noradrenaline",
+    "States alpha-blockade must precede beta-blockade and must precede CT contrast administration",
+    "Asks a trauma-informed safety question about the bruise and names 1800RESPECT or Safe Steps as a practical referral resource",
+    "Does NOT recommend outpatient-only investigation without same-week endocrine referral"
+   ],
+   doubleCheck: [
+    "Phenoxybenzamine is the standard pre-operative alpha-blocker in Australian endocrinology practice; check current eTG Endocrinology chapter for dosing and alternatives (doxazosin is also used).",
+    "IPV documentation and referral pathways: Victoria — Safe Steps 1800 015 188; 1800RESPECT 1800 737 732.",
+    "Contrast-enhanced CT before adequate alpha-blockade is contraindicated; confirm pre-imaging alpha-blockade status with your endocrinologist.",
+    ...commonDoubleCheck
+   ]
+  },
+
+  // ── NEW HARD CASE 2 ── Weight Loss ────────────────────────────────────────
+  {
+   id: "wl-coeliac-001",
+   title: "Tired And Losing Weight",
+   presentation: "Weight loss",
+   frameworkId: "fatigue",
+   setting: "GP",
+   difficulty: "hard",
+   hidden: true,
+   stem: "A 28-year-old man presents to your GP clinic reporting that he has been losing weight.",
+   finalDiagnosis: "Coeliac disease",
+   diagnosisAliases: ["coeliac", "celiac", "coeliac disease", "gluten enteropathy", "gluten-sensitive enteropathy", "villous atrophy"],
+   recording: [
+    "He says he has lost about six kilograms over the past five months without dieting and feels it has just crept up on him.",
+    "He initially volunteers nothing further; when prompted he adds that his energy 'has not been the same since he moved out of home.'",
+    "He was born in Afghanistan and arrived in Australia seven years ago; he works long hours in a food-delivery job and has had no GP contact in the past four years.",
+    "He appears thin, slightly pale, and is guarded — he says he is fine and that his family thinks he just needs to eat more red meat."
+   ],
+   ddx: {
+    must: [
+     ddx("Coeliac disease", "Insidious weight loss with micronutrient deficiency in a young adult is coeliac disease until proven otherwise; commonly missed when GI symptoms are absent or minimised.", true, ["coeliac", "celiac", "gluten intolerance", "gluten sensitivity"]),
+     ddx("Malignancy — lymphoma or GI cancer", "Weight loss >5% body weight without explanation mandates cancer exclusion; small bowel lymphoma is a specific complication of untreated coeliac disease.", true, ["lymphoma", "cancer", "malignancy", "bowel cancer"]),
+     ddx("Type 1 diabetes or LADA", "Young man with weight loss and fatigue; autoimmune overlap with coeliac disease makes LADA a genuine co-risk.", true, ["diabetes", "type 1 diabetes", "LADA", "autoimmune diabetes"]),
+     ddx("Tuberculosis", "Afghan-born man — lifetime TB risk is substantially higher; systemic weight loss and fatigue warrant TB exclusion.", true, ["tuberculosis", "TB", "mycobacterium tuberculosis"]),
+     ddx("Depression with weight loss", "Weight loss and fatigue in a recently isolated young man who works alone; depression is both a standalone diagnosis and a coeliac complication.", false, ["depression", "low mood", "mental health"])
+    ],
+    bonus: [
+     ddx("Inflammatory bowel disease", "Crohn disease causes malabsorption and weight loss; needs colonoscopy if coeliac serology is negative."),
+     ddx("Hyperthyroidism", "Weight loss with fatigue; less likely without heat intolerance or palpitations but screens easily."),
+     ddx("HIV", "Systemic weight loss; relevant given limited healthcare access over four years."),
+     ddx("Addison disease", "Autoimmune weight loss and fatigue; pigmentation and electrolyte disturbance are clues.")
+    ]
+   },
+   history: [
+    item("h-gi-stool", "Stool character, frequency and bloating", "His stools are 'sometimes loose and floaty' — two to four times per day. He notices increased flatus, worse after bread or pasta, but had not connected these to his weight loss.", ["bowel habit", "diarrhoea", "stool", "loose", "floaty", "pale stool", "bloating", "flatus", "bowel frequency", "gi symptoms", "steatorrhoea"], 3, "Steatorrhoea (pale, floating, offensive stools) is the hallmark of fat malabsorption from villous atrophy. Patients frequently normalise their bowel habit unless specifically asked about stool character.", ["malabsorption", "gi"], "gastrointestinal"),
+    item("h-diet-shift", "Dietary pattern and changes since moving out of home", "He now eats a predominantly bread-, rice- and pasta-based diet because it is cheap and fast. At home his family cooked a mostly meat- and rice-based diet. His gluten exposure has increased markedly since moving out.", ["diet", "food", "eating", "nutrition", "what do you eat", "bread", "pasta", "wheat", "gluten", "food change"], 3, "Increased gluten exposure from a bread- and pasta-based diet is the precipitating dietary shift that unmasked symptomatic coeliac disease in an adult who was previously eating less wheat.", ["malabsorption"], "social"),
+    item("h-fatigue-detail", "Fatigue: character, timing and functional impact", "He feels tired by early afternoon despite adequate sleep. Concentration at work is suffering; he has had two minor delivery accidents in the past month.", ["fatigue", "tired", "energy", "concentration", "function", "work performance", "afternoon tiredness"], 2, "Iron, folate and B12 deficiency from villous atrophy drive fatigue that is often disproportionate to the apparent weight loss.", ["malabsorption", "anaemia"], "systems"),
+    item("h-tb-screen", "TB risk screen: cough, night sweats, haemoptysis, contacts", "Born in Kandahar; lived in a refugee camp in Pakistan for two years. No cough, no haemoptysis, no night sweats. No known TB contacts in Australia.", ["tuberculosis", "tb", "cough", "night sweats", "haemoptysis", "afghanistan", "refugee", "country of origin", "contacts", "fever"], 3, "TB is mandatory in any Afghan-born person with unexplained weight loss and fatigue. Night sweats and cough are absent here but IGRA testing is still warranted given the high background risk.", ["infection"], "infection"),
+    item("h-mood-screen", "Mood, social connection, safety and help-seeking", "He misses his family. He has no close friends in Australia. He feels 'okay' but admits to feeling hopeless about his situation at times. He denies active suicidal ideation. He says he would not see a psychologist 'because Afghans don't do that'.", ["mood", "depression", "mental health", "hopeless", "anxiety", "sleep", "social", "lonely", "isolation", "safety", "suicidal", "wellbeing"], 3, "Depression is present but minimised and filtered through cultural norms. A forced referral will not be accepted; culturally concordant supports are needed.", ["psychosocial", "depression"], "psychosocial"),
+    item("h-family-history", "Family history of bowel disease, coeliac, thyroid, diabetes or anaemia", "His mother has anaemia and 'problems with her stomach' but has never been investigated. Two maternal aunts also have anaemia.", ["family history", "coeliac family", "bowel disease", "relatives", "genetics", "anaemia family", "mother anaemia"], 2, "Maternal GI symptoms and anaemia in multiple female relatives is a strong coeliac family pattern; first-degree relatives have ~10% prevalence.", ["malabsorption"], "family"),
+    item("h-medications", "Medications, supplements and healthcare access", "Takes no medications. Does not take vitamin D or iron supplements. Has had no healthcare in four years.", ["medications", "supplements", "vitamins", "iron", "healthcare access", "no medications"], 2, "Lack of supplementation means nutrient deficiencies will be clinically manifest; four years without healthcare access means preventive screening is overdue.", ["malabsorption"], "medications"),
+    item("h-financial", "Financial situation and food security", "He sends most of his income overseas to his family. Some weeks he eats only one meal a day when delivery work is slow. He has not disclosed this to anyone.", ["financial", "money", "food security", "poverty", "eating", "hunger", "income"], 2, "Food insecurity contributes to his restricted diet and reduced help-seeking. Management plans that ignore this will not be followed.", ["psychosocial"], "social")
+   ],
+   examination: [
+    item("ex-weight-vitals", "Vital signs, weight and BMI", "Weight 61 kg (was 67 kg six months ago on a delivery company weigh-in). BMI 19.2. BP 100/62. HR 82. Afebrile. SpO2 99%.", ["vitals", "weight", "bmi", "blood pressure", "pulse", "temperature", "weight loss objective"], 3, "Objective weight loss from a reliable external source is critical. Low BMI and borderline-low BP support malabsorption; BP is relevant to Addison disease screen.", ["malabsorption", "anaemia"], "cardiovascular"),
+    item("ex-pallor-cheilitis", "General inspection: pallor, angular cheilitis, koilonychia, glossitis", "Mild conjunctival pallor. Angular cheilitis bilaterally. Nails are flat and faintly ridged (early koilonychia). No glossitis. No lymphadenopathy.", ["pallor", "anaemia signs", "angular cheilitis", "koilonychia", "nails", "glossitis", "general inspection", "conjunctiva"], 3, "Angular cheilitis (iron/B2 deficiency), koilonychia (iron deficiency) and pallor are peripheral stigmata of nutritional deficiency from malabsorption.", ["malabsorption", "anaemia"], "general"),
+    item("ex-abdominal", "Abdominal examination", "Mild generalised abdominal distension. Hyperactive bowel sounds. No organomegaly. No mass. No peritonism.", ["abdominal exam", "abdomen", "bowel sounds", "distension", "organomegaly", "mass", "guarding"], 2, "Abdominal distension and hyperactive bowel sounds are consistent with fermentation and malabsorptive diarrhoea; organomegaly excludes lymphoma.", ["malabsorption", "gi"], "abdominal"),
+    item("ex-skin-dh", "Skin: dermatitis herpetiformis, hyperpigmentation", "No dermatitis herpetiformis. No Addisonian hyperpigmentation. Dry skin over shins.", ["skin", "rash", "dermatitis herpetiformis", "pigmentation", "hyperpigmentation", "dh", "skin exam"], 2, "Dermatitis herpetiformis — intensely pruritic vesicular rash on extensor surfaces — is pathognomonic for coeliac disease. Addisonian pigmentation would shift the differential.", ["malabsorption"], "skin"),
+    item("ex-neuro-vibration", "Peripheral neurological exam: reflexes, sensation, proprioception, vibration", "Reduced vibration sense bilateral feet. Ankle jerks mildly diminished. No frank weakness.", ["neurology", "reflexes", "sensation", "proprioception", "vibration", "peripheral neuropathy", "neuropathy", "ankle jerks"], 2, "Peripheral neuropathy from B12 and B1 deficiency occurs in coeliac disease and is reversible if treated early.", ["malabsorption", "neuro"], "neurological")
+   ],
+   investigations: [
+    ix("coeliac-serology", "Coeliac serology: tTG-IgA AND total serum IgA", "tTG-IgA 180 U/mL (markedly elevated, reference <7). Total IgA normal — not IgA deficient.", ["coeliac serology", "ttg", "anti-ttg", "tissue transglutaminase", "iga", "total iga", "endomysial antibody", "ema", "coeliac blood test"], "special", 3, "tTG-IgA is the recommended first-line coeliac screen in Australia (RACGP). Total IgA must always be measured simultaneously to exclude false-negative from IgA deficiency.", ["malabsorption"]),
+    ix("fbe-iron-coeliac", "FBE, iron studies (ferritin, serum iron, transferrin saturation)", "Hb 101 g/L microcytic (MCV 72). Ferritin 6 μg/L. Serum iron 5 μmol/L. Transferrin saturation 8%.", ["fbe", "full blood count", "iron studies", "ferritin", "iron deficiency", "anaemia", "haemoglobin", "mcv"], "bloods", 3, "Iron deficiency anaemia is the most common presentation of coeliac disease in adults, often preceding GI symptoms.", ["anaemia", "malabsorption"]),
+    ix("b12-folate-coeliac", "Serum B12 and red cell folate", "B12 188 pmol/L (low-normal, reference 180–900). Red cell folate 98 nmol/L (low, reference 360–1400).", ["b12", "vitamin b12", "folate", "red cell folate", "vitamin deficiency", "b12 folate"], "bloods", 2, "Folate deficiency from proximal small bowel villous atrophy; low-normal B12 is consistent with early deficiency — both explain the peripheral neuropathy.", ["malabsorption", "anaemia"]),
+    ix("igra-tb", "IGRA (QuantiFERON-TB Gold) for TB screening", "QuantiFERON-TB Gold negative.", ["igra", "quantiferon", "tb gold", "mantoux", "tb test", "tuberculosis test", "interferon gamma release", "latent tb"], "special", 3, "IGRA is preferred over Mantoux in BCG-vaccinated individuals. Negative result is reassuring; TB is effectively excluded.", ["infection"]),
+    ix("bone-profile-coeliac", "Calcium, 25-OH vitamin D, ALP, PTH", "Calcium 2.18 mmol/L (low-normal). 25-OH vitamin D 22 nmol/L (severely deficient). ALP 112 U/L (elevated). PTH 9.2 pmol/L (elevated — secondary hyperparathyroidism).", ["calcium", "vitamin d", "bone", "alk phos", "alp", "pth", "parathyroid", "vitamin d level", "25 oh"], "bloods", 2, "Fat-soluble vitamin deficiency and secondary hyperparathyroidism from malabsorption predict low bone density; urgent vitamin D replacement is needed.", ["malabsorption"]),
+    ix("tft-glucose-coeliac", "TSH, fasting glucose and HbA1c", "TSH 1.8 mU/L (normal). Fasting glucose 5.0 mmol/L. HbA1c 5.2%.", ["tsh", "thyroid", "glucose", "hba1c", "diabetes screen", "blood sugar", "thyroid function"], "bloods", 2, "Thyroid and diabetes exclusion is mandatory; autoimmune clustering means T1DM and thyroid disease are more common in coeliac disease.", ["thyroid"]),
+    ix("gastro-biopsy", "Gastroenterology referral for confirmatory duodenal biopsy (OGD) — maintain gluten until biopsy", "Confirmatory duodenal biopsy arranged. Biopsy shows Marsh III villous atrophy.", ["gastroenterology", "biopsy", "ogd", "endoscopy", "duodenal biopsy", "small bowel biopsy", "gastro referral", "endoscopy referral"], "special", 3, "Australian guidelines require histological confirmation before committing to lifelong gluten-free diet. Do NOT start GFD before biopsy — this normalises the result and prevents diagnosis.", ["malabsorption"])
+   ],
+   management: [
+    mx("maintain-gluten-biopsy", "Refer to gastroenterology — maintain gluten in diet until confirmatory biopsy is performed", ["gastroenterology referral", "biopsy", "maintain gluten", "do not start gfd", "keep eating gluten", "ogd", "endoscopy"], 3, "Starting a gluten-free diet before histological confirmation normalises the biopsy and prevents diagnosis — a common and consequential management error."),
+    mx("nutrient-replacement", "Replace iron (oral or IV), folate, B12 and vitamin D urgently", ["iron supplementation", "vitamin d replacement", "folate", "b12", "nutritional replacement", "supplements", "deficiency treatment", "iv iron"], 3, "Oral iron first-line; IV iron (ferric carboxymaltose) if malabsorption is severe. Vitamin D replacement is urgent given severe deficiency and fracture risk."),
+    mx("dietitian-gfd", "Refer to dietitian experienced in coeliac disease — culturally appropriate gluten-free diet", ["dietitian", "diet", "gluten free diet", "gfd", "dietitian referral", "nutrition", "gluten free"], 3, "Gluten-free diet is the only definitive treatment. Specialist dietitian guidance is essential, especially given food insecurity and cultural dietary constraints."),
+    mx("depression-cultural-support", "Address depression sensitively — explore culturally acceptable supports, not just psychology referral", ["depression", "mental health", "cultural support", "community", "interpreting service", "transcultural mental health", "afghan community", "psychosocial support", "counselling"], 3, "A forced psychology referral will be declined. Culturally concordant supports are more likely to result in engagement. Victoria: Transcultural Mental Health Centre 1800 648 911."),
+    mx("food-security-support", "Address food security: social worker referral, community health, FoodBank", ["food security", "foodbank", "social worker", "financial assistance", "bulk billing", "community health", "social support"], 2, "Food insecurity is a direct barrier to dietary treatment. Ignoring it produces a management plan the patient cannot follow."),
+    mx("dexa-bone", "DEXA scan for bone mineral density given severe vitamin D deficiency and malabsorption", ["dexa", "bone density", "bone mineral density", "osteoporosis screen", "fracture risk"], 2, "Young men with coeliac disease have significantly increased fracture risk; DEXA at diagnosis guides supplementation intensity."),
+    mx("family-screening", "Recommend first-degree family coeliac screening", ["family screening", "relatives", "first degree", "family testing", "coeliac screening"], 1, "First-degree relatives have ~10% prevalence; the maternal GI and anaemia history makes this particularly relevant.")
+   ],
+   examinerNotes: "This is a hard case because the stem says only 'weight loss' and the diagnosis (coeliac disease) is frequently dismissed as a simple GI condition rather than a multisystem malabsorption disorder. The patient actively minimises his bowel symptoms, his mood and his food insecurity. Candidates who stay at a surface level will generate a cancer- and TB-heavy DDx but miss the key dietary exposure shift and the steatorrhoea. Critical examiner markers: (1) asking about stool character specifically (floating, pale, offensive) rather than just 'any diarrhoea', (2) eliciting the dietary shift to bread/pasta since moving out, (3) ordering tTG-IgA WITH total IgA, (4) stating gluten must be maintained until biopsy, (5) TB IGRA rather than just CXR, (6) culturally appropriate mental health pathway rather than a generic psychology referral.",
+   discriminators: [
+    "Asks about stool character including floating or pale stools (steatorrhoea) — not just 'any diarrhoea'",
+    "Elicits the dietary shift to a bread- and pasta-based diet since moving out and connects this to increased gluten exposure",
+    "Orders tTG-IgA AND total serum IgA together — not tTG-IgA alone",
+    "States that gluten must be maintained in the diet until after confirmatory biopsy — does NOT advise starting GFD before OGD",
+    "Performs TB risk assessment and orders IGRA (not just CXR) given country of origin",
+    "Asks a depression/safety screen and names a culturally appropriate referral pathway rather than a generic psychology referral",
+    "Elicits food insecurity as a social driver and addresses it explicitly in the management plan"
+   ],
+   doubleCheck: [
+    "Coeliac serology requires the patient to be on a gluten-containing diet for at least six weeks prior to testing; confirm dietary status before sending.",
+    "IV iron dosing (ferric carboxymaltose) should be checked against current eTG Haematology chapter and local formulary.",
+    "Vitamin D repletion regimens vary; check current Endocrine Society of Australia or eTG for loading vs maintenance dosing.",
+    "Transcultural Mental Health Centre (Victoria) 1800 648 911; confirm current service availability.",
+    ...commonDoubleCheck
+   ]
+  },
+
+  // ── NEW HARD CASE 3 ── Syncope / TLOC ────────────────────────────────────
+  {
+   id: "syncope-hcm-021",
+   title: "Blacked Out At The Gym",
+   presentation: "Syncope",
+   frameworkId: "falls-syncope",
+   setting: "GP",
+   difficulty: "hard",
+   hidden: true,
+   stem: "A 22-year-old man presents to your GP clinic after blacking out.",
+   finalDiagnosis: "Hypertrophic cardiomyopathy",
+   diagnosisAliases: ["hypertrophic cardiomyopathy", "HCM", "HOCM", "hypertrophic obstructive cardiomyopathy", "asymmetric septal hypertrophy"],
+   recording: [
+    "He says he felt fine beforehand and woke up on the gym floor with no warning.",
+    "His training partner says it lasted about thirty seconds and he was confused briefly afterwards.",
+    "He plays for a local AFL club and has never had anything like this before.",
+    "He is eager to get back to training and asks if it was probably dehydration."
+   ],
+   ddx: {
+    must: [
+     ddx("Hypertrophic cardiomyopathy", "Exertional syncope without prodrome in a young athlete is HCM until proven otherwise — the leading cause of sudden cardiac death in young Australians under 35.", true, ["HCM", "HOCM", "hypertrophic cardiomyopathy"]),
+     ddx("Long QT syndrome or other channelopathy", "Syncope during exercise or emotion with family sudden death history; ECG may be normal at rest.", true, ["long QT", "LQTS", "channelopathy", "Brugada"]),
+     ddx("Ventricular tachycardia", "Structural heart disease or channelopathy can produce VT causing sudden loss of consciousness during exertion.", true, ["VT", "ventricular tachycardia", "arrhythmia"]),
+     ddx("Vasovagal syncope", "Most common cause of syncope in young people — but the absence of prodrome and exertional timing makes this a diagnosis of exclusion here, not assumption.", false, ["vasovagal", "faint", "neurocardiogenic"]),
+     ddx("Wolff-Parkinson-White syndrome", "Pre-excitation can cause rapid conduction and syncope, especially during exertion.", true, ["WPW", "Wolf Parkinson White", "pre-excitation", "accessory pathway"])
+    ],
+    bonus: [
+     ddx("Anomalous coronary artery origin", "A structural cause of exertional ischaemia and sudden death in young athletes; not detectable on ECG alone."),
+     ddx("Aortic stenosis", "Exertional syncope with a murmur; less likely at 22 without rheumatic history but must be sought."),
+     ddx("Commotio cordis or chest trauma", "A direct blow to the chest before the syncopal event would raise this.")
+    ]
+   },
+   history: [
+    item("h-syncopal-event", "Full event description: before, during and after", "No warning — no nausea, no greying vision, no palpitations before collapse. Approximately 30-second loss of consciousness. Brief confusion on waking. No witnessed tonic-clonic activity.", ["before syncope", "prodrome", "warning", "loss of consciousness", "after syncope", "confusion", "recovery", "seizure", "tongue bite"], 3, "Absence of a vasovagal prodrome combined with exertional timing and post-event confusion is the cardinal pattern of cardiac syncope. Each element must be elicited separately to avoid missing the absence of warning.", ["cardiac", "neuro"], "episode"),
+    item("h-exertional-timing", "Precise timing: what was he doing at the exact moment of collapse", "He was mid-set on a heavy squat — at peak Valsalva. Not cooling down, not just standing up, not during rest.", ["exertion", "timing", "during exercise", "lifting", "squat", "valsalva", "peak exercise", "what was he doing"], 3, "Syncope during peak exertion (not after) strongly favours outflow obstruction or arrhythmia over orthostatic or vasovagal mechanisms. Dynamic obstruction worsens with Valsalva in HCM.", ["cardiac"], "episode"),
+    item("h-palpitations-before", "Palpitations, chest pain or dyspnoea during exercise prior to this event", "He recalls occasional awareness of his heart 'pounding differently' during sprints over the past few months but dismissed it as adrenaline. No chest pain. No exertional dyspnoea beyond fitness level.", ["palpitations", "chest pain", "dyspnoea", "exercise symptoms", "pounding", "racing heart", "exertional symptoms"], 3, "Episodic exertional palpitations in the weeks before a syncopal event suggest a structural or arrhythmic substrate being progressively provoked.", ["cardiac"], "associated"),
+    item("h-family-history-cardiac", "Family history of sudden death, cardiomyopathy, arrhythmia or young cardiac events", "An older brother died unexpectedly in his sleep aged 19 — attributed to 'heart attack' at the time. His father was told he has a 'thick heart' but does not take any medication.", ["family history", "sudden death", "family cardiac", "cardiomyopathy", "arrhythmia", "young death", "thick heart", "sudden cardiac death"], 3, "A sibling sudden death and a father with known cardiomegaly creates a strong hereditary cardiomyopathy pedigree. This single item should pivot the entire consultation.", ["cardiac"], "family"),
+    item("h-alcohol-drugs", "Alcohol, stimulants, recreational drugs and supplements", "Drinks socially. Takes pre-workout supplements containing caffeine and beta-alanine. No illicit stimulants, no cocaine.", ["alcohol", "drugs", "stimulants", "pre-workout", "caffeine", "cocaine", "supplements", "recreational drugs"], 2, "Pre-workout stimulants can trigger arrhythmia on a structural substrate; cocaine causes coronary vasospasm and arrhythmia. Neither explains the family history.", ["meds"], "background"),
+    item("h-prev-sports-screen", "Prior sports medical screening or ECG", "Had a pre-season physical last year — cleared. No ECG performed. No echocardiogram.", ["sports screen", "pre-season", "ecg", "echo", "cardiac screen", "medical clearance"], 2, "Australian pre-participation cardiac screening is inconsistent; a normal physical examination does not exclude HCM or channelopathy.", ["cardiac"], "background"),
+    item("h-elder-alcohol", "Home environment and stress — full social history", "Lives with parents. His father has struggled with alcohol since the brother's death. He is the primary support for his mother and feels pressure not to worry the family with his own health concerns.", ["family stress", "social history", "father alcohol", "home environment", "support", "pressure", "carer"], 2, "The father's alcohol use disorder and the patient's caretaker role constitute the psychosocial thread. It explains why he minimises symptoms and resists further workup ('eager to get back to training').", ["psychosocial"], "psychosocial")
+   ],
+   examination: [
+    item("ex-vitals-syncope", "Vital signs and postural BP", "HR 62 regular. BP 118/76 sitting, 116/74 standing. SpO2 99%. Afebrile. No postural drop.", ["vitals", "blood pressure", "postural bp", "heart rate", "sats", "lying standing"], 3, "Absence of postural hypotension reduces orthostatic and volume-depletion explanations. Normal resting HR does not exclude HCM.", ["cardiac", "vitals"], "cardiovascular"),
+    item("ex-cardiac-auscultation", "Cardiac auscultation including dynamic manoeuvres", "Ejection systolic murmur heard at the left sternal edge, grade 2/6. Murmur increases with Valsalva and standing, decreases with squatting.", ["cardiac auscultation", "murmur", "systolic murmur", "valsalva", "squatting", "dynamic auscultation", "heart sounds", "sternal edge"], 3, "Dynamic outflow murmur that increases with Valsalva (reduces preload) and decreases with squatting (increases preload) is the physical examination hallmark of HOCM. Most candidates who do not perform dynamic manoeuvres will miss or underinterpret this murmur.", ["cardiac"], "cardiovascular"),
+    item("ex-pulse-character", "Pulse character and carotid palpation", "Pulse has a bifid quality on careful palpation. Carotid upstroke is sharp and bifid (spike-and-dome).", ["pulse character", "carotid", "bifid", "spike and dome", "jerky pulse", "pulsus bisferiens"], 2, "The spike-and-dome carotid pulse reflects early rapid ejection followed by outflow tract obstruction in HOCM.", ["cardiac"], "cardiovascular"),
+    item("ex-neuro-post", "Neurological examination post-syncope", "GCS 15, cranial nerves intact, no focal motor or sensory deficit, no tongue laceration.", ["neuro exam", "focal neurology", "gcs", "tongue bite", "post syncope neuro", "cranial nerves"], 2, "Focal neurology post-syncope would suggest stroke or seizure rather than cardiac syncope. Tongue laceration would raise seizure probability.", ["neuro"], "neurological")
+   ],
+   investigations: [
+    ix("ecg-syncope", "12-lead ECG", "Voltage criteria for left ventricular hypertrophy. Deep Q waves in I and aVL. ST-T wave changes in V4–V6. No delta wave.", ["ecg", "12 lead", "ecg syncope", "lvh", "left ventricular hypertrophy", "q waves", "st changes"], 3, "Significant ECG abnormalities (LVH, pathological Q waves, ST changes) in a young athlete are never a normal finding and mandate echocardiography. A normal ECG does not exclude HCM — ~5% have a normal ECG.", ["cardiac"]),
+    ix("echo-urgent", "Urgent echocardiogram", "Asymmetric septal hypertrophy (IVS 22 mm). Systolic anterior motion of the mitral valve. Significant LVOT gradient 70 mmHg at rest.", ["echo", "echocardiogram", "echocardiography", "heart ultrasound", "lvot", "septal hypertrophy", "cardiomyopathy"], "imaging", 3, "Echocardiography is the definitive diagnostic test for HCM; LVOT gradient and septal thickness guide risk stratification and management.", ["cardiac"]),
+    ix("holter-syncope", "24-48 hour Holter or event monitor", "Non-sustained VT run of 4 beats detected on Holter — a significant risk marker in HCM.", ["holter", "ambulatory ecg", "event monitor", "24 hour ecg", "arrhythmia monitoring", "vt"], "special", 3, "Non-sustained VT on Holter is an independent risk factor for sudden cardiac death in HCM and influences ICD implantation decisions.", ["cardiac"]),
+    ix("genetic-hcm", "Genetic testing for sarcomeric mutations and family cascade", "Sarcomere mutation panel positive; family screening arranged for father and other siblings.", ["genetic testing", "sarcomere", "myosin", "hcm genetics", "family screening", "genetic panel"], "special", 2, "~60% of HCM cases carry an identifiable sarcomeric mutation; cascade family screening can identify at-risk relatives before sudden death.", ["cardiac"]),
+    ix("bloods-syncope", "FBE, UEC, glucose, troponin", "All normal. Troponin negative.", ["fbe", "uec", "glucose", "troponin", "bloods", "electrolytes"], "bloods", 1, "Baseline bloods exclude metabolic syncope causes; troponin is negative here but must be considered post-arrhythmia.")
+   ],
+   management: [
+    mx("no-sport-restriction", "Immediate exercise restriction — no competitive sport, no heavy lifting pending specialist review", ["no sport", "exercise restriction", "stop training", "stop competition", "no gym", "sports restriction", "activity restriction"], 3, "This is the single most time-critical management decision. Continuing competitive sport with undiagnosed HCM significantly increases sudden cardiac death risk. Must be communicated clearly and without ambiguity."),
+    mx("urgent-cardiology", "Same-day or next-day cardiology referral — do not discharge with routine outpatient review", ["cardiology referral", "cardiologist", "urgent referral", "same day", "next day", "specialist"], 3, "HCM with syncope, LVOT obstruction and NSVT requires specialist risk stratification for ICD consideration; this is not a GP-only workup."),
+    mx("icd-discussion", "Discuss ICD implantation risk stratification with cardiologist", ["icd", "defibrillator", "implantable", "risk stratification", "sudden death prevention"], 2, "Multiple HCM sudden death risk factors (syncope, NSVT, family SCD, LVOT gradient) likely meet threshold for ICD consideration."),
+    mx("family-screening-hcm", "Arrange first-degree family cardiac screening — father and other siblings", ["family screening", "first degree", "relatives", "father", "siblings", "family hcm", "genetic screening"], 2, "Father has known cardiomegaly and a sibling died unexpectedly — both need urgent cardiac evaluation independent of the patient's diagnosis."),
+    mx("psychosocial-father", "Address father's alcohol use disorder sensitively — offer GP mental health plan and AUDIT-C, referral to alcohol counselling", ["father alcohol", "alcohol use disorder", "audit", "family support", "counselling", "alcohol", "psychosocial"], 2, "The father's alcohol use disorder is driving family stress and the patient's symptom minimisation. Brief intervention and warm referral to alcohol counselling are within GP scope."),
+    mx("driving-sport-safety", "Advise about driving restrictions and notify AUSTROADS requirements", ["driving", "licence", "austroads", "fitness to drive", "vehicle", "sports"], 2, "Syncope with a cardiac cause requires notification to the relevant authority and driving cessation pending cardiology review per AUSTROADS/Vic Roads guidelines.")
+   ],
+   examinerNotes: "This case is hard because the stem gives only 'blacked out' and the default candidate assumption is vasovagal syncope or dehydration — both of which the patient actively promotes. The critical pivot is eliciting the absence of prodrome, the precise exertional timing (mid-Valsalva, not post-exertion) and the family history (sibling sudden death, father with cardiomegaly). The dynamic cardiac auscultation manoeuvres are the physical examination discriminator — candidates who do not perform Valsalva and squat manoeuvres will hear only a soft murmur and miss its significance. The psychosocial thread is the father's alcohol use disorder — buried in the social history and surfacing as the reason the patient downplays his own symptoms.",
+   discriminators: [
+    "Elicits the absence of vasovagal prodrome (no nausea, no greying vision) and identifies this as abnormal for a young person",
+    "Establishes precise timing — syncope during peak exertion, not post-exertion, which distinguishes outflow obstruction from vasovagal or orthostatic mechanisms",
+    "Asks about family history of sudden death or cardiomyopathy and elicits the sibling death and father's 'thick heart'",
+    "Performs dynamic auscultation with Valsalva and squat — and correctly interprets a murmur that worsens with Valsalva as consistent with LVOT obstruction",
+    "Does NOT reassure the patient that this was probably dehydration or clear him for return to training without cardiological assessment",
+    "Addresses the father's alcohol use disorder as a distinct clinical and psychosocial management item"
+   ],
+   doubleCheck: [
+    "AUSTROADS fitness-to-drive guidelines for cardiac syncope: confirm current criteria for driving cessation and notification obligations in Victoria.",
+    "HCM risk stratification and ICD implantation thresholds: use the current ESC HCM guidelines and involve cardiologist; risk calculators should not be applied by GP alone.",
+    "Sports participation restriction recommendations: check Sports Cardiology Australia and CSANZ position statements for current guidance.",
+    ...commonDoubleCheck
+   ]
+  },
+
+  // ── NEW HARD CASE 4 ── Dysphagia ─────────────────────────────────────────
+  {
+   id: "dysphagia-pharyngeal-022",
+   title: "Food Getting Stuck",
+   presentation: "Dysphagia",
+   frameworkId: "fatigue",
+   setting: "GP",
+   difficulty: "hard",
+   hidden: true,
+   stem: "A 58-year-old woman presents to your GP clinic saying food keeps getting stuck.",
+   finalDiagnosis: "Postcricoid squamous cell carcinoma in the context of Plummer-Vinson syndrome",
+   diagnosisAliases: ["postcricoid carcinoma", "hypopharyngeal cancer", "Plummer-Vinson syndrome", "pharyngeal carcinoma", "Patterson-Kelly syndrome", "sideropenic dysphagia"],
+   recording: [
+    "She says it started with solids about four months ago and has recently begun happening with thick fluids too.",
+    "She attributes it to rushing meals since taking on more shifts after her husband left last year.",
+    "She looks pale and tired; her nails catch your eye — they are flat and slightly spoon-shaped.",
+    "She has not told anyone about the swallowing difficulty because she does not want to make a fuss."
+   ],
+   ddx: {
+    must: [
+     ddx("Oesophageal or pharyngeal malignancy", "Progressive dysphagia from solids to liquids over months in a middle-aged woman is cancer until proven otherwise.", true, ["oesophageal cancer", "pharyngeal cancer", "hypopharyngeal carcinoma", "head and neck cancer"]),
+     ddx("Plummer-Vinson syndrome", "Chronic iron deficiency anaemia plus postcricoid dysphagia plus koilonychia in a middle-aged woman is the defining triad; carries pre-malignant risk.", true, ["Plummer-Vinson", "Patterson-Kelly", "sideropenic dysphagia", "pharyngeal web"]),
+     ddx("Peptic stricture or Barrett oesophagus", "Longstanding GORD can cause progressive dysphagia through fibrotic stricture formation.", true, ["peptic stricture", "GORD stricture", "Barrett oesophagus", "oesophageal stricture"]),
+     ddx("Achalasia", "Progressive dysphagia to both solids and liquids from onset, regurgitation and weight loss.", true, ["achalasia", "oesophageal dysmotility"]),
+     ddx("Extrinsic compression — thyroid mass or lymphadenopathy", "A goitre or malignant nodes can compress the pharynx or oesophagus.", true, ["goitre", "thyroid", "lymphadenopathy", "external compression"])
+    ],
+    bonus: [
+     ddx("Oropharyngeal dysphagia from neurological cause", "Stroke, MND or myasthenia can present as dysphagia — less likely here without neurological symptoms."),
+     ddx("Globus pharyngeus", "A sensation of throat fullness without true obstruction; diagnosis of exclusion after structural pathology is excluded.")
+    ]
+   },
+   history: [
+    item("h-dysphagia-progression", "Progression: solids only, then liquids — time course and what exactly gets stuck", "Started with bread and meat four months ago; now thick soups also catch. She feels it stick at the level of her throat, not her chest. No food coming back up, no coughing on liquids.", ["dysphagia progression", "solids then liquids", "progressive dysphagia", "what sticks", "where sticks", "throat level", "regurgitation", "coughing on food"], 3, "Progressive dysphagia from solids to liquids over months is the pattern of mechanical obstruction — luminal narrowing from malignancy or stricture. Localisation to the throat rather than the chest points to a pharyngeal or hypopharyngeal lesion rather than an oesophageal one.", ["gi", "malignancy"], "hopc"),
+    item("h-weight-appetite", "Weight loss, appetite and systemic symptoms", "She has lost approximately 5 kg over four months. Appetite is preserved but eating less because of fear of choking. Night sweats two to three times per week.", ["weight loss", "appetite", "night sweats", "constitutional", "systemic", "fever", "eating less"], 3, "Unintentional weight loss plus night sweats in the context of dysphagia is a dual red flag — raises malignancy and must not be attributed to reduced caloric intake alone.", ["malignancy", "constitutional"], "redflag"),
+    item("h-iron-symptoms", "Iron deficiency symptoms: fatigue, cold intolerance, nail changes, mouth soreness", "Profound fatigue for over a year. She noticed her nails have become flat and spoon-shaped. Angular mouth cracks. Cold hands. No pica.", ["fatigue", "iron deficiency", "koilonychia", "nails", "angular cheilitis", "cold intolerance", "pica", "anaemia symptoms", "mouth sores"], 3, "Koilonychia (spoon nails) and angular cheilitis are classical iron deficiency signs. In this clinical context — middle-aged woman with progressive postcricoid dysphagia — they complete the Plummer-Vinson triad and must be elicited proactively.", ["anaemia", "malabsorption"], "systems"),
+    item("h-voice-pain", "Voice change, throat pain, ear pain, otalgia", "Mild voice hoarseness over the past six weeks. Occasional right-sided ear pain she thought was an ear infection. No odynophagia.", ["voice change", "hoarseness", "hoarse", "dysphonia", "ear pain", "otalgia", "throat pain", "odynophagia"], 3, "Hoarseness suggests recurrent laryngeal nerve involvement or direct laryngeal extension. Referred otalgia (via Arnold's nerve) is a red flag for pharyngeal or laryngeal malignancy even without ear pathology.", ["malignancy"], "redflag"),
+    item("h-gord-habits", "GORD symptoms, alcohol use, smoking and diet history", "Occasional heartburn for years but no alarm features previously. Non-smoker. Rarely drinks. No betel nut use.", ["gord", "heartburn", "reflux", "smoking", "alcohol", "tobacco", "betel nut", "risk factors", "oesophageal risk"], 2, "GORD is a risk factor for peptic stricture and Barrett; non-smoking is relevant because squamous hypopharyngeal carcinoma without tobacco/alcohol is unusual and points toward Plummer-Vinson as the driving risk factor.", ["gi"], "background"),
+    item("h-psychosocial-separation", "Home environment, social support, stressors and financial situation since separation", "Her husband left fourteen months ago and she has been working double shifts to cover the mortgage. She has not told her adult children because she does not want to worry them. She denies depression but cries when describing the past year.", ["separation", "husband left", "social support", "stress", "financial", "carer", "isolation", "emotional", "depression", "psychosocial"], 3, "The separation and financial stress have driven symptom minimisation ('rushing meals') and avoidance of health care for over a year. This thread explains the presentation delay — a critical quality-of-care and cultural communication issue.", ["psychosocial"], "psychosocial"),
+    item("h-family-history-cancer", "Family history of head and neck, oesophageal or GI cancer", "No known family history of oesophageal or head and neck cancer. Mother had breast cancer.", ["family history", "oesophageal cancer", "head and neck cancer", "gi cancer", "family cancer"], 1, "Family history is less informative here than the phenotypic triad, but should be elicited as part of a systematic approach.", ["malignancy"], "family")
+   ],
+   examination: [
+    item("ex-vitals-dysphagia", "Vital signs and weight", "Weight 61 kg (down from 66 kg four months ago documented at pharmacist). BP 118/74. HR 88. Afebrile. SpO2 98%.", ["vitals", "weight", "bmi", "blood pressure", "temperature", "weight loss objective"], 3, "Documenting objective weight loss strengthens the red flag case and changes urgency of referral.", ["malignancy", "anaemia"], "cardiovascular"),
+    item("ex-koilonychia-pallor", "Nails, skin, conjunctivae and mouth", "Koilonychia present both hands. Conjunctival pallor. Angular cheilitis. Atrophic glossitis.", ["koilonychia", "nails", "pallor", "conjunctiva", "angular cheilitis", "glossitis", "atrophic glossitis", "iron deficiency signs"], 3, "Koilonychia, pallor and glossitis complete the Plummer-Vinson triad on examination. Candidates who only note 'pale' without examining nails and mouth will miss the syndrome.", ["anaemia", "malabsorption"], "general"),
+    item("ex-neck", "Neck examination: lymph nodes, thyroid and carotid", "Single palpable right level II cervical lymph node, firm and non-tender, approximately 1.5 cm. Thyroid not enlarged.", ["neck exam", "lymph nodes", "cervical lymph node", "thyroid", "neck palpation", "lymphadenopathy"], 3, "A firm, non-tender cervical lymph node in this clinical context must be presumed malignant until proven otherwise — level II nodal involvement suggests oropharyngeal or hypopharyngeal primary.", ["malignancy"], "neck"),
+    item("ex-oral-pharynx", "Oral and oropharyngeal inspection", "No oropharyngeal lesion visible. Posterior pharynx appears normal on inspection. Voice is mildly hoarse.", ["oral exam", "mouth", "pharynx", "oropharynx", "throat", "inspect throat", "voice", "hoarseness"], 2, "Visible oral lesions or oropharyngeal abnormalities prompt immediate ENT referral; a normal oropharyngeal view does not exclude hypopharyngeal or postcricoid pathology.", ["malignancy"], "oral")
+   ],
+   investigations: [
+    ix("fbe-iron-dysphagia", "FBE and iron studies", "Hb 88 g/L microcytic. Ferritin 4 μg/L. Transferrin saturation 6%.", ["fbe", "haemoglobin", "iron studies", "ferritin", "iron deficiency anaemia", "mcv", "haematology"], "bloods", 3, "Profound iron deficiency anaemia confirms the haematological component of Plummer-Vinson and must be documented before any procedural intervention.", ["anaemia"]),
+    ix("urgent-ent", "Urgent ENT or head and neck surgery referral — same-week, two-week wait pathway", ["ent referral", "head and neck", "urgent referral", "two week wait", "ear nose throat", "specialist", "otolayrngology"], "special", 3, "Progressive dysphagia plus cervical lymphadenopathy plus hoarseness mandates same-week urgent specialist review under the two-week-wait cancer pathway. Do not wait for investigations to refer.", ["malignancy"]),
+    ix("ct-neck-chest", "CT neck, chest and abdomen with contrast for staging", "CT confirms postcricoid mass with right level II nodal involvement. No distant metastases.", ["ct neck", "ct chest", "ct staging", "contrast ct", "imaging staging", "head and neck ct"], "imaging", 3, "CT staging determines whether the disease is resectable and guides MDT planning; this is arranged in parallel with or following ENT assessment.", ["malignancy", "imaging"]),
+    ix("oes-pharyngoscopy", "Endoscopy or pharyngoscopy under GA", "Postcricoid lesion identified; biopsy confirms squamous cell carcinoma.", ["endoscopy", "pharyngoscopy", "laryngoscopy", "oga", "biopsy", "tissue diagnosis", "flexible laryngoscopy"], "special", 3, "Tissue diagnosis is required before definitive oncological treatment; this occurs in the specialist setting, not GP.", ["malignancy"]),
+    ix("iron-replace-pre", "Commence iron replacement pre-procedurally and optimise for anaesthesia", "IV iron ordered given severity of deficiency.", ["iron replacement", "iron infusion", "oral iron", "pre-operative", "iv iron", "ferric carboxymaltose"], "bloods", 2, "Correcting severe iron deficiency improves perioperative haemoglobin and reduces transfusion risk during major head and neck surgery."),
+    ix("u-se-lft-coag", "UEC, LFTs, coagulation, group and hold", "Renal and hepatic function normal. Coagulation normal.", ["uec", "renal function", "lft", "coagulation", "coag", "inr", "group and hold", "baseline bloods"], "bloods", 1, "Pre-procedural baseline; normal results confirm fitness for general anaesthesia and surgical intervention.")
+   ],
+   management: [
+    mx("urgent-ent-ref", "Same-week ENT or head and neck surgical referral — use two-week-wait cancer pathway", ["ent referral", "urgent referral", "two week wait", "cancer pathway", "head and neck referral", "same week"], 3, "This is the most urgent management step. Do not wait for iron studies or imaging results to initiate referral when the clinical picture is this compelling. Delayed diagnosis of postcricoid carcinoma significantly worsens prognosis."),
+    mx("iron-replacement-mgmt", "Commence iron replacement: oral iron first-line, IV iron if severe or procedure imminent", ["iron replacement", "oral iron", "iv iron", "ferric carboxymaltose", "ferrous sulphate", "iron deficiency treatment"], 3, "Iron replacement is both therapeutic (for the deficiency) and potentially reduces mucosal dysplasia risk; it optimises the patient for surgery."),
+    mx("nutrition-support", "Arrange speech pathology and dietitian review for dysphagia and nutrition", ["speech pathology", "dietitian", "nutrition", "dysphagia management", "modified diet", "swallowing", "nasogastric"], 2, "Progressive dysphagia carries aspiration and malnutrition risk; active nutrition support is a safety priority pending definitive treatment."),
+    mx("psychosocial-separation-mgmt", "Address the separation, financial stress and isolation — offer GP mental health plan, social worker, and explicitly check in on her wellbeing", ["mental health plan", "social worker", "depression", "separation", "financial stress", "psychosocial", "wellbeing", "isolation"], 3, "This patient has been minimising and deferring care for over a year because of social circumstances. Addressing the underlying stressor is as important as the cancer pathway for engagement with care."),
+    mx("safeguard-disclosure", "Explain the findings clearly and without minimising — involve family with consent", ["explain diagnosis", "communication", "family", "consent", "disclosure", "breaking bad news", "support"], 2, "Patients who have been deferring care due to social isolation often need explicit permission and support to engage their family network."),
+    mx("safety-net-dysphagia", "Safety-net urgent review for complete dysphagia, aspiration, haemoptysis or rapid weight loss", ["safety net", "complete dysphagia", "aspiration", "haemoptysis", "urgent review", "worsening"], 2, "While specialist review is pending, the patient must know which symptoms demand immediate emergency care.")
+   ],
+   examinerNotes: "This is a hard case because the stem gives only 'food getting stuck' and the patient has been attributing her progressive dysphagia to rushing meals for four months. The diagnosis is a postcricoid squamous cell carcinoma arising on a background of Plummer-Vinson syndrome. Most candidates will identify malignancy as a differential but will not connect the koilonychia, anaemia and postcricoid dysphagia into the Plummer-Vinson triad. Critical failures to watch for: (1) not examining nails and mouth carefully enough to find koilonychia and glossitis, (2) not asking about hoarseness and referred otalgia as malignancy red flags, (3) not palpating the neck and finding the lymph node, (4) waiting for investigation results before making an urgent ENT referral, (5) not addressing the psychosocial thread. The psychosocial thread — separation, financial stress, isolation and symptom minimisation — runs through the whole case and directly explains the four-month delay.",
+   discriminators: [
+    "Elicits the precise progression from solids to liquids and localises the obstruction to the pharyngeal/throat level rather than the chest",
+    "Proactively asks about koilonychia, angular cheilitis and glossitis — and examines for them — connecting them to iron deficiency and the Plummer-Vinson triad",
+    "Asks about hoarseness and referred otalgia as red flags for pharyngeal malignancy",
+    "Palpates the neck and identifies the cervical lymph node as a presumed malignant finding",
+    "Initiates urgent ENT referral on clinical grounds without waiting for investigation results to come back",
+    "Names the psychosocial driver (separation and financial stress) and addresses it as a distinct management item rather than just noting it"
+   ],
+   doubleCheck: [
+    "Two-week-wait cancer referral pathways in Victoria: confirm current HealthPathways criteria for urgent head and neck cancer referral.",
+    "Plummer-Vinson syndrome is associated with a significantly elevated risk of postcricoid and pharyngeal carcinoma; iron replacement alone does not eliminate this risk — specialist surveillance is required.",
+    "IV iron dosing (ferric carboxymaltose) should be checked against current eTG Haematology chapter.",
+    ...commonDoubleCheck
+   ]
   }
  ];
 
@@ -1414,14 +1746,22 @@
   "fatigue-variceal-017": "On inspection, the patient looks pale and fatigued with subtle jaundice and chronic liver disease stigmata.",
   "chest-pericarditis-018": "On inspection, the patient looks uncomfortable and prefers to sit forward because lying flat worsens the pain.",
   "fever-endocarditis-019": "On inspection, the patient looks febrile and unwell, with visible track marks and a tired appearance.",
-  "cough-aspiration-stroke-020": "On inspection, the patient looks unwell, breathless and confused, with a wet cough and subtle dysarthria."
+  "cough-aspiration-stroke-020": "On inspection, the patient looks unwell, breathless and confused, with a wet cough and subtle dysarthria.",
+  "palp-phaeochromocytoma-001": "On inspection, the patient looks well at rest but pale under closer inspection, with a concealer-covered bruise visible on the left forearm.",
+  "wl-coeliac-001": "On inspection, the patient looks thin and mildly pale, with flat spoon-shaped nails and angular cracks at the corners of his mouth.",
+  "syncope-hcm-021": "On inspection, the patient is a well-built young man who appears well at rest with no acute distress.",
+  "dysphagia-pharyngeal-022": "On inspection, the patient looks pale and tired, with noticeably spoon-shaped nails and subtle angular cheilitis."
  };
 
  const SCBD_VITAL_FINDINGS = {
   "falls-orthostatic-006": "T 36.7, HR 74 lying and 88 standing, BP 138/76 lying and 102/62 standing, RR 14, SpO2 98% room air.",
   "constipation-parkinson-008": "T 36.6, HR 72, BP 132/78, RR 14, SpO2 98% room air.",
   "back-cauda-010": "T 36.8, HR 92, BP 145/86, RR 18, SpO2 99% room air.",
-  "mood-suicide-015": "T 36.6, HR 76, BP 118/72, RR 14, SpO2 99% room air."
+  "mood-suicide-015": "T 36.6, HR 76, BP 118/72, RR 14, SpO2 99% room air.",
+  "palp-phaeochromocytoma-001": "T 36.8, HR 88 regular, BP right arm 158/98 left arm 156/96, RR 14, SpO2 99% room air.",
+  "wl-coeliac-001": "Weight 61 kg (down from 67 kg). BMI 19.2. BP 100/62, HR 82, afebrile, SpO2 99% room air.",
+  "syncope-hcm-021": "HR 62 regular. BP 118/76 sitting 116/74 standing. SpO2 99%. Afebrile.",
+  "dysphagia-pharyngeal-022": "Weight 61 kg (down from 66 kg). BP 118/74, HR 88, afebrile, SpO2 98% room air."
  };
 
  function examText(item) {
