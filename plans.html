@@ -44,6 +44,28 @@
  "image": "https://www.key2md.com/key2md-og.png",
  "url": "https://www.key2md.com/plans.html",
  "category": "Education / Test Preparation",
+ "aggregateRating": {
+ "@type": "AggregateRating",
+ "ratingValue": "5",
+ "bestRating": "5",
+ "ratingCount": "3",
+ "reviewCount": "3"
+ },
+ "review": [
+ {
+ "@type": "Review",
+ "author": {
+ "@type": "Person",
+ "name": "Ri"
+ },
+ "reviewRating": {
+ "@type": "Rating",
+ "ratingValue": "5",
+ "bestRating": "5"
+ },
+ "reviewBody": "After tackling CASPer with Dan's help, I got an offer to my top-choice medical school. Dan's approach was incredibly thorough - detailed feedback, notes after every session."
+ }
+ ],
  "offers": {
  "@type": "Offer",
  "name": "CASPer Pro Weekly Subscription",
@@ -58,6 +80,42 @@
  },
  "availability": "https://schema.org/InStock",
  "url": "https://www.key2md.com/plans.html",
+ "itemCondition": "https://schema.org/NewCondition",
+ "shippingDetails": {
+ "@type": "OfferShippingDetails",
+ "name": "Digital delivery",
+ "description": "CASPer Pro is delivered online immediately after successful Stripe payment. No physical item is shipped.",
+ "shippingDestination": {
+ "@type": "DefinedRegion",
+ "addressCountry": "AU"
+ },
+ "shippingRate": {
+ "@type": "MonetaryAmount",
+ "value": "0",
+ "currency": "AUD"
+ },
+ "deliveryTime": {
+ "@type": "ShippingDeliveryTime",
+ "handlingTime": {
+ "@type": "QuantitativeValue",
+ "minValue": 0,
+ "maxValue": 0,
+ "unitCode": "DAY"
+ },
+ "transitTime": {
+ "@type": "QuantitativeValue",
+ "minValue": 0,
+ "maxValue": 0,
+ "unitCode": "DAY"
+ }
+ }
+ },
+ "hasMerchantReturnPolicy": {
+ "@type": "MerchantReturnPolicy",
+ "applicableCountry": "AU",
+ "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+ "merchantReturnLink": "https://www.key2md.com/terms.html"
+ },
  "seller": {
  "@id": "https://www.key2md.com/#organization"
  }
@@ -1155,6 +1213,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How are credits different from Pro?</button><div class="faq-a"><div class="faq-a-inner">Credits are pay-per-review - you buy a pack and each AI feedback uses one credit. They never expire and work for both CASPer and GAMSAT S2. Pro is subscription access for volume practice: CASPer Pro gives unlimited CASPer reviews, while GAMSAT S2 Pro gives fair-use unlimited essay reviews.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is this the same as Dan's 1:1 coaching?</button><div class="faq-a"><div class="faq-a-inner">The rubric is the same - Dan built the marking criteria from his coaching experience. However, 1:1 coaching includes personalised strategy sessions, live practice, and Dan's direct input on your specific weaknesses. The AI tool is the framework at scale - same criteria, not a replacement for coaching.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are payments secure?</button><div class="faq-a"><div class="faq-a-inner">All payments are processed by Stripe - the same provider used by Shopify, Airbnb, and major Australian banks. Key2MD never sees or stores your card details. Receipts are sent automatically by Stripe.</div></div></div>
+ <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is anything shipped? What about returns?</button><div class="faq-a"><div class="faq-a-inner">Nothing physical is shipped. Credits, Pro access, MMI feedback and mock exam access are digital products delivered through your Key2MD account after payment. Because access starts immediately, change-of-mind returns are not offered; if there is a duplicate payment or access fault, reply to Dan and it can be checked manually.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What if my Pro payment fails?</button><div class="faq-a"><div class="faq-a-inner">Stripe will retry automatically. If it continues to fail, your account reverts to the free tier and you'll receive an email. You can resubscribe at any time from this page.</div></div></div>
  </div>
  </div>
