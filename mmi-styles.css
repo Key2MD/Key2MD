@@ -801,3 +801,259 @@ details[open] .mmi-premium-chevron { transform: rotate(180deg); }
  border-color: rgba(124,58,237,0.3);
  background: rgba(124,58,237,0.06);
 }
+
+/* -- Longitudinal MMI analytics ---------------------------------- */
+.mmi-analytics-card {
+ background: linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+ border: 1px solid rgba(14,165,233,0.18);
+ border-radius: 16px;
+ padding: 18px;
+ box-shadow: 0 16px 40px rgba(15,23,42,0.07);
+}
+
+.mmi-analytics-head {
+ display: flex;
+ align-items: flex-start;
+ justify-content: space-between;
+ gap: 14px;
+ margin-bottom: 14px;
+}
+
+.mmi-analytics-kicker {
+ font-size: 0.68rem;
+ font-weight: 850;
+ letter-spacing: 0.12em;
+ text-transform: uppercase;
+ color: var(--teal3);
+ margin-bottom: 4px;
+}
+
+.mmi-analytics-head h3 {
+ margin: 0 0 4px;
+ font-size: 1.05rem;
+ color: var(--navy);
+ letter-spacing: 0;
+}
+
+.mmi-analytics-head p,
+.mmi-chart-sub {
+ margin: 0;
+ font-size: 0.78rem;
+ color: var(--gray500);
+ line-height: 1.5;
+}
+
+.mmi-analytics-kpis {
+ display: grid;
+ grid-template-columns: repeat(4,minmax(0,1fr));
+ gap: 8px;
+ margin-bottom: 14px;
+}
+
+.mmi-analytics-kpi {
+ background: #fff;
+ border: 1px solid var(--gray200);
+ border-radius: 11px;
+ padding: 10px 12px;
+}
+
+.mmi-analytics-kpi span {
+ display: block;
+ font-size: 0.66rem;
+ font-weight: 800;
+ letter-spacing: 0.08em;
+ text-transform: uppercase;
+ color: var(--gray400);
+ margin-bottom: 3px;
+}
+
+.mmi-analytics-kpi strong {
+ display: block;
+ font-size: 1rem;
+ color: var(--navy);
+ line-height: 1.2;
+}
+
+.mmi-analytics-kpi.up strong,
+.mmi-skill-meta.up,
+.mmi-chart-readout .up { color: #15803d; }
+
+.mmi-analytics-kpi.down strong,
+.mmi-skill-meta.down,
+.mmi-chart-readout .down { color: #b45309; }
+
+.mmi-skill-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+ gap: 8px;
+ margin-bottom: 14px;
+}
+
+.mmi-skill-card {
+ border: 1px solid var(--gray200);
+ background: #fff;
+ border-radius: 11px;
+ padding: 10px 11px;
+ text-align: left;
+ cursor: pointer;
+ font-family: inherit;
+ transition: border-color .18s, box-shadow .18s, transform .18s, background .18s;
+}
+
+.mmi-skill-card:hover {
+ border-color: rgba(14,165,233,0.42);
+ background: rgba(14,165,233,0.035);
+ transform: translateY(-1px);
+}
+
+.mmi-skill-card.active {
+ border-color: var(--teal);
+ box-shadow: 0 0 0 2px rgba(14,165,233,0.12);
+ background: rgba(14,165,233,0.06);
+}
+
+.mmi-overall-skill {
+ min-width: 150px;
+ flex-shrink: 0;
+}
+
+.mmi-skill-card-top {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 8px;
+ margin-bottom: 7px;
+}
+
+.mmi-skill-card-top span {
+ font-size: 0.76rem;
+ font-weight: 850;
+ color: var(--navy);
+ line-height: 1.25;
+}
+
+.mmi-skill-card-top strong {
+ font-size: 0.78rem;
+ color: #7c3aed;
+ white-space: nowrap;
+}
+
+.mmi-skill-track {
+ height: 6px;
+ border-radius: 999px;
+ background: var(--gray200);
+ overflow: hidden;
+}
+
+.mmi-skill-track span {
+ display: block;
+ height: 100%;
+ border-radius: inherit;
+ background: linear-gradient(90deg,var(--teal),#7c3aed);
+}
+
+.mmi-skill-meta {
+ margin-top: 6px;
+ font-size: 0.68rem;
+ color: var(--gray400);
+ line-height: 1.35;
+}
+
+.mmi-chart-panel {
+ background: #fff;
+ border: 1px solid var(--gray200);
+ border-radius: 13px;
+ padding: 14px;
+}
+
+.mmi-chart-copy {
+ display: flex;
+ align-items: flex-start;
+ justify-content: space-between;
+ gap: 12px;
+ margin-bottom: 8px;
+}
+
+.mmi-chart-title {
+ font-size: 0.92rem;
+ font-weight: 900;
+ color: var(--navy);
+}
+
+.mmi-line-chart {
+ width: 100%;
+ height: auto;
+ display: block;
+ overflow: visible;
+}
+
+.mmi-chart-grid {
+ stroke: #e5e7eb;
+ stroke-width: 1;
+}
+
+.mmi-chart-axis,
+.mmi-chart-date {
+ fill: #94a3b8;
+ font-size: 11px;
+ font-weight: 700;
+}
+
+.mmi-chart-line {
+ fill: none;
+ stroke: #7c3aed;
+ stroke-width: 3;
+ stroke-linecap: round;
+ stroke-linejoin: round;
+}
+
+.mmi-chart-dot {
+ fill: #fff;
+ stroke: #7c3aed;
+ stroke-width: 3;
+}
+
+.mmi-chart-readout {
+ display: flex;
+ gap: 8px;
+ flex-wrap: wrap;
+ margin-top: 8px;
+ font-size: 0.74rem;
+ color: var(--gray500);
+}
+
+.mmi-chart-readout span {
+ background: var(--gray50);
+ border: 1px solid var(--gray200);
+ border-radius: 999px;
+ padding: 5px 9px;
+ font-weight: 800;
+}
+
+.mmi-selected-comment,
+.mmi-analytics-history-note {
+ margin-top: 10px;
+ border-left: 3px solid var(--teal);
+ background: rgba(14,165,233,0.045);
+ border-radius: 0 9px 9px 0;
+ padding: 9px 11px;
+ font-size: 0.78rem;
+ color: var(--gray600);
+ line-height: 1.55;
+}
+
+.mmi-selected-comment strong { color: var(--navy); }
+
+.mmi-analytics-loading,
+.mmi-analytics-empty {
+ font-size: 0.82rem;
+ color: var(--gray500);
+ line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+ .mmi-analytics-head { flex-direction: column; }
+ .mmi-overall-skill { width: 100%; }
+ .mmi-analytics-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .mmi-chart-copy { flex-direction: column; }
+}

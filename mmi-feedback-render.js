@@ -14,9 +14,322 @@ const MMIFeedbackRender = (() => {
  reflection: 'Reflection',
  real_world_awareness: 'Real-world Awareness',
  };
+ const CRITERIA_KEYS = Object.keys(CRITERIA_LABELS);
+ const CRITERIA_HELP = {
+ empathy: 'Recognising emotion, vulnerability, and the human meaning of the station.',
+ communication: 'Explaining ideas clearly under pressure without sounding scripted.',
+ reasoning: 'Weighing competing duties and landing on a defensible action.',
+ reflection: 'Showing self-awareness that would change future behaviour.',
+ real_world_awareness: 'Understanding hierarchy, safety, confidentiality, and practical constraints.',
+ };
+ let analyticsState = { mount: null, points: [], selectedKey: 'overall' };
 
  function esc(str) {
  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ }
+
+ function attr(str) {
+ return esc(str).replace(/'/g,'&#39;');
+ }
+
+ function finiteScore(value) {
+ const n = Number(value);
+ return Number.isFinite(n) ? Math.max(1, Math.min(5, Math.round(n * 10) / 10)) : null;
+ }
+
+ function average(values) {
+ const nums = values.map(finiteScore).filter(Number.isFinite);
+ return nums.length ? Math.round((nums.reduce((sum, n) => sum + n, 0) / nums.length) * 10) / 10 : null;
+ }
+
+ function scoreText(value) {
+ const n = finiteScore(value);
+ return Number.isFinite(n) ? n.toFixed(n % 1 ? 1 : 0) : '-';
+ }
+
+ function parseFeedback(raw) {
+ if (!raw) return null;
+ if (typeof raw === 'object') return raw;
+ try { return JSON.parse(raw); } catch { return null; }
+ }
+
+ function criterionSnapshot(feedback, key) {
+ const prompts = Array.isArray(feedback?.per_prompt) ? feedback.per_prompt : [];
+ const scores = [];
+ const comments = [];
+ prompts.forEach(prompt => {
+ const crit = prompt?.scores?.[key];
+ const score = finiteScore(crit?.score);
+ if (Number.isFinite(score)) scores.push(score);
+ if (crit?.comment) comments.push(String(crit.comment));
+ });
+ return {
+ score: average(scores),
+ count: scores.length,
+ comment: comments.find(Boolean) || '',
+ };
+ }
+
+ function pointFromReview(row) {
+ const feedback = parseFeedback(row?.ai_feedback_json || row?.feedback || row);
+ if (!feedback) return null;
+ const criteria = {};
+ CRITERIA_KEYS.forEach(key => { criteria[key] = criterionSnapshot(feedback, key); });
+ const overall = finiteScore(feedback?.overall?.score);
+ return {
+ id: String(row?.id || ''),
+ created_at: row?.created_at || new Date().toISOString(),
+ category: row?.station_category || row?.category || '',
+ tier: row?.tier || '',
+ feedback,
+ overall,
+ criteria,
+ };
+ }
+
+ function pointFromCurrent(data, context) {
+ const feedback = data?.feedback || data;
+ if (!feedback) return null;
+ return pointFromReview({
+ id: data?.review_id || `current-${Date.now()}`,
+ created_at: new Date().toISOString(),
+ station_category: context?.stationCategory || '',
+ tier: context?.tier || '',
+ ai_feedback_json: feedback,
+ });
+ }
+
+ function pointScore(point, key) {
+ if (!point) return null;
+ if (key === 'overall') return finiteScore(point.overall);
+ return finiteScore(point.criteria?.[key]?.score);
+ }
+
+ function seriesFor(points, key) {
+ return (points || [])
+ .map((point, index) => ({ point, index, score: pointScore(point, key) }))
+ .filter(item => Number.isFinite(item.score));
+ }
+
+ function trendDelta(series) {
+ if (!series || series.length < 2) return null;
+ if (series.length >= 4) {
+ const recent = average(series.slice(-3).map(item => item.score));
+ const earlier = average(series.slice(0, Math.max(1, series.length - 3)).map(item => item.score));
+ return Number.isFinite(recent) && Number.isFinite(earlier) ? Math.round((recent - earlier) * 10) / 10 : null;
+ }
+ return Math.round((series[series.length - 1].score - series[series.length - 2].score) * 10) / 10;
+ }
+
+ function trendLabel(delta) {
+ if (!Number.isFinite(delta)) return 'More data needed';
+ if (delta >= 0.3) return `Improving +${delta.toFixed(1)}`;
+ if (delta <= -0.3) return `Dropping ${delta.toFixed(1)}`;
+ return 'Stable';
+ }
+
+ function trendClass(delta) {
+ if (!Number.isFinite(delta)) return 'neutral';
+ if (delta >= 0.3) return 'up';
+ if (delta <= -0.3) return 'down';
+ return 'neutral';
+ }
+
+ function shortDate(value) {
+ const d = new Date(value);
+ if (Number.isNaN(d.getTime())) return '';
+ return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+ }
+
+ function skillStats(points) {
+ return CRITERIA_KEYS.map(key => {
+ const series = seriesFor(points, key);
+ const latest = series[series.length - 1];
+ return {
+ key,
+ label: CRITERIA_LABELS[key],
+ avg: average(series.map(item => item.score)),
+ latest: latest?.score ?? null,
+ count: series.length,
+ delta: trendDelta(series),
+ latestComment: latest?.point?.criteria?.[key]?.comment || '',
+ };
+ }).sort((a, b) => {
+ const aScore = Number.isFinite(a.latest) ? a.latest : 99;
+ const bScore = Number.isFinite(b.latest) ? b.latest : 99;
+ return aScore - bScore;
+ });
+ }
+
+ function renderLineChart(points, key) {
+ const series = seriesFor(points, key);
+ if (!series.length) {
+ return '<div class="mmi-analytics-empty">No scored data for this skill yet.</div>';
+ }
+ const width = 560;
+ const height = 170;
+ const left = 34;
+ const right = 20;
+ const top = 18;
+ const bottom = 32;
+ const plotW = width - left - right;
+ const plotH = height - top - bottom;
+ const xFor = i => series.length === 1 ? left + plotW / 2 : left + (i / (series.length - 1)) * plotW;
+ const yFor = score => top + ((5 - score) / 4) * plotH;
+ const coords = series.map((item, i) => `${xFor(i).toFixed(1)},${yFor(item.score).toFixed(1)}`).join(' ');
+ const pointsSvg = series.map((item, i) => {
+ const x = xFor(i).toFixed(1);
+ const y = yFor(item.score).toFixed(1);
+ const date = shortDate(item.point.created_at);
+ return `<circle class="mmi-chart-dot" cx="${x}" cy="${y}" r="4"><title>${esc(date)}: ${scoreText(item.score)}/5</title></circle>`;
+ }).join('');
+ const grid = [1,2,3,4,5].map(score => {
+ const y = yFor(score).toFixed(1);
+ return `<line class="mmi-chart-grid" x1="${left}" y1="${y}" x2="${width - right}" y2="${y}"></line><text class="mmi-chart-axis" x="8" y="${Number(y) + 4}">${score}</text>`;
+ }).join('');
+ const first = shortDate(series[0].point.created_at);
+ const last = shortDate(series[series.length - 1].point.created_at);
+ return `
+ <svg class="mmi-line-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(key === 'overall' ? 'Overall' : CRITERIA_LABELS[key])} score trend">
+ ${grid}
+ <polyline class="mmi-chart-line" points="${coords}"></polyline>
+ ${pointsSvg}
+ <text class="mmi-chart-date" x="${left}" y="${height - 8}">${esc(first)}</text>
+ <text class="mmi-chart-date" x="${width - right}" y="${height - 8}" text-anchor="end">${esc(last)}</text>
+ </svg>`;
+ }
+
+ function analyticsKpis(points) {
+ const overall = seriesFor(points, 'overall');
+ const recent = overall.slice(-3);
+ const avg = average(overall.map(item => item.score));
+ const recentAvg = average(recent.map(item => item.score));
+ const delta = trendDelta(overall);
+ return `
+ <div class="mmi-analytics-kpis">
+ <div class="mmi-analytics-kpi"><span>Reviews</span><strong>${overall.length}</strong></div>
+ <div class="mmi-analytics-kpi"><span>Average</span><strong>${scoreText(avg)}/5</strong></div>
+ <div class="mmi-analytics-kpi"><span>Recent 3</span><strong>${scoreText(recentAvg)}/5</strong></div>
+ <div class="mmi-analytics-kpi ${trendClass(delta)}"><span>Trend</span><strong>${esc(trendLabel(delta))}</strong></div>
+ </div>`;
+ }
+
+ function renderAnalytics() {
+ const mount = analyticsState.mount;
+ const points = analyticsState.points || [];
+ if (!mount) return;
+ if (!points.length) {
+ mount.innerHTML = '<div class="mmi-analytics-card"><div class="mmi-analytics-empty">Complete a few MMI reviews and this becomes your skill tracker.</div></div>';
+ return;
+ }
+ const stats = skillStats(points);
+ const weakest = stats.find(s => Number.isFinite(s.latest)) || stats[0];
+ if (!analyticsState.selectedKey || (analyticsState.selectedKey !== 'overall' && !CRITERIA_KEYS.includes(analyticsState.selectedKey))) {
+ analyticsState.selectedKey = weakest?.key || 'overall';
+ }
+ const selectedKey = analyticsState.selectedKey;
+ const selectedSeries = seriesFor(points, selectedKey);
+ const selectedLatest = selectedSeries[selectedSeries.length - 1];
+ const selectedDelta = trendDelta(selectedSeries);
+ const selectedLabel = selectedKey === 'overall' ? 'Overall score' : CRITERIA_LABELS[selectedKey];
+ const selectedHelp = selectedKey === 'overall'
+ ? 'Your broad MMI performance signal across saved spoken reviews.'
+ : CRITERIA_HELP[selectedKey];
+ const latestComment = selectedKey === 'overall'
+ ? selectedLatest?.point?.feedback?.overall?.biggest_improvement || selectedLatest?.point?.feedback?.overall?.biggest_strength || ''
+ : selectedLatest?.point?.criteria?.[selectedKey]?.comment || '';
+
+ const overallActive = selectedKey === 'overall' ? ' active' : '';
+ const skillButtons = stats.map(stat => {
+ const active = stat.key === selectedKey ? ' active' : '';
+ const pct = Number.isFinite(stat.latest) ? Math.max(0, Math.min(100, (stat.latest / 5) * 100)) : 0;
+ return `
+ <button class="mmi-skill-card${active}" type="button" data-mmi-skill="${attr(stat.key)}">
+ <div class="mmi-skill-card-top"><span>${esc(stat.label)}</span><strong>${scoreText(stat.latest)}/5</strong></div>
+ <div class="mmi-skill-track"><span style="width:${pct}%"></span></div>
+ <div class="mmi-skill-meta ${trendClass(stat.delta)}">${esc(trendLabel(stat.delta))} | ${stat.count} mark${stat.count === 1 ? '' : 's'}</div>
+ </button>`;
+ }).join('');
+
+ mount.innerHTML = `
+ <div class="mmi-analytics-card">
+ <div class="mmi-analytics-head">
+ <div>
+ <div class="mmi-analytics-kicker">Progress analytics</div>
+ <h3>MMI skills over time</h3>
+ <p>Click a skill to see how that criterion is tracking across your saved MMI markings.</p>
+ </div>
+ <button class="mmi-skill-card mmi-overall-skill${overallActive}" type="button" data-mmi-skill="overall">
+ <div class="mmi-skill-card-top"><span>Overall</span><strong>${scoreText(pointScore(points[points.length - 1], 'overall'))}/5</strong></div>
+ <div class="mmi-skill-meta ${trendClass(trendDelta(seriesFor(points, 'overall')))}">${esc(trendLabel(trendDelta(seriesFor(points, 'overall'))))}</div>
+ </button>
+ </div>
+ ${analyticsKpis(points)}
+ <div class="mmi-skill-grid">${skillButtons}</div>
+ <div class="mmi-chart-panel">
+ <div class="mmi-chart-copy">
+ <div class="mmi-chart-title">${esc(selectedLabel)}</div>
+ <div class="mmi-chart-sub">${esc(selectedHelp)}</div>
+ </div>
+ ${renderLineChart(points, selectedKey)}
+ <div class="mmi-chart-readout">
+ <span class="${trendClass(selectedDelta)}">${esc(trendLabel(selectedDelta))}</span>
+ ${selectedLatest ? `<span>Latest: ${scoreText(selectedLatest.score)}/5 on ${esc(shortDate(selectedLatest.point.created_at))}</span>` : ''}
+ </div>
+ ${latestComment ? `<div class="mmi-selected-comment"><strong>Latest note:</strong> ${esc(latestComment)}</div>` : ''}
+ </div>
+ </div>`;
+
+ mount.querySelectorAll('[data-mmi-skill]').forEach(button => {
+ button.addEventListener('click', () => {
+ analyticsState.selectedKey = button.getAttribute('data-mmi-skill') || 'overall';
+ renderAnalytics();
+ });
+ });
+ }
+
+ function authToken() {
+ try {
+ return (window.Key2MDAuth?.getToken?.() || localStorage.getItem('key2md_token') || '').trim();
+ } catch {
+ return '';
+ }
+ }
+
+ function apiBase() {
+ return window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+ }
+
+ async function hydrateAnalytics(container, data, context) {
+ const mount = container?.querySelector?.('#mmiAnalyticsMount');
+ if (!mount) return;
+ analyticsState.mount = mount;
+ analyticsState.selectedKey = '';
+ mount.innerHTML = '<div class="mmi-analytics-card"><div class="mmi-analytics-loading">Loading your MMI trend history...</div></div>';
+ const current = pointFromCurrent(data, context);
+ const token = authToken();
+ if (!token) {
+ analyticsState.points = current ? [current] : [];
+ renderAnalytics();
+ return;
+ }
+ try {
+ const res = await fetch(`${apiBase()}/api/mmi/reviews?limit=50&source=mmi`, { headers: { Authorization: `Bearer ${token}` } });
+ const payload = await res.json().catch(() => ({}));
+ if (!res.ok) throw new Error(payload.message || payload.error || 'Could not load MMI history');
+ const map = new Map();
+ (payload.reviews || []).map(pointFromReview).filter(Boolean).forEach(point => map.set(point.id || point.created_at, point));
+ if (current) map.set(current.id || current.created_at, current);
+ analyticsState.points = Array.from(map.values()).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+ renderAnalytics();
+ } catch (err) {
+ analyticsState.points = current ? [current] : [];
+ renderAnalytics();
+ const note = document.createElement('div');
+ note.className = 'mmi-analytics-history-note';
+ note.textContent = 'History could not load, so this is showing the latest station only.';
+ mount.querySelector('.mmi-analytics-card')?.appendChild(note);
+ }
  }
 
  function scoreBar(score) {
@@ -201,6 +514,8 @@ const MMIFeedbackRender = (() => {
 
  ${auditorFlag}
 
+ <div id="mmiAnalyticsMount"></div>
+
  <div class="mmi-prompts-block">
  ${promptCards}
  </div>
@@ -246,6 +561,7 @@ const MMIFeedbackRender = (() => {
 
  container.innerHTML = html;
  window._lastMMIFeedback = feedback;
+ hydrateAnalytics(container, data, context);
  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
  }
 
@@ -317,6 +633,6 @@ const MMIFeedbackRender = (() => {
  if (container) container.innerHTML = '';
  }
 
- return { render, renderLoading, renderError, clear };
+ return { render, renderLoading, renderError, clear, selectSkill: key => { analyticsState.selectedKey = key || 'overall'; renderAnalytics(); } };
 
 })();
