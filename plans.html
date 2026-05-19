@@ -846,7 +846,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  Full CASPer Mock Exam
  </h2>
  <p style="color:rgba(255,255,255,0.55);font-size:1.05rem;line-height:1.7;max-width:580px;margin:0 auto;">
- The full CASPer sequence in one sitting: 4 video-response stations, then 7 written stations. All 11 stations are completely new and handwritten by Dan, with realistic breaks and a full debrief at the end.
+ The full CASPer sequence in one sitting: 4 video-response stations, then 7 written stations. Mocks now come from a rotating private bank handwritten by Dan, with realistic breaks and a full debrief at the end.
  </p>
  </div>
 
@@ -857,12 +857,12 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div>
  <div style="font-size:1.6rem;margin-bottom:8px;"></div>
  <div style="font-weight:700;color:#fff;margin-bottom:6px;font-size:0.95rem;">Start the CASPer-style sequence</div>
- <div style="color:rgba(255,255,255,0.5);font-size:0.85rem;line-height:1.6;">Four CASPer-style video stations first, followed by seven written stations. Completely new stations, handwritten by Dan. No MMI questions in the mock.</div>
+ <div style="color:rgba(255,255,255,0.5);font-size:0.85rem;line-height:1.6;">Four CASPer-style video stations first, followed by seven written stations. The next unused private mock is selected automatically. No MMI questions in the mock.</div>
  </div>
  <div>
  <div style="font-size:1.6rem;margin-bottom:8px;">T</div>
  <div style="font-weight:700;color:#fff;margin-bottom:6px;font-size:0.95rem;">Real CASPer timing</div>
- <div style="color:rgba(255,255,255,0.5);font-size:0.85rem;line-height:1.6;">One-minute video answers, timed written responses, a 10-minute break after video, and a 5-minute break during the written section.</div>
+ <div style="color:rgba(255,255,255,0.5);font-size:0.85rem;line-height:1.6;">Video stations give 30 seconds to reflect, then 10 seconds to read each question and 60 seconds to answer. Typed responses and realistic breaks are built in.</div>
  </div>
  <div>
  <div style="font-size:1.6rem;margin-bottom:8px;"></div>
@@ -962,7 +962,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <ul style="list-style:none;padding:0;margin:0 0 16px;display:flex;flex-direction:column;gap:7px;font-size:0.83rem;color:rgba(255,255,255,0.6);">
  <li>&#10003; 7 written CASPer AI markings</li>
  <li>&#10003; 4 CASPer video transcript analyses</li>
- <li>&#10003; 11 new stations handwritten by Dan</li>
+ <li>&#10003; Next unused 11-station mock</li>
  <li>&#10003; CASPer-style video-to-written sequence</li>
  <li>&#10003; Realistic CASPer breaks</li>
  <li>&#10003; Full mock debrief report</li>
@@ -982,7 +982,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-bottom:16px;">$55 for CASPer Pro students | $97 credit-equivalent value</div>
  <ul style="list-style:none;padding:0;margin:0 0 16px;display:flex;flex-direction:column;gap:7px;font-size:0.83rem;color:rgba(255,255,255,0.6);">
  <li>&#10003; Everything in Transcript Mock</li>
- <li>&#10003; 11 new stations handwritten by Dan</li>
+ <li>&#10003; Next unused 11-station mock</li>
  <li>&#10003; Voice & pacing analysis per video station</li>
  <li>&#10003; Presentation analysis per video station</li>
  <li>&#10003; Voice stamina trend across the video section</li>
@@ -1408,7 +1408,7 @@ async function handleMockCheckout(tier) {
  const proPrice = tier === 'premium' ? '$55' : '$41';
  openModal(
  `Full CASPer Mock - ${label}`,
- `${standardPrice} regular | ${proPrice} for CASPer Pro | Includes 11 new stations handwritten by Dan, 7 written markings and 4 video analyses`,
+ `${standardPrice} regular | ${proPrice} for CASPer Pro | Includes the next unused 11-station mock, 7 written markings and 4 video analyses`,
  `mock_${tier}`
  );
 }

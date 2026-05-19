@@ -400,7 +400,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');" aria-label="MMI practice">MMI</button>
  <button class="mode-pill mode-pill-mock" id="modeMock" onclick="setMode('mock');window.FullCasperMock?.activateMockMode?.();" aria-label="Full CASPer mock exam"><span class="mock-pill-kicker">New</span><span>Full Mock</span></button>
  </div>
- <div class="mock-pill-helper">11 new stations handwritten by Dan | <a href="full-casper-mock-exam.html">details</a></div>
+ <div class="mock-pill-helper">Rotating mock bank | no repeats | <a href="full-casper-mock-exam.html">details</a></div>
  </div>
 
  <button class="btn-start" id="startBtn"><span id="startBtnIcon">></span><span id="startBtnText">Start Session</span></button>
@@ -1121,7 +1121,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <article class="practice-action-card">
  <div class="practice-action-kicker">Full CASPer mock</div>
  <div class="practice-action-title">4 video + 7 written stations</div>
- <p class="practice-action-copy">A full 11-station sequence using completely new stations handwritten by Dan. Best when you want exam-condition pressure, not more loose reps.</p>
+ <p class="practice-action-copy">A full 11-station sequence from the rotating private mock bank. Best when you want exam-condition pressure, not more loose reps, and each purchase should unlock a fresh unused mock.</p>
  <div class="practice-action-meta"><span class="practice-mini-tag">11 stations</span><span class="practice-mini-tag">Video + typed</span></div>
  <button type="button" class="practice-action-btn outline" onclick="setMode('mock');window.FullCasperMock?.activateMockMode?.();document.getElementById('practice-app').scrollIntoView({behavior:'smooth',block:'start'});">Open full mock</button>
  </article>
@@ -1319,7 +1319,7 @@ window.MMI_STATIONS = MMI_STATIONS;
 
 const MMI_PRESETS = {
  quickfire: { readingTime:45, recordingTime:300, promptCount:4, revealMode:'quickfire', perPromptRead:15, perPromptAnswer:60 },
- casperVideo:{ readingTime:30, recordingTime:120, promptCount:2, revealMode:'quickfire', perPromptRead:10, perPromptAnswer:60 },
+ casperVideo:{ readingTime:30, recordingTime:140, promptCount:2, revealMode:'quickfire', perPromptRead:10, perPromptAnswer:60 },
  standard: { readingTime:120, recordingTime:300, promptCount:3, revealMode:'all_at_once' },
  extended: { readingTime:120, recordingTime:480, promptCount:4, revealMode:'extended_sequential' },
  random: { readingTime:120, recordingTime:420, promptCount:3, revealMode:'random', followUpMin:1, followUpMax:2 },
@@ -2729,14 +2729,14 @@ function setMode(mode) {
  const isMock = mode === MODE_MOCK;
 
  const pt = document.getElementById('pageTitle');
- if (pt) pt.textContent = (isCasper ? 'CASPer Practice' : isMMI ? 'MMI Practice' : 'Full CASPer Mock Exam: new stations handwritten by Dan') + ' - Key2MD';
+ if (pt) pt.textContent = (isCasper ? 'CASPer Practice' : isMMI ? 'MMI Practice' : 'Full CASPer Mock Exam: rotating private mock bank') + ' - Key2MD';
 
  const ist = $('idle-sub-text');
  if (ist) ist.textContent = isCasper
  ? 'Choose a category and press Start Session to begin your CASPer practice session.'
  : isMMI
  ? 'Choose a station type and press Start Session to begin your MMI practice session.'
- : 'Configure your full CASPer mock exam below: 11 completely new stations handwritten by Dan.';
+ : 'Configure your full CASPer mock exam below. Key2MD will assign your next unused private mock automatically.';
 
  if (!isCasper) {
  if (isMMI && mmiActivePreset === 'casperVideo') mmiActivePreset = 'quickfire';

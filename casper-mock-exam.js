@@ -49,6 +49,7 @@ window.FullCasperMock = (() => {
  let lastRescueRecording = null;
  let mockStatusCache = null;
  let mockStatusRefreshToken = 0;
+ let activeMockExam = null;
 
  function byId(id) {
  return document.getElementById(id);
@@ -113,6 +114,7 @@ window.FullCasperMock = (() => {
  window.K2_ACTIVE_CASPER_MOCK = {
  tier: config.tier,
  attempt_id: mockAttemptId,
+ mock_exam: activeMockExam,
  station_order: Number(item?.order || index + 1),
  station_id: item?.station?.id || null,
  station_type: item?.type || null,
@@ -185,6 +187,7 @@ window.FullCasperMock = (() => {
  version: 1,
  attempt_id: mockAttemptId,
  saved_attempt_id: savedAttemptId,
+ mock_exam: activeMockExam,
  tier: config.tier,
  index,
  updated_at: new Date().toISOString(),
@@ -248,6 +251,7 @@ window.FullCasperMock = (() => {
  order: Number(item.order || i + 1),
  station: item.station || null,
  })) : [];
+ activeMockExam = draft.mock_exam || null;
  results = hydrateResultsFromDraft(draft.rows || []);
  index = Math.max(0, Math.min(Number(draft.index || results.length || 0), Math.max(sequence.length - 1, 0)));
  mockAttemptId = draft.attempt_id;
@@ -365,7 +369,7 @@ window.FullCasperMock = (() => {
  body: JSON.stringify({ tier, success_url: successUrl, cancel_url: cancelUrl }),
  });
  const data = await res.json().catch(() => ({}));
- if (!res.ok) throw new Error(data.error || 'Could not start mock checkout');
+ if (!res.ok) throw new Error(data.message || data.error || 'Could not start mock checkout');
  if (!data.checkout_url) throw new Error('Checkout did not return a Stripe link. Make sure the patched worker is deployed.');
  window.location.href = data.checkout_url;
  }
@@ -375,12 +379,12 @@ window.FullCasperMock = (() => {
  const res = await fetch(`${apiBase()}/api/casper-mock/start`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
- body: JSON.stringify({ tier: config.tier, mock_slug: 'full-casper-mock-1' }),
+ body: JSON.stringify({ tier: config.tier }),
  });
  const data = await res.json().catch(() => ({}));
  if (!res.ok) throw new Error(data.message || data.error || 'Could not prepare the private mock stations.');
  if (!data.attempt_id || !Array.isArray(data.sequence) || data.sequence.length < VIDEO_COUNT + TYPED_COUNT) {
- throw new Error('The private mock bank is not ready yet. Check the D1 seed import.');
+ throw new Error('The private mock bank is not ready yet. Please try again shortly.');
  }
  return data;
  }
@@ -418,6 +422,19 @@ window.FullCasperMock = (() => {
 
  function tierLabel(tier = config.tier) {
  return tier === 'premium' ? 'Premium' : 'Transcript';
+ }
+
+ function pluralise(count, singular, plural = `${singular}s`) {
+ return Number(count) === 1 ? singular : plural;
+ }
+
+ function mockBankSummaryText(status = mockStatusCache) {
+ const total = Number(status?.mock_bank_total || 0);
+ const available = Number(status?.mock_bank_available || 0);
+ if (total > 0) {
+ return `${total} active ${pluralise(total, 'mock')}; ${Math.max(0, available)} unused for this account. Key2MD automatically selects the next unused mock.`;
+ }
+ return 'Multiple private mocks are live. Key2MD automatically selects the next unused mock for this account.';
  }
 
  function checkoutButtonText() {
@@ -536,7 +553,7 @@ window.FullCasperMock = (() => {
  <div class="sidebar-card" style="border-color:rgba(14,165,233,0.25);background:linear-gradient(180deg,rgba(14,165,233,0.06),#fff);">
  <h3>Full CASPer Mock</h3>
  <div style="font-size:0.82rem;color:var(--gray600);line-height:1.55;margin-bottom:14px;">
- CASPer-style sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. All 11 stations are completely new and handwritten by Dan.
+ CASPer-style sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. Multiple private mocks are live, and each account is assigned the next unused one.
  </div>
 
  <div style="margin-bottom:14px;">
@@ -551,7 +568,7 @@ window.FullCasperMock = (() => {
  <div style="background:#fff;border:1px solid rgba(14,165,233,0.24);border-radius:10px;padding:12px;margin-bottom:14px;">
  <div style="font-size:0.68rem;font-weight:800;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Mock exam pass</div>
  <div id="mockPriceLine" data-mock-price-line style="font-size:0.86rem;color:var(--navy);line-height:1.45;">${renderPriceLine('transcript')}</div>
- <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes 11 new handwritten stations by Dan, 7 written CASPer AI markings, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
+ <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes your next unused 11-station mock, 7 written CASPer AI markings, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
  </div>
 
  <div style="background:rgba(10,22,40,0.04);border:1px solid var(--gray200);border-radius:10px;padding:11px 12px;margin-bottom:14px;">
@@ -621,6 +638,7 @@ window.FullCasperMock = (() => {
  started = false;
  advancing = false;
  rulesAccepted = false;
+ activeMockExam = null;
  stationToken += 1;
  window.K2_ACTIVE_CASPER_MOCK = null;
  restoreSubmit();
@@ -691,10 +709,11 @@ window.FullCasperMock = (() => {
  `;
  }
  if (isSelectedTier && hasFullMockPass(status, config.tier)) {
+ const nextTitle = status.next_mock?.title ? ` It will assign ${status.next_mock.title} if you have not sat it before.` : '';
  return `
  <div style="max-width:720px;margin:0 auto 18px;background:#eff6ff;border:1px solid rgba(14,165,233,0.24);border-radius:12px;padding:13px 15px;text-align:left;">
  <div style="font-size:0.75rem;font-weight:900;color:var(--navy);">Mock pass ready</div>
- <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;margin-top:3px;">Your ${esc(tierLabel(status.tier))} mock pass is active. Press Enter to read the rules and begin.</div>
+ <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;margin-top:3px;">Your ${esc(tierLabel(status.tier))} mock pass is active. Press Enter to read the rules and begin.${esc(nextTitle)}</div>
  </div>
  `;
  }
@@ -726,25 +745,26 @@ window.FullCasperMock = (() => {
  </div>
  ` : '';
  const serverBanner = mockServerBanner();
+ const bankLine = mockBankSummaryText();
  area.innerHTML = `
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:34px 32px;text-align:center;">
  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Full CASPer Mock Exam</div>
  <h2 style="font-size:1.7rem;line-height:1.2;color:var(--navy);margin:0 0 10px;">Practise the full sequence in one sitting.</h2>
- <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with the optional breaks built in. The stations are completely new and handwritten by Dan, so it feels like a fresh exam rather than recycled practice.</p>
+ <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with optional breaks built in. The mock bank now has more than one full exam; students are assigned a fresh unused mock each time they buy.</p>
  ${draftBanner}
  ${serverBanner}
  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:720px;margin:0 auto 26px;text-align:left;">
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
  <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">4 video stations</div>
- <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">Camera check first, then two questions per scenario, one minute per answer.</div>
+ <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">30s to read and reflect, then 10s to read each question and 60s to answer.</div>
  </div>
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
  <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">7 typed stations</div>
  <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">Two questions together, 3:30 total writing time after reflection.</div>
  </div>
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
- <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">Real breaks</div>
- <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">Optional 10-minute and 5-minute breaks built into the flow.</div>
+ <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">No repeats</div>
+ <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">${esc(bankLine)}</div>
  </div>
  </div>
  <div style="max-width:680px;margin:0 auto 18px;text-align:left;">
@@ -838,6 +858,7 @@ window.FullCasperMock = (() => {
  }));
  mockAttemptId = mock.attempt_id;
  savedAttemptId = mock.attempt_id;
+ activeMockExam = mock.mock_exam || null;
  let restoredAttempt = null;
  if (mock.resumed) {
  try {
@@ -875,12 +896,12 @@ window.FullCasperMock = (() => {
  <div style="background:var(--navy);padding:26px 30px;color:#fff;">
  <div style="font-size:0.7rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:8px;">Before you begin</div>
  <h2 style="font-size:1.55rem;line-height:1.25;margin:0 0 8px;">Full CASPer Mock Exam rules</h2>
- <p style="font-size:0.9rem;color:rgba(255,255,255,0.68);line-height:1.6;margin:0;max-width:720px;">Your mock pass is active. You are about to begin 11 completely new CASPer stations handwritten by Dan. Read this once, then proceed when you are ready to start the first video station.</p>
+ <p style="font-size:0.9rem;color:rgba(255,255,255,0.68);line-height:1.6;margin:0;max-width:720px;">Your mock pass is active. You are about to begin your next unused 11-station CASPer mock handwritten by Dan. Read this once, then proceed when you are ready to start the first video station.</p>
  </div>
  <div style="padding:26px 30px;">
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:20px;">
  ${ruleCard('Sequence', '4 video-response scenarios first, then an optional 10-minute break, then 7 typed-response scenarios.')}
- ${ruleCard('Video section', 'Camera and microphone are required. The video timer starts only after the camera check, so permission issues will not burn exam time.')}
+ ${ruleCard('Video section', 'Camera and microphone are required. After the station prompt you get 30 seconds to reflect, then 10 seconds to read each question and 60 seconds to answer.')}
  ${ruleCard('Typed section', 'Each typed scenario gives a short reflection period, then 3:30 total writing time for two prompts.')}
  ${ruleCard('Breaks', 'You can take the built-in 10-minute and 5-minute breaks, or continue early. Leaving the page may interrupt the mock.')}
  ${ruleCard('Feedback', config.tier === 'premium' ? 'Premium includes transcript, voice, pacing, and presentation analysis for video stations.' : 'Transcript mock analyses what you said in video stations without voice or presentation scoring.')}
@@ -1352,7 +1373,7 @@ window.FullCasperMock = (() => {
  }
  const instruction = byId('speakingInstruction');
  if (instruction) {
- instruction.innerHTML = '<strong>CASPer video response</strong> - answer each question aloud. This mock uses one minute per response, matching the current video section.';
+ instruction.innerHTML = '<strong>CASPer video response</strong> - read the station, use the 30-second reflection period, then read each question for 10 seconds and answer aloud for 60 seconds.';
  }
  }
 
@@ -3309,7 +3330,7 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
  <div style="background:#fff;border-radius:18px;max-width:520px;width:100%;padding:28px 30px;box-shadow:0 20px 70px rgba(0,0,0,0.28);">
  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">You have done ${threshold}+ practice stations</div>
  <h3 style="font-size:1.35rem;color:var(--navy);line-height:1.25;margin:0 0 8px;">Time to test the whole format?</h3>
- <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;margin:0 0 18px;">Single stations build skill. The full mock gives you 11 completely new stations handwritten by Dan, then tests the thing students underestimate: switching from video to typed responses while tired.</p>
+ <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;margin:0 0 18px;">Single stations build skill. The full mock assigns your next unused 11-station exam handwritten by Dan, then tests the thing students underestimate: switching from video to typed responses while tired.</p>
  <div style="display:flex;gap:10px;flex-wrap:wrap;">
  <button onclick="document.getElementById('mockNudgeOverlay')?.remove();setMode('mock');FullCasperMock.activateMockMode();" style="flex:1;min-width:180px;padding:12px 18px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.88rem;font-weight:800;cursor:pointer;font-family:inherit;">Start full mock</button>
  <button onclick="document.getElementById('mockNudgeOverlay')?.remove();" style="padding:12px 18px;border-radius:50px;border:1px solid var(--gray200);background:#fff;color:var(--gray600);font-size:0.88rem;font-weight:750;cursor:pointer;font-family:inherit;">Keep practising</button>

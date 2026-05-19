@@ -115,8 +115,8 @@ function _setPhaseBadge(text, cls) {
 }
 
 // -- Quickfire engine ---------------------------------------------------------
-// 45 s initial read (handled by existing runTimer in loadStation)
-// Then: Q1 appears -> 15 s read -> 60 s answer -> Q2 -> ... repeat
+// Initial station read/reflection is handled by loadStation.
+// Then: Q1 appears -> per-question read -> answer -> Q2 -> ... repeat
 // Recording starts when first question appears (so whole session = 1 recording)
 
 let _qfIdx = 0; // current question index (0-based)
