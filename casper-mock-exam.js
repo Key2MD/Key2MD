@@ -434,7 +434,7 @@ window.FullCasperMock = (() => {
  if (total > 0) {
  return `${total} active ${pluralise(total, 'mock')}; ${Math.max(0, available)} unused for this account. Key2MD automatically selects the next unused mock.`;
  }
- return 'Multiple private mocks are live. Key2MD automatically selects the next unused mock for this account.';
+ return '3 active private mocks are live. Key2MD automatically selects the next unused mock for this account, with more being added.';
  }
 
  function checkoutButtonText() {
@@ -553,7 +553,7 @@ window.FullCasperMock = (() => {
  <div class="sidebar-card" style="border-color:rgba(14,165,233,0.25);background:linear-gradient(180deg,rgba(14,165,233,0.06),#fff);">
  <h3>Full CASPer Mock</h3>
  <div style="font-size:0.82rem;color:var(--gray600);line-height:1.55;margin-bottom:14px;">
- CASPer-style sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. Multiple private mocks are live, and each account is assigned the next unused one.
+ CASPer-style sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. 3 private mocks are live, and each account is assigned the next unused one.
  </div>
 
  <div style="margin-bottom:14px;">
@@ -750,7 +750,7 @@ window.FullCasperMock = (() => {
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:34px 32px;text-align:center;">
  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Full CASPer Mock Exam</div>
  <h2 style="font-size:1.7rem;line-height:1.2;color:var(--navy);margin:0 0 10px;">Practise the full sequence in one sitting.</h2>
- <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with optional breaks built in. The mock bank now has more than one full exam; students are assigned a fresh unused mock each time they buy.</p>
+ <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with optional breaks built in. The mock bank now has 3 full exams live; students are assigned a fresh unused mock each time they buy, with more being added.</p>
  ${draftBanner}
  ${serverBanner}
  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:720px;margin:0 auto 26px;text-align:left;">

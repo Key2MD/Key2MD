@@ -876,17 +876,17 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="mock-head">
  <div class="mock-kicker">Multiple mocks now live</div>
  <h2>Full CASPer mocks that never repeat.</h2>
- <p>Each purchase unlocks a fresh 11-station mock handwritten by Dan. Key2MD checks your account history before checkout and before the mock starts, so a student who has already sat one mock is assigned a different unused mock next time.</p>
+ <p>Each purchase unlocks a fresh 11-station mock from 3 active private mocks handwritten by Dan. Key2MD checks your account history before checkout and before the mock starts, so a student who has already sat one mock is assigned a different unused mock next time.</p>
  </div>
 
  <div class="mock-guarantee">
  <div class="mock-guarantee-main">
  <h3>The fresh mock guarantee</h3>
- <p>No recycled stations for the same student. If you have already completed Mock 1, your next pass is assigned to the next unused active mock. If you have somehow sat every active mock, checkout is blocked rather than selling you a repeat.</p>
+ <p>No recycled stations for the same student. If you have already completed any active mock, your next pass is assigned to the next unused active mock. If you have somehow sat every active mock, checkout is blocked rather than selling you a repeat.</p>
  </div>
  <div class="mock-guarantee-list">
  <div class="mock-guarantee-pill"><span class="mock-check">&#10003;</span><div><strong>Never repeat a completed mock</strong><span>Attempt history is checked before assigning the exam.</span></div></div>
- <div class="mock-guarantee-pill"><span class="mock-check">&#10003;</span><div><strong>Always new to that student</strong><span>The mock bank rotates forward as more full mocks are added.</span></div></div>
+ <div class="mock-guarantee-pill"><span class="mock-check">&#10003;</span><div><strong>Always new to that student</strong><span>3 full mocks are live now, and the bank rotates forward as more are added.</span></div></div>
  <div class="mock-guarantee-pill"><span class="mock-check">&#10003;</span><div><strong>Always handwritten by Dan</strong><span>Full CASPer-style scenarios, not recycled free-bank prompts.</span></div></div>
  </div>
  </div>
@@ -1383,7 +1383,7 @@ async function handleMockCheckout(tier) {
  const proPrice = tier === 'premium' ? '$55' : '$41';
  openModal(
  `Full CASPer Mock - ${label}`,
- `${standardPrice} regular | ${proPrice} for CASPer Pro | Includes a fresh unused 11-station mock, 7 typed-station markings and 4 video analyses. Never repeats a mock you have already sat.`,
+ `${standardPrice} regular | ${proPrice} for CASPer Pro | Includes a fresh unused 11-station mock from 3 active private mocks, 7 typed-station markings and 4 video analyses. Never repeats a mock you have already sat.`,
  `mock_${tier}`
  );
 }
