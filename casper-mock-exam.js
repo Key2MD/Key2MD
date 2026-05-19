@@ -568,7 +568,7 @@ window.FullCasperMock = (() => {
  <div style="background:#fff;border:1px solid rgba(14,165,233,0.24);border-radius:10px;padding:12px;margin-bottom:14px;">
  <div style="font-size:0.68rem;font-weight:800;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Mock exam pass</div>
  <div id="mockPriceLine" data-mock-price-line style="font-size:0.86rem;color:var(--navy);line-height:1.45;">${renderPriceLine('transcript')}</div>
- <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes your next unused 11-station mock, 7 written CASPer AI markings, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
+ <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes your next unused 11-station mock, 7 typed-station CASPer AI markings, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
  </div>
 
  <div style="background:rgba(10,22,40,0.04);border:1px solid var(--gray200);border-radius:10px;padding:11px 12px;margin-bottom:14px;">
@@ -756,7 +756,7 @@ window.FullCasperMock = (() => {
  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:720px;margin:0 auto 26px;text-align:left;">
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
  <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">4 video stations</div>
- <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">30s to read and reflect, then 10s to read each question and 60s to answer.</div>
+ <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">30s to reflect after the station prompt, then 10s to read each question and 60s to answer.</div>
  </div>
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
  <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">7 typed stations</div>
@@ -1035,7 +1035,7 @@ window.FullCasperMock = (() => {
  const tier = row.tier || config.tier;
  const needsVisualRepair = tier === 'premium' && (row.visualDegraded || !hasMockVisualMetrics(row));
  const frames = Array.isArray(row.autoRepairContext?.frames)
- ? row.autoRepairContext.frames.filter(Boolean).slice(0, 30)
+ ? row.autoRepairContext.frames.filter(Boolean).slice(0, 48)
  : [];
  if (needsVisualRepair && !frames.length) {
  row.autoRepairAttempted = true;
@@ -1051,6 +1051,8 @@ window.FullCasperMock = (() => {
  fd.append('row_index', String(rowIndex));
  if (needsVisualRepair) {
  fd.append('repair_visual', '1');
+ fd.append('visual_only', '1');
+ fd.append('visual_frame_source', 'answer_windows');
  frames.forEach((frame, i) => fd.append(`frame_${i}`, frame, `repair-frame-${String(i + 1).padStart(2, '0')}.jpg`));
  }
  const res = await fetch(`${apiBase()}/api/casper-mock/attempt/${encodeURIComponent(attemptId)}/repair-video`, {
@@ -2284,6 +2286,7 @@ return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : null;
  eyeContact: countVisualValues(items, 'eye_contact'),
  posture: countVisualValues(items, 'posture'),
  composure: countVisualValues(items, 'composure'),
+ facialExpressionCount: items.filter(item => String(item.visual?.facial_expression || item.presentation?.facial_expression || '').trim()).length,
  items: items.map(item => ({
  station: item.station,
  category: item.row.station?.category || 'Video station',
@@ -2701,6 +2704,8 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
  ${presentationLine('Clarity', presentation.clarity)}
  ${presentationLine('Confidence', presentation.confidence)}
  ${presentationLine('Visual presence', presentation.visual_presence)}
+ ${presentationLine('Facial expression', presentation.facial_expression)}
+ ${presentationLine('Visual evidence', presentation.visual_evidence)}
  ${presentationLine('One improvement', presentation.one_improvement)}
  </div>
  `;
@@ -3201,21 +3206,25 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
  ${visual?.eye_contact ? visualLine('Eye contact', niceKey(visual.eye_contact)) : ''}
  ${visual?.posture ? visualLine('Posture', niceKey(visual.posture)) : ''}
  ${visual?.composure ? visualLine('Composure', niceKey(visual.composure)) : ''}
+ ${visual?.facial_expression ? visualLine('Facial expression', visual.facial_expression) : ''}
+ ${visual?.engagement ? visualLine('Visible engagement', visual.engagement) : ''}
  ${Array.isArray(visual?.distractions) && visual.distractions.length ? visualLine('Distractions', visual.distractions.join(', ')) : ''}
  ${presentation.visual_presence ? visualLine('AI interpretation', presentation.visual_presence) : ''}
+ ${presentation.facial_expression ? visualLine('Expression interpretation', presentation.facial_expression) : ''}
  ${presentation.one_improvement ? visualLine('Practice cue', presentation.one_improvement) : ''}
  </div>
  `;
  }).join('');
  return card('Premium visual interpretation', `
  <div style="font-size:0.82rem;color:var(--gray600);line-height:1.62;margin-bottom:12px;">
- Premium visual feedback uses sampled webcam frames plus voice/transcript signals to interpret delivery: camera gaze/eye contact, posture, composure, distracting gestures, pace, clarity, and confidence. These are presentation cues only, not judgements about appearance, identity, personality, or cultural communication style. Non-Western eye contact patterns and neurodivergent presentation differences should not be penalised.
+ Premium visual feedback uses answer-time webcam frames plus voice/transcript signals to interpret delivery: camera gaze/eye contact, posture, facial expression, composure, distracting gestures, pace, clarity, and confidence. These are presentation cues only, not judgements about appearance, identity, personality, or cultural communication style. Non-Western eye contact patterns and neurodivergent presentation differences should not be penalised.
  </div>
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px;margin-bottom:13px;">
  ${visualSummaryTile('Stations analysed', `${summary.analysedCount || 0}`)}
  ${visualSummaryTile('Eye contact', formatVisualCounts(summary.eyeContact))}
  ${visualSummaryTile('Posture', formatVisualCounts(summary.posture))}
  ${visualSummaryTile('Composure', formatVisualCounts(summary.composure))}
+ ${visualSummaryTile('Facial expression', summary.facialExpressionCount ? `${summary.facialExpressionCount} station notes` : 'No expression signal')}
  </div>
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;">${stationCards}</div>
  `);

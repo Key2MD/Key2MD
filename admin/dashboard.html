@@ -675,6 +675,7 @@
  <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')"><span class="icon"></span> Enquiries <span class="nav-badge" id="enqBadge">0</span></button>
  <button class="nav-item" data-page="broadcast" onclick="nav('broadcast')"><span class="icon"></span> Broadcast</button>
  <button class="nav-item" data-page="class" onclick="nav('class')"><span class="icon">C</span> CASPer Class</button>
+ <button class="nav-item" data-page="masterclasses" onclick="nav('masterclasses')"><span class="icon">MC</span> Masterclasses</button>
  <button class="nav-item" data-page="subscribers" onclick="nav('subscribers')"><span class="icon"></span> Subscribers</button>
 
  <div class="sidebar-section">Reports</div>
@@ -1600,6 +1601,75 @@
  </div>
  </div>
 
+ <!-- -- MASTERCLASSES -- -->
+ <div id="pageMasterclasses" class="page">
+ <div class="page-header">
+ <div>
+ <div class="page-title">Masterclasses</div>
+ <div class="page-sub">Paid CASPer/MMI masterclass registration gates. Paste Zoom links here; registered students see them on the protected pages at the release time.</div>
+ </div>
+ <div class="page-actions">
+ <span class="refresh-note" id="mcStatus">Not loaded</span>
+ <button class="btn blue" onclick="reconcileMasterclasses()">Recover Stripe masterclass payments</button>
+ <button class="btn" onclick="loadMasterclasses()">Refresh</button>
+ </div>
+ </div>
+
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:18px;align-items:start;">
+ <div class="bc-card" style="max-width:100%;" data-masterclass-card="casper">
+ <div class="bc-title">CASPer Masterclass</div>
+ <div class="bc-sub">June 11, 12pm. Students register at casper-masterclass.html.</div>
+ <div class="form-row"><label class="form-lbl">Title</label><input class="form-in" id="mc_casper_title" type="text"></div>
+ <div class="form-row"><label class="form-lbl">Masterclass ID</label><input class="form-in" id="mc_casper_class_id" type="text"><div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">Use a new ID if you run a new masterclass later.</div></div>
+ <div class="form-row"><label class="form-lbl">Date/time label</label><input class="form-in" id="mc_casper_starts_at" type="text"></div>
+ <div class="form-row"><label class="form-lbl">Show link from</label><input class="form-in" id="mc_casper_link_available_at" type="datetime-local"></div>
+ <div class="form-row"><label class="form-lbl">Hide link after</label><input class="form-in" id="mc_casper_expires_at" type="datetime-local"></div>
+ <div class="form-row"><label class="form-lbl">Private Zoom/Meet link</label><input class="form-in" id="mc_casper_join_url" type="url" placeholder="https://zoom.us/j/..."></div>
+ <div class="form-row"><label class="form-lbl">Auto-email access page at</label><input class="form-in" id="mc_casper_auto_email_at" type="datetime-local"></div>
+ <div class="form-row"><label class="form-lbl">Automatic email</label><select class="form-sel" id="mc_casper_auto_email_enabled"><option value="1">Enabled</option><option value="0">Paused</option></select></div>
+ <div class="form-row"><label class="form-lbl">Checkout status</label><select class="form-sel" id="mc_casper_status"><option value="open">Open - checkout enabled</option><option value="closed">Closed</option></select></div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+ <button class="btn primary" onclick="saveMasterclass('casper')">Save CASPer gate</button>
+ <button class="btn" onclick="setMasterclassRelease('casper')">Set 11:30am release</button>
+ <button class="btn green" onclick="runMasterclassEmailCheck('casper')">Run email check</button>
+ <button class="btn blue" onclick="copyMasterclassPageLink('casper')">Copy page</button>
+ </div>
+ <div id="mc_casper_email_status" style="margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:0.78rem;line-height:1.55;">Auto-email status not loaded.</div>
+ <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+ <div class="form-row"><label class="form-lbl">Manual access emails</label><textarea class="form-ta" id="mc_casper_manual_emails" rows="3" placeholder="student@email.com"></textarea></div>
+ <button class="btn green" onclick="authoriseMasterclass('casper')">Authorise CASPer emails</button>
+ <div class="tbl-toolbar" style="margin-top:14px;"><span class="tbl-status" id="mc_casper_access_status">No students loaded.</span></div>
+ <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:280px;"><table><thead><tr><th>Email</th><th>Source</th><th>Amount</th><th>Expires</th><th>Added</th><th>Action</th></tr></thead><tbody id="mc_casper_access_body"></tbody></table></div></div>
+ </div>
+
+ <div class="bc-card" style="max-width:100%;" data-masterclass-card="mmi">
+ <div class="bc-title">MMI Masterclass</div>
+ <div class="bc-sub">TBD. Very early September, likely 1-5 depending on interview release dates. Set exact date/time here when confirmed.</div>
+ <div class="form-row"><label class="form-lbl">Title</label><input class="form-in" id="mc_mmi_title" type="text"></div>
+ <div class="form-row"><label class="form-lbl">Masterclass ID</label><input class="form-in" id="mc_mmi_class_id" type="text"><div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">Use a new ID if you run a new masterclass later.</div></div>
+ <div class="form-row"><label class="form-lbl">Date/time label</label><input class="form-in" id="mc_mmi_starts_at" type="text"></div>
+ <div class="form-row"><label class="form-lbl">Show link from</label><input class="form-in" id="mc_mmi_link_available_at" type="datetime-local"></div>
+ <div class="form-row"><label class="form-lbl">Hide link after</label><input class="form-in" id="mc_mmi_expires_at" type="datetime-local"></div>
+ <div class="form-row"><label class="form-lbl">Private Zoom/Meet link</label><input class="form-in" id="mc_mmi_join_url" type="url" placeholder="https://zoom.us/j/..."></div>
+ <div class="form-row"><label class="form-lbl">Auto-email access page at</label><input class="form-in" id="mc_mmi_auto_email_at" type="datetime-local"></div>
+ <div class="form-row"><label class="form-lbl">Automatic email</label><select class="form-sel" id="mc_mmi_auto_email_enabled"><option value="1">Enabled</option><option value="0">Paused</option></select></div>
+ <div class="form-row"><label class="form-lbl">Checkout status</label><select class="form-sel" id="mc_mmi_status"><option value="open">Open - checkout enabled</option><option value="closed">Closed</option></select></div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+ <button class="btn primary" onclick="saveMasterclass('mmi')">Save MMI gate</button>
+ <button class="btn" onclick="setMasterclassRelease('mmi')">Set release from date</button>
+ <button class="btn green" onclick="runMasterclassEmailCheck('mmi')">Run email check</button>
+ <button class="btn blue" onclick="copyMasterclassPageLink('mmi')">Copy page</button>
+ </div>
+ <div id="mc_mmi_email_status" style="margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:0.78rem;line-height:1.55;">Auto-email status not loaded.</div>
+ <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+ <div class="form-row"><label class="form-lbl">Manual access emails</label><textarea class="form-ta" id="mc_mmi_manual_emails" rows="3" placeholder="student@email.com"></textarea></div>
+ <button class="btn green" onclick="authoriseMasterclass('mmi')">Authorise MMI emails</button>
+ <div class="tbl-toolbar" style="margin-top:14px;"><span class="tbl-status" id="mc_mmi_access_status">No students loaded.</span></div>
+ <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:280px;"><table><thead><tr><th>Email</th><th>Source</th><th>Amount</th><th>Expires</th><th>Added</th><th>Action</th></tr></thead><tbody id="mc_mmi_access_body"></tbody></table></div></div>
+ </div>
+ </div>
+ </div>
+
  <!-- -- SUBSCRIBERS -- -->
  <div id="pageSubscribers" class="page">
  <div class="page-header">
@@ -2069,7 +2139,7 @@ const S = {
  pipeline: null, outreachRoi: null, abandonedCheckouts: null, studentTimeline: null, nextActions: [], productFunnel: null, retentionRisks: [],
  conversations: [], filteredConvs: [],
  mmiReviews: [], mockAttempts: [], mockManualReviews: [], revenue: [], payers: [], payersFromServer: false, revenueSummary: null, monitoring: null,
- casperClass: null,
+ casperClass: null, masterclasses: null,
  broadcastHistory: [],
  activeConv: null,
  composeHtml: '',
@@ -2175,7 +2245,7 @@ async function api(path, opts={}) {
 // ======================================================
 // NAVIGATION
 // ======================================================
-const ADMIN_PAGES = new Set(['dashboard','growth','reviews','s2','mmi','mocks','users','warmleads','pipeline','timeline','actions','outreach','funnel','abandoned','retention','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','subscribers']);
+const ADMIN_PAGES = new Set(['dashboard','growth','reviews','s2','mmi','mocks','users','warmleads','pipeline','timeline','actions','outreach','funnel','abandoned','retention','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','masterclasses','subscribers']);
 
 function normalisePage(page) {
  const key = String(page || 'dashboard').replace(/^#/, '').trim().toLowerCase();
@@ -2236,6 +2306,7 @@ function nav(page, opts={}) {
  if (target==='sharing' && !S.sharingWatchlist.length) loadSharingWatchlist();
  if (target==='broadcast') { updateBcStats(); if (!S.broadcastHistory.length) loadBroadcastHistory(); }
  if (target==='class') loadCasperClass();
+ if (target==='masterclasses' && !S.masterclasses) loadMasterclasses();
  if (target==='mmi' && !S.mmiReviews.length) loadMMI();
  if (target==='s2' && !S.s2Reviews.length) loadS2Reviews();
  if (target==='revenue' && !S.revenue.length) loadRevenue();
@@ -2301,6 +2372,7 @@ function buildCommandItems() {
  {kind:'Page', title:'Inbox', sub:'Student conversations and replies', action:()=>nav('inbox'), hint:'Open'},
  {kind:'Page', title:'Broadcast', sub:'Send segmented emails with preview', action:()=>nav('broadcast'), hint:'Open'},
  {kind:'Page', title:'CASPer Class', sub:'Set the paid class link and authorise students', action:()=>nav('class'), hint:'Open'},
+ {kind:'Page', title:'Masterclasses', sub:'Set CASPer/MMI registration gates, Zoom links, and paid access', action:()=>nav('masterclasses'), hint:'Open'},
  {kind:'Page', title:'Mock Exams', sub:'Saved full CASPer mocks and manual review queue', action:()=>nav('mocks'), hint:'Open'},
  {kind:'Page', title:'Monitoring', sub:'AI parse failures, Whisper failures, and margin checks', action:()=>nav('monitoring'), hint:'Open'},
  ];
@@ -2502,7 +2574,7 @@ async function bootLoad() {
  await Promise.all([
  loadReviews(), loadS2Reviews(), loadUsers(), loadEnquiries(),
  loadSubscribers(), loadInbox(), loadMMI(), loadMockAdmin(), loadRevenue(), loadMonitoring(), loadBroadcastHistory(), loadWarmLeads(), loadSharingWatchlist(),
- loadNextActions(), loadProductFunnel(), loadAbandonedCheckouts(), loadRetentionRisk({ silent: true }), loadOutreachRoi(),
+ loadNextActions(), loadProductFunnel(), loadAbandonedCheckouts(), loadRetentionRisk({ silent: true }), loadOutreachRoi(), loadMasterclasses(),
  ]);
  const lu = document.getElementById('lastUpdated');
  if (lu) lu.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
@@ -3630,6 +3702,8 @@ function setText(id, value) {
 function paymentTypeLabel(type) {
  const key = String(type || '').trim().toLowerCase();
  if (!key) return '';
+ if (key.includes('casper_masterclass')) return 'CASPer Masterclass';
+ if (key.includes('mmi_masterclass')) return 'MMI Masterclass';
  if (key.includes('casper_class_subscription')) return 'CASPer class sub';
  if (key.includes('casper_class_package')) return 'CASPer class package';
  if (key.includes('casper_class')) return 'CASPer class';
@@ -4703,6 +4777,10 @@ function fmtGrowthPct(value) {
 
 function growthProductName(value) {
  const key = String(value || '').toLowerCase();
+ if (key.includes('casper_masterclass')) return 'CASPer Masterclass';
+ if (key.includes('mmi_masterclass')) return 'MMI Masterclass';
+ if (key.includes('masterclass') && key.includes('mmi')) return 'MMI Masterclass';
+ if (key.includes('masterclass')) return 'CASPer Masterclass';
  if (key.includes('class')) return 'CASPer class';
  if (key.includes('mock')) return 'Full CASPer mock';
  if (key.includes('casper')) return 'CASPer Pro';
@@ -6333,6 +6411,223 @@ async function copyClassPageLink() {
  }
 }
 
+// ======================================================
+// MASTERCLASSES
+// ======================================================
+const MASTERCLASS_PAGE_URLS = {
+ casper: 'https://www.key2md.com/casper-masterclass.html',
+ mmi: 'https://www.key2md.com/mmi-masterclass.html',
+};
+
+async function loadMasterclasses() {
+ const status = document.getElementById('mcStatus');
+ if (status) status.textContent = 'Loading...';
+ try {
+ const res = await api('/admin/masterclasses');
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not load masterclasses');
+ S.masterclasses = data;
+ renderMasterclasses();
+ if (status) status.textContent = 'Loaded';
+ } catch(e) {
+ if (status) status.textContent = e.message;
+ }
+}
+
+function masterclassItem(kind) {
+ return S.masterclasses?.items?.[kind] || {};
+}
+
+function renderMasterclasses() {
+ ['casper','mmi'].forEach(kind => renderMasterclass(kind, masterclassItem(kind)));
+}
+
+function renderMasterclass(kind, item) {
+ const s = item.settings || {};
+ const privateData = item.private || {};
+ const set = (suffix, value) => { const el = document.getElementById(`mc_${kind}_${suffix}`); if (el) el.value = value || ''; };
+ set('title', s.title || item.definition?.title || '');
+ set('class_id', s.class_id || '');
+ set('starts_at', s.starts_at || '');
+ set('link_available_at', datetimeLocalFromMs(s.link_available_at));
+ set('expires_at', datetimeLocalFromMs(s.expires_at));
+ set('auto_email_at', datetimeLocalFromMs(s.auto_email_at));
+ set('join_url', privateData.join_url || '');
+ set('status', s.status || 'open');
+ set('auto_email_enabled', s.auto_email_enabled === false ? '0' : '1');
+
+ const rows = item.access || [];
+ renderMasterclassEmailState(kind, item.email_state || {}, s, rows.length);
+ const status = document.getElementById(`mc_${kind}_access_status`);
+ if (status) status.textContent = `${rows.length} registered student${rows.length===1?'':'s'}`;
+ const body = document.getElementById(`mc_${kind}_access_body`);
+ if (!body) return;
+ body.innerHTML = rows.length ? rows.map(row => {
+ const dt = fmtDate(row.created_at);
+ const expires = row.expires_at ? fmtDate(row.expires_at) : null;
+ const amount = Number(row.amount_paid || 0);
+ return `<tr class="data-row">
+ <td><div class="cell-main">${emailWithDuplicateFlag(row.email || row.user_id || '?',row)}</div><div class="cell-sub">${esc(row.name || '')}</div></td>
+ <td><span class="badge ${String(row.source||'')==='stripe'?'badge-paid':'badge-default'}">${esc(row.source || 'admin')}</span></td>
+ <td><span class="spend ${amount>0?'has':'none'}">${amount ? fmtMoney(amount / 100) : '-'}</span></td>
+ <td><div class="cell-main">${expires?.date || '-'}</div></td>
+ <td><div class="cell-main">${dt?.date || '-'}</div><div class="cell-sub">${dt?.time || ''}</div></td>
+ <td><button class="btn" style="font-size:0.68rem;padding:3px 8px;background:var(--red-dim);border-color:var(--red-border);color:var(--red);" onclick='removeMasterclassAccess(${jsArg(kind)}, ${jsArg(row.email || '')}, ${jsArg(row.user_id || '')})'>Remove</button></td>
+ </tr>`;
+ }).join('') : '<tr><td colspan="6" style="color:var(--muted);padding:16px;">No one is registered yet.</td></tr>';
+}
+
+function renderMasterclassEmailState(kind, state, settings={}, accessCount=0) {
+ const el = document.getElementById(`mc_${kind}_email_status`);
+ if (!el) return;
+ const autoAt = Number(settings.auto_email_at || 0);
+ const enabled = settings.auto_email_enabled !== false;
+ const status = state?.status || (enabled ? 'pending' : 'paused');
+ const releaseAt = Number(settings.link_available_at || 0);
+ const parts = [
+ `<strong style="color:var(--text);">Auto-email:</strong> ${enabled ? 'enabled' : 'paused'}`,
+ `<strong style="color:var(--text);">Send time:</strong> ${autoAt ? esc(new Date(autoAt).toLocaleString('en-AU', { dateStyle:'medium', timeStyle:'short' })) : 'not set'}`,
+ `<strong style="color:var(--text);">Link release:</strong> ${releaseAt ? esc(new Date(releaseAt).toLocaleString('en-AU', { dateStyle:'medium', timeStyle:'short' })) : 'as soon as pasted'}`,
+ `<strong style="color:var(--text);">Students:</strong> ${accessCount}`,
+ `<strong style="color:var(--text);">Status:</strong> ${esc(String(status).replace(/_/g, ' '))}`,
+ ];
+ if (state?.sent_at) parts.push(`<strong style="color:var(--text);">Sent:</strong> ${esc(new Date(Number(state.sent_at)).toLocaleString('en-AU', { dateStyle:'medium', timeStyle:'short' }))} (${state.sent_count || 0}/${state.recipient_count || state.sent_count || 0})`);
+ if (state?.last_message) parts.push(`<span style="color:${status === 'missing_link' || status === 'send_failed' ? 'var(--orange)' : 'var(--muted)'};">${esc(state.last_message)}</span>`);
+ el.innerHTML = parts.join('<br>');
+}
+
+function setMasterclassRelease(kind) {
+ const startsValue = document.getElementById(`mc_${kind}_starts_at`)?.value || '';
+ const releaseInput = document.getElementById(`mc_${kind}_link_available_at`);
+ const emailInput = document.getElementById(`mc_${kind}_auto_email_at`);
+ if (kind === 'casper') {
+ const releaseMs = Date.parse('2026-06-11T11:30:00+10:00');
+ if (releaseInput) releaseInput.value = datetimeLocalFromMs(releaseMs);
+ if (emailInput) emailInput.value = datetimeLocalFromMs(releaseMs);
+ return;
+ }
+ const parsed = Date.parse(startsValue);
+ const releaseMs = Number.isFinite(parsed) ? parsed - 30 * 60 * 1000 : 0;
+ if (releaseMs && releaseInput) releaseInput.value = datetimeLocalFromMs(releaseMs);
+ if (releaseMs && emailInput) emailInput.value = datetimeLocalFromMs(releaseMs);
+}
+
+async function saveMasterclass(kind) {
+ const status = document.getElementById('mcStatus');
+ if (status) status.textContent = `Saving ${kind}...`;
+ const body = {
+ kind,
+ title: document.getElementById(`mc_${kind}_title`)?.value || '',
+ class_id: document.getElementById(`mc_${kind}_class_id`)?.value || '',
+ starts_at: document.getElementById(`mc_${kind}_starts_at`)?.value || '',
+ link_available_at: datetimeLocalToMs(document.getElementById(`mc_${kind}_link_available_at`)?.value || ''),
+ expires_at: datetimeLocalToMs(document.getElementById(`mc_${kind}_expires_at`)?.value || ''),
+ auto_email_enabled: (document.getElementById(`mc_${kind}_auto_email_enabled`)?.value || '1') !== '0',
+ auto_email_at: datetimeLocalToMs(document.getElementById(`mc_${kind}_auto_email_at`)?.value || ''),
+ join_url: document.getElementById(`mc_${kind}_join_url`)?.value || '',
+ status: document.getElementById(`mc_${kind}_status`)?.value || 'open',
+ };
+ try {
+ const res = await api('/admin/masterclasses', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not save masterclass');
+ S.masterclasses = data;
+ renderMasterclasses();
+ if (status) status.textContent = 'Saved';
+ } catch(e) {
+ if (status) status.textContent = e.message;
+ alert(e.message);
+ }
+}
+
+async function runMasterclassEmailCheck(kind) {
+ if (!confirm(`Run the ${kind.toUpperCase()} masterclass email check now? If the private link is pasted and students are registered, this will email them immediately.`)) return;
+ const status = document.getElementById('mcStatus');
+ if (status) status.textContent = 'Running email check...';
+ try {
+ const res = await api('/admin/masterclasses/email/run', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, force:true }) });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.result?.message || data?.message || data?.error || 'Could not run email check');
+ S.masterclasses = data;
+ renderMasterclasses();
+ if (status) status.textContent = data.result?.message || 'Email check complete';
+ alert(data.result?.message || 'Email check complete.');
+ } catch(e) {
+ if (status) status.textContent = e.message;
+ alert(e.message);
+ }
+}
+
+async function reconcileMasterclasses() {
+ if (!confirm('Check recent Stripe checkout sessions and recover paid masterclass students into this dashboard? This will not email students.')) return;
+ const status = document.getElementById('mcStatus');
+ if (status) status.textContent = 'Checking Stripe...';
+ try {
+ const res = await api('/admin/masterclasses/reconcile', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ days: 14 }) });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not reconcile Stripe payments');
+ S.masterclasses = data;
+ renderMasterclasses();
+ const message = `Recovered/confirmed ${data.recovered || 0} masterclass payment${Number(data.recovered || 0)===1?'':'s'} from ${data.checked || 0} matching Stripe session${Number(data.checked || 0)===1?'':'s'}.`;
+ if (status) status.textContent = message;
+ alert(message);
+ } catch(e) {
+ if (status) status.textContent = e.message;
+ alert(e.message);
+ }
+}
+
+async function authoriseMasterclass(kind) {
+ const emails = document.getElementById(`mc_${kind}_manual_emails`)?.value || '';
+ const parsed = parseBroadcastEmails(emails);
+ if (!parsed.emails.length || parsed.invalid.length) {
+ alert(parsed.invalid.length ? `Fix invalid email: ${parsed.invalid[0]}` : 'Paste at least one valid email.');
+ return;
+ }
+ const status = document.getElementById('mcStatus');
+ if (status) status.textContent = 'Authorising...';
+ try {
+ const res = await api('/admin/masterclasses/authorize', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, emails }) });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not authorise students');
+ S.masterclasses = data;
+ document.getElementById(`mc_${kind}_manual_emails`).value = '';
+ renderMasterclasses();
+ if (status) status.textContent = `Authorised ${data.granted || parsed.emails.length}`;
+ } catch(e) {
+ if (status) status.textContent = e.message;
+ alert(e.message);
+ }
+}
+
+async function removeMasterclassAccess(kind, email, userId) {
+ if (!confirm(`Remove ${kind.toUpperCase()} masterclass access for ${email || userId}?`)) return;
+ const status = document.getElementById('mcStatus');
+ if (status) status.textContent = 'Removing access...';
+ try {
+ const res = await api('/admin/masterclasses/remove', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, email, user_id: userId }) });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not remove access');
+ S.masterclasses = data;
+ renderMasterclasses();
+ if (status) status.textContent = 'Access removed';
+ } catch(e) {
+ if (status) status.textContent = e.message;
+ alert(e.message);
+ }
+}
+
+async function copyMasterclassPageLink(kind) {
+ const url = MASTERCLASS_PAGE_URLS[kind] || 'https://www.key2md.com/';
+ try {
+ await navigator.clipboard.writeText(url);
+ const status = document.getElementById('mcStatus');
+ if (status) status.textContent = 'Masterclass page copied';
+ } catch {
+ alert(url);
+ }
+}
+
 async function updateBcStats() {
  document.getElementById('bcSubs').textContent = S.subscribers.length||'-';
  document.getElementById('bcUsers').textContent = S.users.length||'-';
@@ -7403,7 +7698,7 @@ function buildPayerRows(payments) {
  existing.total_spend_aud += amount;
  if (type.includes('subscription')) existing.subscription_spend_aud += amount;
  if (type.includes('credit')) existing.credit_spend_aud += amount;
- if (type.startsWith('marking_') || type.includes('mock') || type.includes('manual_review') || type === 'casper_class') existing.service_spend_aud += amount;
+ if (type.startsWith('marking_') || type.includes('mock') || type.includes('manual_review') || type === 'casper_class' || type.includes('masterclass')) existing.service_spend_aud += amount;
  if (email && !existing.email) existing.email = email;
  if (p.name && !existing.name) existing.name = p.name;
  if (p.tier && !existing.tier) existing.tier = p.tier;

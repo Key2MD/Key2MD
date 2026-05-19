@@ -902,7 +902,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="mock-step">
  <div class="mock-step-num">2</div>
  <h3>Get the next unused mock</h3>
- <p>The system selects a fresh private exam for you: 4 video stations first, then 7 written stations.</p>
+ <p>The system selects a fresh private exam for you: 4 video stations first, then 7 typed stations.</p>
  </div>
  <div class="mock-step">
  <div class="mock-step-num">3</div>
@@ -930,7 +930,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="mock-score-row"><span>Empathy</span><div class="mock-bars"><span class="on green"></span><span class="on green"></span><span class="on green"></span><span class="on green"></span><span></span></div></div>
  <div class="mock-score-row"><span>Reasoning</span><div class="mock-bars"><span class="on teal"></span><span class="on teal"></span><span class="on teal"></span><span></span><span></span></div></div>
  <div class="mock-score-row"><span>Reflection</span><div class="mock-bars"><span class="on red"></span><span class="on red"></span><span></span><span></span><span></span></div></div>
- <div class="mock-alert"><strong>Stamina drop detected</strong><br>Later typed stations are weaker than the first half of the written section.</div>
+ <div class="mock-alert"><strong>Stamina drop detected</strong><br>Later typed stations are weaker than the first half of the typed section.</div>
  </div>
  </div>
  </div>
@@ -1351,7 +1351,7 @@ async function handleBuyPro() {
  const token = Key2MDAuth.getToken();
  const res = await fetch(`${API_BASE}/api/pro/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({success_url:`${location.origin}/practice.html?pro=success`,cancel_url:`${location.origin}/plans.html`})});
  const data = await res.json();
- if (!res.ok) throw new Error(data.error || 'Checkout failed');
+ if (!res.ok) throw new Error(data.message || data.error || 'Checkout failed');
  window.location.href = data.checkout_url;
  } catch(e) {
  btns.forEach(b => { b.disabled = false; b.textContent = 'Start CASPer Pro ->'; });
@@ -1383,7 +1383,7 @@ async function handleMockCheckout(tier) {
  const proPrice = tier === 'premium' ? '$55' : '$41';
  openModal(
  `Full CASPer Mock - ${label}`,
- `${standardPrice} regular | ${proPrice} for CASPer Pro | Includes a fresh unused 11-station mock, 7 written markings and 4 video analyses. Never repeats a mock you have already sat.`,
+ `${standardPrice} regular | ${proPrice} for CASPer Pro | Includes a fresh unused 11-station mock, 7 typed-station markings and 4 video analyses. Never repeats a mock you have already sat.`,
  `mock_${tier}`
  );
 }
@@ -1454,7 +1454,7 @@ async function confirmCheckout() {
  res = await fetch(`${API_BASE}/api/pro/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({success_url:`${location.origin}/practice.html?pro=success`,cancel_url:`${location.origin}/plans.html`})});
  }
  data = await res.json();
- if (!res.ok) throw new Error(data.error || 'Checkout failed');
+ if (!res.ok) throw new Error(data.message || data.error || 'Checkout failed');
  window.location.href = data.checkout_url;
  } catch(e) {
  al.className = 'modal-alert err'; al.textContent = e.message;

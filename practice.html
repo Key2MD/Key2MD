@@ -1120,7 +1120,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </article>
  <article class="practice-action-card">
  <div class="practice-action-kicker">Full CASPer mock</div>
- <div class="practice-action-title">4 video + 7 written stations</div>
+ <div class="practice-action-title">4 video + 7 typed stations</div>
  <p class="practice-action-copy">A full 11-station sequence from the rotating private mock bank. Best when you want exam-condition pressure, not more loose reps, and each purchase should unlock a fresh unused mock.</p>
  <div class="practice-action-meta"><span class="practice-mini-tag">11 stations</span><span class="practice-mini-tag">Video + typed</span></div>
  <button type="button" class="practice-action-btn outline" onclick="setMode('mock');window.FullCasperMock?.activateMockMode?.();document.getElementById('practice-app').scrollIntoView({behavior:'smooth',block:'start'});">Open full mock</button>
@@ -1325,6 +1325,7 @@ const MMI_PRESETS = {
  random: { readingTime:120, recordingTime:420, promptCount:3, revealMode:'random', followUpMin:1, followUpMax:2 },
  custom: { readingTime:120, recordingTime:300, promptCount:2, revealMode:'all_at_once' },
 };
+const PREMIUM_VISUAL_FRAME_LIMIT = 48;
 let mmiActivePreset = 'quickfire';
 let mmiSpecialistMode = false;
 let mmiPremiumMode = false;
@@ -1381,7 +1382,69 @@ async function loadFFmpeg() {
  ffmpegLoading = false;
 }
 
-async function extractVideoFrames(videoBlob, frameCount) {
+function buildCasperAnswerFrameWindows(cfg = {}, promptCount = 2) {
+ const readSeconds = Math.max(0, Number(cfg.perPromptRead ?? 10) || 0);
+ const answerSeconds = Math.max(1, Number(cfg.perPromptAnswer ?? 60) || 60);
+ const count = Math.max(1, Math.min(4, Number(promptCount || cfg.promptCount || 2) || 2));
+ const windows = [];
+ let cursor = 0;
+ for(let i = 0; i < count; i++) {
+ cursor += readSeconds;
+ const edgePad = Math.min(1.5, answerSeconds * 0.08);
+ const start = cursor + edgePad;
+ const end = cursor + answerSeconds - Math.min(1, answerSeconds * 0.04);
+ if(end - start >= 2) windows.push({ start, end });
+ cursor += answerSeconds;
+ }
+ return windows;
+}
+
+function premiumFrameOptionsForStation(cfg = {}, isCasperMockReview = false, prompts = []) {
+ if(isCasperMockReview && cfg.revealMode === 'quickfire') {
+ return {
+ windows: buildCasperAnswerFrameWindows(cfg, prompts.length || cfg.promptCount || 2),
+ source: 'answer_windows',
+ };
+ }
+ return {};
+}
+
+function buildFrameSampleTimes(duration, frameCount, windows = null) {
+ const safeDuration = Number(duration) || 0;
+ if(!safeDuration) return [];
+ const fullWindow = [{
+ start: Math.min(0.6, Math.max(0.05, safeDuration * 0.03)),
+ end: Math.max(0.08, safeDuration - 0.08),
+ }];
+ const requested = Array.isArray(windows) ? windows : [];
+ const usable = requested.map(w => {
+ const rawStart = Number(w?.start ?? w?.[0] ?? 0);
+ const rawEnd = Number(w?.end ?? w?.[1] ?? 0);
+ const start = Math.max(0.05, Math.min(rawStart, Math.max(0.05, safeDuration - 0.12)));
+ const end = Math.max(start, Math.min(rawEnd, Math.max(0.08, safeDuration - 0.08)));
+ return { start, end };
+ }).filter(w => w.end - w.start >= 0.6);
+ const ranges = usable.length ? usable : fullWindow;
+ const total = ranges.reduce((sum, w) => sum + Math.max(0, w.end - w.start), 0);
+ if(total <= 0) return [];
+ const times = [];
+ for(let i = 0; i < frameCount; i++) {
+ let target = total * ((i + 0.5) / frameCount);
+ let selected = ranges[ranges.length - 1].end;
+ for(const range of ranges) {
+ const len = Math.max(0, range.end - range.start);
+ if(target <= len) {
+ selected = range.start + target;
+ break;
+ }
+ target -= len;
+ }
+ times.push(Math.max(0.05, Math.min(selected, Math.max(0.08, safeDuration - 0.08))));
+ }
+ return times;
+}
+
+async function extractVideoFrames(videoBlob, frameCount, options = {}) {
  if(!videoBlob || !frameCount) return [];
  const url = URL.createObjectURL(videoBlob);
  const video = document.createElement('video');
@@ -1410,7 +1473,7 @@ async function extractVideoFrames(videoBlob, frameCount) {
  if(!duration || !video.videoWidth || !video.videoHeight) return [];
 
  const canvas = document.createElement('canvas');
- const maxWidth = 320;
+ const maxWidth = 480;
  const scale = Math.min(1, maxWidth / video.videoWidth);
  canvas.width = Math.max(1, Math.round(video.videoWidth * scale));
  canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
@@ -1418,13 +1481,14 @@ async function extractVideoFrames(videoBlob, frameCount) {
  if(!ctx) return [];
 
  const frames = [];
- const count = Math.max(1, Math.min(frameCount, 30));
- for(let i = 0; i < count; i++) {
- const targetTime = Math.min(Math.max(0, duration - 0.05), duration * (i + 1) / (count + 1));
+ const count = Math.max(1, Math.min(frameCount, PREMIUM_VISUAL_FRAME_LIMIT));
+ const sampleTimes = buildFrameSampleTimes(duration, count, options.windows);
+ for(let i = 0; i < sampleTimes.length; i++) {
+ const targetTime = sampleTimes[i];
  video.currentTime = targetTime;
  await waitFor(video, 'seeked', 5000);
  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
- const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.72));
+ const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.78));
  if(blob) frames.push(blob);
  }
  return frames;
@@ -1446,14 +1510,14 @@ async function capturePremiumLiveFrame() {
  const video = $('webcamLive');
  if(!video || video.readyState < 2 || !video.videoWidth || !video.videoHeight) return false;
  const canvas = document.createElement('canvas');
- const maxWidth = 320;
+ const maxWidth = 480;
  const scale = Math.min(1, maxWidth / video.videoWidth);
  canvas.width = Math.max(1, Math.round(video.videoWidth * scale));
  canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
  const ctx = canvas.getContext('2d');
  if(!ctx) return false;
  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
- const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.72));
+ const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.78));
  if(blob) {
   mmiLiveFrameBlobs.push(blob);
   return true;
@@ -1466,14 +1530,14 @@ function startPremiumLiveFrameCapture() {
  mmiLiveFrameBlobs = [];
  if(!shouldCapturePremiumLiveFrames()) return;
  const sample = () => {
-  if(!webcamActive || mmiLiveFrameBlobs.length >= 30) {
+  if(!webcamActive || mmiLiveFrameBlobs.length >= PREMIUM_VISUAL_FRAME_LIMIT) {
    stopPremiumLiveFrameCapture();
    return;
   }
   capturePremiumLiveFrame().catch(e => console.warn('Live premium frame capture failed:', e.message));
  };
  setTimeout(sample, 900);
- mmiLiveFrameTimer = setInterval(sample, 3500);
+ mmiLiveFrameTimer = setInterval(sample, 2800);
 }
 
 function stopPremiumLiveFrameCapture() {
@@ -1661,8 +1725,9 @@ async function submitMMIForFeedback() {
  let visualDegraded = false;
  if(isPremium && recordingBlob) {
  if(btn) btn.textContent = ' Extracting presentation snapshots...';
- frames = await extractVideoFrames(recordingBlob, 30);
- if(frames.length === 0 && mmiLiveFrameBlobs.length) frames = mmiLiveFrameBlobs.slice(0, 30);
+ const frameOptions = premiumFrameOptionsForStation(cfg, isCasperMockReview, mmiCurrentPrompts);
+ frames = await extractVideoFrames(recordingBlob, PREMIUM_VISUAL_FRAME_LIMIT, frameOptions);
+ if(frames.length === 0 && !frameOptions.windows?.length && mmiLiveFrameBlobs.length) frames = mmiLiveFrameBlobs.slice(0, PREMIUM_VISUAL_FRAME_LIMIT);
  if(frames.length === 0) {
  visualDegraded = true;
  console.info('Visual analysis unavailable - proceeding with voice + transcript only');
@@ -1706,6 +1771,7 @@ async function submitMMIForFeedback() {
  fd.append('mock_station_id', window.K2_ACTIVE_CASPER_MOCK.station_id || stationId);
  }
  fd.append('visual_degraded', visualDegraded ? '1' : '0');
+ if (isPremium && isCasperMockReview) fd.append('visual_frame_source', 'answer_windows');
 
  frames.forEach((frame, i) => fd.append(`frame_${i}`, frame, `frame_${i}.jpg`));
  return fd;
@@ -1857,6 +1923,7 @@ function buildMMIMockFormData(snapshot, frames, visualDegraded) {
  fd.append('mock_station_order', String(window.K2_ACTIVE_CASPER_MOCK?.station_order || currentIdx + 1));
  fd.append('mock_station_id', window.K2_ACTIVE_CASPER_MOCK?.station_id || snapshot.stationId);
  fd.append('visual_degraded', visualDegraded ? '1' : '0');
+ if (snapshot.isPremium) fd.append('visual_frame_source', 'answer_windows');
  frames.forEach((frame, i) => fd.append(`frame_${i}`, frame, `frame_${i}.jpg`));
  return fd;
 }
@@ -1876,11 +1943,12 @@ function submitMMIMockReviewSilently() {
  let frames = [];
  let visualDegraded = false;
  if(snapshot.isPremium && snapshot.recordingBlob) {
- frames = await extractVideoFrames(snapshot.recordingBlob, 30);
- if(frames.length === 0 && mmiLiveFrameBlobs.length) frames = mmiLiveFrameBlobs.slice(0, 30);
+ const frameOptions = premiumFrameOptionsForStation(snapshot.cfg, true, snapshot.prompts);
+ frames = await extractVideoFrames(snapshot.recordingBlob, PREMIUM_VISUAL_FRAME_LIMIT, frameOptions);
+ if(frames.length === 0 && !frameOptions.windows?.length && mmiLiveFrameBlobs.length) frames = mmiLiveFrameBlobs.slice(0, PREMIUM_VISUAL_FRAME_LIMIT);
  if(frames.length === 0) visualDegraded = true;
  }
- autoRepairContext.frames = frames.slice(0, 30);
+ autoRepairContext.frames = frames.slice(0, PREMIUM_VISUAL_FRAME_LIMIT);
  autoRepairContext.visualDegraded = visualDegraded;
  const token = auth.getToken();
  let lastError = null;

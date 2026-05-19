@@ -438,6 +438,13 @@
         && (!!row.visual_degraded || !hasVisualMetrics(row));
     }
 
+    function videoNeedsOnlyVisualRepair(row){
+      return videoNeedsVisualRepair(row)
+        && hasFeedback(row)
+        && String(row.transcript||'').trim().length>=10
+        && !row.processing_error;
+    }
+
     function needsVideoReprocess(row){
       if(row?.type!=='video' || !row.recording_key)return false;
       return !hasFeedback(row)
@@ -947,7 +954,7 @@
     }
 
     async function drawVideoFrameBlob(video){
-      const maxWidth=960;
+      const maxWidth=480;
       const scale=Math.min(1,maxWidth/Math.max(1,video.videoWidth));
       const canvas=document.createElement('canvas');
       canvas.width=Math.max(1,Math.round(video.videoWidth*scale));
@@ -955,26 +962,68 @@
       const ctx=canvas.getContext('2d');
       if(!ctx)throw new Error('Could not prepare the frame capture canvas.');
       ctx.drawImage(video,0,0,canvas.width,canvas.height);
-      return await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.84));
+      return await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.82));
     }
 
-    async function captureAdminVideoFrames(videoId='adminVideoPlayer',frameLimit=18,statusEl=null){
+    function buildAdminCasperAnswerWindows(promptCount=2){
+      const windows=[];
+      const readSeconds=10;
+      const answerSeconds=60;
+      let cursor=0;
+      for(let i=0;i<Math.max(1,Math.min(4,Number(promptCount)||2));i++){
+        cursor+=readSeconds;
+        windows.push({start:cursor+1.5,end:cursor+answerSeconds-1});
+        cursor+=answerSeconds;
+      }
+      return windows;
+    }
+
+    function buildAdminFrameSampleTimes(duration,frameLimit,windows=null){
+      const safeDuration=Number(duration)||0;
+      if(!safeDuration)return [];
+      const requested=Array.isArray(windows)?windows:[];
+      const ranges=requested.map(w=>{
+        const rawStart=Number(w?.start??w?.[0]??0);
+        const rawEnd=Number(w?.end??w?.[1]??0);
+        const start=Math.max(0.05,Math.min(rawStart,Math.max(0.05,safeDuration-0.12)));
+        const end=Math.max(start,Math.min(rawEnd,Math.max(0.08,safeDuration-0.08)));
+        return {start,end};
+      }).filter(w=>w.end-w.start>=0.6);
+      if(!ranges.length){
+        ranges.push({start:Math.min(0.6,Math.max(0.05,safeDuration*0.03)),end:Math.max(0.08,safeDuration-0.08)});
+      }
+      const total=ranges.reduce((sum,w)=>sum+Math.max(0,w.end-w.start),0);
+      if(total<=0)return [];
+      const count=Math.max(1,Math.min(frameLimit||48,48));
+      const times=[];
+      for(let i=0;i<count;i++){
+        let target=total*((i+0.5)/count);
+        let selected=ranges[ranges.length-1].end;
+        for(const range of ranges){
+          const len=Math.max(0,range.end-range.start);
+          if(target<=len){selected=range.start+target;break;}
+          target-=len;
+        }
+        times.push(Math.max(0.05,Math.min(selected,Math.max(0.08,safeDuration-0.08))));
+      }
+      return times;
+    }
+
+    async function captureAdminVideoFrames(videoId='adminVideoPlayer',frameLimit=48,statusEl=null,options={}){
       const video=document.getElementById(videoId);
       await ensureVideoReadyForFrameCapture(video);
       const duration=videoCaptureDuration(video);
       if(!duration)throw new Error('The saved video has no readable duration, so frames could not be sampled.');
       const originalTime=Number(video.currentTime)||0;
       const wasPaused=video.paused;
-      const count=Math.min(frameLimit,Math.max(6,Math.min(frameLimit,Math.ceil(duration/12))));
-      const start=Math.min(0.6,Math.max(0.05,duration*0.03));
-      const end=Math.max(start, duration-0.2);
+      const sampleTimes=buildAdminFrameSampleTimes(duration,frameLimit,options.windows);
+      const label=options.answerOnly?'answer-window':'saved video';
       const frames=[];
       video.pause();
       try{
-        for(let i=0;i<count;i++){
-          const fraction=count===1?0.5:i/(count-1);
-          const time=start+(end-start)*fraction;
-          if(statusEl)statusEl.textContent=`Sampling saved video frame ${i+1}/${count}...`;
+        for(let i=0;i<sampleTimes.length;i++){
+          if(statusEl)statusEl.textContent=`Sampling ${label} frame ${i+1}/${sampleTimes.length}...`;
+          const time=sampleTimes[i];
           await seekVideoForFrameCapture(video,time);
           const blob=await drawVideoFrameBlob(video);
           if(blob && blob.size>900)frames.push(blob);
@@ -1056,11 +1105,11 @@
       if(r.type==='video'){
         const key=r.recording_key;
         const canReprocess=needsVideoReprocess(r);
-        const visualRepair=videoNeedsVisualRepair(r);
+        const visualRepair=videoNeedsOnlyVisualRepair(r);
         const reprocess=canReprocess?`<div class="review-box" style="border-color:#bae6fd;background:#f0f9ff;">
           <div class="section-label" style="color:#0369a1;">${visualRepair?'Premium visual repair':'Safety net'}</div>
-          <div class="text-block" style="margin-bottom:10px;">${visualRepair?'A saved video exists. This will sample camera frames from the playable recording, then re-run premium analysis so the student gets the visual feedback they paid for.':'A saved recording exists. Re-run transcript and AI feedback from admin so this station does not stay broken for the student.'}</div>
-          <button id="reprocessBtn" class="secondary" type="button" onclick="reprocessCurrentStation()">${visualRepair?'Reprocess with visual check':'Reprocess saved recording'}</button>
+          <div class="text-block" style="margin-bottom:10px;">${visualRepair?'A saved video exists. This will sample answer-time camera frames from the playable recording, then refresh only the premium visual feedback the student paid for.':'A saved recording exists. Re-run transcript and AI feedback from admin so this station does not stay broken for the student.'}</div>
+          <button id="reprocessBtn" class="secondary" type="button" onclick="reprocessCurrentStation()">${visualRepair?'Refresh visual only':'Reprocess saved recording'}</button>
           <div id="reprocessStatus" class="muted" style="margin-top:8px;"></div>
         </div>`:'';
         const uploadRescue=`<div class="review-box" style="border-color:#bbf7d0;background:#f0fdf4;">
@@ -1261,13 +1310,22 @@
     async function buildVideoReprocessBody(row,rowIndex,statusEl){
       const fd=new FormData();
       fd.append('row_index',String(rowIndex));
-      if(videoNeedsVisualRepair(row)){
-        if(statusEl)statusEl.textContent='Checking saved video and preparing frame capture...';
-        const frames=await captureAdminVideoFrames('adminVideoPlayer',18,statusEl);
+      const needsVisual=videoNeedsVisualRepair(row);
+      const visualOnly=videoNeedsOnlyVisualRepair(row);
+      if(needsVisual){
+        if(statusEl)statusEl.textContent='Checking saved video and preparing answer-window frame capture...';
+        const promptCount=Array.isArray(row.station?.prompts)
+          ? row.station.prompts.length
+          : [row.station?.prompt1,row.station?.prompt2,row.station?.prompt3,row.station?.prompt4].filter(Boolean).length || 2;
+        const frames=await captureAdminVideoFrames('adminVideoPlayer',48,statusEl,{answerOnly:true,windows:buildAdminCasperAnswerWindows(promptCount||2)});
         fd.append('reprocess_visual','1');
+        if(visualOnly)fd.append('visual_only','1');
+        fd.append('visual_frame_source','answer_windows');
         fd.append('captured_frame_count',String(frames.length));
         appendFramesToFormData(fd,frames);
-        if(statusEl)statusEl.textContent=`Sampled ${frames.length} frames. Re-running premium visual, voice, transcript, and scoring analysis...`;
+        if(statusEl)statusEl.textContent=visualOnly
+          ? `Sampled ${frames.length} answer-window frames. Updating premium visual feedback only...`
+          : `Sampled ${frames.length} answer-window frames. Re-running transcript and scoring with visual metrics...`;
       }
       return fd;
     }
@@ -1291,15 +1349,15 @@
       const isTyped=row.type!=='video';
       const btn=document.getElementById('reprocessBtn');
       const status=document.getElementById('reprocessStatus');
-      const visualRepair=videoNeedsVisualRepair(row);
-      if(btn){btn.disabled=true;btn.textContent=visualRepair?'Checking video...':'Reprocessing...';}
-      if(status)status.textContent=isTyped?'Running AI feedback from the saved typed answer. This may take a minute.':(visualRepair?'Checking saved video frames before reprocessing premium analysis.':'Running transcript and AI feedback from the saved recording. This may take a minute.');
+      const visualRepair=videoNeedsOnlyVisualRepair(row);
+      if(btn){btn.disabled=true;btn.textContent=visualRepair?'Refreshing visual...':'Reprocessing...';}
+      if(status)status.textContent=isTyped?'Running AI feedback from the saved typed answer. This may take a minute.':(visualRepair?'Sampling answer-time frames and refreshing visual feedback only.':'Running transcript and AI feedback from the saved recording. This may take a minute.');
       try{
         const data=await postStationReprocess(currentStation,status);
         currentAttempt=data.attempt||currentAttempt;
         renderAttempt();
       }catch(err){
-        if(btn){btn.disabled=false;btn.textContent=isTyped?'Reprocess typed answer':(visualRepair?'Reprocess with visual check':'Reprocess saved recording');}
+        if(btn){btn.disabled=false;btn.textContent=isTyped?'Reprocess typed answer':(visualRepair?'Refresh visual only':'Reprocess saved recording');}
         if(status)status.textContent=err.message||'Reprocess failed.';
       }
     }

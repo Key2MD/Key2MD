@@ -11,6 +11,16 @@
  tags: ['casper', 'uow', 'notre dame', 'class', 'june']
  },
  {
+ id: 'casper_masterclass',
+ area: 'CASPer',
+ title: 'CASPer Masterclass',
+ price: '$300',
+ href: 'casper-masterclass.html',
+ cta: 'Register for June 11',
+ bestFor: 'Students sitting the June 11 CASPer who want a final exam-day reset with key points fresh and clear.',
+ tags: ['casper', 'masterclass', 'june', 'exam day']
+ },
+ {
  id: 'casper_pro',
  area: 'CASPer',
  title: 'CASPer Pro',
@@ -59,6 +69,16 @@
  cta: 'Compare MMI options',
  bestFor: 'Applicants whose written profile is competitive and now need interview conversion.',
  tags: ['mmi', 'interview', 'voice', 'transcript']
+ },
+ {
+ id: 'mmi_masterclass',
+ area: 'MMI',
+ title: 'MMI Masterclass',
+ price: '$400',
+ href: 'mmi-masterclass.html',
+ cta: 'Register for MMI masterclass',
+ bestFor: 'Applicants who want a live, structured pass through examiner expectations, station types, and authentic communication around very early September interview-release timing.',
+ tags: ['mmi', 'masterclass', 'interview']
  },
  {
  id: 'gamsat_s2_pro',
