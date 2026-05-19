@@ -222,6 +222,10 @@ window.FullCasperMock = (() => {
  visualDegraded: !!row.visual_degraded,
  durationSec: row.duration_sec || null,
  processingError: row.processing_error || null,
+ autoRepairTask: null,
+ autoRepairAttempted: !!row.auto_repair_attempted,
+ autoRepairError: row.auto_repair_error || null,
+ autoRepairContext: null,
  localRescuePending: !!row.local_rescue_pending,
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
  }));
@@ -280,6 +284,7 @@ window.FullCasperMock = (() => {
  try {
  await saveMockAttempt(buildRows(), null, 'in_progress');
  saveMockDraft({ phase: reason, checkpointed_at: new Date().toISOString() });
+ startPendingAutoRepairs();
  } catch (err) {
  saveMockDraft({ phase: reason, checkpoint_error: err.message || 'Checkpoint failed' });
  if (options.throwOnError) throw err;
@@ -945,6 +950,7 @@ window.FullCasperMock = (() => {
  row.visualMetrics = data?.visual_metrics || null;
  row.visualDegraded = !!data?.visual_degraded;
  row.processingError = data?.processing_error || data?.message || null;
+ row.autoRepairError = null;
  } else {
  row.score = scoreValue(data?.score);
  row.feedback = data?.feedback || null;
@@ -955,6 +961,114 @@ window.FullCasperMock = (() => {
  if (!row || row.feedbackSettled) return;
  row.feedbackSettled = true;
  row.processingError = err?.message || 'Feedback processing failed.';
+ }
+
+ function hasMockVisualMetrics(row) {
+ const value = row?.visualMetrics || row?.visual_metrics || row?.rawFeedback?.visual_metrics;
+ return !!(value && typeof value === 'object' && Object.keys(value).length);
+ }
+
+ function mockVideoNeedsAutoRepair(row) {
+ if (!row || row.type !== 'video' || !row.recordingKey) return false;
+ const tier = row.tier || config.tier;
+ const visualIssue = tier === 'premium' && (row.visualDegraded || !hasMockVisualMetrics(row));
+ return visualIssue || !!row.processingError || !row.feedback || !String(row.transcript || '').trim();
+ }
+
+ function applyRepairedMockRow(row, repaired) {
+ if (!row || !repaired) return;
+ row.feedback = repaired.feedback || row.feedback || null;
+ row.transcript = repaired.transcript || row.transcript || '';
+ row.transcriptSegments = Array.isArray(repaired.transcript_segments) ? repaired.transcript_segments : row.transcriptSegments || [];
+ row.reviewId = repaired.review_id || row.reviewId || null;
+ row.recordingKey = repaired.recording_key || row.recordingKey || null;
+ row.transcriptionAudioKey = repaired.transcription_audio_key || row.transcriptionAudioKey || null;
+ row.voiceMetrics = repaired.voice_metrics || row.voiceMetrics || null;
+ row.visualMetrics = repaired.visual_metrics || row.visualMetrics || null;
+ row.visualDegraded = !!repaired.visual_degraded;
+ row.processingError = repaired.processing_error || null;
+ row.rawFeedback = {
+ ...(row.rawFeedback || {}),
+ feedback: row.feedback,
+ transcript: row.transcript,
+ transcript_segments: row.transcriptSegments,
+ review_id: row.reviewId,
+ recording_url: row.recordingKey,
+ transcription_audio_key: row.transcriptionAudioKey,
+ voice_metrics: row.voiceMetrics,
+ visual_metrics: row.visualMetrics,
+ visual_degraded: row.visualDegraded,
+ processing_error: row.processingError,
+ };
+ row.feedbackSettled = true;
+ row.autoRepairError = null;
+ }
+
+ function scheduleMockVideoAutoRepair(row) {
+ if (!mockVideoNeedsAutoRepair(row)) return null;
+ if (row.autoRepairTask) return row.autoRepairTask;
+ if (row.autoRepairAttempted) return null;
+ const attemptId = savedAttemptId || mockAttemptId;
+ const rowIndex = results.indexOf(row);
+ if (!attemptId || rowIndex < 0) return null;
+ const tier = row.tier || config.tier;
+ const needsVisualRepair = tier === 'premium' && (row.visualDegraded || !hasMockVisualMetrics(row));
+ const frames = Array.isArray(row.autoRepairContext?.frames)
+ ? row.autoRepairContext.frames.filter(Boolean).slice(0, 30)
+ : [];
+ if (needsVisualRepair && !frames.length) {
+ row.autoRepairAttempted = true;
+ row.autoRepairError = 'Premium visual repair could not run because no frame snapshots were retained.';
+ return null;
+ }
+ row.autoRepairAttempted = true;
+ const task = (async () => {
+ const auth = getAuth();
+ const token = auth?.getToken?.();
+ if (!token) throw new Error('Sign in required for background mock repair.');
+ const fd = new FormData();
+ fd.append('row_index', String(rowIndex));
+ if (needsVisualRepair) {
+ fd.append('repair_visual', '1');
+ frames.forEach((frame, i) => fd.append(`frame_${i}`, frame, `repair-frame-${String(i + 1).padStart(2, '0')}.jpg`));
+ }
+ const res = await fetch(`${apiBase()}/api/casper-mock/attempt/${encodeURIComponent(attemptId)}/repair-video`, {
+ method: 'POST',
+ headers: { 'Authorization': `Bearer ${token}` },
+ body: fd,
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) throw new Error(data.message || data.error || 'Background mock repair failed.');
+ if (data.row) applyRepairedMockRow(row, data.row);
+ saveMockDraft({ phase: 'auto_repair_saved', auto_repaired_at: new Date().toISOString() });
+ return data;
+ })()
+ .catch(err => {
+ row.autoRepairError = err.message || 'Background mock repair failed.';
+ saveMockDraft({ phase: 'auto_repair_failed', auto_repair_error: row.autoRepairError });
+ throw err;
+ });
+ row.autoRepairTask = task;
+ return task;
+ }
+
+ function startPendingAutoRepairs() {
+ results.forEach(row => {
+ const task = scheduleMockVideoAutoRepair(row);
+ if (task) task.catch(() => {});
+ });
+ }
+
+ async function settleMockAutoRepairTasks() {
+ startPendingAutoRepairs();
+ const tasks = results
+ .map(row => row.autoRepairTask)
+ .filter(Boolean);
+ if (!tasks.length) return;
+ await Promise.allSettled(tasks.map(task => Promise.race([
+ task,
+ new Promise((_, reject) => setTimeout(() => reject(new Error('Background repair timed out.')), 4 * 60 * 1000)),
+ ])));
  }
 
  function prepareMockFeedbackTask(row) {
@@ -996,6 +1110,8 @@ window.FullCasperMock = (() => {
  duration_sec: row.durationSec || row.duration_sec || row.rawFeedback?.durationSec || (row.localRescuePending ? 1 : null),
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
  processing_error: row.processingError || null,
+ auto_repair_error: row.autoRepairError || null,
+ auto_repair_attempted: !!row.autoRepairAttempted,
  local_rescue_pending: !!row.localRescuePending,
  }));
  }
@@ -1480,6 +1596,10 @@ window.FullCasperMock = (() => {
  recordingUrl: isVideoSubmission ? payload.recordingUrl : null,
  durationSec: isVideoSubmission ? payload.durationSec : null,
  processingError: null,
+ autoRepairTask: null,
+ autoRepairAttempted: false,
+ autoRepairError: null,
+ autoRepairContext: isVideoSubmission ? payload.autoRepairContext || null : null,
  localRescuePending: false,
  tier: item.type === 'video' ? config.tier : 'typed',
  };
@@ -2190,6 +2310,7 @@ const report = { rows, overallAvg, scoredCount, expectedCount, isPartial: scored
  area.innerHTML = renderProcessingScreen();
 
  await settleMockFeedbackTasks();
+ await settleMockAutoRepairTasks();
 
  const rows = buildRows();
  const typed = rows.filter(r => r.type === 'typed');

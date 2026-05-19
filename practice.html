@@ -1438,6 +1438,49 @@ async function extractVideoFrames(videoBlob, frameCount) {
  }
 }
 
+function shouldCapturePremiumLiveFrames() {
+ return !!((window.K2_ACTIVE_CASPER_MOCK && window.K2_ACTIVE_CASPER_MOCK.tier === 'premium') || mmiPremiumMode);
+}
+
+async function capturePremiumLiveFrame() {
+ const video = $('webcamLive');
+ if(!video || video.readyState < 2 || !video.videoWidth || !video.videoHeight) return false;
+ const canvas = document.createElement('canvas');
+ const maxWidth = 320;
+ const scale = Math.min(1, maxWidth / video.videoWidth);
+ canvas.width = Math.max(1, Math.round(video.videoWidth * scale));
+ canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
+ const ctx = canvas.getContext('2d');
+ if(!ctx) return false;
+ ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+ const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.72));
+ if(blob) {
+  mmiLiveFrameBlobs.push(blob);
+  return true;
+ }
+ return false;
+}
+
+function startPremiumLiveFrameCapture() {
+ stopPremiumLiveFrameCapture();
+ mmiLiveFrameBlobs = [];
+ if(!shouldCapturePremiumLiveFrames()) return;
+ const sample = () => {
+  if(!webcamActive || mmiLiveFrameBlobs.length >= 30) {
+   stopPremiumLiveFrameCapture();
+   return;
+  }
+  capturePremiumLiveFrame().catch(e => console.warn('Live premium frame capture failed:', e.message));
+ };
+ setTimeout(sample, 900);
+ mmiLiveFrameTimer = setInterval(sample, 3500);
+}
+
+function stopPremiumLiveFrameCapture() {
+ if(mmiLiveFrameTimer) clearInterval(mmiLiveFrameTimer);
+ mmiLiveFrameTimer = null;
+}
+
 function getMMIConfig() {
  if(mmiActivePreset === 'custom') {
  return {
@@ -1619,6 +1662,7 @@ async function submitMMIForFeedback() {
  if(isPremium && recordingBlob) {
  if(btn) btn.textContent = ' Extracting presentation snapshots...';
  frames = await extractVideoFrames(recordingBlob, 30);
+ if(frames.length === 0 && mmiLiveFrameBlobs.length) frames = mmiLiveFrameBlobs.slice(0, 30);
  if(frames.length === 0) {
  visualDegraded = true;
  console.info('Visual analysis unavailable - proceeding with voice + transcript only');
@@ -1819,6 +1863,13 @@ function buildMMIMockFormData(snapshot, frames, visualDegraded) {
 
 function submitMMIMockReviewSilently() {
  const snapshot = createMMIMockReviewSnapshot();
+ const autoRepairContext = {
+ snapshot,
+ frames: [],
+ visualDegraded: false,
+ lastError: null,
+ createdAt: new Date().toISOString(),
+ };
  const promise = (async () => {
  const auth = getK2Auth();
  if(!auth?.isLoggedIn?.()) throw new Error('Sign in required for mock video analysis.');
@@ -1826,8 +1877,11 @@ function submitMMIMockReviewSilently() {
  let visualDegraded = false;
  if(snapshot.isPremium && snapshot.recordingBlob) {
  frames = await extractVideoFrames(snapshot.recordingBlob, 30);
+ if(frames.length === 0 && mmiLiveFrameBlobs.length) frames = mmiLiveFrameBlobs.slice(0, 30);
  if(frames.length === 0) visualDegraded = true;
  }
+ autoRepairContext.frames = frames.slice(0, 30);
+ autoRepairContext.visualDegraded = visualDegraded;
  const token = auth.getToken();
  let lastError = null;
  for(let attempt = 1; attempt <= 3; attempt++) {
@@ -1841,6 +1895,7 @@ function submitMMIMockReviewSilently() {
  const data = await res.json().catch(() => ({}));
  if(!res.ok) {
  lastError = data.message || data.error || `Video analysis failed (${res.status})`;
+ autoRepairContext.lastError = lastError;
  if(res.status >= 500 && attempt < 3) continue;
  throw new Error(lastError);
  }
@@ -1853,6 +1908,7 @@ function submitMMIMockReviewSilently() {
  };
  } catch(err) {
  lastError = err.message;
+ autoRepairContext.lastError = lastError;
  if(attempt >= 3) throw new Error(lastError || 'Video analysis failed.');
  }
  }
@@ -1864,6 +1920,7 @@ function submitMMIMockReviewSilently() {
  station: snapshot.station,
  recordingUrl: snapshot.recordingUrl,
  durationSec: snapshot.durationSec,
+ autoRepairContext,
  promise,
  };
 }
@@ -2322,6 +2379,7 @@ let webcamStream=null,mediaRecorder=null,recordedChunks=[],recordingBlob=null;
 
 let audioRecorder=null,audioChunks=[],audioBlob=null;
 let webcamReady=false,webcamActive=false;
+let mmiLiveFrameBlobs=[],mmiLiveFrameTimer=null;
 
 
 const $ = id => document.getElementById(id);
@@ -2735,6 +2793,8 @@ function startRecording(){
  if(!webcamReady||!webcamStream)return;
  recordedChunks=[];recordingBlob=null;
  audioChunks=[];audioBlob=null;
+ mmiLiveFrameBlobs=[];
+ stopPremiumLiveFrameCapture();
 
  const rc=$('recordingControls');const pc=$('playbackControls');
  if(rc)rc.style.display='flex';if(pc)pc.style.display='none';
@@ -2804,6 +2864,7 @@ function startRecording(){
  }
 
  webcamActive=true;
+ startPremiumLiveFrameCapture();
  $('btnRestartRecording').disabled=false;
  $('recDot').style.display='block';$('recLabel').style.display='block';
  $('webcamTitle').textContent=' Recording';
@@ -2811,6 +2872,7 @@ function startRecording(){
 }
 function stopRecording(){
  if(window._elapsedInterval){clearInterval(window._elapsedInterval);window._elapsedInterval=null;}
+ stopPremiumLiveFrameCapture();
  if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
  if(audioRecorder&&audioRecorder.state!=='inactive')audioRecorder.stop();
  webcamActive=false;

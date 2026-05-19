@@ -365,7 +365,7 @@
       const avg=scored.length?Math.round((scored.reduce((sum,n)=>sum+n,0)/scored.length)*10)/10:'-';
       const videoCount=rows.filter(r=>r.type==='video').length;
       const typedCount=rows.filter(r=>r.type!=='video').length;
-      const typedIssueCount=rows.filter(needsTypedReprocess).length;
+      const reprocessIssueCount=rows.filter(needsStationReprocess).length;
       const tabs=rows.map((r,i)=>{const score=stationScore(r);return `<button class="${i===currentStation?'active':''}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}${Number.isFinite(score)?` - ${Math.round(score*10)/10}`:(r.processing_error||r.reprocess_error)?' - issue':''}</button>`;}).join('');
       document.getElementById('attemptPanel').innerHTML=`
         <div class="attempt-head">
@@ -374,7 +374,7 @@
             <div class="muted">${esc(a.user_email||'No email')} | <span class="pill">${esc(a.tier||'mock')}</span> | ${esc(statusText(a.manual_review_status||'pending_review'))}</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-          ${typedIssueCount?`<button id="reprocessTypedIssuesBtn" class="secondary" onclick="reprocessTypedIssues()">Reprocess ${typedIssueCount} typed issue${typedIssueCount===1?'':'s'}</button>`:''}
+          ${reprocessIssueCount?`<button id="reprocessIssuesBtn" class="secondary" onclick="reprocessAttemptIssues()">Check + reprocess ${reprocessIssueCount} issue${reprocessIssueCount===1?'':'s'}</button>`:''}
           <button class="secondary" onclick="saveNotes()">Save notes</button>
           </div>
         </div>
@@ -385,7 +385,7 @@
           <div class="metric"><strong>${typedCount}</strong><span>Typed stations</span></div>
           <div class="metric"><strong>${esc(fmtDateTime(a.completed_at)||'-')}</strong><span>Completed</span></div>
         </div>
-        ${typedIssueCount?`<div id="bulkReprocessStatus" class="muted" style="margin:0 0 12px;"></div>`:''}
+        ${reprocessIssueCount?`<div id="bulkReprocessStatus" class="muted" style="margin:0 0 12px;"></div>`:''}
         <div class="tabs">${tabs}</div>
         <div>${stationHtml(rows[currentStation])}</div>
         <div class="review-box" style="margin-top:16px">
@@ -422,6 +422,35 @@
       return row?.type!=='video' && String(row?.answer||'').trim().length>=20 && (!hasFeedback(row) || !!row.processing_error || !!row.reprocess_error);
     }
 
+    function rowTier(row){
+      return String(row?.tier || currentAttempt?.tier || '').toLowerCase();
+    }
+
+    function hasVisualMetrics(row){
+      const value=row?.visual_metrics || row?.visualMetrics;
+      return !!(value && typeof value==='object' && Object.keys(value).length);
+    }
+
+    function videoNeedsVisualRepair(row){
+      return row?.type==='video'
+        && rowTier(row)==='premium'
+        && !!row.recording_key
+        && (!!row.visual_degraded || !hasVisualMetrics(row));
+    }
+
+    function needsVideoReprocess(row){
+      if(row?.type!=='video' || !row.recording_key)return false;
+      return !hasFeedback(row)
+        || !!row.processing_error
+        || !!row.reprocess_error
+        || !String(row.transcript||'').trim()
+        || videoNeedsVisualRepair(row);
+    }
+
+    function needsStationReprocess(row){
+      return needsTypedReprocess(row) || needsVideoReprocess(row);
+    }
+
     function stationScore(row){
       if(!hasFeedback(row))return null;
       const fb=row.feedback||{}, overall=fb.overall||{};
@@ -450,7 +479,7 @@
       const keyAttr = recordingKey ? ` data-recording-key="${esc(recordingKey)}"` : '';
       return `<div class="mock-video-shell">
         <div class="mock-video-stage">
-          <video id="${id}" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="cursor:pointer"></video>
+          <video id="${id}" crossorigin="anonymous" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="cursor:pointer"></video>
           <button type="button" id="${id}Overlay" class="mock-video-overlay" onclick="playAdminRecording('${esc(id)}')">
             <span>
               <span class="mock-video-playmark">▶</span>
@@ -486,7 +515,7 @@
       }
       const src=adminRecordingUrl(recordingKey);
       return `<div class="mock-video-shell">
-        <video id="${id}" controls playsinline preload="metadata" src="${esc(src)}" data-loaded="1" data-recording-key="${esc(recordingKey)}" data-duration="${duration||''}"></video>
+        <video id="${id}" controls crossorigin="anonymous" playsinline preload="metadata" src="${esc(src)}" data-loaded="1" data-recording-key="${esc(recordingKey)}" data-duration="${duration||''}"></video>
         <div class="mock-video-status">Native secure playback. If it does not play in-page, open the raw recording below.</div>
         <div class="mock-video-actions">
           <a class="mock-video-action" href="${esc(src)}" target="_blank" rel="noopener">Open raw video</a>
@@ -845,6 +874,124 @@
       catch{setVideoState(id,video.dataset.loaded==='1'?'ready':'idle','Recording key',key);}
     }
 
+    function waitForMediaEvent(el,eventName,timeoutMs=8000){
+      return new Promise((resolve,reject)=>{
+        let done=false;
+        const cleanup=()=>{clearTimeout(timer);el.removeEventListener(eventName,onEvent);el.removeEventListener('error',onError);};
+        const finish=(fn,value)=>{if(done)return;done=true;cleanup();fn(value);};
+        const onEvent=()=>finish(resolve);
+        const onError=()=>finish(reject,new Error('The recording could not be decoded by the browser.'));
+        const timer=setTimeout(()=>finish(reject,new Error(`Timed out waiting for ${eventName}.`)),timeoutMs);
+        el.addEventListener(eventName,onEvent,{once:true});
+        el.addEventListener('error',onError,{once:true});
+      });
+    }
+
+    function videoCaptureDuration(video){
+      const nativeDuration=Number(video.duration);
+      const hintedDuration=Number(video.dataset.duration||0);
+      if(Number.isFinite(nativeDuration)&&nativeDuration>0&&nativeDuration<86400)return nativeDuration;
+      if(Number.isFinite(hintedDuration)&&hintedDuration>0&&hintedDuration<86400)return hintedDuration;
+      return 0;
+    }
+
+    async function waitForVideoPaint(video){
+      if(typeof video.requestVideoFrameCallback==='function'){
+        await new Promise(resolve=>{
+          const timer=setTimeout(resolve,650);
+          video.requestVideoFrameCallback(()=>{clearTimeout(timer);resolve();});
+        });
+        return;
+      }
+      await new Promise(resolve=>setTimeout(resolve,90));
+    }
+
+    async function ensureVideoReadyForFrameCapture(video){
+      if(!video)throw new Error('No video player is available for this station.');
+      if(video.crossOrigin!=='anonymous')video.crossOrigin='anonymous';
+      if((video.dataset.loaded!=='1' || !video.getAttribute('src')) && video.dataset.recordingKey){
+        await loadAdminRecording(video.id||'adminVideoPlayer');
+      }
+      if(!video.getAttribute('src'))throw new Error('No saved video source is loaded for this station.');
+      if(video.readyState<1){
+        try{video.load();}catch{}
+        await waitForMediaEvent(video,'loadedmetadata',9000);
+      }
+      if(!video.videoWidth || !video.videoHeight){
+        try{await waitForMediaEvent(video,'loadeddata',7000);}catch{}
+      }
+      if(!video.videoWidth || !video.videoHeight){
+        throw new Error('The saved recording loaded, but the browser could not read visual frames from it.');
+      }
+    }
+
+    async function seekVideoForFrameCapture(video,time){
+      const duration=videoCaptureDuration(video);
+      const target=Math.max(0.05,Math.min(time,Math.max(0.05,duration-0.08)));
+      if(Math.abs((Number(video.currentTime)||0)-target)<0.08 && video.readyState>=2){
+        await waitForVideoPaint(video);
+        return;
+      }
+      await new Promise((resolve,reject)=>{
+        let done=false;
+        const cleanup=()=>{clearTimeout(timer);video.removeEventListener('seeked',onSeeked);video.removeEventListener('error',onError);};
+        const finish=(fn,value)=>{if(done)return;done=true;cleanup();fn(value);};
+        const onSeeked=()=>finish(resolve);
+        const onError=()=>finish(reject,new Error('The browser could not seek through the saved video.'));
+        const timer=setTimeout(()=>finish(resolve),6500);
+        video.addEventListener('seeked',onSeeked,{once:true});
+        video.addEventListener('error',onError,{once:true});
+        try{video.currentTime=target;}catch(err){finish(reject,err);}
+      });
+      await waitForVideoPaint(video);
+    }
+
+    async function drawVideoFrameBlob(video){
+      const maxWidth=960;
+      const scale=Math.min(1,maxWidth/Math.max(1,video.videoWidth));
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.max(1,Math.round(video.videoWidth*scale));
+      canvas.height=Math.max(1,Math.round(video.videoHeight*scale));
+      const ctx=canvas.getContext('2d');
+      if(!ctx)throw new Error('Could not prepare the frame capture canvas.');
+      ctx.drawImage(video,0,0,canvas.width,canvas.height);
+      return await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.84));
+    }
+
+    async function captureAdminVideoFrames(videoId='adminVideoPlayer',frameLimit=18,statusEl=null){
+      const video=document.getElementById(videoId);
+      await ensureVideoReadyForFrameCapture(video);
+      const duration=videoCaptureDuration(video);
+      if(!duration)throw new Error('The saved video has no readable duration, so frames could not be sampled.');
+      const originalTime=Number(video.currentTime)||0;
+      const wasPaused=video.paused;
+      const count=Math.min(frameLimit,Math.max(6,Math.min(frameLimit,Math.ceil(duration/12))));
+      const start=Math.min(0.6,Math.max(0.05,duration*0.03));
+      const end=Math.max(start, duration-0.2);
+      const frames=[];
+      video.pause();
+      try{
+        for(let i=0;i<count;i++){
+          const fraction=count===1?0.5:i/(count-1);
+          const time=start+(end-start)*fraction;
+          if(statusEl)statusEl.textContent=`Sampling saved video frame ${i+1}/${count}...`;
+          await seekVideoForFrameCapture(video,time);
+          const blob=await drawVideoFrameBlob(video);
+          if(blob && blob.size>900)frames.push(blob);
+        }
+      }finally{
+        try{await seekVideoForFrameCapture(video,Math.min(originalTime,Math.max(0.05,duration-0.08)));}catch{}
+        if(wasPaused)video.pause();
+        else video.play?.().catch(()=>{});
+      }
+      if(!frames.length)throw new Error('No usable frames could be sampled from the saved video.');
+      return frames;
+    }
+
+    function appendFramesToFormData(fd,frames){
+      frames.forEach((blob,i)=>fd.append(`frame_${i}`,blob,`admin-reprocess-frame-${String(i+1).padStart(2,'0')}.jpg`));
+    }
+
     function transcriptSegments(row){
       const direct=Array.isArray(row?.transcript_segments) ? row.transcript_segments : [];
       const camel=Array.isArray(row?.transcriptSegments) ? row.transcriptSegments : [];
@@ -908,11 +1055,12 @@
       const issue=issueText?`<div class="review-box" style="border-color:#fed7aa;background:#fff7ed;color:#7c2d12;"><div class="section-label" style="color:#c2410c;">Analysis issue</div><div class="text-block">${esc(issueText)}</div></div>`:'';
       if(r.type==='video'){
         const key=r.recording_key;
-        const canReprocess=key && (!hasFeedback(r) || r.processing_error || !r.transcript);
+        const canReprocess=needsVideoReprocess(r);
+        const visualRepair=videoNeedsVisualRepair(r);
         const reprocess=canReprocess?`<div class="review-box" style="border-color:#bae6fd;background:#f0f9ff;">
-          <div class="section-label" style="color:#0369a1;">Safety net</div>
-          <div class="text-block" style="margin-bottom:10px;">A saved recording exists. Re-run transcript and AI feedback from admin so this station does not stay broken for the student.</div>
-          <button id="reprocessBtn" class="secondary" type="button" onclick="reprocessCurrentStation()">Reprocess saved recording</button>
+          <div class="section-label" style="color:#0369a1;">${visualRepair?'Premium visual repair':'Safety net'}</div>
+          <div class="text-block" style="margin-bottom:10px;">${visualRepair?'A saved video exists. This will sample camera frames from the playable recording, then re-run premium analysis so the student gets the visual feedback they paid for.':'A saved recording exists. Re-run transcript and AI feedback from admin so this station does not stay broken for the student.'}</div>
+          <button id="reprocessBtn" class="secondary" type="button" onclick="reprocessCurrentStation()">${visualRepair?'Reprocess with visual check':'Reprocess saved recording'}</button>
           <div id="reprocessStatus" class="muted" style="margin-top:8px;"></div>
         </div>`:'';
         const uploadRescue=`<div class="review-box" style="border-color:#bbf7d0;background:#f0fdf4;">
@@ -1110,59 +1258,86 @@
       document.getElementById('saveStatus').textContent=res.ok?'Saved.':(data.error||'Save failed');
     }
 
+    async function buildVideoReprocessBody(row,rowIndex,statusEl){
+      const fd=new FormData();
+      fd.append('row_index',String(rowIndex));
+      if(videoNeedsVisualRepair(row)){
+        if(statusEl)statusEl.textContent='Checking saved video and preparing frame capture...';
+        const frames=await captureAdminVideoFrames('adminVideoPlayer',18,statusEl);
+        fd.append('reprocess_visual','1');
+        fd.append('captured_frame_count',String(frames.length));
+        appendFramesToFormData(fd,frames);
+        if(statusEl)statusEl.textContent=`Sampled ${frames.length} frames. Re-running premium visual, voice, transcript, and scoring analysis...`;
+      }
+      return fd;
+    }
+
+    async function postStationReprocess(rowIndex,statusEl){
+      const row=(currentAttempt.rows||[])[rowIndex]||{};
+      const isTyped=row.type!=='video';
+      const url=API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/reprocess';
+      const options=isTyped
+        ? {method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({row_index:rowIndex})}
+        : {method:'POST',headers:authHeaders(),body:await buildVideoReprocessBody(row,rowIndex,statusEl)};
+      const res=await fetch(url,options);
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok)throw new Error(data.message||data.error||'Reprocess failed');
+      return data;
+    }
+
     async function reprocessCurrentStation(){
       if(!currentAttempt)return;
       const row=(currentAttempt.rows||[])[currentStation]||{};
       const isTyped=row.type!=='video';
       const btn=document.getElementById('reprocessBtn');
       const status=document.getElementById('reprocessStatus');
-      if(btn){btn.disabled=true;btn.textContent='Reprocessing...';}
-      if(status)status.textContent=isTyped?'Running AI feedback from the saved typed answer. This may take a minute.':'Running transcript and AI feedback from the saved recording. This may take a minute.';
+      const visualRepair=videoNeedsVisualRepair(row);
+      if(btn){btn.disabled=true;btn.textContent=visualRepair?'Checking video...':'Reprocessing...';}
+      if(status)status.textContent=isTyped?'Running AI feedback from the saved typed answer. This may take a minute.':(visualRepair?'Checking saved video frames before reprocessing premium analysis.':'Running transcript and AI feedback from the saved recording. This may take a minute.');
       try{
-        const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/reprocess',{
-          method:'POST',
-          headers:{...authHeaders(),'Content-Type':'application/json'},
-          body:JSON.stringify({row_index:currentStation})
-        });
-        const data=await res.json().catch(()=>({}));
-        if(!res.ok)throw new Error(data.message||data.error||'Reprocess failed');
+        const data=await postStationReprocess(currentStation,status);
         currentAttempt=data.attempt||currentAttempt;
         renderAttempt();
       }catch(err){
-        if(btn){btn.disabled=false;btn.textContent=isTyped?'Reprocess typed answer':'Reprocess saved recording';}
+        if(btn){btn.disabled=false;btn.textContent=isTyped?'Reprocess typed answer':(visualRepair?'Reprocess with visual check':'Reprocess saved recording');}
         if(status)status.textContent=err.message||'Reprocess failed.';
       }
     }
 
-    async function reprocessTypedIssues(){
+    async function reprocessAttemptIssues(){
       if(!currentAttempt)return;
-      const btn=document.getElementById('reprocessTypedIssuesBtn');
+      const btn=document.getElementById('reprocessIssuesBtn');
       const status=document.getElementById('bulkReprocessStatus');
       const rows=currentAttempt.rows||[];
-      const indexes=rows.map((row,index)=>needsTypedReprocess(row)?index:null).filter(Number.isInteger);
+      const indexes=rows.map((row,index)=>needsStationReprocess(row)?index:null).filter(Number.isInteger);
       if(!indexes.length)return;
-      if(btn){btn.disabled=true;btn.textContent='Reprocessing typed issues...';}
+      if(btn){btn.disabled=true;btn.textContent='Checking issues...';}
       try{
         for(let i=0;i<indexes.length;i++){
           const rowIndex=indexes[i];
           currentStation=rowIndex;
-          if(status)status.textContent=`Reprocessing typed issue ${i+1}/${indexes.length}...`;
-          const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/reprocess',{
-            method:'POST',
-            headers:{...authHeaders(),'Content-Type':'application/json'},
-            body:JSON.stringify({row_index:rowIndex})
-          });
-          const data=await res.json().catch(()=>({}));
-          if(!res.ok)throw new Error(data.message||data.error||`Typed ${rowIndex+1} failed`);
+          renderAttempt();
+          const liveStatus=document.getElementById('reprocessStatus')||document.getElementById('bulkReprocessStatus')||status;
+          if(liveStatus)liveStatus.textContent=`Checking station ${rowIndex+1} (${i+1}/${indexes.length})...`;
+          const data=await postStationReprocess(rowIndex,liveStatus);
           currentAttempt=data.attempt||currentAttempt;
+          if(status)status.textContent=`Reprocessed station ${rowIndex+1} (${i+1}/${indexes.length}).`;
         }
-        if(status)status.textContent='Typed issue reprocessing complete.';
+        if(status)status.textContent='Issue reprocessing complete.';
         renderAttempt();
       }catch(err){
-        if(btn){btn.disabled=false;btn.textContent=`Reprocess ${indexes.length} typed issue${indexes.length===1?'':'s'}`;}
-        if(status)status.textContent=err.message||'Bulk reprocess failed.';
+        if(btn){btn.disabled=false;btn.textContent=`Check + reprocess ${indexes.length} issue${indexes.length===1?'':'s'}`;}
+        const message=err.message||'Bulk reprocess failed.';
+        const liveStatus=document.getElementById('reprocessStatus')||status;
+        if(liveStatus)liveStatus.textContent=message;
         renderAttempt();
+        const nextStatus=document.getElementById('reprocessStatus')||document.getElementById('bulkReprocessStatus');
+        if(nextStatus)nextStatus.textContent=message;
       }
+    }
+
+    async function reprocessTypedIssues(){
+      return reprocessAttemptIssues();
     }
 
     async function uploadRecordingForCurrentStation(){
