@@ -1705,6 +1705,16 @@
  <div class="admin-note blue" style="margin-bottom:14px;">
  <strong>Privacy guard:</strong> this page only uses admin-protected mock endpoints. Use the reader buttons to inspect an individual attempt with the same admin session.
  </div>
+ <section class="mock-admin-panel" style="margin-bottom:14px;">
+ <div class="mock-panel-head">
+ <div>
+ <div class="mock-panel-title">Mock Bank Health</div>
+ <div class="mock-panel-sub" id="mockBankStatus">Loading private D1 bank audit...</div>
+ </div>
+ <button class="btn" onclick="loadMockAdmin()">Audit bank</button>
+ </div>
+ <div id="mockBankAudit" class="admin-note blue" style="margin:14px;">Loading...</div>
+ </section>
  <div class="mock-command-strip" id="mockSummaryCards"></div>
  <div class="mock-filter-card">
  <div class="mock-filter-top">
@@ -2138,7 +2148,7 @@ const S = {
  reviews: [], s2Reviews: [], users: [], warmLeads: [], sharingWatchlist: [], enquiries: [], subscribers: [],
  pipeline: null, outreachRoi: null, abandonedCheckouts: null, studentTimeline: null, nextActions: [], productFunnel: null, retentionRisks: [],
  conversations: [], filteredConvs: [],
- mmiReviews: [], mockAttempts: [], mockManualReviews: [], revenue: [], payers: [], payersFromServer: false, revenueSummary: null, monitoring: null,
+ mmiReviews: [], mockAttempts: [], mockManualReviews: [], mockBank: null, revenue: [], payers: [], payersFromServer: false, revenueSummary: null, monitoring: null,
  casperClass: null, masterclasses: null,
  broadcastHistory: [],
  activeConv: null,
@@ -7182,14 +7192,17 @@ async function unsubscribeRow(idx, email) {
 // MOCK EXAMS
 async function loadMockAdmin() {
  try {
- const [attemptRes, manualRes] = await Promise.all([
+ const [attemptRes, manualRes, bankRes] = await Promise.all([
  api('/api/admin/casper-mock/attempts?limit=250'),
  api('/api/admin/casper-mock/manual-reviews'),
+ api('/api/admin/casper-mock/bank'),
  ]);
  const attemptData = await attemptRes.json().catch(()=>({}));
  const manualData = await manualRes.json().catch(()=>({}));
+ const bankData = await bankRes.json().catch(()=>({}));
  if (!attemptRes.ok) throw new Error(attemptData?.error || 'Could not load mock attempts');
  if (!manualRes.ok) throw new Error(manualData?.error || 'Could not load manual review queue');
+ S.mockBank = bankRes.ok ? bankData : { error: bankData?.error || 'Could not audit mock bank' };
  S.mockAttempts = (attemptData.rows || []).map(row => summariseMockForDashboard(row));
  S.mockManualReviews = (manualData.rows || []).map(row => summariseMockForDashboard(row));
  await hydrateMockCompletionGaps();
@@ -7399,6 +7412,47 @@ function mockSortLabel(sort) {
  return ({recent:'Newest activity',completed:'Newest completed',oldest:'Oldest first',student:'Student A-Z',tier:'Tier'}[sort] || sort || 'Newest activity');
 }
 
+function renderMockBankAudit() {
+ const box = document.getElementById('mockBankAudit');
+ const status = document.getElementById('mockBankStatus');
+ if (!box) return;
+ if (!S.mockBank) {
+ box.className = 'admin-note blue';
+ box.style.margin = '14px';
+ box.innerHTML = 'Loading...';
+ if (status) status.textContent = 'Loading private D1 bank audit...';
+ return;
+ }
+ const data = S.mockBank || {};
+ if (data.error) {
+ box.className = 'admin-note amber';
+ box.style.margin = '14px';
+ box.innerHTML = `<strong>Audit unavailable:</strong> ${esc(data.error)}`;
+ if (status) status.textContent = 'Could not audit private D1 bank';
+ return;
+ }
+ const rows = data.rows || [];
+ const ready = !!data.expected_ready;
+ box.className = ready ? 'admin-note blue' : 'admin-note amber';
+ box.style.margin = '14px';
+ if (status) status.textContent = ready
+ ? `${data.expected_ready_count || 0}/3 expected mocks ready`
+ : `${data.expected_ready_count || 0}/3 expected mocks ready - check missing rows`;
+ const mockOneSource = data.mock_1_source === 'private_d1_only' ? 'D1-only' : (data.mock_1_source || 'missing');
+ const missing = (data.missing_expected_slugs || []).length ? ` Missing: ${data.missing_expected_slugs.map(esc).join(', ')}.` : '';
+ box.innerHTML = `
+ <strong>${ready ? 'Ready' : 'Check needed'}:</strong>
+ ${esc(data.expected_ready_count || 0)}/3 expected mocks are complete. Mock 1 source: ${esc(mockOneSource)}.${missing}
+ <div class="mock-row-flags" style="margin-top:10px;">
+ ${rows.map(row => `
+ <span class="mock-row-flag ${row.ready ? 'good' : 'warn'}">
+ ${esc(row.slug)}: ${Number(row.station_count || 0)} stations, ${Number(row.video_count || 0)} video, ${Number(row.typed_count || 0)} typed, ${Number(row.prompt_count || 0)} prompts
+ </span>
+ `).join('') || '<span class="mock-row-flag warn">No active mocks found</span>'}
+ </div>
+ `;
+}
+
 function renderMockSummaryCards() {
  const el = document.getElementById('mockSummaryCards');
  if (!el) return;
@@ -7425,6 +7479,7 @@ function renderMockSummaryCards() {
 }
 
 function renderMockAdmin() {
+ renderMockBankAudit();
  renderMockSummaryCards();
  renderMockFilterState();
  const manualRows = filterMockRows(S.mockManualReviews);
