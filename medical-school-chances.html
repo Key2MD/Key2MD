@@ -839,6 +839,23 @@
 body[data-page="guide"] .k2-nav-links a[data-nav="resources"],body[data-page="about"] .k2-nav-links a[data-nav="resources"],body[data-page="blog"] .k2-nav-links a[data-nav="resources"],body[data-page="requirements"] .k2-nav-links a[data-nav="resources"]{color:#0ea5e9;}
 body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 @media(max-width:900px){.k2-dropdown-menu{display:none;}}
+ /* Bonus panel attention banner */
+ .bonus-attention-banner {
+ display: flex; align-items: flex-start; gap: 10px;
+ background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+ border: 2px solid #f59e0b; border-radius: 10px;
+ padding: 12px 14px; margin-bottom: 16px;
+ font-size: 0.83rem; color: #78350f; line-height: 1.55;
+ box-shadow: 0 2px 8px rgba(245,158,11,0.15);
+ }
+ .bonus-attention-icon { font-size: 1.1rem; color: #d97706; flex-shrink: 0; margin-top: 1px; }
+ .bonus-pill-badge {
+ display: inline-flex; align-items: center; justify-content: center;
+ background: var(--teal3); color: #fff; border-radius: 50px;
+ font-size: 0.62rem; font-weight: 800; padding: 1px 5px;
+ margin-left: 4px; min-width: 16px; line-height: 1.3;
+ }
+ .bonus-school-pill.active .bonus-pill-badge { background: rgba(255,255,255,0.3); }
 </style>
 </head>
 <body>
@@ -1051,10 +1068,14 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 
  <div class="bonus-panel calc-initial-only" id="bonusPanel">
+ <div class="bonus-attention-banner">
+ <span class="bonus-attention-icon">✦</span>
+ <span><strong>Don't skip this — bonuses can change your shortlist.</strong> Each university has its own adjustments (rural background, HDR, work experience, and more). Use the university tabs below and tick what applies to <em>each one separately</em> — your selections are saved independently per school.</span>
+ </div>
  <div class="bonus-panel-head">
  <div>
  <div class="bonus-panel-title">University bonuses and GPA rules</div>
- <div class="bonus-panel-sub">Pick a university, then tick the adjustments you qualify for. Numeric bonuses only affect that university's result.</div>
+ <div class="bonus-panel-sub">Switch between universities using the tabs below — each school has its own bonus rules, and your selections are saved independently for each one. Numeric bonuses only affect that university's result.</div>
  </div>
  </div>
  <div class="bonus-school-pills" id="bonusSchoolPills" aria-label="Choose university for bonus options"></div>
@@ -1409,6 +1430,9 @@ const UNIS = [
  { id:'undf', name:'The University of Notre Dame Fremantle', short:'UNDF', gamsatMode:'unweighted', gamsatHurdle:{ scoreMin:52, sectionMin:50 }, nInt:44, nRej:22, interview:{med:1.60658, std:0.03229}, cutoffNR:1.56, cutoffR:1.51, casper:true, uow:false,
  noteNR:'UNDF uses unweighted GAMSAT and CASPer as formal selection components. A Q4 typically required to compete at this combo range.',
  noteCasperRural:'Rural applicants usually need at least a Q2 CASPer.' },
+ { id:'flinders', name:'Flinders University Doctor of Medicine', short:'Flinders', gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 }, nInt:null, nRej:null, interview:null, cutoffNR:1.60, cutoffR:1.52, casper:false, uow:false, flinders:true,
+ noteNR:'Flinders requires a direct application — not GEMSAS. Uses a Flinders-calculated weighted GPA (wGPA, minimum 5.0) and weighted GAMSAT (minimum 50 in each section). Up to 75% of SA Bedford Park places are reserved for internal Flinders graduates, so the effective cutoff for external applicants is substantially higher (~1.67+ estimated). Combo shown is a planning estimate only; no large student-submitted dataset is available.',
+ noteRural:'SA rural (SARM program) and NT (NTMP) sub-quotas exist with separate priority criteria. Non-internal applicants in these streams can be more competitive relative to the general SA quota.' },
  { id:'uow', name:'The University of Wollongong', short:'UoW', gamsatMode:'hurdle', nInt:40, nRej:59, interview:null, cutoffNR:null, cutoffR:null, casper:true, uow:true,
  hurdles:{ gpaMin:5.5, gamsatMin:50, sectionMin:50, casperReq:'Q4 typically', bonusReq:'UOW bonuses are weighted equally and combined with Casper for interview ranking' } },
 ];
@@ -1416,7 +1440,7 @@ const UNIS = [
 
 
 
-const BONUS_ORDER = ['deakin','uow','uq','anu','uwa','macquarie','griffith','uom','unds','undf'];
+const BONUS_ORDER = ['deakin','uow','uq','anu','uwa','macquarie','griffith','uom','unds','undf','flinders'];
 
 const BONUS_RULES = {
  deakin: {
@@ -1524,6 +1548,17 @@ const BONUS_RULES = {
  { id:'waResidency', label:'Western Australian residency', type:'qualitative', meta:'bonus points', detail:'Cumulative WA residency of 10 years or more may receive bonus points.' },
  { id:'hdr', label:'Masters by Research or Doctoral degree complete by 31 July', type:'qualitative', meta:'bonus points', detail:'Notre Dame awards bonus points for completed HDR qualifications.' },
  { id:'fipUnda', label:'Facilitated interview pathway graduate', type:'qualitative', meta:'pathway', detail:'UNDA undergraduate, Graduate Diploma of Health and Medical Sciences, and Pre-Medicine Certificate graduates may have a facilitated interview pathway.' },
+ ],
+ },
+ flinders: {
+ summary: 'Flinders is not GEMSAS — it requires a direct application to Flinders University. Ranking uses a Flinders-calculated weighted GPA (wGPA) and weighted GAMSAT. Up to 75% of SA Bedford Park places are reserved for Flinders graduates; external applicants face a materially higher effective cutoff.',
+ foot: 'SARM (SA rural) and NTMP (NT) sub-quotas have separate priority criteria. No published percentage bonus multiplier like Deakin or ANU. A $160 non-refundable application fee applies.',
+ items: [
+ { id:'flindersDegree', label:'Flinders University graduate (internal applicant)', type:'qualitative', meta:'sub-quota priority', detail:'Up to 75% of SA Bedford Park places are reserved for Flinders graduates, who compete in a substantially larger internal pool with a lower effective cutoff than external applicants.' },
+ { id:'sarm', label:'SA rural background or commitment (SARM program)', type:'qualitative', meta:'rural sub-quota', detail:'SARM program has dedicated SA rural-background sub-quota places. Priority given to applicants meeting SARM criteria including rural residency and/or rural schooling in SA.' },
+ { id:'ntmp', label:'NT residency or NT commitment (NTMP)', type:'qualitative', meta:'NT sub-quota', detail:'NTMP places are set aside for applicants with NT residency or a demonstrable commitment to working in the Northern Territory.' },
+ { id:'atsiFlinders', label:'Aboriginal and/or Torres Strait Islander applicant', type:'qualitative', meta:'IES/sub-quota pathway', detail:'ATSI applicants may apply via the IES (Indigenous Entry Stream) pathway if they do not hold a current GAMSAT result. Sub-quota places also exist within SAMP.' },
+ { id:'hdrFlinders', label:'Completed HDR (Masters by Research or PhD)', type:'qualitative', meta:'wGPA effect', detail:'Completed HDR qualifications may affect the Flinders wGPA calculation. Check the Flinders MD Application Guide for the exact wGPA treatment of your qualification.' },
  ],
  },
 };
@@ -1981,8 +2016,13 @@ function renderBonusPicker() {
  const list = document.getElementById('bonusChecklist');
  const foot = document.getElementById('bonusPanelFoot');
  document.querySelectorAll('.bonus-school-pill').forEach(btn => {
- btn.classList.toggle('active', btn.dataset.school === activeId);
- btn.setAttribute('aria-pressed', btn.dataset.school === activeId ? 'true' : 'false');
+ const sid = btn.dataset.school;
+ btn.classList.toggle('active', sid === activeId);
+ btn.setAttribute('aria-pressed', sid === activeId ? 'true' : 'false');
+ const sc = BONUS_RULES[sid] ? getSelectedBonusIds(sid).length : 0;
+ const schoolObj = schoolById(sid);
+ const lbl = schoolObj ? schoolObj.short : sid;
+ btn.innerHTML = escapeHtml(lbl) + (sc > 0 ? `<span class="bonus-pill-badge">${sc}</span>` : '');
  });
  if (!rule) return;
  const school = schoolById(activeId);
@@ -3037,6 +3077,11 @@ function renderUni(u, gpa, scores) {
  const card = document.createElement('div');
  card.className = 'uni-card';
 
+ if (u.flinders) {
+ card.innerHTML = renderFlindersCard(u, gpa, scores);
+ return card;
+ }
+
  if (u.uow) {
  card.innerHTML = renderUoWCard(u, gpa, scores);
  return card;
@@ -3178,6 +3223,42 @@ function renderCasperBadge(u) {
  }
  }
  return `<div class="uni-casper-badge">CASPer-critical | ${txt}</div>`;
+}
+
+function renderFlindersCard(u, gpa, scores) {
+ const gam = scores.weighted;
+ const combo = gpa / 7 + gam / 100;
+ const cutoff = state.rural ? (u.cutoffR || 1.52) : (u.cutoffNR || 1.60);
+ const margin = combo - cutoff;
+ const aboveBelow = margin >= 0 ? `+${margin.toFixed(3)} above` : `${margin.toFixed(3)} below`;
+ const verdictClass = margin >= 0.02 ? 'green' : (margin >= -0.02 ? 'amber' : 'red');
+ const verdictLabel = margin >= 0.02 ? 'Possibly competitive (external est.)' : (margin >= -0.02 ? 'Borderline (external est.)' : 'Below external estimate');
+ const note = state.rural ? (u.noteRural || u.noteNR) : u.noteNR;
+ const bonusImpact = getBonusImpact(u, gpa, scores);
+ return `
+ <div class="uni-card-top">
+ <div>
+ <div class="uni-name">${escapeHtml(u.name)}</div>
+ <div class="uni-n" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+ <span style="display:inline-block;background:#7c3aed;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 8px;border-radius:4px;letter-spacing:0.04em;">DIRECT APPLY — NOT GEMSAS</span>
+ <span>Weighted GPA + Weighted GAMSAT | No student dataset available</span>
+ </div>
+ </div>
+ <div class="uni-verdict ${verdictClass}">${verdictLabel}</div>
+ </div>
+ <div class="uni-body">
+ Combo ${combo.toFixed(3)} vs ~${cutoff.toFixed(2)} estimated ${state.rural ? 'rural/SARM' : 'external'} cutoff (${aboveBelow}).
+ </div>
+ <div class="uni-notes" style="background:#faf5ff;border-left-color:#7c3aed;">
+ <strong>⚠ Separate application required — not covered by your GEMSAS application.</strong><br>${escapeHtml(note)}
+ </div>
+ ${renderBonusImpact(bonusImpact)}
+ <div class="uni-notes" style="margin-top:8px;">
+ Official sources:
+ <a href="https://www.flinders.edu.au/study/courses/postgraduate-doctor-medicine" target="_blank" rel="noopener" style="color:var(--teal3);text-decoration:underline;">Flinders MD page</a> ·
+ <a href="https://www.flinders.edu.au/content/dam/documents/study/domestic/apply/md-admissions-guide.pdf" target="_blank" rel="noopener" style="color:var(--teal3);text-decoration:underline;">Application guide (PDF)</a>
+ </div>
+ `;
 }
 
 function renderUoWCard(u, gpa, scores) {

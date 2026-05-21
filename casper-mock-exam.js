@@ -133,10 +133,54 @@ window.FullCasperMock = (() => {
  transitionNextIndex = null;
  }
 
+ function currentDraftStorageKey() {
+ const user = getAuth()?.getUser?.() || null;
+ const raw = String(user?.id || user?.email || 'anon').trim().toLowerCase();
+ const safe = raw.replace(/[^a-z0-9_-]/g, '_').replace(/_+/g, '_').slice(0, 90) || 'anon';
+ return `${MOCK_DRAFT_KEY}:${safe}`;
+ }
+
+ function currentDraftUserSnapshot() {
+ const user = getAuth()?.getUser?.() || null;
+ return {
+ id: user?.id ? String(user.id) : '',
+ email: user?.email ? String(user.email).trim().toLowerCase() : '',
+ };
+ }
+
+ function draftSequenceLength(draft) {
+ return Array.isArray(draft?.sequence) && draft.sequence.length
+ ? draft.sequence.length
+ : VIDEO_COUNT + TYPED_COUNT;
+ }
+
+ function draftIsFinished(draft) {
+ if (!draft) return false;
+ const rows = Array.isArray(draft.rows) ? draft.rows : [];
+ const sequenceLength = draftSequenceLength(draft);
+ return !!draft.completed
+ || draft.status === 'completed'
+ || draft.phase === 'completed'
+ || rows.length >= sequenceLength
+ || Number(draft.index || 0) >= sequenceLength;
+ }
+
+ function draftBelongsToCurrentUser(draft) {
+ const user = currentDraftUserSnapshot();
+ if (!draft || (!draft.user_id && !draft.user_email)) return true;
+ if (draft.user_id && user.id && String(draft.user_id) !== user.id) return false;
+ if (draft.user_email && user.email && String(draft.user_email).trim().toLowerCase() !== user.email) return false;
+ return true;
+ }
+
  function readMockDraft() {
  try {
- const draft = JSON.parse(localStorage.getItem(MOCK_DRAFT_KEY) || 'null');
- if (!draft || !draft.attempt_id || draft.completed) return null;
+ localStorage.removeItem(MOCK_DRAFT_KEY);
+ const draft = JSON.parse(localStorage.getItem(currentDraftStorageKey()) || 'null');
+ if (!draft || !draft.attempt_id || draftIsFinished(draft) || !draftBelongsToCurrentUser(draft)) {
+ clearMockDraft();
+ return null;
+ }
  return draft;
  } catch {
  return null;
@@ -144,7 +188,10 @@ window.FullCasperMock = (() => {
  }
 
  function clearMockDraft() {
- try { localStorage.removeItem(MOCK_DRAFT_KEY); } catch {}
+ try {
+ localStorage.removeItem(currentDraftStorageKey());
+ localStorage.removeItem(MOCK_DRAFT_KEY);
+ } catch {}
  }
 
  function startDraftMonitor() {
@@ -177,7 +224,12 @@ window.FullCasperMock = (() => {
 
  function saveMockDraft(extra = {}) {
  if (!active || !started || !mockAttemptId) return;
+ if (extra.completed || extra.status === 'completed' || extra.phase === 'completed') {
+ clearMockDraft();
+ return;
+ }
  try {
+ const user = currentDraftUserSnapshot();
  const bridge = window.K2PracticeBridge;
  bridge?.saveAnswer?.();
  const current = bridge?.getCurrentHistory?.() || null;
@@ -187,6 +239,8 @@ window.FullCasperMock = (() => {
  version: 1,
  attempt_id: mockAttemptId,
  saved_attempt_id: savedAttemptId,
+ user_id: user.id,
+ user_email: user.email,
  mock_exam: activeMockExam,
  tier: config.tier,
  index,
@@ -202,7 +256,12 @@ window.FullCasperMock = (() => {
  } : null,
  ...extra,
  };
- localStorage.setItem(MOCK_DRAFT_KEY, JSON.stringify(draft));
+ if (draftIsFinished(draft)) {
+ clearMockDraft();
+ return;
+ }
+ localStorage.removeItem(MOCK_DRAFT_KEY);
+ localStorage.setItem(currentDraftStorageKey(), JSON.stringify(draft));
  } catch {}
  }
 
@@ -269,6 +328,36 @@ window.FullCasperMock = (() => {
  function discardDraft() {
  clearMockDraft();
  renderIdle();
+ }
+
+ function resetMockRuntimeState() {
+ clearDoneMonitor();
+ clearTransitionTimer();
+ stopDraftMonitor();
+ clearInterval(breakTimer);
+ breakTimer = null;
+ restoreSubmit();
+ window.K2PracticeBridge?.hardStopSession?.();
+ window.K2_ACTIVE_CASPER_MOCK = null;
+ started = false;
+ rulesAccepted = false;
+ sequence = [];
+ index = 0;
+ results = [];
+ finalVideoRows = [];
+ finalReviewRows = [];
+ breakLeft = 0;
+ stationToken += 1;
+ advancing = false;
+ mockAttemptId = null;
+ savedAttemptId = null;
+ latestReport = null;
+ pendingDraftAnswer = null;
+ serverCheckpointBusy = false;
+ queuedCheckpointReason = null;
+ lastRescueRecording = null;
+ activeMockExam = null;
+ clearMockDraft();
  }
 
  async function checkpointMockAttempt(reason = 'station', options = {}) {
@@ -849,6 +938,13 @@ window.FullCasperMock = (() => {
  });
  }
 
+ function startFreshMock() {
+ resetMockRuntimeState();
+ active = true;
+ renderIdle();
+ startMock();
+ }
+
  async function beginMockExam() {
  setCheckoutState(true, 'Preparing your private mock stations...', 'Preparing...');
  const mock = await startPrivateMockAttempt();
@@ -871,6 +967,24 @@ window.FullCasperMock = (() => {
  results = restoredAttempt?.rows ? hydrateResultsFromDraft(restoredAttempt.rows) : [];
  const resumeOrder = Number(mock.current_station_order || results.length + 1 || 1);
  const hasFullSavedSequence = results.length >= sequence.length;
+ if (mock.resumed && hasFullSavedSequence) {
+ try {
+ await saveMockAttempt(results, restoredAttempt?.report || null, 'completed');
+ } catch (err) {
+ console.warn('Could not close already-complete mock attempt during resume:', err);
+ }
+ resetMockRuntimeState();
+ active = true;
+ setCheckoutState(false);
+ await refreshMockPassStatus().catch(() => {});
+ renderIdle();
+ const status = document.querySelector('.mock-checkout-status');
+ if (status) {
+ status.textContent = 'That previous mock was already complete, so it has been closed. Start again to use your next unused mock.';
+ status.style.display = 'block';
+ }
+ return;
+ }
  index = hasFullSavedSequence ? sequence.length : Math.max(0, Math.min(resumeOrder - 1, sequence.length - 1));
  latestReport = null;
  pendingDraftAnswer = null;
@@ -2422,7 +2536,7 @@ ${failedAnalyses || partialAnalyses ? renderPartialReportNotice(rows) : ''}
  </div>
 
  <div style="display:flex;gap:10px;flex-wrap:wrap;">
- <button onclick="FullCasperMock.startMock()" class="btn-restart">Start another mock</button>
+ <button onclick="FullCasperMock.startFreshMock()" class="btn-restart">Start another mock</button>
  <button onclick="setMode('casper');FullCasperMock.deactivateMockMode();" class="btn-restart btn-restart-outline">Return to practice</button>
  </div>
  </div>
@@ -3370,6 +3484,7 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
  activateMockMode,
  deactivateMockMode,
  startMock,
+ startFreshMock,
  setTier,
  refreshPricing,
  checkoutMock,
