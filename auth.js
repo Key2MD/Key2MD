@@ -25,6 +25,7 @@ const Key2MDAuth = (() => {
  let _config = {};
  const TOKEN_KEY = 'key2md_token';
  const DEVICE_KEY = 'key2md_device_id';
+ const IMPERSONATION_HANDOFF_PREFIX = 'k2md_impersonation_handoff_';
  let _fetchPatched = false;
 
  function makeDeviceId() {
@@ -65,6 +66,10 @@ const Key2MDAuth = (() => {
  };
  }
 
+ function htmlEscape(value) {
+ return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+ }
+
  function installFetchActivityHeaders() {
  if (_fetchPatched || !window.fetch || !_config.apiBase) return;
  const nativeFetch = window.fetch.bind(window);
@@ -96,7 +101,7 @@ const Key2MDAuth = (() => {
  installFetchActivityHeaders();
  injectAuthModal();
  injectAuthBar();
- checkSession();
+ consumeImpersonationHandoff().finally(() => checkSession());
  }
 
  function getUser() { return _user; }
@@ -106,6 +111,41 @@ const Key2MDAuth = (() => {
  function isProCancelling() { return _user?.tier === 'pro' && !!_user.cancel_requested; }
  function getProPeriodEnd() { return _user?.pro_period_end || null; }
  function getToken() { return localStorage.getItem(TOKEN_KEY); }
+
+ async function consumeImpersonationHandoff() {
+ try {
+ const url = new URL(window.location.href);
+ const handoffId = String(url.searchParams.get('k2md_impersonation_handoff') || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 120);
+ if (!handoffId || !('BroadcastChannel' in window)) return false;
+ url.searchParams.delete('k2md_impersonation_handoff');
+ url.searchParams.delete('admin_view');
+ window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+ const channel = new BroadcastChannel(IMPERSONATION_HANDOFF_PREFIX + handoffId);
+ return await new Promise(resolve => {
+ let done = false;
+ const finish = ok => {
+ if (done) return;
+ done = true;
+ try { channel.close(); } catch {}
+ resolve(ok);
+ };
+ channel.onmessage = event => {
+ const data = event.data || {};
+ if (data.type === 'student-token' && data.token) {
+ localStorage.setItem(TOKEN_KEY, String(data.token));
+ finish(true);
+ }
+ };
+ const ready = () => channel.postMessage({ type: 'ready' });
+ ready();
+ setTimeout(ready, 250);
+ setTimeout(ready, 900);
+ setTimeout(() => finish(false), 7000);
+ });
+ } catch {
+ return false;
+ }
+ }
 
  /**
  * Call this before making an AI review request.
@@ -219,6 +259,7 @@ const Key2MDAuth = (() => {
  function setUser(user) {
  _user = user;
  updateAuthBar();
+ updateImpersonationBanner();
  _config.onAuthChange(user);
  }
 
@@ -420,22 +461,46 @@ const Key2MDAuth = (() => {
  updateAuthBar();
  }
 
+ function updateImpersonationBanner() {
+ let banner = document.getElementById('k2mdImpersonationBanner');
+ if (!_user?.impersonation) {
+ if (banner) banner.remove();
+ return;
+ }
+ if (!banner) {
+ banner = document.createElement('div');
+ banner.id = 'k2mdImpersonationBanner';
+ document.body.appendChild(banner);
+ }
+ const expiresAt = Number(_user.impersonation.expires_at || 0);
+ const expiry = expiresAt ? new Date(expiresAt).toLocaleTimeString([], { hour:'numeric', minute:'2-digit' }) : 'soon';
+ banner.innerHTML = `
+ <div style="position:fixed;left:12px;right:12px;bottom:12px;z-index:99998;background:#7c2d12;color:#fff;border:1px solid rgba(255,255,255,0.28);box-shadow:0 16px 44px rgba(15,23,42,0.26);border-radius:10px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+ <div style="font-size:0.82rem;line-height:1.35;"><strong>Admin view</strong> as ${htmlEscape(_user.email)}. Session expires ${htmlEscape(expiry)}. Be careful: actions here affect this student account.</div>
+ <button onclick="Key2MDAuth.logout()" style="border:1px solid rgba(255,255,255,0.42);background:rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:7px 10px;font:inherit;font-size:0.78rem;font-weight:800;cursor:pointer;white-space:nowrap;">Exit admin view</button>
+ </div>
+ `;
+ }
+
  function updateAuthBar() {
  const bar = document.getElementById('k2mdAuthBar');
  if (!bar) return;
 
  if (_user) {
  const proEndsAt = formatPeriodEnd(_user.pro_period_end);
- const accountLabel = _user.tier === 'pro'
+ const accountLabel = _user.impersonation
+ ? 'Admin view as student'
+ : _user.tier === 'pro'
  ? (_user.cancel_requested ? `CASPer Pro cancelling - access ends ${proEndsAt}` : 'CASPer Pro')
  : 'Free account';
+ const displayName = htmlEscape(_user.name || _user.email.split('@')[0]);
  bar.innerHTML = `
  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:10px;">
  <div>
- <div style="font-size:0.82rem;font-weight:700;color:var(--navy,#0a1628);">${_user.name || _user.email.split('@')[0]}</div>
- <div style="font-size:0.72rem;color:var(--gray400,#94a3b8);">${accountLabel}</div>
+ <div style="font-size:0.82rem;font-weight:700;color:var(--navy,#0a1628);">${displayName}</div>
+ <div style="font-size:0.72rem;color:var(--gray400,#94a3b8);">${htmlEscape(accountLabel)}</div>
  </div>
- <button onclick="Key2MDAuth.logout()" style="background:none;border:1px solid var(--gray200,#e2e8f0);border-radius:6px;padding:5px 10px;font-size:0.72rem;color:var(--gray600,#475569);cursor:pointer;font-family:inherit;">Log out</button>
+ <button onclick="Key2MDAuth.logout()" style="background:none;border:1px solid var(--gray200,#e2e8f0);border-radius:6px;padding:5px 10px;font-size:0.72rem;color:var(--gray600,#475569);cursor:pointer;font-family:inherit;">${_user.impersonation ? 'Exit' : 'Log out'}</button>
  </div>
  `;
  } else {

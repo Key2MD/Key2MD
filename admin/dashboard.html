@@ -2143,6 +2143,7 @@ const API = 'https://key2md-api.brittainmbbs.workers.dev';
 const SS_KEY = 'k2md_admin_token';
 const LEGACY_HANDOFF_KEY = 'k2md_admin_token_handoff';
 const MOCK_READER_CHANNEL_PREFIX = 'k2md_mock_reader_handoff_';
+const IMPERSONATION_HANDOFF_PREFIX = 'k2md_impersonation_handoff_';
 const WARM_OUTREACH_LOCAL_KEY = 'k2md_warm_outreach_local_v1';
 const NAV_SEEN_KEY = 'k2md_admin_nav_seen_v1';
 const ACTION_STATUS_KEY = 'k2md_admin_action_status_v1';
@@ -3604,8 +3605,9 @@ function renderUsers() {
  <button class="btn blue" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openCreditModal('${esc(row.id)}','${esc(row.email)}',${cbA},${gbA},${mtA},${mpA})">Credits</button>
  <button class="btn amber" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openTierModal('${esc(row.id)}','${esc(row.email)}','${esc(row.tier||'free')}')">Tier</button>
  <button class="btn green" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();openMockPassModal('${esc(row.id)}','${esc(row.email)}')">Mock</button>
+ <button class="btn blue" style="font-size:0.7rem;padding:4px 9px;" onclick='event.stopPropagation();viewAsStudent(${jsArg(row.id)},${jsArg(row.email)})'>View as</button>
  <button class="btn red" style="font-size:0.7rem;padding:4px 9px;" onclick='event.stopPropagation();openDuplicateFlagModal(${jsArg(row.id)},${jsArg(row.email)})'>Restrict</button>
- <button class="btn" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();composeToUser('${esc(row.email)}')"></button>
+ <button class="btn" style="font-size:0.7rem;padding:4px 9px;" onclick="event.stopPropagation();composeToUser('${esc(row.email)}')">Email</button>
  </div>
  </td>`;
  const xr = document.createElement('tr');
@@ -3667,6 +3669,7 @@ function renderUserDetail(det) {
  <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
  <button class="btn green" onclick="openStudentReportForUser('${esc(u.id)}','tutor')">Tutor Brief</button>
  <button class="btn blue" onclick="openStudentReportForUser('${esc(u.id)}','student')">Student Report</button>
+ <button class="btn blue" onclick='viewAsStudent(${jsArg(u.id)},${jsArg(u.email)})'>View as student</button>
  <button class="btn green" onclick="openMockPassModal('${esc(u.id)}','${esc(u.email)}')">Grant Mock</button>
  <button class="btn blue" onclick="openCreditModal('${esc(u.id)}','${esc(u.email)}',${credits.find(c=>c.tool==='casper')?.balance||0},${credits.find(c=>c.tool==='gamsat')?.balance||0},${credits.find(c=>c.tool==='mmi_transcript')?.balance||0},${credits.find(c=>c.tool==='mmi_premium')?.balance||0})"> Credits</button>
  <button class="btn amber" onclick="openTierModal('${esc(u.id)}','${esc(u.email)}','${esc(u.tier||'free')}')">Tier</button>
@@ -5283,6 +5286,7 @@ function renderStudentDrawer(email, opts = {}) {
  const actions = document.getElementById('studentDrawerActions');
  if (actions) actions.innerHTML = `
  <button class="btn green" onclick='composeToUser(${jsArg(ctx.email)}, "", "", "", "student_drawer", {stayOnPage:true, contextTitle:"Student context"})'>Message</button>
+ <button class="btn blue" onclick='viewAsStudent(${jsArg(user.id || "")},${jsArg(ctx.email)})'>View as</button>
  <button class="btn blue" onclick='openTimelineForEmail(${jsArg(ctx.email)})'>Timeline</button>
  <button class="btn" onclick='viewUserByEmail(${jsArg(ctx.email)})'>Users page</button>
  <button class="btn" onclick='copyText(${jsArg(ctx.email)}, "Email copied")'>Copy email</button>
@@ -7542,7 +7546,7 @@ function renderMockRows(targetId, rows, manualOnly) {
  <td>${tierBadge(r.tier)}</td>
  <td>${mockAttemptStatusBadge(r)}<div class="cell-sub" style="margin-top:5px;">Manual: ${mockStatusBadge(status)}</div>${statusActions}</td>
  <td><div class="cell-main">${manualOnly ? (r.manual_review_paid ? 'Yes' : 'No') : (dt?.date || '-')}</div><div class="cell-sub">${manualOnly ? (fmtDate(r.manual_review_paid_at)?.date || '-') : (dt?.time || '')}</div></td>
- <td><div class="mock-action-row"><button class="btn blue" onclick="openMockReader('${esc(r.id)}')">Reader</button><button class="btn" onclick="copyMockId('${esc(r.id)}')">Copy ID</button></div></td>
+ <td><div class="mock-action-row"><button class="btn blue" onclick="openMockReader('${esc(r.id)}')">Reader</button><button class="btn" onclick='viewAsStudent("",${jsArg(r.user_email || "")})'>View as</button><button class="btn" onclick="copyMockId('${esc(r.id)}')">Copy ID</button></div></td>
  </tr>`;
  }).join('') : `<tr><td colspan="5" style="text-align:center;padding:22px;color:var(--muted2);">${manualOnly ? 'No manual review requests match this filter.' : 'No saved mock attempts match this filter.'}</td></tr>`;
 }
@@ -7579,6 +7583,52 @@ function openMockReader(attemptId = '') {
  setTimeout(() => channel.close(), 10000);
  }
  window.open(url, '_blank', 'noopener');
+}
+
+async function viewAsStudent(userId = '', email = '', targetPath = '/practice.html?tab=mock') {
+ if (!S.token) return;
+ const note = document.getElementById('usrStatus') || document.getElementById('studentDrawerSub') || document.getElementById('mockStatus');
+ if (!('BroadcastChannel' in window)) {
+ alert('This browser does not support the secure admin handoff channel.');
+ return;
+ }
+ const child = window.open('about:blank', '_blank');
+ if (!child) {
+ alert('Popup blocked. Allow popups for Key2MD admin, then try again.');
+ return;
+ }
+ try {
+ child.document.write('<!doctype html><title>Opening student view</title><body style="font-family:system-ui;padding:24px;">Opening student view...</body>');
+ } catch {}
+ try {
+ if (note) note.textContent = `Opening student view for ${email || userId}...`;
+ const res = await api('/admin/users/impersonate', {
+ method: 'POST',
+ headers: {'Content-Type':'application/json'},
+ body: JSON.stringify({ user_id:userId || '', email:email || '', redirect_path:targetPath }),
+ });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok || !data.token) throw new Error(data?.message || data?.error || 'Could not create student view session');
+ const handoffId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+ const url = new URL(data.redirect_path || targetPath, window.location.origin);
+ url.searchParams.set('k2md_impersonation_handoff', handoffId);
+ url.searchParams.set('admin_view', '1');
+ const channel = new BroadcastChannel(IMPERSONATION_HANDOFF_PREFIX + handoffId);
+ const sendToken = () => channel.postMessage({ type:'student-token', token:data.token });
+ channel.onmessage = event => {
+ if (event.data?.type === 'ready') sendToken();
+ };
+ child.location.href = url.toString();
+ setTimeout(sendToken, 300);
+ setTimeout(sendToken, 1000);
+ setTimeout(sendToken, 2200);
+ setTimeout(() => channel.close(), 12000);
+ if (note) note.textContent = `Student view opened for ${data.user?.email || email || userId}.`;
+ } catch(e) {
+ if (note) note.textContent = e.message;
+ try { child.close(); } catch {}
+ alert(e.message);
+ }
 }
 
 async function copyMockId(id) {
