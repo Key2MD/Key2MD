@@ -1,0 +1,1027 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CASPer Marker</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f3ee;
+      --panel: #ffffff;
+      --panel-soft: #f9fafb;
+      --ink: #17212b;
+      --muted: #667085;
+      --line: #d7dde5;
+      --line-strong: #b8c3cf;
+      --accent: #006d6f;
+      --accent-dark: #064f51;
+      --accent-soft: #d9f0ef;
+      --amber: #b76e00;
+      --rose: #a9364c;
+      --shadow: 0 14px 40px rgba(23, 33, 43, 0.08);
+      --radius: 8px;
+      --focus: 0 0 0 3px rgba(0, 109, 111, 0.18);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(217, 240, 239, 0.55), rgba(246, 243, 238, 0) 320px),
+        var(--bg);
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      cursor: pointer;
+      min-height: 38px;
+      padding: 0 13px;
+      transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    button:focus-visible,
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      box-shadow: var(--focus);
+      border-color: var(--accent);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.62;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+      color: var(--ink);
+      padding: 10px 11px;
+      line-height: 1.45;
+    }
+
+    textarea {
+      min-height: 126px;
+      resize: vertical;
+    }
+
+    label {
+      display: block;
+      color: #26323d;
+      font-size: 0.83rem;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .app-shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    .title-group h1 {
+      font-size: clamp(1.6rem, 2.5vw, 2.35rem);
+      line-height: 1;
+      margin: 0 0 7px;
+      letter-spacing: 0;
+    }
+
+    .title-group p {
+      color: var(--muted);
+      margin: 0;
+      max-width: 760px;
+    }
+
+    .status-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      min-height: 28px;
+      padding: 0 10px;
+      white-space: nowrap;
+    }
+
+    .pill.good {
+      border-color: #96cbc5;
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+    }
+
+    .pill.warn {
+      border-color: #edc878;
+      background: #fff4d7;
+      color: #7c4a00;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 370px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(184, 195, 207, 0.72);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 58px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-header h2,
+    .section-title {
+      font-size: 0.96rem;
+      line-height: 1.2;
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-row {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .button-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      font-weight: 800;
+    }
+
+    .primary:hover:not(:disabled) {
+      background: var(--accent-dark);
+    }
+
+    .secondary {
+      background: #ffffff;
+      border-color: var(--line-strong);
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .secondary:hover:not(:disabled) {
+      background: var(--panel-soft);
+      border-color: #8996a4;
+    }
+
+    .danger {
+      background: #fff7f8;
+      border-color: #e9b5bf;
+      color: var(--rose);
+      font-weight: 700;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      margin-top: 7px;
+    }
+
+    .workbench {
+      display: grid;
+      gap: 18px;
+    }
+
+    .case-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .case-grid textarea {
+      min-height: 210px;
+    }
+
+    #candidateResponse {
+      min-height: 238px;
+    }
+
+    #customPrompt {
+      min-height: 380px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.83rem;
+    }
+
+    .result-panel {
+      min-height: 360px;
+    }
+
+    .result-output {
+      min-height: 300px;
+      padding: 18px;
+      border-radius: var(--radius);
+      background: #101820;
+      color: #eef6f5;
+      overflow: auto;
+      white-space: pre-wrap;
+      line-height: 1.55;
+      font-size: 0.94rem;
+    }
+
+    .placeholder {
+      color: #8fa2ad;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 8px;
+      max-height: 280px;
+      overflow: auto;
+    }
+
+    .history-item {
+      display: grid;
+      gap: 4px;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+      text-align: left;
+    }
+
+    .history-item:hover {
+      border-color: var(--accent);
+      background: #f5fbfb;
+    }
+
+    .history-title {
+      color: var(--ink);
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .history-meta {
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 20;
+      max-width: min(420px, calc(100vw - 44px));
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line-strong);
+      background: #ffffff;
+      box-shadow: var(--shadow);
+      color: var(--ink);
+      font-size: 0.88rem;
+    }
+
+    .toast.error {
+      border-color: #e7a3ad;
+      background: #fff7f8;
+      color: #7f2638;
+    }
+
+    .toast.success {
+      border-color: #96cbc5;
+      background: #eef9f8;
+      color: #064f51;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    @media (max-width: 1050px) {
+      .layout,
+      .case-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .status-strip {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .app-shell {
+        padding: 14px;
+      }
+
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="title-group">
+        <h1>CASPer Marker</h1>
+        <p>Local single-file marker for scenario notes, questions, candidate responses, and your own Claude marking prompt.</p>
+      </div>
+      <div class="status-strip" aria-live="polite">
+        <span id="saveStatus" class="pill">Draft idle</span>
+        <span id="keyStatus" class="pill warn">No API key</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="panel">
+        <div class="panel-header">
+          <h2>Claude Setup</h2>
+          <button id="clearAllButton" class="danger" type="button">Clear local data</button>
+        </div>
+        <div class="panel-body stack">
+          <div>
+            <label for="apiKey">API key</label>
+            <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-api03-...">
+            <div class="button-row" style="margin-top: 8px;">
+              <button id="saveKeyButton" class="secondary" type="button">Save key</button>
+              <button id="showKeyButton" class="secondary" type="button">Show</button>
+              <button id="importKeyButton" class="secondary" type="button">Import .txt</button>
+              <input id="keyFile" class="hidden" type="file" accept=".txt,.env,text/plain">
+            </div>
+            <p class="subtle">Saved only in this browser's local storage. For personal local use, keep this file off public hosting.</p>
+          </div>
+
+          <div>
+            <label for="endpoint">Messages endpoint</label>
+            <input id="endpoint" type="url" spellcheck="false" value="https://api.anthropic.com/v1/messages">
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label for="model">Model</label>
+              <input id="model" type="text" spellcheck="false" value="claude-sonnet-4-20250514">
+            </div>
+            <div>
+              <label for="maxTokens">Max tokens</label>
+              <input id="maxTokens" type="number" min="256" max="8192" step="128" value="1800">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label for="temperature">Temperature</label>
+              <input id="temperature" type="number" min="0" max="1" step="0.05" value="0.2">
+            </div>
+            <div>
+              <label for="autosaveMode">Autosave</label>
+              <select id="autosaveMode">
+                <option value="on">On</option>
+                <option value="off">Off</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="customPrompt">Claude marking prompt</label>
+            <textarea id="customPrompt" spellcheck="true"></textarea>
+            <div class="button-row" style="margin-top: 8px;">
+              <button id="savePromptButton" class="secondary" type="button">Save prompt</button>
+              <button id="resetPromptButton" class="secondary" type="button">Reset prompt</button>
+            </div>
+            <p class="subtle">Optional tokens: {{scenario}}, {{questions}}, {{response}}.</p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="workbench">
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Case Material</h2>
+            <div class="button-row">
+              <button id="saveDraftButton" class="secondary" type="button">Save draft</button>
+              <button id="clearDraftButton" class="secondary" type="button">Clear draft</button>
+              <button id="markButton" class="primary" type="button">Mark with Claude</button>
+            </div>
+          </div>
+          <div class="panel-body stack">
+            <div class="case-grid">
+              <div>
+                <label for="scenario">Scenario</label>
+                <textarea id="scenario" spellcheck="true" placeholder="Paste the CASPer scenario here."></textarea>
+              </div>
+              <div>
+                <label for="questions">Questions</label>
+                <textarea id="questions" spellcheck="true" placeholder="Paste the question set here."></textarea>
+              </div>
+            </div>
+            <div>
+              <label for="candidateResponse">Candidate response</label>
+              <textarea id="candidateResponse" spellcheck="true" placeholder="Paste the response to be marked here."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel result-panel">
+          <div class="panel-header">
+            <h2>Marking Output</h2>
+            <div class="button-row">
+              <button id="copyButton" class="secondary" type="button">Copy</button>
+              <button id="downloadButton" class="secondary" type="button">Download .md</button>
+              <button id="clearOutputButton" class="secondary" type="button">Clear output</button>
+            </div>
+          </div>
+          <div class="panel-body stack">
+            <div id="resultOutput" class="result-output" role="region" aria-live="polite"><span class="placeholder">No mark yet.</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Recent Marks</h2>
+            <button id="clearHistoryButton" class="secondary" type="button">Clear history</button>
+          </div>
+          <div class="panel-body">
+            <div id="historyList" class="history-list" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = "key2md.casperMarker.v1";
+    const HISTORY_LIMIT = 20;
+
+    const defaultPrompt = `You are an expert CASPer assessor for Australian medical-entry and healthcare professionalism contexts.
+
+Assess the candidate response against CASPer-style qualities:
+- empathy, perspective-taking, fairness, professionalism, communication, ethics, judgment, accountability, and practical next steps
+- recognition of stakeholder needs and uncertainty
+- avoidance of assumptions, defensiveness, blame, and premature escalation
+
+Return a concise markdown report with:
+1. Overall score out of 9
+2. Band label: Low, Borderline, Competent, Strong, Excellent
+3. What the response does well
+4. What limits the score
+5. Specific upgrade suggestions
+6. A model improved answer in the candidate's voice
+
+Be direct, specific, and fair. Do not reward generic virtue-signalling unless it is tied to concrete action.`;
+
+    const els = {
+      apiKey: document.getElementById("apiKey"),
+      endpoint: document.getElementById("endpoint"),
+      model: document.getElementById("model"),
+      maxTokens: document.getElementById("maxTokens"),
+      temperature: document.getElementById("temperature"),
+      autosaveMode: document.getElementById("autosaveMode"),
+      customPrompt: document.getElementById("customPrompt"),
+      scenario: document.getElementById("scenario"),
+      questions: document.getElementById("questions"),
+      candidateResponse: document.getElementById("candidateResponse"),
+      saveStatus: document.getElementById("saveStatus"),
+      keyStatus: document.getElementById("keyStatus"),
+      resultOutput: document.getElementById("resultOutput"),
+      historyList: document.getElementById("historyList"),
+      toast: document.getElementById("toast"),
+      markButton: document.getElementById("markButton"),
+      saveKeyButton: document.getElementById("saveKeyButton"),
+      showKeyButton: document.getElementById("showKeyButton"),
+      importKeyButton: document.getElementById("importKeyButton"),
+      keyFile: document.getElementById("keyFile"),
+      savePromptButton: document.getElementById("savePromptButton"),
+      resetPromptButton: document.getElementById("resetPromptButton"),
+      saveDraftButton: document.getElementById("saveDraftButton"),
+      clearDraftButton: document.getElementById("clearDraftButton"),
+      copyButton: document.getElementById("copyButton"),
+      downloadButton: document.getElementById("downloadButton"),
+      clearOutputButton: document.getElementById("clearOutputButton"),
+      clearHistoryButton: document.getElementById("clearHistoryButton"),
+      clearAllButton: document.getElementById("clearAllButton")
+    };
+
+    let state = loadState();
+    let toastTimer;
+    let saveTimer;
+
+    function loadState() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        return {
+          settings: {
+            apiKey: "",
+            endpoint: "https://api.anthropic.com/v1/messages",
+            model: "claude-sonnet-4-20250514",
+            maxTokens: 1800,
+            temperature: 0.2,
+            autosaveMode: "on",
+            customPrompt: defaultPrompt,
+            ...(stored.settings || {})
+          },
+          draft: {
+            scenario: "",
+            questions: "",
+            candidateResponse: "",
+            ...(stored.draft || {})
+          },
+          output: stored.output || "",
+          history: Array.isArray(stored.history) ? stored.history.slice(0, HISTORY_LIMIT) : []
+        };
+      } catch (error) {
+        console.warn("Could not read saved marker state:", error);
+        return {
+          settings: {
+            apiKey: "",
+            endpoint: "https://api.anthropic.com/v1/messages",
+            model: "claude-sonnet-4-20250514",
+            maxTokens: 1800,
+            temperature: 0.2,
+            autosaveMode: "on",
+            customPrompt: defaultPrompt
+          },
+          draft: { scenario: "", questions: "", candidateResponse: "" },
+          output: "",
+          history: []
+        };
+      }
+    }
+
+    function saveState(statusText = "Saved locally") {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      setSaveStatus(statusText, "good");
+    }
+
+    function hydrate() {
+      els.apiKey.value = state.settings.apiKey;
+      els.endpoint.value = state.settings.endpoint;
+      els.model.value = state.settings.model;
+      els.maxTokens.value = state.settings.maxTokens;
+      els.temperature.value = state.settings.temperature;
+      els.autosaveMode.value = state.settings.autosaveMode;
+      els.customPrompt.value = state.settings.customPrompt;
+      els.scenario.value = state.draft.scenario;
+      els.questions.value = state.draft.questions;
+      els.candidateResponse.value = state.draft.candidateResponse;
+      renderOutput(state.output);
+      renderHistory();
+      updateKeyStatus();
+    }
+
+    function currentSettings() {
+      return {
+        apiKey: els.apiKey.value.trim(),
+        endpoint: els.endpoint.value.trim() || "https://api.anthropic.com/v1/messages",
+        model: els.model.value.trim() || "claude-sonnet-4-20250514",
+        maxTokens: clampNumber(els.maxTokens.value, 256, 8192, 1800),
+        temperature: clampNumber(els.temperature.value, 0, 1, 0.2),
+        autosaveMode: els.autosaveMode.value,
+        customPrompt: els.customPrompt.value.trim() || defaultPrompt
+      };
+    }
+
+    function currentDraft() {
+      return {
+        scenario: els.scenario.value.trim(),
+        questions: els.questions.value.trim(),
+        candidateResponse: els.candidateResponse.value.trim()
+      };
+    }
+
+    function clampNumber(value, min, max, fallback) {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed)) return fallback;
+      return Math.min(max, Math.max(min, parsed));
+    }
+
+    function syncSettings(statusText = "Settings saved") {
+      state.settings = currentSettings();
+      saveState(statusText);
+      updateKeyStatus();
+    }
+
+    function syncDraft(statusText = "Draft saved") {
+      state.draft = currentDraft();
+      saveState(statusText);
+    }
+
+    function autosaveDraft() {
+      if (els.autosaveMode.value !== "on") {
+        setSaveStatus("Autosave off", "warn");
+        return;
+      }
+      clearTimeout(saveTimer);
+      setSaveStatus("Saving draft...", "");
+      saveTimer = setTimeout(() => {
+        state.settings = currentSettings();
+        state.draft = currentDraft();
+        saveState("Draft autosaved");
+      }, 420);
+    }
+
+    function setSaveStatus(text, mode) {
+      els.saveStatus.textContent = text;
+      els.saveStatus.className = "pill" + (mode ? " " + mode : "");
+    }
+
+    function updateKeyStatus() {
+      const hasKey = Boolean(els.apiKey.value.trim());
+      els.keyStatus.textContent = hasKey ? "API key saved" : "No API key";
+      els.keyStatus.className = "pill " + (hasKey ? "good" : "warn");
+    }
+
+    function showToast(message, type = "") {
+      clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.toast.className = "toast" + (type ? " " + type : "");
+      toastTimer = setTimeout(() => {
+        els.toast.classList.add("hidden");
+      }, 3800);
+    }
+
+    function renderPrompt(settings, draft) {
+      const prompt = settings.customPrompt || defaultPrompt;
+      const replacements = {
+        scenario: draft.scenario || "[No scenario supplied]",
+        questions: draft.questions || "[No questions supplied]",
+        response: draft.candidateResponse || "[No candidate response supplied]"
+      };
+
+      if (/\{\{\s*(scenario|questions|response)\s*\}\}/i.test(prompt)) {
+        return {
+          system: "You are a careful CASPer marking assistant. Follow the user's rubric exactly.",
+          user: prompt.replace(/\{\{\s*(scenario|questions|response)\s*\}\}/gi, (_, key) => replacements[key.toLowerCase()])
+        };
+      }
+
+      return {
+        system: prompt,
+        user: `Please mark this CASPer response.
+
+SCENARIO:
+${replacements.scenario}
+
+QUESTIONS:
+${replacements.questions}
+
+CANDIDATE RESPONSE:
+${replacements.response}`
+      };
+    }
+
+    async function markWithClaude() {
+      state.settings = currentSettings();
+      state.draft = currentDraft();
+
+      const settings = state.settings;
+      const draft = state.draft;
+      const isAnthropicEndpoint = /(^|\.)anthropic\.com\//i.test(settings.endpoint.replace(/^https?:\/\//i, ""));
+
+      if (!settings.apiKey && isAnthropicEndpoint) {
+        showToast("Add and save an Anthropic API key first.", "error");
+        els.apiKey.focus();
+        return;
+      }
+
+      if (!draft.scenario || !draft.questions || !draft.candidateResponse) {
+        showToast("Scenario, questions, and candidate response are all needed before marking.", "error");
+        return;
+      }
+
+      const prompt = renderPrompt(settings, draft);
+      const headers = {
+        "content-type": "application/json",
+        "anthropic-version": "2023-06-01"
+      };
+
+      if (settings.apiKey) {
+        headers["x-api-key"] = settings.apiKey;
+      }
+
+      if (isAnthropicEndpoint) {
+        headers["anthropic-dangerous-direct-browser-access"] = "true";
+      }
+
+      const body = {
+        model: settings.model,
+        max_tokens: settings.maxTokens,
+        temperature: settings.temperature,
+        system: prompt.system,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: prompt.user
+              }
+            ]
+          }
+        ]
+      };
+
+      els.markButton.disabled = true;
+      els.markButton.textContent = "Marking...";
+      renderOutput("Claude is marking this response...");
+      saveState("Draft saved");
+
+      try {
+        const response = await fetch(settings.endpoint, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(body)
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const apiMessage = data && data.error && data.error.message ? data.error.message : response.statusText;
+          throw new Error(`${response.status} ${apiMessage}`);
+        }
+
+        const output = extractClaudeText(data);
+        if (!output) {
+          throw new Error("Claude returned no text content.");
+        }
+
+        state.output = output;
+        addHistory(output, draft);
+        saveState("Mark saved");
+        renderOutput(output);
+        renderHistory();
+        showToast("Mark complete and saved locally.", "success");
+      } catch (error) {
+        const message = error && error.message ? error.message : "Unknown Claude API error";
+        renderOutput(`Error calling Claude API:\n\n${message}`);
+        showToast("Claude API call failed. Check the key, model, endpoint, and browser console.", "error");
+      } finally {
+        els.markButton.disabled = false;
+        els.markButton.textContent = "Mark with Claude";
+      }
+    }
+
+    function extractClaudeText(data) {
+      if (!data || !Array.isArray(data.content)) return "";
+      return data.content
+        .filter((part) => part && part.type === "text" && typeof part.text === "string")
+        .map((part) => part.text)
+        .join("\n\n")
+        .trim();
+    }
+
+    function addHistory(output, draft) {
+      const scoreMatch = output.match(/(?:score|overall score)[^\d]{0,20}(\d+(?:\.\d+)?)\s*(?:\/|out of)\s*9/i);
+      const title = draft.questions.split("\n").find(Boolean) || "CASPer mark";
+      const item = {
+        id: String(Date.now()),
+        createdAt: new Date().toISOString(),
+        title: title.slice(0, 92),
+        score: scoreMatch ? `${scoreMatch[1]}/9` : "",
+        scenario: draft.scenario,
+        questions: draft.questions,
+        candidateResponse: draft.candidateResponse,
+        output
+      };
+      state.history = [item, ...state.history].slice(0, HISTORY_LIMIT);
+    }
+
+    function renderOutput(text) {
+      if (!text) {
+        els.resultOutput.innerHTML = '<span class="placeholder">No mark yet.</span>';
+        return;
+      }
+      els.resultOutput.textContent = text;
+    }
+
+    function renderHistory() {
+      els.historyList.innerHTML = "";
+      if (!state.history.length) {
+        const empty = document.createElement("div");
+        empty.className = "subtle";
+        empty.textContent = "No saved marks yet.";
+        els.historyList.appendChild(empty);
+        return;
+      }
+
+      state.history.forEach((item) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "history-item";
+        const date = new Date(item.createdAt);
+        button.innerHTML = `
+          <span class="history-title"></span>
+          <span class="history-meta"></span>
+        `;
+        button.querySelector(".history-title").textContent = item.score ? `${item.score} - ${item.title}` : item.title;
+        button.querySelector(".history-meta").textContent = Number.isNaN(date.getTime()) ? "Saved mark" : date.toLocaleString();
+        button.addEventListener("click", () => {
+          state.draft = {
+            scenario: item.scenario || "",
+            questions: item.questions || "",
+            candidateResponse: item.candidateResponse || ""
+          };
+          state.output = item.output || "";
+          hydrate();
+          saveState("History loaded");
+          showToast("Saved mark loaded.", "success");
+        });
+        els.historyList.appendChild(button);
+      });
+    }
+
+    function downloadMarkdown() {
+      const text = state.output || els.resultOutput.textContent.trim();
+      if (!text || text === "No mark yet.") {
+        showToast("Nothing to download yet.", "error");
+        return;
+      }
+
+      const filenameDate = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+      const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `casper-mark-${filenameDate}.md`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showToast("Markdown downloaded.", "success");
+    }
+
+    async function copyOutput() {
+      const text = state.output || els.resultOutput.textContent.trim();
+      if (!text || text === "No mark yet.") {
+        showToast("Nothing to copy yet.", "error");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Copied to clipboard.", "success");
+      } catch (error) {
+        showToast("Clipboard access was blocked by the browser.", "error");
+      }
+    }
+
+    function clearDraft() {
+      els.scenario.value = "";
+      els.questions.value = "";
+      els.candidateResponse.value = "";
+      state.draft = currentDraft();
+      saveState("Draft cleared");
+    }
+
+    function clearAllLocalData() {
+      const confirmed = window.confirm("Clear the saved key, prompt, draft, output, and history from this browser?");
+      if (!confirmed) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = loadState();
+      hydrate();
+      setSaveStatus("Local data cleared", "warn");
+      showToast("Local data cleared.", "success");
+    }
+
+    function wireEvents() {
+      [els.endpoint, els.model, els.maxTokens, els.temperature, els.autosaveMode, els.customPrompt].forEach((input) => {
+        input.addEventListener("input", () => {
+          state.settings = currentSettings();
+          if (els.autosaveMode.value === "on") autosaveDraft();
+        });
+      });
+
+      [els.scenario, els.questions, els.candidateResponse].forEach((input) => {
+        input.addEventListener("input", autosaveDraft);
+      });
+
+      els.apiKey.addEventListener("input", updateKeyStatus);
+      els.saveKeyButton.addEventListener("click", () => syncSettings("API key saved"));
+      els.savePromptButton.addEventListener("click", () => syncSettings("Prompt saved"));
+      els.saveDraftButton.addEventListener("click", () => {
+        state.settings = currentSettings();
+        syncDraft("Draft saved");
+      });
+      els.resetPromptButton.addEventListener("click", () => {
+        els.customPrompt.value = defaultPrompt;
+        syncSettings("Prompt reset");
+      });
+      els.showKeyButton.addEventListener("click", () => {
+        const showing = els.apiKey.type === "text";
+        els.apiKey.type = showing ? "password" : "text";
+        els.showKeyButton.textContent = showing ? "Show" : "Hide";
+      });
+      els.importKeyButton.addEventListener("click", () => els.keyFile.click());
+      els.keyFile.addEventListener("change", async () => {
+        const file = els.keyFile.files && els.keyFile.files[0];
+        if (!file) return;
+        const text = await file.text();
+        const envMatch = text.match(/ANTHROPIC_API_KEY\s*=\s*["']?([^"'\n\r]+)["']?/);
+        els.apiKey.value = (envMatch ? envMatch[1] : text.trim().split(/\s+/)[0] || "").trim();
+        syncSettings("API key imported");
+        els.keyFile.value = "";
+      });
+      els.markButton.addEventListener("click", markWithClaude);
+      els.clearDraftButton.addEventListener("click", clearDraft);
+      els.copyButton.addEventListener("click", copyOutput);
+      els.downloadButton.addEventListener("click", downloadMarkdown);
+      els.clearOutputButton.addEventListener("click", () => {
+        state.output = "";
+        renderOutput("");
+        saveState("Output cleared");
+      });
+      els.clearHistoryButton.addEventListener("click", () => {
+        state.history = [];
+        renderHistory();
+        saveState("History cleared");
+      });
+      els.clearAllButton.addEventListener("click", clearAllLocalData);
+    }
+
+    hydrate();
+    wireEvents();
+  </script>
+</body>
+</html>

@@ -234,12 +234,6 @@ window.FullCasperMock = (() => {
  }));
  }
 
- function rowHasSecureEvidence(row) {
- if (!row) return false;
- if (row.type === 'video') return !!(row.reviewId || row.recordingKey);
- return String(row.answer || '').trim().length >= 20;
- }
-
  function restoreDraft() {
  const draft = readMockDraft();
  if (!draft) return;
@@ -253,7 +247,11 @@ window.FullCasperMock = (() => {
  })) : [];
  activeMockExam = draft.mock_exam || null;
  results = hydrateResultsFromDraft(draft.rows || []);
- index = Math.max(0, Math.min(Number(draft.index || results.length || 0), Math.max(sequence.length - 1, 0)));
+ const sequenceLength = sequence.length || VIDEO_COUNT + TYPED_COUNT;
+ const savedRowCount = results.length;
+ index = savedRowCount >= sequenceLength
+ ? sequenceLength
+ : Math.max(0, Math.min(Number(draft.index || savedRowCount || 0), Math.max(sequenceLength - 1, 0)));
  mockAttemptId = draft.attempt_id;
  savedAttemptId = draft.saved_attempt_id || draft.attempt_id;
  latestReport = null;
@@ -732,11 +730,14 @@ window.FullCasperMock = (() => {
  const area = ensureMainArea();
  if (!area) return;
  const draft = readMockDraft();
+ const draftSequenceLength = Array.isArray(draft?.sequence) && draft.sequence.length ? draft.sequence.length : VIDEO_COUNT + TYPED_COUNT;
+ const draftRowsLength = Array.isArray(draft?.rows) ? draft.rows.length : 0;
+ const draftResumeLabel = draftRowsLength >= draftSequenceLength ? 'the final report' : `station ${Number(draft?.index || 0) + 1}`;
  const draftBanner = draft ? `
  <div style="max-width:720px;margin:0 auto 18px;background:#ecfeff;border:1px solid rgba(14,165,233,0.26);border-radius:12px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;flex-wrap:wrap;">
  <div>
  <div style="font-size:0.75rem;font-weight:900;color:var(--navy);">Saved mock draft found</div>
- <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;">Last saved ${esc(draftAgeText(draft))}. Restore it to continue from station ${Number(draft.index || 0) + 1}.</div>
+ <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;">Last saved ${esc(draftAgeText(draft))}. Restore it to continue from ${esc(draftResumeLabel)}.</div>
  </div>
  <div style="display:flex;gap:8px;flex-wrap:wrap;">
  <button type="button" onclick="FullCasperMock.restoreDraft()" style="padding:9px 14px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.78rem;font-weight:850;cursor:pointer;font-family:inherit;">Restore draft</button>
@@ -869,8 +870,8 @@ window.FullCasperMock = (() => {
  }
  results = restoredAttempt?.rows ? hydrateResultsFromDraft(restoredAttempt.rows) : [];
  const resumeOrder = Number(mock.current_station_order || results.length + 1 || 1);
- const readyForReport = results.length >= sequence.length && results.slice(0, sequence.length).every(rowHasSecureEvidence);
- index = readyForReport ? sequence.length : Math.max(0, Math.min(resumeOrder - 1, sequence.length - 1));
+ const hasFullSavedSequence = results.length >= sequence.length;
+ index = hasFullSavedSequence ? sequence.length : Math.max(0, Math.min(resumeOrder - 1, sequence.length - 1));
  latestReport = null;
  pendingDraftAnswer = null;
  stationToken = 0;
@@ -965,7 +966,7 @@ window.FullCasperMock = (() => {
  row.transcriptSegments = Array.isArray(data?.transcript_segments) ? data.transcript_segments : [];
  row.rawFeedback = data || null;
  row.reviewId = data?.review_id || null;
- row.recordingKey = data?.recording_url || null;
+ row.recordingKey = data?.recording_key || data?.recording_url || null;
  row.transcriptionAudioKey = data?.transcription_audio_key || null;
  row.voiceMetrics = data?.voice_metrics || null;
  row.visualMetrics = data?.visual_metrics || null;
@@ -1125,7 +1126,7 @@ window.FullCasperMock = (() => {
  transcript: row.transcript || '',
  transcript_segments: row.transcriptSegments || row.transcript_segments || row.rawFeedback?.transcript_segments || [],
  review_id: row.reviewId || row.rawFeedback?.review_id || null,
- recording_key: row.recordingKey || row.rawFeedback?.recording_url || null,
+ recording_key: row.recordingKey || row.rawFeedback?.recording_key || row.rawFeedback?.recording_url || null,
  transcription_audio_key: row.transcriptionAudioKey || row.rawFeedback?.transcription_audio_key || null,
  voice_metrics: row.voiceMetrics || row.rawFeedback?.voice_metrics || null,
  visual_metrics: row.visualMetrics || row.rawFeedback?.visual_metrics || null,
@@ -1635,8 +1636,18 @@ window.FullCasperMock = (() => {
  renderStationSaving(item.type);
  try {
  await feedbackTask;
+ if (!submittedRow.recordingKey) {
+ submittedRow.localRescuePending = true;
+ submittedRow.processingError = `${submittedRow.processingError || 'Video upload did not return a saved recording key.'} Ping SOS to Dan.`;
+ saveMockDraft({ phase: 'analysis_missing_recording' });
+ await checkpointMockAttempt('local_rescue_pending').catch(() => {});
+ advancing = false;
+ transitionActive = false;
+ renderStationSaveError(submittedRow, new Error(submittedRow.processingError), 'local_rescue');
+ return;
+ }
  } catch (err) {
- if (submittedRow.type === 'video' && !submittedRow.recordingKey && !submittedRow.reviewId) {
+ if (submittedRow.type === 'video' && !submittedRow.recordingKey) {
  submittedRow.localRescuePending = true;
  submittedRow.processingError = `${submittedRow.processingError || 'Video upload did not complete.'} Ping SOS to Dan.`;
  saveMockDraft({ phase: 'analysis_failed' });
