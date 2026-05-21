@@ -7449,13 +7449,21 @@ function renderMockBankAudit() {
  : `${data.expected_ready_count || 0}/3 expected mocks ready - check missing rows`;
  const mockOneSource = data.mock_1_source === 'private_d1_only' ? 'D1-only' : (data.mock_1_source || 'missing');
  const missing = (data.missing_expected_slugs || []).length ? ` Missing: ${data.missing_expected_slugs.map(esc).join(', ')}.` : '';
+ const rowDetail = row => {
+ const issues = [];
+ if ((row.extra_station_orders || []).length) issues.push(`extra station ${row.extra_station_orders.map(esc).join(', ')}`);
+ if ((row.missing_station_orders || []).length) issues.push(`missing station ${row.missing_station_orders.map(esc).join(', ')}`);
+ if ((row.wrong_type_orders || []).length) issues.push(`wrong type ${row.wrong_type_orders.map(esc).join(', ')}`);
+ if ((row.missing_prompt_orders || []).length) issues.push(`missing prompts ${row.missing_prompt_orders.map(esc).join(', ')}`);
+ return issues.length ? ` - ${issues.join('; ')}` : '';
+ };
  box.innerHTML = `
  <strong>${ready ? 'Ready' : 'Check needed'}:</strong>
  ${esc(data.expected_ready_count || 0)}/3 expected mocks are complete. Mock 1 source: ${esc(mockOneSource)}.${missing}
  <div class="mock-row-flags" style="margin-top:10px;">
  ${rows.map(row => `
- <span class="mock-row-flag ${row.ready ? 'good' : 'warn'}">
- ${esc(row.slug)}: ${Number(row.station_count || 0)} stations, ${Number(row.video_count || 0)} video, ${Number(row.typed_count || 0)} typed, ${Number(row.prompt_count || 0)} prompts
+ <span class="mock-row-flag ${row.exact_ready ? 'good' : row.ready ? 'blue' : 'warn'}">
+ ${esc(row.slug)}: ${Number(row.station_count || 0)} stations, ${Number(row.video_count || 0)} video, ${Number(row.typed_count || 0)} typed, ${Number(row.prompt_count || 0)} prompts${esc(rowDetail(row))}
  </span>
  `).join('') || '<span class="mock-row-flag warn">No active mocks found</span>'}
  </div>
@@ -7481,9 +7489,19 @@ async function importMockBankFile() {
  });
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.message || data?.error || 'Import failed');
+ if (Array.isArray(data.imported_slugs) && Number(data.imported_verified_count || 0) < data.imported_slugs.length) {
+ throw new Error(`Import did not verify all mocks in D1. Verified ${data.imported_verified_count || 0}/${data.imported_slugs.length}.`);
+ }
  S.mockBank = data;
  renderMockBankAudit();
- if (note) note.textContent = `Imported ${data.imported_slugs?.join(', ') || 'private mocks'} into D1.`;
+ if (note) {
+ const imported = data.imported_slugs?.join(', ') || 'private mocks';
+ const readyCount = Number(data.imported_ready_count || 0);
+ const totalCount = Number(data.imported_count || data.imported_slugs?.length || 0);
+ note.textContent = readyCount === totalCount
+ ? `Imported and verified ${imported} in D1.`
+ : `Imported ${imported}, but ${Math.max(0,totalCount - readyCount)} imported mock${Math.max(0,totalCount - readyCount)===1?' is':'s are'} not ready. Check the audit chips.`;
+ }
  await loadMockAdmin();
  } catch(e) {
  if (note) note.textContent = e.message || 'Import failed';
