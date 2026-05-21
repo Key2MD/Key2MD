@@ -1711,9 +1711,14 @@
  <div class="mock-panel-title">Mock Bank Health</div>
  <div class="mock-panel-sub" id="mockBankStatus">Loading private D1 bank audit...</div>
  </div>
+ <div class="mock-action-row">
+ <input id="mockBankFile" type="file" accept="application/json" style="max-width:240px;">
+ <button class="btn" onclick="importMockBankFile()">Import private JSON</button>
  <button class="btn" onclick="loadMockAdmin()">Audit bank</button>
  </div>
+ </div>
  <div id="mockBankAudit" class="admin-note blue" style="margin:14px;">Loading...</div>
+ <div id="mockBankImportStatus" class="mock-panel-sub" style="padding:0 14px 14px;">Private import file stays local until you choose it.</div>
  </section>
  <div class="mock-command-strip" id="mockSummaryCards"></div>
  <div class="mock-filter-card">
@@ -7451,6 +7456,34 @@ function renderMockBankAudit() {
  `).join('') || '<span class="mock-row-flag warn">No active mocks found</span>'}
  </div>
  `;
+}
+
+async function importMockBankFile() {
+ const input = document.getElementById('mockBankFile');
+ const note = document.getElementById('mockBankImportStatus');
+ const file = input?.files?.[0] || null;
+ if (!file) {
+ if (note) note.textContent = 'Choose the private mock bank JSON first.';
+ return;
+ }
+ if (note) note.textContent = 'Importing private bank into D1...';
+ try {
+ const text = await file.text();
+ const payload = JSON.parse(text);
+ const res = await api('/api/admin/casper-mock/bank/import', {
+ method: 'POST',
+ headers: {'Content-Type':'application/json'},
+ body: JSON.stringify(payload),
+ });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Import failed');
+ S.mockBank = data;
+ renderMockBankAudit();
+ if (note) note.textContent = `Imported ${data.imported_slugs?.join(', ') || 'private mocks'} into D1.`;
+ await loadMockAdmin();
+ } catch(e) {
+ if (note) note.textContent = e.message || 'Import failed';
+ }
 }
 
 function renderMockSummaryCards() {
