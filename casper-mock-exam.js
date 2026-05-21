@@ -168,6 +168,7 @@ window.FullCasperMock = (() => {
  function draftBelongsToCurrentUser(draft) {
  const user = currentDraftUserSnapshot();
  if (!draft || (!draft.user_id && !draft.user_email)) return true;
+ if (!user.id && !user.email) return false;
  if (draft.user_id && user.id && String(draft.user_id) !== user.id) return false;
  if (draft.user_email && user.email && String(draft.user_email).trim().toLowerCase() !== user.email) return false;
  return true;
