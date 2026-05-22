@@ -845,6 +845,7 @@
       const activeRecently=Number.isFinite(lastSeenMs) && Date.now()-lastSeenMs < 5*60*1000 && (attempt?.status||'')==='in_progress';
       const reachedUnsaved=current?.order && rows.length < Number(current.order);
       const breakRows=Array.isArray(tel.breaks)?tel.breaks:[];
+      const recoveryRows=Array.isArray(attempt?.recovery_events)?attempt.recovery_events:[];
       const statusTone=activeRecently?'good':((attempt?.status||'')==='in_progress'?'warn':'');
       const statusText=activeRecently?'Active now':((attempt?.status||'')==='in_progress'?'Not currently active':'Finished/closed');
       const hasTelemetry=!!(tel.started_at || lastSeen || current || breakRows.length);
@@ -872,6 +873,9 @@
         </div>
         ${breakRows.length?`<div style="margin-top:12px">${dataLines({
           breaks: breakRows.map(b=>`${b.title||'Break'}: ${fmtDuration(b.elapsed_sec)} used${b.skipped?' (skipped early)':''}`).join('; ')
+        })}</div>`:''}
+        ${recoveryRows.length?`<div style="margin-top:12px">${dataLines({
+          recovery: recoveryRows.slice(-4).map(e=>`${fmtDateTime(e.at)}: server progress repaired from ${e.db_current_station_order||'?'} to ${e.saved_next_station_order||'?'}${e.rescue_pending?' (SOS pending)':''}`).join('; ')
         })}</div>`:''}
         ${tel.browser?`<details class="raw"><summary>Browser/session details</summary><pre>${esc(JSON.stringify(tel.browser,null,2))}</pre></details>`:''}
       </div>`;

@@ -47,6 +47,7 @@ window.FullCasperMock = (() => {
  let serverCheckpointBusy = false;
  let queuedCheckpointReason = null;
  let lastRescueRecording = null;
+ let lastMockSaveResponse = null;
  let mockStatusCache = null;
  let mockStatusRefreshToken = 0;
  let activeMockExam = null;
@@ -793,11 +794,22 @@ window.FullCasperMock = (() => {
  serverCheckpointBusy = false;
  queuedCheckpointReason = null;
  lastRescueRecording = null;
+ lastMockSaveResponse = null;
  activeMockExam = null;
  mockTelemetry = null;
  currentStationTelemetry = null;
  currentBreakTelemetry = null;
  clearMockDraft();
+ }
+
+ function assertServerAcceptedMockProgress(reason = 'station') {
+ const data = lastMockSaveResponse || {};
+ if (!data.ok || data.status === 'completed' || data.rescue_pending) return;
+ const serverOrder = Number(data.current_station_order || 0);
+ const expectedOrder = Math.min(VIDEO_COUNT + TYPED_COUNT, results.length + 1);
+ if (serverOrder && serverOrder < expectedOrder) {
+ throw new Error(`The server saved your answer but has not unlocked the next station yet. Please press Try saving again. (${reason})`);
+ }
  }
 
  async function checkpointMockAttempt(reason = 'station', options = {}) {
@@ -814,6 +826,7 @@ window.FullCasperMock = (() => {
  serverCheckpointBusy = true;
  try {
  await saveMockAttempt(buildRows(), null, 'in_progress');
+ assertServerAcceptedMockProgress(reason);
  saveMockDraft({ phase: reason, checkpointed_at: new Date().toISOString() });
  startPendingAutoRepairs();
  } catch (err) {
@@ -1717,6 +1730,7 @@ window.FullCasperMock = (() => {
  }),
  });
  const data = await res.json().catch(() => ({}));
+ lastMockSaveResponse = data || null;
  if (!res.ok) throw new Error(data.message || data.error || 'Could not save mock attempt.');
  savedAttemptId = data.attempt_id || mockAttemptId;
  return savedAttemptId;

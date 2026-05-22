@@ -95,7 +95,7 @@
  area: 'Strategy',
  title: '15-min strategy call',
  price: 'Free',
- href: 'https://calendly.com/brittainmbbs/30min',
+ href: 'booking.html?type=intro',
  cta: 'Book free call',
  bestFor: 'When the right product depends on preferences, timing, or edge-case admissions rules.',
  tags: ['strategy', 'call', 'preference']

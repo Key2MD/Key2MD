@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Book with Dan | Key2MD</title>
+ <meta name="description" content="Book a Key2MD session with Dan, or send a direct booking request if the calendar does not load.">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+ <style>
+ :root{--navy:#071326;--panel:#0d1f3c;--blue:#0ea5e9;--gold:#f59e0b;--green:#22c55e;--text:#eaf4ff;--muted:#9fb0c7;--line:rgba(255,255,255,0.12);}
+ *{box-sizing:border-box}
+ body{margin:0;min-height:100vh;font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(135deg,#071326 0%,#0d1f3c 56%,#082f49 100%);color:var(--text);display:flex;align-items:flex-start;justify-content:center;padding:28px}
+ .shell{width:min(1040px,100%);display:grid;grid-template-columns:0.9fr 1.1fr;gap:22px;align-items:stretch;margin:auto}
+ .brand,.panel{border:1px solid var(--line);background:rgba(7,19,38,0.78);box-shadow:0 24px 80px rgba(0,0,0,0.28)}
+ .brand{border-radius:20px;padding:30px;display:flex;flex-direction:column;justify-content:space-between;min-height:520px}
+ .brand-top{display:flex;align-items:center;justify-content:space-between;gap:18px}
+ .logo{font-size:1.35rem;font-weight:900;text-decoration:none;color:#fff}.logo span{color:#0ea5e9}
+ .portrait{width:74px;height:74px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,0.16);background:#0a1628;box-shadow:0 10px 30px rgba(0,0,0,0.25)}
+ .portrait img{width:100%;height:100%;object-fit:cover;object-position:center 20%;display:block}
+ .eyebrow{color:#38bdf8;text-transform:uppercase;letter-spacing:0.14em;font-size:0.72rem;font-weight:900;margin-bottom:14px}
+ h1{font-size:clamp(2rem,5vw,4rem);line-height:0.96;margin:0 0 18px;letter-spacing:0}
+ p{margin:0;color:var(--muted);line-height:1.65}
+ .trust{display:grid;gap:10px;margin-top:28px}
+ .trust div{padding:13px 14px;border-radius:12px;background:rgba(255,255,255,0.055);border:1px solid rgba(255,255,255,0.08);font-size:0.9rem;color:#dbeafe}
+ .panel{border-radius:20px;padding:26px;display:grid;gap:16px}
+ .session-info,.payment-card{border:1px solid rgba(255,255,255,0.11);background:rgba(255,255,255,0.055);border-radius:16px;padding:18px}
+ .section-label{display:block;color:#7dd3fc;text-transform:uppercase;letter-spacing:0.12em;font-size:0.68rem;font-weight:900;margin-bottom:8px}
+ .session-info h2,.payment-card h2{font-size:1.08rem;line-height:1.25;margin:0 0 8px;color:#fff}
+ .session-list{display:grid;gap:8px;margin:14px 0 0;padding:0;list-style:none}
+ .session-list li{position:relative;padding-left:20px;color:#d8e7f7;font-size:0.9rem;line-height:1.55}
+ .session-list li::before{content:'';position:absolute;left:0;top:0.72em;width:7px;height:7px;border-radius:50%;background:#38bdf8;box-shadow:0 0 0 4px rgba(56,189,248,0.12)}
+ .choice{display:block;text-decoration:none;border:1.5px solid rgba(14,165,233,0.28);background:rgba(14,165,233,0.1);border-radius:16px;padding:20px;color:#fff;transition:transform 0.18s ease,border-color 0.18s ease,background 0.18s ease}
+ .choice:hover{transform:translateY(-2px);border-color:rgba(14,165,233,0.65);background:rgba(14,165,233,0.16)}
+ .choice.primary{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.12)}
+ .choice.primary:hover{border-color:rgba(245,158,11,0.78);background:rgba(245,158,11,0.18)}
+ .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px}
+ .pill{border-radius:999px;padding:4px 10px;font-size:0.72rem;font-weight:900;background:rgba(255,255,255,0.12);color:#dbeafe}.primary .pill{background:var(--gold);color:#071326}
+ .title{font-weight:900;font-size:1.04rem}.copy{font-size:0.9rem;color:#b8c7dc;margin:0}
+ .fallback{border:1px solid rgba(34,197,94,0.28);background:rgba(34,197,94,0.09);border-radius:16px;padding:18px}
+ .fallback strong{display:block;color:#bbf7d0;margin-bottom:6px}
+ .fallback a{color:#fff;font-weight:900;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.45)}
+ .payment-card{border-color:rgba(245,158,11,0.32);background:rgba(245,158,11,0.09)}
+ .bank-grid{display:grid;grid-template-columns:82px 1fr;gap:8px 12px;margin:14px 0;color:#f8fafc;font-size:0.95rem}
+ .bank-grid span:nth-child(odd){color:#fcd34d;font-size:0.75rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase}
+ .bank-grid span:nth-child(even){font-weight:900}
+ .confirm-note{color:#fde68a;font-weight:700;font-size:0.9rem}
+ .tiny{font-size:0.82rem;color:#8ea2bd}
+ .back{display:inline-flex;color:#cfe8ff;text-decoration:none;font-weight:800;margin-top:12px}
+ @media(max-width:820px){body{padding:16px}.shell{grid-template-columns:1fr}.brand{min-height:auto}.panel{padding:18px}h1{font-size:2.2rem}}
+ </style>
+</head>
+<body>
+ <main class="shell">
+  <section class="brand">
+   <div>
+    <div class="brand-top">
+     <a class="logo" href="index.html">Key<span>2</span>MD</a>
+     <div class="portrait"><img src="Selfie-optimized.jpg" alt="Dan, Key2MD medical admissions tutor"></div>
+    </div>
+    <div style="margin-top:58px">
+     <div class="eyebrow">Booking options</div>
+     <h1>Book with Dan.</h1>
+     <p>Choose a time for a private 1:1 session, then finalise payment directly with Dan. If the calendar says you do not have permission, will not load, or behaves strangely in your browser, use the direct request option and Dan can book it manually.</p>
+    </div>
+   </div>
+   <div class="trust">
+    <div>1:1 sessions are for MMI, CASPer, GAMSAT S2 and admissions strategy.</div>
+    <div>Intro call requests are handled by Dan directly rather than relying only on an automated calendar.</div>
+   </div>
+  </section>
+  <section class="panel" aria-label="Booking actions">
+   <div class="session-info">
+    <span class="section-label">Premium 1:1 coaching</span>
+    <h2>A focused session with Dan, built around the exact problem you are trying to solve.</h2>
+    <p>Sessions can be used for CASPer, MMI, GAMSAT S2, admissions strategy, or a mix depending on where you need the highest-leverage help.</p>
+    <ul class="session-list">
+     <li>Clarify your key concerns, current preparation level, strengths and weak points.</li>
+     <li>Work through live practice with immediate feedback, answer dissection and strategic revisions.</li>
+     <li>Show where an answer can be strengthened, how to make judgement clearer, and how to avoid sounding generic.</li>
+     <li>Where appropriate, Dan may provide model answers or model phrasing at his discretion to demonstrate the standard expected.</li>
+    </ul>
+   </div>
+   <a class="choice primary" id="paidChoice" href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener" data-track="calendly_paid_click">
+    <div class="top"><span class="pill">$300</span><span class="title">Open 1:1 booking calendar</span></div>
+    <p class="copy">Book a 1-hour private coaching session with Dan.</p>
+   </a>
+   <div class="payment-card">
+    <span class="section-label">Payment</span>
+    <h2>Bank transfer can be made directly to Dan.</h2>
+    <div class="bank-grid" aria-label="Bank transfer details">
+     <span>BSB</span><span>064168</span>
+     <span>ACC</span><span>1035 2111</span>
+     <span>Name</span><span>Daniel Brittain</span>
+    </div>
+    <p class="confirm-note">Your booking is officially confirmed once payment has been received.</p>
+   </div>
+   <a class="choice" id="introChoice" href="https://calendly.com/brittainmbbs/30min" target="_blank" rel="noopener" data-track="calendly_intro_click">
+    <div class="top"><span class="pill">Free</span><span class="title">Open intro call calendar</span></div>
+    <p class="copy">Use this if you want to check fit before committing.</p>
+   </a>
+   <div class="fallback">
+    <strong>Calendar not working?</strong>
+    <p id="fallbackCopy">Email Dan your name, preferred times, exam pathway, and whether you want a 1:1 session or intro call.</p>
+    <p style="margin-top:10px"><a id="fallbackMail" href="mailto:brittainmbbs@gmail.com?subject=Key2MD%20booking%20request&body=Hi%20Dan%2C%0A%0AI%20am%20trying%20to%20book%20through%20the%20website%20but%20the%20calendar%20is%20not%20working.%0A%0AName%3A%20%0APathway%3A%20%0APreferred%20times%3A%20%0AWhat%20I%20need%20help%20with%3A%20%0A">Send direct booking request</a></p>
+   </div>
+   <p class="tiny">Tip: if Calendly opens but refuses access, try a private/incognito window once, then email Dan using the fallback above.</p>
+   <a class="back" href="index.html">Back to Key2MD -></a>
+  </section>
+ </main>
+ <script>
+ (function(){
+  var params=new URLSearchParams(window.location.search);
+  var type=params.get('type')||'paid';
+  var paid=document.getElementById('paidChoice');
+  var intro=document.getElementById('introChoice');
+  var mail=document.getElementById('fallbackMail');
+  if(type==='intro'){
+   intro.classList.add('primary');
+   paid.classList.remove('primary');
+   mail.href='mailto:brittainmbbs@gmail.com?subject=Key2MD%20intro%20call%20request&body=Hi%20Dan%2C%0A%0AI%20am%20trying%20to%20book%20an%20intro%20call%20through%20the%20website%20but%20the%20calendar%20is%20not%20working.%0A%0AName%3A%20%0APathway%3A%20%0APreferred%20times%3A%20%0AWhat%20I%20need%20help%20with%3A%20%0A';
+  }
+ })();
+ </script>
+ <script src="key2md-tracking.js" defer></script>
+</body>
+</html>

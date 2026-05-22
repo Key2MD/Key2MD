@@ -269,6 +269,8 @@
 
  if (href.indexOf('calendly.com') !== -1) {
  track('calendly_click', { event_category: 'conversion', event_label: href });
+ } else if (href.indexOf('booking.html') !== -1) {
+ track('booking_page_click', { event_category: 'conversion', event_label: href });
  } else if (href.indexOf('casper-class.html') !== -1) {
  track('class_page_click', { event_category: 'navigation', event_label: href });
  } else if (/checkout|buy|pro/i.test(target.id + ' ' + target.className + ' ' + target.textContent)) {
