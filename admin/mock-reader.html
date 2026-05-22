@@ -48,6 +48,7 @@
     .list-meta{font-size:.76rem;color:var(--muted);line-height:1.45}
     .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
     .tabs button{background:#fff;color:var(--ink);border:1px solid var(--line-strong);padding:8px 11px;font-size:.78rem}
+    .tabs button.has-issue{border-color:#fed7aa;background:#fff7ed;color:#9a3412}
     .tabs button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
     .mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}
     .mode-switch button{background:#fff;color:var(--ink);border:1px solid var(--line-strong);font-size:.78rem;padding:9px 10px}
@@ -101,6 +102,13 @@
     .data-lines{display:grid;gap:8px}
     .data-line{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;border-top:1px solid var(--line);padding-top:8px;font-size:.84rem;line-height:1.5}
     .data-line b{color:var(--navy)}
+    .monitor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+    .monitor-tile{border:1px solid var(--line);border-radius:8px;background:#fff;padding:10px 12px}
+    .monitor-tile strong{display:block;color:var(--navy);font-size:.9rem}
+    .monitor-tile span{display:block;color:var(--muted);font-size:.72rem;margin-top:2px;line-height:1.4}
+    .monitor-tile.warn{background:var(--amber-soft);border-color:#fed7aa}
+    .monitor-tile.risk{background:var(--red-soft);border-color:#fecaca}
+    .monitor-tile.good{background:var(--green-soft);border-color:#bbf7d0}
     pre{white-space:pre-wrap;background:#0f172a;color:#e2e8f0;border:1px solid #1e293b;border-radius:8px;padding:12px;line-height:1.55;max-height:320px;overflow:auto}
     details.raw{margin-top:12px}
     details.raw summary{cursor:pointer;color:var(--muted);font-size:.78rem;font-weight:800}
@@ -302,6 +310,36 @@
       `).join('')}</div>`;
     }
 
+    function timeAgo(value){
+      if(!value)return '';
+      const ms=Date.parse(value);
+      if(!Number.isFinite(ms))return '';
+      const diff=Math.max(0,Date.now()-ms);
+      const mins=Math.round(diff/60000);
+      if(mins<1)return 'just now';
+      if(mins<60)return `${mins} min ago`;
+      const hours=Math.round(mins/60);
+      if(hours<48)return `${hours} hr ago`;
+      const days=Math.round(hours/24);
+      return `${days} day${days===1?'':'s'} ago`;
+    }
+
+    function monitorTile(label,value,sub='',tone=''){
+      const main=value === null || value === undefined || value === '' ? '-' : value;
+      return `<div class="monitor-tile ${esc(tone)}"><strong>${esc(main)}</strong><span>${esc(label)}${sub?` - ${esc(sub)}`:''}</span></div>`;
+    }
+
+    function attemptActivityLine(row){
+      const t=row?.telemetry_summary||{};
+      if(!t.last_seen_at)return '';
+      const bits=[];
+      if(row.status==='in_progress')bits.push(t.active_recently?'Active now':'Last seen '+timeAgo(t.last_seen_at));
+      else bits.push('Last activity '+timeAgo(t.last_seen_at));
+      if(t.current_station_label)bits.push(`${t.current_station_label}${t.current_phase?` (${t.current_phase})`:''}`);
+      if(Number(t.current_answer_chars)>0)bits.push(`${t.current_answer_chars} chars typed`);
+      return bits.join(' | ');
+    }
+
     function startAdminHandoff(){
       if(adminToken || !handoffId || !('BroadcastChannel' in window))return;
       const channel = new BroadcastChannel(MOCK_READER_CHANNEL_PREFIX + handoffId);
@@ -401,9 +439,10 @@
           <div class="list-meta">${esc(r.user_email||'No email')}</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin:9px 0 7px;">
             <span class="pill">${esc(r.tier||'mock')}</span>
-            <span class="score-pill ${r.manual_review_paid?'good':''}">${r.manual_review_paid ? 'Paid review' : 'Saved mock'}</span>
+            <span class="score-pill ${r.manual_review_paid?'good':(r.status==='in_progress'?'warn':'')}">${r.manual_review_paid ? 'Paid review' : (r.status==='in_progress' ? 'In progress' : 'Saved mock')}</span>
           </div>
           <div class="list-meta">${esc(statusText(r.manual_review_status))}${r.completed_at ? ' | ' + esc(fmtDateTime(r.completed_at)) : ''}</div>
+          ${attemptActivityLine(r)?`<div class="list-meta" style="margin-top:4px;color:${r.telemetry_summary?.active_recently?'#16a34a':'var(--muted)'}">${esc(attemptActivityLine(r))}</div>`:''}
         </button>
       `).join(''):(listScope === 'paid' ? 'No paid manual reviews yet.' : 'No saved mock attempts yet.');
       return rows;
@@ -733,7 +772,13 @@
       const videoCount=rows.filter(r=>r.type==='video').length;
       const typedCount=rows.filter(r=>r.type!=='video').length;
       const reprocessIssueCount=rows.filter(needsStationReprocess).length;
-      const tabs=rows.map((r,i)=>{const score=stationScore(r);return `<button class="${i===currentStation?'active':''}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}${Number.isFinite(score)?` - ${Math.round(score*10)/10}`:(r.processing_error||r.reprocess_error)?' - issue':''}</button>`;}).join('');
+      const issueSummaries=stationIssueSummaries(rows);
+      const tabs=rows.map((r,i)=>{
+        const score=stationScore(r);
+        const issueLabel=stationIssueLabel(r);
+        const classes=[i===currentStation?'active':'',issueLabel?'has-issue':''].filter(Boolean).join(' ');
+        return `<button class="${classes}" onclick="currentStation=${i};renderAttempt()">${r.type==='video'?'Video':'Typed'} ${r.localIndex||i+1}${Number.isFinite(score)?` - ${Math.round(score*10)/10}`:''}${issueLabel?` - ${esc(issueLabel)}`:''}</button>`;
+      }).join('');
       document.getElementById('attemptPanel').innerHTML=`
         <div class="attempt-head">
           <div>
@@ -752,6 +797,8 @@
           <div class="metric"><strong>${typedCount}</strong><span>Typed stations</span></div>
           <div class="metric"><strong>${esc(fmtDateTime(a.completed_at)||'-')}</strong><span>Completed</span></div>
         </div>
+        ${attemptMonitoringHtml(a)}
+        ${issueSummaries.length?`<div class="qa-chip-row" style="margin:12px 0 0;">${issueSummaries.map(item=>`<button class="qa-chip warn" type="button" onclick="currentStation=${item.index};renderAttempt()">${esc(item.label)}: ${esc(item.detail)}</button>`).join('')}</div>`:''}
         ${reprocessIssueCount?`<div id="bulkReprocessStatus" class="muted" style="margin:0 0 12px;"></div>`:''}
         <div class="tabs">${tabs}</div>
         <div>${stationHtml(rows[currentStation])}</div>
@@ -773,6 +820,97 @@
       const total=Math.max(0,Math.round(Number(seconds)||0));
       const m=Math.floor(total/60), s=total%60;
       return `${m}:${String(s).padStart(2,'0')}`;
+    }
+
+    function fmtDuration(seconds){
+      const total=Math.max(0,Math.round(Number(seconds)||0));
+      if(!total)return '-';
+      if(total<3600)return fmtTime(total);
+      const h=Math.floor(total/3600);
+      const m=Math.round((total%3600)/60);
+      return `${h}h ${m}m`;
+    }
+
+    function telemetryForAttempt(attempt=currentAttempt){
+      return attempt?.telemetry && typeof attempt.telemetry==='object' ? attempt.telemetry : {};
+    }
+
+    function attemptMonitoringHtml(attempt){
+      const tel=telemetryForAttempt(attempt);
+      const current=tel.current_station || tel.current || null;
+      const visibility=tel.visibility || {};
+      const rows=attempt?.rows||[];
+      const lastSeen=tel.last_server_seen_at || tel.last_seen_at || attempt?.updated_at || '';
+      const lastSeenMs=Date.parse(lastSeen||'');
+      const activeRecently=Number.isFinite(lastSeenMs) && Date.now()-lastSeenMs < 5*60*1000 && (attempt?.status||'')==='in_progress';
+      const reachedUnsaved=current?.order && rows.length < Number(current.order);
+      const breakRows=Array.isArray(tel.breaks)?tel.breaks:[];
+      const statusTone=activeRecently?'good':((attempt?.status||'')==='in_progress'?'warn':'');
+      const statusText=activeRecently?'Active now':((attempt?.status||'')==='in_progress'?'Not currently active':'Finished/closed');
+      const hasTelemetry=!!(tel.started_at || lastSeen || current || breakRows.length);
+      if(!hasTelemetry){
+        return `<div class="review-box soft">
+          <div class="section-label">Monitoring</div>
+          <div class="muted">No timing trail is saved for this attempt. Older mocks will only show the stations that were already saved.</div>
+        </div>`;
+      }
+      const currentLine=current?[
+        current.station_label || `Station ${current.order||''}`.trim(),
+        current.phase ? `phase: ${current.phase}` : '',
+        current.visible===false ? 'tab hidden' : '',
+        Number(current.answer_chars)>0 ? `${current.answer_chars} chars / ${current.answer_words||0} words` : '',
+      ].filter(Boolean).join(' | '):'No current page reported';
+      return `<div class="review-box soft">
+        <div class="section-label">Monitoring</div>
+        <div class="monitor-grid">
+          ${monitorTile('Status',statusText,timeAgo(lastSeen),statusTone)}
+          ${monitorTile('Started',fmtDateTime(tel.started_at || attempt?.started_at),tel.browser?.timezone || '')}
+          ${monitorTile('Last seen',fmtDateTime(lastSeen),timeAgo(lastSeen))}
+          ${monitorTile('Saved stations',`${rows.length}/11`,reachedUnsaved?'student reached a later unsaved station':'')}
+          ${monitorTile('Current page',currentLine,'',reachedUnsaved?'warn':'')}
+          ${monitorTile('Tab hidden',fmtDuration(Math.round(Number(visibility.hidden_ms||0)/1000)),`${visibility.hidden_count||0} switch${Number(visibility.hidden_count||0)===1?'':'es'}`)}
+        </div>
+        ${breakRows.length?`<div style="margin-top:12px">${dataLines({
+          breaks: breakRows.map(b=>`${b.title||'Break'}: ${fmtDuration(b.elapsed_sec)} used${b.skipped?' (skipped early)':''}`).join('; ')
+        })}</div>`:''}
+        ${tel.browser?`<details class="raw"><summary>Browser/session details</summary><pre>${esc(JSON.stringify(tel.browser,null,2))}</pre></details>`:''}
+      </div>`;
+    }
+
+    function stationMonitoringHtml(row){
+      const timing=row?.timing || {};
+      const typing=row?.typing || timing.typing || null;
+      const hasTiming=!!(timing.started_at || timing.ended_at || typing);
+      if(!hasTiming){
+        return `<div class="review-box soft">
+          <div class="section-label">Station monitoring</div>
+          <div class="muted">No per-station timing was recorded for this station.</div>
+        </div>`;
+      }
+      const typedPasteRisk=!!(typing?.possible_paste_or_external_draft);
+      const tiles=[
+        monitorTile('Opened',fmtDateTime(timing.started_at),timing.local_started_at||''),
+        monitorTile('Submitted',fmtDateTime(timing.ended_at || timing.submitted_at),''),
+        monitorTile('Time on page',fmtDuration(timing.elapsed_sec),`${fmtDuration(timing.visible_sec)} visible`),
+        monitorTile('Tab hidden',fmtDuration(timing.hidden_sec),`${timing.hidden_count||0} switch${Number(timing.hidden_count||0)===1?'':'es'}`,Number(timing.hidden_sec)>30?'warn':''),
+      ];
+      if(row?.type==='video'){
+        tiles.push(monitorTile('Recording length',fmtDuration(timing.recording_duration_sec || rowDuration(row)),timing.submission_kind||''));
+      }
+      if(typing){
+        tiles.push(monitorTile('First typing',fmtDuration(typing.first_input_delay_sec),'after page opened'));
+        tiles.push(monitorTile('Active typing focus',fmtDuration(typing.active_focus_sec),`${typing.focus_count||0} focus event${Number(typing.focus_count||0)===1?'':'s'}`));
+        tiles.push(monitorTile('Keystrokes',typing.keydown_count||0,`${typing.input_events||0} input events`));
+        tiles.push(monitorTile('Paste events',typing.paste_events||0,`${typing.paste_chars||0} pasted chars`,typedPasteRisk?'warn':''));
+        tiles.push(monitorTile('Large inserts',typing.large_insert_events||0,`${typing.largest_insert_chars||0} largest insert`,typedPasteRisk?'warn':''));
+        tiles.push(monitorTile('Final typed size',`${typing.final_chars||0} chars`,`${typing.final_words||0} words`));
+      }
+      return `<div class="review-box soft">
+        <div class="section-label">Station monitoring</div>
+        <div class="monitor-grid">${tiles.join('')}</div>
+        ${typedPasteRisk?`<div class="muted" style="margin-top:10px;color:#9a3412;">Possible paste or external draft pattern. This is a signal only: it records timing and paste/insert size, not clipboard contents.</div>`:''}
+        ${Array.isArray(timing.events)&&timing.events.length?`<details class="raw"><summary>Timing events</summary><pre>${esc(JSON.stringify(timing.events,null,2))}</pre></details>`:''}
+      </div>`;
     }
 
     function rowDuration(r){
@@ -825,55 +963,42 @@
       return needsTypedReprocess(row) || needsVideoReprocess(row);
     }
 
+    function stationIssueDetail(row){
+      if(!row)return '';
+      if(row.processing_error)return String(row.processing_error);
+      if(row.reprocess_error)return String(row.reprocess_error);
+      if(videoNeedsVisualRepair(row)){
+        if(row.visual_degraded)return 'Premium visual analysis was degraded or missing.';
+        return 'Premium visual metrics are missing from this saved video.';
+      }
+      if(needsTypedReprocess(row))return 'Typed answer has no usable AI feedback.';
+      if(needsVideoReprocess(row))return 'Saved recording needs transcript or AI feedback repair.';
+      return '';
+    }
+
+    function stationIssueLabel(row){
+      const detail=stationIssueDetail(row);
+      if(!detail)return '';
+      if(videoNeedsVisualRepair(row))return 'visual';
+      if(row?.processing_error || row?.reprocess_error)return 'issue';
+      return 'repair';
+    }
+
+    function stationIssueSummaries(rows){
+      return (rows||[]).map((row,index)=>{
+        const detail=stationIssueDetail(row);
+        if(!detail)return null;
+        const type=row?.type==='video'?'Video':'Typed';
+        const local=row?.localIndex||index+1;
+        return {index,label:`${type} ${local}`,detail:detail.slice(0,140)};
+      }).filter(Boolean);
+    }
+
     function stationScore(row){
       if(!hasFeedback(row))return null;
       const fb=row.feedback||{}, overall=fb.overall||{};
       const score=Number(overall.score ?? fb.score ?? row.score);
       return Number.isFinite(score)&&score>0 ? score : null;
-    }
-
-    function adminRecordingUrl(recordingKey){
-      const url=new URL(API_BASE+'/api/admin/casper-mock/recording');
-      url.searchParams.set('key',recordingKey||'');
-      url.searchParams.set('admin_token',adminToken||'');
-      return url.toString();
-    }
-
-    function legacyVideoPlayerHtml(recordingKey,r,id='adminVideoPlayer'){
-      const duration=rowDuration(r);
-      if(!recordingKey){
-        return `<div class="mock-video-shell" style="min-height:190px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:18px;">
-          <div>
-            <div class="mock-video-playmark" style="background:rgba(255,255,255,.12);color:#fff;">!</div>
-            <div style="font-weight:850;margin-bottom:6px;">No recording key saved</div>
-            <div style="font-size:0.78rem;color:rgba(255,255,255,0.68);line-height:1.5;">${duration?`The browser captured about ${fmtTime(duration)}, but the analysis/upload did not return a playable recording.`:'The video upload did not complete for this station.'}</div>
-          </div>
-        </div>`;
-      }
-      const keyAttr = recordingKey ? ` data-recording-key="${esc(recordingKey)}"` : '';
-      return `<div class="mock-video-shell">
-        <div class="mock-video-stage">
-          <video id="${id}" crossorigin="anonymous" playsinline preload="metadata"${keyAttr} data-duration="${duration||''}" style="cursor:pointer"></video>
-          <button type="button" id="${id}Overlay" class="mock-video-overlay" onclick="playAdminRecording('${esc(id)}')">
-            <span>
-              <span class="mock-video-playmark">▶</span>
-              <span class="mock-video-overlay-title" id="${id}OverlayTitle">Loading recording...</span>
-              <span class="mock-video-overlay-sub" id="${id}OverlaySub">Preparing secure admin playback. If the first frame is dark, the recording is still being loaded.</span>
-            </span>
-          </button>
-        </div>
-        <div class="mock-video-bar">
-          <div class="mock-video-row">
-            <button type="button" id="${id}Btn" class="mock-video-btn" aria-label="Play recording">▶</button>
-            <div class="mock-video-track">
-              <div class="mock-video-bg"><div id="${id}Fill" class="mock-video-fill"></div></div>
-              <input id="${id}Range" class="mock-video-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording">
-            </div>
-            <div id="${id}Time" class="mock-video-time">0:00 / ${duration?fmtTime(duration):'--:--'}</div>
-          </div>
-          <div id="${id}Status" class="mock-video-status">Loading secure recording...</div>
-        </div>
-      </div>`;
     }
 
     function videoPlayerHtml(recordingKey,r,id='adminVideoPlayer'){
@@ -887,13 +1012,32 @@
           </div>
         </div>`;
       }
-      const src=adminRecordingUrl(recordingKey);
       return `<div class="mock-video-shell">
-        <video id="${id}" controls crossorigin="anonymous" playsinline preload="metadata" src="${esc(src)}" data-loaded="1" data-recording-key="${esc(recordingKey)}" data-duration="${duration||''}"></video>
-        <div class="mock-video-status">Native secure playback. If it does not play in-page, open the raw recording below.</div>
+        <div class="mock-video-stage">
+          <video id="${id}" crossorigin="anonymous" playsinline preload="metadata" data-recording-key="${esc(recordingKey)}" data-duration="${duration||''}" style="cursor:pointer"></video>
+          <button type="button" id="${id}Overlay" class="mock-video-overlay" data-video-action="play" data-video-id="${esc(id)}">
+            <span>
+              <span class="mock-video-playmark">&#9658;</span>
+              <span class="mock-video-overlay-title" id="${id}OverlayTitle">Load recording</span>
+              <span class="mock-video-overlay-sub" id="${id}OverlaySub">Creates a short-lived secure stream. The timeline uses the saved recording length if browser metadata is unreliable.</span>
+            </span>
+          </button>
+        </div>
+        <div class="mock-video-bar">
+          <div class="mock-video-row">
+            <button type="button" id="${id}Btn" class="mock-video-btn" data-video-action="play" data-video-id="${esc(id)}" aria-label="Play recording">&#9658;</button>
+            <div class="mock-video-track">
+              <div class="mock-video-bg"><div id="${id}Fill" class="mock-video-fill"></div></div>
+              <input id="${id}Range" class="mock-video-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording">
+            </div>
+            <div id="${id}Time" class="mock-video-time">0:00 / ${duration?fmtTime(duration):'--:--'}</div>
+          </div>
+          <div id="${id}Status" class="mock-video-status">Recording is ready to load.</div>
+        </div>
         <div class="mock-video-actions">
-          <a class="mock-video-action" href="${esc(src)}" target="_blank" rel="noopener">Open raw video</a>
-          <a class="mock-video-action" href="${esc(src)}" target="_blank" rel="noopener" download>Download original</a>
+          <button type="button" id="${id}LoadBtn" class="mock-video-action" data-video-action="load" data-video-id="${esc(id)}">Load stream</button>
+          <button type="button" id="${id}RetryBtn" class="mock-video-action" data-video-action="retry" data-video-id="${esc(id)}" hidden>Retry stream</button>
+          <a id="${id}Download" class="mock-video-action" href="#" target="_blank" rel="noopener" download hidden>Download original</a>
           <button type="button" class="mock-video-action" data-video-action="copy" data-video-id="${esc(id)}">Copy key</button>
         </div>
       </div>`;
@@ -937,10 +1081,52 @@
       video.poster=canvas.toDataURL('image/jpeg',0.82);
     }
 
+    function effectiveVideoDuration(video){
+      const native=Number(video?.duration);
+      const hinted=Number(video?.dataset?.duration||0);
+      const hasNative=Number.isFinite(native)&&native>0&&native<86400;
+      const hasHint=Number.isFinite(hinted)&&hinted>0&&hinted<86400;
+      if(hasNative&&hasHint){
+        if(native < hinted*0.55 || native > hinted*1.8)return hinted;
+        return native;
+      }
+      if(hasNative)return native;
+      if(hasHint)return hinted;
+      return 0;
+    }
+
+    function adminPlaybackExpired(video,bufferMs=15000){
+      const expires=Number(video?.dataset?.playbackExpires||0);
+      return video?.dataset?.playbackMode==='stream'
+        && Number.isFinite(expires)
+        && expires>0
+        && Date.now()+bufferMs>=expires;
+    }
+
+    function clearAdminVideoSource(video){
+      if(!video)return;
+      try{video.pause?.();}catch{}
+      if(video.dataset.blobUrl){
+        try{URL.revokeObjectURL(video.dataset.blobUrl);}catch{}
+      }
+      video.dataset.blobUrl='';
+      video.dataset.loaded='';
+      video.dataset.loading='';
+      video.dataset.playbackExpires='';
+      video.dataset.playbackMode='';
+      video.removeAttribute('src');
+      try{video.load();}catch{}
+    }
+
+    function streamReadyMessage(expiresIn){
+      const mins=Math.max(1,Math.round(Number(expiresIn||600)/60));
+      return `Stream ready for about ${mins} min. Retry creates a fresh stream if this page stays open.`;
+    }
+
     function tryCaptureAdminPoster(video){
       if(!video || video.dataset.posterCaptureStarted==='1')return;
       video.dataset.posterCaptureStarted='1';
-      const duration=Number(video.duration)||Number(video.dataset.duration)||0;
+      const duration=effectiveVideoDuration(video);
       if(!duration || !video.videoWidth || !video.videoHeight)return;
       const target=Math.min(Math.max(duration*0.08,0.35),Math.max(0.35,duration-0.15),1.5);
       const original=Number(video.currentTime)||0;
@@ -960,94 +1146,6 @@
       const onSeeked=()=>{ video.removeEventListener('seeked',onSeeked); draw(); };
       video.addEventListener('seeked',onSeeked);
       try{ video.currentTime=target; }catch{ video.removeEventListener('seeked',onSeeked); }
-    }
-
-    async function legacyLoadAdminRecording(id='adminVideoPlayer',opts={}){
-      const video=document.getElementById(id);
-      if(!video)return;
-      const key=video.dataset.recordingKey||'';
-      setAdminFallbackPoster(video);
-      if(!key){initVideoPlayer(id);return;}
-      if(video.dataset.loaded==='1'){
-        initVideoPlayer(id);
-        if(opts.playAfterLoad)await playAdminRecording(id);
-        return;
-      }
-      if(video.dataset.loading==='1'){
-        if(opts.playAfterLoad)video.dataset.playWhenReady='1';
-        setVideoState(id,'loading','Loading recording...','The video is still being prepared. It will play as soon as it is ready.');
-        return;
-      }
-      video.dataset.loading='1';
-      setVideoState(id,'loading','Loading recording...','Fetching the secure video file for playback.');
-      try{
-        const res=await fetch(API_BASE+'/api/admin/casper-mock/recording?key='+encodeURIComponent(key),{headers:authHeaders()});
-        if(!res.ok)throw new Error('Recording unavailable');
-        const blob=await res.blob();
-        if(video.dataset.blobUrl)URL.revokeObjectURL(video.dataset.blobUrl);
-        const url=URL.createObjectURL(blob);
-        video.dataset.blobUrl=url;
-        video.src=url;
-        video.dataset.loaded='1';
-        video.load();
-        setVideoState(id,'ready','Ready to play','Click the large play button or the control bar. Transcript highlighting will follow playback.');
-      }catch(e){
-        video.removeAttribute('src');
-        setVideoState(id,'error','Recording could not be loaded','Refresh the admin session, then try again. The saved key is still shown in the attempt data.');
-      }
-      video.dataset.loading='';
-      initVideoPlayer(id);
-      const shouldPlay=opts.playAfterLoad || video.dataset.playWhenReady==='1';
-      video.dataset.playWhenReady='';
-      if(shouldPlay && video.dataset.loaded==='1')await playAdminRecording(id);
-    }
-
-    function legacyInitVideoPlayer(id='adminVideoPlayer'){
-      const video=document.getElementById(id), btn=document.getElementById(id+'Btn'), range=document.getElementById(id+'Range'), fill=document.getElementById(id+'Fill'), time=document.getElementById(id+'Time');
-      if(!video||!btn||!range||!fill||!time)return;
-      setAdminFallbackPoster(video);
-      const hint=()=>{const n=Number(video.dataset.duration||0);return Number.isFinite(n)&&n>0?n:0;};
-      const dur=()=>{const d=Number(video.duration);return Number.isFinite(d)&&d>0&&d<86400?d:hint();};
-      const update=()=>{
-        const d=dur(), cur=Math.max(0,Number(video.currentTime)||0), pct=d?Math.max(0,Math.min(1,cur/d)):0;
-        range.value=String(Math.round(pct*1000));
-        fill.style.width=(pct*100)+'%';
-        time.textContent=`${fmtTime(cur)} / ${d?fmtTime(d):'--:--'}`;
-        btn.textContent=video.paused||video.ended?'▶':'❚❚';
-        if(video.paused||video.ended){
-          if(video.dataset.loaded==='1')setVideoState(id,'ready','Ready to play','Click play to review the recording with the transcript.');
-        }else{
-          setVideoState(id,'playing','Playing','Transcript highlighting follows the current playback time.');
-        }
-        syncAdminTranscript(id,cur);
-      };
-      const seek=()=>{const d=dur();if(!d)return;video.currentTime=(Number(range.value)/1000)*d;update();};
-      const toggle=()=>{if(video.paused||video.ended)playAdminRecording(id);else video.pause();};
-      if(!video.dataset.bound){
-        video.dataset.bound='1';
-        btn.addEventListener('click',toggle);
-        video.addEventListener('click',toggle);
-        range.addEventListener('input',seek);
-        video.addEventListener('loadedmetadata',()=>{tryCaptureAdminPoster(video);update();});
-        video.addEventListener('loadeddata',()=>{tryCaptureAdminPoster(video);update();});
-        ['durationchange','timeupdate','play','pause','ended','seeked'].forEach(ev=>video.addEventListener(ev,update));
-      }
-      update();
-    }
-
-    async function legacyPlayAdminRecording(id='adminVideoPlayer'){
-      const video=document.getElementById(id);
-      if(!video)return;
-      if(video.dataset.loaded!=='1' || !video.getAttribute('src')){
-        await loadAdminRecording(id,{playAfterLoad:true});
-        return;
-      }
-      try{
-        await video.play();
-        setVideoState(id,'playing','Playing','Transcript highlighting follows the current playback time.');
-      }catch{
-        setVideoState(id,'ready','Ready to play','Your browser blocked autoplay. Press the play button once more.');
-      }
     }
 
     async function createAdminPlaybackUrl(key){
@@ -1110,11 +1208,12 @@
       const key=video.dataset.recordingKey||'';
       setAdminFallbackPoster(video);
       if(!key){initVideoPlayer(id);return;}
-      if(video.dataset.loaded==='1' && video.getAttribute('src')){
+      if(video.dataset.loaded==='1' && video.getAttribute('src') && !opts.force && !adminPlaybackExpired(video)){
         initVideoPlayer(id);
         if(opts.playAfterLoad)await playAdminRecording(id);
         return;
       }
+      if(opts.force || adminPlaybackExpired(video))clearAdminVideoSource(video);
       if(video.dataset.loading==='1'){
         if(opts.playAfterLoad)video.dataset.playWhenReady='1';
         setVideoState(id,'loading','Creating stream...','The secure playback URL is being prepared.');
@@ -1126,16 +1225,17 @@
       setVideoState(id,'loading','Creating stream...','Preparing a short-lived secure stream for this recording.');
       try{
         const data=await createAdminPlaybackUrl(key);
+        const expiresIn=Number(data.expires_in||600);
         video.src=data.playback_url;
         video.dataset.playbackMode='stream';
         video.dataset.loaded='1';
         video.dataset.loading='';
-        video.dataset.playbackExpires=String(Date.now()+Number(data.expires_in||600)*1000);
+        video.dataset.playbackExpires=String(Date.now()+expiresIn*1000);
         attachVideoDownload(id,data.playback_url,key);
         video.load();
         initVideoPlayer(id);
         setVideoActionState(id,'ready');
-        setVideoState(id,'ready','Ready to play','Click play. The video now streams through the browser player instead of waiting for a full download.');
+        setVideoState(id,'ready','Ready to play',streamReadyMessage(expiresIn));
         const shouldPlay=opts.playAfterLoad || video.dataset.playWhenReady==='1';
         video.dataset.playWhenReady='';
         if(shouldPlay)await playAdminRecording(id);
@@ -1162,6 +1262,7 @@
         video.src=url;
         video.dataset.loaded='1';
         video.dataset.loading='';
+        video.dataset.playbackExpires='';
         attachVideoDownload(id,url,key);
         video.load();
         initVideoPlayer(id);
@@ -1173,6 +1274,8 @@
       }catch(fallbackErr){
         video.dataset.loading='';
         video.dataset.loaded='';
+        video.dataset.playbackExpires='';
+        video.dataset.playbackMode='';
         video.removeAttribute('src');
         attachVideoDownload(id,'',key);
         setVideoActionState(id,'error');
@@ -1185,19 +1288,15 @@
     async function reloadAdminRecording(id='adminVideoPlayer'){
       const video=document.getElementById(id);
       if(!video)return;
-      video.pause?.();
-      video.dataset.loaded='';
-      video.dataset.loading='';
-      video.removeAttribute('src');
-      await loadAdminRecording(id);
+      clearAdminVideoSource(video);
+      await loadAdminRecording(id,{force:true});
     }
 
     function initVideoPlayer(id='adminVideoPlayer'){
       const video=document.getElementById(id), btn=document.getElementById(id+'Btn'), range=document.getElementById(id+'Range'), fill=document.getElementById(id+'Fill'), time=document.getElementById(id+'Time');
       if(!video||!btn||!range||!fill||!time)return;
       setAdminFallbackPoster(video);
-      const hint=()=>{const n=Number(video.dataset.duration||0);return Number.isFinite(n)&&n>0?n:0;};
-      const dur=()=>{const d=Number(video.duration);return Number.isFinite(d)&&d>0&&d<86400?d:hint();};
+      const dur=()=>effectiveVideoDuration(video);
       const update=()=>{
         const d=dur(), cur=Math.max(0,Number(video.currentTime)||0), pct=d?Math.max(0,Math.min(1,cur/d)):0;
         range.value=String(Math.round(pct*1000));
@@ -1210,12 +1309,13 @@
         }
         syncAdminTranscript(id,cur);
       };
-      const seek=()=>{const d=dur();if(!d)return;video.currentTime=(Number(range.value)/1000)*d;update();};
+      const seek=async()=>{const d=dur();if(!d)return;const target=(Number(range.value)/1000)*d;if(adminPlaybackExpired(video))await loadAdminRecording(id,{force:true});video.currentTime=target;update();};
       const toggle=()=>{if(video.paused||video.ended)playAdminRecording(id);else video.pause();};
       if(!video.dataset.bound){
         video.dataset.bound='1';
         video.addEventListener('click',toggle);
         range.addEventListener('input',seek);
+        range.addEventListener('change',seek);
         ['loadedmetadata','loadeddata'].forEach(ev=>video.addEventListener(ev,()=>{tryCaptureAdminPoster(video);update();}));
         ['durationchange','timeupdate','play','pause','ended','seeked'].forEach(ev=>video.addEventListener(ev,update));
         video.addEventListener('error',()=>{setVideoActionState(id,'error');setVideoState(id,'error','Playback failed','Use Retry to create a fresh secure stream, or download the original file.');});
@@ -1229,6 +1329,10 @@
       if(!video)return;
       if(video.dataset.loaded!=='1' || !video.getAttribute('src')){
         await loadAdminRecording(id,{playAfterLoad:true});
+        return;
+      }
+      if(adminPlaybackExpired(video)){
+        await loadAdminRecording(id,{playAfterLoad:true,force:true});
         return;
       }
       try{
@@ -1262,11 +1366,7 @@
     }
 
     function videoCaptureDuration(video){
-      const nativeDuration=Number(video.duration);
-      const hintedDuration=Number(video.dataset.duration||0);
-      if(Number.isFinite(nativeDuration)&&nativeDuration>0&&nativeDuration<86400)return nativeDuration;
-      if(Number.isFinite(hintedDuration)&&hintedDuration>0&&hintedDuration<86400)return hintedDuration;
-      return 0;
+      return effectiveVideoDuration(video);
     }
 
     async function waitForVideoPaint(video){
@@ -1283,8 +1383,8 @@
     async function ensureVideoReadyForFrameCapture(video){
       if(!video)throw new Error('No video player is available for this station.');
       if(video.crossOrigin!=='anonymous')video.crossOrigin='anonymous';
-      if((video.dataset.loaded!=='1' || !video.getAttribute('src')) && video.dataset.recordingKey){
-        await loadAdminRecording(video.id||'adminVideoPlayer');
+      if((video.dataset.loaded!=='1' || !video.getAttribute('src') || adminPlaybackExpired(video)) && video.dataset.recordingKey){
+        await loadAdminRecording(video.id||'adminVideoPlayer',{force:adminPlaybackExpired(video)});
       }
       if(!video.getAttribute('src'))throw new Error('No saved video source is loaded for this station.');
       if(video.readyState<1){
@@ -1456,8 +1556,8 @@
     async function jumpAdminTranscript(videoId,start){
       const video=document.getElementById(videoId);
       if(!video)return;
-      if(video.dataset.loaded!=='1' || !video.getAttribute('src')){
-        await loadAdminRecording(videoId);
+      if(video.dataset.loaded!=='1' || !video.getAttribute('src') || adminPlaybackExpired(video)){
+        await loadAdminRecording(videoId,{force:adminPlaybackExpired(video)});
       }
       try{ video.currentTime=Math.max(0,Number(start)||0); }catch{}
       syncAdminTranscript(videoId,Number(start)||0);
@@ -1492,6 +1592,7 @@
         return `<div class="station-grid">
           <div>
             ${videoPlayerHtml(key,r)}
+            ${stationMonitoringHtml(r)}
             ${issue}
             ${reprocess}
             ${uploadRescue}
@@ -1516,6 +1617,7 @@
           ${issue}
           ${typedReprocess}
           ${textPanel('Typed answer', r.answer, 'No typed answer captured.')}
+          ${stationMonitoringHtml(r)}
         </div>
         <div>${feedbackHtml(r.feedback||{}, r)}</div>
       </div>`;

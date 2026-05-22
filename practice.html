@@ -1444,6 +1444,37 @@ function buildFrameSampleTimes(duration, frameCount, windows = null) {
  return times;
 }
 
+async function recoverVideoDuration(video, fallbackDuration = 0) {
+ let duration = Number(video.duration);
+ if(Number.isFinite(duration) && duration > 0 && duration < 86400) return duration;
+ try {
+  await new Promise(resolve => {
+   let done = false;
+   const finish = () => {
+    if(done) return;
+    done = true;
+    clearTimeout(timer);
+    video.removeEventListener('durationchange', finish);
+    video.removeEventListener('timeupdate', finish);
+    video.removeEventListener('seeked', finish);
+    resolve();
+   };
+   const timer = setTimeout(finish, 900);
+   video.addEventListener('durationchange', finish, { once: true });
+   video.addEventListener('timeupdate', finish, { once: true });
+   video.addEventListener('seeked', finish, { once: true });
+   video.currentTime = 1e101;
+  });
+ } catch {}
+ duration = Number(video.duration);
+ if(Number.isFinite(duration) && duration > 0 && duration < 86400) {
+  try { video.currentTime = 0; } catch {}
+  return duration;
+ }
+ const fallback = Number(fallbackDuration || 0);
+ return Number.isFinite(fallback) && fallback > 0 && fallback < 86400 ? fallback : 0;
+}
+
 async function extractVideoFrames(videoBlob, frameCount, options = {}) {
  if(!videoBlob || !frameCount) return [];
  const url = URL.createObjectURL(videoBlob);
@@ -1469,7 +1500,10 @@ async function extractVideoFrames(videoBlob, frameCount, options = {}) {
  try {
  video.src = url;
  await waitFor(video, 'loadedmetadata');
- const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
+ const duration = await recoverVideoDuration(video, options.durationSec);
+ if(!video.videoWidth || !video.videoHeight) {
+  try { await waitFor(video, 'loadeddata', 5000); } catch {}
+ }
  if(!duration || !video.videoWidth || !video.videoHeight) return [];
 
  const canvas = document.createElement('canvas');
@@ -1519,15 +1553,30 @@ async function capturePremiumLiveFrame() {
  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.78));
  if(blob) {
+  const atSec = mmiRecordingStartedAt ? Math.max(0, (Date.now() - mmiRecordingStartedAt) / 1000) : null;
   mmiLiveFrameBlobs.push(blob);
+  mmiLiveFrameSamples.push({ blob, atSec });
   return true;
  }
  return false;
 }
 
+function liveFrameBlobsForOptions(options = {}) {
+ const windows = Array.isArray(options.windows) ? options.windows : [];
+ if(windows.length && mmiLiveFrameSamples.length) {
+  const matched = mmiLiveFrameSamples
+   .filter(sample => Number.isFinite(Number(sample.atSec)) && windows.some(w => sample.atSec >= Number(w.start || 0) && sample.atSec <= Number(w.end || 0)))
+   .map(sample => sample.blob)
+   .filter(Boolean);
+  if(matched.length) return matched.slice(0, PREMIUM_VISUAL_FRAME_LIMIT);
+ }
+ return mmiLiveFrameBlobs.slice(0, PREMIUM_VISUAL_FRAME_LIMIT);
+}
+
 function startPremiumLiveFrameCapture() {
  stopPremiumLiveFrameCapture();
  mmiLiveFrameBlobs = [];
+ mmiLiveFrameSamples = [];
  if(!shouldCapturePremiumLiveFrames()) return;
  const sample = () => {
   if(!webcamActive || mmiLiveFrameBlobs.length >= PREMIUM_VISUAL_FRAME_LIMIT) {
@@ -1726,8 +1775,8 @@ async function submitMMIForFeedback() {
  if(isPremium && recordingBlob) {
  if(btn) btn.textContent = ' Extracting presentation snapshots...';
  const frameOptions = premiumFrameOptionsForStation(cfg, isCasperMockReview, mmiCurrentPrompts);
- frames = await extractVideoFrames(recordingBlob, PREMIUM_VISUAL_FRAME_LIMIT, frameOptions);
- if(frames.length === 0 && !frameOptions.windows?.length && mmiLiveFrameBlobs.length) frames = mmiLiveFrameBlobs.slice(0, PREMIUM_VISUAL_FRAME_LIMIT);
+ frames = await extractVideoFrames(recordingBlob, PREMIUM_VISUAL_FRAME_LIMIT, { ...frameOptions, durationSec: mmiRecordingDurationSec });
+ if(frames.length === 0 && mmiLiveFrameBlobs.length) frames = liveFrameBlobsForOptions(frameOptions);
  if(frames.length === 0) {
  visualDegraded = true;
  console.info('Visual analysis unavailable - proceeding with voice + transcript only');
@@ -1944,8 +1993,8 @@ function submitMMIMockReviewSilently() {
  let visualDegraded = false;
  if(snapshot.isPremium && snapshot.recordingBlob) {
  const frameOptions = premiumFrameOptionsForStation(snapshot.cfg, true, snapshot.prompts);
- frames = await extractVideoFrames(snapshot.recordingBlob, PREMIUM_VISUAL_FRAME_LIMIT, frameOptions);
- if(frames.length === 0 && !frameOptions.windows?.length && mmiLiveFrameBlobs.length) frames = mmiLiveFrameBlobs.slice(0, PREMIUM_VISUAL_FRAME_LIMIT);
+ frames = await extractVideoFrames(snapshot.recordingBlob, PREMIUM_VISUAL_FRAME_LIMIT, { ...frameOptions, durationSec: snapshot.durationSec });
+ if(frames.length === 0 && mmiLiveFrameBlobs.length) frames = liveFrameBlobsForOptions(frameOptions);
  if(frames.length === 0) visualDegraded = true;
  }
  autoRepairContext.frames = frames.slice(0, PREMIUM_VISUAL_FRAME_LIMIT);
@@ -2447,7 +2496,7 @@ let webcamStream=null,mediaRecorder=null,recordedChunks=[],recordingBlob=null;
 
 let audioRecorder=null,audioChunks=[],audioBlob=null;
 let webcamReady=false,webcamActive=false;
-let mmiLiveFrameBlobs=[],mmiLiveFrameTimer=null;
+let mmiLiveFrameBlobs=[],mmiLiveFrameSamples=[],mmiLiveFrameTimer=null;
 
 
 const $ = id => document.getElementById(id);
@@ -2862,6 +2911,7 @@ function startRecording(){
  recordedChunks=[];recordingBlob=null;
  audioChunks=[];audioBlob=null;
  mmiLiveFrameBlobs=[];
+ mmiLiveFrameSamples=[];
  stopPremiumLiveFrameCapture();
 
  const rc=$('recordingControls');const pc=$('playbackControls');
@@ -2973,9 +3023,15 @@ function initPlaybackUI(vid) {
 function getPlaybackDuration(vid){
  if(!vid)return 0;
  const dur=Number(vid.duration);
- if(Number.isFinite(dur)&&dur>0&&dur<86400)return dur;
  const fallback=Number(vid.dataset?.duration||0);
- return Number.isFinite(fallback)&&fallback>0?fallback:0;
+ const hasNative=Number.isFinite(dur)&&dur>0&&dur<86400;
+ const hasFallback=Number.isFinite(fallback)&&fallback>0&&fallback<86400;
+ if(hasNative&&hasFallback){
+ if(dur < fallback*0.55 || dur > fallback*1.8)return fallback;
+ return dur;
+ }
+ if(hasNative)return dur;
+ return hasFallback?fallback:0;
 }
 
 function updatePlaybackProgress() {
@@ -3025,6 +3081,7 @@ function confirmRestartRecording() {
  const rr=$('btnReRecordBtn');if(rr)rr.disabled=true;
  recordedChunks=[];recordingBlob=null;
  audioChunks=[];audioBlob=null;
+ mmiLiveFrameBlobs=[];mmiLiveFrameSamples=[];
  clearTimer();
  loadStation();
 }

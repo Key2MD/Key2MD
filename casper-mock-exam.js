@@ -50,6 +50,11 @@ window.FullCasperMock = (() => {
  let mockStatusCache = null;
  let mockStatusRefreshToken = 0;
  let activeMockExam = null;
+ let mockTelemetry = null;
+ let currentStationTelemetry = null;
+ let currentBreakTelemetry = null;
+ let mockTelemetryTimer = null;
+ let typedTelemetryBinding = null;
 
  function byId(id) {
  return document.getElementById(id);
@@ -147,6 +152,420 @@ window.FullCasperMock = (() => {
  email: user?.email ? String(user.email).trim().toLowerCase() : '',
  };
  }
+
+ function isoNow() {
+ return new Date().toISOString();
+ }
+
+ function nowMs() {
+ return Date.now();
+ }
+
+ function secondsBetween(start, end = nowMs()) {
+ const s = Number(start || 0);
+ const e = Number(end || nowMs());
+ return s && e >= s ? Math.round((e - s) / 1000) : 0;
+ }
+
+ function wordCount(text) {
+ return String(text || '').trim().split(/\s+/).filter(Boolean).length;
+ }
+
+ function browserSnapshot() {
+ const nav = window.navigator || {};
+ return {
+ user_agent: String(nav.userAgent || '').slice(0, 220),
+ platform: String(nav.platform || '').slice(0, 80),
+ language: String(nav.language || '').slice(0, 40),
+ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+ timezone_offset_min: new Date().getTimezoneOffset(),
+ viewport: `${window.innerWidth || 0}x${window.innerHeight || 0}`,
+ };
+ }
+
+ function createMockTelemetry(reason = 'started') {
+ const user = currentDraftUserSnapshot();
+ const browser = browserSnapshot();
+ return {
+ version: 1,
+ started_at: isoNow(),
+ last_seen_at: isoNow(),
+ user_id: user.id,
+ user_email: user.email,
+ mock_exam: activeMockExam,
+ tier: config.tier,
+ browser,
+ current: null,
+ station_events: [],
+ breaks: [],
+ visibility: {
+ visible: document.visibilityState !== 'hidden',
+ hidden_count: 0,
+ hidden_ms: 0,
+ last_hidden_at: null,
+ },
+ last_reason: reason,
+ };
+ }
+
+ function ensureMockTelemetry(reason = 'active') {
+ if (!mockTelemetry) mockTelemetry = createMockTelemetry(reason);
+ mockTelemetry.last_seen_at = isoNow();
+ mockTelemetry.last_reason = reason;
+ mockTelemetry.tier = config.tier;
+ mockTelemetry.mock_exam = activeMockExam;
+ return mockTelemetry;
+ }
+
+ function currentStationLabel(item = sequence[index] || {}) {
+ const type = item.type === 'video' ? 'video' : 'typed';
+ const local = sequence.slice(0, index + 1).filter(entry => (entry.type === 'video' ? 'video' : 'typed') === type).length || 1;
+ return `${type === 'video' ? 'Video' : 'Typed'} ${local}`;
+ }
+
+ function addTelemetryEvent(type, detail = {}) {
+ const tel = ensureMockTelemetry(type);
+ const item = sequence[index] || null;
+ tel.station_events.push({
+ type,
+ at: isoNow(),
+ elapsed_sec: secondsBetween(Date.parse(tel.started_at)),
+ index,
+ order: Number(item?.order || index + 1),
+ station_type: item?.type || null,
+ station_id: item?.station?.id || null,
+ detail,
+ });
+ if (tel.station_events.length > 160) tel.station_events = tel.station_events.slice(-160);
+ }
+
+ function updateMockCurrent(reason = 'heartbeat') {
+ const tel = ensureMockTelemetry(reason);
+ const item = sequence[index] || null;
+ const bridge = window.K2PracticeBridge || null;
+ const answer = item?.type === 'typed' ? (byId('answerTextarea')?.value || '') : '';
+ tel.current = item ? {
+ index,
+ order: Number(item.order || index + 1),
+ station_id: item.station?.id || null,
+ station_type: item.type || null,
+ station_label: currentStationLabel(item),
+ phase: bridge?.getPhase?.() || 'unknown',
+ at: isoNow(),
+ visible: document.visibilityState !== 'hidden',
+ elapsed_sec: currentStationTelemetry ? secondsBetween(currentStationTelemetry.started_ms) : null,
+ answer_chars: answer.length,
+ answer_words: wordCount(answer),
+ } : null;
+ return tel;
+ }
+
+ function startMockTelemetry(reason = 'mock_started') {
+ mockTelemetry = createMockTelemetry(reason);
+ addTelemetryEvent(reason);
+ clearInterval(mockTelemetryTimer);
+ mockTelemetryTimer = setInterval(() => sendMockTelemetry('heartbeat'), 30000);
+ sendMockTelemetry(reason).catch(() => {});
+ }
+
+ function breakTelemetrySnapshot(source = currentBreakTelemetry, extra = {}) {
+ if (!source) return null;
+ const snapshot = {
+ id: source.id,
+ title: source.title,
+ planned_sec: source.planned_sec,
+ started_at: source.started_at,
+ local_started_at: source.local_started_at,
+ after_index: source.after_index,
+ after_order: source.after_order,
+ after_label: source.after_label,
+ ...extra,
+ };
+ return snapshot;
+ }
+
+ function startBreakTelemetry(seconds, title) {
+ const tel = ensureMockTelemetry('break_started');
+ const started = nowMs();
+ const item = sequence[index] || null;
+ currentBreakTelemetry = {
+ id: `break-${(tel.breaks || []).length + 1}`,
+ title: String(title || 'Optional break'),
+ planned_sec: Number(seconds || 0),
+ started_at: isoNow(),
+ started_ms: started,
+ local_started_at: new Date(started).toLocaleString('en-AU'),
+ after_index: index,
+ after_order: Number(item?.order || index + 1),
+ after_label: item ? currentStationLabel(item) : '',
+ };
+ tel.breaks = Array.isArray(tel.breaks) ? tel.breaks : [];
+ tel.breaks.push(breakTelemetrySnapshot());
+ if (tel.breaks.length > 20) tel.breaks = tel.breaks.slice(-20);
+ addTelemetryEvent('break_started', {
+ title: currentBreakTelemetry.title,
+ planned_sec: currentBreakTelemetry.planned_sec,
+ after_label: currentBreakTelemetry.after_label,
+ });
+ sendMockTelemetry('break_started').catch(() => {});
+ }
+
+ function finishBreakTelemetry(reason = 'continued') {
+ if (!currentBreakTelemetry) return;
+ const ended = nowMs();
+ const elapsedSec = secondsBetween(currentBreakTelemetry.started_ms, ended);
+ const remainingSec = Math.max(0, Number(breakLeft || 0));
+ const snapshot = breakTelemetrySnapshot(currentBreakTelemetry, {
+ ended_at: isoNow(),
+ elapsed_sec: elapsedSec,
+ remaining_sec: remainingSec,
+ skipped: remainingSec > 0,
+ reason,
+ });
+ const tel = ensureMockTelemetry('break_finished');
+ const breaks = Array.isArray(tel.breaks) ? tel.breaks : [];
+ const existingIndex = breaks.findIndex(item => item?.id === snapshot.id);
+ if (existingIndex >= 0) breaks[existingIndex] = snapshot;
+ else breaks.push(snapshot);
+ tel.breaks = breaks.slice(-20);
+ addTelemetryEvent('break_finished', {
+ title: snapshot.title,
+ elapsed_sec: elapsedSec,
+ remaining_sec: remainingSec,
+ skipped: snapshot.skipped,
+ reason,
+ });
+ currentBreakTelemetry = null;
+ sendMockTelemetry('break_finished').catch(() => {});
+ }
+
+ function stopMockTelemetry() {
+ clearInterval(mockTelemetryTimer);
+ mockTelemetryTimer = null;
+ }
+
+ function startStationTelemetry(item, reason = 'station_loaded') {
+ if (
+ currentStationTelemetry
+ && Number(currentStationTelemetry.index) === Number(index)
+ && Number(currentStationTelemetry.order) === Number(item?.order || index + 1)
+ ) {
+ updateMockCurrent(reason);
+ return;
+ }
+ const started = nowMs();
+ const label = currentStationLabel(item);
+ currentStationTelemetry = {
+ version: 1,
+ index,
+ order: Number(item?.order || index + 1),
+ station_id: item?.station?.id || null,
+ station_type: item?.type || null,
+ station_label: label,
+ started_at: isoNow(),
+ started_ms: started,
+ local_started_at: new Date(started).toLocaleString('en-AU'),
+ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+ visible_started: document.visibilityState !== 'hidden',
+ hidden_ms: 0,
+ hidden_count: 0,
+ last_hidden_ms: document.visibilityState === 'hidden' ? started : null,
+ events: [{ type: reason, at: isoNow() }],
+ typing: item?.type === 'typed' ? {
+ focus_count: 0,
+ blur_count: 0,
+ keydown_count: 0,
+ input_events: 0,
+ paste_events: 0,
+ paste_chars: 0,
+ paste_into_empty: false,
+ large_insert_events: 0,
+ largest_insert_chars: 0,
+ first_input_at: null,
+ first_input_delay_sec: null,
+ last_input_at: null,
+ active_focus_ms: 0,
+ focus_started_ms: null,
+ restored_answer_chars: 0,
+ final_chars: 0,
+ final_words: 0,
+ } : null,
+ };
+ updateMockCurrent(reason);
+ addTelemetryEvent(reason, { label });
+ }
+
+ function markStationTelemetryEvent(type, detail = {}) {
+ if (!currentStationTelemetry) return;
+ currentStationTelemetry.events.push({ type, at: isoNow(), detail });
+ if (currentStationTelemetry.events.length > 40) currentStationTelemetry.events = currentStationTelemetry.events.slice(-40);
+ addTelemetryEvent(type, detail);
+ }
+
+ function updateTelemetryVisibility() {
+ const now = nowMs();
+ const hidden = document.visibilityState === 'hidden';
+ const tel = ensureMockTelemetry('visibility');
+ if (!tel.visibility) tel.visibility = { visible: !hidden, hidden_count: 0, hidden_ms: 0, last_hidden_at: null };
+ if (hidden && tel.visibility.visible !== false) {
+ tel.visibility.visible = false;
+ tel.visibility.hidden_count = Number(tel.visibility.hidden_count || 0) + 1;
+ tel.visibility.last_hidden_at = isoNow();
+ tel.visibility.last_hidden_ms = now;
+ if (currentStationTelemetry && !currentStationTelemetry.last_hidden_ms) {
+ currentStationTelemetry.last_hidden_ms = now;
+ currentStationTelemetry.hidden_count += 1;
+ }
+ addTelemetryEvent('tab_hidden');
+ } else if (!hidden && tel.visibility.visible === false) {
+ const hiddenStart = Number(tel.visibility.last_hidden_ms || 0);
+ if (hiddenStart) tel.visibility.hidden_ms = Number(tel.visibility.hidden_ms || 0) + Math.max(0, now - hiddenStart);
+ tel.visibility.visible = true;
+ tel.visibility.last_hidden_at = null;
+ tel.visibility.last_hidden_ms = null;
+ if (currentStationTelemetry?.last_hidden_ms) {
+ currentStationTelemetry.hidden_ms += Math.max(0, now - currentStationTelemetry.last_hidden_ms);
+ currentStationTelemetry.last_hidden_ms = null;
+ }
+ addTelemetryEvent('tab_visible');
+ }
+ }
+
+ function finishStationTelemetry(extra = {}) {
+ if (!currentStationTelemetry) return null;
+ updateTelemetryVisibility();
+ const ended = nowMs();
+ if (currentStationTelemetry.typing?.focus_started_ms) {
+ currentStationTelemetry.typing.active_focus_ms += Math.max(0, ended - currentStationTelemetry.typing.focus_started_ms);
+ currentStationTelemetry.typing.focus_started_ms = null;
+ }
+ const answer = currentStationTelemetry.station_type === 'typed' ? (byId('answerTextarea')?.value || '') : '';
+ if (currentStationTelemetry.typing) {
+ currentStationTelemetry.typing.final_chars = answer.length;
+ currentStationTelemetry.typing.final_words = wordCount(answer);
+ currentStationTelemetry.typing.active_focus_sec = Math.round(currentStationTelemetry.typing.active_focus_ms / 1000);
+ delete currentStationTelemetry.typing.focus_started_ms;
+ delete currentStationTelemetry.typing.active_focus_ms;
+ const pasteChars = Number(currentStationTelemetry.typing.paste_chars || 0);
+ currentStationTelemetry.typing.paste_ratio = answer.length ? Math.round((pasteChars / answer.length) * 100) / 100 : 0;
+ currentStationTelemetry.typing.possible_paste_or_external_draft = !!(
+ currentStationTelemetry.typing.paste_events
+ || currentStationTelemetry.typing.large_insert_events
+ || (answer.length > 400 && Number(currentStationTelemetry.typing.keydown_count || 0) < Math.max(20, answer.length / 20))
+ );
+ }
+ currentStationTelemetry.ended_at = isoNow();
+ currentStationTelemetry.elapsed_sec = secondsBetween(currentStationTelemetry.started_ms, ended);
+ currentStationTelemetry.hidden_sec = Math.round(Number(currentStationTelemetry.hidden_ms || 0) / 1000);
+ currentStationTelemetry.visible_sec = Math.max(0, currentStationTelemetry.elapsed_sec - currentStationTelemetry.hidden_sec);
+ currentStationTelemetry.completed = true;
+ Object.assign(currentStationTelemetry, extra);
+ const snapshot = JSON.parse(JSON.stringify(currentStationTelemetry));
+ markStationTelemetryEvent('station_completed', { elapsed_sec: snapshot.elapsed_sec });
+ currentStationTelemetry = null;
+ return snapshot;
+ }
+
+ function bindTypedTelemetry(answer = '') {
+ const textarea = byId('answerTextarea');
+ if (!textarea || !currentStationTelemetry?.typing) return;
+ if (typedTelemetryBinding?.textarea) {
+ typedTelemetryBinding.textarea.removeEventListener('focus', typedTelemetryBinding.onFocus);
+ typedTelemetryBinding.textarea.removeEventListener('blur', typedTelemetryBinding.onBlur);
+ typedTelemetryBinding.textarea.removeEventListener('keydown', typedTelemetryBinding.onKeydown);
+ typedTelemetryBinding.textarea.removeEventListener('paste', typedTelemetryBinding.onPaste);
+ typedTelemetryBinding.textarea.removeEventListener('input', typedTelemetryBinding.onInput);
+ }
+ const typing = currentStationTelemetry.typing;
+ typing.restored_answer_chars = String(answer || textarea.value || '').length;
+ let lastLength = textarea.value.length;
+ let recentPasteAt = 0;
+ const onFocus = () => {
+ typing.focus_count += 1;
+ if (!typing.focus_started_ms) typing.focus_started_ms = nowMs();
+ };
+ const onBlur = () => {
+ typing.blur_count += 1;
+ if (typing.focus_started_ms) {
+ typing.active_focus_ms += Math.max(0, nowMs() - typing.focus_started_ms);
+ typing.focus_started_ms = null;
+ }
+ };
+ const onKeydown = event => {
+ if (event.key && event.key.length === 1) typing.keydown_count += 1;
+ };
+ const onPaste = event => {
+ const text = event.clipboardData?.getData?.('text') || '';
+ typing.paste_events += 1;
+ typing.paste_chars += text.length;
+ typing.paste_into_empty = typing.paste_into_empty || textarea.value.trim().length === 0;
+ recentPasteAt = nowMs();
+ markStationTelemetryEvent('typed_paste', { chars: text.length });
+ };
+ const onInput = () => {
+ const now = nowMs();
+ const len = textarea.value.length;
+ const delta = len - lastLength;
+ typing.input_events += 1;
+ if (!typing.first_input_at) {
+ typing.first_input_at = isoNow();
+ typing.first_input_delay_sec = secondsBetween(currentStationTelemetry.started_ms, now);
+ }
+ typing.last_input_at = isoNow();
+ if (delta > 80 && now - recentPasteAt > 1200) {
+ typing.large_insert_events += 1;
+ typing.largest_insert_chars = Math.max(Number(typing.largest_insert_chars || 0), delta);
+ }
+ lastLength = len;
+ };
+ textarea.addEventListener('focus', onFocus);
+ textarea.addEventListener('blur', onBlur);
+ textarea.addEventListener('keydown', onKeydown);
+ textarea.addEventListener('paste', onPaste);
+ textarea.addEventListener('input', onInput);
+ typedTelemetryBinding = { textarea, onFocus, onBlur, onKeydown, onPaste, onInput };
+ }
+
+ function compactTelemetryForSend() {
+ const tel = updateMockCurrent('send');
+ return {
+ ...tel,
+ station_events: (tel.station_events || []).slice(-80),
+ breaks: (tel.breaks || []).slice(-20),
+ current_station: currentStationTelemetry ? {
+ ...currentStationTelemetry,
+ events: (currentStationTelemetry.events || []).slice(-20),
+ } : null,
+ };
+ }
+
+ async function sendMockTelemetry(reason = 'heartbeat', options = {}) {
+ if (!mockAttemptId || !started || !mockTelemetry) return;
+ updateMockCurrent(reason);
+ const token = getAuth()?.getToken?.();
+ if (!token) return;
+ const payload = JSON.stringify({ reason, telemetry: compactTelemetryForSend() });
+ try {
+ await fetch(`${apiBase()}/api/casper-mock/attempt/${encodeURIComponent(mockAttemptId)}/telemetry`, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+ body: payload,
+ keepalive: !!options.keepalive && payload.length < 60000,
+ });
+ } catch {}
+ }
+
+ document.addEventListener('visibilitychange', () => {
+ if (!started || !mockAttemptId) return;
+ updateTelemetryVisibility();
+ sendMockTelemetry(document.visibilityState === 'hidden' ? 'tab_hidden' : 'tab_visible', { keepalive: document.visibilityState === 'hidden' }).catch(() => {});
+ });
+
+ window.addEventListener('beforeunload', () => {
+ if (!started || !mockAttemptId) return;
+ updateMockCurrent('page_unload');
+ sendMockTelemetry('page_unload', { keepalive: true }).catch(() => {});
+ });
 
  function draftSequenceLength(draft) {
  return Array.isArray(draft?.sequence) && draft.sequence.length
@@ -255,6 +674,7 @@ window.FullCasperMock = (() => {
  station: item.station || current?.station || null,
  answer: item.type === 'typed' ? typedValue : '',
  } : null,
+ telemetry: mockTelemetry ? compactTelemetryForSend() : null,
  ...extra,
  };
  if (draftIsFinished(draft)) {
@@ -291,6 +711,8 @@ window.FullCasperMock = (() => {
  autoRepairContext: null,
  localRescuePending: !!row.local_rescue_pending,
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
+ timing: row.timing || null,
+ typing: row.typing || row.timing?.typing || null,
  }));
  }
 
@@ -306,6 +728,8 @@ window.FullCasperMock = (() => {
  station: item.station || null,
  })) : [];
  activeMockExam = draft.mock_exam || null;
+ mockTelemetry = draft.telemetry || createMockTelemetry('draft_restored');
+ mockTelemetry.last_seen_at = isoNow();
  results = hydrateResultsFromDraft(draft.rows || []);
  const sequenceLength = sequence.length || VIDEO_COUNT + TYPED_COUNT;
  const savedRowCount = results.length;
@@ -323,6 +747,9 @@ window.FullCasperMock = (() => {
  byId('casperMockMainArea')?.style.setProperty('display', 'none');
  setTier(config.tier, { skipIdleRender: true });
  startDraftMonitor();
+ clearInterval(mockTelemetryTimer);
+ mockTelemetryTimer = setInterval(() => sendMockTelemetry('heartbeat'), 30000);
+ sendMockTelemetry('draft_restored').catch(() => {});
  launchCurrent();
  }
 
@@ -335,6 +762,15 @@ window.FullCasperMock = (() => {
  clearDoneMonitor();
  clearTransitionTimer();
  stopDraftMonitor();
+ stopMockTelemetry();
+ if (typedTelemetryBinding?.textarea) {
+ typedTelemetryBinding.textarea.removeEventListener('focus', typedTelemetryBinding.onFocus);
+ typedTelemetryBinding.textarea.removeEventListener('blur', typedTelemetryBinding.onBlur);
+ typedTelemetryBinding.textarea.removeEventListener('keydown', typedTelemetryBinding.onKeydown);
+ typedTelemetryBinding.textarea.removeEventListener('paste', typedTelemetryBinding.onPaste);
+ typedTelemetryBinding.textarea.removeEventListener('input', typedTelemetryBinding.onInput);
+ typedTelemetryBinding = null;
+ }
  clearInterval(breakTimer);
  breakTimer = null;
  restoreSubmit();
@@ -358,6 +794,9 @@ window.FullCasperMock = (() => {
  queuedCheckpointReason = null;
  lastRescueRecording = null;
  activeMockExam = null;
+ mockTelemetry = null;
+ currentStationTelemetry = null;
+ currentBreakTelemetry = null;
  clearMockDraft();
  }
 
@@ -993,6 +1432,7 @@ window.FullCasperMock = (() => {
  advancing = false;
  started = true;
  syncActiveMockContext();
+ startMockTelemetry(mock.resumed ? 'mock_resumed' : 'mock_started');
  startDraftMonitor();
  saveMockDraft({ phase: mock.resumed ? 'resumed' : 'started' });
  setCheckoutState(false);
@@ -1252,6 +1692,9 @@ window.FullCasperMock = (() => {
  auto_repair_error: row.autoRepairError || null,
  auto_repair_attempted: !!row.autoRepairAttempted,
  local_rescue_pending: !!row.localRescuePending,
+ timing: row.timing || null,
+ typing: row.typing || row.timing?.typing || null,
+ monitoring: row.monitoring || null,
  }));
  }
 
@@ -1270,6 +1713,7 @@ window.FullCasperMock = (() => {
  completed_at: finalStatus === 'completed' ? new Date().toISOString() : null,
  rows: serialiseAttemptRows(rows),
  report,
+ telemetry: mockTelemetry ? compactTelemetryForSend() : null,
  }),
  });
  const data = await res.json().catch(() => ({}));
@@ -1386,12 +1830,15 @@ window.FullCasperMock = (() => {
  byId('casperMockConfigPanel')?.style.setProperty('display', 'block');
  byId('scenarioCard')?.style.setProperty('display', '');
  renderProgress();
+ startStationTelemetry(item, 'station_loaded');
+ sendMockTelemetry('station_loaded').catch(() => {});
 
  const bridge = window.K2PracticeBridge;
  if (!bridge) return;
 
  if (item.type === 'video') {
  if (!window.webcamReady) {
+ markStationTelemetryEvent('camera_gate_shown');
  renderCameraGate();
  return;
  }
@@ -1415,11 +1862,13 @@ window.FullCasperMock = (() => {
  if (current && answer && !current.answer) current.answer = answer;
  bridge.saveAnswer?.();
  pendingDraftAnswer = null;
+ bindTypedTelemetry(answer);
  saveMockDraft({ phase: 'restored_current_answer' });
  }, 120);
  }
  keepMockModeChrome();
  hideStationReflection();
+ bindTypedTelemetry('');
  }
  hideNormalPanelsExceptStation();
  renderProgress();
@@ -1477,6 +1926,7 @@ window.FullCasperMock = (() => {
  }
 
  function beginVideoStation(item, bridge) {
+ markStationTelemetryEvent('video_station_started');
  patchSubmitForVideo();
  bridge.setupSingleStation(item.station, 'mmi', {
  preset: VIDEO_PRESET,
@@ -1572,11 +2022,13 @@ window.FullCasperMock = (() => {
 
  if (item?.type === 'video') {
  if (phase === 'reading') {
+ markStationTelemetryEvent('video_prompt_reading_started');
  bridge.clearTimer();
  bridge.startWriting();
  return true;
  }
  if (phase === 'writing') {
+ markStationTelemetryEvent('video_answer_finished_by_button');
  bridge.clearTimer();
  bridge.stopRecording();
  bridge.setPhase('done');
@@ -1595,11 +2047,14 @@ window.FullCasperMock = (() => {
  }
 
  if (phase === 'reading') {
+ markStationTelemetryEvent('typed_writing_started');
  bridge.clearTimer();
  bridge.startWriting();
+ bindTypedTelemetry(byId('answerTextarea')?.value || '');
  return true;
  }
  if (phase === 'writing') {
+ markStationTelemetryEvent('typed_answer_finished_by_button');
  bridge.clearTimer();
  bridge.saveAnswer();
  bridge.setPhase('done');
@@ -1742,6 +2197,13 @@ window.FullCasperMock = (() => {
  localRescuePending: false,
  tier: item.type === 'video' ? config.tier : 'typed',
  };
+ const stationTiming = finishStationTelemetry({
+ submitted_at: isoNow(),
+ submission_kind: payload?.kind || null,
+ recording_duration_sec: isVideoSubmission ? payload.durationSec || null : null,
+ });
+ submittedRow.timing = stationTiming;
+ submittedRow.typing = stationTiming?.typing || null;
  results.push(submittedRow);
  if (submittedRow.feedbackTask) {
  const feedbackTask = prepareMockFeedbackTask(submittedRow);
@@ -1867,25 +2329,27 @@ window.FullCasperMock = (() => {
  if (!area) return;
  area.style.display = 'block';
  breakLeft = seconds;
+ startBreakTelemetry(seconds, title);
  area.innerHTML = `
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:38px 32px;text-align:center;">
  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:8px;">Optional break</div>
  <h2 style="font-size:1.45rem;color:var(--navy);margin:0 0 8px;">${esc(title)}</h2>
  <p style="font-size:0.9rem;color:var(--gray600);line-height:1.6;max-width:520px;margin:0 auto 22px;">${esc(copy)}</p>
  <div id="mockBreakTimer" style="font-size:3.2rem;font-weight:900;color:var(--navy);font-variant-numeric:tabular-nums;margin-bottom:18px;">${formatTime(breakLeft)}</div>
- <button onclick="FullCasperMock.skipBreak()" style="padding:11px 24px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.86rem;font-weight:800;cursor:pointer;font-family:inherit;">Continue now</button>
+ <button onclick="FullCasperMock.skipBreak('manual_continue')" style="padding:11px 24px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.86rem;font-weight:800;cursor:pointer;font-family:inherit;">Continue now</button>
  </div>
  `;
  breakTimer = setInterval(() => {
  breakLeft--;
  const el = byId('mockBreakTimer');
  if (el) el.textContent = formatTime(Math.max(0, breakLeft));
- if (breakLeft <= 0) skipBreak();
+ if (breakLeft <= 0) skipBreak('timer_finished');
  }, 1000);
  }
 
- function skipBreak() {
+ function skipBreak(reason = 'continued') {
  clearInterval(breakTimer);
+ finishBreakTelemetry(reason);
  advancing = false;
  byId('casperMockMainArea')?.style.setProperty('display', 'none');
  if (index + 1 === VIDEO_COUNT || index + 1 === VIDEO_COUNT + 4) index++;
@@ -2443,6 +2907,9 @@ const report = { rows, overallAvg, scoredCount, expectedCount, isPartial: scored
  }
 
  async function renderDebrief() {
+ ensureMockTelemetry('mock_completed');
+ addTelemetryEvent('mock_completed');
+ stopMockTelemetry();
  started = false;
  rulesAccepted = false;
  stopDraftMonitor();
