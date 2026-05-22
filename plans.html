@@ -499,6 +499,13 @@
  .modal-alert{padding:10px 13px;border-radius:8px;font-size:0.8rem;font-weight:600;margin-top:10px;display:none;}
  .modal-alert.ok{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:var(--green);display:block;}
  .modal-alert.err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:var(--red);display:block;}
+ .mock-discount-box{display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:13px;margin:0 0 16px;}
+ .mock-discount-box.show{display:block;}
+ .mock-discount-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:7px;}
+ .mock-discount-kicker{font-size:0.67rem;font-weight:900;color:#fbbf24;letter-spacing:0.1em;text-transform:uppercase;}
+ .mock-discount-saving{font-size:0.74rem;font-weight:900;color:#fde68a;}
+ .mock-discount-copy{font-size:0.78rem;color:rgba(255,255,255,0.62);line-height:1.45;margin-bottom:9px;}
+ .mock-discount-code-input{width:100%;border:1px solid rgba(245,158,11,0.42);border-radius:9px;background:#fff;color:#0a1628;padding:10px 11px;font:inherit;font-size:0.84rem;font-weight:900;text-transform:uppercase;}
 
 
  .fade-up{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease;}
@@ -1250,6 +1257,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="modal-card">
  <div class="modal-title" id="modalTitle">Complete your purchase</div>
  <div class="modal-sub" id="modalSub">You'll be redirected to Stripe's secure checkout.</div>
+ <div class="mock-discount-box" id="mockDiscountBox">
+ <div class="mock-discount-top"><span class="mock-discount-kicker">24h earlybird</span><span class="mock-discount-saving">20% off</span></div>
+ <div class="mock-discount-copy">Use code <strong>EARLYBIRD20</strong> before 1:05am AEST, 24 May 2026. Applies to Transcript and Premium CASPer mock checkout.</div>
+ <input id="mockDiscountCodeInput" class="mock-discount-code-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="EARLYBIRD20">
+ </div>
  <div class="modal-alert" id="modalAlert"></div>
  <button class="modal-btn" id="modalConfirmBtn" onclick="confirmCheckout()">Continue to Payment -></button>
  <span class="modal-cancel-link" onclick="closeModal()">Cancel</span>
@@ -1269,6 +1281,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
 <script>
 const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+const MOCK_EARLYBIRD_CODE = 'EARLYBIRD20';
+const MOCK_EARLYBIRD_EXPIRES_AT = '2026-05-23T15:05:00.000Z';
 let selectedPackId = null;
 let pendingAction = null;
 
@@ -1388,6 +1402,23 @@ async function handleMockCheckout(tier) {
  );
 }
 
+function normaliseMockDiscountCode(value) {
+ return String(value || '').trim().toUpperCase().replace(/\s+/g, '');
+}
+
+function mockEarlybirdActive() {
+ return Date.now() <= Date.parse(MOCK_EARLYBIRD_EXPIRES_AT);
+}
+
+function configureMockDiscountBox(action) {
+ const box = document.getElementById('mockDiscountBox');
+ const input = document.getElementById('mockDiscountCodeInput');
+ const isMock = (action === 'mock_transcript' || action === 'mock_premium') && mockEarlybirdActive();
+ if (box) box.classList.toggle('show', isMock);
+ if (input && isMock && !input.value) input.value = MOCK_EARLYBIRD_CODE;
+ if (input && !isMock) input.value = '';
+}
+
 function openModal(title, sub, action) {
  document.getElementById('modalTitle').textContent = title;
  document.getElementById('modalSub').textContent = sub;
@@ -1395,6 +1426,7 @@ function openModal(title, sub, action) {
  document.getElementById('modalConfirmBtn').disabled = false;
  document.getElementById('modalConfirmBtn').textContent = 'Continue to Payment ->';
  pendingAction = action;
+ configureMockDiscountBox(action);
  document.getElementById('checkoutModal').classList.add('open');
 }
 function closeModal() { document.getElementById('checkoutModal').classList.remove('open'); }
@@ -1411,14 +1443,17 @@ async function confirmCheckout() {
  res = await fetch(`${API_BASE}/api/checkout/create`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({pack_id:selectedPackId,success_url:`${location.origin}/practice.html?payment=success`,cancel_url:`${location.origin}/plans.html`})});
  } else if (pendingAction === 'mock_transcript' || pendingAction === 'mock_premium') {
  const tier = pendingAction === 'mock_premium' ? 'premium' : 'transcript';
- res = await fetch(`${API_BASE}/api/casper-mock/checkout`, {
- method:'POST',
- headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
- body:JSON.stringify({
+ const discountCode = mockEarlybirdActive() ? normaliseMockDiscountCode(document.getElementById('mockDiscountCodeInput')?.value || '') : '';
+ const mockBody = {
  tier,
  success_url:`${location.origin}/practice.html?tab=mock&mock_payment=success&mock_tier=${tier}`,
  cancel_url:`${location.origin}/plans.html#full-casper-mock`
- })
+ };
+ if (discountCode) mockBody.discount_code = discountCode;
+ res = await fetch(`${API_BASE}/api/casper-mock/checkout`, {
+ method:'POST',
+ headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+ body:JSON.stringify(mockBody)
  });
  } else if (pendingAction === 'mmi_pro') {
  const body = { pro_tier: `${mmiTier}_${mmiProFreq}`, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
@@ -1702,6 +1737,7 @@ function openMMIModal(title, sub, action) {
  document.getElementById('modalConfirmBtn').disabled = false;
  document.getElementById('modalConfirmBtn').textContent = 'Continue to Payment ->';
  pendingAction = action;
+ configureMockDiscountBox(action);
  document.getElementById('checkoutModal').classList.add('open');
 }
 
@@ -1747,12 +1783,12 @@ document.addEventListener('DOMContentLoaded', function(){
  </div>
  <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">MMI, CASPer, or GAMSAT S2. Full personalised session with Dan.</p>
  </a>
- <a href="booking.html?type=intro" target="_blank" rel="noopener" data-track="intro_call_click" data-track-detail="book_modal_free" style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;cursor:pointer;font-family:inherit;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+ <a href="booking.html?type=intro" target="_blank" rel="noopener" data-track="preference_discussion_click" data-track-detail="book_modal_preference" style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;cursor:pointer;font-family:inherit;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
- <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">Free</span>
- <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">15-Min Intro Call</span>
+ <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$75</span>
+ <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">$75 Preference Discussion</span>
  </div>
- <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">Not sure yet? Tell Dan you're interested — he'll reply with a couple of time options.</p>
+ <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">A focused 15-minute discussion for preference order, edge cases and next-step application strategy.</p>
  </a>
  </div>
  </div>

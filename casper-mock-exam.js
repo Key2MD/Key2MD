@@ -21,6 +21,9 @@ window.FullCasperMock = (() => {
  transcript: { standard: 59, pro: 41, value: 69, video: 20 },
  premium: { standard: 79, pro: 55, value: 97, video: 48 },
  };
+ const MOCK_EARLYBIRD_CODE = 'EARLYBIRD20';
+ const MOCK_EARLYBIRD_EXPIRES_AT = '2026-05-23T15:05:00.000Z';
+ const MOCK_EARLYBIRD_EXPIRES_TEXT = '1:05am AEST, 24 May 2026';
  let active = false;
  let started = false;
  let config = { tier: 'transcript' };
@@ -56,6 +59,7 @@ window.FullCasperMock = (() => {
  let currentBreakTelemetry = null;
  let mockTelemetryTimer = null;
  let typedTelemetryBinding = null;
+ let mockDiscountCode = mockEarlybirdActive() ? MOCK_EARLYBIRD_CODE : '';
 
  function byId(id) {
  return document.getElementById(id);
@@ -79,6 +83,42 @@ window.FullCasperMock = (() => {
  function priceForTier(tier = config.tier) {
  const prices = MOCK_PRICES[tier] || MOCK_PRICES.transcript;
  return isCasperPro() ? prices.pro : prices.standard;
+ }
+
+ function mockEarlybirdActive() {
+ return Date.now() <= Date.parse(MOCK_EARLYBIRD_EXPIRES_AT);
+ }
+
+ function normaliseMockDiscountCode(value) {
+ return String(value || '').trim().toUpperCase().replace(/\s+/g, '');
+ }
+
+ function syncDiscountCode(value) {
+ mockDiscountCode = normaliseMockDiscountCode(value);
+ document.querySelectorAll('.mock-discount-code').forEach(input => {
+ if (input.value !== mockDiscountCode) input.value = mockDiscountCode;
+ });
+ return mockDiscountCode;
+ }
+
+ function currentMockDiscountCode() {
+ if (!mockEarlybirdActive()) return syncDiscountCode('');
+ const focused = document.activeElement?.classList?.contains('mock-discount-code') ? document.activeElement.value : '';
+ const entered = focused || Array.from(document.querySelectorAll('.mock-discount-code')).map(input => input.value).find(Boolean) || mockDiscountCode;
+ return syncDiscountCode(entered);
+ }
+
+ function mockDiscountMarkup() {
+ if (!mockEarlybirdActive()) return '';
+ return `
+ <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.28);border-radius:10px;padding:11px 12px;margin-bottom:14px;text-align:left;">
+ <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:7px;">
+ <div style="font-size:0.68rem;font-weight:900;color:#b45309;letter-spacing:0.08em;text-transform:uppercase;">24h earlybird</div>
+ <div style="font-size:0.72rem;font-weight:900;color:#92400e;">20% off</div>
+ </div>
+ <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;margin-bottom:8px;">Use code <strong style="color:var(--navy);">${MOCK_EARLYBIRD_CODE}</strong> before ${MOCK_EARLYBIRD_EXPIRES_TEXT}. Applies to Transcript and Premium mock checkout.</div>
+ <input class="mock-discount-code" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="${MOCK_EARLYBIRD_CODE}" value="${esc(mockDiscountCode)}" oninput="FullCasperMock.syncDiscountCode(this.value)" style="width:100%;border:1px solid rgba(245,158,11,0.35);border-radius:8px;padding:9px 10px;font:inherit;font-size:0.82rem;font-weight:850;color:var(--navy);text-transform:uppercase;background:#fff;">
+ </div>`;
  }
 
  function returnedFromCheckout(tier = config.tier) {
@@ -903,10 +943,13 @@ window.FullCasperMock = (() => {
  const token = auth.getToken();
  const successUrl = `${window.location.origin}${window.location.pathname}?tab=mock&mock_payment=success&mock_tier=${encodeURIComponent(tier)}`;
  const cancelUrl = `${window.location.origin}${window.location.pathname}?tab=mock&mock_payment=cancelled`;
+ const discountCode = currentMockDiscountCode();
+ const checkoutBody = { tier, success_url: successUrl, cancel_url: cancelUrl };
+ if (discountCode) checkoutBody.discount_code = discountCode;
  const res = await fetch(`${apiBase()}/api/casper-mock/checkout`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
- body: JSON.stringify({ tier, success_url: successUrl, cancel_url: cancelUrl }),
+ body: JSON.stringify(checkoutBody),
  });
  const data = await res.json().catch(() => ({}));
  if (!res.ok) throw new Error(data.message || data.error || 'Could not start mock checkout');
@@ -1110,6 +1153,8 @@ window.FullCasperMock = (() => {
  <div id="mockPriceLine" data-mock-price-line style="font-size:0.86rem;color:var(--navy);line-height:1.45;">${renderPriceLine('transcript')}</div>
  <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes your next unused 11-station mock, 7 typed-station CASPer AI markings, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
  </div>
+
+ ${mockDiscountMarkup()}
 
  <div style="background:rgba(10,22,40,0.04);border:1px solid var(--gray200);border-radius:10px;padding:11px 12px;margin-bottom:14px;">
  <div style="font-size:0.72rem;color:var(--gray500);margin-bottom:4px;">Approximate exam time</div>
@@ -1331,6 +1376,7 @@ window.FullCasperMock = (() => {
  </button>
  </div>
  </div>
+ ${mockDiscountMarkup()}
  <button type="button" class="mock-checkout-btn" style="position:relative;z-index:81;pointer-events:auto;padding:13px 30px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.94rem;font-weight:800;cursor:pointer;font-family:inherit;">${checkoutButtonText()}</button>
  <div class="mock-checkout-status" style="display:none;margin-top:10px;font-size:0.78rem;color:var(--gray500);line-height:1.45;"></div>
  <div data-mock-tier-copy="short" style="max-width:620px;margin:13px auto 0;font-size:0.78rem;color:var(--gray500);line-height:1.55;">Transcript analyses what you said in the video stations, without voice or presentation review. <a href="plans.html#mock" style="color:var(--teal3);font-weight:800;text-decoration:none;">See full details</a>.</div>
@@ -3968,6 +4014,7 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
  startMock,
  startFreshMock,
  setTier,
+ syncDiscountCode,
  refreshPricing,
  checkoutMock,
  restoreDraft,

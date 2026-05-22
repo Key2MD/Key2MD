@@ -3,11 +3,11 @@
  {
  id: 'casper_class_package',
  area: 'CASPer',
- title: '3-class CASPer sprint',
- price: '$345 upfront',
+ title: '2-class CASPer sprint',
+ price: '$230 upfront',
  href: 'casper-class.html',
- cta: 'Join the 3-class June package',
- bestFor: 'Students aiming for the June 11 CASPer who want the three remaining Friday live reviews before the last June 5 class.',
+ cta: 'Join the 2-class June package',
+ bestFor: 'Students aiming for the June 11 CASPer who want the two remaining Friday live reviews before the last June 5 class.',
  tags: ['casper', 'uow', 'notre dame', 'class', 'june']
  },
  {
@@ -91,13 +91,13 @@
  tags: ['gamsat', 's2', 'essay']
  },
  {
- id: 'strategy_call',
+ id: 'preference_discussion',
  area: 'Strategy',
- title: '15-min strategy call',
- price: 'Free',
- href: 'booking.html?type=intro',
- cta: 'Book free call',
- bestFor: 'When the right product depends on preferences, timing, or edge-case admissions rules.',
+ title: '15-minute preferences discussion',
+ price: '$75',
+ href: 'https://buy.stripe.com/eVq28k0e5b8c4a28J9fjG00',
+ cta: 'Book discussion',
+ bestFor: 'When the right application strategy depends on preference order, timing, or edge-case admissions rules.',
  tags: ['strategy', 'call', 'preference']
  }
  ];
@@ -156,7 +156,7 @@
  }
 
  if (!recs.length) {
- addUnique(recs, 'strategy_call', 'No saved strategy yet, so the safest next step is a quick preference sanity-check.');
+ addUnique(recs, 'preference_discussion', 'No saved strategy yet, so the safest next step is a focused preference sanity-check.');
  addUnique(recs, 'casper_credits', 'A low-commitment way to test the feedback loop before subscribing.');
  }
 

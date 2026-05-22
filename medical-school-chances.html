@@ -710,6 +710,16 @@
  border: 1.5px solid rgba(245,158,11,0.4); transition: all 0.2s; position: relative;
  }
  .book-btn:hover { background: rgba(245,158,11,0.25); }
+ .preference-offer {
+ max-width: 560px; margin: 4px auto 0; padding: 20px; border-radius: 14px;
+ background: rgba(255,255,255,0.06); border: 1px solid rgba(245,158,11,0.28);
+ position: relative; text-align: left;
+ }
+ .preference-offer-top { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap; margin-bottom:8px; }
+ .preference-offer h4 { color:#fff; font-size:1rem; margin:0; }
+ .preference-price { background:var(--gold); color:#111827; border-radius:999px; padding:5px 11px; font-size:0.78rem; font-weight:900; }
+ .preference-offer p { max-width:none; margin:0 0 12px; font-size:0.86rem; color:rgba(255,255,255,0.68); }
+ .preference-offer ul { margin:0 0 14px; padding-left:18px; color:rgba(255,255,255,0.74); font-size:0.84rem; line-height:1.55; }
  .email-done { display: none; color: var(--teal2); font-weight: 600; font-size: 0.95rem; margin-top: 4px; position: relative; }
  .email-done.show { display: block; }
  .result-actions {
@@ -1217,7 +1227,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <div class="post-result" id="postResult">
  <h3>Want this turned into an application plan?</h3>
- <p>Send yourself the shortlist and next step, copy it for later, or book a free 15-minute call if you want Dan to sanity-check your preference strategy.</p>
+ <p>Send yourself the shortlist and next step, copy it for later, or book a focused 15-minute discussion if you want Dan to sanity-check your preference strategy.</p>
  <div class="result-shortlist" id="resultShortlist"></div>
  <div class="result-actions">
  <button type="button" class="result-action-btn" id="copyResultBtn">Copy my result</button>
@@ -1231,7 +1241,16 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </form>
  <div class="email-done" id="emailDone">Done. Your calculator plan has been sent.</div>
  <div class="email-divider">or</div>
- <a href="booking.html?type=intro" target="_blank" rel="noopener" class="book-btn">Book a Free 15-Min Call with Dan -></a>
+ <div class="preference-offer">
+ <div class="preference-offer-top"><h4>15-minute preferences discussion with Dan</h4><span class="preference-price">$75</span></div>
+ <p>For students who have numbers but still need judgement: which schools to prioritise, where CASPer can compensate, where bonuses matter, and which application risks are worth taking seriously.</p>
+ <ul>
+ <li>Clarify your strongest realistic preference order.</li>
+ <li>Identify weak spots the calculator cannot fully model.</li>
+ <li>Leave with a concrete next-step application strategy.</li>
+ </ul>
+ <a href="https://buy.stripe.com/eVq28k0e5b8c4a28J9fjG00" target="_blank" rel="noopener" class="book-btn">Book the $75 discussion -></a>
+ </div>
  </div>
  </div>
  </div>
@@ -1328,7 +1347,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <details class="faq-item">
  <summary>My combo is below every cutoff. Is there any point applying?</summary>
- <p>Yes, with caveats. Apply to schools where CASPer and bonuses can compensate (UoW, UNDS, UNDF), consider rural if you qualify, and if your GPA is strong consider retaking GAMSAT. A 1:1 session with someone who's worked with applicants in your range can help map out a realistic strategy - <a href="#" onclick="openBookModal(event);return false;">book a free 15-min chat</a> to discuss.</p>
+ <p>Yes, with caveats. Apply to schools where CASPer and bonuses can compensate (UoW, UNDS, UNDF), consider rural if you qualify, and if your GPA is strong consider retaking GAMSAT. A short paid preference discussion with someone who's worked with applicants in your range can help map out a realistic strategy - <a href="https://buy.stripe.com/eVq28k0e5b8c4a28J9fjG00" target="_blank" rel="noopener">book the $75 discussion</a> to talk it through.</p>
  </details>
 
  <h2 style="margin-top:40px;" id="legal">Disclaimer &amp; data notes</h2>
@@ -1389,10 +1408,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </a>
  <a href="booking.html?type=intro" target="_blank" rel="noopener" style="display:block;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;text-decoration:none;">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
- <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">Free</span>
- <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">15-Min Intro Call</span>
+ <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$75</span>
+ <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">$75 Preference Discussion</span>
  </div>
- <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">Quick chat to see if we're a fit - no commitment.</p>
+ <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">Focused 15-minute strategy discussion for preferences, edge cases and next steps.</p>
  </a>
  </div>
  </div>

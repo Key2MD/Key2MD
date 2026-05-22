@@ -4,11 +4,11 @@
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>CASPer Live Class Australia | Key2MD</title>
- <meta name="description" content="Register for the Key2MD CASPer live class. Small-group practice with Dan, with one-off, weekly, or 3-class June exam package access.">
+ <meta name="description" content="Register for the Key2MD CASPer live class. Small-group practice with Dan, with one-off, weekly, or 2-class June exam package access.">
  <link rel="canonical" href="https://www.key2md.com/casper-class.html">
  <meta name="robots" content="index, follow">
  <meta property="og:title" content="CASPer Live Class Australia">
- <meta property="og:description" content="Register for the Key2MD CASPer live class. Small-group practice with Dan, with one-off, weekly, or 3-class June exam package access.">
+ <meta property="og:description" content="Register for the Key2MD CASPer live class. Small-group practice with Dan, with one-off, weekly, or 2-class June exam package access.">
  <meta property="og:type" content="website">
  <meta property="og:url" content="https://www.key2md.com/casper-class.html">
  <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
@@ -342,7 +342,7 @@
  </style>
  <meta name="twitter:card" content="summary_large_image">
  <meta name="twitter:title" content="CASPer Live Class Australia">
- <meta name="twitter:description" content="Register for the Key2MD CASPer live class. Small-group practice with Dan, with one-off, weekly, or 3-class June exam package access.">
+ <meta name="twitter:description" content="Register for the Key2MD CASPer live class. Small-group practice with Dan, with one-off, weekly, or 2-class June exam package access.">
  <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
 </head>
 <body>
@@ -454,7 +454,7 @@
  <div class="step-num">2</div>
  <div class="step-body">
  <strong>Pay through Stripe - one-off, weekly, or package</strong>
- <span>$120 for one class, $120/week for ongoing access, or $345 upfront for the three remaining Friday classes before the June 11 exam.</span>
+ <span>$120 for one class, $120/week for ongoing access, or $230 upfront for the two remaining Friday classes before the June 11 exam.</span>
  </div>
  </div>
  <div class="step">
@@ -498,8 +498,8 @@
  </button>
  <button type="button" class="plan-option" id="planPackage" data-track="class_plan_select" data-plan="package" data-track-detail="casper_class_card" onclick="selectClassPlan('package')">
  <div class="plan-kicker">June 11 exam package</div>
- <strong>3-class upfront package - $345 AUD</strong>
- <span>Covers the three remaining Friday CASPer live classes before the June 11 exam. Last class: Friday June 5.</span>
+ <strong>2-class upfront package - $230 AUD</strong>
+ <span>Covers the two remaining Friday CASPer live classes before the June 11 exam. Last class: Friday June 5.</span>
  </button>
  </div>
 
@@ -558,8 +558,8 @@
  buttonText: 'Start weekly access'
  },
  package: {
- priceHtml: '$345 <small>AUD upfront</small>',
- buttonText: 'Pay $345 for 3 classes'
+ priceHtml: '$230 <small>AUD upfront</small>',
+ buttonText: 'Pay $230 for 2 classes'
  }
  };
 
@@ -650,6 +650,9 @@
  const accessSource = data.access_source || '';
  const subscriptionActive = data.subscription_active ?? accessSource === 'subscription';
  const packageActive = data.package_active ?? accessSource === 'package';
+ const packageTotal = Number(data.package_class_count || cls.package_class_count || 0);
+ const packageRemaining = Number(data.package_classes_remaining ?? packageTotal);
+ const packageUsed = Number(data.package_classes_used || 0);
 
  if (hasAccess) {
  setPlanOptionsVisible(false);
@@ -658,14 +661,16 @@
  cancelBtn.style.display = 'flex';
  setStatus('You have ongoing weekly access. The class link appears below once Dan releases it.', 'ok');
  } else if (packageActive) {
- setStatus('You have June exam package access: three remaining Friday classes before the June 11 exam, with the last class on Friday June 5. The class link appears below once Dan releases it.', 'ok');
+ const totalLabel = packageTotal ? `${Math.max(0, packageRemaining)} of ${packageTotal} class${packageTotal===1?'':'es'} remaining` : 'package access active';
+ const usedLabel = packageUsed ? ` ${packageUsed} class${packageUsed===1?' has':'es have'} already been counted after Friday 7pm.` : '';
+ setStatus(`You have June exam package access: ${totalLabel}.${usedLabel} The class link appears below once Dan releases it.`, 'ok');
  } else {
  setStatus('You have one-off access for this week\'s class. The link appears below once Dan releases it.', 'ok');
  }
  if (data.join_url) {
  linkBox.style.display = 'block';
  document.getElementById('classJoinLink').href = data.join_url;
- } else {
+ } else if (!packageActive && !subscriptionActive) {
  setStatus('You\'re registered. The link will appear here once Dan releases it before 6pm.', 'ok');
  }
  } else {
@@ -673,7 +678,7 @@
  payBtn.disabled = false;
  payBtn.textContent = checkoutButtonText();
  if (cls.status === 'open') {
- setStatus('Registration is open. Choose a class pass or the 3-class June package to unlock access.');
+ setStatus('Registration is open. Choose a class pass or the 2-class June package to unlock access.');
  } else {
  setStatus('Registration is currently closed. Check back closer to Friday.', 'warn');
  payBtn.disabled = true;

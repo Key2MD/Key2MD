@@ -157,9 +157,9 @@
  },
  {
  "@type": "Offer",
- "name": "June 11 CASPer 3-Class Package",
- "description": "Three remaining Friday CASPer live classes before the June 11 exam, with the last class on June 5",
- "price": "345",
+ "name": "June 11 CASPer 2-Class Package",
+ "description": "Two remaining Friday CASPer live classes before the June 11 exam, with the last class on June 5",
+ "price": "230",
  "priceCurrency": "AUD",
  "availability": "https://schema.org/InStock",
  "url": "https://www.key2md.com/casper-class.html"
@@ -184,12 +184,12 @@
  },
  {
  "@type": "Offer",
- "name": "Free 15-minute Intro Call",
- "description": "Free no-commitment introductory call with Dan",
- "price": "0",
+ "name": "$75 Preference Discussion",
+ "description": "A focused 15-minute discussion with Dan about preferences, edge cases, and application strategy.",
+ "price": "75",
  "priceCurrency": "AUD",
  "availability": "https://schema.org/InStock",
- "url": "https://www.key2md.com/#intro-call"
+ "url": "https://buy.stripe.com/eVq28k0e5b8c4a28J9fjG00"
  }
  ]
  },
@@ -787,7 +787,7 @@
  {
  "@type": "Question",
  "name": "How much does MMI and CASPer coaching cost?",
- "acceptedAnswer": {"@type": "Answer", "text": "One-on-one sessions are $300 per hour. Group CASPer sessions run weekly on Fridays for $120 per session. Masterclasses are $300 (CASPer) and $400 (MMI). A free 15-minute intro call is available by submitting an EOI request — no automated booking."}
+ "acceptedAnswer": {"@type": "Answer", "text": "One-on-one sessions are $300 per hour. Group CASPer sessions run weekly on Fridays for $120 per session. Masterclasses are $300 (CASPer) and $400 (MMI). A 15-minute preference discussion is available for $75 if you want help choosing the right application path before booking a full session."}
  },
  {
  "@type": "Question",
@@ -797,7 +797,7 @@
  {
  "@type": "Question",
  "name": "How do I get started with MMI or CASPer coaching?",
- "acceptedAnswer": {"@type": "Answer", "text": "You can book a 1-hour session directly for $300, or submit a free intro call request with your availability and Dan will reply within 24 hours with time options. No automated booking."}
+ "acceptedAnswer": {"@type": "Answer", "text": "You can book a 1-hour session directly for $300, or book a $75 15-minute preference discussion if you want help choosing between pathways before committing to a full session."}
  }
  ]
  }
@@ -993,7 +993,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <option value="CASPer Masterclass">CASPer Masterclass</option>
  <option value="MMI Masterclass">MMI Masterclass</option>
  <option value="General Enquiry">General Enquiry</option>
- <option value="Intro Call Request">15-Min Intro Call Request</option>
+ <option value="Preference Discussion Request">$75 Preference Discussion Request</option>
  </select>
  </div>
  <div class="eq-field" id="eqAvailRow" style="display:none;"><label>Your general availability</label><input type="text" id="eqAvail" placeholder="e.g. Weekday evenings, weekend mornings"></div>
@@ -1130,10 +1130,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <a href="booking.html?type=paid" target="_blank" class="btn btn-primary" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'hero_book_session'});" rel="noopener noreferrer">Book a 1-Hour Session - $300 -></a>
  <button class="hero-enquiry-btn" onclick="openEnquiry('General Enquiry')">Send an Enquiry</button>
  </div>
- <button type="button" class="hero-intro-link fade-up delay-3 visible" onclick="openEnquiry('Intro Call Request');gtag('event','intro_call_click',{'event_category':'conversion','event_label':'hero_free_intro'});" style="background:none;border:none;display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:rgba(255,255,255,0.7);font-size:0.88rem;font-weight:500;cursor:pointer;font-family:inherit;border-bottom:1px dashed rgba(255,255,255,0.3);padding:0 0 2px;transition:all 0.2s;" onmouseover="this.style.color='#38bdf8';this.style.borderBottomColor='#38bdf8'" onmouseout="this.style.color='rgba(255,255,255,0.7)';this.style.borderBottomColor='rgba(255,255,255,0.3)'">
+ <a href="booking.html?type=intro" class="hero-intro-link fade-up delay-3 visible" onclick="gtag('event','preference_discussion_click',{'event_category':'conversion','event_label':'hero_preference_discussion'});" style="background:none;border:none;display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:rgba(255,255,255,0.7);font-size:0.88rem;font-weight:500;cursor:pointer;font-family:inherit;border-bottom:1px dashed rgba(255,255,255,0.3);padding:0 0 2px;transition:all 0.2s;text-decoration:none;" onmouseover="this.style.color='#38bdf8';this.style.borderBottomColor='#38bdf8'" onmouseout="this.style.color='rgba(255,255,255,0.7)';this.style.borderBottomColor='rgba(255,255,255,0.3)'">
  <span style="display:inline-flex;width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,0.18);"></span>
- Request a free 15-min intro call - no commitment
- </button>
+ Book a $75 preference discussion
+ </a>
  <a href="#results" class="fade-up delay-4 visible" style="display:inline-flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:28px;text-decoration:none;opacity:0.45;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='0.45'">
  <span style="font-size:0.72rem;font-weight:600;color:#fff;letter-spacing:0.08em;text-transform:uppercase;">See the 2025 results</span>
  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:bounceDown 1.8s ease-in-out infinite;">
@@ -1404,7 +1404,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <div style="padding:44px 44px 40px;border-right:1px solid rgba(255,255,255,0.06);">
 
- <h2 style="font-family:'DM Serif Display',Georgia,serif;font-size:clamp(1.8rem,3.2vw,2.5rem);font-weight:400;color:#fff;line-height:1.1;margin-bottom:14px;letter-spacing:-0.5px;">Friday CASPer Classes<br><span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">One-off, weekly, or 3-class June package.</span></h2>
+ <h2 style="font-family:'DM Serif Display',Georgia,serif;font-size:clamp(1.8rem,3.2vw,2.5rem);font-weight:400;color:#fff;line-height:1.1;margin-bottom:14px;letter-spacing:-0.5px;">Friday CASPer Classes<br><span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">One-off, weekly, or 2-class June package.</span></h2>
 
  <p style="font-size:1rem;color:rgba(255,255,255,0.72);line-height:1.65;margin-bottom:24px;max-width:480px;">
  The weekly group that produced <strong style="color:#fff;">34 Q4 students in 2025</strong> (54 across 2024-25). Every Friday at 6pm AEST you'll write, get individually scored, and hear how other students answered the same prompt - the single fastest way to learn what a Q4 response actually sounds like.
@@ -1455,7 +1455,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 
  <h3 style="font-family:'DM Serif Display',Georgia,serif;font-size:1.5rem;font-weight:400;color:#fff;margin-bottom:6px;line-height:1.2;">Register for the next Friday class</h3>
- <p style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-bottom:22px;line-height:1.5;">Choose a one-off pass, ongoing weekly access, or the $345 3-class package before the June 11 exam. Stripe handles payment, then the protected class page reveals the link for paid students.</p>
+ <p style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-bottom:22px;line-height:1.5;">Choose a one-off pass, ongoing weekly access, or the $230 2-class package before the June 11 exam. Stripe handles payment, then the protected class page reveals the link for paid students.</p>
 
  <div id="casperClassError" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:0.82rem;padding:10px 14px;border-radius:8px;margin-bottom:14px;"></div>
 
@@ -1471,14 +1471,14 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div style="font-size:0.78rem;color:rgba(255,255,255,0.56);line-height:1.5;margin-top:4px;">Automatically register each week and keep the class page as your access point.</div>
  </div>
  <div style="border:1px solid rgba(34,197,94,0.25);background:rgba(34,197,94,0.08);border-radius:12px;padding:14px 16px;">
- <div style="font-size:0.76rem;font-weight:800;color:#4ade80;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">3-class June 11 package</div>
- <div style="font-size:1rem;font-weight:800;color:#fff;">$345 upfront for 3 classes</div>
- <div style="font-size:0.78rem;color:rgba(255,255,255,0.56);line-height:1.5;margin-top:4px;">Covers the three remaining Friday classes before the June 11 exam. Last class: Friday June 5.</div>
+ <div style="font-size:0.76rem;font-weight:800;color:#4ade80;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;">2-class June 11 package</div>
+ <div style="font-size:1rem;font-weight:800;color:#fff;">$230 upfront for 2 classes</div>
+ <div style="font-size:0.78rem;color:rgba(255,255,255,0.56);line-height:1.5;margin-top:4px;">Covers the two remaining Friday classes before the June 11 exam. Last class: Friday June 5.</div>
  </div>
  </div>
 
  <button id="ccSubmit" data-track="class_checkout_intent" data-track-detail="homepage_panel" onclick="location.href='casper-class.html'" style="width:100%;padding:15px 24px;border-radius:50px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;font-size:0.95rem;font-weight:800;cursor:pointer;font-family:inherit;transition:all 0.2s;letter-spacing:0.01em;box-shadow:0 6px 20px rgba(245,158,11,0.25);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 28px rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(245,158,11,0.25)'">
- Compare all 3 class options ->
+ Compare all class options ->
  </button>
 
  <p style="text-align:center;font-size:0.72rem;color:rgba(255,255,255,0.38);margin-top:12px;line-height:1.5;">
@@ -1979,13 +1979,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="pricing-label" style="color:#d97706;">Friday Group Class</div>
  <div class="pricing-title" style="color:#0a1628;">Friday CASPer Classes</div>
  <div class="pricing-price" style="color:#d97706;">$120 <sub style="color:#64748b;">/ session</sub></div>
- <p class="pricing-desc" style="color:#475569;">The weekly class that produced 34 Q4s in 2025 (54 across 2024-25). Drop in any Friday, subscribe weekly, or pay $345 upfront for the three remaining classes before the June 11 exam.</p>
+ <p class="pricing-desc" style="color:#475569;">The weekly class that produced 34 Q4s in 2025 (54 across 2024-25). Drop in any Friday, subscribe weekly, or pay $230 upfront for the two remaining classes before the June 11 exam.</p>
  <ul class="pricing-features">
  <li class="pricing-feature" style="color:#334155;"><strong style="color:#0a1628;">Individual feedback from Dan</strong> on your response</li>
  <li class="pricing-feature" style="color:#334155;">Peer benchmarking against 8-12 other students</li>
  <li class="pricing-feature" style="color:#334155;">Live station walk-throughs &amp; common traps</li>
  <li class="pricing-feature" style="color:#334155;">Fridays 6:00pm AEST via Zoom</li>
- <li class="pricing-feature" style="color:#334155;">$345 package covers 3 classes, last class Friday June 5</li>
+ <li class="pricing-feature" style="color:#334155;">$230 package covers 2 classes, last class Friday June 5</li>
  </ul>
  <a href="casper-class.html" class="btn btn-primary" data-track="class_checkout_intent" data-track-detail="homepage_pricing" style="width:100%;justify-content:center;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1628;box-shadow:0 4px 20px rgba(245,158,11,0.35);">Register / Pay -></a>
  </div>
@@ -2005,7 +2005,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <p class="section-sub">MMI, CASPer, GAMSAT &amp; specialist training. If something isn't answered here, send Dan a message.</p>
  </div>
  <div class="faq-list" id="faqList">
- <div class="faq-item"><button class="faq-q" style="color:#d97706;">How do the Friday CASPer Classes actually work?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Every Friday at 6pm AEST, you join a small group (capped at 12) on Zoom. Dan runs through a real-style CASPer station - you write your response under timed conditions, and then <strong>Dan individually reviews your written answer</strong> and gives you feedback tailored to what you wrote, not a generic rubric. You also hear how 8-12 other motivated students answered the same prompt, which is the single fastest way to learn what a Q4 response actually looks like. You can buy a one-off $120 pass, ongoing weekly access at $120/week, or the $345 3-class June 11 exam package from the protected class page. The package includes the three remaining Friday classes before the June 11 exam, with the last class on Friday June 5. 34 of last year's regulars scored Q4.</div></div></div>
+ <div class="faq-item"><button class="faq-q" style="color:#d97706;">How do the Friday CASPer Classes actually work?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Every Friday at 6pm AEST, you join a small group (capped at 12) on Zoom. Dan runs through a real-style CASPer station - you write your response under timed conditions, and then <strong>Dan individually reviews your written answer</strong> and gives you feedback tailored to what you wrote, not a generic rubric. You also hear how 8-12 other motivated students answered the same prompt, which is the single fastest way to learn what a Q4 response actually looks like. You can buy a one-off $120 pass, ongoing weekly access at $120/week, or the $230 2-class June 11 exam package from the protected class page. The package includes the two remaining Friday classes before the June 11 exam, with the last class on Friday June 5. 34 of last year's regulars scored Q4.</div></div></div>
  <div class="faq-item"><button class="faq-q">Which universities and programs do you cover?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Dan covers all major Australian MD programs including University of Melbourne, Monash, ANU, UQ, USYD, Flinders, UWA, UNSW, and Notre Dame. For specialist training, he covers MMI preparation for RANZCO (Ophthalmology), RACS (Surgery), RANZCP (Psychiatry), ACEM (Emergency Medicine), Dermatology, and Radiology. For GP training, he covers Casper Test preparation for RACGP (AGPT and FSP) and MMI preparation for ACRRM rural pathway selection.</div></div></div>
  <div class="faq-item"><button class="faq-q">Is the specialist training MMI really the same as medical school MMI?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">Structurally yes - the station types (ethics, role-play, policy, communication) are the same. What differs is the expected level of response. Specialist program assessors are senior clinicians who expect doctor-level thinking, not student-level. Dan calibrates the coaching accordingly - same framework, higher bar.</div></div></div>
  <div class="faq-item"><button class="faq-q">How is the RACGP Casper Test different from medical school CASPer?<span class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span></button><div class="faq-a" style="max-height:0"><div class="faq-a-inner">It is the same Casper Test - same Acuity Insights platform, same nine competencies, same response formats. What changes is the bar. Doctors applying for AGPT or FSP are assessed at registrar level rather than student level: deeper reflection, multilateral empathy, considered ethical reasoning. The full breakdown is in the <a href="blog-racgp-casper-australia.html">RACGP Casper Test Guide</a>. Note: ACRRM uses MMI for selection, not Casper.</div></div></div>
@@ -2175,7 +2175,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <p class="cta-banner-sub">CASPer closes June 11. MMI rounds begin mid-September. The students who get in start now - not after their first rejection.</p>
  <div class="cta-banner-btns">
  <a href="booking.html?type=paid" target="_blank" class="btn btn-primary" style="font-size:1rem;padding:16px 36px;" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'cta_banner'});" rel="noopener noreferrer">Book a 1-Hour Session - $300 -></a>
- <button class="btn btn-outline" style="font-size:1rem;padding:16px 36px;border:2px solid rgba(255,255,255,0.4);" onclick="openEnquiry('Intro Call Request')">Request a Free Intro Call</button>
+ <a href="booking.html?type=intro" class="btn btn-outline" style="font-size:1rem;padding:16px 36px;border:2px solid rgba(255,255,255,0.4);">Book a $75 Preference Discussion</a>
  </div>
  </div>
  </div>
@@ -2275,10 +2275,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  if(type&&select){for(var i=0;i<select.options.length;i++){if(select.options[i].value===type){select.selectedIndex=i;break;}}}
  if(type==='Specialist MMI'){badge.textContent=' Specialist MMI';badge.style.cssText='background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.3);';title.textContent='Specialist Training MMI Coaching';}
  else if(type==='GP CASPer'){badge.textContent=' RACGP Casper Test';badge.style.cssText='background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.25);';title.textContent='RACGP Casper - AGPT & FSP Coaching';}
- else if(type==='Intro Call Request'){badge.textContent=' Intro Call';badge.style.cssText='background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.3);';title.textContent='Request a 15-Min Intro Call';}
+ else if(type==='Preference Discussion Request'){badge.textContent=' Preference Discussion';badge.style.cssText='background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.3);';title.textContent='Request a $75 Preference Discussion';}
  else{badge.textContent=' Enquiry';badge.style.cssText='background:rgba(14,165,233,0.15);color:#38bdf8;border:1px solid rgba(14,165,233,0.3);';title.textContent='Register Your Interest';}
- if(type==='Intro Call Request'){sub.textContent='Tell Dan a little about where you\'re at and when you\'re free \u2014 he\'ll reply within 24 hours with a couple of time options.';}else{sub.textContent='Dan usually replies within 24 hours.';}
- var availRow=document.getElementById('eqAvailRow');if(availRow)availRow.style.display=(type==='Intro Call Request')?'block':'none';
+ if(type==='Preference Discussion Request'){sub.textContent='Tell Dan a little about where you\'re at and when you\'re free \u2014 he\'ll reply within 24 hours with a couple of time options.';}else{sub.textContent='Dan usually replies within 24 hours.';}
+ var availRow=document.getElementById('eqAvailRow');if(availRow)availRow.style.display=(type==='Preference Discussion Request')?'block':'none';
  modal.classList.add('open');document.body.style.overflow='hidden';
  setTimeout(function(){document.getElementById('eqName').focus();},100);
  }
@@ -2308,7 +2308,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
   function clearLandingFlag(){ history.replaceState({},'',window.location.pathname); }
   function openBookFromLink(){ setTimeout(function(){openBookModal();},400); clearLandingFlag(); }
   var qs=window.location.search;
-  if(qs.indexOf('intro=1')!==-1){setTimeout(function(){openEnquiry('Intro Call Request');},400);clearLandingFlag();}
+  if(qs.indexOf('intro=1')!==-1){window.location.href='booking.html?type=intro';}
   else if(qs.indexOf('book=1')!==-1 || window.location.hash==='#book'){openBookFromLink();}
   window.addEventListener('hashchange',function(){if(window.location.hash==='#book')openBookFromLink();});
  })();
@@ -2540,13 +2540,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">MMI, CASPer, or GAMSAT S2. Full personalised session with Dan.</p>
  </a>
- <button type="button" onclick="closeBookModal();setTimeout(function(){openEnquiry('Intro Call Request');},120);" data-track="intro_call_click" data-track-detail="book_modal_free" style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+ <a href="booking.html?type=intro" target="_blank" rel="noopener" data-track="preference_discussion_click" data-track-detail="book_modal_preference" style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
- <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">Free</span>
- <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">15-Min Intro Call</span>
+ <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$75</span>
+ <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">$75 Preference Discussion</span>
  </div>
- <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">Not sure yet? Tell Dan you're interested — he'll reply with a couple of time options.</p>
- </button>
+ <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">A focused 15-minute discussion for preference order, edge cases and next-step application strategy.</p>
+ </a>
  </div>
  </div>
 </div>

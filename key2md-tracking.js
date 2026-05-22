@@ -261,8 +261,8 @@
  track('calculator_result_action', { event_category: 'conversion', event_label: target.textContent.trim().slice(0, 80) });
  } else if (/service-|tutor-|coaching-/i.test(href)) {
  track('service_page_click', { event_category: 'navigation', event_label: href });
- } else if (/book a free|15-min|intro call/i.test(target.textContent || '')) {
- track('intro_call_click', { event_category: 'conversion', event_label: href || target.textContent.trim().slice(0, 80) });
+ } else if (/preference discussion|preferences discussion/i.test(target.textContent || '')) {
+ track('preference_discussion_click', { event_category: 'conversion', event_label: href || target.textContent.trim().slice(0, 80) });
  } else if (/send enquiry|enquire/i.test(target.textContent || '')) {
  track('enquiry_intent', { event_category: 'conversion', event_label: target.textContent.trim().slice(0, 80) });
  }

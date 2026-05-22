@@ -1534,11 +1534,11 @@
  <div class="page-header">
  <div>
  <div class="page-title">CASPer Class</div>
- <div class="page-sub">One-off, weekly and 3-class June package class gate. Students only see the link after payment or manual authorisation.</div>
+ <div class="page-sub">One-off, weekly and 2-class June package class gate. Students only see the link after payment or manual authorisation.</div>
  </div>
  <div class="page-actions">
  <span class="refresh-note" id="ccStatus">Not loaded</span>
- <button class="btn blue" onclick="reconcileCasperClass()">Recover Stripe class payments</button>
+ <button class="btn blue" onclick="reconcileCasperClass()">Sync Stripe + pass usage</button>
  <button class="btn" onclick="loadCasperClass()">Refresh</button>
  </div>
  </div>
@@ -6289,14 +6289,20 @@ function renderCasperClass() {
  const dt = fmtDate(row.created_at);
  const expires = row.expires_at ? fmtDate(row.expires_at) : null;
  const purchaseType = row.purchase_type || (row.source === 'package' ? 'package' : row.source === 'subscription' ? 'ongoing' : row.source === 'stripe' ? 'one_off' : row.source === 'indefinite' ? 'indefinite' : 'manual');
- const planLabel = purchaseType === 'package' ? '3-class June package' : purchaseType === 'ongoing' ? 'Weekly' : purchaseType === 'one_off' ? 'One-off' : purchaseType === 'indefinite' ? 'Indefinite' : 'Manual';
+ const planLabel = purchaseType === 'package' ? '2-class June package' : purchaseType === 'ongoing' ? 'Weekly' : purchaseType === 'one_off' ? 'One-off' : purchaseType === 'indefinite' ? 'Indefinite' : 'Manual';
+ const packageTotal = Number(row.package_class_count || row.class_count || 0);
+ const packageRemaining = Number(row.package_classes_remaining ?? packageTotal);
+ const packageUsed = Number(row.package_classes_used || 0);
+ const classDetail = purchaseType === 'package' && packageTotal
+ ? `${Math.max(0, packageRemaining)} pass${Math.max(0, packageRemaining)===1?'':'es'} available / ${packageTotal} bought${packageUsed ? ` | ${packageUsed} used after Friday 7pm` : ''}`
+ : (row.class_count ? `${row.class_count} classes` : (row.exam_date || ''));
  const amount = Number(row.amount_paid || 0);
  const stripeId = row.stripe_session_id || row.stripe_subscription_id || '';
  const stripeShort = stripeId ? `${stripeId.slice(0, 10)}...${stripeId.slice(-4)}` : '-';
  const paidSource = ['stripe', 'subscription', 'package'].includes(String(row.source || '').toLowerCase());
  return `<tr class="data-row">
  <td><div class="cell-main">${emailWithDuplicateFlag(row.email || row.user_id || '?',row)}</div><div class="cell-sub">${esc(row.name || '')}</div></td>
- <td><div class="cell-main">${esc(planLabel)}</div><div class="cell-sub">${row.class_count ? `${row.class_count} classes` : esc(row.exam_date || '')}</div></td>
+ <td><div class="cell-main">${esc(planLabel)}</div><div class="cell-sub">${esc(classDetail)}</div></td>
  <td><span class="badge ${paidSource?'badge-paid':'badge-default'}">${esc(row.source || 'admin')}</span></td>
  <td><span class="spend ${amount>0?'has':'none'}">${amount ? fmtMoney(amount / 100) : '-'}</span></td>
  <td><div class="cell-main">${expires?.date || '-'}</div><div class="cell-sub">${row.cancel_requested ? 'Cancels at period end' : ''}</div></td>
@@ -6389,11 +6395,11 @@ async function runCasperClassEmailCheck() {
 }
 
 async function reconcileCasperClass() {
- if (!confirm('Check recent Stripe checkout sessions and recover paid CASPer class students into this dashboard? This includes one-off, weekly, and 3-class package payments. This will not email students.')) return;
+ if (!confirm('Check recent Stripe checkout sessions, recover paid CASPer class students, and refresh package pass usage from Friday class dates? This includes one-off, weekly, and package payments. This will not email students.')) return;
  const status = document.getElementById('ccStatus');
  if (status) status.textContent = 'Checking Stripe...';
  try {
- const res = await api('/admin/casper-class/reconcile', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ days: 14 }) });
+ const res = await api('/admin/casper-class/reconcile', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ days: 45 }) });
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not reconcile Stripe payments');
  S.casperClass = {
