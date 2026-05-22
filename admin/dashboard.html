@@ -1699,6 +1699,7 @@
  </div>
  <div class="page-actions">
  <button class="btn blue" onclick="loadMockAdmin()">Refresh mocks</button>
+ <button class="btn green" onclick="openMockReader('', 'bank')">QA mock bank</button>
  <button class="btn" onclick="openMockReader()">Open full reader</button>
  </div>
  </div>
@@ -7581,13 +7582,14 @@ function mockStatusBadge(status) {
  return `<span class="badge ${cls}">${esc(s.replace(/_/g,' '))}</span>`;
 }
 
-function openMockReader(attemptId = '') {
+function openMockReader(attemptId = '', mode = '') {
  const canHandoff = !!(S.token && 'BroadcastChannel' in window);
  const handoffId = canHandoff
  ? (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`)
  : '';
  const params = new URLSearchParams();
  if (attemptId) params.set('attempt_id', attemptId);
+ if (mode) params.set('mode', mode);
  if (handoffId) params.set('handoff', handoffId);
  const url = `mock-reader.html${params.toString() ? '?' + params.toString() : ''}`;
  if (handoffId) {
