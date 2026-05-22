@@ -318,10 +318,23 @@
  .mock-active-filters{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:0.72rem;color:var(--muted2);}
  .mock-filter-pill{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--blue-border);background:var(--blue-dim);color:var(--blue);border-radius:999px;padding:4px 9px;font-weight:800;}
  .mock-row-flags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
- .mock-row-flag{display:inline-flex;align-items:center;border:1px solid var(--border);background:rgba(255,255,255,0.04);border-radius:999px;padding:2px 7px;font-size:0.62rem;font-weight:750;color:var(--muted);}
- .mock-row-flag.warn{border-color:var(--amber-border);background:var(--amber-dim);color:var(--amber);}
- .mock-row-flag.good{border-color:var(--green-border);background:var(--green-dim);color:var(--green);}
- .mock-row-flag.blue{border-color:var(--blue-border);background:var(--blue-dim);color:var(--blue);}
+.mock-row-flag{display:inline-flex;align-items:center;border:1px solid var(--border);background:rgba(255,255,255,0.04);border-radius:999px;padding:2px 7px;font-size:0.62rem;font-weight:750;color:var(--muted);}
+.mock-row-flag-btn{font-family:inherit;cursor:pointer;}
+.mock-row-flag-btn:hover{filter:brightness(1.18);transform:translateY(-1px);}
+.mock-row-flag.warn{border-color:var(--amber-border);background:var(--amber-dim);color:var(--amber);}
+.mock-row-flag.good{border-color:var(--green-border);background:var(--green-dim);color:var(--green);}
+.mock-row-flag.blue{border-color:var(--blue-border);background:var(--blue-dim);color:var(--blue);}
+.mock-issue-card{width:min(820px,calc(100vw - 28px));max-height:88vh;padding:0;overflow:hidden;display:flex;flex-direction:column;}
+.mock-issue-head{padding:18px 20px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;gap:12px;align-items:flex-start;background:rgba(255,255,255,0.035);}
+.mock-issue-title{font-size:1rem;font-weight:900;line-height:1.25;}
+.mock-issue-sub{font-size:0.74rem;color:var(--muted);margin-top:4px;line-height:1.45;}
+.mock-issue-body{padding:16px 20px;overflow:auto;display:grid;gap:12px;}
+.mock-issue-row{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.035);padding:13px;}
+.mock-issue-row-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px;}
+.mock-issue-row-title{font-size:0.84rem;font-weight:900;color:var(--text);}
+.mock-issue-detail{font-size:0.78rem;color:var(--text);line-height:1.55;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere;}
+.mock-issue-action{font-size:0.72rem;color:var(--muted);line-height:1.55;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.mock-issue-empty{border:1px solid var(--green-border);background:var(--green-dim);color:var(--green);border-radius:12px;padding:14px 16px;font-size:0.82rem;line-height:1.55;}
  .broadcast-audience{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:10px 0 14px;padding:11px 12px;border:1px solid var(--blue-border);background:var(--blue-dim);border-radius:10px;}
  .broadcast-audience-main{font-size:0.82rem;font-weight:800;color:var(--text);}
  .broadcast-audience-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;line-height:1.45;}
@@ -1688,6 +1701,24 @@
  </div>
  </div>
 
+<div class="modal-ov" id="mockIssueModal">
+ <div class="modal-card mock-issue-card">
+ <div class="mock-issue-head">
+ <div>
+ <div class="mock-issue-title" id="mockIssueTitle">Mock attempt issues</div>
+ <div class="mock-issue-sub" id="mockIssueSub">Loading...</div>
+ </div>
+ <div class="mock-action-row">
+ <button class="btn blue" id="mockIssueReaderBtn" type="button">Open reader</button>
+ <button class="btn" type="button" onclick="closeMockIssueModal()">Close</button>
+ </div>
+ </div>
+ <div class="mock-issue-body" id="mockIssueBody">
+ <div class="drawer-empty">Loading...</div>
+ </div>
+ </div>
+</div>
+
  <!-- -- MMI REVIEWS -- -->
  <!-- MOCK EXAMS -->
  <div id="pageMocks" class="page">
@@ -2570,6 +2601,8 @@ document.addEventListener('keydown', e => {
  const cmdOpen = document.getElementById('cmdModal')?.classList.contains('open');
  const reportOpen = document.getElementById('studentReportModal')?.classList.contains('open');
  const drawerOpen = document.getElementById('studentDrawer')?.classList.contains('open');
+ const mockIssueOpen = document.getElementById('mockIssueModal')?.classList.contains('open');
+ if (mockIssueOpen && e.key === 'Escape') { e.preventDefault(); closeMockIssueModal(); return; }
  if (drawerOpen && e.key === 'Escape') { e.preventDefault(); closeStudentDrawer(); return; }
  if (reportOpen && e.key === 'Escape') { e.preventDefault(); closeStudentReport(); return; }
  if (cmdOpen) {
@@ -7558,7 +7591,7 @@ function renderMockRows(targetId, rows, manualOnly) {
  const status = r.manual_review_status || (r.manual_review_paid ? 'pending_review' : 'not_requested');
  const statusActions = r.manual_review_paid ? `<div class="action-mini-row"><button class="btn amber" onclick="quickMockStatus('${esc(r.id)}','in_review')">In review</button><button class="btn green" onclick="quickMockStatus('${esc(r.id)}','completed')">Complete</button></div>` : '';
  const countLabel = Number(r.station_count || 0) ? `${Number(r.station_count || 0)}/11 stations` : '';
- const issueLabel = Number(r.issue_count || 0) ? `<span class="mock-row-flag warn">${Number(r.issue_count || 0)} issue${Number(r.issue_count || 0)===1?'':'s'}</span>` : '';
+ const issueLabel = Number(r.issue_count || 0) ? `<button type="button" class="mock-row-flag mock-row-flag-btn warn" onclick='viewMockIssues(${jsArg(r.id || "")})' title="View what went wrong">${Number(r.issue_count || 0)} issue${Number(r.issue_count || 0)===1?'':'s'}</button>` : '';
  const completeFlag = mockIsCompleted(r) ? '<span class="mock-row-flag good">finished</span>' : '<span class="mock-row-flag warn">not finished</span>';
  return `<tr>
  <td><div class="cell-main">${esc(r.user_name || r.user_email || 'Student')}</div><div class="cell-sub">${emailWithDuplicateFlag(r.user_email || r.id || '',r)}</div><div class="mock-row-flags">${completeFlag}${countLabel ? `<span class="mock-row-flag blue">${esc(countLabel)}</span>` : ''}${issueLabel}</div></td>
@@ -7568,6 +7601,126 @@ function renderMockRows(targetId, rows, manualOnly) {
  <td><div class="mock-action-row"><button class="btn blue" onclick="openMockReader('${esc(r.id)}')">Reader</button><button class="btn" onclick='viewAsStudent("",${jsArg(r.user_email || "")})'>View as</button><button class="btn" onclick="copyMockId('${esc(r.id)}')">Copy ID</button></div></td>
  </tr>`;
  }).join('') : `<tr><td colspan="5" style="text-align:center;padding:22px;color:var(--muted2);">${manualOnly ? 'No manual review requests match this filter.' : 'No saved mock attempts match this filter.'}</td></tr>`;
+}
+
+function closeMockIssueModal() {
+ document.getElementById('mockIssueModal')?.classList.remove('open');
+}
+
+function mockStationLocalLabel(rows, row, index) {
+ const type = row?.type === 'video' ? 'video' : 'typed';
+ const order = Number(row?.order || row?.station_order || index + 1);
+ const local = (rows || []).slice(0, index + 1).filter(item => (item?.type === 'video' ? 'video' : 'typed') === type).length || 1;
+ return `${type === 'video' ? 'Video' : 'Typed'} ${row?.localIndex || row?.local_index || local} / station ${order || index + 1}`;
+}
+
+function mockIssueActionFor(problem, row) {
+ const text = String(problem || '').toLowerCase();
+ if (row?.type === 'video' && !row?.recording_key) return 'Likely action: ask the student whether they saved a local recording, then use the Reader SOS upload if they have one.';
+ if (row?.type === 'video' && /visual|camera|frame/.test(text)) return 'Likely action: open Reader and use the premium visual repair/reprocess button for this station.';
+ if (row?.type === 'video' && row?.recording_key) return 'Likely action: open Reader and reprocess the saved recording. The recording key exists, so this is usually recoverable.';
+ if (row?.type !== 'video') return 'Likely action: open Reader and reprocess the saved typed answer.';
+ return 'Likely action: open Reader, inspect the station, then reprocess or upload a rescue recording if needed.';
+}
+
+function collectMockAttemptIssues(attempt) {
+ const rows = Array.isArray(attempt?.rows) ? attempt.rows : [];
+ const issues = [];
+ rows.forEach((row, index) => {
+ const stationIssues = [];
+ const processingError = String(row?.processing_error || '').trim();
+ const reprocessError = String(row?.reprocess_error || '').trim();
+ if (processingError) stationIssues.push({ label: 'Processing error', detail: processingError });
+ if (reprocessError && reprocessError !== processingError) stationIssues.push({ label: 'Reprocess error', detail: reprocessError });
+ const hasFeedback = !!(row?.feedback && typeof row.feedback === 'object' && Object.keys(row.feedback).length);
+ const transcript = String(row?.transcript || '').trim();
+ const answer = String(row?.answer || '').trim();
+ if (row?.type === 'video') {
+ if (!row?.recording_key && Number(row?.duration_sec || row?.durationSec || 0) > 0) stationIssues.push({ label: 'Recording missing', detail: 'The browser captured a duration, but no saved recording key is attached to this station.' });
+ if (row?.recording_key && !transcript) stationIssues.push({ label: 'Transcript missing', detail: 'A recording key exists, but no transcript is saved.' });
+ if (row?.recording_key && transcript && !hasFeedback) stationIssues.push({ label: 'AI feedback missing', detail: 'Recording and transcript exist, but no station feedback is saved.' });
+ if ((attempt?.tier === 'premium' || row?.tier === 'premium') && row?.recording_key && (row?.visual_degraded || !row?.visual_metrics)) {
+ stationIssues.push({ label: 'Premium visual feedback limited', detail: row?.visual_degraded ? 'The saved premium station is marked visual_degraded.' : 'No visual metrics are saved for this premium video station.' });
+ }
+ } else {
+ if (answer.length >= 20 && !hasFeedback) stationIssues.push({ label: 'AI feedback missing', detail: 'A typed answer is saved, but feedback did not finish or was not saved.' });
+ }
+ if (hasFeedback && !Number.isFinite(Number(row?.score ?? row?.feedback?.overall?.score ?? row?.feedback?.score))) {
+ stationIssues.push({ label: 'Score missing', detail: 'Feedback exists, but no usable score was found for the station summary.' });
+ }
+ stationIssues.forEach(problem => {
+ issues.push({
+ station: mockStationLocalLabel(rows, row, index),
+ label: problem.label,
+ detail: problem.detail,
+ action: mockIssueActionFor(`${problem.label} ${problem.detail}`, row),
+ row_index: index,
+ type: row?.type || 'typed',
+ });
+ });
+ });
+ if (!issues.length && Number(attempt?.issue_count || 0) > 0) {
+ issues.push({
+ station: 'Attempt summary',
+ label: 'Summary issue',
+ detail: 'The attempt summary reports an issue, but the saved station rows do not currently expose a processing_error or reprocess_error. Open Reader to inspect the raw attempt data.',
+ action: 'Likely action: open Reader and check each station tab for missing feedback, transcript, visual metrics, or save problems.',
+ row_index: null,
+ type: 'summary',
+ });
+ }
+ return issues;
+}
+
+function renderMockIssueModal(attempt, issues) {
+ const title = document.getElementById('mockIssueTitle');
+ const sub = document.getElementById('mockIssueSub');
+ const body = document.getElementById('mockIssueBody');
+ const reader = document.getElementById('mockIssueReaderBtn');
+ const name = attempt?.user_name || attempt?.user_email || 'Student';
+ if (title) title.textContent = `${issues.length || 0} mock issue${issues.length === 1 ? '' : 's'} - ${name}`;
+ if (sub) sub.textContent = `${attempt?.user_email || 'No email'} | ${attempt?.tier || 'mock'} | ${attempt?.id || 'No attempt ID'}`;
+ if (reader) reader.onclick = () => openMockReader(attempt?.id || '');
+ if (!body) return;
+ if (!issues.length) {
+ body.innerHTML = `<div class="mock-issue-empty">No station-level error is currently visible on this attempt. It may have been repaired since the dashboard summary loaded. Refresh mocks to update the count.</div>`;
+ return;
+ }
+ body.innerHTML = issues.map(issue => `
+ <div class="mock-issue-row">
+ <div class="mock-issue-row-head">
+ <div>
+ <div class="mock-issue-row-title">${esc(issue.station)} - ${esc(issue.label)}</div>
+ <div class="cell-sub">${esc(issue.type || 'station')}${Number.isInteger(issue.row_index) ? ` | row ${issue.row_index + 1}` : ''}</div>
+ </div>
+ <span class="mock-row-flag warn">issue</span>
+ </div>
+ <div class="mock-issue-detail">${esc(issue.detail || 'No detail saved.')}</div>
+ <div class="mock-issue-action">${esc(issue.action || '')}</div>
+ </div>
+ `).join('');
+}
+
+async function viewMockIssues(id) {
+ const modal = document.getElementById('mockIssueModal');
+ const title = document.getElementById('mockIssueTitle');
+ const sub = document.getElementById('mockIssueSub');
+ const body = document.getElementById('mockIssueBody');
+ if (!modal || !id) return;
+ modal.classList.add('open');
+ if (title) title.textContent = 'Mock attempt issues';
+ if (sub) sub.textContent = 'Loading full attempt details...';
+ if (body) body.innerHTML = '<div class="drawer-empty">Loading the saved attempt and station errors...</div>';
+ try {
+ const res = await api(`/api/admin/casper-mock/attempt/${encodeURIComponent(id)}`);
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok || !data.attempt) throw new Error(data?.message || data?.error || 'Could not load mock attempt');
+ const issues = collectMockAttemptIssues(data.attempt);
+ renderMockIssueModal(data.attempt, issues);
+ } catch(e) {
+ if (sub) sub.textContent = 'Could not load issue details';
+ if (body) body.innerHTML = `<div class="mock-issue-row"><div class="mock-issue-row-title">Load failed</div><div class="mock-issue-detail">${esc(e.message || 'Unknown error')}</div></div>`;
+ }
 }
 
 function mockAttemptStatusBadge(row) {
@@ -8414,6 +8567,7 @@ document.getElementById('ncModal').addEventListener('click',e=>{if(e.target===e.
 document.getElementById('cmdModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCommandPalette();});
 document.getElementById('studentReportModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStudentReport();});
 document.getElementById('studentDrawer').addEventListener('click',e=>{if(e.target===e.currentTarget)closeStudentDrawer();});
+document.getElementById('mockIssueModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeMockIssueModal();});
 
 // ======================================================
 // HELPERS
