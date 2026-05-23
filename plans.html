@@ -1299,9 +1299,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="modal-title" id="modalTitle">Complete your purchase</div>
  <div class="modal-sub" id="modalSub">You'll be redirected to Stripe's secure checkout.</div>
  <div class="mock-discount-box" id="mockDiscountBox">
- <div class="mock-discount-top"><span class="mock-discount-kicker">24h earlybird</span><span class="mock-discount-saving">20% off</span></div>
- <div class="mock-discount-copy">Use code <strong>EARLYBIRD20</strong> before 1:05am AEST, 24 May 2026. Applies to Transcript and Premium CASPer mock checkout.</div>
- <input id="mockDiscountCodeInput" class="mock-discount-code-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="EARLYBIRD20">
+ <div class="mock-discount-top"><span class="mock-discount-kicker">Discount code</span><span class="mock-discount-saving">Optional</span></div>
+ <div class="mock-discount-copy">Have a code from Dan? Enter it here before continuing to Stripe.</div>
+ <input id="mockDiscountCodeInput" class="mock-discount-code-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Enter code">
  </div>
  <div class="modal-alert" id="modalAlert"></div>
  <button class="modal-btn" id="modalConfirmBtn" onclick="confirmCheckout()">Continue to Payment -></button>
@@ -1322,8 +1322,6 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
 <script>
 const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
-const MOCK_EARLYBIRD_CODE = 'EARLYBIRD20';
-const MOCK_EARLYBIRD_EXPIRES_AT = '2026-05-23T15:05:00.000Z';
 let selectedPackId = null;
 let pendingAction = null;
 
@@ -1492,17 +1490,12 @@ function normaliseMockDiscountCode(value) {
  return String(value || '').trim().toUpperCase().replace(/\s+/g, '');
 }
 
-function mockEarlybirdActive() {
- return Date.now() <= Date.parse(MOCK_EARLYBIRD_EXPIRES_AT);
-}
-
 function configureMockDiscountBox(action) {
  const box = document.getElementById('mockDiscountBox');
  const input = document.getElementById('mockDiscountCodeInput');
- const isMock = (action === 'mock_transcript' || action === 'mock_premium') && mockEarlybirdActive();
+ const isMock = action === 'mock_transcript' || action === 'mock_premium';
  if (box) box.classList.toggle('show', isMock);
- if (input && isMock && !input.value) input.value = MOCK_EARLYBIRD_CODE;
- if (input && !isMock) input.value = '';
+ if (input) input.value = '';
 }
 
 function openModal(title, sub, action) {
@@ -1529,7 +1522,7 @@ async function confirmCheckout() {
  res = await fetch(`${API_BASE}/api/checkout/create`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({pack_id:selectedPackId,success_url:`${location.origin}/practice.html?payment=success`,cancel_url:`${location.origin}/plans.html`})});
  } else if (pendingAction === 'mock_transcript' || pendingAction === 'mock_premium') {
  const tier = pendingAction === 'mock_premium' ? 'premium' : 'transcript';
- const discountCode = mockEarlybirdActive() ? normaliseMockDiscountCode(document.getElementById('mockDiscountCodeInput')?.value || '') : '';
+ const discountCode = normaliseMockDiscountCode(document.getElementById('mockDiscountCodeInput')?.value || '');
  const mockBody = {
  tier,
  success_url:`${location.origin}/practice.html?tab=mock&mock_payment=success&mock_tier=${tier}`,
