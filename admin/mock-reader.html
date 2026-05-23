@@ -568,11 +568,59 @@
       return issues;
     }
 
+    function readableOrderList(values){
+      const cleaned=(values||[]).map(v=>String(v||'').trim()).filter(Boolean);
+      return cleaned.length?cleaned.join(', '):'unknown';
+    }
+
     function bankExamIssues(exam){
       const issues=[];
-      if(!exam?.exact_ready)issues.push('Bank structure');
+      const stations=exam?.stations||[];
+      const stationCount=Number(exam?.station_count||stations.length||0);
+      if(stationCount!==11)issues.push(`Expected 11 stations, found ${stationCount}`);
+      if((exam?.extra_station_orders||[]).length)issues.push(`Extra station order(s): ${readableOrderList(exam.extra_station_orders)}. Safe admin repair can remove these.`);
+      if((exam?.invalid_type_orders||[]).length)issues.push(`Invalid station type at order(s): ${readableOrderList(exam.invalid_type_orders)}`);
+      if((exam?.missing_station_orders||[]).length)issues.push(`Missing station order(s): ${readableOrderList(exam.missing_station_orders)}`);
+      if((exam?.wrong_type_orders||[]).length)issues.push(`Wrong video/typed type at station(s): ${readableOrderList(exam.wrong_type_orders)}`);
+      if((exam?.missing_prompt_orders||[]).length)issues.push(`Missing prompt(s) at station(s): ${readableOrderList(exam.missing_prompt_orders)}`);
+      if(exam && !exam.sequence_valid)issues.push('Sequence must be Video 1-4, then Typed 5-11');
+      if(!exam?.exact_ready && !issues.length)issues.push('Bank structure');
       for(const station of exam?.stations||[])issues.push(...bankStationIssues(exam,station).map(issue=>`Station ${station.order}: ${issue}`));
-      return issues;
+      return [...new Set(issues)];
+    }
+
+    function bankExamHasRepairableExtraStations(exam){
+      return !!((exam?.extra_station_orders||[]).length);
+    }
+
+    async function repairBankExamExtraStations(){
+      if(!currentBankExam || !bankExamHasRepairableExtraStations(currentBankExam))return;
+      const slug=currentBankExam.slug;
+      const extras=readableOrderList(currentBankExam.extra_station_orders);
+      const ok=confirm(`Remove only the extra station row(s) for ${currentBankExam.title||slug}: ${extras}? Stations 1-11 will be left untouched.`);
+      if(!ok)return;
+      const panel=document.getElementById('attemptPanel');
+      const note=panel?.querySelector('.attempt-head .muted');
+      if(note)note.textContent='Repairing extra mock bank rows...';
+      try{
+        const res=await fetch(API_BASE+'/api/admin/casper-mock/bank/repair',{
+          method:'POST',
+          headers:{...authHeaders(),'Content-Type':'application/json'},
+          body:JSON.stringify({slug,repair:'extra_stations'})
+        });
+        const data=await res.json().catch(()=>({}));
+        if(!res.ok)throw new Error(data.message||data.error||'Repair failed');
+        mockBank=data;
+        const rows=mockBank?.rows||[];
+        currentBankExam=rows.find(row=>row.slug===slug)||rows[0]||null;
+        currentBankStation=Math.max(0,Math.min(currentBankStation,(currentBankExam?.stations||[]).length-1));
+        renderBankList();
+        renderBankExam();
+        alert(`Done. Removed ${Number(data.removed_station_count||0)} extra station row(s).`);
+      }catch(err){
+        alert(err?.message||'Repair failed');
+        renderBankExam();
+      }
     }
 
     function renderBankExam(){
@@ -603,6 +651,7 @@
             <button class="secondary" onclick="showBankStation(${currentBankStation-1})" ${currentBankStation<=0?'disabled':''}>Previous</button>
             <button class="secondary" onclick="showBankStation(${currentBankStation+1})" ${currentBankStation>=stations.length-1?'disabled':''}>Next</button>
             <button class="secondary" onclick="copyBankExamSummary()">Copy audit summary</button>
+            ${bankExamHasRepairableExtraStations(exam)?'<button class="secondary" style="border-color:#fb923c;color:#9a3412;" onclick="repairBankExamExtraStations()">Repair extra rows</button>':''}
           </div>
         </div>
         <div class="metric-row">
