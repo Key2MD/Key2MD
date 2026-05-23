@@ -923,7 +923,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="mock-head">
  <div class="mock-kicker">Multiple mocks now live</div>
  <h2>Full CASPer mocks that never repeat.</h2>
- <p>Each purchase unlocks a fresh 11-station mock from 5 active private mocks handwritten by Dan. Key2MD checks your account history before checkout and before the mock starts, so a student who has already sat one mock is assigned a different unused mock next time.</p>
+<p>Each purchase unlocks a fresh 11-station mock from 5 active private mocks handwritten by Dan. Key2MD checks your account history before checkout and before the mock starts, so a student who has already sat one mock is assigned a different unused mock next time. Students with written-station access arrangements can choose standard, 1.5x or 2x typed timing before beginning.</p>
  </div>
 
  <div class="mock-guarantee">
@@ -933,8 +933,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div class="mock-guarantee-list">
  <div class="mock-guarantee-pill"><span class="mock-check">&#10003;</span><div><strong>Never repeat a completed mock</strong><span>Attempt history is checked before assigning the exam.</span></div></div>
- <div class="mock-guarantee-pill"><span class="mock-check">&#10003;</span><div><strong>Always new to that student</strong><span>3 full mocks are live now, and the bank rotates forward as more are added.</span></div></div>
- <div class="mock-guarantee-pill"><span class="mock-check">&#10003;</span><div><strong>Always handwritten by Dan</strong><span>Full CASPer-style scenarios, not recycled free-bank prompts.</span></div></div>
+<div class="mock-guarantee-pill"><span class="mock-check">&#10003;</span><div><strong>Always new to that student</strong><span>5 full mocks are live now, and the bank rotates forward as more are added.</span></div></div>
+<div class="mock-guarantee-pill"><span class="mock-check">&#10003;</span><div><strong>Access timing supported</strong><span>Typed stations can run at standard, 1.5x or 2x timing when that matches the student's real conditions.</span></div></div>
+<div class="mock-guarantee-pill"><span class="mock-check">&#10003;</span><div><strong>Always handwritten by Dan</strong><span>Full CASPer-style scenarios, not recycled free-bank prompts.</span></div></div>
  </div>
  </div>
 
@@ -949,12 +950,12 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="mock-step">
  <div class="mock-step-num">2</div>
  <h3>Get the next unused mock</h3>
- <p>The system selects a fresh private exam for you: 4 video stations first, then 7 typed stations.</p>
+<p>The system selects a fresh private exam for you: 4 video stations first, then 7 typed stations with access timing selected before start.</p>
  </div>
  <div class="mock-step">
  <div class="mock-step-num">3</div>
  <h3>Sit the full sequence</h3>
- <p>Video stations give 30 seconds to reflect, then 10 seconds to read each question and 60 seconds to answer.</p>
+<p>Video stations use standard timing. Typed stations can use 3:30 standard, 5:15 for 1.5x, or 7:00 for 2x access timing.</p>
  </div>
  </div>
  </div>
@@ -990,9 +991,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <ul style="list-style:none;padding:0;margin:0 0 16px;display:flex;flex-direction:column;gap:7px;font-size:0.83rem;color:rgba(255,255,255,0.64);">
  <li>&#10003; Fresh unused 11-station mock</li>
  <li>&#10003; Never repeats a mock you already sat</li>
- <li>&#10003; All stations handwritten by Dan</li>
- <li>&#10003; 7 written CASPer AI markings</li>
- <li>&#10003; 4 CASPer video transcript analyses</li>
+<li>&#10003; All stations handwritten by Dan</li>
+<li>&#10003; 7 written CASPer AI markings</li>
+<li>&#10003; Standard, 1.5x or 2x typed timing</li>
+<li>&#10003; 4 CASPer video transcript analyses</li>
  <li>&#10003; Full mock debrief report</li>
  <li style="color:rgba(255,255,255,0.32);">- Voice & presentation not included</li>
  </ul>
@@ -1007,10 +1009,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-bottom:16px;">$55 for CASPer Pro students | $97 credit-equivalent value</div>
  <ul style="list-style:none;padding:0;margin:0 0 16px;display:flex;flex-direction:column;gap:7px;font-size:0.83rem;color:rgba(255,255,255,0.64);">
  <li>&#10003; Everything in Transcript Mock</li>
- <li>&#10003; Fresh unused 11-station mock</li>
- <li>&#10003; Never repeats a mock you already sat</li>
- <li>&#10003; All stations handwritten by Dan</li>
- <li>&#10003; Voice & pacing analysis per video station</li>
+<li>&#10003; Fresh unused 11-station mock</li>
+<li>&#10003; Never repeats a mock you already sat</li>
+<li>&#10003; All stations handwritten by Dan</li>
+<li>&#10003; Standard, 1.5x or 2x typed timing</li>
+<li>&#10003; Voice & pacing analysis per video station</li>
  <li>&#10003; Presentation analysis per video station</li>
  </ul>
  <button onclick="handleMockCheckout('premium')" style="width:100%;margin-top:6px;margin-bottom:10px;padding:11px 16px;border-radius:50px;border:none;background:linear-gradient(135deg,#0ea5e9,#22c55e);color:#fff;font-size:0.86rem;font-weight:800;cursor:pointer;font-family:inherit;">Buy Premium Mock -></button>
@@ -1482,7 +1485,7 @@ async function handleMockCheckout(tier) {
  const proPrice = tier === 'premium' ? '$55' : '$41';
  openModal(
  `Full CASPer Mock - ${label}`,
- `${standardPrice} regular | ${proPrice} for CASPer Pro | Includes a fresh unused 11-station mock from 5 active private mocks, 7 typed-station markings and 4 video analyses. Never repeats a mock you have already sat.`,
+`${standardPrice} regular | ${proPrice} for CASPer Pro | Includes a fresh unused 11-station mock from 5 active private mocks, 7 typed-station markings, 4 video analyses, and standard/1.5x/2x typed timing. Never repeats a mock you have already sat.`,
  `mock_${tier}`
  );
 }

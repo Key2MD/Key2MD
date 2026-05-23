@@ -24,9 +24,42 @@ window.FullCasperMock = (() => {
  const MOCK_EARLYBIRD_CODE = 'EARLYBIRD20';
  const MOCK_EARLYBIRD_EXPIRES_AT = '2026-05-24T08:00:00.000Z';
  const MOCK_EARLYBIRD_EXPIRES_TEXT = '6:00pm AEST, 24 May 2026';
+ const MOCK_ACCESS_TIMING_KEY = 'k2md_full_mock_access_timing_v1';
+ const ACCESS_TIMING_OPTIONS = {
+ standard: {
+ key: 'standard',
+ multiplier: 1,
+ label: 'Standard',
+ shortLabel: 'Standard timing',
+ typedSeconds: CASPER_TYPED_SECONDS,
+ cardTitle: 'Standard',
+ cardMeta: '3:30 writing time',
+ description: 'Use this if you sit the mock under standard CASPer timing.',
+ },
+ x15: {
+ key: 'x15',
+ multiplier: 1.5,
+ label: '1.5x access timing',
+ shortLabel: '1.5x timing',
+ typedSeconds: Math.round(CASPER_TYPED_SECONDS * 1.5),
+ cardTitle: '1.5x',
+ cardMeta: '5:15 writing time',
+ description: 'For students with approved 1.5x written-station access arrangements.',
+ },
+ x2: {
+ key: 'x2',
+ multiplier: 2,
+ label: '2x access timing',
+ shortLabel: '2x timing',
+ typedSeconds: CASPER_TYPED_SECONDS * 2,
+ cardTitle: '2x',
+ cardMeta: '7:00 writing time',
+ description: 'For students with approved 2x written-station access arrangements.',
+ },
+ };
  let active = false;
  let started = false;
- let config = { tier: 'transcript' };
+ let config = { tier: 'transcript', accessTiming: readStoredAccessTiming() };
  let sequence = [];
  let index = 0;
  let results = [];
@@ -69,6 +102,71 @@ window.FullCasperMock = (() => {
  return String(value ?? '').replace(/[&<>"']/g, ch => ({
  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
  }[ch]));
+ }
+
+ function normaliseAccessTiming(value) {
+ const raw = String(value || '').trim().toLowerCase().replace(/\s+/g, '');
+ if (raw === '1.5' || raw === '1.5x' || raw === 'x1.5' || raw === 'x15' || raw === '15' || raw === '150') return 'x15';
+ if (raw === '2' || raw === '2x' || raw === 'x2' || raw === '200') return 'x2';
+ return 'standard';
+ }
+
+ function readStoredAccessTiming() {
+ try {
+ return normaliseAccessTiming(localStorage.getItem(MOCK_ACCESS_TIMING_KEY) || 'standard');
+ } catch {
+ return 'standard';
+ }
+ }
+
+ function accessTimingOption(value = config.accessTiming) {
+ const key = normaliseAccessTiming(value);
+ return ACCESS_TIMING_OPTIONS[key] || ACCESS_TIMING_OPTIONS.standard;
+ }
+
+ function accessTimingPayload(value = config.accessTiming) {
+ const option = accessTimingOption(value);
+ return {
+ key: option.key,
+ label: option.label,
+ multiplier: option.multiplier,
+ typed_seconds: option.typedSeconds,
+ reflection_seconds: CASPER_REFLECTION_SECONDS,
+ applies_to: 'typed_stations_only',
+ };
+ }
+
+ function typedWritingSeconds() {
+ return accessTimingOption().typedSeconds;
+ }
+
+ function formatSeconds(seconds) {
+ const total = Math.max(0, Math.round(Number(seconds) || 0));
+ const m = Math.floor(total / 60);
+ const s = total % 60;
+ return `${m}:${String(s).padStart(2, '0')}`;
+ }
+
+ function persistAccessTiming() {
+ try {
+ localStorage.setItem(MOCK_ACCESS_TIMING_KEY, accessTimingOption().key);
+ } catch {}
+ }
+
+ function restoreAccessTimingFromSaved(source = null) {
+ const rows = Array.isArray(source?.rows) ? source.rows : [];
+ const rowTiming = rows.map(row => row?.access_timing || row?.accessTiming || row?.timing?.access_timing).find(Boolean);
+ const saved = source?.access_timing
+ || source?.accessTiming
+ || source?.report?.accessTiming
+ || source?.report?.access_timing
+ || source?.telemetry?.access_timing
+ || rowTiming
+ || null;
+ if (!saved) return false;
+ config.accessTiming = normaliseAccessTiming(saved.key || saved.mode || saved);
+ persistAccessTiming();
+ return true;
  }
 
  function getAuth() {
@@ -161,6 +259,7 @@ window.FullCasperMock = (() => {
  tier: config.tier,
  attempt_id: mockAttemptId,
  mock_exam: activeMockExam,
+ access_timing: accessTimingPayload(),
  station_order: Number(item?.order || index + 1),
  station_id: item?.station?.id || null,
  station_type: item?.type || null,
@@ -235,6 +334,7 @@ window.FullCasperMock = (() => {
  user_email: user.email,
  mock_exam: activeMockExam,
  tier: config.tier,
+ access_timing: accessTimingPayload(),
  browser,
  current: null,
  station_events: [],
@@ -255,6 +355,7 @@ window.FullCasperMock = (() => {
  mockTelemetry.last_reason = reason;
  mockTelemetry.tier = config.tier;
  mockTelemetry.mock_exam = activeMockExam;
+ mockTelemetry.access_timing = accessTimingPayload();
  return mockTelemetry;
  }
 
@@ -292,6 +393,8 @@ window.FullCasperMock = (() => {
  station_type: item.type || null,
  station_label: currentStationLabel(item),
  phase: bridge?.getPhase?.() || 'unknown',
+ access_timing: accessTimingPayload(),
+ planned_writing_sec: item.type === 'typed' ? typedWritingSeconds() : null,
  at: isoNow(),
  visible: document.visibilityState !== 'hidden',
  elapsed_sec: currentStationTelemetry ? secondsBetween(currentStationTelemetry.started_ms) : null,
@@ -403,6 +506,9 @@ window.FullCasperMock = (() => {
  station_id: item?.station?.id || null,
  station_type: item?.type || null,
  station_label: label,
+ access_timing: accessTimingPayload(),
+ planned_writing_sec: item?.type === 'typed' ? typedWritingSeconds() : null,
+ planned_reflection_sec: item?.type === 'typed' ? CASPER_REFLECTION_SECONDS : null,
  started_at: isoNow(),
  started_ms: started,
  local_started_at: new Date(started).toLocaleString('en-AU'),
@@ -704,6 +810,7 @@ window.FullCasperMock = (() => {
  user_email: user.email,
  mock_exam: activeMockExam,
  tier: config.tier,
+ access_timing: accessTimingPayload(),
  index,
  updated_at: new Date().toISOString(),
  sequence: serialiseSequenceForDraft(),
@@ -745,6 +852,8 @@ window.FullCasperMock = (() => {
  visualMetrics: row.visual_metrics || null,
  visualDegraded: !!row.visual_degraded,
  durationSec: row.duration_sec || null,
+ accessTiming: row.access_timing || row.accessTiming || row.timing?.access_timing || null,
+ plannedWritingSec: row.planned_writing_sec || row.plannedWritingSec || row.timing?.planned_writing_sec || null,
  processingError: row.processing_error || null,
  autoRepairTask: null,
  autoRepairAttempted: !!row.auto_repair_attempted,
@@ -763,6 +872,8 @@ window.FullCasperMock = (() => {
  active = true;
  started = true;
  config.tier = draft.tier === 'premium' ? 'premium' : 'transcript';
+ config.accessTiming = normaliseAccessTiming(draft.access_timing?.key || draft.access_timing || draft.accessTiming || config.accessTiming);
+ persistAccessTiming();
  sequence = Array.isArray(draft.sequence) ? draft.sequence.map((item, i) => ({
  type: item.type === 'video' ? 'video' : 'typed',
  order: Number(item.order || i + 1),
@@ -962,7 +1073,7 @@ window.FullCasperMock = (() => {
  const res = await fetch(`${apiBase()}/api/casper-mock/start`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
- body: JSON.stringify({ tier: config.tier }),
+ body: JSON.stringify({ tier: config.tier, access_timing: accessTimingPayload() }),
  });
  const data = await res.json().catch(() => ({}));
  if (!res.ok) throw new Error(data.message || data.error || 'Could not prepare the private mock stations.');
@@ -1151,7 +1262,7 @@ window.FullCasperMock = (() => {
  <div class="sidebar-card" style="border-color:rgba(14,165,233,0.25);background:linear-gradient(180deg,rgba(14,165,233,0.06),#fff);">
  <h3>Full CASPer Mock</h3>
  <div style="font-size:0.82rem;color:var(--gray600);line-height:1.55;margin-bottom:14px;">
- CASPer-style sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. 3 private mocks are live, and each account is assigned the next unused one.
+ CASPer-style sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. 5 private mocks are live, typed access timing is supported, and each account is assigned the next unused one.
  </div>
 
  <div style="margin-bottom:14px;">
@@ -1166,14 +1277,14 @@ window.FullCasperMock = (() => {
  <div style="background:#fff;border:1px solid rgba(14,165,233,0.24);border-radius:10px;padding:12px;margin-bottom:14px;">
  <div style="font-size:0.68rem;font-weight:800;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Mock exam pass</div>
  <div id="mockPriceLine" data-mock-price-line style="font-size:0.86rem;color:var(--navy);line-height:1.45;">${renderPriceLine('transcript')}</div>
- <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes your next unused 11-station mock, 7 typed-station CASPer AI markings, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
+ <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes your next unused 11-station mock, 7 typed-station CASPer AI markings with standard/1.5x/2x timing, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
  </div>
 
  ${mockDiscountMarkup()}
 
  <div style="background:rgba(10,22,40,0.04);border:1px solid var(--gray200);border-radius:10px;padding:11px 12px;margin-bottom:14px;">
  <div style="font-size:0.72rem;color:var(--gray500);margin-bottom:4px;">Approximate exam time</div>
- <div style="font-size:1rem;font-weight:800;color:var(--navy);">65-85 minutes</div>
+ <div style="font-size:1rem;font-weight:800;color:var(--navy);">65-110 minutes</div>
  </div>
 
  <button type="button" class="mock-checkout-btn" style="position:relative;z-index:81;pointer-events:auto;width:100%;padding:13px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.92rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(10,22,40,0.25);">
@@ -1353,7 +1464,7 @@ window.FullCasperMock = (() => {
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:34px 32px;text-align:center;">
  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Full CASPer Mock Exam</div>
  <h2 style="font-size:1.7rem;line-height:1.2;color:var(--navy);margin:0 0 10px;">Practise the full sequence in one sitting.</h2>
- <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with optional breaks built in. The mock bank now has 3 full exams live; students are assigned a fresh unused mock each time they buy, with more being added.</p>
+ <p style="font-size:0.94rem;color:var(--gray600);line-height:1.7;max-width:660px;margin:0 auto 24px;">Exam-mode CASPer practice: 4 video-response scenarios first, then 7 typed-response scenarios, with optional breaks built in. The mock bank now has 5 full exams live; students are assigned a fresh unused mock each time they buy, with more being added.</p>
  ${draftBanner}
  ${serverBanner}
  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:720px;margin:0 auto 26px;text-align:left;">
@@ -1363,7 +1474,7 @@ window.FullCasperMock = (() => {
  </div>
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
  <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">7 typed stations</div>
- <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">Two questions together, 3:30 total writing time after reflection.</div>
+ <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">Two questions together. Standard is 3:30; 1.5x and 2x written-station access timing can be selected before you begin.</div>
  </div>
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
  <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">No repeats</div>
@@ -1398,6 +1509,69 @@ window.FullCasperMock = (() => {
  </div>
  `;
  setTier(config.tier, { skipIdleRender: true });
+ }
+
+ function accessTimingSelectorHtml() {
+ const options = Object.values(ACCESS_TIMING_OPTIONS);
+ return `
+ <div style="background:linear-gradient(135deg,rgba(14,165,233,0.08),rgba(34,197,94,0.04));border:1px solid rgba(14,165,233,0.22);border-radius:14px;padding:16px;margin:0 0 18px;">
+ <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+ <div>
+ <div style="font-size:0.7rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:4px;">Access arrangements</div>
+ <div style="font-size:0.92rem;font-weight:900;color:var(--navy);line-height:1.3;">Typed-station timing</div>
+ </div>
+ <div id="mockAccessTimingSummary" style="font-size:0.75rem;font-weight:900;color:var(--teal3);background:#fff;border:1px solid rgba(14,165,233,0.18);border-radius:999px;padding:6px 10px;">${esc(accessTimingOption().shortLabel)} · ${formatSeconds(typedWritingSeconds())}</div>
+ </div>
+ <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px;">
+ ${options.map(option => `
+ <button type="button" data-mock-access-timing="${esc(option.key)}" onclick="FullCasperMock.setAccessTiming('${esc(option.key)}')" style="text-align:left;border:1px solid var(--gray200);background:#fff;border-radius:12px;padding:12px;cursor:pointer;font-family:inherit;color:var(--gray600);">
+ <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+ <strong style="font-size:0.88rem;color:var(--navy);">${esc(option.cardTitle)}</strong>
+ <span style="font-size:0.67rem;font-weight:900;color:var(--teal3);background:rgba(14,165,233,0.08);border-radius:999px;padding:3px 7px;white-space:nowrap;">${esc(option.cardMeta)}</span>
+ </div>
+ <span style="display:block;font-size:0.72rem;color:var(--gray500);line-height:1.45;">${esc(option.description)}</span>
+ </button>
+ `).join('')}
+ </div>
+ <div id="mockAccessTimingStatus" style="font-size:0.76rem;color:var(--gray500);line-height:1.55;">This affects the 7 typed stations only. Video stations keep standard timing.</div>
+ </div>
+ `;
+ }
+
+ function updateAccessTimingUI() {
+ const selected = accessTimingOption();
+ document.querySelectorAll('[data-mock-access-timing]').forEach(btn => {
+ const activeTiming = btn.dataset.mockAccessTiming === selected.key;
+ btn.style.background = activeTiming ? 'rgba(14,165,233,0.1)' : '#fff';
+ btn.style.borderColor = activeTiming ? 'rgba(14,165,233,0.55)' : 'var(--gray200)';
+ btn.style.boxShadow = activeTiming ? '0 8px 18px rgba(14,165,233,0.12)' : 'none';
+ btn.setAttribute('aria-pressed', activeTiming ? 'true' : 'false');
+ });
+ const summary = byId('mockAccessTimingSummary');
+ if (summary) summary.textContent = `${selected.shortLabel} · ${formatSeconds(selected.typedSeconds)} write`;
+ const status = byId('mockAccessTimingStatus');
+ if (status) {
+ status.textContent = selected.key === 'standard'
+ ? 'Standard timing selected. You can switch to 1.5x or 2x here if that matches your real access arrangements.'
+ : `${selected.label} selected for typed stations: ${formatSeconds(selected.typedSeconds)} total writing time after reflection. Video station timing stays standard.`;
+ status.style.color = selected.key === 'standard' ? 'var(--gray500)' : 'var(--teal3)';
+ }
+ }
+
+ function setAccessTiming(value) {
+ if (started || results.length) {
+ const status = byId('mockAccessTimingStatus');
+ if (status) {
+ status.textContent = 'Timing is locked once the mock has started, so the saved attempt stays consistent.';
+ status.style.color = '#b45309';
+ }
+ return;
+ }
+ config.accessTiming = normaliseAccessTiming(value);
+ persistAccessTiming();
+ updateAccessTimingUI();
+ syncActiveMockContext();
+ sendMockTelemetry('access_timing_selected').catch(() => {});
  }
 
  async function startMock() {
@@ -1478,6 +1652,7 @@ window.FullCasperMock = (() => {
  console.warn('Could not load server mock attempt for resume:', err);
  }
  }
+ if (restoredAttempt) restoreAccessTimingFromSaved(restoredAttempt);
  results = restoredAttempt?.rows ? hydrateResultsFromDraft(restoredAttempt.rows) : [];
  const resumeOrder = Number(mock.current_station_order || results.length + 1 || 1);
  const hasFullSavedSequence = results.length >= sequence.length;
@@ -1532,11 +1707,12 @@ window.FullCasperMock = (() => {
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:20px;">
  ${ruleCard('Sequence', '4 video-response scenarios first, then an optional 10-minute break, then 7 typed-response scenarios.')}
  ${ruleCard('Video section', 'Camera and microphone are required. After the station prompt you get 30 seconds to reflect, then 10 seconds to read each question and 60 seconds to answer.')}
- ${ruleCard('Typed section', 'Each typed scenario gives a short reflection period, then 3:30 total writing time for two prompts.')}
+ ${ruleCard('Typed section', `Each typed scenario gives a short reflection period, then ${formatSeconds(typedWritingSeconds())} total writing time for two prompts under your selected timing.`)}
  ${ruleCard('Breaks', 'You can take the built-in 10-minute and 5-minute breaks, or continue early. Leaving the page may interrupt the mock.')}
  ${ruleCard('Feedback', config.tier === 'premium' ? 'Premium includes transcript, voice, pacing, and presentation analysis for video stations.' : 'Transcript mock analyses what you said in video stations without voice or presentation scoring.')}
  ${ruleCard('Report', 'The final report compares your performance against the Key2MD cohort of serious, actively preparing applicants. It is a practice estimate, not an official Acuity result.')}
  </div>
+ ${accessTimingSelectorHtml()}
  <div style="background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:14px 16px;font-size:0.82rem;color:var(--gray600);line-height:1.6;margin-bottom:18px;">
  Best setup: quiet room, charger plugged in, browser tab kept open, camera permission allowed, and no page refresh once the exam starts.
  </div>
@@ -1547,6 +1723,7 @@ window.FullCasperMock = (() => {
  </div>
  </div>
  `;
+ updateAccessTimingUI();
  }
 
  function renderProcessingScreen() {
@@ -1762,6 +1939,8 @@ window.FullCasperMock = (() => {
  visual_degraded: !!(row.visualDegraded || row.rawFeedback?.visual_degraded),
  duration_sec: row.durationSec || row.duration_sec || row.rawFeedback?.durationSec || (row.localRescuePending ? 1 : null),
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
+ access_timing: row.accessTiming || row.access_timing || row.timing?.access_timing || (row.type === 'typed' ? accessTimingPayload() : null),
+ planned_writing_sec: row.plannedWritingSec || row.planned_writing_sec || row.timing?.planned_writing_sec || (row.type === 'typed' ? typedWritingSeconds() : null),
  processing_error: row.processingError || null,
  auto_repair_error: row.autoRepairError || null,
  auto_repair_attempted: !!row.autoRepairAttempted,
@@ -1783,6 +1962,7 @@ window.FullCasperMock = (() => {
  body: JSON.stringify({
  attempt_id: mockAttemptId,
  tier: config.tier,
+ access_timing: accessTimingPayload(),
  status: finalStatus,
  completed_at: finalStatus === 'completed' ? new Date().toISOString() : null,
  rows: serialiseAttemptRows(rows),
@@ -1837,6 +2017,7 @@ window.FullCasperMock = (() => {
 
  function proceedAfterRules() {
  rulesAccepted = true;
+ persistAccessTiming();
  beginMockExam().catch(err => {
  setCheckoutState(false, err.message || 'Could not start the mock.');
  alert(err.message || 'Could not start the mock.');
@@ -1923,7 +2104,7 @@ window.FullCasperMock = (() => {
  bridge.setupSingleStation(item.station, 'casper', {
  timerMode: 'standard',
  readingTime: CASPER_REFLECTION_SECONDS,
- writingTime: CASPER_TYPED_SECONDS,
+ writingTime: typedWritingSeconds(),
  });
  if (pendingDraftAnswer && Number(pendingDraftAnswer.index) === index) {
  const answer = String(pendingDraftAnswer.answer || '');
@@ -1964,6 +2145,7 @@ window.FullCasperMock = (() => {
  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">Camera check</div>
  <h2 style="font-size:1.55rem;line-height:1.25;color:var(--navy);margin:0 0 10px;">Ready for ${esc(label)}?</h2>
  <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;max-width:620px;margin:0 auto 22px;">The video timer will not start until your camera and microphone are available. Allow browser access, then begin the station.</p>
+ <div style="max-width:520px;margin:0 auto 18px;background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:11px 13px;font-size:0.78rem;color:var(--gray600);line-height:1.5;"><strong style="color:var(--navy);">Typed timing locked in:</strong> ${esc(accessTimingOption().shortLabel)} (${formatSeconds(typedWritingSeconds())} writing time per typed station).</div>
  <button type="button" id="mockCameraStartBtn" onclick="FullCasperMock.enableCameraAndStartVideoStation()" style="padding:13px 26px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.9rem;font-weight:850;cursor:pointer;font-family:inherit;">Enable camera & start station</button>
  <div id="mockCameraGateStatus" style="display:none;margin-top:12px;font-size:0.78rem;color:var(--gray500);line-height:1.55;"></div>
  </div>
@@ -2041,6 +2223,9 @@ window.FullCasperMock = (() => {
 
  const item = sequence[index] || {};
  const sectionLabel = item.type === 'video' ? 'Video section' : 'Typed section';
+ const timingLine = item.type === 'typed'
+ ? `${accessTimingOption().shortLabel}: ${formatSeconds(typedWritingSeconds())} writing time`
+ : `Typed timing: ${accessTimingOption().shortLabel}`;
  const completed = index;
  const dots = sequence.map((entry, i) => {
  const colour = i < index ? 'var(--green)' : i === index ? 'var(--navy)' : 'var(--gray200)';
@@ -2053,6 +2238,7 @@ window.FullCasperMock = (() => {
  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
  <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);">${sectionLabel}</div>
  <div style="font-size:0.82rem;font-weight:700;color:var(--navy);">Station ${index + 1} of ${sequence.length}</div>
+ <div style="font-size:0.72rem;font-weight:800;color:${item.type === 'typed' ? 'var(--teal3)' : 'var(--gray400)'};background:${item.type === 'typed' ? 'rgba(14,165,233,0.08)' : 'var(--gray50)'};border:1px solid ${item.type === 'typed' ? 'rgba(14,165,233,0.2)' : 'var(--gray200)'};border-radius:999px;padding:4px 8px;">${esc(timingLine)}</div>
  <div style="margin-left:auto;font-size:0.76rem;color:var(--gray400);">${completed} complete</div>
  </div>
  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${dots}</div>
@@ -2271,11 +2457,16 @@ window.FullCasperMock = (() => {
  autoRepairContext: isVideoSubmission ? payload.autoRepairContext || null : null,
  localRescuePending: false,
  tier: item.type === 'video' ? config.tier : 'typed',
+ accessTiming: accessTimingPayload(),
+ plannedWritingSec: item.type === 'typed' ? typedWritingSeconds() : null,
  };
  const stationTiming = finishStationTelemetry({
  submitted_at: isoNow(),
  submission_kind: payload?.kind || null,
  recording_duration_sec: isVideoSubmission ? payload.durationSec || null : null,
+ access_timing: accessTimingPayload(),
+ planned_writing_sec: item.type === 'typed' ? typedWritingSeconds() : null,
+ planned_reflection_sec: item.type === 'typed' ? CASPER_REFLECTION_SECONDS : null,
  });
  submittedRow.timing = stationTiming;
  submittedRow.typing = stationTiming?.typing || null;
@@ -2974,7 +3165,7 @@ const patterns = buildPatternReport(rows);
 const categories = buildCategoryReport(rows);
 const interpretation = buildInterpretation(overallAvg);
 const visualInterpretation = buildPremiumVisualInterpretation(rows);
-const report = { rows, overallAvg, scoredCount, expectedCount, isPartial: scoredCount < expectedCount, criteria, stamina, patterns, categories, interpretation, visualInterpretation };
+const report = { rows, overallAvg, scoredCount, expectedCount, isPartial: scoredCount < expectedCount, criteria, stamina, patterns, categories, interpretation, visualInterpretation, accessTiming: accessTimingPayload() };
  report.oneThing = buildOneThing(report);
  report.actionPlan = buildMockActionPlan(report, rows);
  report.readiness = buildReadinessChecklist(report);
@@ -3026,6 +3217,7 @@ latestReport = {
  categories: report.categories,
  interpretation: report.interpretation,
  visualInterpretation: report.visualInterpretation,
+ accessTiming: report.accessTiming,
  oneThing: report.oneThing,
  actionPlan: report.actionPlan,
  readiness: report.readiness,
@@ -3063,6 +3255,7 @@ const partialAnalyses = completedAnalyses < rows.length;
       <div class="k2mr-stat"><div class="k2mr-stat-num">${videoAvg}</div><div class="k2mr-stat-lbl">Video avg /10</div></div>
       <div class="k2mr-stat"><div class="k2mr-stat-num">${typedAvg}</div><div class="k2mr-stat-lbl">Typed avg /10</div></div>
       <div class="k2mr-stat"><div class="k2mr-stat-num">${answeredTyped}/7</div><div class="k2mr-stat-lbl">Typed answered</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(accessTimingOption().shortLabel)}</div><div class="k2mr-stat-lbl">${formatSeconds(typedWritingSeconds())} typed time</div></div>
       <div class="k2mr-stat"><div class="k2mr-stat-num">${completedAnalyses}/${rows.length}</div><div class="k2mr-stat-lbl">AI analysed</div></div>
      </div>
      <div class="k2mr-hero-foot">
@@ -3437,16 +3630,20 @@ function renderPartialReportNotice(rows) {
     `;
    }
 
-    function typedStationReviewHtml(row) {
+  function typedStationReviewHtml(row) {
     const fb = row.feedback || {};
     const score = numericScore(row);
     const scoreColor = score >= 7 ? 'var(--green)' : score >= 5.5 ? 'var(--teal2)' : score >= 4.5 ? '#fbbf24' : 'var(--red)';
+    const rowTiming = row.accessTiming || row.access_timing || row.timing?.access_timing || accessTimingPayload();
+    const timingKey = normaliseAccessTiming(rowTiming.key || rowTiming);
+    const timingOption = accessTimingOption(timingKey);
     return `
      <div class="k2mr-station-grid">
       <div class="k2mr-station-left">
        ${scenarioPromptHtml(row)}
        <div class="k2mr-answer-card">
         <div class="k2mr-card-title" style="margin-bottom:8px;">Your typed answer</div>
+        <div style="font-family:var(--mono);font-size:0.7rem;color:rgba(255,255,255,0.48);line-height:1.45;margin-bottom:8px;">${esc(timingOption.label)} · ${formatSeconds(timingOption.typedSeconds)} writing time</div>
         <div class="k2mr-answer-text">${esc(row.answer || 'No typed response captured.')}</div>
        </div>
       </div>
@@ -3698,6 +3895,7 @@ function renderPartialReportNotice(rows) {
  '',
  `Overall: ${Number.isFinite(report.overallAvg) ? report.overallAvg + '/10' : 'awaiting scored feedback'}`,
  `Interpretation: ${report.interpretation?.band || 'No interpretation available'}`,
+ `Typed-station timing: ${(report.accessTiming?.label || accessTimingOption().label)} (${formatSeconds(report.accessTiming?.typed_seconds || typedWritingSeconds())} writing time)`,
  '',
  `One thing to fix: ${report.oneThing?.title || 'Awaiting pattern data'}`,
  report.oneThing?.body || '',
@@ -3757,6 +3955,7 @@ function renderPartialReportNotice(rows) {
 	 function buildPrintableMockReportHtml(report = latestReport, rows = finalReviewRows) {
 	 const studentName = getAuth()?.getUser?.()?.name || 'Student';
 	 const printedAt = new Date().toLocaleString('en-AU', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+	 const accessTiming = report?.accessTiming || accessTimingPayload();
 	 const stationRows = (rows || []).map(printStationHtml).join('');
 	 const criteriaRows = (report?.criteria || []).filter(c => Number.isFinite(c.avg)).map(c => `
 	 <div class="crit">
@@ -3788,6 +3987,7 @@ function renderPartialReportNotice(rows) {
 	 <div class="metric"><b>${esc((rows || []).length)}</b><span>Stations completed</span></div>
 	 <div class="metric"><b>${esc((rows || []).filter(r => r.type === 'video').length)}</b><span>Video stations</span></div>
 	 <div class="metric"><b>${esc((rows || []).filter(r => r.type !== 'video').length)}</b><span>Typed stations</span></div>
+	 <div class="metric"><b>${esc(accessTiming.label || accessTimingOption().label)}</b><span>${esc(formatSeconds(accessTiming.typed_seconds || typedWritingSeconds()))} typed time</span></div>
 	 </section>
 	 <section class="grid">
 	 <div class="card"><h2>${esc(report?.interpretation?.band || 'Overall interpretation')}</h2><div class="one">${esc(report?.interpretation?.text || 'No overall interpretation returned yet.')}</div></div>
@@ -4133,6 +4333,7 @@ function renderPartialReportNotice(rows) {
  startMock,
  startFreshMock,
  setTier,
+ setAccessTiming,
  syncDiscountCode,
  refreshPricing,
  checkoutMock,

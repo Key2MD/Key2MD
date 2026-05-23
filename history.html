@@ -796,12 +796,13 @@ function mockCardHTML(attempt) {
  const statusClass = attempt.expired ? ' warn' : '';
  const stationCount = attempt.station_count || rows.length || 11;
  const isLoaded = Array.isArray(attempt.rows);
+ const accessTiming = mockAttemptAccessTiming(attempt);
  return `
  <article class="mock-card" id="mock-${escapeAttr(attempt.id)}">
  <div class="mock-card-header">
  <div>
  <div class="mock-card-title">Full CASPer Mock - ${escapeHtml(attempt.tier || 'mock')}</div>
- <div class="mock-card-meta">${completed || 'Saved mock'} | ${stationCount} stations | ${escapeHtml(manual)}</div>
+ <div class="mock-card-meta">${completed || 'Saved mock'} | ${stationCount} stations | ${escapeHtml(accessTiming.label)} | ${escapeHtml(manual)}</div>
  <div class="mock-card-stats">
  <div class="mock-score">${escapeHtml(score)}</div>
  <span class="mock-status-pill${statusClass}">${escapeHtml(expires)}</span>
@@ -851,7 +852,7 @@ function mockStationHTML(attempt, row, index) {
  </div>
  <div class="mock-station-grid">
  <div>
- ${isVideo ? mockVideoHTML(attempt, row, index) : mockTypedAnswerHTML(row)}
+ ${isVideo ? mockVideoHTML(attempt, row, index) : mockTypedAnswerHTML(row, attempt)}
  </div>
  <div>
  <div class="mock-section-label">Scenario</div>
@@ -893,9 +894,11 @@ function mockSyncedTranscriptHTML(videoId, segments) {
  `).join('')}</div>`;
 }
 
-function mockTypedAnswerHTML(row) {
+function mockTypedAnswerHTML(row, attempt = null) {
+ const accessTiming = mockRowAccessTiming(row, attempt);
  return `
  <div class="mock-section-label">Typed response</div>
+ <div class="mock-card-meta" style="margin-bottom:7px;">${escapeHtml(accessTiming.label)} | ${escapeHtml(formatDuration(accessTiming.seconds))} writing time</div>
  <div class="mock-transcript mock-text">${escapeHtml(row.answer || 'No typed response captured.')}</div>
  `;
 }
@@ -1407,6 +1410,30 @@ function mockAttemptAverage(attempt) {
  const scores = rows.map(row => safeNumericScore(row?.feedback?.overall?.score ?? row?.feedback?.score ?? row?.score)).filter(Number.isFinite);
  if (scores.length) return Math.round((scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10) / 10;
  return safeNumericScore(attempt?.report?.overallAvg);
+}
+
+function normaliseMockAccessTiming(value) {
+ const raw = String(value || '').trim().toLowerCase().replace(/\s+/g, '');
+ if (raw === '1.5' || raw === '1.5x' || raw === 'x1.5' || raw === 'x15' || raw === '15' || raw === '150') return 'x15';
+ if (raw === '2' || raw === '2x' || raw === 'x2' || raw === '200') return 'x2';
+ return 'standard';
+}
+
+function mockAccessTimingInfo(value) {
+ const key = normaliseMockAccessTiming(value?.key || value?.mode || value);
+ if (key === 'x15') return { key, label: '1.5x timing', seconds: 315 };
+ if (key === 'x2') return { key, label: '2x timing', seconds: 420 };
+ return { key: 'standard', label: 'Standard timing', seconds: 210 };
+}
+
+function mockAttemptAccessTiming(attempt) {
+ const rows = Array.isArray(attempt?.rows) ? attempt.rows : [];
+ const rowTiming = rows.map(row => row?.access_timing || row?.accessTiming || row?.timing?.access_timing).find(Boolean);
+ return mockAccessTimingInfo(attempt?.access_timing || attempt?.accessTiming || attempt?.report?.accessTiming || attempt?.report?.access_timing || attempt?.telemetry?.access_timing || rowTiming);
+}
+
+function mockRowAccessTiming(row, attempt = null) {
+ return mockAccessTimingInfo(row?.access_timing || row?.accessTiming || row?.timing?.access_timing || mockAttemptAccessTiming(attempt));
 }
 
 function mockRowScore(row) {

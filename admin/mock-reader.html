@@ -440,6 +440,7 @@
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin:9px 0 7px;">
             <span class="pill">${esc(r.tier||'mock')}</span>
             <span class="score-pill ${r.manual_review_paid?'good':(r.status==='in_progress'?'warn':'')}">${r.manual_review_paid ? 'Paid review' : (r.status==='in_progress' ? 'In progress' : 'Saved mock')}</span>
+            ${r.telemetry_summary?.access_timing?`<span class="pill">${esc(accessTimingInfo(r.telemetry_summary.access_timing).short)} timing</span>`:''}
           </div>
           <div class="list-meta">${esc(statusText(r.manual_review_status))}${r.completed_at ? ' | ' + esc(fmtDateTime(r.completed_at)) : ''}</div>
           ${attemptActivityLine(r)?`<div class="list-meta" style="margin-top:4px;color:${r.telemetry_summary?.active_recently?'#16a34a':'var(--muted)'}">${esc(attemptActivityLine(r))}</div>`:''}
@@ -822,6 +823,7 @@
       const typedCount=rows.filter(r=>r.type!=='video').length;
       const reprocessIssueCount=rows.filter(needsStationReprocess).length;
       const issueSummaries=stationIssueSummaries(rows);
+      const accessTiming=attemptAccessTiming(a);
       const tabs=rows.map((r,i)=>{
         const score=stationScore(r);
         const issueLabel=stationIssueLabel(r);
@@ -832,7 +834,7 @@
         <div class="attempt-head">
           <div>
             <h2 style="margin:0">${esc(a.user_name||a.user_email||'Student')}</h2>
-            <div class="muted">${esc(a.user_email||'No email')} | <span class="pill">${esc(a.tier||'mock')}</span> | ${esc(statusText(a.manual_review_status||'pending_review'))}</div>
+            <div class="muted">${esc(a.user_email||'No email')} | <span class="pill">${esc(a.tier||'mock')}</span> | <span class="pill">${esc(accessTiming.short)} typed timing</span> | ${esc(statusText(a.manual_review_status||'pending_review'))}</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
           ${reprocessIssueCount?`<button id="reprocessIssuesBtn" class="secondary" onclick="reprocessAttemptIssues()">Check + reprocess ${reprocessIssueCount} issue${reprocessIssueCount===1?'':'s'}</button>`:''}
@@ -844,6 +846,7 @@
           <div class="metric"><strong>${analysed.length}/${rows.length}</strong><span>Stations with AI feedback</span></div>
           <div class="metric"><strong>${videoCount}</strong><span>Video stations</span></div>
           <div class="metric"><strong>${typedCount}</strong><span>Typed stations</span></div>
+          <div class="metric"><strong>${esc(accessTiming.short)}</strong><span>${esc(fmtTime(accessTiming.seconds))} typed timing</span></div>
           <div class="metric"><strong>${esc(fmtDateTime(a.completed_at)||'-')}</strong><span>Completed</span></div>
         </div>
         ${attemptMonitoringHtml(a)}
@@ -880,6 +883,31 @@
       return `${h}h ${m}m`;
     }
 
+    function normaliseAccessTiming(value){
+      const raw=String(value||'').trim().toLowerCase().replace(/\s+/g,'');
+      if(raw==='1.5'||raw==='1.5x'||raw==='x1.5'||raw==='x15'||raw==='15'||raw==='150')return 'x15';
+      if(raw==='2'||raw==='2x'||raw==='x2'||raw==='200')return 'x2';
+      return 'standard';
+    }
+
+    function accessTimingInfo(value){
+      const key=normaliseAccessTiming(value?.key||value?.mode||value);
+      if(key==='x15')return {key,label:'1.5x access timing',short:'1.5x',seconds:315};
+      if(key==='x2')return {key,label:'2x access timing',short:'2x',seconds:420};
+      return {key:'standard',label:'Standard timing',short:'Standard',seconds:210};
+    }
+
+    function attemptAccessTiming(attempt=currentAttempt){
+      const rows=attempt?.rows||[];
+      const rowTiming=rows.map(row=>row?.access_timing||row?.accessTiming||row?.timing?.access_timing).find(Boolean);
+      const saved=attempt?.access_timing||attempt?.accessTiming||attempt?.report?.accessTiming||attempt?.report?.access_timing||attempt?.telemetry?.access_timing||attempt?.telemetry_summary?.access_timing||rowTiming;
+      return accessTimingInfo(saved);
+    }
+
+    function rowAccessTiming(row){
+      return accessTimingInfo(row?.access_timing||row?.accessTiming||row?.timing?.access_timing||attemptAccessTiming());
+    }
+
     function telemetryForAttempt(attempt=currentAttempt){
       return attempt?.telemetry && typeof attempt.telemetry==='object' ? attempt.telemetry : {};
     }
@@ -898,6 +926,7 @@
       const statusTone=activeRecently?'good':((attempt?.status||'')==='in_progress'?'warn':'');
       const statusText=activeRecently?'Active now':((attempt?.status||'')==='in_progress'?'Not currently active':'Finished/closed');
       const hasTelemetry=!!(tel.started_at || lastSeen || current || breakRows.length);
+      const accessTiming=attemptAccessTiming(attempt);
       if(!hasTelemetry){
         return `<div class="review-box soft">
           <div class="section-label">Monitoring</div>
@@ -917,6 +946,7 @@
           ${monitorTile('Started',fmtDateTime(tel.started_at || attempt?.started_at),tel.browser?.timezone || '')}
           ${monitorTile('Last seen',fmtDateTime(lastSeen),timeAgo(lastSeen))}
           ${monitorTile('Saved stations',`${rows.length}/11`,reachedUnsaved?'student reached a later unsaved station':'')}
+          ${monitorTile('Typed timing',accessTiming.short,`${fmtTime(accessTiming.seconds)} per typed station`)}
           ${monitorTile('Current page',currentLine,'',reachedUnsaved?'warn':'')}
           ${monitorTile('Tab hidden',fmtDuration(Math.round(Number(visibility.hidden_ms||0)/1000)),`${visibility.hidden_count||0} switch${Number(visibility.hidden_count||0)===1?'':'es'}`)}
         </div>
@@ -951,6 +981,8 @@
         tiles.push(monitorTile('Recording length',fmtDuration(timing.recording_duration_sec || rowDuration(row)),timing.submission_kind||''));
       }
       if(typing){
+        const accessTiming=rowAccessTiming(row);
+        tiles.push(monitorTile('Access timing',accessTiming.short,`${fmtTime(accessTiming.seconds)} allowed`));
         tiles.push(monitorTile('First typing',fmtDuration(typing.first_input_delay_sec),'after page opened'));
         tiles.push(monitorTile('Active typing focus',fmtDuration(typing.active_focus_sec),`${typing.focus_count||0} focus event${Number(typing.focus_count||0)===1?'':'s'}`));
         tiles.push(monitorTile('Keystrokes',typing.keydown_count||0,`${typing.input_events||0} input events`));
