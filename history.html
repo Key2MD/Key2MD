@@ -573,6 +573,7 @@ async function loadReviews() {
 	 const data = await res.json();
 	 allReviews = data.reviews || [];
 	 mockAttempts = await loadMockAttempts(token);
+	 mockAttempts = await hydrateMockAttemptScores(mockAttempts);
 	 updateStats();
 	 renderMockHistory();
 	 renderCompetencyProgress();
@@ -605,6 +606,37 @@ async function loadMockAttemptDetail(id) {
  const data = await res.json().catch(() => ({}));
  if (!res.ok) throw new Error(data.message || data.error || 'Could not load this mock report.');
  return data.attempt;
+}
+
+async function hydrateMockAttemptScores(attempts) {
+ if (!Array.isArray(attempts) || !attempts.length) return [];
+ const needsScore = attempts
+ .filter(attempt => attempt?.id && !Number.isFinite(mockAttemptAverage(attempt)))
+ .slice(0, 8);
+ if (!needsScore.length) return attempts;
+
+ const details = await Promise.all(needsScore.map(async attempt => {
+ try {
+ const detail = await loadMockAttemptDetail(attempt.id);
+ const avg = mockAttemptAverage(detail);
+ return Number.isFinite(avg)
+ ? { id: attempt.id, avg_score: avg, report: mockAttemptReport(detail) }
+ : null;
+ } catch {
+ return null;
+ }
+ }));
+
+ const byId = new Map(details.filter(Boolean).map(detail => [detail.id, detail]));
+ return attempts.map(attempt => {
+ const detail = byId.get(attempt.id);
+ if (!detail) return attempt;
+ return {
+ ...attempt,
+ avg_score: detail.avg_score,
+ report: Object.keys(detail.report || {}).length ? detail.report : attempt.report,
+ };
+ });
 }
 
 
@@ -668,8 +700,29 @@ function normalizeCompetencyName(name) {
 
 function safeNumericScore(value) {
  if (value === null || value === undefined || value === '') return null;
- const score = Number(value);
+ const raw = typeof value === 'string' ? (value.match(/\d+(?:\.\d+)?/)?.[0] || value) : value;
+ const score = Number(raw);
  return Number.isFinite(score) && score > 0 ? Math.round(score * 10) / 10 : null;
+}
+
+function parseObject(value) {
+ if (!value) return null;
+ if (typeof value === 'object') return value;
+ if (typeof value !== 'string') return null;
+ try {
+ const parsed = JSON.parse(value);
+ return parsed && typeof parsed === 'object' ? parsed : null;
+ } catch {
+ return null;
+ }
+}
+
+function mockAttemptReport(attempt) {
+ return parseObject(attempt?.report)
+ || parseObject(attempt?.report_json)
+ || parseObject(attempt?.report_data)
+ || parseObject(attempt?.ai_report)
+ || {};
 }
 
 function normalizeCompetencies(raw) {
@@ -787,7 +840,7 @@ function renderMockHistory() {
 
 function mockCardHTML(attempt) {
  const rows = attempt.rows || [];
- const report = attempt.report || {};
+ const report = mockAttemptReport(attempt);
  const completed = formatDate(attempt.completed_at);
  const expires = mockExpiryText(attempt);
  const avg = mockAttemptAverage(attempt);
@@ -821,7 +874,7 @@ function mockCardHTML(attempt) {
 }
 
 function mockOverviewHTML(attempt) {
- const report = attempt.report || {};
+ const report = mockAttemptReport(attempt);
  const action = (report.actionPlan || [])[0];
  const oneThing = report.oneThing || {};
  const manualNotes = String(attempt.manual_review_notes || '').trim();
@@ -1408,26 +1461,57 @@ function mockExpiryText(attempt) {
 }
 
 function mockAttemptAverage(attempt) {
+ const report = mockAttemptReport(attempt);
+ const summary = parseObject(attempt?.summary) || {};
+ const metrics = parseObject(attempt?.metrics) || {};
  const direct = [
+ attempt?.overallAvg,
  attempt?.avg_casper_score,
  attempt?.avg_score,
+ attempt?.avgScore,
  attempt?.average_score,
+ attempt?.averageScore,
  attempt?.overall_score,
+ attempt?.overallScore,
  attempt?.score,
- attempt?.report?.overallAvg,
- attempt?.report?.avg_score,
- attempt?.report?.avg_casper_score,
- attempt?.report?.average_score,
- attempt?.report?.overall_score,
- attempt?.report?.score,
- attempt?.summary?.overall_score,
- attempt?.summary?.avg_score,
- attempt?.metrics?.average_reviewed_score,
- attempt?.metrics?.avg_score
+ attempt?.average_reviewed_score,
+ attempt?.averageReviewedScore,
+ report?.overallAvg,
+ report?.overall,
+ report?.overall?.score,
+ report?.overall?.avg_score,
+ report?.overall?.avgScore,
+ report?.overall?.average_score,
+ report?.overall?.averageScore,
+ report?.avg_score,
+ report?.avgScore,
+ report?.avg_casper_score,
+ report?.average_score,
+ report?.averageScore,
+ report?.overall_score,
+ report?.overallScore,
+ report?.score,
+ report?.summary?.overall_score,
+ report?.summary?.overallScore,
+ report?.summary?.avg_score,
+ report?.summary?.avgScore,
+ report?.summary?.averageScore,
+ summary?.overall_score,
+ summary?.overallScore,
+ summary?.avg_score,
+ summary?.avgScore,
+ summary?.average_score,
+ summary?.averageScore,
+ metrics?.average_reviewed_score,
+ metrics?.averageReviewedScore,
+ metrics?.avg_score,
+ metrics?.avgScore,
+ metrics?.average_score,
+ metrics?.averageScore
  ].map(safeNumericScore).find(Number.isFinite);
  if (Number.isFinite(direct)) return direct;
  const rows = Array.isArray(attempt?.rows) ? attempt.rows : [];
- const scores = rows.map(row => safeNumericScore(row?.feedback?.overall?.score ?? row?.feedback?.score ?? row?.score)).filter(Number.isFinite);
+ const scores = rows.map(mockRowNumericScore).filter(Number.isFinite);
  if (scores.length) return Math.round((scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10) / 10;
  return null;
 }
@@ -1457,8 +1541,50 @@ function mockRowAccessTiming(row, attempt = null) {
 }
 
 function mockRowScore(row) {
- const score = safeNumericScore(row?.feedback?.overall?.score ?? row?.feedback?.score ?? row?.score);
+ const score = mockRowNumericScore(row);
  return Number.isFinite(score) ? `${score}/10` : 'No score';
+}
+
+function mockRowNumericScore(row) {
+ const fb = parseObject(row?.feedback) || parseObject(row?.ai_feedback) || parseObject(row?.feedback_json) || {};
+ const direct = [
+ row?.overall_score,
+ row?.overallScore,
+ row?.avg_score,
+ row?.avgScore,
+ row?.average_score,
+ row?.averageScore,
+ row?.score,
+ row?.score_estimate,
+ row?.scoreEstimate,
+ fb?.overall?.score,
+ fb?.overall?.avg_score,
+ fb?.overall?.avgScore,
+ fb?.overall?.average_score,
+ fb?.overall?.averageScore,
+ fb?.score,
+ fb?.overall_score,
+ fb?.overallScore,
+ fb?.average_score,
+ fb?.averageScore,
+ fb?.score_estimate,
+ fb?.scoreEstimate,
+ fb?.result?.score,
+ fb?.assessment?.score,
+ ].map(safeNumericScore).find(Number.isFinite);
+ if (Number.isFinite(direct)) return direct;
+
+ const competencyScores = normalizeCompetencies(fb.competencies).map(comp => comp.score).filter(Number.isFinite);
+ const promptScores = [];
+ (fb.per_prompt || []).forEach(prompt => {
+ Object.values(prompt?.scores || {}).forEach(item => {
+ const score = safeNumericScore(item?.score ?? item);
+ if (Number.isFinite(score)) promptScores.push(score);
+ });
+ });
+ const scores = competencyScores.length ? competencyScores : promptScores;
+ if (!scores.length) return null;
+ return Math.round((scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10) / 10;
 }
 
 function formatDuration(seconds) {

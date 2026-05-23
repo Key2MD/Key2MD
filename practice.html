@@ -316,13 +316,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 </section>
 
-<section style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:34px 24px;">
+<section style="background:#fff;border-bottom:1px solid #e2e8f0;padding:30px 24px;">
  <div style="max-width:1080px;margin:0 auto;">
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;align-items:stretch;">
- <div style="background:#0a1628;color:#fff;border-radius:12px;padding:20px;">
- <p style="font-size:0.68rem;font-weight:900;letter-spacing:0.14em;text-transform:uppercase;color:#38bdf8;margin:0 0 8px;">Free first, paid only when useful</p>
- <h2 style="font-size:1.25rem;line-height:1.25;margin:0 0 8px;">Use the practice tool as the organic entry point.</h2>
- <p style="font-size:0.86rem;color:rgba(255,255,255,0.72);line-height:1.6;margin:0;">Start with one timed station. If the free limit becomes the bottleneck, move to CASPer Pro, a full mock, or human marking.</p>
+ <div style="background:#f8fafc;color:#0a1628;border:1px solid #e2e8f0;border-radius:12px;padding:18px;">
+ <p style="font-size:0.68rem;font-weight:900;letter-spacing:0.14em;text-transform:uppercase;color:#0284c7;margin:0 0 8px;">Free first, paid only when useful</p>
+ <h2 style="font-size:1.12rem;line-height:1.28;margin:0 0 8px;">Start with the practice tool.</h2>
+ <p style="font-size:0.84rem;color:#475569;line-height:1.55;margin:0;">Try one timed station first. CASPer Pro, full mocks, and human marking stay available when you need more.</p>
  </div>
  <a href="plans.html#pro-section" style="display:block;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;text-decoration:none;">
  <strong style="display:block;color:#0a1628;font-size:0.92rem;margin-bottom:6px;">CASPer Pro</strong>
@@ -398,7 +398,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="mode-pill-row practice-mode-grid">
  <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper');" aria-label="CASPer practice">CASPer</button>
  <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');" aria-label="MMI practice">MMI</button>
-<button class="mode-pill mode-pill-mock" id="modeMock" onclick="setMode('mock');window.FullCasperMock?.activateMockMode?.();" aria-label="Full CASPer mock exam">Full Mock</button>
+<button class="mode-pill mode-pill-mock" id="modeMock" onclick="setMode('mock');window.FullCasperMock?.activateMockMode?.();" aria-label="Full CASPer mock exam"><span>Full Mock</span><span class="mock-pill-kicker">New</span></button>
 </div>
 </div>
 
@@ -592,12 +592,12 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
 
- <button id="lbExpandBtn" type="button" onclick="toggleLeaderboard()" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:calc(100% - 24px);margin:11px 12px 0;padding:11px 14px;border-radius:10px;border:none;background:linear-gradient(135deg,#0a1628 0%,#0d2a52 100%);color:rgba(255,255,255,0.9);font-size:0.8rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;text-align:left;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 14px rgba(10,22,40,0.2)';" onmouseout="this.style.transform='';this.style.boxShadow='';">
+ <button id="lbExpandBtn" type="button" onclick="toggleLeaderboard()" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:calc(100% - 24px);margin:11px 12px 0;padding:11px 14px;border-radius:10px;border:1px solid var(--gray200);background:#fff;color:var(--navy);font-size:0.8rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;text-align:left;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 14px rgba(10,22,40,0.08)';" onmouseout="this.style.transform='';this.style.boxShadow='';">
  <span style="display:flex;align-items:center;gap:8px;">
  <span id="lbExpandLabel">See where students rank today</span>
- <span id="lbExpandChip" style="display:none;font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:50px;background:rgba(245,158,11,0.18);color:#fbbf24;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;"></span>
+ <span id="lbExpandChip" style="display:none;font-size:0.62rem;font-weight:700;padding:2px 7px;border-radius:50px;background:#fffbeb;color:#b45309;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;"></span>
  </span>
- <span id="lbCollapseIcon" style="font-size:0.7rem;color:rgba(255,255,255,0.5);transition:transform 0.25s;display:inline-block;">v</span>
+ <span id="lbCollapseIcon" style="font-size:0.7rem;color:var(--gray500);transition:transform 0.25s;display:inline-block;">v</span>
  </button>
  </div>
 
@@ -3657,15 +3657,15 @@ function showFeedback(score,fb,options){
  const qi=getQuartile(score);
  const cal=getCalibrationQuartile();
  const calHtml=cal?`
- <div style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid rgba(14,165,233,0.15);">
+ <div style="background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid var(--gray200);">
  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
- <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);">Your Calibration Score</div>
- <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);">Based on ${cal.n} station${cal.n===1?'':'s'}</div>
+ <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray500);">Your Calibration Score</div>
+ <div style="font-size:0.68rem;color:var(--gray400);">Based on ${cal.n} station${cal.n===1?'':'s'}</div>
  </div>
  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
- <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1;">${cal.avg}</div>
+ <div style="font-size:2rem;font-weight:800;color:var(--navy);line-height:1;">${cal.avg}</div>
  <div style="flex:1;">
- <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;">
+ <div style="height:6px;background:var(--gray100);border-radius:3px;overflow:hidden;">
  <div style="height:100%;width:${(cal.avg/10)*100}%;background:${cal.color};border-radius:3px;transition:width 0.6s ease;"></div>
  </div>
  </div>
@@ -3673,10 +3673,10 @@ function showFeedback(score,fb,options){
  <div style="display:flex;gap:8px;flex-wrap:wrap;">
  ${['Q1','Q2','Q3','Q4'].map(q=>`
  <div style="display:flex;align-items:center;gap:4px;">
- <span style="font-size:0.72rem;font-weight:${qi.q===q?'800':'500'};color:${qi.q===q?qi.color:'rgba(255,255,255,0.25)'};">${q}</span>
+ <span style="font-size:0.72rem;font-weight:${qi.q===q?'800':'500'};color:${qi.q===q?qi.color:'var(--gray400)'};">${q}</span>
  </div>`).join('')}
  </div>
-<div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:4px;">${
+<div style="font-size:0.78rem;color:var(--gray600);line-height:1.4;margin-top:4px;">${
 qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus on repeating it.':
  qi.q==='Q3'?'Above median. Strong foundation - some refinement needed.':
  qi.q==='Q2'?'Below median. The feedback below shows exactly where to focus.':
@@ -3714,19 +3714,19 @@ The AI score is a practice calibration, not an official Acuity result. The scale
  </div>`;
  getAiFbEl().innerHTML=`
  ${getSelfRatingComparisonHtml(sessionHistory[currentIdx]?.selfRating, score)}
- <div style="background:linear-gradient(135deg,#0a1628,#112240);border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.08);">
+ <div style="background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid var(--gray200);">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
- <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;">${score}<span style="font-size:1rem;color:rgba(255,255,255,0.4);font-weight:400;">/10</span></div>
+ <div style="font-size:2.4rem;font-weight:800;color:var(--navy);line-height:1;">${score}<span style="font-size:1rem;color:var(--gray400);font-weight:400;">/10</span></div>
  <div style="flex:1;">
  <div style="font-size:0.82rem;font-weight:700;color:${qi.color};">${qi.label}</div>
- <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);margin-top:1px;">${qi.q}</div>
+ <div style="font-size:0.68rem;color:var(--gray400);margin-top:1px;">${qi.q}</div>
  </div>
  <span style="font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:50px;background:${qi.color}22;color:${qi.color};border:1px solid ${qi.color}44;">${qi.q}</span>
  </div>
- <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;">
+ <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;">
  <div style="height:100%;width:${score*10}%;background:${qi.color};border-radius:2px;transition:width 0.6s ease;"></div>
  </div>
-<div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:8px;">${
+<div style="font-size:0.78rem;color:var(--gray600);line-height:1.4;margin-top:8px;">${
 qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus on repeating it.':
  qi.q==='Q3'?'Above median. Strong foundation - some refinement needed.':
  qi.q==='Q2'?'Below median. The feedback below shows exactly where to focus.':
@@ -5735,15 +5735,15 @@ function k2RenderNudge(){
 
  const el = document.createElement('div');
  el.id = 'k2Nudge';
- el.style.cssText = 'margin-top:18px;background:linear-gradient(135deg,#0a1628,#0d2a52);border:1px solid rgba(14,165,233,0.3);border-radius:14px;padding:20px 22px;color:#fff;font-family:inherit;position:relative;animation:k2NudgeFadeIn 0.4s ease-out;';
+ el.style.cssText = 'margin-top:18px;background:#fff;border:1px solid var(--gray200);border-radius:14px;padding:20px 22px;color:var(--gray800);font-family:inherit;position:relative;animation:k2NudgeFadeIn 0.4s ease-out;';
  el.innerHTML = `
- <button aria-label="Dismiss" onclick="k2Dismiss('${nudge.key}')" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:0.9rem;line-height:1;display:flex;align-items:center;justify-content:center;">x</button>
- <div style="display:inline-block;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#38bdf8;background:rgba(14,165,233,0.15);padding:4px 10px;border-radius:50px;margin-bottom:10px;">${nudge.badge}</div>
- <div style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:8px;line-height:1.35;">${nudge.title}</div>
- <p style="font-size:0.85rem;color:rgba(255,255,255,0.72);margin:0 0 14px;line-height:1.55;">${nudge.body}</p>
+ <button aria-label="Dismiss" onclick="k2Dismiss('${nudge.key}')" style="position:absolute;top:10px;right:10px;background:var(--gray50);border:1px solid var(--gray200);color:var(--gray500);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:0.9rem;line-height:1;display:flex;align-items:center;justify-content:center;">x</button>
+ <div style="display:inline-block;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0369a1;background:#e0f2fe;padding:4px 10px;border-radius:50px;margin-bottom:10px;">${nudge.badge}</div>
+ <div style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:8px;line-height:1.35;">${nudge.title}</div>
+ <p style="font-size:0.85rem;color:var(--gray600);margin:0 0 14px;line-height:1.55;">${nudge.body}</p>
  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
  <a href="${nudge.cta.href}" ${nudge.cta.onclick?`onclick="${nudge.cta.onclick}"`:'target="_blank" rel="noopener"'} style="display:inline-block;background:#0ea5e9;color:#fff;font-weight:700;font-size:0.88rem;padding:10px 20px;border-radius:50px;text-decoration:none;transition:all 0.2s;">${nudge.cta.text}</a>
- ${nudge.secondary ? `<a href="${nudge.secondary.href}" ${nudge.secondary.onclick?`onclick="${nudge.secondary.onclick}"`:'target="_blank" rel="noopener"'} style="font-size:0.82rem;color:rgba(255,255,255,0.6);text-decoration:underline;text-underline-offset:3px;">${nudge.secondary.text}</a>` : ''}
+ ${nudge.secondary ? `<a href="${nudge.secondary.href}" ${nudge.secondary.onclick?`onclick="${nudge.secondary.onclick}"`:'target="_blank" rel="noopener"'} style="font-size:0.82rem;color:var(--gray600);text-decoration:underline;text-underline-offset:3px;">${nudge.secondary.text}</a>` : ''}
  </div>
  `;
  container.appendChild(el);
