@@ -34,7 +34,7 @@ window.FullCasperMock = (() => {
  typedSeconds: CASPER_TYPED_SECONDS,
  cardTitle: 'Standard',
  cardMeta: '3:30 writing time',
- description: 'Use this if you sit the mock under standard CASPer timing.',
+ description: 'Use this when you are ready to mimic ordinary CASPer timing.',
  },
  x15: {
  key: 'x15',
@@ -44,7 +44,7 @@ window.FullCasperMock = (() => {
  typedSeconds: Math.round(CASPER_TYPED_SECONDS * 1.5),
  cardTitle: '1.5x',
  cardMeta: '5:15 writing time',
- description: 'For students with approved 1.5x written-station access arrangements.',
+ description: 'For approved 1.5x accommodations, or a gentler first timed run.',
  },
  x2: {
  key: 'x2',
@@ -54,7 +54,7 @@ window.FullCasperMock = (() => {
  typedSeconds: CASPER_TYPED_SECONDS * 2,
  cardTitle: '2x',
  cardMeta: '7:00 writing time',
- description: 'For students with approved 2x written-station access arrangements.',
+ description: 'For approved 2x accommodations, or a low-pressure first mock.',
  },
  };
  let active = false;
@@ -1262,7 +1262,7 @@ window.FullCasperMock = (() => {
  <div class="sidebar-card" style="border-color:rgba(14,165,233,0.25);background:linear-gradient(180deg,rgba(14,165,233,0.06),#fff);">
  <h3>Full CASPer Mock</h3>
  <div style="font-size:0.82rem;color:var(--gray600);line-height:1.55;margin-bottom:14px;">
- CASPer-style sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. 5 private mocks are live, typed access timing is supported, and each account is assigned the next unused one.
+ CASPer-style sequence: 4 video scenarios, 10-minute optional break, then 7 typed scenarios with a 5-minute optional break after typed station 4. 5 private mocks are live, equity access timing is supported, and each account is assigned the next unused one.
  </div>
 
  <div style="margin-bottom:14px;">
@@ -1277,7 +1277,7 @@ window.FullCasperMock = (() => {
  <div style="background:#fff;border:1px solid rgba(14,165,233,0.24);border-radius:10px;padding:12px;margin-bottom:14px;">
  <div style="font-size:0.68rem;font-weight:800;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Mock exam pass</div>
  <div id="mockPriceLine" data-mock-price-line style="font-size:0.86rem;color:var(--navy);line-height:1.45;">${renderPriceLine('transcript')}</div>
- <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes your next unused 11-station mock, 7 typed-station CASPer AI markings with standard/1.5x/2x timing, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
+ <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes your next unused 11-station mock, 7 typed-station CASPer AI markings, optional equity access timing, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
  </div>
 
  ${mockDiscountMarkup()}
@@ -1474,7 +1474,7 @@ window.FullCasperMock = (() => {
  </div>
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
  <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">7 typed stations</div>
- <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">Two questions together. Standard is 3:30; 1.5x and 2x written-station access timing can be selected before you begin.</div>
+ <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">Two questions together. Use standard timing, or choose an equity/low-pressure timing option before you begin.</div>
  </div>
  <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:14px;">
  <div style="font-size:0.78rem;font-weight:800;color:var(--navy);margin-bottom:4px;">No repeats</div>
@@ -1517,7 +1517,7 @@ window.FullCasperMock = (() => {
  <div style="background:linear-gradient(135deg,rgba(14,165,233,0.08),rgba(34,197,94,0.04));border:1px solid rgba(14,165,233,0.22);border-radius:14px;padding:16px;margin:0 0 18px;">
  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
  <div>
- <div style="font-size:0.7rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:4px;">Access arrangements</div>
+ <div style="font-size:0.7rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:4px;">Equity access / first run</div>
  <div style="font-size:0.92rem;font-weight:900;color:var(--navy);line-height:1.3;">Typed-station timing</div>
  </div>
  <div id="mockAccessTimingSummary" style="font-size:0.75rem;font-weight:900;color:var(--teal3);background:#fff;border:1px solid rgba(14,165,233,0.18);border-radius:999px;padding:6px 10px;">${esc(accessTimingOption().shortLabel)} · ${formatSeconds(typedWritingSeconds())}</div>
@@ -1552,7 +1552,7 @@ window.FullCasperMock = (() => {
  const status = byId('mockAccessTimingStatus');
  if (status) {
  status.textContent = selected.key === 'standard'
- ? 'Standard timing selected. You can switch to 1.5x or 2x here if that matches your real access arrangements.'
+ ? 'Standard timing selected. Use an equity option only if it matches your accommodations, or if you want a gentler first mock before standard timing.'
  : `${selected.label} selected for typed stations: ${formatSeconds(selected.typedSeconds)} total writing time after reflection. Video station timing stays standard.`;
  status.style.color = selected.key === 'standard' ? 'var(--gray500)' : 'var(--teal3)';
  }
@@ -3624,7 +3624,7 @@ function renderPartialReportNotice(rows) {
     if (!body) return '';
     return `
      <div class="k2mr-fb-tile ${cls}">
-      <div class="k2mr-fb-lbl">${label}</div>
+      <div class="k2mr-fb-lbl"><span class="k2mr-fb-icon" aria-hidden="true"></span><span>${esc(label)}</span></div>
       <div class="k2mr-fb-body">${esc(body)}</div>
      </div>
     `;
@@ -3653,11 +3653,11 @@ function renderPartialReportNotice(rows) {
          <div class="k2mr-fbsummary-cat">${esc(row.station?.category || 'Typed station')} &middot; Typed ${row.localIndex || ''}</div>
          <div class="k2mr-fbsummary-score" style="color:${scoreColor};">${esc(rowScoreLabel(row))}</div>
         </div>
-        ${fbTile('strength', '&#10003; Strength', fb.strengths)}
-        ${fbTile('improve', '&rarr; Biggest improvement', fb.improvements)}
-        ${fbTile('empathy', '&#9825; Empathy layer to add', fb.empathy)}
-        ${fb.missed && fb.missed !== 'None' ? fbTile('missed', '&#8859; Missed point', fb.missed) : ''}
-        ${fb.excellent_version ? fbTile('excellent', '&#9733; An excellent response would add', fb.excellent_version) : ''}
+        ${fbTile('strength', 'Strength', fb.strengths)}
+        ${fbTile('improve', 'Biggest improvement', fb.improvements)}
+        ${fbTile('empathy', 'Empathy layer to add', fb.empathy)}
+        ${fb.missed && fb.missed !== 'None' ? fbTile('missed', 'Missed point', fb.missed) : ''}
+        ${fb.excellent_version ? fbTile('excellent', 'An excellent response would add', fb.excellent_version) : ''}
        </div>
        ${typedCompetencyReviewHtml(row)}
       </div>
@@ -3755,9 +3755,9 @@ function renderPartialReportNotice(rows) {
        <div class="k2mr-fbsummary-cat">${esc(row.station?.category || 'Video station')}</div>
        <div class="k2mr-fbsummary-score" style="color:${scoreColor};">${Number.isFinite(score) ? `${round1(score)}/10` : '-'}${overall.label ? ` &middot; ${esc(overall.label)}` : ''}</div>
       </div>
-      ${fbTile('strength', '&#10003; Strength', overall.biggest_strength)}
-      ${fbTile('improve', '&rarr; Biggest improvement', overall.biggest_improvement)}
-      ${overall.excellent_version ? fbTile('excellent', '&#9733; An excellent response would add', overall.excellent_version) : ''}
+      ${fbTile('strength', 'Strength', overall.biggest_strength)}
+      ${fbTile('improve', 'Biggest improvement', overall.biggest_improvement)}
+      ${overall.excellent_version ? fbTile('excellent', 'An excellent response would add', overall.excellent_version) : ''}
       ${row.transcript ? `<div style="font-family:var(--mono);font-size:0.7rem;color:rgba(255,255,255,0.45);line-height:1.55;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);"><strong style="color:var(--teal2);">TRANSCRIPT EXCERPT:</strong> ${esc(String(row.transcript).slice(0, 260))}${String(row.transcript).length > 260 ? '...' : ''}</div>` : ''}
      </div>
      ${promptHtml}

@@ -275,7 +275,14 @@ a{color:inherit;text-decoration:none}
 .k2mr-fb-tile.empathy{border-left-color:var(--teal2)}
 .k2mr-fb-tile.missed{border-left-color:var(--purple)}
 .k2mr-fb-tile.excellent{border-left-color:var(--gold3)}
-.k2mr-fb-lbl{font-family:var(--mono);font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px}
+.k2mr-fb-lbl{font-family:var(--mono);font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.k2mr-fb-icon{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 14px;font-size:0;line-height:1}
+.k2mr-fb-icon::before{font-size:0.78rem;line-height:1;transform:translateY(-0.5px)}
+.k2mr-fb-tile.strength .k2mr-fb-icon::before{content:'\2713'}
+.k2mr-fb-tile.improve .k2mr-fb-icon::before{content:'\2192'}
+.k2mr-fb-tile.empathy .k2mr-fb-icon::before{content:'\2665'}
+.k2mr-fb-tile.missed .k2mr-fb-icon::before{content:'\2299'}
+.k2mr-fb-tile.excellent .k2mr-fb-icon::before{content:'\2605'}
 .k2mr-fb-tile.strength .k2mr-fb-lbl{color:var(--green)}
 .k2mr-fb-tile.improve .k2mr-fb-lbl{color:var(--gold3)}
 .k2mr-fb-tile.empathy .k2mr-fb-lbl{color:var(--teal2)}

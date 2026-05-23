@@ -57,7 +57,7 @@
  price: 'from $59',
  href: 'full-casper-mock-exam.html',
  cta: 'View full mock',
- bestFor: 'Students close to test day who need full-test stamina, no-repeat mocks, and standard or access-adjusted typed timing.',
+ bestFor: 'Students close to test day who need full-test stamina, no-repeat mocks, and optional equity access timing.',
  tags: ['casper', 'mock', 'exam']
  },
  {

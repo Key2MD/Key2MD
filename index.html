@@ -342,7 +342,9 @@
  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
  .stat-card{text-align:center;padding:36px 20px;position:relative}
  .stat-card+.stat-card::before{content:'';position:absolute;left:0;top:20%;height:60%;width:1px;background:rgba(255,255,255,0.08)}
- .stat-number{font-size:2.2rem;font-weight:800;color:var(--white);display:block;margin-bottom:6px;letter-spacing:-0.5px;font-family:'DM Serif Display',Georgia,serif}
+.stat-number{font-size:2.2rem;font-weight:800;color:var(--white);display:block;margin-bottom:6px;letter-spacing:0;line-height:1;font-family:'DM Serif Display',Georgia,serif}
+.stat-number.stat-check{display:flex;align-items:center;justify-content:center;width:1.2em;height:1.2em;margin:0 auto 6px;font-size:0;}
+.stat-number.stat-check::before{content:'\2713';font-size:2.2rem;line-height:1;transform:translateY(-1px);}
  .stat-label{font-size:0.78rem;color:rgba(255,255,255,0.45);font-weight:500;letter-spacing:0.04em}
 
 
@@ -359,7 +361,7 @@
  .path-card p{font-size:0.92rem;color:var(--gray600);line-height:1.65;margin:0 0 18px;max-width:none}
  .path-list{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:8px}
  .path-list li{font-size:0.84rem;color:var(--gray600);display:flex;gap:8px;align-items:flex-start}
- .path-list li::before{content:'\2713';color:#16a34a;font-weight:900;flex:0 0 auto}
+.path-list li::before{content:'\2713';width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;color:#16a34a;font-size:0.78rem;line-height:1;font-weight:900;flex:0 0 16px;margin-top:2px}
  .path-link{margin-top:auto;display:inline-flex;align-items:center;gap:8px;color:var(--navy);font-weight:900;font-size:0.92rem}
  .path-card.primary{border-color:rgba(14,165,233,0.38)}
  .path-card.primary .path-link{color:#0369a1}
@@ -387,7 +389,7 @@
  .service-desc{font-size:0.9rem;color:var(--gray600);line-height:1.65;flex:1}
  .service-features{list-style:none;display:flex;flex-direction:column;gap:7px}
  .service-features li{font-size:0.85rem;color:var(--gray600);display:flex;align-items:flex-start;gap:8px}
- .service-features li::before{content:'\2713';color:var(--teal);font-weight:700;flex-shrink:0;margin-top:1px}
+.service-features li::before{content:'\2713';width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;color:var(--teal);font-size:0.78rem;line-height:1;font-weight:700;flex-shrink:0;margin-top:2px}
  .service-card.specialty .service-features li::before{color:#7c3aed}
  .service-card.gp .service-features li::before{color:#16a34a}
 
@@ -528,7 +530,7 @@
  .pricing-desc{font-size:0.88rem;color:var(--gray600);line-height:1.6}
  .pricing-features{list-style:none;display:flex;flex-direction:column;gap:8px;flex:1}
  .pricing-feature{font-size:0.87rem;color:var(--gray600);display:flex;align-items:flex-start;gap:8px}
- .pricing-feature::before{content:'\2713';color:var(--teal);font-weight:700;flex-shrink:0;margin-top:1px}
+.pricing-feature::before{content:'\2713';width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;color:var(--teal);font-size:0.78rem;line-height:1;font-weight:700;flex-shrink:0;margin-top:2px}
 
 
  .enquiry-section{background:linear-gradient(135deg,var(--navy) 0%,#0d2a52 100%);padding:80px 0;position:relative;overflow:hidden}
@@ -627,7 +629,7 @@
  .footer-logo span{color:var(--teal)}
  .footer-tagline{font-size:0.88rem;color:rgba(255,255,255,0.45);line-height:1.6;margin-bottom:20px;max-width:260px}
  .footer-studentvip{display:inline-flex;align-items:center;gap:6px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);color:var(--teal2);font-size:0.75rem;font-weight:600;padding:5px 12px;border-radius:50px}
- .footer-studentvip::before{content:'\2713'}
+.footer-studentvip::before{content:'\2713';width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;line-height:1;flex:0 0 16px;transform:translateY(-0.5px)}
  .footer-col h4{font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.8);margin-bottom:18px;letter-spacing:0.05em;text-transform:uppercase}
  .footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
  .footer-links a{font-size:0.88rem;color:rgba(255,255,255,0.45);transition:color 0.2s}
@@ -659,7 +661,10 @@
  .eq-btn-submit:disabled{opacity:0.5;cursor:not-allowed}
  .eq-error{display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:0.82rem;padding:10px 14px;border-radius:8px;margin-bottom:14px}
  .eq-success{text-align:center;padding:20px 0}
- .eq-success-icon{font-size:2.5rem;margin-bottom:12px}
+.eq-success-icon{width:52px;height:52px;margin:0 auto 12px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(34,197,94,0.13);border:1px solid rgba(34,197,94,0.28);color:#86efac;font-size:0;line-height:1}
+.eq-success-icon::before{content:'\2713';font-size:1.45rem;line-height:1;transform:translateY(-1px)}
+.inline-check-icon{width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;color:#fbbf24;font-size:0;line-height:1;font-weight:800;margin-top:2px}
+.inline-check-icon::before{content:'\2713';font-size:0.78rem;line-height:1;transform:translateY(-0.5px)}
  .eq-success-title{color:#fff;font-size:1.1rem;font-weight:700;margin-bottom:6px}
  .eq-success-sub{color:rgba(255,255,255,0.5);font-size:0.85rem}
 
@@ -1008,7 +1013,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div id="eqSuccess" style="display:none;">
  <div class="eq-success">
- <div class="eq-success-icon">&#10003;</div>
+<div class="eq-success-icon" aria-hidden="true"></div>
  <div class="eq-success-title">Enquiry sent!</div>
  <div class="eq-success-sub">Dan usually replies within 24 hours. Keep an eye on your inbox.</div>
  <button class="eq-btn-submit" onclick="closeEnquiry()" style="margin-top:20px;width:100%;">Got it -></button>
@@ -1192,7 +1197,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <span class="stat-label">Moderator-Chosen Tutor</span>
  </div>
  <div class="stat-card fade-up delay-3 visible">
- <span class="stat-number" style="color:#22c55e;">&#10003;</span>
+<span class="stat-number stat-check" style="color:#22c55e;" aria-hidden="true"></span>
  <span class="stat-label">StudentVIP Verified</span>
  </div>
 
@@ -1781,10 +1786,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <h2 style="color:var(--white);font-size:clamp(1.6rem,3vw,2.2rem);margin-bottom:16px;letter-spacing:-0.3px;">The Interview Day Kit</h2>
  <p style="color:rgba(255,255,255,0.65);font-size:0.97rem;line-height:1.75;margin-bottom:20px;">The night before your MMI or CASPer matters. This one-page checklist covers exactly what to do - and what not to do - in the 24 hours before you walk in. Used by Dan's private students every intake.</p>
  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
- <div style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span style="color:#fbbf24;font-weight:700;">&#10003;</span> Night-before mindset and preparation checklist</div>
- <div style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span style="color:#fbbf24;font-weight:700;">&#10003;</span> Morning-of logistics (tech check, login, setup)</div>
- <div style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span style="color:#fbbf24;font-weight:700;">&#10003;</span> What to do in the waiting room</div>
- <div style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span style="color:#fbbf24;font-weight:700;">&#10003;</span> The 3 things Dan tells every student the day before</div>
+<div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span class="inline-check-icon" aria-hidden="true"></span> Night-before mindset and preparation checklist</div>
+<div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span class="inline-check-icon" aria-hidden="true"></span> Morning-of logistics (tech check, login, setup)</div>
+<div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span class="inline-check-icon" aria-hidden="true"></span> What to do in the waiting room</div>
+<div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.7);"><span class="inline-check-icon" aria-hidden="true"></span> The 3 things Dan tells every student the day before</div>
  </div>
  </div>
  <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius);padding:32px 28px;">

@@ -111,7 +111,7 @@
  {
  "@type": "Question",
  "name": "How does the timer work?",
- "acceptedAnswer": {"@type": "Answer", "text": "The practice tool offers four CASPer timer modes, plus optional Special Accommodations at 1.5x or 2.0x timing. Standard mode uses a 60-second reading period followed by a 3:30 typed response, mirroring real CASPer conditions. Rapid Fire (30s read, 2:00 write) trains instinctive thinking. Deep Dive (90s read, 6:00 write) gives room to fully develop a response. Off mode disables the timer entirely for first attempts. Most users practise in Standard mode."}
+"acceptedAnswer": {"@type": "Answer", "text": "The practice tool offers four CASPer timer modes, plus Special Accommodations timing for students with approved access arrangements. Standard mode uses a 60-second reading period followed by a 3:30 typed response, mirroring real CASPer conditions. Rapid Fire (30s read, 2:00 write) trains instinctive thinking. Deep Dive (90s read, 6:00 write) gives room to fully develop a response. Off mode disables the timer entirely for first attempts. Most users practise in Standard mode."}
  },
  {
  "@type": "Question",
@@ -330,7 +330,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </a>
  <a href="full-casper-mock-exam.html" style="display:block;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;text-decoration:none;">
  <strong style="display:block;color:#0a1628;font-size:0.92rem;margin-bottom:6px;">Full CASPer Mock Exam</strong>
-<span style="display:block;color:#475569;font-size:0.8rem;line-height:1.5;">4 video stations, 7 typed stations, access timing options, and a final report when test day is close.</span>
+<span style="display:block;color:#475569;font-size:0.8rem;line-height:1.5;">4 video stations, 7 typed stations, equity access supported, and a final report when test day is close.</span>
  </a>
  <a href="plans.html#credits" style="display:block;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;text-decoration:none;">
  <strong style="display:block;color:#0a1628;font-size:0.92rem;margin-bottom:6px;">AI review credits</strong>
@@ -400,7 +400,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');" aria-label="MMI practice">MMI</button>
  <button class="mode-pill mode-pill-mock" id="modeMock" onclick="setMode('mock');window.FullCasperMock?.activateMockMode?.();" aria-label="Full CASPer mock exam"><span class="mock-pill-kicker">New</span><span>Full Mock</span></button>
  </div>
-<div class="mock-pill-helper">5-mock bank | no repeats | 1.5x/2x typed timing | <a href="full-casper-mock-exam.html">details</a></div>
+<div class="mock-pill-helper">5-mock bank | no repeats | equity access supported | <a href="full-casper-mock-exam.html">details</a></div>
  </div>
 
  <button class="btn-start" id="startBtn"><span id="startBtnIcon">></span><span id="startBtnText">Start Session</span></button>
@@ -1121,8 +1121,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <article class="practice-action-card">
  <div class="practice-action-kicker">Full CASPer mock</div>
  <div class="practice-action-title">4 video + 7 typed stations</div>
-<p class="practice-action-copy">A full 11-station sequence from the rotating private mock bank. 5 full mocks are live now, each purchase should unlock a fresh unused mock, and typed stations support standard, 1.5x or 2x timing.</p>
-<div class="practice-action-meta"><span class="practice-mini-tag">5 mocks live</span><span class="practice-mini-tag">11 stations</span><span class="practice-mini-tag">1.5x/2x timing</span></div>
+<p class="practice-action-copy">A full 11-station sequence from the rotating private mock bank. 5 full mocks are live now, each purchase should unlock a fresh unused mock, with optional equity timing for accommodations or a lower-pressure first run.</p>
+<div class="practice-action-meta"><span class="practice-mini-tag">5 mocks live</span><span class="practice-mini-tag">11 stations</span><span class="practice-mini-tag">Equity access</span></div>
  <button type="button" class="practice-action-btn outline" onclick="setMode('mock');window.FullCasperMock?.activateMockMode?.();document.getElementById('practice-app').scrollIntoView({behavior:'smooth',block:'start'});">Open full mock</button>
  </article>
  <article class="practice-action-card">
@@ -1209,7 +1209,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <div id="eqSuccess" style="display:none;">
  <div class="eq-success">
- <div class="eq-success-icon">&#10003;</div>
+ <div class="eq-success-icon" aria-hidden="true"></div>
  <div class="eq-success-title">Sent!</div>
  <div class="eq-success-sub">Dan usually replies within 24 hours. Keep an eye on your inbox.</div>
  <button class="eq-btn-submit" onclick="closeEnquiry()" style="margin-top:20px;width:100%;">Got it -></button>
@@ -1264,7 +1264,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div id="questionSubmitSuccess" style="display:none;">
  <div class="eq-success">
- <div class="eq-success-icon">&#10003;</div>
+ <div class="eq-success-icon" aria-hidden="true"></div>
  <div class="eq-success-title">Question submitted</div>
  <div class="eq-success-sub">Dan will review it personally. The useful part for you is already happening: you are training yourself to see what CASPer is actually assessing.</div>
  <button class="eq-btn-submit" onclick="closeQuestionSubmitModal()" style="margin-top:20px;width:100%;">Done</button>
@@ -2724,7 +2724,7 @@ function setPhaseUI(p){
  phase=p;phaseBadge.className='phase-badge';progressFill.className='progress-fill';
  if(p==='reading'){phaseBadge.classList.add('phase-reading');phaseBadge.textContent='📖 Reading';progressFill.classList.add('reading');}
  else if(p==='writing'){phaseBadge.classList.add('phase-writing');phaseBadge.textContent='✍️ Writing';progressFill.classList.add('writing');}
- else if(p==='done'){phaseBadge.classList.add('phase-done');phaseBadge.textContent='✓ Done';}
+else if(p==='done'){phaseBadge.classList.add('phase-done');phaseBadge.textContent='Done';}
  else{phaseBadge.classList.add('phase-idle');phaseBadge.textContent='Idle';}
  updateReflectionUI();
  updateBtns();
@@ -5856,8 +5856,8 @@ document.addEventListener('DOMContentLoaded', function(){
  </div>
 
 
- <div id="creditShopSuccess" style="display:none;text-align:center;padding:20px 0;">
- <div style="font-size:2.5rem;margin-bottom:12px;">&#10003;</div>
+<div id="creditShopSuccess" style="display:none;text-align:center;padding:20px 0;">
+<div class="eq-success-icon" aria-hidden="true"></div>
  <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:6px;">Credits added!</div>
  <div style="font-size:0.85rem;color:rgba(255,255,255,0.5);" id="creditSuccessMsg">Your credits are ready to use.</div>
  <button onclick="closeCreditShop()" style="margin-top:20px;width:100%;padding:12px;border-radius:50px;border:none;background:#0ea5e9;color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;">Start Practising -></button>

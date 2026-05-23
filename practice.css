@@ -198,7 +198,8 @@
  .eq-btn-submit:disabled { opacity:0.5; cursor:not-allowed; }
  .eq-error { display:none; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; font-size:0.82rem; padding:10px 14px; border-radius:8px; margin-bottom:14px; }
  .eq-success { text-align:center; padding:20px 0; }
- .eq-success-icon { font-size:2.5rem; margin-bottom:12px; }
+.eq-success-icon { width:52px; height:52px; margin:0 auto 12px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(34,197,94,0.13); border:1px solid rgba(34,197,94,0.28); color:#86efac; font-size:0; line-height:1; }
+.eq-success-icon::before { content:'\2713'; font-size:1.45rem; line-height:1; transform:translateY(-1px); }
  .eq-success-title { color:#fff; font-size:1.1rem; font-weight:700; margin-bottom:6px; }
  .question-modal-card { max-width:620px; }
  .question-format-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }

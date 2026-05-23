@@ -147,6 +147,10 @@ footer a:hover { color:var(--white); }
 .student-card h5 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:6px; }
 .student-card .calc { font-size:0.85rem; color:var(--gray600); font-family:'Courier New',monospace; line-height:1.6; margin-bottom:4px; }
 .student-card .result { font-size:0.88rem; font-weight:700; padding:6px 0; }
+.result-icon { width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:0; line-height:1; vertical-align:-2px; }
+.result-icon::before { font-size:0.78rem; line-height:1; transform:translateY(-0.5px); }
+.result-icon.pass::before { content:'\2713'; }
+.result-icon.fail::before { content:'\2717'; }
 .result-pass { color:var(--green); }
 .result-fail { color:var(--red); }
 
@@ -416,13 +420,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <h5>Student A - Competitive Profile</h5>
  <p class="calc">GEMSAS GPA: 6.95  |  GAMSAT: 75</p>
  <p class="calc">(6.95 / 7) + (75 / 100) = 0.993 + 0.750</p>
- <p class="result result-pass">Combo: 1.743 - Highly competitive for most schools &#10003;</p>
+<p class="result result-pass">Combo: 1.743 - Highly competitive for most schools <span class="result-icon pass" aria-hidden="true"></span></p>
  </div>
  <div class="student-card">
  <h5>Student B - Below Threshold</h5>
  <p class="calc">GEMSAS GPA: 6.75  |  GAMSAT: 66</p>
  <p class="calc">(6.75 / 7) + (66 / 100) = 0.964 + 0.660</p>
- <p class="result result-fail">Combo: 1.624 - Unlikely to receive an interview at most schools &#10007;</p>
+<p class="result result-fail">Combo: 1.624 - Unlikely to receive an interview at most schools <span class="result-icon fail" aria-hidden="true"></span></p>
  </div>
 
  <div class="callout callout-navy">
