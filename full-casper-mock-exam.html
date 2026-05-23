@@ -304,10 +304,6 @@
     .ppill span { font-size:.68rem; color:rgba(255,255,255,.5); font-weight:600; }
     .pnote { text-align:center; font-size:.8rem; color:rgba(255,255,255,.42); margin-top:18px; position:relative; z-index:2; }
     .pnote a { color:var(--teal2); font-weight:700; }
-    .earlybird-callout { max-width:800px; margin:0 auto 20px; border:1px solid rgba(245,158,11,.35); background:rgba(245,158,11,.12); border-radius:16px; padding:16px 18px; color:#fff; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; position:relative; z-index:2; }
-    .earlybird-callout strong { color:#fde68a; }
-    .earlybird-callout span { color:rgba(255,255,255,.72); font-size:.9rem; line-height:1.5; }
-    .earlybird-code { font-weight:900; letter-spacing:.08em; color:#0f172a; background:#fbbf24; border-radius:999px; padding:8px 12px; white-space:nowrap; }
     .faq-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; position:relative; z-index:2; }
     .faq-card { background:rgba(255,255,255,.055); border:1px solid rgba(56,189,248,.14); border-radius:var(--r); padding:22px; }
     .faq-card h3 { font-family:"DM Sans",system-ui,sans-serif; font-size:.98rem; font-weight:800; color:#fff; margin-bottom:8px; letter-spacing:0; }
@@ -544,10 +540,6 @@
           <h2>Choose Transcript or Premium.</h2>
  <p>Both include a fresh unused 11-station mock selected from the 5 active private mocks, 7 typed-station AI markings, optional equity access timing, 4 video analyses, and the full mock report. CASPer Pro students pay less.</p>
         </div>
-        <div class="earlybird-callout" data-earlybird-callout>
-          <span><strong>24-hour earlybird:</strong> use code EARLYBIRD20 for 20% off every fresh Transcript or Premium mock checkout before 6:00pm AEST, 24 May 2026.</span>
-          <div class="earlybird-code">EARLYBIRD20</div>
-        </div>
         <div class="price-grid">
           <div class="pcard">
             <div class="p-eyb">Transcript Mock</div>
@@ -657,14 +649,6 @@
       </div>
     </div>
   </footer>
-
-  <script>
-    (() => {
-      if (Date.now() > Date.parse('2026-05-24T08:00:00.000Z')) {
-        document.querySelectorAll('[data-earlybird-callout]').forEach(el => { el.style.display = 'none'; });
-      }
-    })();
-  </script>
 
   <script>
     (() => {

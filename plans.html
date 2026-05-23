@@ -521,16 +521,7 @@
  .modal-alert{padding:10px 13px;border-radius:8px;font-size:0.8rem;font-weight:600;margin-top:10px;display:none;}
  .modal-alert.ok{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:var(--green);display:block;}
  .modal-alert.err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:var(--red);display:block;}
- .mock-discount-box{display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:13px;margin:0 0 16px;}
- .mock-discount-box.show{display:block;}
- .mock-discount-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:7px;}
- .mock-discount-kicker{font-size:0.67rem;font-weight:900;color:#fbbf24;letter-spacing:0.1em;text-transform:uppercase;}
- .mock-discount-saving{font-size:0.74rem;font-weight:900;color:#fde68a;}
- .mock-discount-copy{font-size:0.78rem;color:rgba(255,255,255,0.62);line-height:1.45;margin-bottom:9px;}
- .mock-discount-code-input{width:100%;border:1px solid rgba(245,158,11,0.42);border-radius:9px;background:#fff;color:#0a1628;padding:10px 11px;font:inherit;font-size:0.84rem;font-weight:900;text-transform:uppercase;}
-
-
- .fade-up{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.fade-up{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease;}
  .fade-up.visible{opacity:1;transform:none;}
  .delay-1{transition-delay:0.12s;}.delay-2{transition-delay:0.24s;}
 
@@ -1305,16 +1296,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
 
 <div class="modal-ov" id="checkoutModal">
- <div class="modal-card">
- <div class="modal-title" id="modalTitle">Complete your purchase</div>
- <div class="modal-sub" id="modalSub">You'll be redirected to Stripe's secure checkout.</div>
- <div class="mock-discount-box" id="mockDiscountBox">
- <div class="mock-discount-top"><span class="mock-discount-kicker">Discount code</span><span class="mock-discount-saving">Optional</span></div>
- <div class="mock-discount-copy">Have a code from Dan? Enter it here before continuing to Stripe.</div>
- <input id="mockDiscountCodeInput" class="mock-discount-code-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Enter code">
- </div>
- <div class="modal-alert" id="modalAlert"></div>
- <button class="modal-btn" id="modalConfirmBtn" onclick="confirmCheckout()">Continue to Payment -></button>
+<div class="modal-card">
+<div class="modal-title" id="modalTitle">Complete your purchase</div>
+<div class="modal-sub" id="modalSub">You'll be redirected to Stripe's secure checkout.</div>
+<div class="modal-alert" id="modalAlert"></div>
+<button class="modal-btn" id="modalConfirmBtn" onclick="confirmCheckout()">Continue to Payment -></button>
  <span class="modal-cancel-link" onclick="closeModal()">Cancel</span>
  </div>
 </div>
@@ -1497,27 +1483,14 @@ async function handleMockCheckout(tier) {
  );
 }
 
-function normaliseMockDiscountCode(value) {
- return String(value || '').trim().toUpperCase().replace(/\s+/g, '');
-}
-
-function configureMockDiscountBox(action) {
- const box = document.getElementById('mockDiscountBox');
- const input = document.getElementById('mockDiscountCodeInput');
- const isMock = action === 'mock_transcript' || action === 'mock_premium';
- if (box) box.classList.toggle('show', isMock);
- if (input) input.value = '';
-}
-
 function openModal(title, sub, action) {
  document.getElementById('modalTitle').textContent = title;
  document.getElementById('modalSub').textContent = sub;
  document.getElementById('modalAlert').className = 'modal-alert';
  document.getElementById('modalConfirmBtn').disabled = false;
  document.getElementById('modalConfirmBtn').textContent = 'Continue to Payment ->';
- pendingAction = action;
- configureMockDiscountBox(action);
- document.getElementById('checkoutModal').classList.add('open');
+pendingAction = action;
+document.getElementById('checkoutModal').classList.add('open');
 }
 function closeModal() { document.getElementById('checkoutModal').classList.remove('open'); }
 
@@ -1531,15 +1504,13 @@ async function confirmCheckout() {
  let res, data;
  if (pendingAction === 'credits') {
  res = await fetch(`${API_BASE}/api/checkout/create`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({pack_id:selectedPackId,success_url:`${location.origin}/practice.html?payment=success`,cancel_url:`${location.origin}/plans.html`})});
- } else if (pendingAction === 'mock_transcript' || pendingAction === 'mock_premium') {
+} else if (pendingAction === 'mock_transcript' || pendingAction === 'mock_premium') {
  const tier = pendingAction === 'mock_premium' ? 'premium' : 'transcript';
- const discountCode = normaliseMockDiscountCode(document.getElementById('mockDiscountCodeInput')?.value || '');
  const mockBody = {
  tier,
  success_url:`${location.origin}/practice.html?tab=mock&mock_payment=success&mock_tier=${tier}`,
  cancel_url:`${location.origin}/plans.html#full-casper-mock`
  };
- if (discountCode) mockBody.discount_code = discountCode;
  res = await fetch(`${API_BASE}/api/casper-mock/checkout`, {
  method:'POST',
  headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
@@ -1827,9 +1798,8 @@ function openMMIModal(title, sub, action) {
  document.getElementById('modalAlert').className = 'modal-alert';
  document.getElementById('modalConfirmBtn').disabled = false;
  document.getElementById('modalConfirmBtn').textContent = 'Continue to Payment ->';
- pendingAction = action;
- configureMockDiscountBox(action);
- document.getElementById('checkoutModal').classList.add('open');
+pendingAction = action;
+document.getElementById('checkoutModal').classList.add('open');
 }
 
 
