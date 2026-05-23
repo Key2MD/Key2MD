@@ -253,6 +253,67 @@
  .hero-stat { text-align: center; }
  .hero-stat-num { display: block; font-family: 'DM Serif Display', Georgia, serif; font-size: 1.7rem; color: var(--teal2); line-height: 1; }
  .hero-stat-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-top: 4px; display: block; }
+ .hero-stat-intake {
+ display: flex; align-items: center; justify-content: center; gap: 16px;
+ text-align: left;
+ }
+ .hero-stat-intake-copy { text-align: center; }
+ .hero-strategy {
+ display: flex; align-items: center; justify-content: center;
+ }
+ .hero-strategy-trigger {
+ display: inline-flex; align-items: center; gap: 10px;
+ min-height: 48px; padding: 0 18px 0 14px; border-radius: 999px;
+ border: 1px solid rgba(125,211,252,0.34);
+ background: rgba(255,255,255,0.08);
+ color: #fff; font-family: inherit; font-size: 0.9rem; font-weight: 900;
+ box-shadow: 0 16px 42px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.12);
+ transition: transform 0.2s, border-color 0.2s, background 0.2s;
+ }
+ .hero-strategy-trigger:hover {
+ transform: translateY(-1px);
+ background: rgba(255,255,255,0.12);
+ border-color: rgba(125,211,252,0.58);
+ }
+ .hero-strategy-trigger .dot {
+ width: 10px; height: 10px; border-radius: 999px;
+ background: #22c55e; box-shadow: 0 0 0 5px rgba(34,197,94,0.16);
+ flex: 0 0 auto;
+ }
+ .hero-strategy-trigger .price {
+ color: #fef3c7; font-weight: 900;
+ border-left: 1px solid rgba(255,255,255,0.18);
+ padding-left: 10px;
+ }
+ .hero-strategy-panel {
+ display: none; flex-basis: min(720px, 100%); width: min(720px, 100%); text-align: left;
+ margin: -2px auto 0;
+ background: rgba(3,10,24,0.64);
+ border: 1px solid rgba(125,211,252,0.26);
+ border-radius: 14px; padding: 18px;
+ box-shadow: 0 22px 60px rgba(0,0,0,0.3);
+ backdrop-filter: blur(14px);
+ -webkit-backdrop-filter: blur(14px);
+ }
+ .hero-strategy-panel.open { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 18px; align-items: center; }
+ .hero-strategy-panel h2 {
+ font-family: 'DM Sans', system-ui, sans-serif; color: #fff;
+ font-size: 1rem; line-height: 1.35; margin: 0 0 6px; font-weight: 900;
+ }
+ .hero-strategy-panel p {
+ color: rgba(255,255,255,0.76); margin: 0; font-size: 0.9rem; line-height: 1.58;
+ }
+ .hero-strategy-panel small {
+ color: #fde68a; display: block; margin-top: 8px; font-size: 0.78rem; font-weight: 800; line-height: 1.45;
+ }
+ .hero-strategy-panel .book-btn { white-space: nowrap; }
+ @media(max-width:760px){
+ .hero-stats { gap: 24px; }
+ .hero-stat-intake { flex-direction: column; gap: 12px; text-align: center; flex-basis: 100%; }
+ .hero-strategy-panel.open { grid-template-columns: 1fr; }
+ .hero-strategy-panel .book-btn { width: 100%; }
+ .hero-strategy-trigger { width: 100%; justify-content: center; max-width: 360px; }
+ }
 
 
  .disclaimer-strip {
@@ -706,11 +767,11 @@
  }
  .book-btn {
  display: inline-flex; align-items:center; justify-content:center; gap:8px; padding: 14px 24px; border-radius: 50px;
- background: #f59e0b; color: #071326; font-weight: 900; font-size: 0.92rem;
- border: 1.5px solid rgba(255,255,255,0.4); transition: all 0.2s; position: relative;
- box-shadow: 0 14px 30px rgba(245,158,11,0.24);
+ background: #fff; color: #071326; font-weight: 900; font-size: 0.9rem;
+ border: 1.5px solid rgba(255,255,255,0.45); transition: all 0.2s; position: relative;
+ box-shadow: 0 14px 30px rgba(2,8,23,0.18);
  }
- .book-btn:hover { background: #fbbf24; transform: translateY(-1px); }
+ .book-btn:hover { background: #e0f2fe; transform: translateY(-1px); }
  .preference-offer {
  max-width: 680px; margin: 4px auto 0; padding: 24px; border-radius: 14px;
  background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(245,158,11,0.12));
@@ -764,31 +825,6 @@
  .explainer a { color: var(--teal3); text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
  .explainer a:hover { color: var(--teal); }
 
- .gemsas-callout {
- margin: 34px 0 18px; padding: 28px; border-radius: 14px;
- background: linear-gradient(135deg, #071326 0%, #0d1f3c 58%, #123154 100%);
- color: #fff; border: 1px solid rgba(14,165,233,0.24);
- box-shadow: 0 22px 60px rgba(10,22,40,0.22);
- display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 22px; align-items: center;
- }
- .gemsas-callout-label {
- display:inline-flex; align-items:center; width:max-content; margin-bottom:10px;
- background: rgba(14,165,233,0.14); border:1px solid rgba(56,189,248,0.24);
- color:#7dd3fc; border-radius:999px; padding:5px 10px;
- font-size:0.68rem; font-weight:900; letter-spacing:0.12em; text-transform:uppercase;
- }
- .gemsas-callout h3 { color:#fff; margin:0 0 10px; font-size:1.45rem; }
- .gemsas-callout p { color:rgba(255,255,255,0.78); margin:0; max-width:700px; }
- .gemsas-callout-meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
- .gemsas-callout-meta span {
- background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.11);
- color:rgba(255,255,255,0.84); border-radius:999px; padding:6px 10px;
- font-size:0.78rem; font-weight:800;
- }
- .gemsas-callout-action { display:grid; gap:8px; justify-items:end; min-width:210px; }
- .gemsas-callout-action .book-btn { width:100%; }
- .gemsas-callout-action small { display:block; color:#fde68a; font-weight:800; font-size:0.78rem; text-align:right; line-height:1.4; }
-
  details.faq-item {
  border-bottom: 1px solid var(--gray200); padding: 18px 0;
  }
@@ -804,20 +840,6 @@
  }
  details.faq-item[open] summary::after { transform: rotate(45deg); }
  details.faq-item p { margin-top: 10px; color: var(--gray600); }
- .faq-cta {
- margin-top:16px; padding:20px; border-radius:14px;
- background:linear-gradient(135deg,#eff6ff,#fff7ed);
- border:1px solid #fed7aa; display:grid; grid-template-columns: minmax(0,1fr) auto;
- gap:18px; align-items:center;
- }
- .faq-cta strong { display:block; color:var(--navy); font-size:1.02rem; margin-bottom:5px; }
- .faq-cta span { display:block; color:var(--gray700); font-size:0.92rem; line-height:1.55; }
- .faq-cta .book-btn { box-shadow:none; white-space:nowrap; }
- @media(max-width:760px){
- .gemsas-callout, .faq-cta { grid-template-columns: 1fr; }
- .gemsas-callout-action { justify-items:stretch; min-width:0; }
- .gemsas-callout-action small { text-align:left; }
- }
 
 
  .legal-box {
@@ -1008,13 +1030,43 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <span class="hero-stat-num">UCAT</span>
  <span class="hero-stat-label">Undergraduate</span>
  </div>
- <div class="hero-stat">
+ <div class="hero-stat hero-stat-intake">
+ <div class="hero-stat-intake-copy">
  <span class="hero-stat-num">2026</span>
  <span class="hero-stat-label">Intake</span>
+ </div>
+ <div class="hero-strategy">
+ <button type="button" class="hero-strategy-trigger" id="heroStrategyTrigger" aria-expanded="false" aria-controls="heroStrategyPanel" data-track="preference_discussion_hero_open">
+ <span class="dot" aria-hidden="true"></span>
+ <span>Plan your GEMSAS preferences with Dan</span>
+ <span class="price">$75</span>
+ </button>
+ </div>
+ </div>
+ <div class="hero-strategy-panel" id="heroStrategyPanel">
+ <div>
+ <h2>15-minute chances and preferencing call</h2>
+ <p>Ask Dan about your preference order, GEMSAS process questions, CASPer and bonus strategy, drop-down interview rounds, school weighting, and what to do next.</p>
+ <small>After payment, Dan will contact you with available times for the call.</small>
+ </div>
+ <a href="https://buy.stripe.com/cNibIUbWNeko8qigbBfjG01" target="_blank" rel="noopener" class="book-btn" data-track="preference_discussion_stripe_click" data-track-detail="hero_panel">Pay $75 and request times</a>
  </div>
  </div>
  </div>
 </section>
+
+<script>
+(function(){
+ var trigger = document.getElementById('heroStrategyTrigger');
+ var panel = document.getElementById('heroStrategyPanel');
+ if (!trigger || !panel) return;
+ trigger.addEventListener('click', function(){
+ var open = !panel.classList.contains('open');
+ panel.classList.toggle('open', open);
+ trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+ });
+})();
+</script>
 
 
 <div class="disclaimer-strip" role="note">
@@ -1342,23 +1394,6 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <h3>Rural / priority category</h3>
  <p>Australian medical schools reserve a proportion of places for applicants from rural, regional, and remote backgrounds. Cutoffs for rural applicants are typically <strong>0.08 to 0.20 combo points lower</strong> than non-rural cutoffs. The data for rural applicants is much sparser than for non-rural - treat rural results as a very loose guide and expect wider variation year-to-year.</p>
 
- <div class="gemsas-callout">
- <div>
- <span class="gemsas-callout-label">GEMSAS strategy</span>
- <h3>Want a 15-minute call to discuss your chances and preferencing strategy?</h3>
- <p>Use this if you want a focused paid discussion before the upcoming GEMSAS closing date: which schools to preference, where your profile is strongest, and which risks are worth taking seriously.</p>
- <div class="gemsas-callout-meta">
- <span>15 minutes</span>
- <span>$75 AUD</span>
- <span>Dan messages available times after payment</span>
- </div>
- </div>
- <div class="gemsas-callout-action">
- <a href="https://buy.stripe.com/cNibIUbWNeko8qigbBfjG01" target="_blank" rel="noopener" class="book-btn" data-track="preference_discussion_stripe_click" data-track-detail="explainer_callout">Pay $75 and request times -></a>
- <small>Once paid, Dan will message you with availabilities for the call.</small>
- </div>
- </div>
-
  <h2 style="margin-top:40px;">Frequently asked questions</h2>
 
  <details class="faq-item">
@@ -1408,14 +1443,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <details class="faq-item">
  <summary>Want a 15-minute call to discuss your chances or GEMSAS preference strategy?</summary>
- <p>If you have your numbers but still feel unsure how to order schools, where CASPer or bonuses matter, or which application risks are worth taking, a short paid strategy call can help turn the calculator result into a clearer plan before the upcoming GEMSAS closing date.</p>
- <div class="faq-cta">
- <div>
- <strong>15-minute chances and preferencing discussion with Dan</strong>
- <span>$75 AUD. After payment, Dan will message you with available times for the call.</span>
- </div>
- <a href="https://buy.stripe.com/cNibIUbWNeko8qigbBfjG01" target="_blank" rel="noopener" class="book-btn" data-track="preference_discussion_stripe_click" data-track-detail="faq">Pay $75 and request times -></a>
- </div>
+ <p>If you have your numbers but still feel unsure how to order schools, where CASPer or bonuses matter, or which application risks are worth taking, use the strategy pill at the top of this page. It opens a $75 paid 15-minute call option; after payment, Dan will message you with available times.</p>
  </details>
 
  <h2 style="margin-top:40px;" id="legal">Disclaimer &amp; data notes</h2>
