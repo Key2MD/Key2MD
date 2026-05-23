@@ -116,7 +116,7 @@ window.FullCasperMock = (() => {
  <div style="font-size:0.68rem;font-weight:900;color:#b45309;letter-spacing:0.08em;text-transform:uppercase;">24h earlybird</div>
  <div style="font-size:0.72rem;font-weight:900;color:#92400e;">20% off</div>
  </div>
- <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;margin-bottom:8px;">Use code <strong style="color:var(--navy);">${MOCK_EARLYBIRD_CODE}</strong> before ${MOCK_EARLYBIRD_EXPIRES_TEXT}. Applies to Transcript and Premium mock checkout.</div>
+ <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;margin-bottom:8px;">Use code <strong style="color:var(--navy);">${MOCK_EARLYBIRD_CODE}</strong> before ${MOCK_EARLYBIRD_EXPIRES_TEXT}. Reuse it on every fresh Transcript or Premium mock checkout during the 24-hour window.</div>
  <input class="mock-discount-code" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="${MOCK_EARLYBIRD_CODE}" value="${esc(mockDiscountCode)}" oninput="FullCasperMock.syncDiscountCode(this.value)" style="width:100%;border:1px solid rgba(245,158,11,0.35);border-radius:8px;padding:9px 10px;font:inherit;font-size:0.82rem;font-weight:850;color:var(--navy);text-transform:uppercase;background:#fff;">
  </div>`;
  }
