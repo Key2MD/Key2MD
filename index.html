@@ -184,7 +184,7 @@
  },
  {
  "@type": "Offer",
- "name": "$75 Preference Discussion",
+ "name": "$75 Preferences Discussion",
  "description": "A focused 15-minute discussion with Dan about preferences, edge cases, and application strategy.",
  "price": "75",
  "priceCurrency": "AUD",
@@ -787,7 +787,7 @@
  {
  "@type": "Question",
  "name": "How much does MMI and CASPer coaching cost?",
- "acceptedAnswer": {"@type": "Answer", "text": "One-on-one sessions are $300 per hour. Group CASPer sessions run weekly on Fridays for $120 per session. Masterclasses are $300 (CASPer) and $400 (MMI). A 15-minute preference discussion is available for $75 if you want help choosing the right application path before booking a full session."}
+ "acceptedAnswer": {"@type": "Answer", "text": "One-on-one sessions are $300 per hour. Group CASPer sessions run weekly on Fridays for $120 per session. Masterclasses are $300 (CASPer) and $400 (MMI). A 15-minute preferences discussion is available for $75 if you want help choosing the right application path before booking a full session."}
  },
  {
  "@type": "Question",
@@ -797,7 +797,7 @@
  {
  "@type": "Question",
  "name": "How do I get started with MMI or CASPer coaching?",
- "acceptedAnswer": {"@type": "Answer", "text": "You can book a 1-hour session directly for $300, or book a $75 15-minute preference discussion if you want help choosing between pathways before committing to a full session."}
+ "acceptedAnswer": {"@type": "Answer", "text": "You can book a 1-hour session directly for $300, or book a $75 15-minute preferences discussion if you want help choosing between pathways before committing to a full session."}
  }
  ]
  }
@@ -993,7 +993,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <option value="CASPer Masterclass">CASPer Masterclass</option>
  <option value="MMI Masterclass">MMI Masterclass</option>
  <option value="General Enquiry">General Enquiry</option>
- <option value="Preference Discussion Request">$75 Preference Discussion Request</option>
+ <option value="Preference Discussion Request">$75 Preferences Discussion Request</option>
  </select>
  </div>
  <div class="eq-field" id="eqAvailRow" style="display:none;"><label>Your general availability</label><input type="text" id="eqAvail" placeholder="e.g. Weekday evenings, weekend mornings"></div>
@@ -1132,7 +1132,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <a href="booking.html?type=intro" class="hero-intro-link fade-up delay-3 visible" onclick="gtag('event','preference_discussion_click',{'event_category':'conversion','event_label':'hero_preference_discussion'});" style="background:none;border:none;display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:rgba(255,255,255,0.7);font-size:0.88rem;font-weight:500;cursor:pointer;font-family:inherit;border-bottom:1px dashed rgba(255,255,255,0.3);padding:0 0 2px;transition:all 0.2s;text-decoration:none;" onmouseover="this.style.color='#38bdf8';this.style.borderBottomColor='#38bdf8'" onmouseout="this.style.color='rgba(255,255,255,0.7)';this.style.borderBottomColor='rgba(255,255,255,0.3)'">
  <span style="display:inline-flex;width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,0.18);"></span>
- Book a $75 preference discussion
+ Book a $75 preferences discussion
  </a>
  <a href="#results" class="fade-up delay-4 visible" style="display:inline-flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:28px;text-decoration:none;opacity:0.45;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='0.45'">
  <span style="font-size:0.72rem;font-weight:600;color:#fff;letter-spacing:0.08em;text-transform:uppercase;">See the 2025 results</span>
@@ -2175,7 +2175,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <p class="cta-banner-sub">CASPer closes June 11. MMI rounds begin mid-September. The students who get in start now - not after their first rejection.</p>
  <div class="cta-banner-btns">
  <a href="booking.html?type=paid" target="_blank" class="btn btn-primary" style="font-size:1rem;padding:16px 36px;" onclick="gtag('event','book_click',{'event_category':'conversion','event_label':'cta_banner'});" rel="noopener noreferrer">Book a 1-Hour Session - $300 -></a>
- <a href="booking.html?type=intro" class="btn btn-outline" style="font-size:1rem;padding:16px 36px;border:2px solid rgba(255,255,255,0.4);">Book a $75 Preference Discussion</a>
+ <a href="booking.html?type=intro" class="btn btn-outline" style="font-size:1rem;padding:16px 36px;border:2px solid rgba(255,255,255,0.4);">Book a $75 Preferences Discussion</a>
  </div>
  </div>
  </div>
@@ -2275,7 +2275,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  if(type&&select){for(var i=0;i<select.options.length;i++){if(select.options[i].value===type){select.selectedIndex=i;break;}}}
  if(type==='Specialist MMI'){badge.textContent=' Specialist MMI';badge.style.cssText='background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.3);';title.textContent='Specialist Training MMI Coaching';}
  else if(type==='GP CASPer'){badge.textContent=' RACGP Casper Test';badge.style.cssText='background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.25);';title.textContent='RACGP Casper - AGPT & FSP Coaching';}
- else if(type==='Preference Discussion Request'){badge.textContent=' Preference Discussion';badge.style.cssText='background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.3);';title.textContent='Request a $75 Preference Discussion';}
+ else if(type==='Preference Discussion Request'){badge.textContent=' Preferences Discussion';badge.style.cssText='background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.3);';title.textContent='Request a $75 Preferences Discussion';}
  else{badge.textContent=' Enquiry';badge.style.cssText='background:rgba(14,165,233,0.15);color:#38bdf8;border:1px solid rgba(14,165,233,0.3);';title.textContent='Register Your Interest';}
  if(type==='Preference Discussion Request'){sub.textContent='Tell Dan a little about where you\'re at and when you\'re free \u2014 he\'ll reply within 24 hours with a couple of time options.';}else{sub.textContent='Dan usually replies within 24 hours.';}
  var availRow=document.getElementById('eqAvailRow');if(availRow)availRow.style.display=(type==='Preference Discussion Request')?'block':'none';
@@ -2543,7 +2543,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <a href="booking.html?type=intro" target="_blank" rel="noopener" data-track="preference_discussion_click" data-track-detail="book_modal_preference" style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
  <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$75</span>
- <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">$75 Preference Discussion</span>
+ <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">$75 Preferences Discussion</span>
  </div>
  <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">A focused 15-minute discussion for preference order, edge cases and next-step application strategy.</p>
  </a>
