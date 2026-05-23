@@ -1884,6 +1884,18 @@
  </div>
  <div class="dash-card" style="margin-bottom:20px;">
  <div class="dash-card-title">
+ <span>Payment Health</span>
+ <span class="refresh-note" id="rvPaymentHealthStatus">Not loaded yet</span>
+ </div>
+ <div class="tbl-wrap">
+ <div class="tbl-scroller"><table><thead><tr>
+ <th>Level</th><th>Area</th><th>Student / record</th><th>What to check</th><th>Seen</th><th style="width:110px;text-align:center;">Actions</th>
+ </tr></thead><tbody id="rvPaymentHealthBody"></tbody></table></div>
+ <div class="empty hidden" id="rvPaymentHealthEmpty">No payment health issues found.</div>
+ </div>
+ </div>
+ <div class="dash-card" style="margin-bottom:20px;">
+ <div class="dash-card-title">
  <span>Student Spend Summary</span>
  <span class="refresh-note" id="rvPayerStatus">Not loaded yet</span>
  </div>
@@ -2186,7 +2198,7 @@ const S = {
  reviews: [], s2Reviews: [], users: [], warmLeads: [], sharingWatchlist: [], enquiries: [], subscribers: [],
  pipeline: null, outreachRoi: null, abandonedCheckouts: null, studentTimeline: null, nextActions: [], productFunnel: null, retentionRisks: [],
  conversations: [], filteredConvs: [],
- mmiReviews: [], mockAttempts: [], mockManualReviews: [], mockBank: null, revenue: [], payers: [], payersFromServer: false, revenueSummary: null, monitoring: null,
+ mmiReviews: [], mockAttempts: [], mockManualReviews: [], mockBank: null, revenue: [], payers: [], payersFromServer: false, revenueSummary: null, paymentHealth: null, monitoring: null,
  casperClass: null, masterclasses: null,
  broadcastHistory: [],
  activeConv: null,
@@ -7951,6 +7963,13 @@ async function loadRevenue() {
  if (!res.ok) throw new Error(data?.error||'Failed');
  S.revenue = data.rows||[];
  try {
+ const healthRes = await api('/admin/payment-health');
+ const healthData = await healthRes.json().catch(()=>({}));
+ S.paymentHealth = healthRes.ok ? healthData : { ok:false, rows:[{ level:'warn', type:'payment_health', message:healthData?.error||'Payment health could not be loaded.' }] };
+ } catch(e) {
+ S.paymentHealth = { ok:false, rows:[{ level:'warn', type:'payment_health', message:e.message||'Payment health could not be loaded.' }] };
+ }
+ try {
  const payerRes = await api('/admin/payers?limit=5000');
  const payerData = await payerRes.json().catch(()=>({}));
  if (payerRes.ok) {
@@ -8028,6 +8047,36 @@ function buildPayerRows(payments) {
  ...p,
  payment_types: Array.from(p.paymentTypes||[]).join(','),
  })).sort((a,b) => Number(b.total_spend_aud||0) - Number(a.total_spend_aud||0));
+}
+
+function renderPaymentHealth() {
+ const body = document.getElementById('rvPaymentHealthBody');
+ const empty = document.getElementById('rvPaymentHealthEmpty');
+ const status = document.getElementById('rvPaymentHealthStatus');
+ if (!body) return;
+ const rows = S.paymentHealth?.rows || [];
+ const summary = S.paymentHealth?.summary || {};
+ const bad = Number(summary.bad || rows.filter(r=>r.level==='bad').length || 0);
+ const warn = Number(summary.warn || rows.filter(r=>r.level==='warn').length || 0);
+ if (status) status.textContent = rows.length ? `${bad} urgent | ${warn} warning | ${rows.length} total` : 'No obvious payment issues';
+ if (empty) empty.classList.toggle('hidden', rows.length>0);
+ body.innerHTML = rows.length ? rows.slice(0,80).map(row => {
+ const level = String(row.level || 'warn');
+ const badge = level === 'bad' ? 'badge-no' : level === 'ok' ? 'badge-yes' : 'badge-maybe';
+ const subject = row.email || row.user_id || row.payment_id || row.subscription_id || row.session_id || row.customer_id || '-';
+ const seen = row.created_at || row.updated_at || row.current_period_end || row.pro_period_end || row.last_payment_at || '';
+ const email = row.email || (String(row.user_id||'').includes('@') ? row.user_id : '');
+ return `<tr class="data-row">
+ <td><span class="badge ${badge}" style="font-size:0.62rem;">${esc(level)}</span></td>
+ <td><span class="badge badge-default" style="font-size:0.62rem;">${esc(row.type||row.kind||'payment')}</span></td>
+ <td><div class="cell-main">${email ? emailWithDuplicateFlag(email,row) : esc(subject)}</div><div class="cell-sub">${esc(row.name||row.user_id||'')}</div></td>
+ <td><div class="cell-main">${esc(row.message||row.title||'Check payment record.')}</div><div class="cell-sub">${esc(row.action||row.detail||row.reason||row.subscription_type||'')}</div></td>
+ <td><div class="cell-main">${fmtDate(seen)?.date||'-'}</div><div class="cell-sub">${fmtDate(seen)?.time||''}</div></td>
+ <td style="text-align:center;">
+ ${email ? `<button class="btn" style="font-size:0.68rem;padding:3px 8px;" onclick='event.stopPropagation();viewUserByEmail(${jsArg(email)})'>View</button>` : '<span style="color:var(--muted2);">-</span>'}
+ </td>
+ </tr>`;
+ }).join('') : '';
 }
 
 function renderPayers() {
@@ -8114,6 +8163,7 @@ function renderRevenue() {
  setEl('rvSubs', pro + mmiPro);
  setEl('rvAOV', `$${aov.toFixed(2)}`);
  setEl('rvMonth', `$${monthR.toFixed(2)}`);
+ renderPaymentHealth();
  renderPayers();
 
  document.getElementById('rvStatus').textContent = `${rows.length} transaction${rows.length===1?'':'s'} | $${rows.reduce((s,r)=>s+Number(r.amount_aud||0),0).toFixed(2)} filtered total`;

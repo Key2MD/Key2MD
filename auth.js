@@ -539,7 +539,7 @@ const Key2MDAuth = (() => {
  const displayName = htmlEscape(_user.name || _user.email.split('@')[0]);
  const accountActions = _user.impersonation ? '' : `
  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;">
- <button onclick="Key2MDAuth.openBillingPortal().catch(e=>alert(e.message))" style="padding:8px 9px;border-radius:8px;border:1px solid rgba(14,165,233,0.28);background:#fff;color:var(--navy,#0a1628);font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;">Billing / card</button>
+ <button onclick="window.location.href='billing.html'" style="padding:8px 9px;border-radius:8px;border:1px solid rgba(14,165,233,0.28);background:#fff;color:var(--navy,#0a1628);font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;">Billing / purchases</button>
  <button onclick="window.location.href='plans.html#full-casper-mock'" style="padding:8px 9px;border-radius:8px;border:1px solid rgba(14,165,233,0.28);background:#fff;color:var(--navy,#0a1628);font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;">Buy mock</button>
  ${_user.tier === 'pro' ? (_user.cancel_requested
  ? `<button disabled style="grid-column:1/-1;padding:8px 9px;border-radius:8px;border:1px solid rgba(245,158,11,0.28);background:rgba(245,158,11,0.08);color:#92400e;font:inherit;font-size:0.72rem;font-weight:800;">Cancels ${htmlEscape(proEndsAt)}</button>`

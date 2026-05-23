@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Billing & Purchases | Key2MD</title>
+ <meta name="description" content="Manage Key2MD billing, card details, subscriptions, mock passes, credits and recent purchases.">
+ <meta name="robots" content="noindex,follow">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+ <style>
+ :root{--navy:#071326;--panel:#0d1f3c;--ink:#0f172a;--muted:#64748b;--line:#d8e4f2;--soft:#f5f8fc;--blue:#0ea5e9;--green:#16a34a;--amber:#d97706;--red:#dc2626;}
+ *{box-sizing:border-box}
+ body{margin:0;font-family:'DM Sans',system-ui,sans-serif;background:#eef5fb;color:var(--ink)}
+ a{color:inherit}
+ .topbar{background:var(--navy);color:#fff;border-bottom:1px solid rgba(255,255,255,0.1)}
+ .top-inner{width:min(1180px,calc(100% - 32px));margin:0 auto;min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+ .logo{font-size:1.35rem;font-weight:900;text-decoration:none}.logo span{color:#0ea5e9}
+ .nav-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+ .nav-actions a{font-size:0.84rem;font-weight:800;text-decoration:none;color:#dbeafe;border:1px solid rgba(255,255,255,0.14);border-radius:999px;padding:9px 13px;background:rgba(255,255,255,0.05)}
+ .wrap{width:min(1180px,calc(100% - 32px));margin:28px auto 48px}
+ .hero{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:stretch;margin-bottom:18px}
+ .panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 44px rgba(15,23,42,0.07)}
+ .headline{padding:28px}
+ .kicker{color:#0284c7;text-transform:uppercase;letter-spacing:0.12em;font-size:0.72rem;font-weight:900;margin-bottom:8px}
+ h1{font-size:clamp(2rem,4vw,3.4rem);line-height:0.98;margin:0 0 12px;letter-spacing:0}
+ .lead{font-size:1rem;color:var(--muted);line-height:1.65;margin:0;max-width:760px}
+ .authbox{padding:18px}
+ #k2mdAuthBar{min-width:0}
+ .notice{display:none;margin-bottom:18px;border-radius:14px;padding:14px 16px;border:1px solid rgba(14,165,233,0.22);background:#e0f2fe;color:#075985;font-size:0.92rem;font-weight:700}
+ .notice.show{display:block}
+ .notice.bad{border-color:rgba(220,38,38,0.22);background:#fef2f2;color:#991b1b}
+ .grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:18px}
+ .card{padding:20px}
+ .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+ .card-title{font-size:1rem;font-weight:900;color:var(--navy)}
+ .card-sub{font-size:0.82rem;color:var(--muted);line-height:1.45;margin-top:3px}
+ .btn-row{display:flex;gap:8px;flex-wrap:wrap}
+ button,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--navy);font:inherit;font-size:0.82rem;font-weight:900;text-decoration:none;padding:0 14px;cursor:pointer}
+ button.primary,.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+ button.blue,.btn.blue{background:#e0f2fe;border-color:#bae6fd;color:#075985}
+ button.danger{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+ button:disabled{opacity:0.58;cursor:default}
+ .status-list{display:grid;gap:10px}
+ .row{border:1px solid #e2e8f0;border-radius:12px;padding:13px 14px;background:#fbfdff;display:flex;align-items:center;justify-content:space-between;gap:14px}
+ .row-main{min-width:0}
+ .row-title{font-weight:900;color:var(--navy);font-size:0.92rem}
+ .row-meta{font-size:0.78rem;color:var(--muted);line-height:1.5;margin-top:3px}
+ .badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;font-size:0.68rem;font-weight:900;white-space:nowrap;border:1px solid #dbeafe;background:#eff6ff;color:#1d4ed8}
+ .badge.good{background:#dcfce7;border-color:#bbf7d0;color:#166534}
+ .badge.warn{background:#fef3c7;border-color:#fde68a;color:#92400e}
+ .badge.bad{background:#fee2e2;border-color:#fecaca;color:#991b1b}
+ .summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .mini{border:1px solid #e2e8f0;border-radius:12px;background:#fbfdff;padding:14px}
+ .mini-label{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:900}
+ .mini-val{font-size:1.35rem;color:var(--navy);font-weight:900;margin-top:4px}
+ .empty{padding:18px;border:1px dashed #cbd5e1;border-radius:12px;color:var(--muted);font-size:0.9rem;background:#f8fafc}
+ .issue{display:none;border:1px solid #fecaca;background:#fef2f2;color:#991b1b;border-radius:14px;padding:16px;margin-bottom:18px}
+ .issue.show{display:block}
+ .issue strong{display:block;color:#7f1d1d;margin-bottom:5px}
+ .issue p{margin:0 0 12px;line-height:1.55;font-size:0.9rem}
+ .table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:12px}
+ table{width:100%;border-collapse:collapse;min-width:560px;background:#fff}
+ th,td{text-align:left;padding:12px 13px;border-bottom:1px solid #e2e8f0;font-size:0.82rem}
+ th{background:#f8fafc;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;font-size:0.65rem}
+ tr:last-child td{border-bottom:0}
+ .help{margin-top:18px;padding:16px 18px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:0.9rem;line-height:1.55}
+ @media(max-width:900px){.hero,.grid{grid-template-columns:1fr}.top-inner{align-items:flex-start;flex-direction:column;padding:18px 0}.summary-grid{grid-template-columns:1fr}}
+ @media(max-width:560px){.wrap,.top-inner{width:min(100% - 24px,1180px)}.headline,.card{padding:18px}.row{align-items:flex-start;flex-direction:column}.btn-row button,.btn-row .btn{width:100%}}
+ </style>
+</head>
+<body>
+ <header class="topbar">
+  <div class="top-inner">
+   <a class="logo" href="index.html">Key<span>2</span>MD</a>
+   <nav class="nav-actions" aria-label="Key2MD pages">
+    <a href="plans.html">Plans</a>
+    <a href="practice.html">Practice</a>
+    <a href="booking.html">Book Dan</a>
+   </nav>
+  </div>
+ </header>
+
+ <main class="wrap">
+  <div class="notice" id="pageNotice"></div>
+  <section class="hero">
+   <div class="panel headline">
+    <div class="kicker">Billing & purchases</div>
+    <h1>Manage your Key2MD account.</h1>
+    <p class="lead">Change card details, check subscriptions, cancel CASPer Pro renewal, find your mock pass, and review recent payments from one place.</p>
+   </div>
+   <aside class="panel authbox">
+    <div id="k2mdAuthBar"></div>
+   </aside>
+  </section>
+
+  <section class="issue" id="paymentIssue">
+   <strong>Payment needs attention</strong>
+   <p id="paymentIssueText">Your latest payment could not be completed. Update your card in Stripe, then retry from Stripe if a retry link is available.</p>
+   <div class="btn-row" id="paymentIssueActions"></div>
+  </section>
+
+  <section class="grid">
+   <div class="panel card">
+    <div class="card-head">
+     <div>
+      <div class="card-title">Subscriptions</div>
+      <div class="card-sub">Active or cancelling recurring products linked to this login.</div>
+     </div>
+     <div class="btn-row">
+      <button class="primary" id="portalBtn" onclick="openStripeBilling(this)">Open Stripe billing</button>
+      <button class="danger" id="cancelProBtn" onclick="cancelCasperPro(this)" style="display:none;">Cancel CASPer Pro renewal</button>
+     </div>
+    </div>
+    <div class="status-list" id="subscriptionList">
+     <div class="empty">Log in to see subscriptions.</div>
+    </div>
+    <div class="help">Stripe billing is the safest place to update cards and manage Stripe-side payment details. CASPer Pro cancellation is also shown directly here so students can see clearly when access ends.</div>
+   </div>
+
+   <div class="panel card">
+    <div class="card-head">
+     <div>
+      <div class="card-title">Credits and passes</div>
+      <div class="card-sub">Available one-off products on this account.</div>
+     </div>
+     <a class="btn blue" href="plans.html">Buy more</a>
+    </div>
+    <div class="summary-grid" id="creditGrid">
+     <div class="mini"><div class="mini-label">CASPer credits</div><div class="mini-val">-</div></div>
+     <div class="mini"><div class="mini-label">GAMSAT credits</div><div class="mini-val">-</div></div>
+     <div class="mini"><div class="mini-label">MMI transcript</div><div class="mini-val">-</div></div>
+     <div class="mini"><div class="mini-label">MMI premium</div><div class="mini-val">-</div></div>
+    </div>
+    <div class="status-list" id="passList" style="margin-top:12px;">
+     <div class="empty">Mock and class access will appear after login.</div>
+    </div>
+   </div>
+  </section>
+
+  <section class="panel card" style="margin-top:18px;">
+   <div class="card-head">
+    <div>
+     <div class="card-title">Recent payments</div>
+     <div class="card-sub">This is a record of payments Key2MD has saved against your account.</div>
+    </div>
+    <a class="btn" href="mailto:brittainmbbs@gmail.com?subject=Key2MD%20billing%20question">Ask Dan</a>
+   </div>
+   <div class="table-wrap" id="paymentsWrap">
+    <table>
+     <thead><tr><th>Date</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
+     <tbody id="paymentsBody"><tr><td colspan="4">Log in to see recent payments.</td></tr></tbody>
+    </table>
+   </div>
+  </section>
+ </main>
+
+ <script src="auth.js"></script>
+ <script>
+ const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+ let billingSummary = null;
+
+ document.addEventListener('DOMContentLoaded', () => {
+  showQueryNotice();
+  Key2MDAuth.init({ tool:'casper', apiBase:API_BASE, onAuthChange:user => {
+   if (user) loadBillingSummary();
+   else renderLoggedOut();
+  }});
+ });
+
+ function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+ }
+
+ function fmtDate(value) {
+  if (!value) return '-';
+  let date;
+  if (typeof value === 'number' || /^\d+$/.test(String(value))) {
+   const n = Number(value);
+   date = new Date(n > 100000000000 ? n : n * 1000);
+  } else {
+   date = new Date(value);
+  }
+  if (Number.isNaN(date.getTime())) return '-';
+  return date.toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+ }
+
+ function fmtMoney(value) {
+  return Number(value || 0).toLocaleString('en-AU', { style:'currency', currency:'AUD' });
+ }
+
+ function productLabel(type) {
+  const clean = String(type || 'payment').replace(/_/g, ' ');
+  return clean.replace(/\b\w/g, ch => ch.toUpperCase());
+ }
+
+ function showQueryNotice() {
+  const notice = document.getElementById('pageNotice');
+  const params = new URLSearchParams(location.search);
+  const payment = params.get('payment');
+  if (payment === 'success') {
+   notice.textContent = 'Payment received. Your account should update shortly. Refresh this page if it has not appeared yet.';
+   notice.className = 'notice show';
+  } else if (payment === 'cancelled' || payment === 'cancel') {
+   notice.textContent = 'Checkout was cancelled. No payment was taken.';
+   notice.className = 'notice show bad';
+  }
+ }
+
+ async function loadBillingSummary() {
+  const token = Key2MDAuth.getToken();
+  renderLoading();
+  try {
+   const res = await fetch(`${API_BASE}/api/billing/summary`, { headers:{ 'Authorization':`Bearer ${token}` } });
+   const data = await res.json().catch(() => ({}));
+   if (!res.ok) throw new Error(data.message || data.error || 'Could not load billing.');
+   billingSummary = data;
+   renderBilling(data);
+  } catch (e) {
+   document.getElementById('subscriptionList').innerHTML = `<div class="empty">${esc(e.message || 'Could not load billing.')}</div>`;
+   document.getElementById('paymentsBody').innerHTML = `<tr><td colspan="4">${esc(e.message || 'Could not load billing.')}</td></tr>`;
+  }
+ }
+
+ function renderLoading() {
+  document.getElementById('subscriptionList').innerHTML = '<div class="empty">Loading billing details...</div>';
+  document.getElementById('passList').innerHTML = '<div class="empty">Loading passes...</div>';
+  document.getElementById('paymentsBody').innerHTML = '<tr><td colspan="4">Loading payments...</td></tr>';
+ }
+
+ function renderLoggedOut() {
+  billingSummary = null;
+  document.getElementById('subscriptionList').innerHTML = '<div class="empty">Log in with the email used for payment to see subscriptions and card tools.</div>';
+  document.getElementById('creditGrid').innerHTML = ['CASPer credits','GAMSAT credits','MMI transcript','MMI premium'].map(label => `<div class="mini"><div class="mini-label">${label}</div><div class="mini-val">-</div></div>`).join('');
+  document.getElementById('passList').innerHTML = '<div class="empty">Mock and class access will appear after login.</div>';
+  document.getElementById('paymentsBody').innerHTML = '<tr><td colspan="4">Log in to see recent payments.</td></tr>';
+  document.getElementById('paymentIssue').classList.remove('show');
+  document.getElementById('cancelProBtn').style.display = 'none';
+ }
+
+ function renderBilling(data) {
+  renderSubscriptions(data);
+  renderCredits(data);
+  renderPasses(data);
+  renderPaymentIssue(data.payment_issue);
+  renderPayments(data.payments || []);
+ }
+
+ function renderSubscriptions(data) {
+  const list = document.getElementById('subscriptionList');
+  const portalBtn = document.getElementById('portalBtn');
+  const cancelBtn = document.getElementById('cancelProBtn');
+  const subs = data.subscriptions || [];
+  const casperPro = subs.find(s => s.product === 'CASPer Pro');
+  if (portalBtn) {
+   portalBtn.disabled = !data.portal_available;
+   portalBtn.textContent = data.portal_available ? 'Open Stripe billing' : 'No Stripe billing yet';
+  }
+  if (cancelBtn) {
+   cancelBtn.style.display = casperPro && !casperPro.cancel_requested ? 'inline-flex' : 'none';
+  }
+  if (!subs.length) {
+   list.innerHTML = '<div class="empty">No active subscriptions found for this login.</div>';
+   return;
+  }
+  list.innerHTML = subs.map(sub => {
+   const cancelling = sub.status === 'cancelling' || sub.cancel_requested;
+   const badgeClass = cancelling ? 'warn' : 'good';
+   const badgeText = cancelling ? 'Cancelling' : 'Active';
+   const accessText = cancelling ? `Access ends ${fmtDate(sub.period_end)}` : (sub.period_end ? `Current paid period ends ${fmtDate(sub.period_end)}` : 'Recurring access is active');
+   const tier = sub.tier ? ` | ${esc(sub.tier)}` : '';
+   return `<div class="row">
+    <div class="row-main"><div class="row-title">${esc(sub.product)}${tier}</div><div class="row-meta">${esc(accessText)}</div></div>
+    <span class="badge ${badgeClass}">${badgeText}</span>
+   </div>`;
+  }).join('');
+ }
+
+ function renderCredits(data) {
+  const credits = data.credits || {};
+  const items = [
+   ['CASPer credits', credits.casper],
+   ['GAMSAT credits', credits.gamsat],
+   ['MMI transcript', credits.mmi_transcript],
+   ['MMI premium', credits.mmi_premium],
+  ];
+  document.getElementById('creditGrid').innerHTML = items.map(([label, value]) => `<div class="mini"><div class="mini-label">${label}</div><div class="mini-val">${Number(value || 0)}</div></div>`).join('');
+ }
+
+ function renderPasses(data) {
+  const rows = [];
+  const mock = data.mock_pass;
+  if (mock?.active) {
+   rows.push(`<div class="row"><div class="row-main"><div class="row-title">Full CASPer mock pass</div><div class="row-meta">${esc(mock.tier || 'mock')} | Typed ${Number(mock.typed_remaining || 0)} remaining | Video ${Number(mock.video_remaining || 0)} remaining</div></div><span class="badge good">Available</span></div>`);
+  }
+  const cls = data.class_access;
+  if (cls?.source) {
+   const remaining = cls.classes_remaining != null ? `${Number(cls.classes_remaining || 0)} remaining` : 'Access active';
+   rows.push(`<div class="row"><div class="row-main"><div class="row-title">CASPer class access</div><div class="row-meta">${esc(cls.purchase_type || cls.source)} | ${esc(remaining)}${cls.expires_at ? ` | Ends ${fmtDate(cls.expires_at)}` : ''}</div></div><span class="badge good">Available</span></div>`);
+  }
+  document.getElementById('passList').innerHTML = rows.length ? rows.join('') : '<div class="empty">No active mock pass or CASPer class access found.</div>';
+ }
+
+ function renderPaymentIssue(issue) {
+  const box = document.getElementById('paymentIssue');
+  const text = document.getElementById('paymentIssueText');
+  const actions = document.getElementById('paymentIssueActions');
+  if (!issue) {
+   box.classList.remove('show');
+   return;
+  }
+  box.classList.add('show');
+  const product = issue.product_label || productLabel(issue.subscription_type || issue.type || 'subscription');
+  text.textContent = `A recent ${product} payment did not complete. Update your card in Stripe so access is not interrupted.`;
+  const retry = issue.retry_url ? `<a class="btn blue" href="${esc(issue.retry_url)}" target="_blank" rel="noopener">Retry payment</a>` : '';
+  actions.innerHTML = `<button class="primary" onclick="openStripeBilling(this)">Update card in Stripe</button>${retry}`;
+ }
+
+ function renderPayments(payments) {
+  const tbody = document.getElementById('paymentsBody');
+  if (!payments.length) {
+   tbody.innerHTML = '<tr><td colspan="4">No saved payments found for this login yet.</td></tr>';
+   return;
+  }
+  tbody.innerHTML = payments.slice(0, 20).map(p => `<tr>
+   <td>${esc(fmtDate(p.created_at))}</td>
+   <td>${esc(productLabel(p.type))}</td>
+   <td>${esc(fmtMoney(p.amount_aud))}</td>
+   <td><span class="badge good">${esc(p.status || 'completed')}</span></td>
+  </tr>`).join('');
+ }
+
+ async function openStripeBilling(btn) {
+  const old = btn?.textContent || '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Opening Stripe...'; }
+  try {
+   await Key2MDAuth.openBillingPortal({ returnUrl: location.href });
+  } catch (e) {
+   if (btn) { btn.disabled = false; btn.textContent = old || 'Open Stripe billing'; }
+   alert(e.message || 'Could not open Stripe billing.');
+  }
+ }
+
+ async function cancelCasperPro(btn) {
+  const old = btn?.textContent || '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Cancelling...'; }
+  try {
+   await Key2MDAuth.cancelCasperProRenewal();
+   await loadBillingSummary();
+  } catch (e) {
+   alert(e.message || 'Could not cancel CASPer Pro renewal.');
+  } finally {
+   if (btn) { btn.disabled = false; btn.textContent = old || 'Cancel CASPer Pro renewal'; }
+  }
+ }
+ </script>
+ <script src="key2md-tracking.js" defer></script>
+</body>
+</html>

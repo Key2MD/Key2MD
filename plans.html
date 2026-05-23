@@ -732,11 +732,12 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div>
  <div class="billing-selfserve-kicker">Account &amp; billing</div>
  <h2>Need to change card, cancel renewal, or buy a mock?</h2>
- <p>Log in with the email used for payment. You can update your Stripe card, schedule CASPer Pro to stop at the end of the paid period, or start checkout for a full CASPer mock from here.</p>
+ <p>Log in with the email used for payment. You can open your billing page, update your Stripe card, schedule CASPer Pro to stop at the end of the paid period, or start checkout for a full CASPer mock from here.</p>
  <div class="billing-status-line" id="billingStatusLine">Log in to manage your Key2MD billing.</div>
  </div>
  <div class="billing-selfserve-actions">
  <button class="primary" id="billingLoginBtn" onclick="Key2MDAuth.showAuthModal('login')">Log in</button>
+ <a href="billing.html" id="billingPageBtn" style="display:none;">Billing page</a>
  <button id="billingCardBtn" onclick="openBillingPortalFromPlans(this)" style="display:none;">Change card</button>
  <a href="#full-casper-mock" id="billingMockBtn">Buy mock</a>
  <button class="danger" id="billingCancelBtn" onclick="handleCancel()" style="display:none;">Cancel Pro renewal</button>
@@ -784,6 +785,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="pro-active-sub" id="proActiveSub">You have unlimited CASPer AI reviews.</div>
  </div>
  <div class="pro-active-actions">
+ <button class="btn-manage-sm" onclick="window.location.href='billing.html'">Billing</button>
  <button class="btn-manage-sm" onclick="openBillingPortalFromPlans(this)">Change card</button>
  <button class="btn-cancel-sm" id="proCancelBtn" onclick="handleCancel()">Cancel</button>
  </div>
@@ -1366,6 +1368,7 @@ function updateBillingPanel(user, isPro, cancelRequested, endLabel) {
  const loggedIn = Key2MDAuth.isLoggedIn();
  const status = document.getElementById('billingStatusLine');
  const loginBtn = document.getElementById('billingLoginBtn');
+ const pageBtn = document.getElementById('billingPageBtn');
  const cardBtn = document.getElementById('billingCardBtn');
  const cancelBtn = document.getElementById('billingCancelBtn');
  if (status) {
@@ -1375,6 +1378,7 @@ function updateBillingPanel(user, isPro, cancelRequested, endLabel) {
  else status.textContent = 'Signed in. You can buy a mock or open Stripe billing if this account has previous payments.';
  }
  if (loginBtn) loginBtn.style.display = loggedIn ? 'none' : 'inline-flex';
+ if (pageBtn) pageBtn.style.display = loggedIn ? 'inline-flex' : 'none';
  if (cardBtn) cardBtn.style.display = loggedIn ? 'inline-flex' : 'none';
  if (cancelBtn) {
  cancelBtn.style.display = isPro ? 'inline-flex' : 'none';

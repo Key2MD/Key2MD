@@ -31,10 +31,11 @@
  .session-list{display:grid;gap:8px;margin:14px 0 0;padding:0;list-style:none}
  .session-list li{position:relative;padding-left:20px;color:#d8e7f7;font-size:0.9rem;line-height:1.55}
  .session-list li::before{content:'';position:absolute;left:0;top:0.72em;width:7px;height:7px;border-radius:50%;background:#38bdf8;box-shadow:0 0 0 4px rgba(56,189,248,0.12)}
- .choice{display:block;text-decoration:none;border:1.5px solid rgba(14,165,233,0.28);background:rgba(14,165,233,0.1);border-radius:16px;padding:20px;color:#fff;transition:transform 0.18s ease,border-color 0.18s ease,background 0.18s ease}
+ .choice{display:block;width:100%;text-align:left;text-decoration:none;border:1.5px solid rgba(14,165,233,0.28);background:rgba(14,165,233,0.1);border-radius:16px;padding:20px;color:#fff;transition:transform 0.18s ease,border-color 0.18s ease,background 0.18s ease;font:inherit;cursor:pointer}
  .choice:hover{transform:translateY(-2px);border-color:rgba(14,165,233,0.65);background:rgba(14,165,233,0.16)}
  .choice.primary{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.12)}
  .choice.primary:hover{border-color:rgba(245,158,11,0.78);background:rgba(245,158,11,0.18)}
+ .choice:disabled{opacity:0.66;cursor:wait;transform:none}
  .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px}
  .pill{border-radius:999px;padding:4px 10px;font-size:0.72rem;font-weight:900;background:rgba(255,255,255,0.12);color:#dbeafe}.primary .pill{background:var(--gold);color:#071326}
  .title{font-weight:900;font-size:1.04rem}.copy{font-size:0.9rem;color:#b8c7dc;margin:0}
@@ -42,11 +43,16 @@
  .fallback strong{display:block;color:#bbf7d0;margin-bottom:6px}
  .fallback a{color:#fff;font-weight:900;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.45)}
  .payment-card{border-color:rgba(245,158,11,0.32);background:rgba(245,158,11,0.09)}
+ .stripe-pay{display:inline-flex;align-items:center;justify-content:center;margin-top:14px;width:auto;min-height:42px;padding:0 18px;border-radius:999px;background:#fff;color:#071326;border-color:rgba(255,255,255,0.45);font-weight:900;text-align:center}
+ .stripe-pay:hover{transform:none;background:#f8fafc;border-color:#fff}
  .bank-grid{display:grid;grid-template-columns:82px 1fr;gap:8px 12px;margin:14px 0;color:#f8fafc;font-size:0.95rem}
  .bank-grid span:nth-child(odd){color:#fcd34d;font-size:0.75rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase}
  .bank-grid span:nth-child(even){font-weight:900}
  .confirm-note{color:#fde68a;font-weight:700;font-size:0.9rem}
  .tiny{font-size:0.82rem;color:#8ea2bd}
+ .notice{display:none;border:1px solid rgba(14,165,233,0.28);background:rgba(14,165,233,0.1);border-radius:14px;padding:12px 14px;color:#dff5ff;font-size:0.9rem;font-weight:800}
+ .notice.show{display:block}
+ .notice.bad{border-color:rgba(248,113,113,0.3);background:rgba(248,113,113,0.1);color:#fecaca}
  .back{display:inline-flex;color:#cfe8ff;text-decoration:none;font-weight:800;margin-top:12px}
  @media(max-width:820px){body{padding:16px}.shell{grid-template-columns:1fr}.brand{min-height:auto}.panel{padding:18px}h1{font-size:2.2rem}}
  </style>
@@ -71,6 +77,7 @@
    </div>
   </section>
   <section class="panel" aria-label="Booking actions">
+   <div class="notice" id="bookingNotice"></div>
    <div class="session-info">
     <span class="section-label">Premium 1:1 coaching</span>
     <h2>A focused session with Dan, built around the exact problem you are trying to solve.</h2>
@@ -96,11 +103,12 @@
     </div>
     <p class="confirm-note">Your booking is officially confirmed once payment has been received.</p>
     <p class="tiny" style="margin-top:10px;color:#fef3c7;">Dan will send the Zoom link to your Gmail shortly before the session. Please safelist <strong>brittainmbbs@gmail.com</strong>.</p>
+    <button class="choice stripe-pay" onclick="startBookingCheckout('one_to_one', this)" data-track="stripe_tutoring_click">Pay $300 by Stripe</button>
    </div>
-   <a class="choice" id="introChoice" href="https://buy.stripe.com/eVq28k0e5b8c4a28J9fjG00" target="_blank" rel="noopener" data-track="preference_discussion_click">
+   <button class="choice" id="introChoice" onclick="startBookingCheckout('preference_discussion', this)" data-track="preference_discussion_click">
     <div class="top"><span class="pill">$75</span><span class="title">Book a 15-minute preferences discussion</span></div>
     <p class="copy">Use this if you want Dan to sanity-check your school preferences, edge cases, and highest-leverage next step before committing to a longer session.</p>
-   </a>
+   </button>
    <div class="fallback">
     <strong>Calendar not working?</strong>
     <p id="fallbackCopy">Email Dan your name, preferred times, exam pathway, and whether you want a 1:1 session or the $75 preferences discussion.</p>
@@ -111,12 +119,49 @@
   </section>
  </main>
  <script>
+ const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+ function siteBase() {
+  return location.protocol === 'http:' || location.protocol === 'https:' ? location.origin : 'https://www.key2md.com';
+ }
+ function setBookingNotice(text, bad) {
+  var el = document.getElementById('bookingNotice');
+  if (!el) return;
+  el.textContent = text || '';
+  el.className = text ? 'notice show' + (bad ? ' bad' : '') : 'notice';
+ }
+ async function startBookingCheckout(product, btn) {
+  var oldHtml = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Opening secure checkout...'; }
+  setBookingNotice('', false);
+  try {
+   var base = siteBase();
+   var type = product === 'preference_discussion' ? 'intro' : 'paid';
+   var res = await fetch(API_BASE + '/api/tutoring/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+     product: product,
+     success_url: base + '/booking.html?type=' + type + '&payment=success',
+     cancel_url: base + '/booking.html?type=' + type + '&payment=cancelled'
+    })
+   });
+   var data = await res.json().catch(function(){ return {}; });
+   if (!res.ok || !data.checkout_url) throw new Error(data.message || data.error || 'Checkout could not be opened.');
+   location.href = data.checkout_url;
+  } catch(e) {
+   setBookingNotice((e && e.message ? e.message : 'Checkout could not be opened.') + ' You can still use the bank transfer details or email Dan directly.', true);
+   if (btn) { btn.disabled = false; btn.innerHTML = oldHtml; }
+  }
+ }
  (function(){
   var params=new URLSearchParams(window.location.search);
   var type=params.get('type')||'paid';
+  var payment=params.get('payment')||'';
   var paid=document.getElementById('paidChoice');
   var intro=document.getElementById('introChoice');
   var mail=document.getElementById('fallbackMail');
+  if(payment==='success') setBookingNotice('Payment received. Dan will confirm the booking officially and send the Zoom link to your Gmail shortly before the session.', false);
+  if(payment==='cancelled'||payment==='cancel') setBookingNotice('Checkout was cancelled. No payment was taken.', true);
   if(type==='intro'){
    intro.classList.add('primary');
    paid.classList.remove('primary');
