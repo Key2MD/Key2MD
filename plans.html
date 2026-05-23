@@ -325,6 +325,9 @@
 .btn-cancel-sm{padding:6px 14px;border-radius:50px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.06);color:#f87171;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;}
 .btn-cancel-sm:hover{background:rgba(239,68,68,0.14);}
 .btn-cancel-sm:disabled{opacity:0.62;cursor:default;background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.25);color:#fbbf24;}
+.pro-active-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.btn-manage-sm{padding:6px 14px;border-radius:50px;border:1px solid rgba(14,165,233,0.32);background:rgba(14,165,233,0.1);color:#7dd3fc;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;}
+.btn-manage-sm:hover{background:rgba(14,165,233,0.18);}
  .btn-pro{width:100%;padding:15px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--teal),var(--teal3));color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.25s;box-shadow:0 4px 20px rgba(14,165,233,0.28);}
  .btn-pro:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(14,165,233,0.42);}
  .btn-pro:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
@@ -413,6 +416,18 @@
  .product-path-card span{display:block;font-size:0.72rem;font-weight:900;color:var(--green);margin-bottom:8px;}
  .product-path-card p{font-size:0.76rem;color:var(--gray600);line-height:1.45;margin:0 0 10px;}
  .product-path-card a{display:inline-flex;align-items:center;min-height:32px;border-radius:999px;background:var(--navy);color:#fff;text-decoration:none;font-size:0.74rem;font-weight:900;padding:0 12px;}
+
+.billing-selfserve-section{background:#fff;border-bottom:1px solid var(--gray200);padding:28px 0;}
+.billing-selfserve-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;border:1px solid rgba(14,165,233,0.18);background:linear-gradient(135deg,rgba(14,165,233,0.06),rgba(34,197,94,0.04));border-radius:14px;padding:18px 20px;box-shadow:0 10px 28px rgba(15,23,42,0.06);}
+.billing-selfserve-kicker{font-size:0.68rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:5px;}
+.billing-selfserve-panel h2{font-size:1.15rem;color:var(--navy);margin:0 0 5px;}
+.billing-selfserve-panel p{font-size:0.86rem;color:var(--gray600);line-height:1.55;margin:0;max-width:720px;}
+.billing-status-line{font-size:0.78rem;font-weight:800;color:var(--navy);margin-top:8px;}
+.billing-selfserve-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.billing-selfserve-actions button,.billing-selfserve-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:36px;border-radius:999px;border:1px solid var(--gray200);background:#fff;color:var(--navy);font:inherit;font-size:0.78rem;font-weight:900;text-decoration:none;padding:0 14px;cursor:pointer;white-space:nowrap;}
+.billing-selfserve-actions .primary{background:var(--navy);border-color:var(--navy);color:#fff;}
+.billing-selfserve-actions .danger{border-color:rgba(239,68,68,0.28);background:rgba(239,68,68,0.06);color:#b91c1c;}
+.billing-selfserve-actions button:disabled{opacity:0.58;cursor:default;}
 
  .mock-section{background:#080d17;padding:86px 24px;position:relative;overflow:hidden;}
  .mock-section .container{max-width:980px;}
@@ -513,8 +528,8 @@
  .delay-1{transition-delay:0.12s;}.delay-2{transition-delay:0.24s;}
 
 
- @media(max-width:960px){.pro-inner{grid-template-columns:1fr;max-width:540px;margin:0 auto;}.proof-grid{grid-template-columns:1fr;}.footer-inner{grid-template-columns:1fr 1fr;}.product-path-grid{grid-template-columns:repeat(2,1fr);}.product-path-head{display:block;}}
- @media(max-width:700px){.other-grid{grid-template-columns:1fr;max-width:480px;margin:40px auto 0;}.footer-inner{grid-template-columns:1fr;gap:32px;}.footer-bottom{flex-direction:column;text-align:center;}.footer-note{text-align:center;max-width:100%;}.product-path-grid{grid-template-columns:1fr;}}
+ @media(max-width:960px){.pro-inner{grid-template-columns:1fr;max-width:540px;margin:0 auto;}.proof-grid{grid-template-columns:1fr;}.footer-inner{grid-template-columns:1fr 1fr;}.product-path-grid{grid-template-columns:repeat(2,1fr);}.product-path-head{display:block;}.billing-selfserve-panel{grid-template-columns:1fr;}.billing-selfserve-actions{justify-content:flex-start;}}
+ @media(max-width:700px){.other-grid{grid-template-columns:1fr;max-width:480px;margin:40px auto 0;}.footer-inner{grid-template-columns:1fr;gap:32px;}.footer-bottom{flex-direction:column;text-align:center;}.footer-note{text-align:center;max-width:100%;}.product-path-grid{grid-template-columns:1fr;}.billing-selfserve-actions{flex-direction:column;align-items:stretch;}.billing-selfserve-actions button,.billing-selfserve-actions a{width:100%;}}
  @media(max-width:480px){.hero-btns{flex-direction:column;align-items:center;}}
  </style>
 <style id="k2-nav-styles">
@@ -711,6 +726,26 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 </section>
 
 
+<section class="billing-selfserve-section" id="account-billing">
+ <div class="container">
+ <div class="billing-selfserve-panel">
+ <div>
+ <div class="billing-selfserve-kicker">Account &amp; billing</div>
+ <h2>Need to change card, cancel renewal, or buy a mock?</h2>
+ <p>Log in with the email used for payment. You can update your Stripe card, schedule CASPer Pro to stop at the end of the paid period, or start checkout for a full CASPer mock from here.</p>
+ <div class="billing-status-line" id="billingStatusLine">Log in to manage your Key2MD billing.</div>
+ </div>
+ <div class="billing-selfserve-actions">
+ <button class="primary" id="billingLoginBtn" onclick="Key2MDAuth.showAuthModal('login')">Log in</button>
+ <button id="billingCardBtn" onclick="openBillingPortalFromPlans(this)" style="display:none;">Change card</button>
+ <a href="#full-casper-mock" id="billingMockBtn">Buy mock</a>
+ <button class="danger" id="billingCancelBtn" onclick="handleCancel()" style="display:none;">Cancel Pro renewal</button>
+ </div>
+ </div>
+ </div>
+</section>
+
+
 <section class="pro-section" id="pro-section">
  <div class="container">
  <div class="pro-inner">
@@ -748,7 +783,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="pro-active-label"><span class="pro-active-dot"></span><span id="proActiveLabelText">CASPer Pro - Active</span></div>
  <div class="pro-active-sub" id="proActiveSub">You have unlimited CASPer AI reviews.</div>
  </div>
+ <div class="pro-active-actions">
+ <button class="btn-manage-sm" onclick="openBillingPortalFromPlans(this)">Change card</button>
  <button class="btn-cancel-sm" id="proCancelBtn" onclick="handleCancel()">Cancel</button>
+ </div>
  </div>
 
  <div class="pro-price-row">
@@ -757,7 +795,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div class="pro-note">Cancel anytime | Auto-renews weekly | Billed via Stripe</div>
  <button class="btn-pro" id="proBtn" onclick="handleBuyPro()">Start CASPer Pro -></button>
- <div class="pro-secure"> Secure payment via Stripe | Cancel from this page anytime</div>
+ <div class="pro-secure">Secure payment via Stripe | Change card or cancel renewal from this page</div>
 
  <ul class="pro-list">
  <li>Unlimited CASPer AI reviews - no daily cap</li>
@@ -1190,13 +1228,14 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="faq-inner">
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What exactly is CASPer Pro?</button><div class="faq-a"><div class="faq-a-inner">CASPer Pro removes the CASPer daily AI review limit entirely. On the free tier you get 1 CASPer AI-scored response per day. With Pro, you can do as many stations as you want, every day, for as long as your subscription is active. It's $40/week, billed automatically, and you can cancel anytime from this page.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I cancel at any time?</button><div class="faq-a"><div class="faq-a-inner">Yes - cancel from this page anytime. Your access continues until the end of the current billing week, then reverts to the free tier. No lock-in, no cancellation fees.</div></div></div>
+ <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How do I change my card?</button><div class="faq-a"><div class="faq-a-inner">Log in with the email you used for payment, then use the Account &amp; billing section near the top of this page. Stripe opens a secure billing page where you can update your card details. Key2MD never sees or stores your card number.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Does CASPer Pro include GAMSAT S2 reviews?</button><div class="faq-a"><div class="faq-a-inner">No - CASPer Pro is CASPer-only. GAMSAT S2 now has its own Pro subscription: $19/week or $49/month for fair-use unlimited AI essay reviews. If you only write the occasional essay, credits still work from $12/review, or $9.60 each in a 10-pack.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What does fair-use unlimited mean for GAMSAT S2 Pro?</button><div class="faq-a"><div class="faq-a-inner">It is built for genuine high-volume study, not automated use or account sharing. The limit is set far above normal student use, so a real student writing essays should not hit it; if you somehow do, contact Dan and he can sort it out.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How are credits different from Pro?</button><div class="faq-a"><div class="faq-a-inner">Credits are pay-per-review - you buy a pack and each AI feedback uses one credit. They never expire and work for both CASPer and GAMSAT S2. Pro is subscription access for volume practice: CASPer Pro gives unlimited CASPer reviews, while GAMSAT S2 Pro gives fair-use unlimited essay reviews.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is this the same as Dan's 1:1 coaching?</button><div class="faq-a"><div class="faq-a-inner">The rubric is the same - Dan built the marking criteria from his coaching experience. However, 1:1 coaching includes personalised strategy sessions, live practice, and Dan's direct input on your specific weaknesses. The AI tool is the framework at scale - same criteria, not a replacement for coaching.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are payments secure?</button><div class="faq-a"><div class="faq-a-inner">All payments are processed by Stripe - the same provider used by Shopify, Airbnb, and major Australian banks. Key2MD never sees or stores your card details. Receipts are sent automatically by Stripe.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is anything shipped? What about returns?</button><div class="faq-a"><div class="faq-a-inner">Nothing physical is shipped. Credits, Pro access, MMI feedback and mock exam access are digital products delivered through your Key2MD account after payment. Because access starts immediately, change-of-mind returns are not offered; if there is a duplicate payment or access fault, reply to Dan and it can be checked manually.</div></div></div>
- <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What if my Pro payment fails?</button><div class="faq-a"><div class="faq-a-inner">Stripe will retry automatically. If it continues to fail, your account reverts to the free tier and you'll receive an email. You can resubscribe at any time from this page.</div></div></div>
+ <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What if my Pro payment fails?</button><div class="faq-a"><div class="faq-a-inner">Stripe will retry automatically and the email from Key2MD includes a secure retry link where available. You can also log in here, open Account &amp; billing, and update your card before the retry. If payment still fails, your account reverts to the free tier.</div></div></div>
  </div>
  </div>
 </section>
@@ -1301,6 +1340,7 @@ function updateUI() {
  const cancelBtn = document.getElementById('proCancelBtn');
  const cancelRequested = isPro && !!user.cancel_requested;
  const endLabel = formatProPeriodEnd(user.pro_period_end);
+ updateBillingPanel(user, isPro, cancelRequested, endLabel);
  banner.style.display = isPro ? 'flex' : 'none';
  banner.classList.toggle('cancelling', cancelRequested);
  if (isPro) {
@@ -1319,6 +1359,27 @@ function updateUI() {
  cancelBtn.disabled = false;
  }
  setProButtons('Start CASPer Pro ->', false, '1');
+ }
+}
+
+function updateBillingPanel(user, isPro, cancelRequested, endLabel) {
+ const loggedIn = Key2MDAuth.isLoggedIn();
+ const status = document.getElementById('billingStatusLine');
+ const loginBtn = document.getElementById('billingLoginBtn');
+ const cardBtn = document.getElementById('billingCardBtn');
+ const cancelBtn = document.getElementById('billingCancelBtn');
+ if (status) {
+ if (!loggedIn) status.textContent = 'Log in to manage your Key2MD billing.';
+ else if (isPro && cancelRequested) status.textContent = `CASPer Pro cancellation is scheduled. Access remains active until ${endLabel}.`;
+ else if (isPro) status.textContent = 'CASPer Pro is active. You can update your card or stop the next renewal here.';
+ else status.textContent = 'Signed in. You can buy a mock or open Stripe billing if this account has previous payments.';
+ }
+ if (loginBtn) loginBtn.style.display = loggedIn ? 'none' : 'inline-flex';
+ if (cardBtn) cardBtn.style.display = loggedIn ? 'inline-flex' : 'none';
+ if (cancelBtn) {
+ cancelBtn.style.display = isPro ? 'inline-flex' : 'none';
+ cancelBtn.disabled = cancelRequested;
+ cancelBtn.textContent = cancelRequested ? 'Cancellation scheduled' : 'Cancel Pro renewal';
  }
 }
 
@@ -1370,6 +1431,27 @@ async function handleBuyPro() {
  } catch(e) {
  btns.forEach(b => { b.disabled = false; b.textContent = 'Start CASPer Pro ->'; });
  alert('Could not start checkout: ' + e.message);
+ }
+}
+
+async function openBillingPortalFromPlans(btn) {
+ if (!Key2MDAuth.isLoggedIn()) {
+ Key2MDAuth.showAuthModal('login');
+ return;
+ }
+ const oldText = btn ? btn.textContent : '';
+ if (btn) {
+ btn.disabled = true;
+ btn.textContent = 'Opening Stripe...';
+ }
+ try {
+ await Key2MDAuth.openBillingPortal({ returnUrl: window.location.href });
+ } catch (e) {
+ if (btn) {
+ btn.disabled = false;
+ btn.textContent = oldText || 'Change card';
+ }
+ alert(e.message || 'Could not open billing.');
  }
 }
 

@@ -311,6 +311,49 @@ const Key2MDAuth = (() => {
  setUser(null);
  }
 
+ async function openBillingPortal(options = {}) {
+ const token = getToken();
+ if (!token || !_user) {
+ showAuthModal('login');
+ return null;
+ }
+ const returnUrl = options.returnUrl || window.location.href;
+ const res = await fetch(`${_config.apiBase}/api/billing/portal`, {
+ method: 'POST',
+ headers: getTrackingHeaders({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }),
+ body: JSON.stringify({ return_url: returnUrl }),
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok || !data.url) throw new Error(data.message || data.error || 'Could not open billing management.');
+ window.location.href = data.url;
+ return data;
+ }
+
+ async function cancelCasperProRenewal(options = {}) {
+ const token = getToken();
+ if (!token || !_user) {
+ showAuthModal('login');
+ return null;
+ }
+ if (_user.tier !== 'pro') throw new Error('CASPer Pro is not active on this account.');
+ if (_user.cancel_requested) return { ok: true, already_cancelled: true, period_end: _user.pro_period_end || null };
+ const endLabel = formatPeriodEnd(_user.pro_period_end);
+ const shouldConfirm = options.confirm !== false;
+ if (shouldConfirm && !window.confirm(`Cancel CASPer Pro renewal?\n\nYou will not be billed again. Your Pro access stays active until ${endLabel}, then returns to Free automatically.`)) return null;
+ const res = await fetch(`${_config.apiBase}/api/pro/cancel`, {
+ method: 'POST',
+ headers: getTrackingHeaders({ 'Authorization': `Bearer ${token}` }),
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) throw new Error(data.message || data.error || 'Cancellation failed.');
+ await checkSession();
+ if (options.alert !== false) {
+ const confirmedEnd = formatPeriodEnd(data.period_end || _user?.pro_period_end);
+ window.alert(`Cancellation confirmed. You will not be billed again. CASPer Pro remains active until ${confirmedEnd}.`);
+ }
+ return data;
+ }
+
  // -- UI: Auth Modal --
 
  function injectAuthModal() {
@@ -494,13 +537,25 @@ const Key2MDAuth = (() => {
  ? (_user.cancel_requested ? `CASPer Pro cancelling - access ends ${proEndsAt}` : 'CASPer Pro')
  : 'Free account';
  const displayName = htmlEscape(_user.name || _user.email.split('@')[0]);
+ const accountActions = _user.impersonation ? '' : `
+ <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;">
+ <button onclick="Key2MDAuth.openBillingPortal().catch(e=>alert(e.message))" style="padding:8px 9px;border-radius:8px;border:1px solid rgba(14,165,233,0.28);background:#fff;color:var(--navy,#0a1628);font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;">Billing / card</button>
+ <button onclick="window.location.href='plans.html#full-casper-mock'" style="padding:8px 9px;border-radius:8px;border:1px solid rgba(14,165,233,0.28);background:#fff;color:var(--navy,#0a1628);font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;">Buy mock</button>
+ ${_user.tier === 'pro' ? (_user.cancel_requested
+ ? `<button disabled style="grid-column:1/-1;padding:8px 9px;border-radius:8px;border:1px solid rgba(245,158,11,0.28);background:rgba(245,158,11,0.08);color:#92400e;font:inherit;font-size:0.72rem;font-weight:800;">Cancels ${htmlEscape(proEndsAt)}</button>`
+ : `<button onclick="Key2MDAuth.cancelCasperProRenewal().catch(e=>alert(e.message))" style="grid-column:1/-1;padding:8px 9px;border-radius:8px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.06);color:#b91c1c;font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;">Cancel CASPer Pro renewal</button>`)
+ : `<button onclick="window.location.href='plans.html#pro-section'" style="grid-column:1/-1;padding:8px 9px;border-radius:8px;border:1px solid rgba(14,165,233,0.28);background:rgba(14,165,233,0.08);color:var(--teal3,#0284c7);font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;">View CASPer Pro</button>`}
+ </div>`;
  bar.innerHTML = `
- <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:10px;">
- <div>
+ <div style="padding:12px 16px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:10px;">
+ <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+ <div style="min-width:0;">
  <div style="font-size:0.82rem;font-weight:700;color:var(--navy,#0a1628);">${displayName}</div>
  <div style="font-size:0.72rem;color:var(--gray400,#94a3b8);">${htmlEscape(accountLabel)}</div>
  </div>
  <button onclick="Key2MDAuth.logout()" style="background:none;border:1px solid var(--gray200,#e2e8f0);border-radius:6px;padding:5px 10px;font-size:0.72rem;color:var(--gray600,#475569);cursor:pointer;font-family:inherit;">${_user.impersonation ? 'Exit' : 'Log out'}</button>
+ </div>
+ ${accountActions}
  </div>
  `;
  } else {
@@ -518,7 +573,7 @@ const Key2MDAuth = (() => {
 
  function formatPeriodEnd(value) {
  const seconds = Number(value || 0);
- if (!seconds) return 'soon';
+ if (!seconds) return 'at the end of your paid period';
  const date = new Date(seconds > 100000000000 ? seconds : seconds * 1000);
  try {
  return date.toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
@@ -665,6 +720,8 @@ const Key2MDAuth = (() => {
  canReview,
  canMakeRequest,
  requestReview,
+ openBillingPortal,
+ cancelCasperProRenewal,
  showAuthModal,
  hideAuthModal,
  logout,
