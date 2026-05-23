@@ -116,7 +116,7 @@
     <div class="status-list" id="subscriptionList">
      <div class="empty">Log in to see subscriptions.</div>
     </div>
-    <div class="help">Stripe billing is the safest place to update cards and manage Stripe-side payment details. CASPer Pro cancellation is also shown directly here so students can see clearly when access ends.</div>
+    <div class="help">Stripe billing is the safest place to update cards and manage Stripe-side payment details. Renewal cancellations are shown directly where Key2MD can confirm the end date clearly.</div>
    </div>
 
    <div class="panel card">
@@ -270,9 +270,14 @@
    const badgeText = cancelling ? 'Cancelling' : 'Active';
    const accessText = cancelling ? `Access ends ${fmtDate(sub.period_end)}` : (sub.period_end ? `Current paid period ends ${fmtDate(sub.period_end)}` : 'Recurring access is active');
    const tier = sub.tier ? ` | ${esc(sub.tier)}` : '';
+   const cancelAction = !cancelling && sub.product === 'GAMSAT S2 Pro'
+    ? `<button class="danger" onclick="cancelProductRenewal('gamsat_s2', this)">Cancel renewal</button>`
+    : !cancelling && sub.product === 'CASPer weekly class'
+    ? `<button class="danger" onclick="cancelProductRenewal('casper_class', this)">Cancel renewal</button>`
+    : '';
    return `<div class="row">
     <div class="row-main"><div class="row-title">${esc(sub.product)}${tier}</div><div class="row-meta">${esc(accessText)}</div></div>
-    <span class="badge ${badgeClass}">${badgeText}</span>
+    <div class="btn-row"><span class="badge ${badgeClass}">${badgeText}</span>${cancelAction}</div>
    </div>`;
   }).join('');
  }
@@ -352,6 +357,34 @@
    alert(e.message || 'Could not cancel CASPer Pro renewal.');
   } finally {
    if (btn) { btn.disabled = false; btn.textContent = old || 'Cancel CASPer Pro renewal'; }
+  }
+ }
+
+ async function cancelProductRenewal(kind, btn) {
+  const config = {
+   gamsat_s2: {
+    label: 'GAMSAT S2 Pro',
+    endpoint: '/api/gamsat-s2/cancel',
+   },
+   casper_class: {
+    label: 'weekly CASPer class',
+    endpoint: '/api/casper-class/cancel',
+   },
+  }[kind];
+  if (!config) return;
+  if (!window.confirm(`Cancel ${config.label} renewal?\n\nYou will not be billed again. Current paid access stays active until the end of the paid period.`)) return;
+  const old = btn?.textContent || '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Cancelling...'; }
+  try {
+   const token = Key2MDAuth.getToken();
+   const res = await fetch(`${API_BASE}${config.endpoint}`, { method:'POST', headers:{ 'Authorization':`Bearer ${token}` } });
+   const data = await res.json().catch(() => ({}));
+   if (!res.ok) throw new Error(data.message || data.error || 'Cancellation failed.');
+   await loadBillingSummary();
+   alert(data.message || `${config.label} renewal has been cancelled.`);
+  } catch (e) {
+   alert(e.message || `Could not cancel ${config.label} renewal.`);
+   if (btn) { btn.disabled = false; btn.textContent = old || 'Cancel renewal'; }
   }
  }
  </script>

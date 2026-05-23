@@ -3336,7 +3336,7 @@ function buyMarkingBundle(bundleId, btn) {
  if (data.checkout_url) {
  window.location.href = data.checkout_url;
  } else {
- btn.textContent = data.error || 'Error - try again';
+ btn.textContent = data.message || data.error || 'Error - try again';
  btn.disabled = false;
  }
  })
@@ -3398,7 +3398,7 @@ function submitMarkingPayment() {
  if (data.checkout_url) {
  window.location.href = data.checkout_url;
  } else {
- btn.textContent = data.error || 'Error \u2014 try again';
+ btn.textContent = data.message || data.error || 'Error \u2014 try again';
  btn.disabled = false;
  }
  })
@@ -3573,7 +3573,7 @@ function purchaseCredits(){
  if(data.checkout_url){
  window.location.href = data.checkout_url;
  } else {
- btn.textContent = data.error || 'Error \u2014 try again';
+ btn.textContent = data.message || data.error || 'Error \u2014 try again';
  btn.disabled = false;
  btn.style.opacity = '1';
  }

@@ -3,180 +3,125 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Full Mock Report - Key2MD</title>
+ <title>Full Mock Report — Key2MD</title>
  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
  <link rel="icon" href="/favicon.ico">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="mock-report-redesign.css">
  <script src="auth.js" defer></script>
- <style>
- *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
- :root{--navy:#0a1628;--teal:#0ea5e9;--teal3:#0284c7;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray400:#94a3b8;--gray600:#475569;--gray800:#1e293b;--white:#fff;--green:#16a34a;--amber:#d97706;--red:#dc2626}
- body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--gray50);color:var(--gray800);line-height:1.6}
- a{color:inherit;text-decoration:none}
- .topbar{background:rgba(10,22,40,.97);color:#fff;position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(255,255,255,.08)}
- .topbar-inner{max-width:1180px;margin:0 auto;padding:15px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
- .logo{font-size:1.35rem;font-weight:900;letter-spacing:-.03em}.logo span{color:var(--teal)}
- .nav-actions{display:flex;gap:10px;flex-wrap:wrap}.nav-actions a,.nav-actions button{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;border-radius:50px;padding:8px 13px;font:inherit;font-size:.8rem;font-weight:800;cursor:pointer}
- .wrap{max-width:1180px;margin:0 auto;padding:34px 24px 64px}
- .hero{background:var(--navy);color:#fff;border-radius:18px;overflow:hidden;margin-bottom:18px}
- .hero-main{padding:30px 32px}.kicker{font-size:.68rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.52);margin-bottom:7px}
- h1{font-size:clamp(1.65rem,3vw,2.35rem);line-height:1.12;margin-bottom:8px}.hero p{color:rgba(255,255,255,.7);font-size:.92rem;max-width:800px}
- .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;padding:18px 32px;background:rgba(255,255,255,.04);border-top:1px solid rgba(255,255,255,.08)}
- .stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px}.stat strong{display:block;font-size:1.3rem}.stat span{font-size:.68rem;color:rgba(255,255,255,.56);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
- .panel{background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px;margin-bottom:16px}
- .panel h2{font-size:1.05rem;color:var(--navy);margin-bottom:8px}.panel p{font-size:.86rem;color:var(--gray600)}
- .overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.tile{background:var(--gray50);border:1px solid var(--gray200);border-radius:12px;padding:14px}.tile strong{display:block;color:var(--navy);font-size:.82rem;margin-bottom:5px}.tile p{font-size:.82rem}
- .readiness{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.ready-item{background:var(--gray50);border:1px solid var(--gray200);border-radius:12px;padding:12px}.ready-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}.ready-head strong{font-size:.82rem;color:var(--navy)}.status{font-size:.64rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}.status.ready{color:var(--green)}.status.work{color:var(--red)}.status.watch{color:var(--amber)}
- .action-list{display:grid;gap:10px}.action-row{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;border-top:1px solid var(--gray100);padding-top:10px}.action-row:first-child{border-top:0;padding-top:0}.action-num{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900}.action-kicker{font-size:.66rem;font-weight:900;color:var(--teal3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}.action-title{font-size:.86rem;font-weight:900;color:var(--navy);line-height:1.35}
- .notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:11px 13px;font-size:.8rem;margin-top:12px}
- .manual{background:#f0fdf4;border-color:#bbf7d0}.manual strong{color:#14532d}.manual p{color:#166534;white-space:pre-wrap}
- .station{background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:18px;margin-bottom:14px}
- .station-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}.station-title{font-weight:900;color:var(--navy)}.score{font-weight:900;color:var(--teal3);white-space:nowrap}
- .station-grid{display:grid;grid-template-columns:minmax(270px,.9fr) minmax(0,1.1fr);gap:16px;align-items:start}
- .label{font-size:.66rem;font-weight:900;color:var(--teal3);letter-spacing:.09em;text-transform:uppercase;margin:10px 0 5px}
- .text{font-size:.84rem;color:var(--gray600);line-height:1.7;white-space:pre-wrap}.box{background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:12px;max-height:230px;overflow:auto}
- .video-box{background:#07111f;border-radius:12px;overflow:hidden;border:1px solid rgba(10,22,40,.18)}video{width:100%;aspect-ratio:16/9;background:#000;display:none}.load-video{width:100%;min-height:160px;border:0;background:#07111f;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font:inherit;cursor:pointer;padding:18px}.load-video span{font-size:.76rem;color:rgba(255,255,255,.64)}.recording-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.download-recording{min-height:34px;padding:8px 12px;border-radius:50px;border:1px solid rgba(14,165,233,.3);background:#fff;color:var(--teal3);font:inherit;font-size:.74rem;font-weight:850;cursor:pointer}.download-recording:hover{background:rgba(14,165,233,.07);border-color:var(--teal)}.download-recording:disabled{cursor:not-allowed;opacity:.65}
- .sync{max-height:270px;overflow:auto;border:1px solid var(--gray200);border-radius:10px;background:#fff;padding:8px;display:grid;gap:4px}.seg{width:100%;border:0;background:transparent;text-align:left;border-radius:8px;padding:7px 8px;font:inherit;font-size:.8rem;line-height:1.55;color:var(--gray600);cursor:pointer}.seg:hover{background:var(--gray50);color:var(--navy)}.seg.active{background:rgba(14,165,233,.11);color:var(--navy);box-shadow:inset 3px 0 0 var(--teal)}
- .feedback{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.feedback .tile{padding:11px}.criteria{margin-top:12px;border:1px solid rgba(14,165,233,.18);background:rgba(14,165,233,.035);border-radius:12px;padding:12px}.criterion{padding:8px 0;border-top:1px solid var(--gray100)}.criterion:first-child{border-top:0}.criterion-head{display:flex;justify-content:space-between;gap:10px;font-size:.78rem;font-weight:850;color:var(--navy)}.criterion p{font-size:.76rem;color:var(--gray600);margin-top:4px}
- .state{background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:44px 28px;text-align:center}.state h2{color:var(--navy);font-size:1.2rem;margin-bottom:6px}.btn{display:inline-flex;border:0;background:var(--teal);color:#fff;border-radius:50px;padding:11px 18px;font:inherit;font-size:.86rem;font-weight:850;cursor:pointer;margin-top:16px}
- @media(max-width:760px){.station-grid,.feedback{grid-template-columns:1fr}.station-head{flex-direction:column}.topbar-inner{align-items:flex-start;flex-direction:column}}
- @media print{.topbar,.nav-actions,.load-video,video{display:none!important}.wrap{padding:0}.hero,.panel,.station{break-inside:avoid;border-color:#ddd}.hero{color:#111;background:#fff}.hero p,.kicker{color:#555}.stats{background:#fff;border-top:1px solid #ddd}.stat{border-color:#ddd}.stat span{color:#555}}
- </style>
 </head>
 <body>
- <header class="topbar">
- <div class="topbar-inner">
- <a class="logo" href="index.html">Key<span>2</span>MD</a>
- <div class="nav-actions">
- <a href="history.html">Back to history</a>
- <a href="full-casper-mock-exam.html">Take another mock</a>
- <button type="button" onclick="window.print()">Print report</button>
+ <div class="k2-mock-report">
+  <div class="k2mr-topbar">
+   <div class="k2mr-topbar-inner">
+    <a class="k2mr-logo" href="index.html">key2<span>md</span></a>
+    <div class="k2mr-nav">
+     <a href="history.html">Back to history</a>
+     <a href="full-casper-mock-exam.html">Take another mock</a>
+     <button type="button" onclick="window.print()">Print report</button>
+    </div>
+   </div>
+  </div>
+  <div class="k2mr-wrap">
+   <div id="content" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:48px 32px;text-align:center;">
+    <h2 style="font-family:'DM Serif Display',serif;font-size:1.5rem;color:#fff;margin-bottom:8px;">Loading your full mock report…</h2>
+    <p style="font-size:0.9rem;color:rgba(255,255,255,0.55);">Please wait while the report is opened securely.</p>
+   </div>
+  </div>
  </div>
- </div>
- </header>
- <main class="wrap">
- <div id="content" class="state"><h2>Loading your full mock report...</h2><p>Please wait while the report is opened securely.</p></div>
- </main>
  <script>
- const API_BASE='https://key2md-api.brittainmbbs.workers.dev';
- const TOKEN_KEY='key2md_token';
- const content=document.getElementById('content');
- let attempt=null;
- function esc(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
- function attr(value){return esc(value).replace(/`/g,'&#96;');}
- function fmtDate(value){if(!value)return '';try{return new Intl.DateTimeFormat('en-AU',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));}catch{return String(value);}}
- function fmtDuration(sec){const s=Math.max(0,Math.round(Number(sec)||0));return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
- function scoreColor(score){const n=Number(score);if(!Number.isFinite(n))return'var(--gray400)';if(n>=7)return'var(--green)';if(n>=5.5)return'var(--teal3)';if(n>=4.5)return'var(--amber)';return'var(--red)';}
- function safeScore(value){if(value===null||value===undefined||value==='')return null;const n=Number(value);return Number.isFinite(n)&&n>0?Math.round(n*10)/10:null;}
- function hasFeedback(row){return !!(row?.feedback&&typeof row.feedback==='object'&&Object.keys(row.feedback).length);}
- function rowScore(row){if(!hasFeedback(row))return '-';const n=safeScore(row.feedback?.overall?.score??row.feedback?.score??row.score);return Number.isFinite(n)?`${n}/10`:'-';}
- function feedback(row){const fb=row.feedback||{},overall=fb.overall||{},issue=row.processing_error||row.reprocess_error;if(!hasFeedback(row)&&issue)return{strength:'AI analysis did not complete.',improve:issue};return{strength:overall.biggest_strength||fb.strengths||fb.strength||'No specific strength returned.',improve:overall.biggest_improvement||fb.improvements||fb.improve||'No specific improvement returned.'};}
- function numericScore(row){return safeScore(row?.feedback?.overall?.score??row?.feedback?.score??row?.score);}
- function avgScore(rows){const values=rows.map(numericScore).filter(Number.isFinite);return values.length?Math.round((values.reduce((sum,n)=>sum+n,0)/values.length)*10)/10:'-';}
- function statusLabel(status){return status==='ready'?'Ready':status==='work'?'Needs work':'Watch';}
- function readinessHTML(items){const rows=Array.isArray(items)&&items.length?items:[{label:'Overall repeatability',status:'watch',detail:'Open the station detail below and check whether the same weakness repeats.'}];return `<div class="readiness">${rows.map(item=>`<div class="ready-item"><div class="ready-head"><strong>${esc(item.label||'Readiness')}</strong><span class="status ${esc(item.status||'watch')}">${esc(statusLabel(item.status))}</span></div><p>${esc(item.detail||'Review the station evidence before deciding what to practise next.')}</p></div>`).join('')}</div>`;}
- function actionPlanHTML(actions){const rows=Array.isArray(actions)&&actions.length?actions:[{label:'Next practice move',title:'Repeat the weakest station type under timing',detail:'Use the station breakdown below to choose what to practise next.'}];return `<div class="action-list">${rows.map((action,i)=>`<div class="action-row"><div class="action-num">${i+1}</div><div><div class="action-kicker">${esc(action.label||'Next step')}</div><div class="action-title">${esc(action.title||'Practice under timing')}</div><p>${esc(action.detail||'Keep the focus narrow so the next station has one clear target.')}</p></div></div>`).join('')}</div>`;}
- function paramsId(){return new URLSearchParams(location.search).get('id')||'';}
- document.addEventListener('DOMContentLoaded',()=>{
- Key2MDAuth.init({tool:'casper',apiBase:API_BASE,onAuthChange:user=>{if(user)loadReport();else showLogin();}});
- });
- function showLogin(){content.innerHTML=`<h2>Log in to view this report</h2><p>Your mock report is private to your account.</p><button class="btn" onclick="Key2MDAuth.showAuthModal('login')">Log in</button>`;}
- async function loadReport(){
- const id=paramsId(),token=localStorage.getItem(TOKEN_KEY);
- if(!id){content.innerHTML='<h2>Missing report id</h2><p>Open this page from your history.</p>';return;}
- try{
- const res=await fetch(`${API_BASE}/api/casper-mock/attempt/${encodeURIComponent(id)}`,{headers:{Authorization:`Bearer ${token}`}});
- const data=await res.json().catch(()=>({}));
- if(!res.ok)throw new Error(data.message||data.error||'Could not load report.');
- attempt=data.attempt; renderReport();
- }catch(err){content.innerHTML=`<h2>Could not open report</h2><p>${esc(err.message||'Try again later.')}</p><a class="btn" href="history.html">Back to history</a>`;}
- }
- function renderReport(){
- const rows=attempt.rows||[],report=attempt.report||{};
- const videoRows=rows.filter(r=>r.type==='video'),typedRows=rows.filter(r=>r.type!=='video');
- const reviewedCount=rows.map(numericScore).filter(Number.isFinite).length;
- const overallScore=avgScore(rows);
- const reportTitle=reviewedCount<rows.length?`Reviewed stations: ${overallScore}/10`:report.interpretation?.band||'Your mock report';
- const reportText=reviewedCount<rows.length?`${reviewedCount}/${rows.length} stations currently have AI feedback. Dan can reprocess the missing stations from admin.`:report.interpretation?.text||'Review your score pattern, station feedback, recordings, and transcripts from this full mock attempt.';
- const manual=String(attempt.manual_review_notes||'').trim();
- content.className='';
- content.innerHTML=`
- <section class="hero">
- <div class="hero-main"><div class="kicker">Full CASPer mock report</div><h1>${esc(reportTitle)}</h1><p>${esc(reportText)}</p></div>
- <div class="stats">
- <div class="stat"><strong>${esc(overallScore)}</strong><span>${reviewedCount<rows.length?'Reviewed avg':'Overall'} /10</span></div>
- <div class="stat"><strong>${rows.length}</strong><span>Stations</span></div>
- <div class="stat"><strong>${esc(avgScore(videoRows))}</strong><span>Video avg</span></div>
- <div class="stat"><strong>${esc(avgScore(typedRows))}</strong><span>Typed avg</span></div>
- <div class="stat"><strong>${esc(fmtDate(attempt.completed_at)||'-')}</strong><span>Completed</span></div>
- </div>
- </section>
- <section class="panel">
- <h2>Report summary</h2>
- <div class="overview">
- <div class="tile"><strong>${esc(report.oneThing?.title||'The one thing to fix')}</strong><p>${esc(report.oneThing?.body||'No repeated pattern was returned for this attempt.')}</p></div>
- <div class="tile"><strong>${esc(report.actionPlan?.[0]?.title||'Next practice move')}</strong><p>${esc(report.actionPlan?.[0]?.detail||'Repeat the weakest station type under timing.')}</p></div>
- <div class="tile"><strong>${esc(report.stamina?.label||'Stamina pattern')}</strong><p>${esc(report.stamina?.body||'Review the station list for early versus late performance.')}</p></div>
- </div>
- ${manual?`<div class="tile manual" style="margin-top:12px;"><strong>Dan's manual review result</strong><p>${esc(manual)}</p></div>`:''}
- <div class="notice">Video recordings expire 30 days after the mock. Transcripts and feedback remain available so you can still understand the marking.</div>
- </section>
- <section class="panel">
- <h2>Readiness dashboard</h2>
- ${readinessHTML(report.readiness)}
- </section>
- <section class="panel">
- <h2>Next practice block</h2>
- ${actionPlanHTML(report.actionPlan)}
- </section>
- ${rows.map(stationHTML).join('')}`;
- }
- function stationHTML(row,index){
- const isVideo=row.type==='video',title=`${isVideo?'Video':'Typed'} ${row.localIndex||index+1}`;
- const fb=feedback(row);
- return `<section class="station">
- <div class="station-head"><div><div class="station-title">${esc(title)} - ${esc(row.station?.category||'CASPer')}</div><div class="text" style="font-size:.75rem;color:var(--gray400);">${esc(row.tier||(isVideo?attempt.tier:'typed'))}</div></div><div class="score" style="color:${scoreColor(row.feedback?.overall?.score??row.feedback?.score??row.score)}">${esc(rowScore(row))}</div></div>
- <div class="station-grid">
- <div>${isVideo?videoHTML(row,index):typedHTML(row)}</div>
- <div><div class="label">Scenario</div><div class="text">${esc(row.station?.scenario||'')}</div>${promptsHTML(row)}
- <div class="feedback"><div class="tile"><strong>Strength</strong><p>${esc(fb.strength)}</p></div><div class="tile"><strong>Improve</strong><p>${esc(fb.improve)}</p></div></div>${criteriaHTML(row)}</div>
- </div></section>`;
- }
- function promptsHTML(row){return row.station?.prompt1||row.station?.prompt2?`<div class="label">Prompts</div><div class="text">${row.station?.prompt1?`1. ${esc(row.station.prompt1)}`:''}${row.station?.prompt2?`\n2. ${esc(row.station.prompt2)}`:''}</div>`:'';}
- function typedHTML(row){return `<div class="label">Typed response</div><div class="box text">${esc(row.answer||'No typed response captured.')}</div>`;}
- function videoHTML(row,index){
- const id=`reportvid-${attempt.id}-${index}`.replace(/[^a-zA-Z0-9_-]/g,'');
- const canLoad=row.recording_key&&!attempt.expired;
- const segs=Array.isArray(row.transcript_segments)?row.transcript_segments:[];
- const issue=row.processing_error?`<div class="box text" style="border-color:#fed7aa;background:#fff7ed;color:#7c2d12;margin-top:10px;">${esc(row.processing_error)}</div>`:'';
- return `<div class="video-box"><video id="${attr(id)}" controls playsinline preload="metadata" data-attempt-id="${attr(attempt.id)}" data-recording-key="${attr(row.recording_key||'')}"></video>${canLoad?`<button type="button" class="load-video" onclick="loadRecording(event,'${attr(id)}')"><strong>Load recording</strong><span>Authenticated playback. Expires ${esc(fmtDate(attempt.expires_at))}.</span></button>`:`<div class="load-video" style="cursor:default;"><strong>${attempt.expired?'Recording expired':'No recording saved'}</strong><span>${attempt.expired?'The 30-day playback window has passed.':'Transcript and feedback are still shown below.'}</span></div>`}</div>${canLoad?`<div class="recording-actions"><button type="button" class="download-recording" onclick="downloadRecording(event,'${attr(id)}')">Download recording only</button></div>`:''}${row.duration_sec?`<div class="text" style="font-size:.75rem;margin-top:7px;color:var(--gray400);">Duration ${esc(fmtDuration(row.duration_sec))}</div>`:''}${issue}${segs.length?`<div class="label">Synced transcript</div>${syncHTML(id,segs)}`:(row.transcript?`<div class="label">Transcript used for marking</div><div class="box text">${esc(row.transcript)}</div>`:'')}`;
- }
- function syncHTML(videoId,segs){return `<div class="sync" data-sync-for="${attr(videoId)}">${segs.map(seg=>`<button type="button" class="seg" data-start="${attr(seg.start||0)}" data-end="${attr(seg.end||seg.start||0)}" onclick="jumpTranscript('${attr(videoId)}',${Number(seg.start||0)})">${esc(seg.text||'')}</button>`).join('')}</div>`;}
- function criteriaHTML(row){
- const fb=row.feedback||{};
- if(row.type==='video'){
- const items=[];(fb.per_prompt||[]).forEach((prompt,i)=>{Object.entries(prompt.scores||{}).forEach(([key,value])=>{const score=safeScore(value?.score);items.push(`<div class="criterion"><div class="criterion-head"><span>Prompt ${i+1} ${esc(key.replace(/_/g,' '))}</span><span style="color:${scoreColor(score)}">${Number.isFinite(score)?score+'/10':'-'}</span></div><p>${esc(value?.comment||value?.label||'')}</p></div>`);});});
- return items.length?`<div class="criteria">${items.join('')}</div>`:'';
- }
- const raw=fb.competencies,items=Array.isArray(raw)?raw:(raw?Object.entries(raw).map(([key,value])=>typeof value==='object'?{name:key,...value}:{name:key,score:value}):[]);
- return items.length?`<div class="criteria">${items.map(item=>{const score=safeScore(item.score);return`<div class="criterion"><div class="criterion-head"><span>${esc(item.name||item.competency||'Competency')}</span><span style="color:${scoreColor(score)}">${Number.isFinite(score)?score+'/10':'-'}</span></div><p>${esc(item.improve||item.improvement||item.evidence||item.reason||item.note||'')}</p></div>`;}).join('')}</div>`:'';
- }
- async function loadRecording(event,videoId){
- event?.stopPropagation?.();const video=document.getElementById(videoId),btn=event?.currentTarget;if(!video)return;
- if(video.dataset.loaded==='1'){video.style.display='block';video.play().catch(()=>{});return;}
- if(btn){btn.disabled=true;btn.querySelector('span').textContent='Loading secure playback...';}
- try{
- const blob=await fetchRecordingBlob(video),url=URL.createObjectURL(blob);
- video.dataset.loaded='1';video.dataset.blobUrl=url;video.src=url;video.style.display='block';bindSync(video);if(btn)btn.style.display='none';video.play().catch(()=>{});
- }catch(err){if(btn){btn.disabled=false;btn.innerHTML=`<strong>Could not load recording</strong><span>${esc(err.message||'Try again later.')}</span>`;}}
- }
- function recordingUrl(video){if(!video?.dataset?.attemptId||!video?.dataset?.recordingKey)throw new Error('Recording details are missing for this station.');return`${API_BASE}/api/casper-mock/recording?attempt_id=${encodeURIComponent(video.dataset.attemptId)}&key=${encodeURIComponent(video.dataset.recordingKey)}`;}
- async function fetchRecordingBlob(video){const token=localStorage.getItem(TOKEN_KEY);if(!token)throw new Error('Please log in again before downloading this recording.');const res=await fetch(recordingUrl(video),{headers:{Authorization:`Bearer ${token}`}});if(!res.ok){const data=await res.json().catch(()=>({}));throw new Error(data.message||data.error||'Recording unavailable.');}const blob=await res.blob();const type=String(blob.type||'');if(type&&!type.startsWith('video/')&&type!=='application/octet-stream')throw new Error('Download blocked because the saved file is not a video recording.');return blob;}
- function downloadName(video,blob){const ext=String(blob?.type||'').includes('mp4')?'mp4':'webm';const station=String(video?.id||'recording').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,80)||'recording';return`key2md-casper-mock-${station}.${ext}`;}
- function saveBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}
- async function downloadRecording(event,videoId){event?.stopPropagation?.();const btn=event?.currentTarget,video=document.getElementById(videoId);if(!video)return;const original=btn?.textContent||'Download recording only';try{if(btn){btn.disabled=true;btn.textContent='Preparing download...';}const blob=await fetchRecordingBlob(video);saveBlob(blob,downloadName(video,blob));if(btn)btn.textContent='Downloaded';setTimeout(()=>{if(btn){btn.disabled=false;btn.textContent=original;}},1800);}catch(err){if(btn){btn.disabled=false;btn.textContent='Download failed';btn.title=err.message||'Try again later.';setTimeout(()=>{btn.textContent=original;},2600);}}}
- function bindSync(video){if(video.dataset.syncBound==='1')return;video.dataset.syncBound='1';video.addEventListener('timeupdate',()=>syncTranscript(video.id,video.currentTime||0));video.addEventListener('seeked',()=>syncTranscript(video.id,video.currentTime||0));}
- function syncTranscript(videoId,time){const wrap=document.querySelector(`[data-sync-for="${CSS.escape(videoId)}"]`);if(!wrap)return;let active=null;wrap.querySelectorAll('.seg').forEach(btn=>{const start=Number(btn.dataset.start||0),end=Number(btn.dataset.end||start+2),on=time>=start&&time<Math.max(end,start+.8);btn.classList.toggle('active',on);if(on)active=btn;});if(active&&wrap.dataset.lastActive!==String(active.dataset.start)){wrap.dataset.lastActive=String(active.dataset.start);active.scrollIntoView({block:'nearest'});}}
- function jumpTranscript(videoId,start){const video=document.getElementById(videoId);if(!video)return;video.currentTime=Math.max(0,Number(start)||0);syncTranscript(videoId,video.currentTime);if(video.dataset.loaded==='1')video.play().catch(()=>{});}
+  const API_BASE='https://key2md-api.brittainmbbs.workers.dev';
+  const TOKEN_KEY='key2md_token';
+  const content=document.getElementById('content');
+  let attempt=null;
+  function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function attr(v){return esc(v).replace(/`/g,'&#96;');}
+  function fmtDate(v){if(!v)return'';try{return new Intl.DateTimeFormat('en-AU',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v));}catch{return String(v);}}
+  function fmtDur(s){const n=Math.max(0,Math.round(Number(s)||0));return`${Math.floor(n/60)}:${String(n%60).padStart(2,'0')}`;}
+  function scoreColor(n){n=Number(n);if(!Number.isFinite(n))return'rgba(255,255,255,0.4)';if(n>=7)return'var(--green)';if(n>=5.5)return'var(--teal2)';if(n>=4.5)return'#fbbf24';return'var(--red)';}
+  function safeN(v){if(v==null||v==='')return null;const n=Number(v);return Number.isFinite(n)&&n>0?Math.round(n*10)/10:null;}
+  function hasFb(row){return!!(row?.feedback&&typeof row.feedback==='object'&&Object.keys(row.feedback).length);}
+  function rowScore(row){if(!hasFb(row))return'–';const n=safeN(row.feedback?.overall?.score??row.feedback?.score??row.score);return Number.isFinite(n)?`${n}/10`:'–';}
+  function getFb(row){const fb=row.feedback||{},ov=fb.overall||{},issue=row.processing_error||row.reprocess_error;if(!hasFb(row)&&issue)return{strength:'AI analysis did not complete.',improve:issue,empathy:'',missed:'',excellent:''};return{strength:ov.biggest_strength||fb.strengths||fb.strength||'',improve:ov.biggest_improvement||fb.improvements||fb.improve||'',empathy:fb.empathy||'',missed:fb.missed||'',excellent:ov.excellent_version||fb.excellent_version||''};}
+  function numScore(row){return safeN(row?.feedback?.overall?.score??row?.feedback?.score??row?.score);}
+  function avgScore(rows){const vals=rows.map(numScore).filter(Number.isFinite);return vals.length?Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*10)/10:'–';}
+  function statusLabel(s){return s==='ready'?'Ready':s==='work'?'Needs work':'Watch';}
+  function statusClass(s){return s==='ready'?'ready':s==='work'?'work':'watch';}
+  function paramsId(){return new URLSearchParams(location.search).get('id')||'';}
+  function fbTile(cls,label,body){if(!body)return'';return`<div class="k2mr-fb-tile ${cls}"><div class="k2mr-fb-lbl">${label}</div><div class="k2mr-fb-body">${esc(body)}</div></div>`;}
+  document.addEventListener('DOMContentLoaded',()=>{Key2MDAuth.init({tool:'casper',apiBase:API_BASE,onAuthChange:user=>{if(user)loadReport();else showLogin();}});});
+  function showLogin(){content.innerHTML=`<h2 style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:#fff;margin-bottom:8px;">Log in to view this report</h2><p style="color:rgba(255,255,255,0.6);margin-bottom:20px;">Your mock report is private to your account.</p><button class="k2mr-btn k2mr-btn-primary" style="font-family:inherit;" onclick="Key2MDAuth.showAuthModal('login')">Log in</button>`;}
+  async function loadReport(){const id=paramsId(),token=localStorage.getItem(TOKEN_KEY);if(!id){content.innerHTML='<h2 style="font-family:\'DM Serif Display\',serif;font-size:1.4rem;color:#fff;">Missing report ID</h2><p style="color:rgba(255,255,255,0.6);margin-top:8px;">Open this page from your history.</p>';return;}try{const res=await fetch(`${API_BASE}/api/casper-mock/attempt/${encodeURIComponent(id)}`,{headers:{Authorization:`Bearer ${token}`}});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||data.error||'Could not load report.');attempt=data.attempt;renderReport();}catch(err){content.innerHTML=`<h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:#fff;">Could not open report</h2><p style="color:rgba(255,255,255,0.6);margin:10px 0 20px;">${esc(err.message||'Try again later.')}</p><a class="k2mr-btn k2mr-btn-primary" href="history.html" style="font-family:inherit;text-decoration:none;">Back to history</a>`;}}
+  function renderReport(){
+   const rows=attempt.rows||[],report=attempt.report||{};
+   const videoRows=rows.filter(r=>r.type==='video'),typedRows=rows.filter(r=>r.type!=='video');
+   const reviewedCount=rows.map(numScore).filter(Number.isFinite).length;
+   const overallScore=avgScore(rows);
+   const interp=report.interpretation||{};
+   const bandClass=interp.tone==='strong'?'strong':interp.tone==='risk'?'risk':interp.tone==='caution'?'caution':'steady';
+   const reportTitle=reviewedCount<rows.length?`Reviewed stations: ${overallScore}/10`:interp.band||'Your mock report';
+   const reportText=reviewedCount<rows.length?`${reviewedCount}/${rows.length} stations currently have AI feedback.`:interp.text||'Review your score pattern, station feedback, recordings, and transcripts.';
+   const manual=String(attempt.manual_review_notes||'').trim();
+   const oneThing=report.oneThing||{};
+   const actions=Array.isArray(report.actionPlan)&&report.actionPlan.length?report.actionPlan:[{label:'Next practice move',title:'Repeat the weakest station type under timing',detail:'Use the station breakdown below to choose what to practise next.'}];
+   const readiness=Array.isArray(report.readiness)&&report.readiness.length?report.readiness:[{label:'Overall repeatability',status:'watch',detail:'Open the station detail below and check whether the same weakness repeats.'}];
+   content.removeAttribute('style');
+   content.innerHTML=`
+    <section class="k2mr-hero">
+     <div class="k2mr-hero-top">
+      <div>
+       <div class="k2mr-kicker">Full CASPer mock report &middot; ${esc(fmtDate(attempt.completed_at)||'Saved')}</div>
+       <h1>${esc(reportTitle)}</h1>
+       <p class="k2mr-hero-sub">${esc(reportText)}</p>
+      </div>
+      <div class="k2mr-score-block">
+       <div class="k2mr-score-big">${esc(String(overallScore))}<span class="max">/10</span></div>
+       <div class="k2mr-score-lbl">${reviewedCount<rows.length?'Reviewed avg':'Cohort signal'}</div>
+       ${interp.band?`<div class="k2mr-score-band ${bandClass}">${esc(interp.band)}</div>`:''}
+      </div>
+     </div>
+     <div class="k2mr-stats">
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${rows.length}</div><div class="k2mr-stat-lbl">Stations</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(String(avgScore(videoRows)))}</div><div class="k2mr-stat-lbl">Video avg</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(String(avgScore(typedRows)))}</div><div class="k2mr-stat-lbl">Typed avg</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(attempt.tier||'mock')}</div><div class="k2mr-stat-lbl">Tier</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(fmtDate(attempt.completed_at)||'–')}</div><div class="k2mr-stat-lbl">Completed</div></div>
+     </div>
+     <div class="k2mr-hero-foot"><strong>Guide only:</strong> 6.5+ is likely a Q4-style signal if repeatable; 5.5–6.5 is probably Q3. Scores run cooler than free tools.</div>
+    </section>
+    ${oneThing.title?`<section class="k2mr-onething"><div class="k2mr-kicker">The one thing to fix</div><h2>${esc(oneThing.title)}</h2><p>${esc(oneThing.body||'')}</p>${oneThing.source?`<div class="k2mr-onething-why"><strong>WHY THIS ONE:</strong> ${esc(oneThing.source)}</div>`:''}</section>`:''}
+    ${manual?`<div class="k2mr-actionbar" style="background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(34,197,94,0.02));border-color:rgba(34,197,94,0.25);"><div class="k2mr-actionbar-text"><strong style="color:var(--green);">Dan's manual review result.</strong> ${esc(manual)}</div></div>`:''}
+    <section class="k2mr-section">
+     <div class="k2mr-section-head"><div class="k2mr-kicker">Readiness dashboard</div><h3>Where you stand <em>right now</em>.</h3></div>
+     <div class="k2mr-card"><div class="k2mr-readiness">${readiness.map(item=>`<div class="k2mr-ready-item"><div class="k2mr-ready-head"><div class="k2mr-ready-label">${esc(item.label||'Readiness')}</div><div class="k2mr-status ${statusClass(item.status)}">${statusLabel(item.status)}</div></div><div class="k2mr-ready-detail">${esc(item.detail||'')}</div></div>`).join('')}</div></div>
+    </section>
+    <section class="k2mr-section">
+     <div class="k2mr-section-head"><div class="k2mr-kicker">Next practice block</div><h3>What to do <em>this week</em>.</h3></div>
+     <div class="k2mr-card"><div class="k2mr-actionplan">${actions.map((a,i)=>`<div class="k2mr-action"><div class="k2mr-action-num">${i+1}</div><div><div class="k2mr-action-kicker">${esc(a.label||'')}</div><div class="k2mr-action-title">${esc(a.title||'')}</div><div class="k2mr-action-detail">${esc(a.detail||'')}</div></div></div>`).join('')}</div></div>
+    </section>
+    <div class="k2mr-notice" style="margin-bottom:22px;">Video recordings expire 30 days after the mock. Transcripts and feedback remain available.</div>
+    ${rows.map(stationHTML).join('')}
+   `;
+  }
+  function stationHTML(row,index){
+   const isVideo=row.type==='video',title=`${isVideo?'Video':'Typed'} ${row.localIndex||index+1}`;
+   const fb=getFb(row),n=numScore(row),col=scoreColor(n);
+   return`<section class="k2mr-explorer" style="margin-bottom:14px;"><div class="k2mr-explorer-head"><div class="k2mr-explorer-title-block"><div class="k2mr-kicker">${esc(title)}</div><h3 style="font-size:1.1rem;margin-top:4px;">${esc(row.station?.category||'CASPer')}</h3><p style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.04em;">${esc(row.tier||(isVideo?attempt.tier:'typed'))}</p></div><div style="text-align:right;flex-shrink:0;"><div style="font-family:'DM Serif Display',serif;font-size:2.2rem;line-height:1;color:${col};">${esc(rowScore(row))}</div></div></div><div class="k2mr-explorer-body"><div class="k2mr-station-grid"><div class="k2mr-station-left">${isVideo?videoHTML(row,index):`<div class="k2mr-answer-card"><div class="k2mr-card-title" style="margin-bottom:8px;">Your typed answer</div><div class="k2mr-answer-text">${esc(row.answer||'No typed response captured.')}</div></div>`}</div><div class="k2mr-station-right"><div class="k2mr-scenario-card"><div class="k2mr-card-title">Scenario</div><div class="k2mr-scenario-text">${esc(row.station?.scenario||'')}</div>${promptsBlock(row)}</div><div class="k2mr-fbsummary" style="margin-top:0;">${fbTile('strength','&#10003; Strength',fb.strength)}${fbTile('improve','&rarr; Biggest improvement',fb.improve)}${fbTile('empathy','&#9825; Empathy layer to add',fb.empathy)}${fb.missed&&fb.missed!=='None'?fbTile('missed','&#8859; Missed point',fb.missed):''}${fb.excellent?fbTile('excellent','&#9733; An excellent response would add',fb.excellent):''}</div>${criteriaHTML(row)}</div></div></div></section>`;
+  }
+  function promptsBlock(row){const ps=[row.station?.prompt1,row.station?.prompt2].filter(Boolean);if(!ps.length)return'';return`<div class="k2mr-prompts" style="margin-top:14px;">${ps.map((p,i)=>`<div class="k2mr-prompt"><div class="k2mr-prompt-num">Prompt ${i+1}</div><div class="k2mr-prompt-text">${esc(p)}</div></div>`).join('')}</div>`;}
+  function videoHTML(row,index){const id=`rv-${(attempt.id||'x').replace(/[^a-zA-Z0-9_-]/g,'')}-${index}`;const canLoad=row.recording_key&&!attempt.expired;const segs=Array.isArray(row.transcript_segments)?row.transcript_segments:[];const issue=row.processing_error?`<div class="k2mr-notice" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.25);margin-top:10px;font-size:0.76rem;"><strong style="color:var(--red);">Issue:</strong> ${esc(row.processing_error)}</div>`:'';return`<div style="background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;"><video id="${attr(id)}" controls playsinline preload="metadata" data-attempt-id="${attr(attempt.id)}" data-recording-key="${attr(row.recording_key||'')}" style="width:100%;aspect-ratio:16/9;background:#000;display:none;"></video>${canLoad?`<button type="button" onclick="loadRec(event,'${attr(id)}')" style="width:100%;min-height:180px;border:0;background:linear-gradient(135deg,#0a1628,#0d2a52);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:inherit;cursor:pointer;padding:24px;"><strong style="font-family:'DM Serif Display',serif;font-size:1.2rem;">Load recording</strong><span style="font-family:var(--mono);font-size:0.72rem;color:rgba(255,255,255,0.6);letter-spacing:0.04em;">Authenticated playback &middot; Expires ${esc(fmtDate(attempt.expires_at))}</span></button>`:`<div style="width:100%;min-height:160px;background:linear-gradient(135deg,#0a1628,#0d2a52);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;text-align:center;"><strong style="font-family:'DM Serif Display',serif;font-size:1.1rem;">${attempt.expired?'Recording expired':'No recording saved'}</strong><span style="font-family:var(--mono);font-size:0.72rem;color:rgba(255,255,255,0.55);">${attempt.expired?'The 30-day playback window has passed.':'Transcript and feedback are still shown below.'}</span></div>`}</div>${canLoad?`<div style="margin-top:10px;"><button type="button" onclick="dlRec(event,'${attr(id)}')" class="k2mr-btn k2mr-btn-ghost" style="font-family:var(--mono);font-size:0.72rem;padding:8px 14px;width:auto;">Download recording</button></div>`:''}${row.duration_sec?`<div style="font-family:var(--mono);font-size:0.68rem;color:rgba(255,255,255,0.4);margin-top:7px;letter-spacing:0.04em;">Duration ${esc(fmtDur(row.duration_sec))}</div>`:''}${issue}${segs.length?`<div class="k2mr-card" style="margin-top:12px;padding:14px 16px;"><div class="k2mr-card-title" style="margin-bottom:8px;">Synced transcript</div><div data-sync-for="${attr(id)}" style="max-height:260px;overflow:auto;display:grid;gap:3px;">${segs.map(seg=>`<button type="button" data-start="${attr(seg.start||0)}" data-end="${attr(seg.end||seg.start||0)}" onclick="jumpTr('${attr(id)}',${Number(seg.start||0)})" style="width:100%;text-align:left;border:0;background:transparent;border-radius:7px;padding:7px 9px;font-family:inherit;font-size:0.78rem;line-height:1.55;color:rgba(255,255,255,0.7);cursor:pointer;">${esc(seg.text||'')}</button>`).join('')}</div></div>`:(row.transcript?`<div class="k2mr-card" style="margin-top:12px;padding:14px 16px;"><div class="k2mr-card-title" style="margin-bottom:7px;">Transcript used for marking</div><div style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.7;max-height:230px;overflow:auto;">${esc(row.transcript)}</div></div>`:'')}`;
+  }
+  function criteriaHTML(row){const fb=row.feedback||{};if(row.type==='video'){const items=[];(fb.per_prompt||[]).forEach((prompt,i)=>{Object.entries(prompt.scores||{}).forEach(([key,val])=>{const s=safeN(val?.score);items.push(`<div class="k2mr-comp"><div class="k2mr-comp-head"><div class="k2mr-comp-name">Prompt ${i+1} &middot; ${esc(key.replace(/_/g,' '))}</div><div class="k2mr-comp-score" style="color:${scoreColor(s)};">${Number.isFinite(s)?`${s}/10`:'–'}</div></div><div class="k2mr-comp-note">${esc(val?.comment||val?.label||'')}</div></div>`);});});return items.length?`<div class="k2mr-comps">${items.join('')}</div>`:'';}const raw=fb.competencies;const items=Array.isArray(raw)?raw:(raw?Object.entries(raw).map(([k,v])=>typeof v==='object'?{name:k,...v}:{name:k,score:v}):[]);return items.length?`<div class="k2mr-comps"><div class="k2mr-card-title" style="margin-bottom:10px;">Competency breakdown</div>${items.map(item=>{const s=safeN(item.score);return`<div class="k2mr-comp"><div class="k2mr-comp-head"><div class="k2mr-comp-name">${esc(item.name||item.competency||'Competency')}</div><div class="k2mr-comp-score" style="color:${scoreColor(s)};">${Number.isFinite(s)?`${s}/10`:'–'}</div></div><div class="k2mr-comp-note">${esc(item.improve||item.improvement||item.evidence||item.note||'')}</div></div>`;}).join('')}</div>`:'';}
+  function recUrl(vid){if(!vid?.dataset?.attemptId||!vid?.dataset?.recordingKey)throw new Error('Recording details missing.');return`${API_BASE}/api/casper-mock/recording?attempt_id=${encodeURIComponent(vid.dataset.attemptId)}&key=${encodeURIComponent(vid.dataset.recordingKey)}`;}
+  async function fetchBlob(vid){const tok=localStorage.getItem(TOKEN_KEY);if(!tok)throw new Error('Please log in again.');const res=await fetch(recUrl(vid),{headers:{Authorization:`Bearer ${tok}`}});if(!res.ok){const d=await res.json().catch(()=>({}));throw new Error(d.message||d.error||'Recording unavailable.');}const b=await res.blob();if(b.type&&!b.type.startsWith('video/')&&b.type!=='application/octet-stream')throw new Error('Download blocked: file is not a video.');return b;}
+  async function loadRec(event,videoId){event?.stopPropagation?.();const vid=document.getElementById(videoId),btn=event?.currentTarget;if(!vid)return;if(vid.dataset.loaded==='1'){vid.style.display='block';vid.play().catch(()=>{});return;}if(btn){btn.disabled=true;btn.querySelector('span').textContent='Loading secure playback\u2026';}try{const b=await fetchBlob(vid),url=URL.createObjectURL(b);vid.dataset.loaded='1';vid.src=url;vid.style.display='block';bindSync(vid);if(btn)btn.style.display='none';vid.play().catch(()=>{});}catch(err){if(btn){btn.disabled=false;btn.innerHTML=`<strong>Could not load recording</strong><span style="font-family:var(--mono);font-size:0.72rem;color:rgba(255,255,255,0.6);">${esc(err.message||'Try again.')}</span>`;}}}
+  function savB(b,name){const url=URL.createObjectURL(b),a=document.createElement('a');a.href=url;a.download=name;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}
+  async function dlRec(event,videoId){event?.stopPropagation?.();const btn=event?.currentTarget,vid=document.getElementById(videoId);if(!vid)return;const orig=btn?.textContent||'Download';try{if(btn){btn.disabled=true;btn.textContent='Preparing\u2026';}const b=await fetchBlob(vid);const ext=String(b.type||'').includes('mp4')?'mp4':'webm';savB(b,`key2md-casper-mock-${String(videoId).slice(0,60)}.${ext}`);if(btn)btn.textContent='Downloaded';setTimeout(()=>{if(btn){btn.disabled=false;btn.textContent=orig;}},1800);}catch(err){if(btn){btn.disabled=false;btn.textContent='Failed';btn.title=err.message;setTimeout(()=>{btn.textContent=orig;},2600);}}}
+  function bindSync(vid){if(vid.dataset.syncBound==='1')return;vid.dataset.syncBound='1';vid.addEventListener('timeupdate',()=>syncTr(vid.id,vid.currentTime||0));vid.addEventListener('seeked',()=>syncTr(vid.id,vid.currentTime||0));}
+  function syncTr(videoId,time){const wrap=document.querySelector(`[data-sync-for="${CSS.escape(videoId)}"]`);if(!wrap)return;let active=null;wrap.querySelectorAll('[data-start]').forEach(btn=>{const s=Number(btn.dataset.start||0),e=Number(btn.dataset.end||s+2),on=time>=s&&time<Math.max(e,s+0.8);btn.style.background=on?'rgba(14,165,233,0.15)':'transparent';btn.style.boxShadow=on?'inset 3px 0 0 var(--teal2)':'none';btn.style.color=on?'#fff':'rgba(255,255,255,0.7)';if(on)active=btn;});if(active&&wrap.dataset.lastActive!==String(active.dataset.start)){wrap.dataset.lastActive=String(active.dataset.start);active.scrollIntoView({block:'nearest'});}}
+  function jumpTr(videoId,start){const vid=document.getElementById(videoId);if(!vid)return;vid.currentTime=Math.max(0,Number(start)||0);syncTr(videoId,vid.currentTime);if(vid.dataset.loaded==='1')vid.play().catch(()=>{});}
  </script>
 </body>
 </html>

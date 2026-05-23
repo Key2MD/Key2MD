@@ -22,8 +22,8 @@ window.FullCasperMock = (() => {
  premium: { standard: 79, pro: 55, value: 97, video: 48 },
  };
  const MOCK_EARLYBIRD_CODE = 'EARLYBIRD20';
- const MOCK_EARLYBIRD_EXPIRES_AT = '2026-05-23T15:05:00.000Z';
- const MOCK_EARLYBIRD_EXPIRES_TEXT = '1:05am AEST, 24 May 2026';
+ const MOCK_EARLYBIRD_EXPIRES_AT = '2026-05-24T08:00:00.000Z';
+ const MOCK_EARLYBIRD_EXPIRES_TEXT = '6:00pm AEST, 24 May 2026';
  let active = false;
  let started = false;
  let config = { tier: 'transcript' };
@@ -1082,12 +1082,27 @@ window.FullCasperMock = (() => {
  return picked.length >= count ? picked.slice(0, count) : shuffle(stations).slice(0, count);
  }
 
+ function injectMockReportStyles() {
+  if (document.getElementById('k2mr-stylesheet')) return;
+  const fonts = document.createElement('link');
+  fonts.rel = 'stylesheet';
+  fonts.href = 'https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap';
+  fonts.id = 'k2mr-fonts';
+  document.head.appendChild(fonts);
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'mock-report-redesign.css';
+  css.id = 'k2mr-stylesheet';
+  document.head.appendChild(css);
+ }
+
  function init() {
- applyTierFromUrl();
- renderConfigPanel();
- setTier(config.tier, { skipIdleRender: true });
- bindNavigation();
- bindPracticeNudge();
+  injectMockReportStyles();
+  applyTierFromUrl();
+  renderConfigPanel();
+  setTier(config.tier, { skipIdleRender: true });
+  bindNavigation();
+  bindPracticeNudge();
  if (window.location.search.includes('tab=mock') || window.location.hash === '#full-casper-mock') {
  setTimeout(() => {
  if (window.setMode) window.setMode('mock');
@@ -3019,57 +3034,96 @@ latestReport = {
 const failedAnalyses = rows.filter(r => r.processingError).length;
 const partialAnalyses = completedAnalyses < rows.length;
 
+ const studentName = getAuth()?.getUser?.()?.name?.split(' ')[0] || 'Student';
+ const interpretation = report.interpretation || {};
+ const bandClass = interpretation.tone === 'strong' ? 'strong'
+  : interpretation.tone === 'risk' ? 'risk'
+  : interpretation.tone === 'caution' ? 'caution'
+  : 'steady';
+
  area.innerHTML = `
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;overflow:hidden;">
- <div style="background:var(--navy);padding:30px 32px;color:#fff;">
- <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.52);margin-bottom:8px;">Full mock complete</div>
- <h2 style="font-size:1.8rem;line-height:1.2;margin:0 0 8px;">You completed the full CASPer sequence.</h2>
- <p style="font-size:0.9rem;color:rgba(255,255,255,0.68);line-height:1.6;max-width:760px;margin:0;">This report compares your mock against the Key2MD cohort: a competitive group of real applicants who are actively preparing. It is not an official Acuity score, but it is a useful practice signal.</p>
- </div>
- <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;padding:24px 32px;border-bottom:1px solid var(--gray100);">
- <div class="stat-mini"><span class="stat-mini-num">${results.length}</span><span class="stat-mini-label">Stations done</span></div>
-<div class="stat-mini"><span class="stat-mini-num">${report.overallAvg ?? '-'}</span><span class="stat-mini-label">${partialAnalyses ? 'Reviewed avg' : 'Overall'} /10</span></div>
- <div class="stat-mini"><span class="stat-mini-num">${videoAvg}</span><span class="stat-mini-label">Video avg /10</span></div>
- <div class="stat-mini"><span class="stat-mini-num">${typedAvg}</span><span class="stat-mini-label">Typed avg /10</span></div>
- <div class="stat-mini"><span class="stat-mini-num">${answeredTyped}/7</span><span class="stat-mini-label">Typed answered</span></div>
- <div class="stat-mini"><span class="stat-mini-num">${completedAnalyses}/${rows.length}</span><span class="stat-mini-label">AI analysed</span></div>
- </div>
- <div style="padding:24px 32px;">
-${failedAnalyses || partialAnalyses ? renderPartialReportNotice(rows) : ''}
- ${renderInterpretation(report)}
- ${renderOneThing(report.oneThing)}
- ${renderReportActions()}
- ${renderReadinessChecklist(report.readiness)}
- ${renderActionPlan(report.actionPlan)}
+  <div class="k2-mock-report">
+   <div class="k2mr-wrap">
 
- <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:22px;">
- ${renderCriterionHeatmap(report.criteria)}
- ${renderStamina(report.stamina)}
- </div>
+    <section class="k2mr-hero">
+     <div class="k2mr-hero-top">
+      <div>
+       <div class="k2mr-kicker">Full CASPer mock complete \u00b7 ${esc(studentName)}</div>
+       <h1>You finished the full sequence. Here's the <em>real</em> read.</h1>
+       <p class="k2mr-hero-sub">This report compares your mock against the Key2MD cohort. It's a practice signal, not an official Acuity score.</p>
+      </div>
+      <div class="k2mr-score-block">
+       <div class="k2mr-score-big">${report.overallAvg ?? '-'}<span class="max">/10</span></div>
+       <div class="k2mr-score-lbl">Cohort signal</div>
+       ${interpretation.band ? `<div class="k2mr-score-band ${bandClass}">${esc(interpretation.band)}</div>` : ''}
+      </div>
+     </div>
+     <div class="k2mr-stats">
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${results.length}</div><div class="k2mr-stat-lbl">Stations done</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${videoAvg}</div><div class="k2mr-stat-lbl">Video avg /10</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${typedAvg}</div><div class="k2mr-stat-lbl">Typed avg /10</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${answeredTyped}/7</div><div class="k2mr-stat-lbl">Typed answered</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${completedAnalyses}/${rows.length}</div><div class="k2mr-stat-lbl">AI analysed</div></div>
+     </div>
+     <div class="k2mr-hero-foot">
+      <strong>Guide only:</strong> 6.5+ is likely a Q4-style signal in this cohort if repeatable; 5.5-6.5 is probably Q3. The scoring intentionally runs cooler than free tools.
+     </div>
+    </section>
 
- ${renderPremiumVisualInterpretation(report.visualInterpretation)}
+    ${failedAnalyses || partialAnalyses ? renderPartialReportNotice(rows) : ''}
+    ${renderOneThing(report.oneThing)}
+    ${renderReportActions()}
 
- <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:22px;">
- ${renderPatternReport(report.patterns, report.criteria)}
- ${renderCategoryReport(report.categories)}
- </div>
+    <section class="k2mr-section">
+     <div class="k2mr-section-head">
+      <div class="k2mr-kicker">Readiness dashboard</div>
+      <h3>Where you stand <em>right now</em>.</h3>
+     </div>
+     ${renderReadinessChecklist(report.readiness)}
+    </section>
 
- ${renderStationExplorer(rows)}
+    <section class="k2mr-section">
+     <div class="k2mr-section-head">
+      <div class="k2mr-kicker">Next practice block</div>
+      <h3>What to do in the <em>next seven days</em>.</h3>
+     </div>
+     ${renderActionPlan(report.actionPlan)}
+    </section>
 
- <div style="background:#f8fafc;border:1px solid var(--gray200);border-radius:14px;padding:16px 18px;margin-bottom:16px;">
- <div style="font-size:0.72rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal3);margin-bottom:6px;">Optional manual review</div>
- <div style="font-size:0.86rem;color:var(--gray600);line-height:1.6;margin-bottom:12px;">Dan will review your full mock, including typed answers, video responses, transcripts, AI feedback, and overall patterns. Available for both Transcript and Premium mock attempts. Mock data is retained for 30 days.</div>
- <button id="mockManualReviewBtn" onclick="FullCasperMock.requestManualReview()" class="btn-restart">Request Dan's manual review - $300 AUD</button>
- <div id="mockManualReviewStatus" style="font-size:0.76rem;color:var(--gray500);line-height:1.45;margin-top:9px;"></div>
- </div>
+    <div class="k2mr-grid2">
+     ${renderCriterionHeatmap(report.criteria)}
+     ${renderStamina(report.stamina, rows)}
+    </div>
 
- <div style="display:flex;gap:10px;flex-wrap:wrap;">
- <button onclick="FullCasperMock.startFreshMock()" class="btn-restart">Start another mock</button>
- <button onclick="setMode('casper');FullCasperMock.deactivateMockMode();" class="btn-restart btn-restart-outline">Return to practice</button>
- </div>
- </div>
- </div>
- `;
+    ${renderPremiumVisualInterpretation(report.visualInterpretation)}
+
+    <div class="k2mr-grid2">
+     ${renderPatternReport(report.patterns, report.criteria)}
+     ${renderCategoryReport(report.categories)}
+    </div>
+
+    ${renderStationExplorer(rows)}
+
+    <div class="k2mr-actionbar" style="background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(34,197,94,0.02));border-color:rgba(34,197,94,0.25);">
+     <div class="k2mr-actionbar-text"><strong>Want Dan's eyes on this mock?</strong> Optional manual review covers every typed answer, video, transcript, and the AI feedback itself.</div>
+     <div class="k2mr-actionbar-btns">
+      <button id="mockManualReviewBtn" onclick="FullCasperMock.requestManualReview()" class="k2mr-btn k2mr-btn-primary" style="background:linear-gradient(135deg,#22c55e,#16a34a);box-shadow:0 4px 14px rgba(34,197,94,0.3);">Request Dan's manual review - $300 AUD</button>
+     </div>
+     <div id="mockManualReviewStatus" style="width:100%;font-size:0.74rem;color:rgba(255,255,255,0.55);line-height:1.45;margin-top:6px;"></div>
+    </div>
+
+    <div class="k2mr-notice" style="margin-bottom:18px;">
+     <strong>Recording note:</strong> Your video recordings are kept for 30 days. Transcripts and feedback stay available - save any notes you need before they expire.
+    </div>
+
+    <div class="k2mr-final">
+     <button onclick="FullCasperMock.startFreshMock()" class="k2mr-btn k2mr-btn-primary">Start another mock</button>
+     <button onclick="setMode('casper');FullCasperMock.deactivateMockMode();" class="k2mr-btn k2mr-btn-ghost">Return to practice</button>
+    </div>
+
+   </div>
+  </div>
+ `
  setTimeout(() => showReviewStation(0), 0);
  saveMockAttempt(rows, latestReport, 'completed').then(() => {
  clearMockDraft();
@@ -3080,66 +3134,67 @@ ${failedAnalyses || partialAnalyses ? renderPartialReportNotice(rows) : ''}
  }
 
  function card(title, body, extra = '') {
- return `
- <div style="border:1px solid var(--gray200);border-radius:14px;padding:18px 20px;background:#fff;">
- <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:10px;">${esc(title)}</div>
- ${body}
- ${extra}
- </div>
- `;
- }
+    return `
+     <div class="k2mr-card">
+      <div class="k2mr-card-head">
+       <div class="k2mr-card-title">${esc(title)}</div>
+      </div>
+      ${body}
+      ${extra}
+     </div>
+    `;
+   }
 
 function renderPartialReportNotice(rows) {
-const failed = rows
-.filter(row => row.processingError || !Number.isFinite(row.score10))
-.map(row => `${stationShort(row)}: ${row.processingError || 'analysis not returned yet'}`)
-.join(' | ');
-return `
-<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;margin-bottom:18px;">
-<div style="font-size:0.78rem;font-weight:900;color:#9a3412;margin-bottom:5px;">Partial analysis warning</div>
-<div style="font-size:0.82rem;color:#7c2d12;line-height:1.55;">Some station analyses did not finish in time, so the overall estimate is based only on completed AI feedback. You can still review the recordings and responses captured in the mock.</div>
-${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-top:7px;">${esc(failed)}</div>` : ''}
-</div>
-`;
-}
+  const failed = rows
+   .filter(row => row.processingError || !Number.isFinite(row.score10))
+   .map(row => `${stationShort(row)}: ${row.processingError || 'analysis not returned yet'}`)
+   .join(' | ');
+  return `
+   <div class="k2mr-notice" style="margin-bottom:18px;">
+    <strong>Partial analysis warning.</strong> Some station analyses did not finish in time, so the overall estimate is based only on completed AI feedback. You can still review the recordings and responses captured in the mock.
+    ${failed ? `<div style="font-family:var(--mono);font-size:0.7rem;color:rgba(255,255,255,0.5);margin-top:6px;line-height:1.5;">${esc(failed)}</div>` : ''}
+   </div>
+  `;
+ }
 
  function renderStationExplorer(rows) {
- if (!rows.length) return '';
- const tabs = rows.map((row, i) => {
- const label = row.type === 'video' ? `Video ${row.localIndex}` : `Typed ${row.localIndex}`;
- return `
- <button type="button" onclick="FullCasperMock.showReviewStation(${i})" data-mock-review-tab="${i}" style="padding:9px 13px;border-radius:50px;border:1px solid ${i === 0 ? 'var(--navy)' : 'var(--gray200)'};background:${i === 0 ? 'var(--navy)' : '#fff'};color:${i === 0 ? '#fff' : 'var(--gray600)'};font-size:0.76rem;font-weight:850;cursor:pointer;font-family:inherit;">${esc(label)}</button>
- `;
- }).join('');
- return `
- <div style="border:1px solid rgba(10,22,40,0.12);background:#fff;border-radius:16px;padding:22px 24px;margin-bottom:22px;">
- <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
- <div>
- <div style="font-size:0.66rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:6px;">Station explorer</div>
- <div style="font-size:1.12rem;font-weight:900;color:var(--navy);line-height:1.3;">Review each answer in detail.</div>
- <div style="font-size:0.8rem;color:var(--gray500);line-height:1.55;margin-top:4px;">Open any station to see the scenario, your response, AI feedback, and next-step advice.</div>
- </div>
- <div style="display:flex;gap:8px;flex-wrap:wrap;max-width:620px;justify-content:flex-end;">${tabs}</div>
- </div>
- <div id="mockStationReviewPanel">${stationReviewHtml(rows[0])}</div>
- </div>
- `;
- }
+    if (!rows.length) return '';
+    const tabs = rows.map((row, i) => {
+     const label = row.type === 'video' ? `V${row.localIndex}` : `T${row.localIndex}`;
+     const isActive = i === 0;
+     const cls = `k2mr-tab${row.type === 'video' ? ' video' : ''}${isActive ? ' active' : ''}`;
+     return `<button type="button" onclick="FullCasperMock.showReviewStation(${i})" data-mock-review-tab="${i}" class="${cls}">${esc(label)}</button>`;
+    }).join('');
+    return `
+     <section class="k2mr-explorer">
+      <div class="k2mr-explorer-head">
+       <div class="k2mr-explorer-title-block">
+        <div class="k2mr-kicker">Station explorer</div>
+        <h3>Open <em>any</em> station to see the detail.</h3>
+        <p>Click a tab to load that station's scenario, your answer, AI feedback, and rewrite suggestion.</p>
+       </div>
+       <div class="k2mr-tabs">${tabs}</div>
+      </div>
+      <div class="k2mr-explorer-body">
+       <div id="mockStationReviewPanel">${stationReviewHtml(rows[0])}</div>
+      </div>
+     </section>
+    `;
+   }
 
  function showReviewStation(i = 0) {
- const row = finalReviewRows[i];
- document.querySelectorAll('[data-mock-review-tab]').forEach(btn => {
- const activeTab = Number(btn.dataset.mockReviewTab) === i;
- btn.style.background = activeTab ? 'var(--navy)' : '#fff';
- btn.style.color = activeTab ? '#fff' : 'var(--gray600)';
- btn.style.border = activeTab ? '1px solid var(--navy)' : '1px solid var(--gray200)';
- });
- const panel = byId('mockStationReviewPanel');
- if (panel) {
- panel.innerHTML = stationReviewHtml(row);
- if (row?.type === 'video') setTimeout(() => initMockVideoPlayer('mockStationVideoPlayer'), 0);
- }
- }
+    const row = finalReviewRows[i];
+    document.querySelectorAll('[data-mock-review-tab]').forEach(btn => {
+     const isActive = Number(btn.dataset.mockReviewTab) === i;
+     btn.classList.toggle('active', isActive);
+    });
+    const panel = byId('mockStationReviewPanel');
+    if (panel) {
+     panel.innerHTML = stationReviewHtml(row);
+     if (row?.type === 'video') setTimeout(() => initMockVideoPlayer('mockStationVideoPlayer'), 0);
+    }
+   }
 
  function stationReviewHtml(row) {
  if (!row) return '<div style="font-size:0.84rem;color:var(--gray400);">No station selected.</div>';
@@ -3147,21 +3202,23 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
  }
 
  function scenarioPromptHtml(row) {
- const station = row.station || {};
- const prompts = [station.prompt1, station.prompt2].filter(Boolean).map((prompt, i) => `
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:11px 12px;">
- <div style="font-size:0.66rem;font-weight:850;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;">Prompt ${i + 1}</div>
- <div style="font-size:0.82rem;color:var(--navy);line-height:1.5;">${esc(prompt)}</div>
- </div>
- `).join('');
- return `
- <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:12px;padding:14px 15px;">
- <div style="font-size:0.66rem;font-weight:850;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px;">Scenario</div>
- <div style="font-size:0.86rem;color:var(--gray700);line-height:1.65;margin-bottom:12px;">${esc(station.scenario || '')}</div>
- <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px;">${prompts}</div>
- </div>
- `;
- }
+    const station = row.station || {};
+    const isVideo = row.type === 'video';
+    const stationType = isVideo ? 'Video' : 'Typed';
+    const prompts = [station.prompt1, station.prompt2].filter(Boolean).map((prompt, i) => `
+     <div class="k2mr-prompt">
+      <div class="k2mr-prompt-num">Prompt ${i + 1}</div>
+      <div class="k2mr-prompt-text">${esc(prompt)}</div>
+     </div>
+    `).join('');
+    return `
+     <div class="k2mr-scenario-card">
+      <div class="k2mr-card-title">Scenario &middot; ${stationType} ${row.localIndex || ''} &middot; ${esc(station.category || 'CASPer')}</div>
+      <div class="k2mr-scenario-text">${esc(station.scenario || '')}</div>
+      ${prompts ? `<div class="k2mr-prompts">${prompts}</div>` : ''}
+     </div>
+    `;
+   }
 
  function mockVideoDuration(row) {
  const candidates = [
@@ -3196,22 +3253,22 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
 	 }
 
 	 function mockTranscriptReviewHtml(row, videoId) {
-	 const segments = mockTranscriptSegments(row);
-	 if (segments.length) {
-	 return `
-	 <div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:12px;margin-top:12px;">
-	 <div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;">Synced transcript</div>
-	 <div style="font-size:0.74rem;color:var(--gray400);line-height:1.45;margin-bottom:8px;">Click a line to jump the video. The active line follows playback.</div>
-	 <div data-mock-sync-for="${esc(videoId)}" style="max-height:250px;overflow:auto;display:grid;gap:5px;">
-	 ${segments.map(seg => {
-	 const end = Number.isFinite(seg.end) && seg.end > seg.start ? seg.end : seg.start + 2.5;
-	 return `<button type="button" data-mock-sync-segment data-video-id="${esc(videoId)}" data-start="${esc(seg.start)}" data-end="${esc(end)}" onclick="FullCasperMock.jumpTranscript('${esc(videoId)}', ${Number(seg.start) || 0})" style="width:100%;text-align:left;border:0;background:transparent;border-radius:8px;padding:7px 8px;font-family:inherit;font-size:0.78rem;line-height:1.55;color:var(--gray600);cursor:pointer;"><span style="font-size:0.68rem;color:var(--gray400);font-weight:900;margin-right:7px;font-variant-numeric:tabular-nums;">${esc(mockTime(seg.start))}</span>${esc(seg.text)}</button>`;
-	 }).join('')}
-	 </div>
-	 </div>
-	 `;
-	 }
-	 return row?.transcript ? `<div style="background:#fff;border:1px solid var(--gray200);border-radius:10px;padding:12px;margin-top:12px;"><div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Transcript used for marking</div><div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;max-height:230px;overflow:auto;">${esc(row.transcript)}</div></div>` : '';
+	  const segments = mockTranscriptSegments(row);
+	  if (segments.length) {
+	   return `
+	    <div class="k2mr-card" style="margin-top:12px;padding:14px 16px;">
+	     <div class="k2mr-card-title" style="margin-bottom:6px;">Synced transcript</div>
+	     <div style="font-size:0.74rem;color:rgba(255,255,255,0.5);line-height:1.45;margin-bottom:10px;">Click a line to jump the video.</div>
+	     <div data-mock-sync-for="${esc(videoId)}" style="max-height:280px;overflow:auto;display:grid;gap:3px;">
+	      ${segments.map(seg => {
+	       const end = Number.isFinite(seg.end) && seg.end > seg.start ? seg.end : seg.start + 2.5;
+	       return `<button type="button" data-mock-sync-segment data-video-id="${esc(videoId)}" data-start="${esc(seg.start)}" data-end="${esc(end)}" onclick="FullCasperMock.jumpTranscript('${esc(videoId)}', ${Number(seg.start) || 0})" style="width:100%;text-align:left;border:0;background:transparent;border-radius:7px;padding:7px 9px;font-family:inherit;font-size:0.78rem;line-height:1.55;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.15s;"><span style="font-family:var(--mono);font-size:0.66rem;color:rgba(255,255,255,0.4);font-weight:700;margin-right:8px;font-variant-numeric:tabular-nums;">${esc(mockTime(seg.start))}</span>${esc(seg.text)}</button>`;
+	      }).join('')}
+	     </div>
+	    </div>
+	   `;
+	  }
+	  return row?.transcript ? `<div class="k2mr-card" style="margin-top:12px;padding:14px 16px;"><div class="k2mr-card-title" style="margin-bottom:7px;">Transcript used for marking</div><div style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.7;max-height:230px;overflow:auto;">${esc(row.transcript)}</div></div>` : '';
 	 }
 
 	 function syncMockTranscript(videoId, time) {
@@ -3223,9 +3280,9 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
 	 const start = Number(btn.dataset.start || 0);
 	 const end = Number(btn.dataset.end || start + 2.5);
 	 const on = time >= start && time < Math.max(end, start + 0.8);
-	 btn.style.background = on ? 'rgba(14,165,233,0.11)' : 'transparent';
-	 btn.style.boxShadow = on ? 'inset 3px 0 0 var(--teal3)' : 'none';
-	 btn.style.color = on ? 'var(--navy)' : 'var(--gray600)';
+	 btn.style.background = on ? 'rgba(14,165,233,0.15)' : 'transparent';
+	 btn.style.boxShadow = on ? 'inset 3px 0 0 var(--teal2)' : 'none';
+	 btn.style.color = on ? '#fff' : 'rgba(255,255,255,0.7)';
 	 if (on) active = btn;
 	 });
 	 if (active && wrap.dataset.lastActive !== String(active.dataset.start)) {
@@ -3243,27 +3300,27 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
 	 }
 
 	 function mockVideoPlayerHtml(row, id = 'mockStationVideoPlayer') {
- const src = row?.recordingUrl || '';
- const duration = mockVideoDuration(row);
- return `
- <div id="${id}Shell" style="background:#07111f;border:1px solid rgba(10,22,40,0.18);border-radius:14px;overflow:hidden;box-shadow:0 10px 28px rgba(10,22,40,0.12);">
- <video id="${id}" playsinline preload="metadata" src="${esc(src)}" data-duration="${duration || ''}" style="width:100%;aspect-ratio:16/9;background:#000;display:block;cursor:pointer;"></video>
- <div style="padding:11px 12px 12px;background:linear-gradient(180deg,#0a1628,#07111f);">
- <div style="display:flex;align-items:center;gap:10px;">
- <button type="button" id="${id}Btn" aria-label="Play recording" style="min-width:54px;height:34px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-size:0.72rem;font-weight:900;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0;">Play</button>
- ${src ? `<button type="button" onclick="FullCasperMock.downloadLocalRecording('${esc(id)}')" style="min-width:78px;height:34px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-size:0.72rem;font-weight:900;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;flex-shrink:0;">Download</button>` : ''}
- <div style="position:relative;height:18px;flex:1;display:flex;align-items:center;">
- <div style="position:absolute;left:0;right:0;height:5px;border-radius:999px;background:rgba(255,255,255,0.18);overflow:hidden;">
- <div id="${id}Fill" style="height:100%;width:0%;background:#0ea5e9;border-radius:999px;"></div>
- </div>
- <input id="${id}Range" type="range" min="0" max="1000" value="0" aria-label="Seek recording" style="position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;">
- </div>
- <div id="${id}Time" style="min-width:74px;text-align:right;color:rgba(255,255,255,0.72);font-size:0.72rem;font-weight:800;font-variant-numeric:tabular-nums;">0:00 / ${duration ? mockTime(duration) : '--:--'}</div>
- </div>
- </div>
- </div>
- `;
- }
+	  const src_url = row?.recordingUrl || '';
+	  const duration = mockVideoDuration(row);
+	  return `
+	   <div id="${id}Shell" style="background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;">
+	    <video id="${id}" playsinline preload="metadata" src="${esc(src_url)}" data-duration="${duration || ''}" style="width:100%;aspect-ratio:16/9;background:#000;display:block;cursor:pointer;"></video>
+	    <div style="padding:11px 14px 13px;background:linear-gradient(180deg,rgba(0,0,0,0.3),rgba(0,0,0,0.6));border-top:1px solid rgba(255,255,255,0.08);">
+	     <div style="display:flex;align-items:center;gap:10px;">
+	      <button type="button" id="${id}Btn" aria-label="Play recording" style="min-width:54px;height:32px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">PLAY</button>
+	      ${src_url ? `<button type="button" onclick="FullCasperMock.downloadLocalRecording('${esc(id)}')" style="min-width:78px;height:32px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">DL</button>` : ''}
+	      <div style="position:relative;height:16px;flex:1;display:flex;align-items:center;">
+	       <div style="position:absolute;left:0;right:0;height:4px;border-radius:99px;background:rgba(255,255,255,0.15);overflow:hidden;">
+	        <div id="${id}Fill" style="height:100%;width:0%;background:linear-gradient(90deg,var(--teal3),var(--teal2));border-radius:99px;"></div>
+	       </div>
+	       <input id="${id}Range" type="range" min="0" max="1000" value="0" aria-label="Seek recording" style="position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;">
+	      </div>
+	      <div id="${id}Time" style="min-width:74px;text-align:right;color:rgba(255,255,255,0.7);font-family:var(--mono);font-size:0.7rem;font-weight:700;font-variant-numeric:tabular-nums;">0:00 / ${duration ? mockTime(duration) : '--:--'}</div>
+	     </div>
+	    </div>
+	   </div>
+	  `;
+	 }
 
  function initMockVideoPlayer(id = 'mockStationVideoPlayer') {
  const video = byId(id);
@@ -3330,98 +3387,112 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
  }
 
  function videoStationReviewHtml(row) {
- const presentation = row.feedback?.presentation;
- return `
- <div style="display:grid;grid-template-columns:minmax(min(100%,320px),0.9fr) minmax(0,1.1fr);gap:20px;align-items:start;">
-	 <div>
-	 ${mockVideoPlayerHtml(row, 'mockStationVideoPlayer')}
-	 <div style="font-size:0.76rem;color:var(--gray400);line-height:1.45;margin-top:8px;">${esc(rowScoreLabel(row))} - ${esc(row.station?.category || 'Video station')}</div>
-	 <div style="font-size:0.72rem;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:9px 10px;line-height:1.45;margin-top:10px;">Recording playback is kept for 30 days after the mock. Save any notes you need before it expires.</div>
-	 ${mockTranscriptReviewHtml(row, 'mockStationVideoPlayer')}
-	 </div>
- <div style="display:grid;gap:14px;">
- ${scenarioPromptHtml(row)}
- ${videoFeedbackHtml(row)}
- ${presentation ? renderPresentationFeedback(presentation, row.rawFeedback?.visual_degraded || row.visualDegraded || row.visual_degraded) : ''}
- </div>
- </div>
- `;
- }
+    const presentation = row.feedback?.presentation;
+    return `
+     <div class="k2mr-station-grid">
+      <div class="k2mr-station-left">
+       ${mockVideoPlayerHtml(row, 'mockStationVideoPlayer')}
+       <div style="font-family:var(--mono);font-size:0.72rem;color:rgba(255,255,255,0.5);line-height:1.5;margin-top:8px;letter-spacing:0.04em;">${esc(rowScoreLabel(row))} &middot; ${esc(row.station?.category || 'Video station')}</div>
+       <div class="k2mr-notice" style="margin-top:10px;font-size:0.74rem;">Recording playback is kept for 30 days. Save any notes you need before they expire.</div>
+       ${mockTranscriptReviewHtml(row, 'mockStationVideoPlayer')}
+      </div>
+      <div class="k2mr-station-right">
+       ${scenarioPromptHtml(row)}
+       ${videoFeedbackHtml(row)}
+       ${presentation ? renderPresentationFeedback(presentation, row.rawFeedback?.visual_degraded || row.visualDegraded || row.visual_degraded) : ''}
+      </div>
+     </div>
+    `;
+   }
 
  function renderPresentationFeedback(presentation, visualDegraded) {
- return `
- <div style="background:#f8fafc;border:1px solid rgba(124,58,237,0.18);border-radius:12px;padding:14px 15px;">
- <div style="font-size:0.7rem;font-weight:900;color:#6d28d9;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Presentation feedback</div>
- ${visualDegraded ? '<div style="font-size:0.76rem;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:9px 10px;line-height:1.45;margin-bottom:9px;">Camera-based feedback was limited, but voice and transcript feedback were still analysed.</div>' : ''}
- ${presentationLine('Pace', presentation.pace)}
- ${presentationLine('Clarity', presentation.clarity)}
- ${presentationLine('Confidence', presentation.confidence)}
- ${presentationLine('Visual presence', presentation.visual_presence)}
- ${presentationLine('Facial expression', presentation.facial_expression)}
- ${presentationLine('Visual evidence', presentation.visual_evidence)}
- ${presentationLine('One improvement', presentation.one_improvement)}
- </div>
- `;
- }
+    return `
+     <div class="k2mr-presentation">
+      <div class="k2mr-card-title" style="color:#a78bfa;margin-bottom:8px;">Presentation feedback</div>
+      ${visualDegraded ? '<div class="k2mr-notice" style="font-size:0.74rem;margin-bottom:9px;">Camera-based feedback was limited, but voice and transcript feedback were still analysed.</div>' : ''}
+      ${presentationLine('Pace', presentation.pace)}
+      ${presentationLine('Clarity', presentation.clarity)}
+      ${presentationLine('Confidence', presentation.confidence)}
+      ${presentationLine('Visual presence', presentation.visual_presence)}
+      ${presentationLine('Facial expression', presentation.facial_expression)}
+      ${presentationLine('Visual evidence', presentation.visual_evidence)}
+      ${presentationLine('One improvement', presentation.one_improvement)}
+     </div>
+    `;
+   }
 
  function presentationLine(label, value) {
- if (!value) return '';
- return `<div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;margin-top:6px;"><strong>${esc(label)}:</strong> ${esc(value)}</div>`;
- }
+    if (!value) return '';
+    return `<div class="k2mr-pres-row"><strong>${esc(label)}:</strong> ${esc(value)}</div>`;
+   }
 
- function typedStationReviewHtml(row) {
- const fb = row.feedback || {};
- return `
- <div style="display:grid;grid-template-columns:minmax(min(100%,330px),0.95fr) minmax(0,1.05fr);gap:20px;align-items:start;">
- <div style="display:grid;gap:14px;">
- ${scenarioPromptHtml(row)}
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:12px;padding:15px;">
- <div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px;">Your typed answer</div>
- <div style="font-size:0.84rem;color:var(--gray700);line-height:1.7;white-space:pre-wrap;max-height:420px;overflow:auto;">${esc(row.answer || 'No typed response captured.')}</div>
- </div>
- </div>
- <div style="display:grid;gap:14px;">
- <div style="background:linear-gradient(135deg,rgba(14,165,233,0.08),#fff);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:15px;">
- <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">
- <div style="font-size:0.78rem;font-weight:900;color:var(--navy);">${esc(row.station?.category || 'Typed station')}</div>
- <div style="font-size:0.9rem;font-weight:900;color:var(--teal3);">${esc(rowScoreLabel(row))}</div>
- </div>
- ${typedFeedbackLine('Strengths', fb.strengths)}
- ${typedFeedbackLine('Improve', fb.improvements)}
- ${typedFeedbackLine('Empathy', fb.empathy)}
- ${fb.missed && fb.missed !== 'None' ? typedFeedbackLine('Missed point', fb.missed) : ''}
- </div>
- ${typedCompetencyReviewHtml(row)}
- </div>
- </div>
- `;
- }
+
+   function fbTile(cls, label, body) {
+    if (!body) return '';
+    return `
+     <div class="k2mr-fb-tile ${cls}">
+      <div class="k2mr-fb-lbl">${label}</div>
+      <div class="k2mr-fb-body">${esc(body)}</div>
+     </div>
+    `;
+   }
+
+    function typedStationReviewHtml(row) {
+    const fb = row.feedback || {};
+    const score = numericScore(row);
+    const scoreColor = score >= 7 ? 'var(--green)' : score >= 5.5 ? 'var(--teal2)' : score >= 4.5 ? '#fbbf24' : 'var(--red)';
+    return `
+     <div class="k2mr-station-grid">
+      <div class="k2mr-station-left">
+       ${scenarioPromptHtml(row)}
+       <div class="k2mr-answer-card">
+        <div class="k2mr-card-title" style="margin-bottom:8px;">Your typed answer</div>
+        <div class="k2mr-answer-text">${esc(row.answer || 'No typed response captured.')}</div>
+       </div>
+      </div>
+      <div class="k2mr-station-right">
+       <div class="k2mr-fbsummary">
+        <div class="k2mr-fbsummary-head">
+         <div class="k2mr-fbsummary-cat">${esc(row.station?.category || 'Typed station')} &middot; Typed ${row.localIndex || ''}</div>
+         <div class="k2mr-fbsummary-score" style="color:${scoreColor};">${esc(rowScoreLabel(row))}</div>
+        </div>
+        ${fbTile('strength', '&#10003; Strength', fb.strengths)}
+        ${fbTile('improve', '&rarr; Biggest improvement', fb.improvements)}
+        ${fbTile('empathy', '&#9825; Empathy layer to add', fb.empathy)}
+        ${fb.missed && fb.missed !== 'None' ? fbTile('missed', '&#8859; Missed point', fb.missed) : ''}
+        ${fb.excellent_version ? fbTile('excellent', '&#9733; An excellent response would add', fb.excellent_version) : ''}
+       </div>
+       ${typedCompetencyReviewHtml(row)}
+      </div>
+     </div>
+    `;
+   }
 
  function typedFeedbackLine(label, value) {
  return value ? `<div style="font-size:0.8rem;color:var(--gray600);line-height:1.6;margin-top:7px;"><strong>${esc(label)}:</strong> ${esc(value)}</div>` : '';
  }
 
  function typedCompetencyReviewHtml(row) {
- const comps = typedCompetencies(row).sort((a, b) => a.score - b.score);
- if (!comps.length) return '';
- return `
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:12px;padding:15px;">
- <div style="font-size:0.68rem;font-weight:850;color:var(--teal3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Competency breakdown</div>
- ${comps.map(comp => {
- const color = comp.score >= 7 ? '#16a34a' : comp.score >= 5.5 ? '#0ea5e9' : comp.score >= 4.5 ? '#d97706' : '#dc2626';
- return `
- <div style="padding:9px 0;border-top:1px solid var(--gray100);">
- <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:4px;">
- <div style="font-size:0.78rem;font-weight:900;color:var(--navy);">${esc(comp.name)}</div>
- <div style="font-size:0.78rem;font-weight:900;color:${color};">${round1(comp.score)}/10</div>
- </div>
- <div style="font-size:0.74rem;color:var(--gray500);line-height:1.45;">${esc(comp.improve || comp.evidence || 'No specific note returned.')}</div>
- </div>
- `;
- }).join('')}
- </div>
- `;
- }
+    const comps = typedCompetencies(row).sort((a, b) => a.score - b.score);
+    if (!comps.length) return '';
+    return `
+     <div class="k2mr-comps">
+      <div class="k2mr-card-title" style="margin-bottom:10px;">Competency breakdown</div>
+      ${comps.map(comp => {
+       const color = comp.score >= 7 ? 'var(--green)' : comp.score >= 5.5 ? 'var(--teal2)' : comp.score >= 4.5 ? '#fbbf24' : 'var(--red)';
+       return `
+        <div class="k2mr-comp">
+         <div class="k2mr-comp-head">
+          <div class="k2mr-comp-name">${esc(comp.name)}</div>
+          <div class="k2mr-comp-score" style="color:${color};">${round1(comp.score)}/10</div>
+         </div>
+         <div class="k2mr-comp-note">${esc(comp.improve || comp.evidence || 'No specific note returned.')}</div>
+        </div>
+       `;
+      }).join('')}
+     </div>
+    `;
+   }
 
  function renderVideoPlaybackPanel(videos) {
  if (!videos.length) return '';
@@ -3456,58 +3527,67 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
  }
 
  function videoFeedbackHtml(row) {
- if (!row) return '<div style="font-size:0.84rem;color:var(--gray400);">No video selected.</div>';
- if (row.processingError) {
- return `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:13px 15px;font-size:0.82rem;color:#991b1b;"><strong>Analysis failed.</strong><br>${esc(row.processingError)}</div>`;
- }
- const fb = row.feedback || {};
- const overall = fb.overall || {};
- const prompts = Array.isArray(fb.per_prompt) ? fb.per_prompt : [];
- const promptHtml = prompts.map((prompt, i) => `
- <div style="padding:10px 0;border-top:1px solid var(--gray100);">
- <div style="font-size:0.76rem;font-weight:850;color:var(--navy);margin-bottom:4px;">Prompt ${i + 1}</div>
- ${videoPromptCriteriaHtml(prompt)}
- </div>
- `).join('');
- return `
- <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:15px 16px;">
- <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">
- <div style="font-size:0.78rem;font-weight:900;color:var(--navy);">${esc(row.station?.category || 'Video station')}</div>
- <div style="font-size:0.82rem;font-weight:900;color:var(--teal3);white-space:nowrap;">${Number.isFinite(Number(overall.score)) ? `${round1(Number(overall.score))}/10 ${overall.label ? `- ${esc(overall.label)}` : ''}` : 'Processing complete'}</div>
- </div>
- <div style="font-size:0.78rem;color:var(--gray600);line-height:1.6;"><strong>Strength:</strong> ${esc(overall.biggest_strength || 'Review the prompt feedback below.')}</div>
- <div style="font-size:0.78rem;color:var(--gray600);line-height:1.6;margin-top:6px;"><strong>Improve:</strong> ${esc(overall.biggest_improvement || 'No specific improvement returned.')}</div>
- ${overall.excellent_version ? `<div style="font-size:0.78rem;color:var(--gray600);line-height:1.6;margin-top:6px;"><strong>Excellent response would add:</strong> ${esc(overall.excellent_version)}</div>` : ''}
- ${row.transcript ? `<div style="font-size:0.72rem;color:var(--gray400);line-height:1.5;margin-top:9px;"><strong>Transcript excerpt:</strong> ${esc(String(row.transcript).slice(0, 260))}${String(row.transcript).length > 260 ? '...' : ''}</div>` : ''}
- ${promptHtml}
- </div>
- `;
- }
+    if (!row) return '<div style="font-size:0.84rem;color:rgba(255,255,255,0.4);">No video selected.</div>';
+    if (row.processingError) {
+     return `<div class="k2mr-fb-tile" style="border-left-color:var(--red);background:rgba(239,68,68,0.08);"><div class="k2mr-fb-lbl" style="color:var(--red);">Analysis failed</div><div class="k2mr-fb-body">${esc(row.processingError)}</div></div>`;
+    }
+    const fb = row.feedback || {};
+    const overall = fb.overall || {};
+    const score = Number(overall.score);
+    const scoreColor = Number.isFinite(score) && score >= 7 ? 'var(--green)'
+     : Number.isFinite(score) && score >= 5.5 ? 'var(--teal2)'
+     : Number.isFinite(score) && score >= 4.5 ? '#fbbf24'
+     : 'var(--red)';
+    const prompts = Array.isArray(fb.per_prompt) ? fb.per_prompt : [];
+    const promptHtml = prompts.length ? `
+     <div class="k2mr-prompts-feedback" style="margin-top:12px;">
+      <div class="k2mr-prompts-feedback-head">Per-prompt feedback</div>
+      ${prompts.map((prompt, i) => `
+       <div class="k2mr-prompt-feedback">
+        <div class="k2mr-prompt-feedback-head">
+         <div class="k2mr-prompt-feedback-title">Prompt ${i + 1}</div>
+        </div>
+        ${videoPromptCriteriaHtml(prompt)}
+       </div>
+      `).join('')}
+     </div>
+    ` : '';
+    return `
+     <div class="k2mr-fbsummary">
+      <div class="k2mr-fbsummary-head">
+       <div class="k2mr-fbsummary-cat">${esc(row.station?.category || 'Video station')}</div>
+       <div class="k2mr-fbsummary-score" style="color:${scoreColor};">${Number.isFinite(score) ? `${round1(score)}/10` : '-'}${overall.label ? ` &middot; ${esc(overall.label)}` : ''}</div>
+      </div>
+      ${fbTile('strength', '&#10003; Strength', overall.biggest_strength)}
+      ${fbTile('improve', '&rarr; Biggest improvement', overall.biggest_improvement)}
+      ${overall.excellent_version ? fbTile('excellent', '&#9733; An excellent response would add', overall.excellent_version) : ''}
+      ${row.transcript ? `<div style="font-family:var(--mono);font-size:0.7rem;color:rgba(255,255,255,0.45);line-height:1.55;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);"><strong style="color:var(--teal2);">TRANSCRIPT EXCERPT:</strong> ${esc(String(row.transcript).slice(0, 260))}${String(row.transcript).length > 260 ? '...' : ''}</div>` : ''}
+     </div>
+     ${promptHtml}
+    `;
+   }
 
  function videoPromptCriteriaHtml(prompt) {
- const scores = prompt?.scores || {};
- const order = ['empathy', 'communication', 'reasoning', 'reflection', 'real_world_awareness'];
- const labels = {
- empathy: 'Empathy',
- communication: 'Communication',
- reasoning: 'Reasoning',
- reflection: 'Reflection',
- real_world_awareness: 'Real-world judgement',
- };
- const rows = order.map(key => {
- const crit = scores[key];
- if (!crit) return '';
- const score = Number(crit.score);
- const color = score >= 7 ? '#16a34a' : score >= 5.5 ? '#0ea5e9' : score >= 4.5 ? '#d97706' : '#dc2626';
- return `
- <div style="display:grid;grid-template-columns:minmax(92px,0.45fr) minmax(0,1fr);gap:8px;padding:7px 0;border-top:1px solid rgba(226,232,240,0.7);">
- <div style="font-size:0.72rem;font-weight:850;color:${color};">${esc(labels[key] || key)} ${Number.isFinite(score) ? `${round1(score)}/10` : ''}</div>
- <div style="font-size:0.74rem;color:var(--gray600);line-height:1.45;">${esc(crit.comment || crit.label || '')}</div>
- </div>
- `;
- }).join('');
- return rows || `<div style="font-size:0.78rem;color:var(--gray600);line-height:1.55;">${esc(prompt?.summary || 'Feedback captured for this prompt.')}</div>`;
- }
+    const scores = prompt?.scores || {};
+    const order = ['empathy', 'communication', 'reasoning', 'reflection', 'real_world_awareness'];
+    const labels = { empathy:'Empathy', communication:'Communication', reasoning:'Reasoning', reflection:'Reflection', real_world_awareness:'Real-world judgement' };
+    const rows = order.map(key => {
+     const crit = scores[key];
+     if (!crit) return '';
+     const score = Number(crit.score);
+     const color = Number.isFinite(score) && score >= 7 ? 'var(--green)'
+      : Number.isFinite(score) && score >= 5.5 ? 'var(--teal2)'
+      : Number.isFinite(score) && score >= 4.5 ? '#fbbf24'
+      : 'var(--red)';
+     return `
+      <div class="k2mr-prompt-crit">
+       <div class="k2mr-prompt-crit-label" style="color:${color};">${esc(labels[key] || key)} ${Number.isFinite(score) ? `${round1(score)}/10` : ''}</div>
+       <div class="k2mr-prompt-crit-comment">${esc(crit.comment || crit.label || '')}</div>
+      </div>
+     `;
+    }).join('');
+    return rows || `<div class="k2mr-prompt-crit-comment">${esc(prompt?.summary || 'Feedback captured for this prompt.')}</div>`;
+   }
 
  function showRecording(i = 0) {
  const row = finalVideoRows[i];
@@ -3541,89 +3621,75 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
 	 }
 
  function renderInterpretation(report) {
- const toneColor = report.interpretation.tone === 'strong' ? '#16a34a'
- : report.interpretation.tone === 'risk' ? '#dc2626'
- : report.interpretation.tone === 'caution' ? '#d97706'
- : 'var(--teal3)';
- return `
- <div style="border:1px solid rgba(14,165,233,0.22);background:linear-gradient(135deg,rgba(14,165,233,0.08),rgba(255,255,255,1));border-radius:14px;padding:20px 22px;margin-bottom:16px;">
- <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:8px;">Overall mark interpretation</div>
- <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
- <div style="min-width:220px;flex:1;">
- <div style="font-size:1.25rem;font-weight:900;color:${toneColor};line-height:1.25;margin-bottom:6px;">${esc(report.interpretation.band)}</div>
- <div style="font-size:0.86rem;color:var(--gray600);line-height:1.65;">${esc(report.interpretation.text)}</div>
- </div>
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:12px;padding:13px 15px;min-width:160px;text-align:center;">
- <div style="font-size:1.8rem;font-weight:900;color:var(--navy);">${report.overallAvg ?? '-'}</div>
- <div style="font-size:0.7rem;font-weight:800;color:var(--gray400);text-transform:uppercase;letter-spacing:0.08em;">Key2MD cohort /10</div>
- </div>
- </div>
- <div style="font-size:0.74rem;color:var(--gray500);line-height:1.55;margin-top:12px;padding-top:12px;border-top:1px solid rgba(14,165,233,0.16);">Guide only: 6.5+ is likely a Q4-style signal in this competitive prep cohort if repeatable; 5.5-6.5 is probably a Q3-style signal. High scores are intentionally difficult because this cohort is mostly serious applicants, not a random test-taking population.</div>
- </div>
- `;
- }
+    // Interpretation is now rendered inline in the hero block
+    return '';
+   }
 
  function renderOneThing(oneThing) {
- return `
- <div style="background:linear-gradient(135deg,#0a1628,#0d2a52);color:#fff;border-radius:14px;padding:20px 22px;margin-bottom:22px;">
- <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.52);margin-bottom:8px;">The one thing to fix</div>
- <div style="font-size:1.05rem;font-weight:850;line-height:1.35;margin-bottom:8px;">${esc(oneThing.title)}</div>
- <div style="font-size:0.9rem;color:rgba(255,255,255,0.78);line-height:1.65;">${esc(oneThing.body)}</div>
- <div style="font-size:0.74rem;color:rgba(255,255,255,0.52);line-height:1.45;margin-top:10px;">Why this one: ${esc(oneThing.source)}</div>
- </div>
- `;
- }
+    if (!oneThing) return '';
+    return `
+     <section class="k2mr-onething">
+      <div class="k2mr-kicker">The one thing to fix</div>
+      <h2>${esc(oneThing.title)}</h2>
+      <p>${esc(oneThing.body)}</p>
+      ${oneThing.source ? `<div class="k2mr-onething-why"><strong>WHY THIS ONE:</strong> ${esc(oneThing.source)}</div>` : ''}
+     </section>
+    `;
+   }
 
  function renderReportActions() {
- return `
- <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#f8fafc;border:1px solid var(--gray200);border-radius:14px;padding:14px 16px;margin-bottom:18px;">
- <div>
- <div style="font-size:0.78rem;font-weight:900;color:var(--navy);">Save the useful part</div>
-	 <div style="font-size:0.76rem;color:var(--gray500);line-height:1.45;">Copy a plain-English summary, print the tailored report, or review the full mock later in History.</div>
- </div>
- <div style="display:flex;gap:8px;flex-wrap:wrap;">
- <button type="button" onclick="FullCasperMock.copyReportSummary()" class="btn-restart btn-restart-outline" style="padding:10px 14px;">Copy summary</button>
- <button type="button" onclick="FullCasperMock.printReport()" class="btn-restart btn-restart-outline" style="padding:10px 14px;">Print report</button>
-	 <a href="history.html" class="btn-restart" style="padding:10px 14px;text-decoration:none;">Open History</a>
- </div>
- <div id="mockReportActionStatus" style="width:100%;font-size:0.74rem;color:var(--gray500);line-height:1.4;"></div>
- </div>
- `;
- }
+    return `
+     <div class="k2mr-actionbar">
+      <div class="k2mr-actionbar-text"><strong>Save the useful part.</strong> Grab a plain-text summary, print the report, or open it in History later.</div>
+      <div class="k2mr-actionbar-btns">
+       <button type="button" onclick="FullCasperMock.copyReportSummary()" class="k2mr-btn k2mr-btn-ghost">Copy summary</button>
+       <button type="button" onclick="FullCasperMock.printReport()" class="k2mr-btn k2mr-btn-ghost">Print report</button>
+       <a href="history.html" class="k2mr-btn k2mr-btn-primary">Open History</a>
+      </div>
+      <div id="mockReportActionStatus" style="width:100%;font-size:0.74rem;color:rgba(255,255,255,0.55);line-height:1.4;"></div>
+     </div>
+    `;
+   }
 
  function renderReadinessChecklist(items) {
- const colorFor = status => status === 'ready' ? '#16a34a' : status === 'work' ? '#dc2626' : '#d97706';
- const labelFor = status => status === 'ready' ? 'Ready signal' : status === 'work' ? 'Needs work' : 'Watch';
- return card('Readiness checklist', `
- <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">
- ${(items || []).map(item => `
- <div style="background:#f8fafc;border:1px solid var(--gray200);border-radius:12px;padding:12px 13px;">
- <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px;">
- <div style="font-size:0.82rem;font-weight:900;color:var(--navy);line-height:1.3;">${esc(item.label)}</div>
- <div style="font-size:0.66rem;font-weight:900;color:${colorFor(item.status)};text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;">${labelFor(item.status)}</div>
- </div>
- <div style="font-size:0.75rem;color:var(--gray500);line-height:1.5;">${esc(item.detail)}</div>
- </div>
- `).join('')}
- </div>
- `);
- }
+    const labelFor = status => status === 'ready' ? 'Ready' : status === 'work' ? 'Needs work' : 'Watch';
+    const classFor = status => status === 'ready' ? 'ready' : status === 'work' ? 'work' : 'watch';
+    return `
+     <div class="k2mr-card">
+      <div class="k2mr-readiness">
+       ${(items || []).map(item => `
+        <div class="k2mr-ready-item">
+         <div class="k2mr-ready-head">
+          <div class="k2mr-ready-label">${esc(item.label)}</div>
+          <div class="k2mr-status ${classFor(item.status)}">${labelFor(item.status)}</div>
+         </div>
+         <div class="k2mr-ready-detail">${esc(item.detail)}</div>
+        </div>
+       `).join('')}
+      </div>
+     </div>
+    `;
+   }
 
  function renderActionPlan(actions) {
- return card('Action plan', `
- <div style="font-size:0.78rem;color:var(--gray500);line-height:1.55;margin-bottom:10px;">Use this as the next practice block. The aim is not to memorise a perfect answer; it is to make the tested skill visible under time pressure.</div>
- ${(actions || []).map((action, i) => `
- <div style="display:grid;grid-template-columns:34px minmax(0,1fr);gap:11px;padding:11px 0;border-top:1px solid var(--gray100);">
- <div style="width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:900;">${i + 1}</div>
- <div>
- <div style="font-size:0.68rem;font-weight:900;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">${esc(action.label)}</div>
- <div style="font-size:0.86rem;font-weight:900;color:var(--navy);line-height:1.35;">${esc(action.title)}</div>
- <div style="font-size:0.77rem;color:var(--gray500);line-height:1.55;margin-top:4px;">${esc(action.detail)}</div>
- </div>
- </div>
- `).join('')}
- `);
- }
+    return `
+     <div class="k2mr-card">
+      <div style="font-size:0.82rem;color:rgba(255,255,255,0.55);line-height:1.6;margin-bottom:14px;">Use this as the next practice block. The aim is not to memorise a perfect answer - it's to make the tested skill visible under time pressure.</div>
+      <div class="k2mr-actionplan">
+       ${(actions || []).map((action, i) => `
+        <div class="k2mr-action">
+         <div class="k2mr-action-num">${i + 1}</div>
+         <div>
+          <div class="k2mr-action-kicker">${esc(action.label)}</div>
+          <div class="k2mr-action-title">${esc(action.title)}</div>
+          <div class="k2mr-action-detail">${esc(action.detail)}</div>
+         </div>
+        </div>
+       `).join('')}
+      </div>
+     </div>
+    `;
+   }
 
  function reportSummaryText(report = latestReport) {
  if (!report) return 'No mock report is available yet.';
@@ -3801,131 +3867,184 @@ ${failed ? `<div style="font-size:0.72rem;color:#9a3412;line-height:1.45;margin-
 	 }
 
  function renderCriterionHeatmap(criteria) {
- const rows = criteria.map(c => {
- const pct = Number.isFinite(c.avg) ? Math.max(4, Math.min(100, Math.round(c.avg * 10))) : 0;
- const color = !Number.isFinite(c.avg) ? 'var(--gray200)' : c.avg >= 7 ? '#16a34a' : c.avg >= 5.5 ? '#0ea5e9' : c.avg >= 4.5 ? '#d97706' : '#dc2626';
- return `
- <div style="margin-bottom:10px;">
- <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:4px;">
- <span style="font-size:0.78rem;font-weight:800;color:var(--navy);">${esc(c.label)}</span>
- <span style="font-size:0.76rem;font-weight:800;color:${color};">${Number.isFinite(c.avg) ? `${c.avg}/10` : '-'} <span style="color:var(--gray400);font-weight:600;">${c.n}x</span></span>
- </div>
- <div style="height:8px;background:var(--gray100);border-radius:5px;overflow:hidden;">
- <div style="height:100%;width:${pct}%;background:${color};border-radius:5px;"></div>
- </div>
- </div>
- `;
- }).join('');
- return card('Criterion heatmap', `
- <div style="font-size:0.78rem;color:var(--gray500);line-height:1.5;margin-bottom:12px;">Averages combine written competency scores and CASPer video criterion scores where available. These are practice signals, not official CASPer sub-scores.</div>
- ${rows}
- `);
- }
+    const rows = criteria.map(c => {
+     const pct = Number.isFinite(c.avg) ? Math.max(4, Math.min(100, Math.round(c.avg * 10))) : 0;
+     let color, gradient;
+     if (!Number.isFinite(c.avg)) { color = 'rgba(255,255,255,0.2)'; gradient = 'rgba(255,255,255,0.1)'; }
+     else if (c.avg >= 7) { color = 'var(--green)'; gradient = 'linear-gradient(90deg,#16a34a,#22c55e)'; }
+     else if (c.avg >= 5.5) { color = 'var(--teal2)'; gradient = 'linear-gradient(90deg,var(--teal3),var(--teal2))'; }
+     else if (c.avg >= 4.5) { color = '#fbbf24'; gradient = 'linear-gradient(90deg,#f59e0b,#fbbf24)'; }
+     else { color = 'var(--red)'; gradient = 'linear-gradient(90deg,#dc2626,#ef4444)'; }
+     return `
+      <div class="k2mr-crit-row">
+       <div class="k2mr-crit-head">
+        <span class="k2mr-crit-label">${esc(c.label)}</span>
+        <span class="k2mr-crit-score" style="color:${color};">${Number.isFinite(c.avg) ? `${c.avg}/10` : '-'}<span class="k2mr-crit-n">${c.n}x</span></span>
+       </div>
+       <div class="k2mr-crit-track"><div class="k2mr-crit-fill" style="width:${pct}%;background:${gradient};"></div></div>
+      </div>
+     `;
+    }).join('');
+    return `
+     <div class="k2mr-card">
+      <div class="k2mr-card-head">
+       <div class="k2mr-card-title">Criterion heatmap</div>
+       <div class="k2mr-card-meta">Across all stations</div>
+      </div>
+      <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.55;margin-bottom:14px;">Averages combine written competency scores and CASPer video criterion scores where available. Practice signals, not official sub-scores.</div>
+      ${rows}
+     </div>
+    `;
+   }
 
- function renderStamina(stamina) {
- const color = stamina.tone === 'strong' ? '#16a34a' : stamina.tone === 'risk' ? '#dc2626' : '#0ea5e9';
- return card('Stamina pattern', `
- <div style="font-size:1rem;font-weight:850;color:${color};line-height:1.35;margin-bottom:8px;">${esc(stamina.label)}</div>
- <div style="font-size:0.84rem;color:var(--gray600);line-height:1.6;margin-bottom:12px;">${esc(stamina.body)}</div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
- <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:10px;">
- <div style="font-size:0.68rem;color:var(--gray400);font-weight:800;text-transform:uppercase;">Typed 1-4</div>
- <div style="font-size:1.1rem;font-weight:900;color:var(--navy);">${stamina.typedEarlyAvg ?? '-'}</div>
- </div>
- <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:10px;">
- <div style="font-size:0.68rem;color:var(--gray400);font-weight:800;text-transform:uppercase;">Typed 5-7</div>
- <div style="font-size:1.1rem;font-weight:900;color:var(--navy);">${stamina.typedLateAvg ?? '-'}</div>
- </div>
- </div>
- `);
- }
+ function renderStamina(stamina, rows) {
+    const toneClass = stamina.tone === 'strong' ? 'strong' : stamina.tone === 'risk' ? 'risk' : 'steady';
+    const sparkline = renderStaminaSparkline(rows || []);
+    return `
+     <div class="k2mr-card">
+      <div class="k2mr-card-head">
+       <div class="k2mr-card-title">Stamina pattern</div>
+       <div class="k2mr-card-meta">First half vs second half</div>
+      </div>
+      <div class="k2mr-stamina-label ${toneClass}">${esc(stamina.label)}</div>
+      <div class="k2mr-stamina-body">${esc(stamina.body)}</div>
+      ${sparkline}
+      <div class="k2mr-stamina-split">
+       <div class="k2mr-stamina-cell">
+        <div class="k2mr-stamina-cell-lbl">Typed 1-4</div>
+        <div class="k2mr-stamina-cell-val">${stamina.typedEarlyAvg ?? '-'}</div>
+       </div>
+       <div class="k2mr-stamina-cell">
+        <div class="k2mr-stamina-cell-lbl">Typed 5-7</div>
+        <div class="k2mr-stamina-cell-val">${stamina.typedLateAvg ?? '-'}</div>
+       </div>
+      </div>
+     </div>
+    `;
+   }
+
+   function renderStaminaSparkline(rows) {
+    const scored = (rows || []).filter(r => Number.isFinite(r.score10));
+    if (scored.length < 3) return '';
+    const bars = scored.map(r => {
+     const score = r.score10;
+     const height = Math.max(12, Math.min(95, Math.round(score * 10)));
+     const cls = score >= 7 ? 'green' : score >= 5.5 ? 'teal' : score >= 4.5 ? 'gold' : 'red';
+     return `<div class="k2mr-sparkline-bar ${cls}" style="height:${height}%" title="${esc(stationShort(r))}: ${score}/10"></div>`;
+    }).join('');
+    const labels = scored.map(r => `<span>${esc(stationShort(r))}</span>`).join('');
+    return `
+     <div class="k2mr-sparkline">
+      <div class="k2mr-sparkline-title">Quality across ${scored.length} station${scored.length === 1 ? '' : 's'}</div>
+      <div class="k2mr-sparkline-bars" style="grid-template-columns:repeat(${scored.length},1fr);">${bars}</div>
+      <div class="k2mr-sparkline-labels">${labels}</div>
+     </div>
+    `;
+   }
 
  function renderPremiumVisualInterpretation(summary) {
- if (!summary) return '';
- const stationCards = (summary.items || []).map(item => {
- const visual = item.visual || {};
- const presentation = item.presentation || {};
- const voice = item.voice || {};
- const cameraLimited = item.visualDegraded || !item.visual;
- return `
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:12px;padding:13px 14px;">
- <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;">
- <div>
- <div style="font-size:0.8rem;font-weight:900;color:var(--navy);">Video ${esc(item.station)} - ${esc(item.category)}</div>
- <div style="font-size:0.7rem;color:var(--gray400);line-height:1.35;">${cameraLimited ? 'Camera signal limited or unavailable' : esc(visual.summary || 'Camera signal available')}</div>
- </div>
- ${voice?.pace_wpm ? `<div style="font-size:0.72rem;font-weight:900;color:#6d28d9;white-space:nowrap;">${esc(voice.pace_wpm)} wpm</div>` : ''}
- </div>
- ${visual?.eye_contact ? visualLine('Eye contact', niceKey(visual.eye_contact)) : ''}
- ${visual?.posture ? visualLine('Posture', niceKey(visual.posture)) : ''}
- ${visual?.composure ? visualLine('Composure', niceKey(visual.composure)) : ''}
- ${visual?.facial_expression ? visualLine('Facial expression', visual.facial_expression) : ''}
- ${visual?.engagement ? visualLine('Visible engagement', visual.engagement) : ''}
- ${Array.isArray(visual?.distractions) && visual.distractions.length ? visualLine('Distractions', visual.distractions.join(', ')) : ''}
- ${presentation.visual_presence ? visualLine('AI interpretation', presentation.visual_presence) : ''}
- ${presentation.facial_expression ? visualLine('Expression interpretation', presentation.facial_expression) : ''}
- ${presentation.one_improvement ? visualLine('Practice cue', presentation.one_improvement) : ''}
- </div>
- `;
- }).join('');
- return card('Premium visual interpretation', `
- <div style="font-size:0.82rem;color:var(--gray600);line-height:1.62;margin-bottom:12px;">
- Premium visual feedback uses answer-time webcam frames plus voice/transcript signals to interpret delivery: camera gaze/eye contact, posture, facial expression, composure, distracting gestures, pace, clarity, and confidence. These are presentation cues only, not judgements about appearance, identity, personality, or cultural communication style. Non-Western eye contact patterns and neurodivergent presentation differences should not be penalised.
- </div>
- <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px;margin-bottom:13px;">
- ${visualSummaryTile('Stations analysed', `${summary.analysedCount || 0}`)}
- ${visualSummaryTile('Eye contact', formatVisualCounts(summary.eyeContact))}
- ${visualSummaryTile('Posture', formatVisualCounts(summary.posture))}
- ${visualSummaryTile('Composure', formatVisualCounts(summary.composure))}
- ${visualSummaryTile('Facial expression', summary.facialExpressionCount ? `${summary.facialExpressionCount} station notes` : 'No expression signal')}
- </div>
- <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;">${stationCards}</div>
- `);
- }
+    if (!summary) return '';
+    const stationCards = (summary.items || []).map(item => {
+     const visual = item.visual || {};
+     const presentation = item.presentation || {};
+     const voice = item.voice || {};
+     const cameraLimited = item.visualDegraded || !item.visual;
+     return `
+      <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(167,139,250,0.18);border-radius:10px;padding:14px 16px;">
+       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;">
+        <div>
+         <div style="font-size:0.84rem;font-weight:800;color:#fff;">Video ${esc(item.station)} &middot; ${esc(item.category)}</div>
+         <div style="font-family:var(--mono);font-size:0.66rem;color:rgba(255,255,255,0.45);line-height:1.4;margin-top:3px;">${cameraLimited ? 'Camera signal limited or unavailable' : esc(visual.summary || 'Camera signal available')}</div>
+        </div>
+        ${voice?.pace_wpm ? `<div style="font-family:var(--mono);font-size:0.72rem;font-weight:700;color:#a78bfa;white-space:nowrap;">${esc(voice.pace_wpm)} wpm</div>` : ''}
+       </div>
+       ${visual?.eye_contact ? visualLine('Eye contact', niceKey(visual.eye_contact)) : ''}
+       ${visual?.posture ? visualLine('Posture', niceKey(visual.posture)) : ''}
+       ${visual?.composure ? visualLine('Composure', niceKey(visual.composure)) : ''}
+       ${visual?.facial_expression ? visualLine('Facial expression', visual.facial_expression) : ''}
+       ${visual?.engagement ? visualLine('Visible engagement', visual.engagement) : ''}
+       ${Array.isArray(visual?.distractions) && visual.distractions.length ? visualLine('Distractions', visual.distractions.join(', ')) : ''}
+       ${presentation.visual_presence ? visualLine('AI interpretation', presentation.visual_presence) : ''}
+       ${presentation.facial_expression ? visualLine('Expression interpretation', presentation.facial_expression) : ''}
+       ${presentation.one_improvement ? visualLine('Practice cue', presentation.one_improvement) : ''}
+      </div>
+     `;
+    }).join('');
+    return `
+     <section class="k2mr-section">
+      <div class="k2mr-section-head">
+       <div class="k2mr-kicker" style="color:#a78bfa;">Premium visual interpretation</div>
+       <h3>How you <em>came across</em> on camera.</h3>
+      </div>
+      <div class="k2mr-card" style="border-color:rgba(167,139,250,0.25);background:linear-gradient(135deg,rgba(167,139,250,0.05),rgba(167,139,250,0.01));">
+       <div style="font-size:0.82rem;color:rgba(255,255,255,0.65);line-height:1.65;margin-bottom:14px;">Premium visual feedback uses answer-time webcam frames plus voice and transcript signals to interpret delivery. These are presentation cues only, not judgements about appearance, identity, or personality.</div>
+       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:14px;">
+        ${visualSummaryTile('Stations analysed', `${summary.analysedCount || 0}`)}
+        ${visualSummaryTile('Eye contact', formatVisualCounts(summary.eyeContact))}
+        ${visualSummaryTile('Posture', formatVisualCounts(summary.posture))}
+        ${visualSummaryTile('Composure', formatVisualCounts(summary.composure))}
+        ${visualSummaryTile('Facial expression', summary.facialExpressionCount ? `${summary.facialExpressionCount} station notes` : 'No expression signal')}
+       </div>
+       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;">${stationCards}</div>
+      </div>
+     </section>
+    `;
+   }
 
  function visualSummaryTile(label, value) {
- return `<div style="background:#f8fafc;border:1px solid var(--gray200);border-radius:10px;padding:10px 11px;"><div style="font-size:0.66rem;font-weight:900;color:#6d28d9;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${esc(label)}</div><div style="font-size:0.78rem;color:var(--gray600);line-height:1.4;">${esc(value || '-')}</div></div>`;
- }
+    return `<div style="background:rgba(0,0,0,0.2);border:1px solid rgba(167,139,250,0.18);border-radius:10px;padding:10px 12px;"><div style="font-family:var(--mono);font-size:0.62rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${esc(label)}</div><div style="font-size:0.78rem;color:rgba(255,255,255,0.75);line-height:1.4;">${esc(value || '-')}</div></div>`;
+   }
 
  function visualLine(label, value) {
- return value ? `<div style="font-size:0.76rem;color:var(--gray600);line-height:1.5;margin-top:5px;"><strong>${esc(label)}:</strong> ${esc(value)}</div>` : '';
- }
+    return value ? `<div style="font-size:0.78rem;color:rgba(255,255,255,0.7);line-height:1.55;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05);"><strong style="color:#a78bfa;font-weight:700;">${esc(label)}:</strong> ${esc(value)}</div>` : '';
+   }
 
  function renderPatternReport(patterns, criteria) {
- let body = '';
- if (patterns.length) {
- body = patterns.map(pattern => `
- <div style="padding:10px 0;border-bottom:1px solid var(--gray100);">
- <div style="font-size:0.82rem;font-weight:850;color:var(--navy);line-height:1.35;">${esc(pattern.label)}</div>
- <div style="font-size:0.76rem;color:var(--gray500);line-height:1.5;margin-top:3px;">${esc(pattern.action)}</div>
- <div style="font-size:0.7rem;color:var(--teal3);font-weight:800;margin-top:5px;">Seen in ${esc(pattern.stations.join(', '))}</div>
- </div>
- `).join('');
- } else {
- const weak = criteria.find(c => Number.isFinite(c.avg));
- body = `<div style="font-size:0.84rem;color:var(--gray600);line-height:1.6;">No repeated text pattern appeared strongly enough across multiple stations. The clearest signal is currently your lowest criterion: <strong>${esc(weak?.label || 'awaiting data')}</strong>.</div>`;
- }
- return card('Cross-station patterns', body);
- }
+    let body = '';
+    if (patterns.length) {
+     body = patterns.map(pattern => `
+      <div class="k2mr-pattern">
+       <div class="k2mr-pattern-label">${esc(pattern.label)}</div>
+       <div class="k2mr-pattern-action">${esc(pattern.action)}</div>
+       <div class="k2mr-pattern-where">Seen in ${esc(pattern.stations.join(', '))}</div>
+      </div>
+     `).join('');
+    } else {
+     const weak = criteria.find(c => Number.isFinite(c.avg));
+     body = `<div style="font-size:0.86rem;color:rgba(255,255,255,0.6);line-height:1.65;">No repeated text pattern appeared strongly enough across multiple stations. The clearest signal is your lowest criterion: <strong style="color:#fff;">${esc(weak?.label || 'awaiting data')}</strong>.</div>`;
+    }
+    return `
+     <div class="k2mr-card">
+      <div class="k2mr-card-head"><div class="k2mr-card-title">Cross-station patterns</div></div>
+      ${body}
+     </div>
+    `;
+   }
 
  function renderCategoryReport(categories) {
- const rows = categories.slice(0, 5).map(cat => {
- const color = cat.avg >= 7 ? '#16a34a' : cat.avg >= 5.5 ? '#0ea5e9' : cat.avg >= 4.5 ? '#d97706' : '#dc2626';
- return `
- <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--gray100);">
- <div style="min-width:0;">
- <div style="font-size:0.82rem;font-weight:850;color:var(--navy);">${esc(cat.category)}</div>
- <div style="font-size:0.7rem;color:var(--gray400);">${esc(cat.stations.join(', '))} - ${cat.n} station${cat.n === 1 ? '' : 's'}</div>
- </div>
- <div style="font-size:0.82rem;font-weight:900;color:${color};white-space:nowrap;">${cat.avg}/10</div>
- </div>
- `;
- }).join('');
- return card('Category weaknesses', `
- <div style="font-size:0.78rem;color:var(--gray500);line-height:1.5;margin-bottom:8px;">Lowest categories first. Treat one-station categories as a clue, not a verdict.</div>
- ${rows || '<div style="font-size:0.84rem;color:var(--gray400);">No scored categories yet.</div>'}
- `);
- }
+    const rows = categories.slice(0, 5).map(cat => {
+     const color = cat.avg >= 7 ? 'var(--green)' : cat.avg >= 5.5 ? 'var(--teal2)' : cat.avg >= 4.5 ? '#fbbf24' : 'var(--red)';
+     return `
+      <div class="k2mr-cat-row">
+       <div>
+        <div class="k2mr-cat-name">${esc(cat.category)}</div>
+        <div class="k2mr-cat-stations">${esc(cat.stations.join(', '))} - ${cat.n} station${cat.n === 1 ? '' : 's'}</div>
+       </div>
+       <div class="k2mr-cat-score" style="color:${color};">${cat.avg}/10</div>
+      </div>
+     `;
+    }).join('');
+    return `
+     <div class="k2mr-card">
+      <div class="k2mr-card-head">
+       <div class="k2mr-card-title">Category weaknesses</div>
+       <div class="k2mr-card-meta">Lowest first</div>
+      </div>
+      <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.55;margin-bottom:10px;">Treat one-station categories as a clue, not a verdict.</div>
+      ${rows || '<div style="font-size:0.84rem;color:rgba(255,255,255,0.4);">No scored categories yet.</div>'}
+     </div>
+    `;
+   }
 
  function sectionSummary(title, rows, type) {
  const items = rows.map((r, i) => {

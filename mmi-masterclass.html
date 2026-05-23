@@ -182,7 +182,7 @@
  if(!res.ok) throw new Error(data.message || data.error || 'Payment setup failed.');
  if(data.already_paid){ await refreshMasterclassStatus(); return; }
  if(data.checkout_url){ window.location.href=data.checkout_url; return; }
- throw new Error('No checkout URL returned.');
+ throw new Error(data.message || data.error || 'No checkout URL returned.');
  }catch(e){ setStatus(e.message || 'Something went wrong. Try again.','err'); btn.disabled=false; btn.textContent=`Pay $${MASTERCLASS_PRICE} and register`; }
  }
  async function trackPaymentReturn(){
