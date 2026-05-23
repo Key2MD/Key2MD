@@ -95,9 +95,9 @@
  area: 'Strategy',
  title: '15-minute preferences discussion',
  price: '$75',
- href: 'https://buy.stripe.com/eVq28k0e5b8c4a28J9fjG00',
- cta: 'Book discussion',
- bestFor: 'When the right application strategy depends on preference order, timing, or edge-case admissions rules.',
+ href: 'https://buy.stripe.com/cNibIUbWNeko8qigbBfjG01',
+ cta: 'Pay $75 and request times',
+ bestFor: 'When you want Dan to sanity-check your chances, preference order, or edge-case admissions rules before GEMSAS closes.',
  tags: ['strategy', 'call', 'preference']
  }
  ];

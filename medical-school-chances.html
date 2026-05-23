@@ -705,21 +705,25 @@
  content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.12);
  }
  .book-btn {
- display: inline-block; padding: 13px 26px; border-radius: 50px;
- background: rgba(245,158,11,0.15); color: var(--gold); font-weight: 700; font-size: 0.92rem;
- border: 1.5px solid rgba(245,158,11,0.4); transition: all 0.2s; position: relative;
+ display: inline-flex; align-items:center; justify-content:center; gap:8px; padding: 14px 24px; border-radius: 50px;
+ background: #f59e0b; color: #071326; font-weight: 900; font-size: 0.92rem;
+ border: 1.5px solid rgba(255,255,255,0.4); transition: all 0.2s; position: relative;
+ box-shadow: 0 14px 30px rgba(245,158,11,0.24);
  }
- .book-btn:hover { background: rgba(245,158,11,0.25); }
+ .book-btn:hover { background: #fbbf24; transform: translateY(-1px); }
  .preference-offer {
- max-width: 560px; margin: 4px auto 0; padding: 20px; border-radius: 14px;
- background: rgba(255,255,255,0.06); border: 1px solid rgba(245,158,11,0.28);
+ max-width: 680px; margin: 4px auto 0; padding: 24px; border-radius: 14px;
+ background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(245,158,11,0.12));
+ border: 1px solid rgba(245,158,11,0.48);
  position: relative; text-align: left;
+ box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 18px 44px rgba(0,0,0,0.18);
  }
  .preference-offer-top { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap; margin-bottom:8px; }
- .preference-offer h4 { color:#fff; font-size:1rem; margin:0; }
+ .preference-offer h4 { color:#fff; font-size:1.18rem; margin:0; line-height:1.25; }
  .preference-price { background:var(--gold); color:#111827; border-radius:999px; padding:5px 11px; font-size:0.78rem; font-weight:900; }
- .preference-offer p { max-width:none; margin:0 0 12px; font-size:0.86rem; color:rgba(255,255,255,0.68); }
- .preference-offer ul { margin:0 0 14px; padding-left:18px; color:rgba(255,255,255,0.74); font-size:0.84rem; line-height:1.55; }
+ .preference-offer p { max-width:none; margin:0 0 14px; font-size:0.94rem; color:rgba(255,255,255,0.78); }
+ .preference-offer ul { margin:0 0 16px; padding-left:18px; color:rgba(255,255,255,0.82); font-size:0.88rem; line-height:1.55; }
+ .preference-offer-note { color:#fde68a; font-size:0.82rem; font-weight:800; margin-top:12px; }
  .email-done { display: none; color: var(--teal2); font-weight: 600; font-size: 0.95rem; margin-top: 4px; position: relative; }
  .email-done.show { display: block; }
  .result-actions {
@@ -760,6 +764,31 @@
  .explainer a { color: var(--teal3); text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
  .explainer a:hover { color: var(--teal); }
 
+ .gemsas-callout {
+ margin: 34px 0 18px; padding: 28px; border-radius: 14px;
+ background: linear-gradient(135deg, #071326 0%, #0d1f3c 58%, #123154 100%);
+ color: #fff; border: 1px solid rgba(14,165,233,0.24);
+ box-shadow: 0 22px 60px rgba(10,22,40,0.22);
+ display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 22px; align-items: center;
+ }
+ .gemsas-callout-label {
+ display:inline-flex; align-items:center; width:max-content; margin-bottom:10px;
+ background: rgba(14,165,233,0.14); border:1px solid rgba(56,189,248,0.24);
+ color:#7dd3fc; border-radius:999px; padding:5px 10px;
+ font-size:0.68rem; font-weight:900; letter-spacing:0.12em; text-transform:uppercase;
+ }
+ .gemsas-callout h3 { color:#fff; margin:0 0 10px; font-size:1.45rem; }
+ .gemsas-callout p { color:rgba(255,255,255,0.78); margin:0; max-width:700px; }
+ .gemsas-callout-meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
+ .gemsas-callout-meta span {
+ background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.11);
+ color:rgba(255,255,255,0.84); border-radius:999px; padding:6px 10px;
+ font-size:0.78rem; font-weight:800;
+ }
+ .gemsas-callout-action { display:grid; gap:8px; justify-items:end; min-width:210px; }
+ .gemsas-callout-action .book-btn { width:100%; }
+ .gemsas-callout-action small { display:block; color:#fde68a; font-weight:800; font-size:0.78rem; text-align:right; line-height:1.4; }
+
  details.faq-item {
  border-bottom: 1px solid var(--gray200); padding: 18px 0;
  }
@@ -775,6 +804,20 @@
  }
  details.faq-item[open] summary::after { transform: rotate(45deg); }
  details.faq-item p { margin-top: 10px; color: var(--gray600); }
+ .faq-cta {
+ margin-top:16px; padding:20px; border-radius:14px;
+ background:linear-gradient(135deg,#eff6ff,#fff7ed);
+ border:1px solid #fed7aa; display:grid; grid-template-columns: minmax(0,1fr) auto;
+ gap:18px; align-items:center;
+ }
+ .faq-cta strong { display:block; color:var(--navy); font-size:1.02rem; margin-bottom:5px; }
+ .faq-cta span { display:block; color:var(--gray700); font-size:0.92rem; line-height:1.55; }
+ .faq-cta .book-btn { box-shadow:none; white-space:nowrap; }
+ @media(max-width:760px){
+ .gemsas-callout, .faq-cta { grid-template-columns: 1fr; }
+ .gemsas-callout-action { justify-items:stretch; min-width:0; }
+ .gemsas-callout-action small { text-align:left; }
+ }
 
 
  .legal-box {
@@ -1242,14 +1285,15 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="email-done" id="emailDone">Done. Your calculator plan has been sent.</div>
  <div class="email-divider">or</div>
  <div class="preference-offer">
- <div class="preference-offer-top"><h4>15-minute preferences discussion with Dan</h4><span class="preference-price">$75</span></div>
- <p>For students who have numbers but still need judgement: which schools to prioritise, where CASPer can compensate, where bonuses matter, and which application risks are worth taking seriously.</p>
+ <div class="preference-offer-top"><h4>Want a 15-minute call to discuss your chances and preferencing strategy?</h4><span class="preference-price">$75</span></div>
+ <p>Use this before the upcoming GEMSAS closing date if you want Dan to sanity-check your school list, edge cases, and where your effort is best spent next.</p>
  <ul>
  <li>Clarify your strongest realistic preference order.</li>
- <li>Identify weak spots the calculator cannot fully model.</li>
- <li>Leave with a concrete next-step application strategy.</li>
+ <li>Identify risks the calculator cannot fully model.</li>
+ <li>After payment, Dan will message you with available call times.</li>
  </ul>
- <a href="booking.html?type=intro" target="_blank" rel="noopener" class="book-btn">Book the $75 discussion -></a>
+ <a href="https://buy.stripe.com/cNibIUbWNeko8qigbBfjG01" target="_blank" rel="noopener" class="book-btn" data-track="preference_discussion_stripe_click" data-track-detail="calculator_results">Pay $75 and request times -></a>
+ <div class="preference-offer-note">Once paid, Dan will message you with availabilities for the call.</div>
  </div>
  </div>
  </div>
@@ -1297,6 +1341,23 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <h3>Rural / priority category</h3>
  <p>Australian medical schools reserve a proportion of places for applicants from rural, regional, and remote backgrounds. Cutoffs for rural applicants are typically <strong>0.08 to 0.20 combo points lower</strong> than non-rural cutoffs. The data for rural applicants is much sparser than for non-rural - treat rural results as a very loose guide and expect wider variation year-to-year.</p>
+
+ <div class="gemsas-callout">
+ <div>
+ <span class="gemsas-callout-label">GEMSAS strategy</span>
+ <h3>Want a 15-minute call to discuss your chances and preferencing strategy?</h3>
+ <p>Use this if you want a focused paid discussion before the upcoming GEMSAS closing date: which schools to preference, where your profile is strongest, and which risks are worth taking seriously.</p>
+ <div class="gemsas-callout-meta">
+ <span>15 minutes</span>
+ <span>$75 AUD</span>
+ <span>Dan messages available times after payment</span>
+ </div>
+ </div>
+ <div class="gemsas-callout-action">
+ <a href="https://buy.stripe.com/cNibIUbWNeko8qigbBfjG01" target="_blank" rel="noopener" class="book-btn" data-track="preference_discussion_stripe_click" data-track-detail="explainer_callout">Pay $75 and request times -></a>
+ <small>Once paid, Dan will message you with availabilities for the call.</small>
+ </div>
+ </div>
 
  <h2 style="margin-top:40px;">Frequently asked questions</h2>
 
@@ -1346,8 +1407,15 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </details>
 
  <details class="faq-item">
- <summary>My combo is below every cutoff. Is there any point applying?</summary>
- <p>Yes, with caveats. Apply to schools where CASPer and bonuses can compensate (UoW, UNDS, UNDF), consider rural if you qualify, and if your GPA is strong consider retaking GAMSAT. A short paid preferences discussion with someone who's worked with applicants in your range can help map out a realistic strategy - <a href="booking.html?type=intro" target="_blank" rel="noopener">book the $75 discussion</a> to talk it through.</p>
+ <summary>Want a 15-minute call to discuss your chances or GEMSAS preference strategy?</summary>
+ <p>If you have your numbers but still feel unsure how to order schools, where CASPer or bonuses matter, or which application risks are worth taking, a short paid strategy call can help turn the calculator result into a clearer plan before the upcoming GEMSAS closing date.</p>
+ <div class="faq-cta">
+ <div>
+ <strong>15-minute chances and preferencing discussion with Dan</strong>
+ <span>$75 AUD. After payment, Dan will message you with available times for the call.</span>
+ </div>
+ <a href="https://buy.stripe.com/cNibIUbWNeko8qigbBfjG01" target="_blank" rel="noopener" class="book-btn" data-track="preference_discussion_stripe_click" data-track-detail="faq">Pay $75 and request times -></a>
+ </div>
  </details>
 
  <h2 style="margin-top:40px;" id="legal">Disclaimer &amp; data notes</h2>
@@ -1406,12 +1474,12 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:0;">Full personalised session with Dan.</p>
  </a>
- <a href="booking.html?type=intro" target="_blank" rel="noopener" style="display:block;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;text-decoration:none;">
+ <a href="https://buy.stripe.com/cNibIUbWNeko8qigbBfjG01" target="_blank" rel="noopener" data-track="preference_discussion_stripe_click" data-track-detail="book_modal" style="display:block;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 22px;text-decoration:none;">
  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
  <span style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;">$75</span>
- <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">$75 Preferences Discussion</span>
+ <span style="color:rgba(255,255,255,0.8);font-weight:600;font-size:0.95rem;">15-minute chances/preferences call</span>
  </div>
- <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">Focused 15-minute strategy discussion for preferences, edge cases and next steps.</p>
+ <p style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">Pay $75 by Stripe. Dan will message you with available times after payment.</p>
  </a>
  </div>
  </div>
