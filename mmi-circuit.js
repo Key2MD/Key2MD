@@ -163,7 +163,7 @@ const MMICircuit = (() => {
  <div style="font-size:0.72rem;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Tier</div>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
  <button class="circuit-tier-btn active" data-tier="transcript" onclick="MMICircuit.setTier('transcript')" style="padding:8px 6px;border-radius:8px;border:1px solid rgba(124,58,237,0.5);background:rgba(124,58,237,0.1);color:#7c3aed;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;"> Transcript</button>
- <button class="circuit-tier-btn" data-tier="premium" onclick="MMICircuit.setTier('premium')" style="padding:8px 6px;border-radius:8px;border:1px solid var(--gray200);background:var(--gray50);color:var(--gray600);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;">Star Premium</button>
+ <button class="circuit-tier-btn" data-tier="premium" onclick="MMICircuit.setTier('premium')" style="padding:8px 6px;border-radius:8px;border:1px solid var(--gray200);background:var(--gray50);color:var(--gray600);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;">Premium</button>
  </div>
  </div>
 
@@ -403,7 +403,7 @@ const MMICircuit = (() => {
  Station ${idx + 1} / ${circuitConfig.size}
  </div>
  <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">${station.category}</div>
- <div style="margin-left:auto;font-size:0.72rem;color:var(--gray400);">${circuitConfig.tier === 'premium' ? 'Star Premium' : ' Transcript'} | ${circuitConfig.specialistMode ? 'Specialist Mode' : 'Med School'}</div>
+ <div style="margin-left:auto;font-size:0.72rem;color:var(--gray400);">${circuitConfig.tier === 'premium' ? 'Premium' : 'Transcript'} | ${circuitConfig.specialistMode ? 'Specialist Mode' : 'Med School'}</div>
  </div>
 
  <div id="circuitFeedbackWrap" style="margin-top:16px;"></div>

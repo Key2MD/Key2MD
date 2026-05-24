@@ -617,7 +617,7 @@ const MMIFeedbackRender = (() => {
 
  let actionHtml = '';
  if (isCredits || isLimit) {
- actionHtml = `<a href="plans.html" class="btn-mmi-error-action">Get MMI Credits -></a>`;
+ actionHtml = `<a href="plans.html#mmi-section" class="btn-mmi-error-action">Get MMI Credits -></a>`;
  }
 
  container.innerHTML = `

@@ -704,7 +704,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <p class="hero-sub">Compare unlimited CASPer AI reviews, pay-per-review credits, GAMSAT S2 Pro, MMI feedback and no-repeat full CASPer mocks. Free to start - upgrade only when volume, timing or feedback depth becomes the bottleneck.</p>
  <div class="hero-btns">
  <button class="btn-primary" onclick="document.getElementById('pro-section').scrollIntoView({behavior:'smooth'})">Get CASPer Pro -></button>
- <a href="practice.html" class="btn-outline-light">Try 1 Free First</a>
+ <a href="practice.html" class="btn-outline-light">Open Free Station Bank</a>
  </div>
  </div>
 </section>
@@ -843,7 +843,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div style="margin-top:24px;padding:16px 20px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:12px;">
  <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Why credits, not free?</div>
- <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.65;margin:0;">MMI feedback requires speech-to-text transcription (Whisper) plus AI analysis - it costs significantly more than a CASPer text review to run. We offered free daily MMI reviews during launch but had to end them because of account duplication and abuse. There is no free MMI AI feedback tier.</p>
+ <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.65;margin:0;">MMI feedback requires speech-to-text transcription plus spoken-response analysis, so it costs significantly more than a CASPer text review to run. The station bank is free to practise with; AI-marked MMI feedback uses credits or MMI Pro.</p>
  </div>
  </div>
 
@@ -854,7 +854,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <div style="display:flex;gap:6px;margin-bottom:18px;background:rgba(0,0,0,0.25);border-radius:50px;padding:4px;">
  <button id="mmiTierTranscript" onclick="switchMMITier('transcript')" style="flex:1;padding:8px 10px;border-radius:46px;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;background:rgba(139,92,246,0.25);color:#c4b5fd;"> Transcript</button>
- <button id="mmiTierPremium" onclick="switchMMITier('premium')" style="flex:1;padding:8px 10px;border-radius:46px;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:rgba(255,255,255,0.45);">* Premium</button>
+ <button id="mmiTierPremium" onclick="switchMMITier('premium')" style="flex:1;padding:8px 10px;border-radius:46px;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:rgba(255,255,255,0.45);">Premium</button>
  </div>
 
 
@@ -882,7 +882,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <li>5-criterion feedback per prompt</li>
  <li>Polished Auditor Trap detection</li>
  <li>Specialist mode included</li>
- <li>All 60 MMI stations unlocked</li>
+ <li>All 30+ MMI stations unlocked</li>
  <li class="dim">Voice &amp; presentation metrics not included</li>
  </ul>
  </div>
@@ -1064,7 +1064,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="fade-up" style="text-align:center;">
  <div class="section-eyebrow">Other Options</div>
  <h2 class="section-title">Choose the right practice path.</h2>
- <p class="section-sub" style="margin:0 auto;">Free accounts include limited CASPer and GAMSAT S2 AI reviews. MMI AI feedback requires MMI credits or MMI Pro because the free MMI tier was abused and too expensive to keep running.</p>
+ <p class="section-sub" style="margin:0 auto;">Free accounts include limited CASPer and GAMSAT S2 AI reviews. The MMI station bank is free to use; AI-marked spoken MMI feedback requires MMI credits or MMI Pro because it includes transcription and spoken-response analysis.</p>
  </div>
  <div class="other-grid">
 
@@ -1623,12 +1623,12 @@ let mmiTier = 'transcript';
 
 const MMI_PACKS = {
  transcript: [
- { id: 'mmi_transcript_1', label: ' 1 Transcript review', price: '$5.00', save: null },
+ { id: 'mmi_transcript_1', label: '1 Transcript review', price: '$5.00', save: null },
  { id: 'mmi_transcript_5', label: ' 5 Transcript reviews', price: '$22.50', save: 'Save 10%' },
  { id: 'mmi_transcript_10', label: ' 10 Transcript reviews', price: '$40.00', save: 'Save 20%' },
  ],
  premium: [
- { id: 'mmi_premium_1', label: '* 1 Premium review', price: '$12.00', save: null },
+ { id: 'mmi_premium_1', label: '1 Premium review', price: '$12.00', save: null },
  { id: 'mmi_premium_5', label: '* 5 Premium reviews', price: '$54.00', save: 'Save 10%' },
  { id: 'mmi_premium_10', label: '* 10 Premium reviews', price: '$96.00', save: 'Save 20%' },
  ],
@@ -1689,7 +1689,7 @@ function switchMMITier(tier) {
  <li>5-criterion feedback per prompt</li>
  <li>Polished Auditor Trap detection</li>
  <li>Specialist mode included</li>
- <li>All 60 MMI stations unlocked</li>
+ <li>All 30+ MMI stations unlocked</li>
  <li class="dim">Voice &amp; presentation metrics not included</li>`;
  } else {
  proFeats.innerHTML = `
@@ -1703,9 +1703,6 @@ function switchMMITier(tier) {
 
 
  renderMMICreditPacks(tier);
-
-
- document.getElementById('mmiCreditsBtn').textContent = `Buy MMI ${tierLabel} Credits ->`;
 
 
  const creditFeats = document.getElementById('mmiCreditFeatureList');
@@ -1735,14 +1732,18 @@ function switchMMITier(tier) {
 
 function renderMMICreditPacks(tier) {
  const container = document.getElementById('mmiCreditPacks');
- container.innerHTML = MMI_PACKS[tier].map(pack => `
- <div class="mmi-credit-pack" data-pack="${pack.id}" onclick="selectMMIPack(this,'${pack.id}')">
+ const packs = MMI_PACKS[tier] || [];
+ selectedMMIPackId = packs[0]?.id || null;
+ container.innerHTML = packs.map((pack, index) => `
+ <div class="mmi-credit-pack${index === 0 ? ' selected' : ''}" data-pack="${pack.id}" onclick="selectMMIPack(this,'${pack.id}')">
  <span class="mmi-pack-name">${pack.label}</span>
  <div class="mmi-pack-right">
  ${pack.save ? `<span class="mmi-pack-save">${pack.save}</span>` : ''}
  <span class="mmi-pack-price">${pack.price}</span>
  </div>
  </div>`).join('');
+ const btn = document.getElementById('mmiCreditsBtn');
+ if (btn && selectedMMIPackId) btn.textContent = `Buy ${MMI_CREDIT_LABELS[selectedMMIPackId]} ->`;
 }
 
 function switchMMITab(tab) {

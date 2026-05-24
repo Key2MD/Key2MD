@@ -101,7 +101,7 @@
  {
  "@type": "Question",
  "name": "Is the Key2MD CASPer practice tool really free?",
- "acceptedAnswer": {"@type": "Answer", "text": "Yes. The full library of 80+ CASPer and MMI scenarios is free to use without signup. You can attempt timed stations, see your scores, and review your written responses at no cost. CASPer has a limited free AI review tier. MMI AI transcript and feedback reviews require paid MMI credits or active MMI Pro access because the free MMI tier was abused and was too expensive to keep running."}
+ "acceptedAnswer": {"@type": "Answer", "text": "Yes. The full library of CASPer and MMI scenarios is free to use without signup. You can attempt timed stations, see your scores, and review your written responses at no cost. CASPer has a limited free AI review tier. MMI AI transcript and feedback reviews require paid MMI credits or active MMI Pro access because spoken-response feedback includes transcription and more expensive analysis."}
  },
  {
  "@type": "Question",
@@ -558,7 +558,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <div class="mmi-specialist-row" id="premiumModeRow" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.18);border-radius:10px;margin-top:8px;">
  <div>
- <div class="mmi-specialist-label" style="color:#7c3aed;">* Premium Analysis</div>
+ <div class="mmi-specialist-label" style="color:#7c3aed;">Premium analysis</div>
  <div class="mmi-specialist-sub">Adds voice pacing + presentation feedback. Uses 1 Premium credit. <a href="plans.html#mmi-section" style="color:#7c3aed;font-weight:600;">Get credits -></a></div>
  </div>
  <label class="toggle-switch">
@@ -568,7 +568,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 
  <div id="premiumDisclaimer" style="display:none;font-size:0.72rem;color:var(--gray400);line-height:1.5;padding:8px 12px;background:rgba(124,58,237,0.04);border-radius:8px;margin-top:4px;">
- Fast Premium analysis reviews your video and thus will require your device's processor for 5-10 seconds during this analysis phase, to send the information to the AI to be reviewed. Your full video will not be stored permanently.
+ Premium analysis samples a small number of video frames locally before upload to assess presentation signals. This can take 5-10 seconds on some devices. Your full video is not stored permanently.
  </div>
  </div>
 
@@ -742,15 +742,16 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div id="mmiAiNote" style="display:none;margin-top:10px;">
  <div style="font-size:0.75rem;color:var(--gray600);line-height:1.6;padding:10px 12px;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.18);border-radius:8px;margin-bottom:8px;">
  <strong style="color:#7c3aed;display:block;margin-bottom:4px;">MMI AI Feedback - Credits Required</strong>
- We previously offered free daily MMI reviews. Unfortunately, due to significant account duplication and abuse, MMI AI feedback now requires paid credits or MMI Pro access. We're sorry to those who used it fairly - this was a difficult decision. MMI transcription and AI analysis is genuinely expensive to run, and there is no free MMI AI feedback tier.
+ MMI AI feedback uses paid credits or MMI Pro access because spoken-response review includes transcription, criterion marking and optional presentation analysis. The timed MMI station bank remains free to practise with.
  </div>
  <div class="mmi-credit-info">
  <div class="mmi-credit-row">
- <span class="mmi-credit-label">Your MMI credits</span>
+ <span class="mmi-credit-label" id="mmiCreditLabel">Transcript access</span>
  <span class="mmi-credit-count" id="mmiCreditCount">0</span>
  </div>
+ <div class="mmi-credit-sub" id="mmiCreditSub">Sign in to check your MMI access.</div>
  </div>
- <a href="plans.html" style="display:block;margin-top:8px;padding:9px;border-radius:8px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#7c3aed;font-size:0.8rem;font-weight:700;text-align:center;text-decoration:none;transition:background 0.18s;" onmouseover="this.style.background='rgba(124,58,237,0.18)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'">Buy MMI Credits -></a>
+ <a href="plans.html#mmi-section" style="display:block;margin-top:8px;padding:9px;border-radius:8px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:#7c3aed;font-size:0.8rem;font-weight:700;text-align:center;text-decoration:none;transition:background 0.18s;" onmouseover="this.style.background='rgba(124,58,237,0.18)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'">Buy MMI Credits -></a>
  </div>
  </div>
 
@@ -952,7 +953,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div id="mmiSubmitWrap" style="display:none;">
  <button class="btn-mmi-submit" id="btnMMISubmit" onclick="submitMMIForFeedback()">
- * Get AI Feedback
+ Get AI Feedback
  </button>
  <div style="font-size:0.7rem;color:var(--gray400);text-align:center;margin-top:6px;">Transcribes and analyses your spoken response (15-30 seconds)</div>
  </div>
@@ -1373,6 +1374,7 @@ function togglePremiumMode() {
  if(disclaimer) disclaimer.style.display = mmiPremiumMode ? 'block' : 'none';
 
  if(mmiPremiumMode && !ffmpegLoaded && !ffmpegLoading) loadFFmpeg();
+ updateMMILimitsUI();
 }
 
 async function loadFFmpeg() {
@@ -1755,14 +1757,14 @@ async function submitMMIForFeedback() {
  if(!auth) {
  MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_loading', message: 'The login system is still loading. Please wait a moment and try again.' });
  if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = '* Get AI Feedback'; }
+ if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
  return;
  }
  if(!auth.isLoggedIn()) {
  auth.showAuthModal?.('signup');
  MMIFeedbackRender.clear(feedbackWrap);
  if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = '* Get AI Feedback'; }
+ if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
  return;
  }
 
@@ -1851,20 +1853,20 @@ async function submitMMIForFeedback() {
  Key2MDAuth.showAuthModal('signup');
  MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_required', message: 'Sign in to get AI feedback on your MMI response.' });
  if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = '* Get AI Feedback'; }
+ if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
  return;
  }
  if(res.status === 402) {
  const data = await res.json().catch(() => ({}));
  MMIFeedbackRender.renderError(feedbackWrap, { code: 'no_credits', message: data.message || `You need MMI ${tier} credits to get AI feedback.` });
  if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = '* Get AI Feedback'; }
+ if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
  return;
  }
  if(res.status === 413) {
  MMIFeedbackRender.renderError(feedbackWrap, { code: 'file_too_large', message: 'Recording is too large to upload. Try a shorter recording.' });
  if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = '* Get AI Feedback'; }
+ if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
  return;
  }
 
@@ -1877,7 +1879,7 @@ async function submitMMIForFeedback() {
  }
  MMIFeedbackRender.renderError(feedbackWrap, { code: data.error, message: data.message || 'Something went wrong. Please try again.' });
  if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = '* Get AI Feedback'; }
+ if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
  return;
  }
 
@@ -1897,7 +1899,7 @@ async function submitMMIForFeedback() {
  if(attempt < MAX_RETRIES) continue;
  MMIFeedbackRender.renderError(feedbackWrap, { code: 'network_error', message: `Upload failed after ${MAX_RETRIES} attempts. Check your connection and try again.` });
  if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = '* Get AI Feedback'; }
+ if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
  }
  }
 }
@@ -2156,8 +2158,20 @@ async function updateMMILimitsUI() {
  const res = await fetch(API_BASE + '/api/mmi/limits', { headers: { 'Authorization': `Bearer ${token}` } });
  if(!res.ok) return;
  const data = await res.json();
+ const selectedTier = mmiPremiumMode ? 'premium' : 'transcript';
+ const access = data[selectedTier] || {};
+ const rawCredits = selectedTier === 'premium' ? data.mmi_premium_credits : data.mmi_transcript_credits;
  const creditEl = document.getElementById('mmiCreditCount');
- if(creditEl) creditEl.textContent = data.mmi_transcript_credits ?? 0;
+ const labelEl = document.getElementById('mmiCreditLabel');
+ const subEl = document.getElementById('mmiCreditSub');
+ if(labelEl) labelEl.textContent = selectedTier === 'premium' ? 'Premium access' : 'Transcript access';
+ if(creditEl) creditEl.textContent = access.unlimited ? 'Unlimited' : String(rawCredits ?? access.remaining ?? 0);
+ if(subEl) {
+ const tierLabel = selectedTier === 'premium' ? 'Premium' : 'Transcript';
+ subEl.textContent = access.unlimited
+ ? `MMI ${tierLabel} Pro active.`
+ : `${rawCredits ?? access.remaining ?? 0} ${tierLabel.toLowerCase()} credit${Number(rawCredits ?? access.remaining ?? 0) === 1 ? '' : 's'} available.`;
+ }
  } catch {}
 }
 </script>
