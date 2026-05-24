@@ -12,7 +12,7 @@
  <link rel="stylesheet" href="mock-report-redesign.css">
  <script src="auth.js" defer></script>
 </head>
-<body>
+<body style="margin:0;padding:0;background:var(--navy,#0a1628);color:#fff;font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;">
  <div class="k2-mock-report">
   <div class="k2mr-topbar">
    <div class="k2mr-topbar-inner">
@@ -47,136 +47,10 @@
   function getFb(row){const fb=row.feedback||{},ov=fb.overall||{},issue=row.processing_error||row.reprocess_error;if(!hasFb(row)&&issue)return{strength:'AI analysis did not complete.',improve:issue,empathy:'',missed:'',excellent:''};return{strength:ov.biggest_strength||fb.strengths||fb.strength||'',improve:ov.biggest_improvement||fb.improvements||fb.improve||'',empathy:fb.empathy||'',missed:fb.missed||'',excellent:ov.excellent_version||fb.excellent_version||''};}
   function numScore(row){return safeN(row?.feedback?.overall?.score??row?.feedback?.score??row?.score);}
   function avgScore(rows){const vals=rows.map(numScore).filter(Number.isFinite);return vals.length?Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*10)/10:'–';}
-  function normaliseAccessTiming(v){const raw=String(v?.key||v?.mode||v||'').trim().toLowerCase().replace(/\s+/g,'');if(raw==='1.5'||raw==='1.5x'||raw==='x1.5'||raw==='x15'||raw==='15'||raw==='150')return'x15';if(raw==='2'||raw==='2x'||raw==='x2'||raw==='200')return'x2';return'standard';}
-  function accessTimingInfo(v){const key=normaliseAccessTiming(v);if(key==='x15')return{key,label:'1.5x timing',seconds:315};if(key==='x2')return{key,label:'2x timing',seconds:420};return{key:'standard',label:'Standard timing',seconds:210};}
-  function attemptAccessTiming(){const rows=attempt?.rows||[];const rowTiming=rows.map(r=>r?.access_timing||r?.accessTiming||r?.timing?.access_timing).find(Boolean);return accessTimingInfo(attempt?.access_timing||attempt?.accessTiming||attempt?.report?.accessTiming||attempt?.report?.access_timing||attempt?.telemetry?.access_timing||rowTiming);}
-  function rowAccessTiming(row){return accessTimingInfo(row?.access_timing||row?.accessTiming||row?.timing?.access_timing||attemptAccessTiming());}
   function statusLabel(s){return s==='ready'?'Ready':s==='work'?'Needs work':'Watch';}
   function statusClass(s){return s==='ready'?'ready':s==='work'?'work':'watch';}
   function paramsId(){return new URLSearchParams(location.search).get('id')||'';}
-  function fbTile(cls,label,body){if(!body)return'';return`<div class="k2mr-fb-tile ${cls}"><div class="k2mr-fb-lbl"><span class="k2mr-fb-icon" aria-hidden="true"></span><span>${esc(label)}</span></div><div class="k2mr-fb-body">${esc(body)}</div></div>`;}
-  function avgN(values){const nums=(values||[]).map(Number).filter(Number.isFinite);return nums.length?Math.round((nums.reduce((a,b)=>a+b,0)/nums.length)*10)/10:null;}
-  function scoreText(value){return Number.isFinite(value)?`${value}/10`:'-';}
-  function scoreTone(value){if(!Number.isFinite(value))return'watch';if(value>=7)return'ready';if(value>=5.5)return'watch';return'work';}
-  function stationShort(row,index=0){const type=row?.type==='video'?'V':'T';return`${type}${row?.localIndex||index+1}`;}
-  function niceKey(key){const map={real_world_awareness:'Real-world judgement',problem_solving:'Problem solving',self_awareness:'Self-awareness',communication:'Communication',reasoning:'Reasoning',empathy:'Empathy',reflection:'Reflection',professionalism:'Professionalism',specificity:'Specificity',structure:'Structure'};return map[String(key||'').toLowerCase()]||String(key||'Criterion').replace(/_/g,' ').replace(/\b\w/g,ch=>ch.toUpperCase());}
-  function clampPct(score){return Math.max(4,Math.min(100,Math.round((Number(score)||0)*10)));}
-  function scoreBarClass(score){if(!Number.isFinite(score))return'red';if(score>=7)return'green';if(score>=5.5)return'teal';if(score>=4.5)return'gold';return'red';}
-  function compList(row,index=0){
-   const fb=row?.feedback||{};
-   const out=[];
-   const push=(name,score,note='')=>{const n=safeN(score);if(!name||!Number.isFinite(n))return;out.push({name:niceKey(name),score:n,station:stationShort(row,index),note:String(note||'').trim()});};
-   if(row?.type==='video'){
-    (fb.per_prompt||[]).forEach(prompt=>{Object.entries(prompt?.scores||{}).forEach(([key,val])=>push(key,val?.score,val?.comment||val?.label));});
-   }else{
-    const raw=fb.competencies;
-    const items=Array.isArray(raw)?raw:(raw&&typeof raw==='object'?Object.entries(raw).map(([key,val])=>typeof val==='object'?{name:key,...val}:{name:key,score:val}):[]);
-    items.forEach(item=>push(item.name||item.competency||item.label,item.score,item.improve||item.improvement||item.evidence||item.note));
-   }
-   return out;
-  }
-  function criteriaStats(rows){
-   const groups={};
-   rows.forEach((row,index)=>compList(row,index).forEach(comp=>{if(!groups[comp.name])groups[comp.name]={name:comp.name,scores:[],stations:[],notes:[]};groups[comp.name].scores.push(comp.score);groups[comp.name].stations.push(comp.station);if(comp.note)groups[comp.name].notes.push(comp.note);}));
-   return Object.values(groups).map(g=>({name:g.name,avg:avgN(g.scores),count:g.scores.length,stations:[...new Set(g.stations)].slice(0,5),note:g.notes[0]||''})).filter(g=>Number.isFinite(g.avg)).sort((a,b)=>a.avg-b.avg);
-  }
-  function categoryStats(rows){
-   const groups={};
-   rows.forEach((row,index)=>{const score=numScore(row);if(!Number.isFinite(score))return;const category=row?.station?.category||row?.type||'CASPer';if(!groups[category])groups[category]={category,scores:[],stations:[]};groups[category].scores.push(score);groups[category].stations.push(stationShort(row,index));});
-   return Object.values(groups).map(g=>({category:g.category,avg:avgN(g.scores),count:g.scores.length,stations:g.stations})).sort((a,b)=>a.avg-b.avg);
-  }
-  function feedbackBlob(row){
-   const fb=row?.feedback||{},ov=fb.overall||{};
-   const parts=[fb.improvements,fb.improve,fb.missed,fb.empathy,fb.strengths,fb.strength,ov.biggest_improvement,ov.biggest_strength,ov.excellent_version,fb.polished_auditor_explanation];
-   (fb.per_prompt||[]).forEach(prompt=>{parts.push(prompt?.summary);Object.values(prompt?.scores||{}).forEach(v=>parts.push(v?.comment||v?.label));});
-   compList(row).forEach(c=>parts.push(c.note));
-   return parts.filter(Boolean).join(' ').toLowerCase();
-  }
-  function patternStats(rows,criteria){
-   const defs=[
-    {label:'Empathy is not specific enough',regex:/empath|emotion|feel|perspective|distress|concern/,action:'Name the person, the likely feeling, and why it matters before moving to action.'},
-    {label:'Reasoning needs a clearer trade-off',regex:/trade.?off|because|reason|weigh|balance|justify|rationale/,action:'Make the competing duties explicit, then explain why your choice is fair.'},
-    {label:'Actions are too broad',regex:/specific|concrete|practical|next step|action|follow.?up/,action:'Convert general intentions into one clear next step the marker can picture.'},
-    {label:'Structure is drifting under timing',regex:/structure|organis|unclear|rambl|concise|direct/,action:'Use the same opening pattern every time: answer, concern, action.'},
-    {label:'Reflection is underdeveloped',regex:/reflect|self.aware|learn|improve|blind spot|uncertain/,action:'Add one sentence showing what you would monitor or learn from the situation.'}
-   ];
-   const found=defs.map(def=>({...def,stations:[]}));rows.forEach((row,index)=>{const text=feedbackBlob(row);if(!text)return;found.forEach(def=>{if(def.regex.test(text))def.stations.push(stationShort(row,index));});});
-   const repeated=found.filter(p=>p.stations.length>=2).sort((a,b)=>b.stations.length-a.stations.length).slice(0,3);
-   const weakCriteria=(criteria||[]).filter(c=>c.count>=2&&c.avg<6.5).slice(0,3).map(c=>({label:`${c.name} is repeatedly limiting marks`,action:c.note||`This averaged ${c.avg}/10 across ${c.count} scored touchpoints. Make it visible in every answer, not just when the prompt asks for it.`,stations:c.stations}));
-   return [...weakCriteria,...repeated].slice(0,4);
-  }
-  function staminaStats(rows){
-   const scored=rows.map((row,index)=>({...row,order:index+1,score10:numScore(row)})).filter(row=>Number.isFinite(row.score10));
-   const video=scored.filter(r=>r.type==='video');
-   const typed=scored.filter(r=>r.type!=='video');
-   const first=avgN(scored.slice(0,4).map(r=>r.score10));
-   const late=avgN(scored.slice(-4).map(r=>r.score10));
-   const typedEarly=avgN(typed.filter(r=>(r.localIndex||0)<=4).map(r=>r.score10));
-   const typedLate=avgN(typed.filter(r=>(r.localIndex||0)>=5).map(r=>r.score10));
-   const earlyBase=Number.isFinite(typedEarly)?typedEarly:first;
-   const lateBase=Number.isFinite(typedLate)?typedLate:late;
-   const diff=Number.isFinite(earlyBase)&&Number.isFinite(lateBase)?Math.round((lateBase-earlyBase)*10)/10:null;
-   let label='Not enough scored stations yet',tone='watch',body='Once more stations have scored feedback, this section checks whether answer quality holds up late in the mock.';
-   if(Number.isFinite(diff)){
-    if(diff<=-0.8){label='Fatigue drop detected';tone='risk';body=`Later stations averaged ${lateBase}/10 compared with ${earlyBase}/10 earlier. That suggests the next gain may come from protecting structure and specificity while tired.`;}
-    else if(diff>=0.5){label='Strong finish under fatigue';tone='strong';body=`Later stations averaged ${lateBase}/10 compared with ${earlyBase}/10 earlier. That is a strong stamina signal: your quality improved or held as the mock got harder.`;}
-    else{label='Stamina held steady';tone='steady';body=`Later stations averaged ${lateBase}/10 compared with ${earlyBase}/10 earlier. Holding quality across the full sequence is a useful readiness sign.`;}
-   }
-   return {label,tone,body,first,late,typedEarly,typedLate,diff,videoAvg:avgN(video.map(r=>r.score10)),typedAvg:avgN(typed.map(r=>r.score10)),points:scored.map(r=>({label:stationShort(r,r.order-1),score:r.score10,type:r.type}))};
-  }
-  function derivedReport(rows,report={}){
-   const scores=rows.map(numScore).filter(Number.isFinite);
-   const overall=Number.isFinite(safeN(report.overallAvg))?safeN(report.overallAvg):avgN(scores);
-   const criteria=criteriaStats(rows);
-   const categories=categoryStats(rows);
-   const stamina=staminaStats(rows);
-   const patterns=patternStats(rows,criteria);
-   const weakest=criteria[0]||null;
-   const weakestCat=categories[0]||null;
-   const interpretation=report.interpretation||{};
-   const band=interpretation.band||(!Number.isFinite(overall)?'Awaiting scored feedback':overall>=6.5?'Likely Q4-style signal':overall>=5.5?'Probably Q3-style signal':overall>=4.5?'Developing signal':'Needs targeted rebuilding');
-   const text=interpretation.text||(!Number.isFinite(overall)?'Some analyses are still missing, so treat this as a partial report.':`Your current full-mock signal is ${overall}/10. The useful part is the pattern below: which skills repeat, and whether quality held late.`);
-   const topPattern=patterns[0];
-   let fallbackOneThing;
-   if(topPattern){
-    fallbackOneThing={title:topPattern.label,body:topPattern.action,source:topPattern.stations?.length?`Seen in ${topPattern.stations.join(', ')}.`:'Repeated across multiple stations.'};
-   }else if(weakest){
-    fallbackOneThing={title:`Lift ${weakest.name.toLowerCase()} first`,body:weakest.note||`This averaged ${weakest.avg}/10. Practise making it visible in every answer before trying to change everything.`,source:`${weakest.name}: ${weakest.avg}/10 across ${weakest.count} scored touchpoints.`};
-   }else if(weakestCat){
-    fallbackOneThing={title:`Repeat ${weakestCat.category} stations`,body:`This category averaged ${weakestCat.avg}/10. Treat it as the next practice block, not a permanent weakness.`,source:`Seen in ${weakestCat.stations.join(', ')}.`};
-   }else{
-    fallbackOneThing={title:'Repeat under full timing',body:'Do another full sequence and compare early versus late station quality.',source:'Not enough repeated weakness data yet.'};
-   }
-   const oneThing=report.oneThing?.title?report.oneThing:fallbackOneThing;
-   const actions=[
-    {label:'Next station',title:oneThing.title,detail:oneThing.body},
-    weakest?{label:'Next 3 stations',title:`Make ${weakest.name.toLowerCase()} visible`,detail:weakest.note||`This averaged ${weakest.avg}/10. Force one sentence that clearly shows this skill.`}:null,
-    stamina.tone==='risk'?{label:'Next full mock',title:'Protect late-station quality',detail:'In the final typed stations, use the same opening structure as early stations: direct answer, humane concern, concrete action.'}:null,
-    weakestCat?{label:'Category focus',title:`Repeat ${weakestCat.category} stations`,detail:`This averaged ${weakestCat.avg}/10 across ${weakestCat.count} scored station${weakestCat.count===1?'':'s'}.`}:null
-   ].filter(Boolean).slice(0,4);
-   const readiness=[
-    {label:'Overall score signal',status:scoreTone(overall),detail:Number.isFinite(overall)?`${overall}/10 across ${scores.length}/${rows.length} reviewed stations.`:'Awaiting enough scored stations for an overall signal.'},
-    {label:'Repeated weakness',status:weakest&&weakest.avg<6.5?'work':'ready',detail:weakest?`${weakest.name} is currently the lowest repeated criterion (${weakest.avg}/10).`:'No repeated criterion weakness detected yet.'},
-    {label:'Fatigue / stamina',status:stamina.tone==='risk'?'work':stamina.tone==='strong'?'ready':'watch',detail:stamina.body},
-    {label:'Action clarity',status:oneThing?.title?'ready':'watch',detail:oneThing?.title||'No single priority could be isolated yet.'}
-   ];
-   return {overall,criteria,categories,stamina,patterns,interpretation:{...interpretation,band,text},oneThing,actions,readiness};
-  }
-  function renderCriterionHeatmap(items){
-   if(!items.length)return`<div class="k2mr-card"><div class="k2mr-card-title">Criterion heatmap</div><div class="k2mr-ready-detail" style="margin-top:10px;">No criterion-level data was returned for this mock yet.</div></div>`;
-   return`<div class="k2mr-card"><div class="k2mr-card-head"><div class="k2mr-card-title">Criterion heatmap</div><div class="k2mr-card-meta">Lowest first</div></div>${items.slice(0,7).map(item=>`<div class="k2mr-crit-row"><div class="k2mr-crit-head"><div class="k2mr-crit-label">${esc(item.name)} <span class="k2mr-crit-n">${item.count}x</span></div><div class="k2mr-crit-score" style="color:${scoreColor(item.avg)};">${scoreText(item.avg)}</div></div><div class="k2mr-crit-track"><div class="k2mr-crit-fill" style="width:${clampPct(item.avg)}%;background:${scoreColor(item.avg)};"></div></div></div>`).join('')}</div>`;
-  }
-  function renderStaminaCard(stamina){
-   const bars=(stamina.points||[]).map(p=>`<div class="k2mr-sparkline-bar ${scoreBarClass(p.score)}" title="${esc(p.label)} ${esc(scoreText(p.score))}" style="height:${clampPct(p.score)}%;"></div>`).join('');
-   const labels=(stamina.points||[]).map(p=>`<span>${esc(p.label)}</span>`).join('');
-   return`<div class="k2mr-card k2mr-stamina-card"><div class="k2mr-card-head"><div class="k2mr-card-title">Fatigue and stamina</div><div class="k2mr-card-meta">Early vs late quality</div></div><div class="k2mr-stamina-label ${stamina.tone==='strong'?'strong':stamina.tone==='risk'?'risk':'steady'}">${esc(stamina.label)}</div><div class="k2mr-stamina-body">${esc(stamina.body)}</div><div class="k2mr-sparkline"><div class="k2mr-sparkline-title">Station score trend</div><div class="k2mr-sparkline-bars">${bars||'<div class="k2mr-ready-detail">No scored trend yet.</div>'}</div>${labels?`<div class="k2mr-sparkline-labels">${labels}</div>`:''}</div><div class="k2mr-stamina-split"><div class="k2mr-stamina-cell"><div class="k2mr-stamina-cell-lbl">Typed early</div><div class="k2mr-stamina-cell-val">${scoreText(stamina.typedEarly)}</div></div><div class="k2mr-stamina-cell"><div class="k2mr-stamina-cell-lbl">Typed late</div><div class="k2mr-stamina-cell-val">${scoreText(stamina.typedLate)}</div></div></div></div>`;
-  }
-  function renderPatterns(patterns){
-   return`<div class="k2mr-card"><div class="k2mr-card-head"><div class="k2mr-card-title">Repeated weaknesses</div><div class="k2mr-card-meta">Detected across stations</div></div>${patterns.length?patterns.map(p=>`<div class="k2mr-pattern"><div class="k2mr-pattern-label">${esc(p.label)}</div><div class="k2mr-pattern-action">${esc(p.action)}</div><div class="k2mr-pattern-where">${esc((p.stations||[]).join(', ')||'Repeated pattern')}</div></div>`).join(''):'<div class="k2mr-ready-detail">No repeated weakness was detected from the available station feedback. Use the heatmap and category chart instead.</div>'}</div>`;
-  }
-  function renderCategories(items){
-   return`<div class="k2mr-card"><div class="k2mr-card-head"><div class="k2mr-card-title">Category weaknesses</div><div class="k2mr-card-meta">Lowest first</div></div>${items.length?items.map(item=>`<div class="k2mr-cat-row"><div><div class="k2mr-cat-name">${esc(item.category)}</div><div class="k2mr-cat-stations">${esc(item.stations.join(', '))}</div><div class="k2mr-crit-track" style="margin-top:8px;"><div class="k2mr-crit-fill" style="width:${clampPct(item.avg)}%;background:${scoreColor(item.avg)};"></div></div></div><div class="k2mr-cat-score" style="color:${scoreColor(item.avg)};">${scoreText(item.avg)}</div></div>`).join(''):'<div class="k2mr-ready-detail">No category chart is available yet.</div>'}</div>`;
-  }
+  function fbTile(cls,label,body){if(!body)return'';return`<div class="k2mr-fb-tile ${cls}"><div class="k2mr-fb-lbl">${label}</div><div class="k2mr-fb-body">${esc(body)}</div></div>`;}
   document.addEventListener('DOMContentLoaded',()=>{Key2MDAuth.init({tool:'casper',apiBase:API_BASE,onAuthChange:user=>{if(user)loadReport();else showLogin();}});});
   function showLogin(){content.innerHTML=`<h2 style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:#fff;margin-bottom:8px;">Log in to view this report</h2><p style="color:rgba(255,255,255,0.6);margin-bottom:20px;">Your mock report is private to your account.</p><button class="k2mr-btn k2mr-btn-primary" style="font-family:inherit;" onclick="Key2MDAuth.showAuthModal('login')">Log in</button>`;}
   async function loadReport(){const id=paramsId(),token=localStorage.getItem(TOKEN_KEY);if(!id){content.innerHTML='<h2 style="font-family:\'DM Serif Display\',serif;font-size:1.4rem;color:#fff;">Missing report ID</h2><p style="color:rgba(255,255,255,0.6);margin-top:8px;">Open this page from your history.</p>';return;}try{const res=await fetch(`${API_BASE}/api/casper-mock/attempt/${encodeURIComponent(id)}`,{headers:{Authorization:`Bearer ${token}`}});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||data.error||'Could not load report.');attempt=data.attempt;renderReport();}catch(err){content.innerHTML=`<h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:#fff;">Could not open report</h2><p style="color:rgba(255,255,255,0.6);margin:10px 0 20px;">${esc(err.message||'Try again later.')}</p><a class="k2mr-btn k2mr-btn-primary" href="history.html" style="font-family:inherit;text-decoration:none;">Back to history</a>`;}}
@@ -184,14 +58,15 @@
    const rows=attempt.rows||[],report=attempt.report||{};
    const videoRows=rows.filter(r=>r.type==='video'),typedRows=rows.filter(r=>r.type!=='video');
    const reviewedCount=rows.map(numScore).filter(Number.isFinite).length;
-   const derived=derivedReport(rows,report);
-   const overallScore=Number.isFinite(derived.overall)?derived.overall:avgScore(rows);
-   const interp=derived.interpretation||{};
+   const overallScore=avgScore(rows);
+   const interp=report.interpretation||{};
    const bandClass=interp.tone==='strong'?'strong':interp.tone==='risk'?'risk':interp.tone==='caution'?'caution':'steady';
-   const reportTitle=Number.isFinite(derived.overall)?`${scoreText(derived.overall)} full-mock signal`:interp.band||'Your mock report';
-   const reportText=reviewedCount<rows.length?`${reviewedCount}/${rows.length} stations have scored feedback. The pattern analysis below uses every station that finished processing.`:(interp.text||'This report turns station feedback into a pattern map: repeated weaknesses, stamina, category risk, and your next practice block.');
+   const reportTitle=reviewedCount<rows.length?`Reviewed stations: ${overallScore}/10`:interp.band||'Your mock report';
+   const reportText=reviewedCount<rows.length?`${reviewedCount}/${rows.length} stations currently have AI feedback.`:interp.text||'Review your score pattern, station feedback, recordings, and transcripts.';
    const manual=String(attempt.manual_review_notes||'').trim();
-   const accessTiming=attemptAccessTiming();
+   const oneThing=report.oneThing||{};
+   const actions=Array.isArray(report.actionPlan)&&report.actionPlan.length?report.actionPlan:[{label:'Next practice move',title:'Repeat the weakest station type under timing',detail:'Use the station breakdown below to choose what to practise next.'}];
+   const readiness=Array.isArray(report.readiness)&&report.readiness.length?report.readiness:[{label:'Overall repeatability',status:'watch',detail:'Open the station detail below and check whether the same weakness repeats.'}];
    content.removeAttribute('style');
    content.innerHTML=`
     <section class="k2mr-hero">
@@ -211,35 +86,20 @@
       <div class="k2mr-stat"><div class="k2mr-stat-num">${rows.length}</div><div class="k2mr-stat-lbl">Stations</div></div>
       <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(String(avgScore(videoRows)))}</div><div class="k2mr-stat-lbl">Video avg</div></div>
       <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(String(avgScore(typedRows)))}</div><div class="k2mr-stat-lbl">Typed avg</div></div>
-      <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(scoreText(derived.stamina.typedLate))}</div><div class="k2mr-stat-lbl">Late typed</div></div>
-      <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(accessTiming.label)}</div><div class="k2mr-stat-lbl">${esc(fmtDur(accessTiming.seconds))} typed time</div></div>
-      <div class="k2mr-stat"><div class="k2mr-stat-num">${reviewedCount}/${rows.length}</div><div class="k2mr-stat-lbl">AI analysed</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(attempt.tier||'mock')}</div><div class="k2mr-stat-lbl">Tier</div></div>
+      <div class="k2mr-stat"><div class="k2mr-stat-num">${esc(fmtDate(attempt.completed_at)||'–')}</div><div class="k2mr-stat-lbl">Completed</div></div>
      </div>
-     <div class="k2mr-hero-foot"><strong>Guide only:</strong> 6.5+ is likely a Q4-style signal if repeatable; 5.5-6.5 is probably Q3. Scores run cooler than free tools.</div>
+     <div class="k2mr-hero-foot"><strong>Guide only:</strong> 6.5+ is likely a Q4-style signal if repeatable; 5.5–6.5 is probably Q3. Scores run cooler than free tools.</div>
     </section>
-    ${derived.oneThing.title?`<section class="k2mr-onething"><div class="k2mr-kicker">The one thing to fix</div><h2>${esc(derived.oneThing.title)}</h2><p>${esc(derived.oneThing.body||'')}</p>${derived.oneThing.source?`<div class="k2mr-onething-why"><strong>WHY THIS ONE:</strong> ${esc(derived.oneThing.source)}</div>`:''}</section>`:''}
+    ${oneThing.title?`<section class="k2mr-onething"><div class="k2mr-kicker">The one thing to fix</div><h2>${esc(oneThing.title)}</h2><p>${esc(oneThing.body||'')}</p>${oneThing.source?`<div class="k2mr-onething-why"><strong>WHY THIS ONE:</strong> ${esc(oneThing.source)}</div>`:''}</section>`:''}
     ${manual?`<div class="k2mr-actionbar" style="background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(34,197,94,0.02));border-color:rgba(34,197,94,0.25);"><div class="k2mr-actionbar-text"><strong style="color:var(--green);">Dan's manual review result.</strong> ${esc(manual)}</div></div>`:''}
-    <section class="k2mr-section k2mr-priority-section">
-     <div class="k2mr-section-head"><div class="k2mr-kicker">Full mock signal</div><h3>The pattern map <em>from this sitting</em>.</h3></div>
-     <div class="k2mr-grid2">
-      ${renderStaminaCard(derived.stamina)}
-      ${renderCriterionHeatmap(derived.criteria)}
-     </div>
-    </section>
-    <section class="k2mr-section">
-     <div class="k2mr-section-head"><div class="k2mr-kicker">Cross-station patterns</div><h3>What repeated across <em>multiple stations</em>.</h3></div>
-     <div class="k2mr-grid2">
-      ${renderPatterns(derived.patterns)}
-      ${renderCategories(derived.categories)}
-     </div>
-    </section>
     <section class="k2mr-section">
      <div class="k2mr-section-head"><div class="k2mr-kicker">Readiness dashboard</div><h3>Where you stand <em>right now</em>.</h3></div>
-     <div class="k2mr-card"><div class="k2mr-readiness">${derived.readiness.map(item=>`<div class="k2mr-ready-item"><div class="k2mr-ready-head"><div class="k2mr-ready-label">${esc(item.label||'Readiness')}</div><div class="k2mr-status ${statusClass(item.status)}">${statusLabel(item.status)}</div></div><div class="k2mr-ready-detail">${esc(item.detail||'')}</div></div>`).join('')}</div></div>
+     <div class="k2mr-card"><div class="k2mr-readiness">${readiness.map(item=>`<div class="k2mr-ready-item"><div class="k2mr-ready-head"><div class="k2mr-ready-label">${esc(item.label||'Readiness')}</div><div class="k2mr-status ${statusClass(item.status)}">${statusLabel(item.status)}</div></div><div class="k2mr-ready-detail">${esc(item.detail||'')}</div></div>`).join('')}</div></div>
     </section>
     <section class="k2mr-section">
      <div class="k2mr-section-head"><div class="k2mr-kicker">Next practice block</div><h3>What to do <em>this week</em>.</h3></div>
-     <div class="k2mr-card"><div class="k2mr-actionplan">${derived.actions.map((a,i)=>`<div class="k2mr-action"><div class="k2mr-action-num">${i+1}</div><div><div class="k2mr-action-kicker">${esc(a.label||'')}</div><div class="k2mr-action-title">${esc(a.title||'')}</div><div class="k2mr-action-detail">${esc(a.detail||'')}</div></div></div>`).join('')}</div></div>
+     <div class="k2mr-card"><div class="k2mr-actionplan">${actions.map((a,i)=>`<div class="k2mr-action"><div class="k2mr-action-num">${i+1}</div><div><div class="k2mr-action-kicker">${esc(a.label||'')}</div><div class="k2mr-action-title">${esc(a.title||'')}</div><div class="k2mr-action-detail">${esc(a.detail||'')}</div></div></div>`).join('')}</div></div>
     </section>
     <div class="k2mr-notice" style="margin-bottom:22px;">Video recordings expire 30 days after the mock. Transcripts and feedback remain available.</div>
     ${rows.map(stationHTML).join('')}
@@ -248,7 +108,7 @@
   function stationHTML(row,index){
    const isVideo=row.type==='video',title=`${isVideo?'Video':'Typed'} ${row.localIndex||index+1}`;
    const fb=getFb(row),n=numScore(row),col=scoreColor(n);
-   return`<section class="k2mr-explorer" style="margin-bottom:14px;"><div class="k2mr-explorer-head"><div class="k2mr-explorer-title-block"><div class="k2mr-kicker">${esc(title)}</div><h3 style="font-size:1.1rem;margin-top:4px;">${esc(row.station?.category||'CASPer')}</h3><p style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.04em;">${esc(row.tier||(isVideo?attempt.tier:'typed'))}</p></div><div style="text-align:right;flex-shrink:0;"><div style="font-family:'DM Serif Display',serif;font-size:2.2rem;line-height:1;color:${col};">${esc(rowScore(row))}</div></div></div><div class="k2mr-explorer-body"><div class="k2mr-station-grid"><div class="k2mr-station-left">${isVideo?videoHTML(row,index):`<div class="k2mr-answer-card"><div class="k2mr-card-title" style="margin-bottom:8px;">Your typed answer</div><div style="font-family:var(--mono);font-size:0.68rem;color:rgba(255,255,255,0.45);letter-spacing:0.04em;margin-bottom:8px;">${esc(rowAccessTiming(row).label)} &middot; ${esc(fmtDur(rowAccessTiming(row).seconds))} writing time</div><div class="k2mr-answer-text">${esc(row.answer||'No typed response captured.')}</div></div>`}</div><div class="k2mr-station-right"><div class="k2mr-scenario-card"><div class="k2mr-card-title">Scenario</div><div class="k2mr-scenario-text">${esc(row.station?.scenario||'')}</div>${promptsBlock(row)}</div><div class="k2mr-fbsummary" style="margin-top:0;">${fbTile('strength','Strength',fb.strength)}${fbTile('improve','Biggest improvement',fb.improve)}${fbTile('empathy','Empathy layer to add',fb.empathy)}${fb.missed&&fb.missed!=='None'?fbTile('missed','Missed point',fb.missed):''}${fb.excellent?fbTile('excellent','An excellent response would add',fb.excellent):''}</div>${criteriaHTML(row)}</div></div></div></section>`;
+   return`<section class="k2mr-explorer" style="margin-bottom:14px;"><div class="k2mr-explorer-head"><div class="k2mr-explorer-title-block"><div class="k2mr-kicker">${esc(title)}</div><h3 style="font-size:1.1rem;margin-top:4px;">${esc(row.station?.category||'CASPer')}</h3><p style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.04em;">${esc(row.tier||(isVideo?attempt.tier:'typed'))}</p></div><div style="text-align:right;flex-shrink:0;"><div style="font-family:'DM Serif Display',serif;font-size:2.2rem;line-height:1;color:${col};">${esc(rowScore(row))}</div></div></div><div class="k2mr-explorer-body"><div class="k2mr-station-grid"><div class="k2mr-station-left">${isVideo?videoHTML(row,index):`<div class="k2mr-answer-card"><div class="k2mr-card-title" style="margin-bottom:8px;">Your typed answer</div><div class="k2mr-answer-text">${esc(row.answer||'No typed response captured.')}</div></div>`}</div><div class="k2mr-station-right"><div class="k2mr-scenario-card"><div class="k2mr-card-title">Scenario</div><div class="k2mr-scenario-text">${esc(row.station?.scenario||'')}</div>${promptsBlock(row)}</div><div class="k2mr-fbsummary" style="margin-top:0;">${fbTile('strength','&#10003; Strength',fb.strength)}${fbTile('improve','&rarr; Biggest improvement',fb.improve)}${fbTile('empathy','&#9825; Empathy layer to add',fb.empathy)}${fb.missed&&fb.missed!=='None'?fbTile('missed','&#8859; Missed point',fb.missed):''}${fb.excellent?fbTile('excellent','&#9733; An excellent response would add',fb.excellent):''}</div>${criteriaHTML(row)}</div></div></div></section>`;
   }
   function promptsBlock(row){const ps=[row.station?.prompt1,row.station?.prompt2].filter(Boolean);if(!ps.length)return'';return`<div class="k2mr-prompts" style="margin-top:14px;">${ps.map((p,i)=>`<div class="k2mr-prompt"><div class="k2mr-prompt-num">Prompt ${i+1}</div><div class="k2mr-prompt-text">${esc(p)}</div></div>`).join('')}</div>`;}
   function videoHTML(row,index){const id=`rv-${(attempt.id||'x').replace(/[^a-zA-Z0-9_-]/g,'')}-${index}`;const canLoad=row.recording_key&&!attempt.expired;const segs=Array.isArray(row.transcript_segments)?row.transcript_segments:[];const issue=row.processing_error?`<div class="k2mr-notice" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.25);margin-top:10px;font-size:0.76rem;"><strong style="color:var(--red);">Issue:</strong> ${esc(row.processing_error)}</div>`:'';return`<div style="background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;"><video id="${attr(id)}" controls playsinline preload="metadata" data-attempt-id="${attr(attempt.id)}" data-recording-key="${attr(row.recording_key||'')}" style="width:100%;aspect-ratio:16/9;background:#000;display:none;"></video>${canLoad?`<button type="button" onclick="loadRec(event,'${attr(id)}')" style="width:100%;min-height:180px;border:0;background:linear-gradient(135deg,#0a1628,#0d2a52);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:inherit;cursor:pointer;padding:24px;"><strong style="font-family:'DM Serif Display',serif;font-size:1.2rem;">Load recording</strong><span style="font-family:var(--mono);font-size:0.72rem;color:rgba(255,255,255,0.6);letter-spacing:0.04em;">Authenticated playback &middot; Expires ${esc(fmtDate(attempt.expires_at))}</span></button>`:`<div style="width:100%;min-height:160px;background:linear-gradient(135deg,#0a1628,#0d2a52);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;text-align:center;"><strong style="font-family:'DM Serif Display',serif;font-size:1.1rem;">${attempt.expired?'Recording expired':'No recording saved'}</strong><span style="font-family:var(--mono);font-size:0.72rem;color:rgba(255,255,255,0.55);">${attempt.expired?'The 30-day playback window has passed.':'Transcript and feedback are still shown below.'}</span></div>`}</div>${canLoad?`<div style="margin-top:10px;"><button type="button" onclick="dlRec(event,'${attr(id)}')" class="k2mr-btn k2mr-btn-ghost" style="font-family:var(--mono);font-size:0.72rem;padding:8px 14px;width:auto;">Download recording</button></div>`:''}${row.duration_sec?`<div style="font-family:var(--mono);font-size:0.68rem;color:rgba(255,255,255,0.4);margin-top:7px;letter-spacing:0.04em;">Duration ${esc(fmtDur(row.duration_sec))}</div>`:''}${issue}${segs.length?`<div class="k2mr-card" style="margin-top:12px;padding:14px 16px;"><div class="k2mr-card-title" style="margin-bottom:8px;">Synced transcript</div><div data-sync-for="${attr(id)}" style="max-height:260px;overflow:auto;display:grid;gap:3px;">${segs.map(seg=>`<button type="button" data-start="${attr(seg.start||0)}" data-end="${attr(seg.end||seg.start||0)}" onclick="jumpTr('${attr(id)}',${Number(seg.start||0)})" style="width:100%;text-align:left;border:0;background:transparent;border-radius:7px;padding:7px 9px;font-family:inherit;font-size:0.78rem;line-height:1.55;color:rgba(255,255,255,0.7);cursor:pointer;">${esc(seg.text||'')}</button>`).join('')}</div></div>`:(row.transcript?`<div class="k2mr-card" style="margin-top:12px;padding:14px 16px;"><div class="k2mr-card-title" style="margin-bottom:7px;">Transcript used for marking</div><div style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.7;max-height:230px;overflow:auto;">${esc(row.transcript)}</div></div>`:'')}`;

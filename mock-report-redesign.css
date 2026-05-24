@@ -3,7 +3,8 @@
    These vars exist on :root so the same CSS works inside practice.html
    (light parent) and as a standalone dark page (mock-report.html).
    ─────────────────────────────────────────────────────────────────────── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* box-sizing reset intentionally removed — practice.css handles this globally */
+/* body/a rules below are ONLY for mock-report.html standalone page */
 :root{
  --navy:#0a1628;--navy2:#0d1f3c;--navy3:#112347;
  --teal:#0ea5e9;--teal2:#38bdf8;--teal3:#0284c7;
@@ -20,8 +21,13 @@
  --mono:'JetBrains Mono',ui-monospace,monospace;
 }
 
-body{font-family:var(--body);background:var(--navy);color:#fff;line-height:1.65;-webkit-font-smoothing:antialiased;min-height:100vh}
-a{color:inherit;text-decoration:none}
+/* These body/a rules apply ONLY when mock-report-redesign.css is loaded
+   as the primary stylesheet (i.e. mock-report.html standalone).
+   When injected into practice.html they must NOT fire — so we scope them
+   to .k2-mock-report which is the actual container used on practice.html.
+   On mock-report.html the <body> itself carries .k2-mock-report class. */
+.k2-mock-report{font-family:var(--body);-webkit-font-smoothing:antialiased}
+.k2-mock-report a{color:inherit;text-decoration:none}
 
 /* ─────────────────────────────────────────────────────────────────────────
    .k2-mock-report — the shell. Everything below scopes under this so it
@@ -129,8 +135,6 @@ a{color:inherit;text-decoration:none}
 .k2mr-section-head{margin-bottom:14px}
 .k2mr-section-head h3{font-family:var(--serif);font-size:1.5rem;color:#fff;line-height:1.2;margin-top:4px;letter-spacing:-0.2px}
 .k2mr-section-head h3 em{font-style:italic;color:var(--teal2)}
-.k2mr-priority-section .k2mr-grid2{grid-template-columns:minmax(0,1.25fr) minmax(280px,0.75fr)}
-.k2mr-priority-section .k2mr-stamina-card{border-color:rgba(251,191,36,0.28);background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(255,255,255,0.035))}
 
 /* ── CARD ───────────────────────────────────────────────────────────────── */
 .k2mr-card{
@@ -197,7 +201,7 @@ a{color:inherit;text-decoration:none}
 .k2mr-stamina-body{font-size:0.85rem;color:rgba(255,255,255,0.68);line-height:1.65;margin-bottom:14px}
 .k2mr-sparkline{background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;margin-bottom:12px}
 .k2mr-sparkline-title{font-family:var(--mono);font-size:0.62rem;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px}
-.k2mr-sparkline-bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(14px,1fr));gap:3px;align-items:end;height:70px;margin-bottom:6px}
+.k2mr-sparkline-bars{display:grid;grid-template-columns:repeat(11,1fr);gap:3px;align-items:end;height:60px;margin-bottom:6px}
 .k2mr-sparkline-bar{border-radius:3px 3px 0 0;background:var(--teal);transition:height 0.5s}
 .k2mr-sparkline-bar.green{background:linear-gradient(180deg,var(--green),var(--green2))}
 .k2mr-sparkline-bar.teal{background:linear-gradient(180deg,var(--teal2),var(--teal))}
@@ -277,14 +281,7 @@ a{color:inherit;text-decoration:none}
 .k2mr-fb-tile.empathy{border-left-color:var(--teal2)}
 .k2mr-fb-tile.missed{border-left-color:var(--purple)}
 .k2mr-fb-tile.excellent{border-left-color:var(--gold3)}
-.k2mr-fb-lbl{font-family:var(--mono);font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:6px}
-.k2mr-fb-icon{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 14px;font-size:0;line-height:1}
-.k2mr-fb-icon::before{font-size:0.78rem;line-height:1;transform:translateY(-0.5px)}
-.k2mr-fb-tile.strength .k2mr-fb-icon::before{content:'\2713'}
-.k2mr-fb-tile.improve .k2mr-fb-icon::before{content:'\2192'}
-.k2mr-fb-tile.empathy .k2mr-fb-icon::before{content:'\2665'}
-.k2mr-fb-tile.missed .k2mr-fb-icon::before{content:'\2299'}
-.k2mr-fb-tile.excellent .k2mr-fb-icon::before{content:'\2605'}
+.k2mr-fb-lbl{font-family:var(--mono);font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px}
 .k2mr-fb-tile.strength .k2mr-fb-lbl{color:var(--green)}
 .k2mr-fb-tile.improve .k2mr-fb-lbl{color:var(--gold3)}
 .k2mr-fb-tile.empathy .k2mr-fb-lbl{color:var(--teal2)}
@@ -342,7 +339,6 @@ a{color:inherit;text-decoration:none}
  .k2mr-stats{margin:20px -22px 0;grid-template-columns:1fr 1fr}
  .k2mr-hero-foot{margin:20px -22px 0;padding:14px 22px}
  .k2mr-station-grid{grid-template-columns:1fr}
- .k2mr-priority-section .k2mr-grid2{grid-template-columns:1fr}
  .k2mr-explorer-head{flex-direction:column}
  .k2mr-tabs{justify-content:flex-start;max-width:100%}
  .k2mr-onething{padding:22px 22px 22px 26px}
