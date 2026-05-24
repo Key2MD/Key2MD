@@ -328,6 +328,16 @@
 .pro-active-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
 .btn-manage-sm{padding:6px 14px;border-radius:50px;border:1px solid rgba(14,165,233,0.32);background:rgba(14,165,233,0.1);color:#7dd3fc;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;}
 .btn-manage-sm:hover{background:rgba(14,165,233,0.18);}
+/* MMI active state banner — mirrors CASPer pro-active-wrap in purple */
+.mmi-active-wrap{background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.35);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.mmi-active-wrap.cancelling{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.28);}
+.mmi-active-label{font-size:0.85rem;font-weight:700;color:#c4b5fd;display:flex;align-items:center;gap:8px;}
+.mmi-active-wrap.cancelling .mmi-active-label{color:#fbbf24;}
+.mmi-active-dot{width:7px;height:7px;border-radius:50%;background:#8b5cf6;display:inline-block;}
+.mmi-active-wrap.cancelling .mmi-active-dot{background:#f59e0b;}
+.mmi-active-sub{font-size:0.73rem;color:rgba(255,255,255,0.5);margin-top:2px;}
+.btn-mmi-manage-sm{padding:6px 14px;border-radius:50px;border:1px solid rgba(139,92,246,0.35);background:rgba(139,92,246,0.1);color:#c4b5fd;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;}
+.btn-mmi-manage-sm:hover{background:rgba(139,92,246,0.2);}
  .btn-pro{width:100%;padding:15px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--teal),var(--teal3));color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.25s;box-shadow:0 4px 20px rgba(14,165,233,0.28);}
  .btn-pro:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(14,165,233,0.42);}
  .btn-pro:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
@@ -834,6 +844,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="pro-eyebrow" style="color:#a78bfa;"> MMI AI Feedback</div>
  <h2 style="color:#fff;">Speak. Get marked.<br>Improve fast.</h2>
  <p style="color:rgba(255,255,255,0.72);">Record your MMI response, and get detailed feedback across 5 criteria - Empathy, Communication, Reasoning, Reflection, and Real-world Awareness - using the same examiner rubric Dan applies in live coaching.</p>
+ <div style="margin-bottom:20px;padding:14px 18px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:12px;">
+ <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Why credits, not free?</div>
+ <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.65;margin:0;">MMI feedback requires speech-to-text transcription plus spoken-response analysis, so it costs significantly more than a CASPer text review to run. The station bank is free to practise with; AI-marked MMI feedback uses credits or MMI Pro.</p>
+ </div>
  <div class="pro-feats">
  <div class="pro-feat">
  <div class="pro-feat-icon">R</div>
@@ -852,16 +866,23 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div><h4 style="color:#fff;">Specialist mode for advanced prep</h4><p style="color:rgba(255,255,255,0.6);">Toggle specialist training for a higher bar - appropriate for registrar-track or postgrad applicants.</p></div>
  </div>
  </div>
- <div style="margin-top:24px;padding:16px 20px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:12px;">
- <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Why credits, not free?</div>
- <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.65;margin:0;">MMI feedback requires speech-to-text transcription plus spoken-response analysis, so it costs significantly more than a CASPer text review to run. The station bank is free to practise with; AI-marked MMI feedback uses credits or MMI Pro.</p>
- </div>
  </div>
 
  <div class="fade-up delay-1">
  <div class="mmi-card">
  <div class="mmi-card-badge"> MMI Feedback</div>
 
+ <!-- MMI active subscription banner (shown when subscribed) -->
+ <div class="mmi-active-wrap" id="mmiActiveBanner" style="display:none;">
+ <div>
+ <div class="mmi-active-label"><span class="mmi-active-dot"></span><span id="mmiActiveLabelText">MMI Pro - Active</span></div>
+ <div class="mmi-active-sub" id="mmiActiveSub">You have unlimited MMI reviews.</div>
+ </div>
+ <div class="pro-active-actions">
+ <button class="btn-mmi-manage-sm" onclick="openBillingPortalFromPlans(this)">Billing</button>
+ <button class="btn-cancel-sm" id="mmiCancelBtn" onclick="handleCancelMMI()">Cancel</button>
+ </div>
+ </div>
 
  <div style="display:flex;gap:6px;margin-bottom:18px;background:rgba(0,0,0,0.25);border-radius:50px;padding:4px;">
  <button id="mmiTierTranscript" onclick="switchMMITier('transcript')" style="flex:1;padding:8px 10px;border-radius:46px;border:none;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;background:rgba(139,92,246,0.25);color:#c4b5fd;"> Transcript</button>
@@ -885,9 +906,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button id="mmiFreqWeekly" onclick="switchMMIFreq('weekly')" style="flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;text-align:center;background:rgba(139,92,246,0.2);color:#c4b5fd;">Weekly<br><strong id="mmiProPriceWeekly" style="font-size:1.1rem;color:#fff;">$80</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/wk</span></button>
  <button id="mmiFreqMonthly" onclick="switchMMIFreq('monthly')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;font-family:inherit;transition:all 0.2s;text-align:center;background:transparent;color:rgba(255,255,255,0.5);">Monthly<br><strong id="mmiProPriceMonthly" style="font-size:1.1rem;color:rgba(255,255,255,0.7);">$240</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/mo</span></button>
  </div>
- <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:16px;text-align:center;" id="mmiProNote">Cancel anytime | Auto-renews weekly</div>
+ <div style="font-size:0.78rem;color:rgba(255,255,255,0.58);margin-bottom:16px;text-align:center;" id="mmiProNote">Cancel anytime | Auto-renews weekly</div>
  <button class="btn-mmi-pro" id="mmiProBtn" onclick="handleMMIPro()">Start MMI Transcript Pro -></button>
  <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:16px;"> Secure checkout via Stripe | Cancel anytime</div>
+ <div id="mmiValueAnchor" style="margin-bottom:14px;padding:10px 14px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.18);border-radius:10px;font-size:0.78rem;color:rgba(255,255,255,0.62);line-height:1.6;"><strong style="color:#c4b5fd;">Value check:</strong> At <span id="mmiValuePerReview">$8/credit</span>, Pro pays for itself after <span id="mmiValueBreakeven">10 reviews/week</span>. Serious MMI prep means 10–15 practice stations weekly — that's <strong style="color:#fff;"><span id="mmiValueCostPer">~$8</span> per review on credits vs included with Pro</strong>.</div>
  <ul class="pro-list" id="mmiProFeatureList" style="color:rgba(255,255,255,0.7);">
  <li>Unlimited MMI Transcript reviews</li>
  <li>5-criterion feedback per prompt</li>
@@ -1175,12 +1197,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <tbody>
 <tr><td>CASPer AI reviews</td><td class="partial">1/day</td><td class="partial">Per credit</td><td class="plan-col check"><span class="plans-inline-check" aria-hidden="true"></span>Unlimited</td><td class="cross">-</td></tr>
 <tr><td>GAMSAT S2 AI reviews</td><td class="partial">1/week</td><td class="partial">Per credit</td><td class="plan-col check"><span class="plans-inline-check" aria-hidden="true"></span>Fair-use unlimited with S2 Pro</td><td class="cross">-</td></tr>
+<tr><td>MMI AI feedback</td><td class="partial">Station bank free</td><td class="partial">Per credit</td><td class="plan-col check"><span class="plans-inline-check" aria-hidden="true"></span>Unlimited with MMI Pro</td><td class="cross">-</td></tr>
 <tr><td>Q1-Q4 score</td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td><td class="plan-col check"><span class="plans-inline-check solo" aria-label="Included"></span></td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td></tr>
 <tr><td>Strengths &amp; improvements</td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td><td class="plan-col check"><span class="plans-inline-check solo" aria-label="Included"></span></td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td></tr>
 <tr><td>Empathy score</td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td><td class="plan-col check"><span class="plans-inline-check solo" aria-label="Included"></span></td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td></tr>
 <tr><td>Review history</td><td class="partial">Limited</td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td><td class="plan-col check"><span class="plans-inline-check" aria-hidden="true"></span>Full</td><td class="cross">-</td></tr>
 <tr><td>Written feedback by Dan</td><td class="cross">-</td><td class="cross">-</td><td class="plan-col cross">-</td><td class="check"><span class="plans-inline-check solo" aria-label="Included"></span></td></tr>
- <tr><td>Price</td><td class="check">Free</td><td class="partial">From $7</td><td class="plan-col" style="font-weight:800;color:var(--teal3);">$40/wk CASPer | $49/mo S2</td><td class="partial">$35-$50</td></tr>
+ <tr><td>Price</td><td class="check">Free</td><td class="partial">From $5</td><td class="plan-col" style="font-weight:800;color:var(--teal3);">$40/wk CASPer | $49/mo S2 | $80/wk MMI</td><td class="partial">$35-$50</td></tr>
  </tbody>
  </table>
 
@@ -1250,6 +1273,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are payments secure?</button><div class="faq-a"><div class="faq-a-inner">All payments are processed by Stripe - the same provider used by Shopify, Airbnb, and major Australian banks. Key2MD never sees or stores your card details. Receipts are sent automatically by Stripe.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is anything shipped? What about returns?</button><div class="faq-a"><div class="faq-a-inner">Nothing physical is shipped. Credits, Pro access, MMI feedback and mock exam access are digital products delivered through your Key2MD account after payment. Because access starts immediately, change-of-mind returns are not offered; if there is a duplicate payment or access fault, reply to Dan and it can be checked manually.</div></div></div>
  <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What if my Pro payment fails?</button><div class="faq-a"><div class="faq-a-inner">Stripe will retry automatically and the email from Key2MD includes a secure retry link where available. You can also log in here, open Account &amp; billing, and update your card before the retry. If payment still fails, your account reverts to the free tier.</div></div></div>
+ <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What's the difference between MMI Transcript and MMI Premium?</button><div class="faq-a"><div class="faq-a-inner">Transcript analyses what you said - it transcribes your spoken response and gives you full 5-criterion feedback (Empathy, Communication, Reasoning, Reflection, Real-world Awareness) plus Polished Auditor Trap detection. Premium adds a second layer on top of Transcript: it simultaneously analyses your voice pacing, filler word frequency, and presentation composure from the video. Premium is best for students who want to work on delivery as well as content; Transcript is best if you are focused on the substance of your answers first.</div></div></div>
+ <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I cancel MMI Pro?</button><div class="faq-a"><div class="faq-a-inner">Yes - log in and use the Account &amp; billing section at the top of this page. Your MMI Pro subscription will appear there with a Cancel renewal button. Cancelling stops the next charge; your access continues until the end of the current paid period, then reverts to the free station bank. You can also cancel from your Stripe billing portal.</div></div></div>
  </div>
  </div>
 </section>
@@ -1338,6 +1363,7 @@ document.addEventListener('DOMContentLoaded', () => {
  Key2MDAuth.init({ tool:'casper', apiBase:API_BASE, onAuthChange:updateUI });
  initFadeObserver();
  renderMMICreditPacks('transcript');
+ updateMMIValueAnchor();
 });
 
 function updateUI() {
@@ -1369,6 +1395,46 @@ function updateUI() {
  cancelBtn.disabled = false;
  }
  setProButtons('Start CASPer Pro ->', false, '1');
+ }
+
+ // MMI active banner — driven from billing summary once loaded
+ // Initial state from user object (mmi_pro field if present)
+ updateMMIActiveState(user);
+}
+
+function updateMMIActiveState(user) {
+ const mmiBanner = document.getElementById('mmiActiveBanner');
+ const mmiLabelText = document.getElementById('mmiActiveLabelText');
+ const mmiSubText = document.getElementById('mmiActiveSub');
+ const mmiCancelBtn = document.getElementById('mmiCancelBtn');
+ const mmiProBtn = document.getElementById('mmiProBtn');
+
+ // Detect MMI Pro from user object (field: mmi_pro, mmi_pro_tier, etc.)
+ // Also check plansBillingSummary subscriptions for robustness
+ const mmiSub = plansBillingSummary?.subscriptions?.find(s => s.product && s.product.startsWith('MMI'));
+ const isMmiPro = !!(user?.mmi_pro || mmiSub);
+ const mmiCancelling = mmiSub ? (mmiSub.status === 'cancelling' || mmiSub.cancel_requested) : false;
+ const mmiTierLabel = mmiSub?.tier ? ` (${mmiSub.tier})` : (user?.mmi_pro_tier ? ` (${user.mmi_pro_tier})` : '');
+ const mmiEndLabel = mmiSub?.period_end ? formatProPeriodEnd(mmiSub.period_end) : 'the end of the paid period';
+
+ if (!mmiBanner) return;
+
+ if (isMmiPro) {
+ mmiBanner.style.display = 'flex';
+ mmiBanner.classList.toggle('cancelling', mmiCancelling);
+ if (mmiLabelText) mmiLabelText.textContent = mmiCancelling ? `MMI Pro${mmiTierLabel} - cancellation scheduled` : `MMI Pro${mmiTierLabel} - Active`;
+ if (mmiSubText) mmiSubText.textContent = mmiCancelling
+ ? `Cancellation scheduled. Access ends ${mmiEndLabel}.`
+ : 'You have unlimited MMI reviews.';
+ if (mmiCancelBtn) {
+ mmiCancelBtn.textContent = mmiCancelling ? 'Cancellation scheduled' : 'Cancel';
+ mmiCancelBtn.disabled = mmiCancelling;
+ }
+ if (mmiProBtn) { mmiProBtn.disabled = true; mmiProBtn.style.opacity = '0.55'; mmiProBtn.textContent = mmiCancelling ? `Access ends ${mmiEndLabel}` : 'Active: MMI Pro'; }
+ } else {
+ mmiBanner.style.display = 'none';
+ if (mmiCancelBtn) { mmiCancelBtn.textContent = 'Cancel'; mmiCancelBtn.disabled = false; }
+ if (mmiProBtn) { mmiProBtn.disabled = false; mmiProBtn.style.opacity = '1'; }
  }
 }
 
@@ -1423,6 +1489,8 @@ async function refreshPlansBillingSummary(force = false) {
  if (!res.ok) throw new Error(data.message || data.error || 'Could not load billing.');
  plansBillingSummary = data;
  renderPlansBillingSubscriptions(data);
+ // Refresh MMI active state now that subscription data is available
+ updateMMIActiveState(Key2MDAuth.getUser() || {});
  return data;
  })
  .catch(() => {
@@ -1462,7 +1530,8 @@ function renderPlansBillingSubscriptions(data) {
  if (!cancelling && product === 'CASPer Pro') action = '<button class="danger" onclick="handleCancel()">Cancel renewal</button>';
  if (!cancelling && product === 'GAMSAT S2 Pro') action = "<button class=\"danger\" onclick=\"cancelProductRenewalFromPlans('gamsat_s2', this)\">Cancel renewal</button>";
  if (!cancelling && product === 'CASPer weekly class') action = "<button class=\"danger\" onclick=\"cancelProductRenewalFromPlans('casper_class', this)\">Cancel renewal</button>";
- if (product === 'MMI Pro') action = '<button onclick="openBillingPortalFromPlans(this)">Cancel/change in Stripe</button>';
+ if (!cancelling && (product === 'MMI Pro' || product.startsWith('MMI '))) action = "<button class=\"danger\" onclick=\"cancelProductRenewalFromPlans('mmi', this)\">Cancel renewal</button>";
+ if (cancelling && (product === 'MMI Pro' || product.startsWith('MMI '))) action = '<button disabled style="opacity:0.55;">Cancellation scheduled</button>';
  return `<div class="plans-subscription-row">
  <div><div class="plans-subscription-title">${escHtml(product)}${sub.tier ? ` - ${escHtml(sub.tier)}` : ''}</div><div class="plans-subscription-meta">${escHtml(meta)}</div>${badge}</div>
  <div class="plans-subscription-actions">${action}<a href="billing.html">Details</a></div>
@@ -1677,6 +1746,12 @@ function handleCancel() {
  modal.classList.add('open');
 }
 
+function handleCancelMMI() {
+ if (!window.confirm('Cancel MMI Pro renewal?\n\nYou will not be billed again. Your current paid access stays active until the end of the paid period, then your account returns to the free station bank.')) return;
+ const btn = document.getElementById('mmiCancelBtn');
+ cancelProductRenewalFromPlans('mmi', btn);
+}
+
 async function confirmCancel() {
  const btn = document.getElementById('cancelConfirmBtn');
  const al = document.getElementById('cancelAlert');
@@ -1705,6 +1780,7 @@ async function cancelProductRenewalFromPlans(kind, btn) {
  const config = {
  gamsat_s2: { label: 'GAMSAT S2 Pro', endpoint: '/api/gamsat-s2/cancel' },
  casper_class: { label: 'weekly CASPer class', endpoint: '/api/casper-class/cancel' },
+ mmi: { label: 'MMI Pro', endpoint: '/api/mmi/cancel' },
  }[kind];
  if (!config) return;
  if (!window.confirm(`Cancel ${config.label} renewal?\n\nYou will not be billed again. Current paid access stays active until the end of the paid period.`)) return;
@@ -1849,6 +1925,7 @@ function switchMMITier(tier) {
 
  const costNote = document.getElementById('mmiPremiumCostNote');
  if (costNote) costNote.style.display = tier === 'premium' ? 'block' : 'none';
+ updateMMIValueAnchor();
 }
 
 function renderMMICreditPacks(tier) {
@@ -1888,6 +1965,24 @@ function switchMMIFreq(freq) {
  wBtn.style.background = 'transparent'; wBtn.style.color = 'rgba(255,255,255,0.5)'; wBtn.style.border = '1px solid rgba(255,255,255,0.1)';
  note.textContent = 'Save ~25% vs weekly | Cancel anytime';
  }
+ updateMMIValueAnchor();
+}
+
+function updateMMIValueAnchor() {
+ const prices = MMI_PRO_PRICES[mmiTier];
+ const creditPack = MMI_PACKS[mmiTier]?.[0];
+ const creditPriceStr = creditPack?.price || '$5.00';
+ const creditPriceNum = parseFloat(creditPriceStr.replace('$','')) || 5;
+ const proPrice = mmiProFreq === 'weekly' ? prices.weekly : prices.monthly;
+ const proPriceNum = parseFloat(proPrice.replace('$','')) || 80;
+ const period = mmiProFreq === 'weekly' ? 'week' : 'month';
+ const breakeven = Math.ceil(proPriceNum / creditPriceNum);
+ const perReview = document.getElementById('mmiValuePerReview');
+ const breakevenEl = document.getElementById('mmiValueBreakeven');
+ const costPerEl = document.getElementById('mmiValueCostPer');
+ if (perReview) perReview.textContent = `${creditPriceStr}/credit`;
+ if (breakevenEl) breakevenEl.textContent = `${breakeven} reviews/${period}`;
+ if (costPerEl) costPerEl.textContent = `~${creditPriceStr}`;
 }
 
 function selectMMIPack(el, packId) {
