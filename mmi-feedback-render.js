@@ -23,6 +23,11 @@ const MMIFeedbackRender = (() => {
  real_world_awareness: 'Understanding hierarchy, safety, confidentiality, and practical constraints.',
  };
  let analyticsState = { mount: null, points: [], selectedKey: 'overall' };
+ const analyticsStates = new WeakMap();
+
+ function isActiveAnalyticsState(state) {
+ return !!(state?.mount && analyticsStates.get(state.mount) === state);
+ }
 
  function esc(str) {
  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -214,20 +219,21 @@ const MMIFeedbackRender = (() => {
  </div>`;
  }
 
- function renderAnalytics() {
- const mount = analyticsState.mount;
- const points = analyticsState.points || [];
+ function renderAnalytics(state = analyticsState) {
+ const mount = state.mount;
+ const points = state.points || [];
  if (!mount) return;
+ if (!isActiveAnalyticsState(state)) return;
  if (!points.length) {
  mount.innerHTML = '<div class="mmi-analytics-card"><div class="mmi-analytics-empty">Complete a few MMI reviews and this becomes your skill tracker.</div></div>';
  return;
  }
  const stats = skillStats(points);
  const weakest = stats.find(s => Number.isFinite(s.latest)) || stats[0];
- if (!analyticsState.selectedKey || (analyticsState.selectedKey !== 'overall' && !CRITERIA_KEYS.includes(analyticsState.selectedKey))) {
- analyticsState.selectedKey = weakest?.key || 'overall';
+ if (!state.selectedKey || (state.selectedKey !== 'overall' && !CRITERIA_KEYS.includes(state.selectedKey))) {
+ state.selectedKey = weakest?.key || 'overall';
  }
- const selectedKey = analyticsState.selectedKey;
+ const selectedKey = state.selectedKey;
  const selectedSeries = seriesFor(points, selectedKey);
  const selectedLatest = selectedSeries[selectedSeries.length - 1];
  const selectedDelta = trendDelta(selectedSeries);
@@ -281,9 +287,12 @@ const MMIFeedbackRender = (() => {
  </div>`;
 
  mount.querySelectorAll('[data-mmi-skill]').forEach(button => {
- button.addEventListener('click', () => {
- analyticsState.selectedKey = button.getAttribute('data-mmi-skill') || 'overall';
- renderAnalytics();
+ button.addEventListener('click', event => {
+ event.preventDefault();
+ event.stopPropagation();
+ state.selectedKey = button.getAttribute('data-mmi-skill') || 'overall';
+ analyticsState = state;
+ renderAnalytics(state);
  });
  });
  }
@@ -303,28 +312,31 @@ const MMIFeedbackRender = (() => {
  async function hydrateAnalytics(container, data, context) {
  const mount = container?.querySelector?.('#mmiAnalyticsMount');
  if (!mount) return;
- analyticsState.mount = mount;
- analyticsState.selectedKey = '';
+ const state = { mount, points: [], selectedKey: '' };
+ analyticsState = state;
+ analyticsStates.set(mount, state);
  mount.innerHTML = '<div class="mmi-analytics-card"><div class="mmi-analytics-loading">Loading your MMI trend history...</div></div>';
  const current = pointFromCurrent(data, context);
  const token = authToken();
  if (!token) {
- analyticsState.points = current ? [current] : [];
- renderAnalytics();
+ state.points = current ? [current] : [];
+ renderAnalytics(state);
  return;
  }
  try {
  const res = await fetch(`${apiBase()}/api/mmi/reviews?limit=50&source=mmi`, { headers: { Authorization: `Bearer ${token}` } });
  const payload = await res.json().catch(() => ({}));
  if (!res.ok) throw new Error(payload.message || payload.error || 'Could not load MMI history');
+ if (!isActiveAnalyticsState(state)) return;
  const map = new Map();
  (payload.reviews || []).map(pointFromReview).filter(Boolean).forEach(point => map.set(point.id || point.created_at, point));
  if (current) map.set(current.id || current.created_at, current);
- analyticsState.points = Array.from(map.values()).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
- renderAnalytics();
+ state.points = Array.from(map.values()).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+ renderAnalytics(state);
  } catch (err) {
- analyticsState.points = current ? [current] : [];
- renderAnalytics();
+ if (!isActiveAnalyticsState(state)) return;
+ state.points = current ? [current] : [];
+ renderAnalytics(state);
  const note = document.createElement('div');
  note.className = 'mmi-analytics-history-note';
  note.textContent = 'History could not load, so this is showing the latest station only.';
@@ -633,6 +645,6 @@ const MMIFeedbackRender = (() => {
  if (container) container.innerHTML = '';
  }
 
- return { render, renderLoading, renderError, clear, selectSkill: key => { analyticsState.selectedKey = key || 'overall'; renderAnalytics(); } };
+ return { render, renderLoading, renderError, clear, selectSkill: key => { analyticsState.selectedKey = key || 'overall'; renderAnalytics(analyticsState); } };
 
 })();
