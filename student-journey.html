@@ -221,6 +221,17 @@
   border-color: rgba(14,165,233,0.62);
   box-shadow: 0 12px 28px rgba(14,165,233,0.12);
  }
+ #mmiSkillMapCard .skill-filter.active {
+  background: #6d28d9;
+  border-color: #6d28d9;
+ }
+ #mmiSkillMapCard .skill-chip.active {
+  border-color: rgba(124,58,237,0.58);
+  box-shadow: 0 12px 28px rgba(124,58,237,0.12);
+ }
+ #mmiSkillMapCard .skill-score {
+  color: #7c3aed;
+ }
  .skill-chip-top,
  .skill-score-row,
  .skill-detail-head,
@@ -438,6 +449,22 @@
  <div class="skill-detail" id="skillDetail"></div>
  </div>
  </article>
+
+ <article class="journey-card" id="mmiSkillMapCard">
+ <div class="journey-kicker">MMI skill map</div>
+ <h2>Track your spoken interview rubric.</h2>
+ <p class="journey-muted" id="mmiSkillMapSummary">This reads your saved MMI AI feedback and maps the five MMI criteria: empathy, communication, reasoning, reflection, and real-world awareness.</p>
+ <div class="skill-toolbar" aria-label="MMI skill map sort options">
+ <button type="button" class="skill-filter active" data-mmi-skill-sort="priority" onclick="setMMISkillSort('priority')">Priority</button>
+ <button type="button" class="skill-filter" data-mmi-skill-sort="recent" onclick="setMMISkillSort('recent')">Recent score</button>
+ <button type="button" class="skill-filter" data-mmi-skill-sort="improving" onclick="setMMISkillSort('improving')">Improving</button>
+ <button type="button" class="skill-filter" data-mmi-skill-sort="volume" onclick="setMMISkillSort('volume')">Most practised</button>
+ </div>
+ <div class="skill-layout">
+ <div class="skill-grid" id="mmiSkillGrid"></div>
+ <div class="skill-detail" id="mmiSkillDetail"></div>
+ </div>
+ </article>
  </section>
 
  <aside class="journey-side">
@@ -473,6 +500,7 @@
  const HISTORY_KEY = 'k2md_station_history_v1';
  const COMPETENCY_PROGRESS_KEY = 'k2md_casper_competency_progress_v1';
  const SKILL_STATE = { sort: 'priority', selected: '' };
+ const MMI_SKILL_STATE = { sort: 'priority', selected: '', loading: false, loaded: false, reviews: [], error: '' };
  const CASPER_COMPETENCIES = [
   'Collaboration',
   'Communication',
@@ -484,6 +512,35 @@
   'Resilience',
   'Self-Awareness'
  ];
+ const MMI_SKILLS = [
+  { key: 'empathy', name: 'Empathy' },
+  { key: 'communication', name: 'Communication' },
+  { key: 'reasoning', name: 'Reasoning' },
+  { key: 'reflection', name: 'Reflection' },
+  { key: 'real_world_awareness', name: 'Real-world Awareness' }
+ ];
+ const MMI_SKILL_DRILLS = {
+  empathy: {
+   focus: 'Make the person and emotional stakes visible before you solve the case.',
+   drill: 'Do one spoken station and open by naming the affected person, what they may be feeling, and why that feeling matters.'
+  },
+  communication: {
+   focus: 'Sound clear, calm, and conversational under time pressure.',
+   drill: 'Record a one-minute answer where every major step starts with a direct phrase you could say to the interviewer.'
+  },
+  reasoning: {
+   focus: 'Weigh competing duties before landing on your action.',
+   drill: 'For the next station, explicitly compare two options, name the risk in each, then choose the safer next step.'
+  },
+  reflection: {
+   focus: 'Show what you learned and how it changes future behaviour.',
+   drill: 'Add one sentence near the end that names your limitation, what you would check, and how you would improve next time.'
+  },
+  real_world_awareness: {
+   focus: 'Bring in hierarchy, safety, confidentiality, policy, and practical constraints.',
+   drill: 'Before answering, list the real-world constraint in the scenario, then make sure your final plan works inside it.'
+  }
+ };
  const SKILL_DRILLS = {
   Collaboration: {
    focus: 'Make the shared goal explicit before you suggest action.',
@@ -611,6 +668,17 @@
   return Array.isArray(rows) ? rows : [];
  }
 
+ function parseJson(value, fallback) {
+  if (!value) return fallback;
+  if (typeof value === 'object') return value;
+  try {
+   const parsed = JSON.parse(value);
+   return parsed || fallback;
+  } catch (error) {
+   return fallback;
+  }
+ }
+
  function average(values) {
   const nums = values.map(Number).filter(function (value) { return Number.isFinite(value); });
   return nums.length ? nums.reduce(function (sum, value) { return sum + value; }, 0) / nums.length : null;
@@ -632,6 +700,14 @@
   return '#dc2626';
  }
 
+ function mmiScoreTone(score) {
+  if (!isFiniteScore(score)) return '#94a3b8';
+  if (score >= 4.2) return '#16a34a';
+  if (score >= 3.5) return '#7c3aed';
+  if (score >= 2.7) return '#d97706';
+  return '#dc2626';
+ }
+
  function trendLabel(delta) {
   if (!isFiniteScore(delta)) return 'No trend yet';
   if (delta >= 0.6) return '+' + delta.toFixed(1) + ' improving';
@@ -645,6 +721,14 @@
   if (score >= 7) return 'Likely Q4-style practice signal';
   if (score >= 6) return 'Developing toward Q4';
   return 'Needs targeted work';
+ }
+
+ function mmiRubricSignal(score) {
+  if (!isFiniteScore(score)) return 'Awaiting data';
+  if (score >= 4.5) return 'Excellent spoken MMI signal';
+  if (score >= 3.8) return 'Strong interview signal';
+  if (score >= 3.0) return 'Developing interview signal';
+  return 'Needs targeted spoken practice';
  }
 
  function buildSkillStats() {
@@ -788,10 +872,198 @@
   renderSkillMap();
  }
 
+ function buildMMISkillStats() {
+  const map = {};
+  MMI_SKILLS.forEach(function (skill) {
+   map[skill.key] = { key: skill.key, name: skill.name, points: [], categories: {}, latestImprove: '', latestEvidence: '' };
+  });
+  MMI_SKILL_STATE.reviews.forEach(function (review) {
+   const feedback = parseJson(review.ai_feedback_json || review.feedback, null);
+   const prompts = Array.isArray(feedback && feedback.per_prompt) ? feedback.per_prompt : [];
+   MMI_SKILLS.forEach(function (skill) {
+    const scores = [];
+    const comments = [];
+    prompts.forEach(function (prompt) {
+     const criterion = prompt && prompt.scores && prompt.scores[skill.key];
+     const score = Number(criterion && criterion.score);
+     if (Number.isFinite(score)) scores.push(score);
+     if (criterion && criterion.comment) comments.push(String(criterion.comment));
+    });
+    const score = average(scores);
+    if (!Number.isFinite(score)) return;
+    const point = {
+     score: score,
+     at: review.created_at || '',
+     category: review.station_category || 'MMI station',
+     tier: review.tier || 'transcript',
+     evidence: comments.find(Boolean) || '',
+     improve: feedback && feedback.overall && feedback.overall.biggest_improvement ? feedback.overall.biggest_improvement : ''
+    };
+    map[skill.key].points.push(point);
+    map[skill.key].categories[point.category] = (map[skill.key].categories[point.category] || 0) + 1;
+    if (point.improve) map[skill.key].latestImprove = point.improve;
+    if (point.evidence) map[skill.key].latestEvidence = point.evidence;
+   });
+  });
+  return Object.values(map).map(function (stat) {
+   stat.points.sort(function (a, b) { return new Date(a.at || 0) - new Date(b.at || 0); });
+   const scores = stat.points.map(function (point) { return point.score; });
+   const recentScores = scores.slice(-5);
+   const firstScores = scores.slice(0, Math.min(5, scores.length));
+   stat.count = scores.length;
+   stat.avg = average(scores);
+   stat.recent = average(recentScores);
+   stat.best = scores.length ? Math.max.apply(Math, scores) : null;
+   stat.delta = stat.count >= 2 ? (average(recentScores) - average(firstScores)) : null;
+   stat.priority = isFiniteScore(stat.recent) ? (5 - stat.recent) + Math.max(0, 4 - stat.count) * 0.12 : 99;
+   return stat;
+  });
+ }
+
+ function sortedMMISkillStats() {
+  const stats = buildMMISkillStats();
+  const sort = MMI_SKILL_STATE.sort;
+  return stats.sort(function (a, b) {
+   if (sort === 'recent') return (b.recent || -1) - (a.recent || -1);
+   if (sort === 'improving') return (b.delta || -99) - (a.delta || -99);
+   if (sort === 'volume') return b.count - a.count || (a.recent || 99) - (b.recent || 99);
+   return a.priority - b.priority || b.count - a.count;
+  });
+ }
+
+ function mmiSkillSparkHtml(points) {
+  const recent = (points || []).slice(-8);
+  if (!recent.length) {
+   return '<div class="skill-spark" aria-hidden="true"><span class="skill-bar" style="height:5px;background:#cbd5e1;"></span><span class="skill-bar" style="height:5px;background:#cbd5e1;"></span><span class="skill-bar" style="height:5px;background:#cbd5e1;"></span></div>';
+  }
+  return '<div class="skill-spark" aria-hidden="true">' + recent.map(function (point) {
+   const height = Math.max(8, Math.min(34, Number(point.score) * 6.8));
+   return '<span class="skill-bar" style="height:' + height.toFixed(0) + 'px;background:' + mmiScoreTone(point.score) + ';"></span>';
+  }).join('') + '</div>';
+ }
+
+ function renderMMISkillMap() {
+  const grid = document.getElementById('mmiSkillGrid');
+  const detail = document.getElementById('mmiSkillDetail');
+  const summary = document.getElementById('mmiSkillMapSummary');
+  if (!grid || !detail || !summary) return;
+  if (MMI_SKILL_STATE.loading) {
+   summary.textContent = 'Loading your saved MMI AI feedback from your account.';
+   grid.innerHTML = '<div class="journey-item"><strong>Loading MMI skill map</strong><span>Pulling your saved spoken MMI reviews now.</span></div>';
+   detail.innerHTML = '<h3>Checking your MMI history.</h3><p class="journey-muted">This will become a rubric map once your saved reviews load.</p>';
+   return;
+  }
+  if (MMI_SKILL_STATE.error) {
+   summary.textContent = 'Your MMI skill map could not load from your account just now.';
+   grid.innerHTML = '<div class="journey-item"><strong>Could not load MMI reviews</strong><span>' + escapeHtml(MMI_SKILL_STATE.error) + '</span></div>';
+   detail.innerHTML = '<h3>Try history or refresh.</h3><p class="journey-muted">Your saved MMI feedback is still available in review history if the API is reachable.</p><div class="journey-actions"><a class="journey-btn primary" href="history.html">Open history</a></div>';
+   return;
+  }
+  if (!MMI_SKILL_STATE.loaded) {
+   summary.textContent = 'Sign in to load your saved MMI AI feedback and build a spoken-interview skill map.';
+   grid.innerHTML = '<div class="journey-item"><strong>Sign in to see MMI skills</strong><span>MMI feedback is saved to your account, not just this browser.</span></div>';
+   detail.innerHTML = '<h3>Account required.</h3><p class="journey-muted">Once signed in, this map shows your five MMI criteria over time.</p><div class="journey-actions"><a class="journey-btn primary" href="practice.html?mode=mmi">Practise MMI</a></div>';
+   return;
+  }
+  const stats = sortedMMISkillStats();
+  const withData = stats.filter(function (stat) { return stat.count > 0; });
+  const strongest = withData.slice().sort(function (a, b) { return (b.recent || -1) - (a.recent || -1); })[0];
+  const priority = withData.slice().sort(function (a, b) { return a.priority - b.priority; })[0];
+  summary.textContent = withData.length
+   ? 'Tracked ' + withData.reduce(function (sum, stat) { return sum + stat.count; }, 0) + ' MMI rubric datapoints across ' + MMI_SKILL_STATE.reviews.length + ' saved review' + (MMI_SKILL_STATE.reviews.length === 1 ? '' : 's') + '. Priority focus: ' + priority.name + '. Strongest signal: ' + strongest.name + '.'
+   : 'Complete MMI AI feedback and your spoken-interview criteria will appear here automatically.';
+  if (!withData.length) {
+   grid.innerHTML = '<div class="journey-item"><strong>No MMI feedback yet</strong><span>Do a spoken MMI station and request AI feedback. Then this becomes your five-skill interview map.</span></div>';
+   detail.innerHTML = '<h3>Start with one spoken station.</h3><p class="journey-muted">After a few marked MMI answers, this will show which interview skills are actually holding you back.</p><div class="journey-actions"><a class="journey-btn primary" href="practice.html?mode=mmi">Start MMI practice</a></div>';
+   return;
+  }
+  if (!MMI_SKILL_STATE.selected || !stats.some(function (stat) { return stat.key === MMI_SKILL_STATE.selected; })) {
+   MMI_SKILL_STATE.selected = priority.key;
+  }
+  grid.innerHTML = stats.map(function (stat) {
+   const active = stat.key === MMI_SKILL_STATE.selected;
+   const recent = isFiniteScore(stat.recent) ? round1(stat.recent) + '/5' : '-';
+   return '<button type="button" class="skill-chip' + (active ? ' active' : '') + '" onclick="selectMMISkill(' + "'" + escapeJs(stat.key) + "'" + ')">' +
+    '<span class="skill-chip-top"><span class="skill-chip-name">' + escapeHtml(stat.name) + '</span><span class="skill-score" style="color:' + mmiScoreTone(stat.recent) + ';">' + recent + '</span></span>' +
+    mmiSkillSparkHtml(stat.points) +
+    '<span class="skill-score-row"><span class="skill-chip-meta">' + stat.count + ' mark' + (stat.count === 1 ? '' : 's') + '</span><span class="skill-chip-meta">' + escapeHtml(trendLabel(stat.delta)) + '</span></span>' +
+    '</button>';
+  }).join('');
+  renderMMISkillDetail(stats.find(function (stat) { return stat.key === MMI_SKILL_STATE.selected; }) || withData[0]);
+ }
+
+ function renderMMISkillDetail(stat) {
+  const detail = document.getElementById('mmiSkillDetail');
+  if (!detail || !stat) return;
+  const drill = MMI_SKILL_DRILLS[stat.key] || { focus: 'Make this skill visible in your spoken answer.', drill: 'Do one timed spoken station and name this criterion explicitly in your structure.' };
+  const recentAttempts = stat.points.slice(-3).reverse();
+  detail.innerHTML =
+   '<div class="skill-detail-head"><div><h3>' + escapeHtml(stat.name) + '</h3><div class="skill-detail-meta">' + escapeHtml(mmiRubricSignal(stat.recent)) + '</div></div><div class="skill-score" style="color:' + mmiScoreTone(stat.recent) + ';">' + (Number.isFinite(Number(stat.recent)) ? round1(stat.recent) + '/5' : '-') + '</div></div>' +
+   '<div class="skill-mini-grid">' +
+   '<div class="skill-mini"><b>' + round1(stat.avg) + '</b><span class="skill-mini-label">All-time average</span></div>' +
+   '<div class="skill-mini"><b>' + (isFiniteScore(stat.delta) ? (stat.delta > 0 ? '+' : '') + stat.delta.toFixed(1) : '-') + '</b><span class="skill-mini-label">Trend</span></div>' +
+   '<div class="skill-mini"><b>' + (isFiniteScore(stat.best) ? round1(stat.best) : '-') + '</b><span class="skill-mini-label">Best mark</span></div>' +
+   '</div>' +
+   '<div class="skill-drill"><strong>Next focus</strong><span>' + escapeHtml(drill.focus) + '</span></div>' +
+   '<div class="skill-drill"><strong>Recommended drill</strong><span>' + escapeHtml(drill.drill) + '</span></div>' +
+   '<div class="skill-drill"><strong>Where it is showing up</strong><span>' + escapeHtml(categorySummary(stat)) + '</span></div>' +
+   (stat.latestImprove ? '<div class="skill-drill"><strong>Latest overall improvement note</strong><span>' + escapeHtml(stat.latestImprove) + '</span></div>' : '') +
+   '<div class="skill-action-row"><a class="journey-btn primary" href="practice.html?mode=mmi">Practise MMI now</a><a class="journey-btn secondary" href="history.html">Open history</a></div>' +
+   '<div class="skill-attempts">' + (recentAttempts.length ? recentAttempts.map(function (point) {
+    return '<div class="skill-attempt"><div class="skill-score-row"><strong>' + escapeHtml(point.category) + '</strong><span class="skill-score" style="font-size:0.82rem;color:' + mmiScoreTone(point.score) + ';">' + round1(point.score) + '/5</span></div><div class="skill-attempt-meta">' + escapeHtml(formatDate(point.at)) + ' | ' + escapeHtml(point.tier) + '</div>' + (point.evidence ? '<span class="skill-attempt-copy">' + escapeHtml(point.evidence) + '</span>' : '') + '</div>';
+   }).join('') : '<div class="skill-attempt"><span class="skill-attempt-copy">No recent examples yet.</span></div>') + '</div>';
+ }
+
+ function setMMISkillSort(sort) {
+  MMI_SKILL_STATE.sort = sort;
+  document.querySelectorAll('[data-mmi-skill-sort]').forEach(function (button) {
+   button.classList.toggle('active', button.dataset.mmiSkillSort === sort);
+  });
+  renderMMISkillMap();
+ }
+
+ function selectMMISkill(key) {
+  MMI_SKILL_STATE.selected = key;
+  renderMMISkillMap();
+ }
+
+ async function loadMMISkillMap(user) {
+  const auth = typeof Key2MDAuth !== 'undefined' ? Key2MDAuth : null;
+  const token = auth && auth.getToken ? auth.getToken() : localStorage.getItem('key2md_token');
+  if (!user || !token) {
+   MMI_SKILL_STATE.loading = false;
+   MMI_SKILL_STATE.loaded = false;
+   MMI_SKILL_STATE.reviews = [];
+   MMI_SKILL_STATE.error = '';
+   renderMMISkillMap();
+   return;
+  }
+  MMI_SKILL_STATE.loading = true;
+  MMI_SKILL_STATE.error = '';
+  renderMMISkillMap();
+  try {
+   const res = await fetch(API_BASE + '/api/mmi/reviews?limit=50&source=mmi', {
+    headers: { Authorization: 'Bearer ' + token }
+   });
+   const data = await res.json().catch(function () { return {}; });
+   if (!res.ok) throw new Error(data.message || data.error || 'Could not load MMI reviews.');
+   MMI_SKILL_STATE.reviews = Array.isArray(data.reviews) ? data.reviews : [];
+   MMI_SKILL_STATE.loaded = true;
+  } catch (error) {
+   MMI_SKILL_STATE.loaded = false;
+   MMI_SKILL_STATE.reviews = [];
+   MMI_SKILL_STATE.error = error && error.message ? error.message : 'Could not load MMI reviews.';
+  } finally {
+   MMI_SKILL_STATE.loading = false;
+   renderMMISkillMap();
+  }
+ }
+
  function renderAccount() {
   const status = document.getElementById('accountStatus');
   if (typeof Key2MDAuth === 'undefined') {
    status.textContent = 'Account tools are still loading.';
+   renderMMISkillMap();
    return;
   }
   Key2MDAuth.init({
@@ -799,6 +1071,7 @@
    apiBase: API_BASE,
    onAuthChange: function (user) {
     status.textContent = user ? 'Signed in as ' + user.email + '.' : 'Not signed in on this device.';
+    loadMMISkillMap(user);
    },
    onLimitsLoaded: function () {}
   });
@@ -818,10 +1091,11 @@
   return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r/g, '\\r').replace(/\n/g, '\\n');
  }
 
- renderPlan();
- renderProgress();
- renderSkillMap();
- renderAccount();
+renderPlan();
+renderProgress();
+renderSkillMap();
+renderMMISkillMap();
+renderAccount();
  </script>
  <script src="key2md-tracking.js" defer></script>
 </body>
