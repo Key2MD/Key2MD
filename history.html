@@ -12,9 +12,9 @@
  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
- <meta name="description" content="View your full practice review history across CASPer and GAMSAT Section II on Key2MD.">
+ <meta name="description" content="View your full practice review history across CASPer, MMI and GAMSAT Section II on Key2MD.">
  <meta property="og:title" content="My Review History - Key2MD">
- <meta property="og:description" content="View your full practice review history across CASPer and GAMSAT Section II on Key2MD.">
+ <meta property="og:description" content="View your full practice review history across CASPer, MMI and GAMSAT Section II on Key2MD.">
  <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
  <meta property="og:image:width" content="1200">
  <meta property="og:image:height" content="630">
@@ -23,11 +23,13 @@
  <meta property="og:url" content="https://www.key2md.com/history.html">
  <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
  <meta name="twitter:image:alt" content="Key2MD - MMI, CASPer and GAMSAT Section II coaching.">
- <meta name="twitter:description" content="View your full practice review history across CASPer and GAMSAT Section II on Key2MD.">
+ <meta name="twitter:description" content="View your full practice review history across CASPer, MMI and GAMSAT Section II on Key2MD.">
  <meta name="twitter:title" content="My Review History - Key2MD">
  <meta name="twitter:card" content="summary_large_image">
  <meta name="robots" content="noindex, nofollow">
  <script src="auth.js" defer></script>
+ <link rel="stylesheet" href="mmi-styles.css">
+ <script src="mmi-feedback-render.js" defer></script>
  <style>
  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  :root {
@@ -155,6 +157,33 @@
 	 .mock-feedback-item strong { display:block; font-size:0.72rem; color:var(--navy); margin-bottom:4px; }
 	 .mock-feedback-item p { font-size:0.78rem; color:var(--gray600); line-height:1.5; margin:0; }
 
+ .mmi-history-section { background:linear-gradient(180deg,#fff,#fbf8ff); border:1px solid rgba(124,58,237,0.2); border-radius:var(--radius); padding:20px; margin-bottom:22px; box-shadow:0 12px 34px rgba(124,58,237,0.07); }
+ .mmi-history-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px; }
+ .mmi-history-kicker { font-size:0.68rem; font-weight:850; letter-spacing:0.12em; text-transform:uppercase; color:#7c3aed; margin-bottom:4px; }
+ .mmi-history-title { font-size:1.08rem; font-weight:900; color:var(--navy); line-height:1.3; }
+ .mmi-history-sub { font-size:0.82rem; color:var(--gray600); line-height:1.55; margin-top:4px; max-width:760px; }
+ .mmi-history-list { display:grid; gap:14px; }
+ .mmi-history-card { background:#fff; border:1px solid var(--gray200); border-radius:14px; overflow:hidden; }
+ .mmi-history-card.open { border-color:rgba(124,58,237,0.28); box-shadow:0 10px 28px rgba(124,58,237,0.08); }
+ .mmi-history-card-head { width:100%; border:0; background:#fff; padding:16px 18px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:center; text-align:left; cursor:pointer; font-family:inherit; }
+ .mmi-history-card-head:hover { background:#fbf8ff; }
+ .mmi-history-card-title { font-size:0.94rem; font-weight:900; color:var(--navy); line-height:1.3; }
+ .mmi-history-card-meta { font-size:0.76rem; color:var(--gray400); line-height:1.45; margin-top:2px; }
+ .mmi-history-card-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
+ .mmi-score-pill { border-radius:50px; padding:6px 12px; font-size:0.78rem; font-weight:900; background:rgba(124,58,237,0.1); color:#6d28d9; white-space:nowrap; }
+ .mmi-history-status { border-radius:50px; padding:5px 10px; font-size:0.68rem; font-weight:850; background:rgba(14,165,233,0.1); color:var(--teal3); white-space:nowrap; }
+ .mmi-history-status.premium { background:rgba(245,158,11,0.12); color:#92400e; }
+ .mmi-history-body { display:none; border-top:1px solid var(--gray100); padding:18px; }
+ .mmi-history-card.open .mmi-history-body { display:block; }
+ .mmi-history-context { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; margin-bottom:14px; }
+ .mmi-history-context-box { background:var(--gray50); border:1px solid var(--gray200); border-radius:12px; padding:13px 14px; }
+ .mmi-history-context-box strong { display:block; font-size:0.72rem; color:var(--teal3); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:6px; }
+ .mmi-history-context-box p { font-size:0.82rem; color:var(--gray600); line-height:1.65; white-space:pre-wrap; margin:0; max-height:220px; overflow:auto; }
+ .mmi-history-prompt-list { display:grid; gap:7px; }
+ .mmi-history-prompt { font-size:0.8rem; color:var(--gray600); line-height:1.55; padding:8px 10px; background:#fff; border:1px solid var(--gray200); border-radius:8px; }
+ .mmi-history-feedback-mount .mmi-feedback { margin-top:0; }
+ .mmi-history-feedback-mount .dan-marking-card { display:none; }
+ .mmi-history-empty { background:#fff; border:1px dashed rgba(124,58,237,0.24); border-radius:12px; padding:18px; color:var(--gray600); font-size:0.86rem; line-height:1.6; }
 
  .reviews-list { display:flex; flex-direction:column; gap:14px; }
 
@@ -167,6 +196,7 @@
  .tool-pill { font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:4px 10px; border-radius:50px; flex-shrink:0; }
  .tool-casper { background:rgba(14,165,233,0.12); color:var(--teal3); }
  .tool-gamsat { background:rgba(167,139,250,0.12); color:#7c3aed; }
+ .tool-mmi { background:rgba(124,58,237,0.12); color:#7c3aed; }
 
  .review-meta { flex:1; min-width:0; }
  .review-scenario { font-size:0.88rem; font-weight:600; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -242,6 +272,8 @@
 	 .mock-card-actions { justify-content:flex-start; }
 	 .mock-report-link,.mock-preview-btn { width:100%; }
 	 .mock-station-grid,.mock-feedback-grid { grid-template-columns:1fr; }
+	 .mmi-history-card-head,.mmi-history-context { grid-template-columns:1fr; }
+	 .mmi-history-card-actions { justify-content:flex-start; }
 	 }
  </style>
 <style id="k2-nav-styles">
@@ -439,6 +471,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 	 <div class="stats-bar" id="statsBar">
 	 <div class="stat-card"><span class="stat-num" id="statTotal">-</span><span class="stat-label">Total Reviews</span></div>
 	 <div class="stat-card"><span class="stat-num" id="statCasper">-</span><span class="stat-label">CASPer</span></div>
+	 <div class="stat-card"><span class="stat-num" id="statMMI">-</span><span class="stat-label">MMI</span></div>
 	 <div class="stat-card"><span class="stat-num" id="statGamsat">-</span><span class="stat-label">GAMSAT</span></div>
 	 <div class="stat-card"><span class="stat-num" id="statMock">-</span><span class="stat-label">Full Mocks</span></div>
 	 <div class="stat-card"><span class="stat-num" id="statAvg">-</span><span class="stat-label">Avg Score</span></div>
@@ -455,6 +488,18 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 	 <a href="full-casper-mock-exam.html" class="filter-btn" style="white-space:nowrap;">Take another mock</a>
 	 </div>
 	 <div class="mock-history-list" id="mockHistoryList"></div>
+	 </section>
+
+	 <section class="mmi-history-section" id="mmiHistorySection" style="display:none;">
+	 <div class="mmi-history-head">
+	 <div>
+	 <div class="mmi-history-kicker">MMI feedback history</div>
+	 <div class="mmi-history-title">Your saved MMI AI feedback</div>
+	 <div class="mmi-history-sub">Review the station, transcript and marked feedback from each spoken MMI attempt. This is separate from CASPer AI credits and full mock reports.</div>
+	 </div>
+	 <a href="practice.html?mode=mmi" class="filter-btn" style="white-space:nowrap;">Practise MMI</a>
+	 </div>
+	 <div class="mmi-history-list" id="mmiHistoryList"></div>
 	 </section>
 
 
@@ -511,9 +556,14 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 <script>
 const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
 const TOKEN_KEY = 'key2md_token';
+window.openEnquiry = window.openEnquiry || function(topic) {
+ const subject = encodeURIComponent(topic || 'Key2MD enquiry');
+ window.location.href = `mailto:brittainmbbs@gmail.com?subject=${subject}`;
+};
 
 let allReviews = [];
 let mockAttempts = [];
+let mmiReviews = [];
 let currentFilter = 'all';
 let currentCompetencyFilter = null;
 const CASPER_COMPETENCIES = [
@@ -573,9 +623,11 @@ async function loadReviews() {
 	 const data = await res.json();
 	 allReviews = data.reviews || [];
 	 mockAttempts = await loadMockAttempts(token);
+	 mmiReviews = await loadMMIReviews(token);
 	 mockAttempts = await hydrateMockAttemptScores(mockAttempts);
 	 updateStats();
 	 renderMockHistory();
+	 renderMMIHistory();
 	 renderCompetencyProgress();
 	 renderReviews();
  } catch (err) {
@@ -583,6 +635,19 @@ async function loadReviews() {
  document.getElementById('errorMsg').textContent = err.message || 'Please try refreshing the page.';
 	 }
 	}
+
+async function loadMMIReviews(token) {
+ try {
+ const res = await fetch(`${API_BASE}/api/mmi/reviews?limit=50&source=mmi`, {
+ headers: { 'Authorization': `Bearer ${token}` },
+ });
+ if (!res.ok) return [];
+ const data = await res.json().catch(() => ({}));
+ return data.reviews || [];
+ } catch {
+ return [];
+ }
+}
 
 async function loadMockAttempts(token) {
  try {
@@ -648,8 +713,9 @@ function updateStats() {
  const scores = allReviews.map(r => extractScore(r)).filter(s => s !== null);
  const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10 : null;
 
-	 document.getElementById('statTotal').textContent = allReviews.length;
+	 document.getElementById('statTotal').textContent = allReviews.length + mmiReviews.length;
 	 document.getElementById('statCasper').textContent = casperReviews.length;
+	 document.getElementById('statMMI').textContent = mmiReviews.length;
 	 document.getElementById('statGamsat').textContent = gamsatReviews.length;
 	 document.getElementById('statMock').textContent = mockAttempts.length;
 	 document.getElementById('statAvg').textContent = avg !== null ? avg + '/10' : '-';
@@ -836,6 +902,141 @@ function renderMockHistory() {
  }
  section.style.display = 'block';
  list.innerHTML = mockAttempts.map(mockCardHTML).join('');
+}
+
+function renderMMIHistory() {
+ const section = document.getElementById('mmiHistorySection');
+ const list = document.getElementById('mmiHistoryList');
+ if (!section || !list) return;
+ if (!mmiReviews.length) {
+ section.style.display = 'none';
+ list.innerHTML = '';
+ return;
+ }
+ section.style.display = 'block';
+ list.innerHTML = mmiReviews.map(mmiHistoryCardHTML).join('');
+}
+
+function mmiHistoryCardHTML(review) {
+ const feedback = parseObject(review.ai_feedback_json) || {};
+ const overall = feedback.overall || {};
+ const score = safeNumericScore(overall.score);
+ const scoreText = Number.isFinite(score) ? `${score}/5` : 'Marked';
+ const tier = String(review.tier || 'transcript').toLowerCase();
+ const tierLabel = tier === 'premium' ? 'Premium' : 'Transcript';
+ const specialist = Number(review.specialist_mode || 0) === 1;
+ const prompts = parseMMIPrompts(review.prompts_json);
+ const promptPreview = prompts.length ? prompts[0].prompt : 'Spoken MMI station';
+ const promptSnippet = promptPreview.length > 150 ? `${promptPreview.substring(0, 150)}...` : promptPreview;
+ const duration = Number(review.recording_duration_seconds || 0);
+ const meta = [
+ formatDate(review.created_at),
+ tierLabel,
+ specialist ? 'Specialist mode' : 'Med school mode',
+ duration ? formatDuration(duration) : '',
+ ].filter(Boolean).join(' | ');
+
+ return `
+ <article class="mmi-history-card" id="mmi-${escapeAttr(review.id)}">
+ <button type="button" class="mmi-history-card-head" onclick="toggleMMIReview('${escapeAttr(review.id)}')">
+ <div>
+ <div class="mmi-history-card-title">${escapeHtml(review.station_category || 'MMI Station')}</div>
+ <div class="mmi-history-card-meta">${escapeHtml(meta)}</div>
+ <div class="mmi-history-card-meta">${escapeHtml(promptSnippet)}</div>
+ </div>
+ <div class="mmi-history-card-actions">
+ <span class="mmi-score-pill">${escapeHtml(scoreText)}</span>
+ <span class="mmi-history-status${tier === 'premium' ? ' premium' : ''}">${escapeHtml(tierLabel)}</span>
+ </div>
+ </button>
+ <div class="mmi-history-body">
+ ${mmiHistoryContextHTML(review, prompts)}
+ <div class="mmi-history-feedback-mount" id="mmi-feedback-${escapeAttr(review.id)}"></div>
+ </div>
+ </article>
+ `;
+}
+
+function mmiHistoryContextHTML(review, prompts) {
+ const scenario = String(review.station_scenario || '').trim();
+ const transcript = String(review.transcript_text || '').trim();
+ const promptRows = prompts.length
+ ? prompts.map((item, i) => `<div class="mmi-history-prompt"><strong>Q${i + 1}.</strong> ${escapeHtml(item.prompt || item)}</div>`).join('')
+ : '<div class="mmi-history-prompt">No prompt list was saved for this review.</div>';
+
+ return `
+ <div class="mmi-history-context">
+ <div class="mmi-history-context-box">
+ <strong>Station</strong>
+ <p>${escapeHtml(scenario || 'No scenario text was saved for this review.')}</p>
+ <div class="mmi-history-prompt-list" style="margin-top:10px;">${promptRows}</div>
+ </div>
+ <div class="mmi-history-context-box">
+ <strong>Transcript used for marking</strong>
+ <p>${escapeHtml(transcript || 'No transcript text was saved for this review.')}</p>
+ </div>
+ </div>
+ `;
+}
+
+function parseMMIPrompts(value) {
+ const raw = parseObject(value);
+ if (!Array.isArray(raw)) return [];
+ return raw.map(item => {
+ if (typeof item === 'string') return { prompt: item };
+ return {
+ prompt: String(item.prompt || item.prompt_text || item.text || ''),
+ revealed_at_seconds: item.revealed_at_seconds,
+ };
+ }).filter(item => item.prompt);
+}
+
+function toggleMMIReview(id) {
+ const card = document.getElementById(`mmi-${id}`);
+ const review = mmiReviews.find(item => String(item.id) === String(id));
+ if (!card || !review) return;
+ const willOpen = !card.classList.contains('open');
+ if (willOpen) {
+ document.querySelectorAll('.mmi-history-card.open').forEach(other => {
+ if (other === card) return;
+ other.classList.remove('open');
+ const mount = other.querySelector('.mmi-history-feedback-mount');
+ if (mount) {
+ mount.innerHTML = '';
+ delete mount.dataset.rendered;
+ }
+ });
+ }
+ card.classList.toggle('open');
+ if (!willOpen) return;
+ renderMMIHistoryFeedback(review);
+}
+window.toggleMMIReview = toggleMMIReview;
+
+function renderMMIHistoryFeedback(review) {
+ const mount = document.getElementById(`mmi-feedback-${review.id}`);
+ if (!mount || mount.dataset.rendered === '1') return;
+ const feedback = parseObject(review.ai_feedback_json);
+ if (!feedback || !Object.keys(feedback).length) {
+ mount.innerHTML = '<div class="mmi-history-empty">No saved AI feedback JSON was found for this review.</div>';
+ mount.dataset.rendered = '1';
+ return;
+ }
+ if (typeof MMIFeedbackRender === 'undefined' || typeof MMIFeedbackRender.render !== 'function') {
+ mount.innerHTML = '<div class="mmi-history-empty">The MMI feedback viewer is still loading. Please try opening this review again in a moment.</div>';
+ return;
+ }
+ MMIFeedbackRender.render(mount, {
+ feedback,
+ voice_metrics: parseObject(review.voice_metrics_json),
+ visual_metrics: parseObject(review.visual_metrics_json),
+ }, {
+ tier: review.tier || 'transcript',
+ specialistMode: Number(review.specialist_mode || 0) === 1,
+ stationCategory: review.station_category || 'MMI',
+ durationSec: Number(review.recording_duration_seconds || 0),
+ });
+ mount.dataset.rendered = '1';
 }
 
 function mockCardHTML(attempt) {
@@ -1175,7 +1376,7 @@ function renderReviews() {
  filtered.length + ' ' + label + (filtered.length !== 1 ? 's' : '');
 
 	 if (filtered.length === 0) {
-	 showState(allReviews.length === 0 ? (mockAttempts.length ? 'emptySingle' : 'empty') : 'emptyFilter');
+	 showState(allReviews.length === 0 ? ((mockAttempts.length || mmiReviews.length) ? 'emptySingle' : 'empty') : 'emptyFilter');
 	 return;
 	 }
 
@@ -1441,7 +1642,7 @@ function showState(state) {
 	 document.getElementById('emptyState').querySelector('.state-sub').textContent = 'Complete a station and get AI feedback to see your history here.';
 	 } else if (state === 'emptySingle') {
 	 document.getElementById('emptyState').querySelector('.state-title').textContent = 'No single-station reviews yet';
-	 document.getElementById('emptyState').querySelector('.state-sub').textContent = 'Your full mock reports are above. Single CASPer/GAMSAT reviews will appear here once you use the practice tools.';
+	 document.getElementById('emptyState').querySelector('.state-sub').textContent = 'Your mock or MMI reports are above. Single CASPer/GAMSAT reviews will appear here once you use those practice tools.';
 	 }
 	}
 

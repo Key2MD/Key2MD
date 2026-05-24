@@ -88,7 +88,7 @@
    <div class="panel headline">
     <div class="kicker">Billing & purchases</div>
     <h1>Manage your Key2MD account.</h1>
-    <p class="lead">Change card details, check subscriptions, cancel CASPer Pro renewal, find your mock pass, and review recent payments from one place.</p>
+    <p class="lead">Change card details, check subscriptions, cancel active renewals, find your mock pass, and review recent payments from one place.</p>
    </div>
    <aside class="panel authbox">
     <div id="k2mdAuthBar"></div>
@@ -116,7 +116,7 @@
     <div class="status-list" id="subscriptionList">
      <div class="empty">Log in to see subscriptions.</div>
     </div>
-    <div class="help">Stripe billing is the safest place to update cards and manage Stripe-side payment details. Renewal cancellations are shown directly where Key2MD can confirm the end date clearly.</div>
+    <div class="help">Use the cancel button beside an active subscription to stop the next renewal. Your access stays active until the end of the paid period, and the row changes to Cancelling once Key2MD has confirmed it.</div>
    </div>
 
    <div class="panel card">
@@ -270,11 +270,15 @@
    const badgeText = cancelling ? 'Cancelling' : 'Active';
    const accessText = cancelling ? `Access ends ${fmtDate(sub.period_end)}` : (sub.period_end ? `Current paid period ends ${fmtDate(sub.period_end)}` : 'Recurring access is active');
    const tier = sub.tier ? ` | ${esc(sub.tier)}` : '';
-   const cancelAction = !cancelling && sub.product === 'GAMSAT S2 Pro'
+   const cancelAction = !cancelling && sub.product === 'CASPer Pro'
+    ? `<button class="danger" onclick="cancelCasperPro(this)">Cancel renewal</button>`
+    : !cancelling && sub.product === 'GAMSAT S2 Pro'
     ? `<button class="danger" onclick="cancelProductRenewal('gamsat_s2', this)">Cancel renewal</button>`
     : !cancelling && sub.product === 'CASPer weekly class'
     ? `<button class="danger" onclick="cancelProductRenewal('casper_class', this)">Cancel renewal</button>`
-    : '';
+    : sub.product === 'MMI Pro'
+    ? `<button onclick="openStripeBilling(this)">Manage/cancel in Stripe</button>`
+    : `<button onclick="openStripeBilling(this)">Manage in Stripe</button>`;
    return `<div class="row">
     <div class="row-main"><div class="row-title">${esc(sub.product)}${tier}</div><div class="row-meta">${esc(accessText)}</div></div>
     <div class="btn-row"><span class="badge ${badgeClass}">${badgeText}</span>${cancelAction}</div>

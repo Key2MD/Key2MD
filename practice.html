@@ -2430,16 +2430,27 @@ function updateLimitUI(){
  const creditCount = document.getElementById('creditCount');
  const buyBtn = document.getElementById('buyCreditsBtnWrap');
  const mmiNote = document.getElementById('mmiAiNote');
+ const isMMIMode = currentMode === MODE_MMI;
 
 
- if(mmiNote) mmiNote.style.display = (currentMode === MODE_MMI) ? 'block' : 'none';
+ if(mmiNote) mmiNote.style.display = isMMIMode ? 'block' : 'none';
 
  if(!loggedIn){
- if(el){el.textContent='1 free/day';el.className='ai-limit-count';}
- if(fill){fill.style.width='100%';fill.className='ai-limit-fill';}
- if(noteEl) noteEl.textContent='Create a free account to unlock AI reviews.';
+ if(el){el.textContent=isMMIMode ? 'Sign in' : '1 free/day';el.className='ai-limit-count';}
+ if(fill){fill.style.width=isMMIMode ? '0%' : '100%';fill.className='ai-limit-fill';}
+ if(noteEl) noteEl.textContent=isMMIMode ? 'Sign in to check MMI transcript/premium access.' : 'Create a free account to unlock AI reviews.';
  if(creditWrap) creditWrap.style.display='none';
  if(buyBtn) buyBtn.style.display='none';
+ return;
+ }
+
+ if(isMMIMode){
+ if(el){el.textContent='MMI access shown below';el.className='ai-limit-count';}
+ if(fill){fill.style.width='100%';fill.className='ai-limit-fill';}
+ if(noteEl) noteEl.textContent='MMI uses its own transcript/premium credits. CASPer AI credits are separate and are hidden here.';
+ if(creditWrap) creditWrap.style.display='none';
+ if(buyBtn) buyBtn.style.display='none';
+ updateMMILimitsUI();
  return;
  }
 
@@ -2578,6 +2589,10 @@ document.addEventListener('DOMContentLoaded', function(){
  updateLibraryCoverage();
  updateStarredCategoryBtn();
  updatePersistentCompetencyProgress();
+ try {
+ const requestedMode = new URLSearchParams(window.location.search).get('mode');
+ if(requestedMode === 'mmi') setMode(MODE_MMI);
+ } catch {}
 });
 
 
@@ -5607,8 +5622,13 @@ window.purchaseCredits = purchaseCredits;
 
 (function handlePaymentReturn(){
  const params = new URLSearchParams(window.location.search);
+ function clearPaymentParams(names){
+ const url = new URL(window.location.href);
+ names.forEach(name => url.searchParams.delete(name));
+ window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+ }
  if(params.get('payment') === 'success'){
- window.history.replaceState({}, '', window.location.pathname);
+ clearPaymentParams(['payment']);
  setTimeout(function(){
  Key2MDAuth.checkSession();
  const overlay = document.getElementById('creditShopOverlay');
@@ -5620,7 +5640,25 @@ window.purchaseCredits = purchaseCredits;
  }
  }, 1500);
  } else if(params.get('payment') === 'cancelled'){
- window.history.replaceState({}, '', window.location.pathname);
+ clearPaymentParams(['payment']);
+ } else if(params.get('pro') === 'success'){
+ clearPaymentParams(['pro']);
+ setTimeout(function(){
+ Key2MDAuth.checkSession();
+ showPracticeNotice('CASPer Pro confirmed. Unlimited CASPer AI reviews are active, and you can manage or cancel renewal from Billing.', 'success');
+ }, 1200);
+ } else if(params.get('mock_payment') === 'success'){
+ clearPaymentParams(['mock_payment','mock_tier']);
+ setTimeout(function(){
+ Key2MDAuth.checkSession();
+ showPracticeNotice('Mock pass confirmed. Your fresh full CASPer mock is ready in the Mock tab.', 'success');
+ }, 1200);
+ } else if(params.get('mmi_payment') === 'success'){
+ clearPaymentParams(['mmi_payment']);
+ setTimeout(function(){
+ Key2MDAuth.checkSession();
+ showPracticeNotice('MMI payment confirmed. Your MMI credits or Pro access are now attached to this account.', 'success');
+ }, 1200);
  }
 })();
 

@@ -423,6 +423,16 @@
 .billing-selfserve-panel h2{font-size:1.15rem;color:var(--navy);margin:0 0 5px;}
 .billing-selfserve-panel p{font-size:0.86rem;color:var(--gray600);line-height:1.55;margin:0;max-width:720px;}
 .billing-status-line{font-size:0.78rem;font-weight:800;color:var(--navy);margin-top:8px;}
+.plans-billing-subscriptions{grid-column:1/-1;display:none;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:2px;}
+.plans-billing-subscriptions.show{display:grid;}
+.plans-subscription-row{border:1px solid rgba(14,165,233,0.16);background:#fff;border-radius:12px;padding:12px 13px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;box-shadow:0 8px 20px rgba(15,23,42,0.04);}
+.plans-subscription-title{font-size:0.84rem;font-weight:900;color:var(--navy);}
+.plans-subscription-meta{font-size:0.73rem;color:var(--gray500);line-height:1.45;margin-top:2px;}
+.plans-subscription-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+.plans-subscription-actions button,.plans-subscription-actions a{min-height:30px;border-radius:999px;border:1px solid var(--gray200);background:#fff;color:var(--navy);font:inherit;font-size:0.7rem;font-weight:900;text-decoration:none;padding:0 10px;cursor:pointer;white-space:nowrap;}
+.plans-subscription-actions .danger{border-color:rgba(239,68,68,0.28);background:#fff5f5;color:#b91c1c;}
+.plans-subscription-badge{display:inline-flex;align-items:center;border-radius:999px;border:1px solid rgba(34,197,94,0.24);background:#ecfdf5;color:#166534;font-size:0.65rem;font-weight:900;padding:3px 8px;margin-top:7px;}
+.plans-subscription-badge.warn{border-color:#fde68a;background:#fef3c7;color:#92400e;}
 .billing-selfserve-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
 .billing-selfserve-actions button,.billing-selfserve-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:36px;border-radius:999px;border:1px solid var(--gray200);background:#fff;color:var(--navy);font:inherit;font-size:0.78rem;font-weight:900;text-decoration:none;padding:0 14px;cursor:pointer;white-space:nowrap;}
 .billing-selfserve-actions .primary{background:var(--navy);border-color:var(--navy);color:#fff;}
@@ -740,6 +750,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <a href="#full-casper-mock" id="billingMockBtn">Buy mock</a>
  <button class="danger" id="billingCancelBtn" onclick="handleCancel()" style="display:none;">Cancel Pro renewal</button>
  </div>
+ <div class="plans-billing-subscriptions" id="plansBillingSubscriptions"></div>
  </div>
  </div>
 </section>
@@ -1320,6 +1331,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
 let selectedPackId = null;
 let pendingAction = null;
+let plansBillingSummary = null;
+let plansBillingLoadInFlight = null;
 
 document.addEventListener('DOMContentLoaded', () => {
  Key2MDAuth.init({ tool:'casper', apiBase:API_BASE, onAuthChange:updateUI });
@@ -1337,6 +1350,7 @@ function updateUI() {
  const cancelRequested = isPro && !!user.cancel_requested;
  const endLabel = formatProPeriodEnd(user.pro_period_end);
  updateBillingPanel(user, isPro, cancelRequested, endLabel);
+ refreshPlansBillingSummary();
  banner.style.display = isPro ? 'flex' : 'none';
  banner.classList.toggle('cancelling', cancelRequested);
  if (isPro) {
@@ -1356,6 +1370,10 @@ function updateUI() {
  }
  setProButtons('Start CASPer Pro ->', false, '1');
  }
+}
+
+function escHtml(value) {
+ return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
 }
 
 function updateBillingPanel(user, isPro, cancelRequested, endLabel) {
@@ -1379,6 +1397,77 @@ function updateBillingPanel(user, isPro, cancelRequested, endLabel) {
  cancelBtn.disabled = cancelRequested;
  cancelBtn.textContent = cancelRequested ? 'Cancellation scheduled' : 'Cancel Pro renewal';
  }
+ if (!loggedIn) renderPlansBillingSubscriptions(null);
+}
+
+async function refreshPlansBillingSummary(force = false) {
+ if (!Key2MDAuth.isLoggedIn()) {
+ plansBillingSummary = null;
+ renderPlansBillingSubscriptions(null);
+ return null;
+ }
+ if (plansBillingSummary && !force) {
+ renderPlansBillingSubscriptions(plansBillingSummary);
+ return plansBillingSummary;
+ }
+ if (plansBillingLoadInFlight) return plansBillingLoadInFlight;
+ const token = Key2MDAuth.getToken();
+ const box = document.getElementById('plansBillingSubscriptions');
+ if (box) {
+ box.className = 'plans-billing-subscriptions show';
+ box.innerHTML = '<div class="plans-subscription-row"><div><div class="plans-subscription-title">Checking subscriptions...</div><div class="plans-subscription-meta">Looking for active recurring products on this account.</div></div></div>';
+ }
+ plansBillingLoadInFlight = fetch(`${API_BASE}/api/billing/summary`, { headers:{ 'Authorization':`Bearer ${token}` } })
+ .then(res => res.json().then(data => ({ res, data })).catch(() => ({ res, data:{} })))
+ .then(({ res, data }) => {
+ if (!res.ok) throw new Error(data.message || data.error || 'Could not load billing.');
+ plansBillingSummary = data;
+ renderPlansBillingSubscriptions(data);
+ return data;
+ })
+ .catch(() => {
+ if (box) {
+ box.className = 'plans-billing-subscriptions show';
+ box.innerHTML = '<div class="plans-subscription-row"><div><div class="plans-subscription-title">Billing check unavailable</div><div class="plans-subscription-meta">Open the Billing page if you need to cancel or change card details.</div></div><div class="plans-subscription-actions"><a href="billing.html">Billing</a></div></div>';
+ }
+ return null;
+ })
+ .finally(() => { plansBillingLoadInFlight = null; });
+ return plansBillingLoadInFlight;
+}
+
+function renderPlansBillingSubscriptions(data) {
+ const box = document.getElementById('plansBillingSubscriptions');
+ if (!box) return;
+ if (!Key2MDAuth.isLoggedIn()) {
+ box.className = 'plans-billing-subscriptions';
+ box.innerHTML = '';
+ return;
+ }
+ const subs = data?.subscriptions || [];
+ box.className = 'plans-billing-subscriptions show';
+ if (!subs.length) {
+ box.innerHTML = '<div class="plans-subscription-row"><div><div class="plans-subscription-title">No active subscriptions found</div><div class="plans-subscription-meta">If you paid with another email, log in with that account or message Dan.</div></div><div class="plans-subscription-actions"><a href="billing.html">Billing</a></div></div>';
+ return;
+ }
+ box.innerHTML = subs.map(sub => {
+ const cancelling = sub.status === 'cancelling' || sub.cancel_requested;
+ const endText = sub.period_end ? formatProPeriodEnd(sub.period_end) : 'the end of the paid period';
+ const meta = cancelling
+ ? `Cancellation scheduled. Access ends ${endText}.`
+ : (sub.period_end ? `Active. Current paid period ends ${endText}.` : 'Active recurring access.');
+ const badge = cancelling ? '<span class="plans-subscription-badge warn">Cancelling</span>' : '<span class="plans-subscription-badge">Active</span>';
+ const product = String(sub.product || '');
+ let action = '<button onclick="openBillingPortalFromPlans(this)">Manage in Stripe</button>';
+ if (!cancelling && product === 'CASPer Pro') action = '<button class="danger" onclick="handleCancel()">Cancel renewal</button>';
+ if (!cancelling && product === 'GAMSAT S2 Pro') action = "<button class=\"danger\" onclick=\"cancelProductRenewalFromPlans('gamsat_s2', this)\">Cancel renewal</button>";
+ if (!cancelling && product === 'CASPer weekly class') action = "<button class=\"danger\" onclick=\"cancelProductRenewalFromPlans('casper_class', this)\">Cancel renewal</button>";
+ if (product === 'MMI Pro') action = '<button onclick="openBillingPortalFromPlans(this)">Cancel/change in Stripe</button>';
+ return `<div class="plans-subscription-row">
+ <div><div class="plans-subscription-title">${escHtml(product)}${sub.tier ? ` - ${escHtml(sub.tier)}` : ''}</div><div class="plans-subscription-meta">${escHtml(meta)}</div>${badge}</div>
+ <div class="plans-subscription-actions">${action}<a href="billing.html">Details</a></div>
+ </div>`;
+ }).join('');
 }
 
 function setProButtons(text, disabled, opacity) {
@@ -1424,6 +1513,10 @@ async function handleBuyPro() {
  const token = Key2MDAuth.getToken();
  const res = await fetch(`${API_BASE}/api/pro/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({success_url:`${location.origin}/practice.html?pro=success`,cancel_url:`${location.origin}/plans.html`})});
  const data = await res.json();
+ if (data.checkout_url && data.error === 'checkout_already_open') {
+ window.location.href = data.checkout_url;
+ return;
+ }
  if (!res.ok) throw new Error(data.message || data.error || 'Checkout failed');
  if (!data.checkout_url) throw new Error(data.message || data.error || 'No checkout URL returned.');
  window.location.href = data.checkout_url;
@@ -1550,6 +1643,10 @@ async function confirmCheckout() {
  res = await fetch(`${API_BASE}/api/pro/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({success_url:`${location.origin}/practice.html?pro=success`,cancel_url:`${location.origin}/plans.html`})});
  }
  data = await res.json();
+ if (data.checkout_url && data.error === 'checkout_already_open') {
+ window.location.href = data.checkout_url;
+ return;
+ }
  if (!res.ok) throw new Error(data.message || data.error || 'Checkout failed');
  if (!data.checkout_url) throw new Error(data.message || data.error || 'No checkout URL returned.');
  window.location.href = data.checkout_url;
@@ -1594,11 +1691,35 @@ async function confirmCancel() {
  al.textContent = `Cancellation confirmed. You will not be billed again. CASPer Pro remains active until ${endLabel}, then your account returns to Free automatically.`;
  btn.textContent = 'Cancellation scheduled';
  await Key2MDAuth.checkSession();
+ plansBillingSummary = null;
  updateUI();
+ await refreshPlansBillingSummary(true);
  setTimeout(() => { document.getElementById('cancelModal').classList.remove('open'); }, 4500);
  } catch(e) {
  al.className = 'modal-alert err'; al.textContent = e.message;
  btn.disabled = false; btn.textContent = 'Confirm Cancellation';
+ }
+}
+
+async function cancelProductRenewalFromPlans(kind, btn) {
+ const config = {
+ gamsat_s2: { label: 'GAMSAT S2 Pro', endpoint: '/api/gamsat-s2/cancel' },
+ casper_class: { label: 'weekly CASPer class', endpoint: '/api/casper-class/cancel' },
+ }[kind];
+ if (!config) return;
+ if (!window.confirm(`Cancel ${config.label} renewal?\n\nYou will not be billed again. Current paid access stays active until the end of the paid period.`)) return;
+ const old = btn?.textContent || '';
+ if (btn) { btn.disabled = true; btn.textContent = 'Cancelling...'; }
+ try {
+ const res = await fetch(`${API_BASE}${config.endpoint}`, { method:'POST', headers:{ 'Authorization':`Bearer ${Key2MDAuth.getToken()}` } });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) throw new Error(data.message || data.error || 'Cancellation failed.');
+ plansBillingSummary = null;
+ await refreshPlansBillingSummary(true);
+ alert(data.message || `${config.label} renewal has been cancelled.`);
+ } catch(e) {
+ alert(e.message || `Could not cancel ${config.label} renewal.`);
+ if (btn) { btn.disabled = false; btn.textContent = old || 'Cancel renewal'; }
  }
 }
 

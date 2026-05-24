@@ -278,6 +278,7 @@ const Key2MDAuth = (() => {
  setUser(data.user);
  await loadLimits();
  hideAuthModal();
+ showAuthNotice('Account created. You are logged in, and purchases/cancellations will be attached to this email.', 'success');
  return data;
  }
 
@@ -295,6 +296,28 @@ const Key2MDAuth = (() => {
  await loadLimits();
  hideAuthModal();
  return data;
+ }
+
+ function showAuthNotice(message, tone = 'success') {
+ let toast = document.getElementById('k2mdAuthNoticeToast');
+ if (!toast) {
+ toast = document.createElement('div');
+ toast.id = 'k2mdAuthNoticeToast';
+ toast.setAttribute('role', 'status');
+ toast.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:100000;max-width:min(440px,calc(100vw - 32px));padding:12px 16px;border-radius:12px;font-size:0.86rem;font-weight:800;line-height:1.45;box-shadow:0 18px 45px rgba(15,23,42,0.18);opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;';
+ document.body.appendChild(toast);
+ }
+ const palette = tone === 'error'
+ ? { bg:'#fef2f2', border:'#fecaca', color:'#991b1b' }
+ : { bg:'#ecfdf5', border:'#bbf7d0', color:'#166534' };
+ toast.textContent = message;
+ toast.style.background = palette.bg;
+ toast.style.border = `1px solid ${palette.border}`;
+ toast.style.color = palette.color;
+ toast.style.opacity = '1';
+ toast.style.transform = 'translateX(-50%) translateY(0)';
+ clearTimeout(toast._hideTimer);
+ toast._hideTimer = setTimeout(() => { toast.style.opacity = '0'; }, 4200);
  }
 
  async function logout() {
@@ -539,7 +562,7 @@ const Key2MDAuth = (() => {
  const displayName = htmlEscape(_user.name || _user.email.split('@')[0]);
  const accountActions = _user.impersonation ? '' : `
  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;">
- <button onclick="window.location.href='billing.html'" style="padding:8px 9px;border-radius:8px;border:1px solid rgba(14,165,233,0.28);background:#fff;color:var(--navy,#0a1628);font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;">Billing / purchases</button>
+ <button onclick="window.location.href='billing.html'" style="padding:8px 9px;border-radius:8px;border:1px solid rgba(14,165,233,0.28);background:#fff;color:var(--navy,#0a1628);font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;">Billing / cancel</button>
  <button onclick="window.location.href='plans.html#full-casper-mock'" style="padding:8px 9px;border-radius:8px;border:1px solid rgba(14,165,233,0.28);background:#fff;color:var(--navy,#0a1628);font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;">Buy mock</button>
  ${_user.tier === 'pro' ? (_user.cancel_requested
  ? `<button disabled style="grid-column:1/-1;padding:8px 9px;border-radius:8px;border:1px solid rgba(245,158,11,0.28);background:rgba(245,158,11,0.08);color:#92400e;font:inherit;font-size:0.72rem;font-weight:800;">Cancels ${htmlEscape(proEndsAt)}</button>`
