@@ -1491,7 +1491,7 @@ function updateMMIFounderCard(state = plansMMIFounderState) {
  const active = isMMIFounderActive(state);
  const expiryText = formatMMIFounderExpiry(state?.founding_member_expires_at || state?.expires_at);
  if (active) {
- status.textContent = `Founder pricing active${expiryText ? ` until ${expiryText}` : ''}. It applies automatically to MMI Pro checkout.`;
+ status.textContent = `Founder pricing active${expiryText ? ` until ${expiryText}` : ''}. It applies automatically at MMI checkout.`;
  btn.textContent = 'Active';
  btn.disabled = true;
  btn.style.opacity = '0.65';
@@ -2157,7 +2157,10 @@ function handleMMICredits() {
  if (!selectedMMIPackId) { alert('Please select a credit pack first.'); return; }
  const price = MMI_CREDIT_PRICES[selectedMMIPackId];
  const label = MMI_CREDIT_LABELS[selectedMMIPackId];
- openMMIModal(`Buy ${label.split(' - ')[0]}`, `${price} | One-time | Credits never expire`, 'mmi_credits');
+ const founderLine = isMMIFounderActive()
+ ? ` | Founder ${getMMIFounderDiscountPercent(mmiTier)}% off applied at checkout`
+ : '';
+ openMMIModal(`Buy ${label.split(' - ')[0]}`, `${price}${founderLine} | One-time | Credits never expire`, 'mmi_credits');
 }
 
 function openMMIModal(title, sub, action) {
