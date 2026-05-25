@@ -2624,6 +2624,28 @@ let aiEnabled=true;
 function getK2Auth(){
  return (typeof Key2MDAuth !== 'undefined' && Key2MDAuth) ? Key2MDAuth : (window.Key2MDAuth || null);
 }
+function numericLimitValue(value, fallback){
+ const n = Number(value);
+ return Number.isFinite(n) ? n : fallback;
+}
+function casperFreeRemaining(toolLimits, fallback){
+ if(!toolLimits) return fallback;
+ if(toolLimits.unlimited) return 99;
+ const explicit = Number(toolLimits.remaining);
+ if(Number.isFinite(explicit)) return Math.max(0, explicit);
+ const limit = numericLimitValue(toolLimits.limit, AI_LIMIT_MAX);
+ const used = numericLimitValue(toolLimits.used, 0);
+ return Math.max(0, limit - used);
+}
+function casperCreditBalance(toolLimits){
+ return Math.max(0, numericLimitValue(toolLimits?.credits, 0));
+}
+async function refreshPracticeLimits(auth){
+ if(auth?.refreshLimits){
+ try { return await auth.refreshLimits(); } catch {}
+ }
+ return auth?.getLimits?.() || null;
+}
 function showAuthLoadingMessage(){
  showPracticeNotice('The login system is still loading. Please wait a moment and try again.', 'error');
 }
@@ -2670,9 +2692,10 @@ function updateLimitUI(){
  const tool = limits.casper;
  if(!tool) return;
 
- const rem = tool.unlimited ? 99 : Math.max(0, tool.limit - tool.used);
- const pct = tool.unlimited ? 100 : (rem / tool.limit * 100);
- const credits = tool.credits || 0;
+ const rem = casperFreeRemaining(tool, 0);
+ const limit = Math.max(1, numericLimitValue(tool.limit, AI_LIMIT_MAX));
+ const pct = tool.unlimited ? 100 : (rem / limit * 100);
+ const credits = casperCreditBalance(tool);
 
  if(el){
  if(tool.unlimited){
@@ -3042,9 +3065,8 @@ function refreshAiMarkButton(){
  const toolLimits = limits?.casper;
  const loggedIn = !!auth?.isLoggedIn?.();
  const isPro = !!auth?.isPro?.();
- const rem = !loggedIn ? AI_LIMIT_MAX : (isPro ? 99 : (toolLimits ? Math.max(0, toolLimits.limit - toolLimits.used) : AI_LIMIT_MAX));
- const credits = toolLimits?.credits || 0;
- const canUse = isPro || rem > 0 || credits > 0;
+ const rem = !loggedIn ? AI_LIMIT_MAX : (isPro ? 99 : casperFreeRemaining(toolLimits, AI_LIMIT_MAX));
+ const credits = casperCreditBalance(toolLimits);
  const needsWords = n <= 20;
  [$('btnAIRemaining'),$('btnAIRemainingTop')].filter(Boolean).forEach(remEl=>{
  if(needsWords) remEl.textContent='Write 20+ words to mark';
@@ -3055,7 +3077,7 @@ function refreshAiMarkButton(){
  else remEl.textContent='No reviews left today';
  });
  [$('btnGetAI'),$('btnGetAITop')].filter(Boolean).forEach(aibtn=>{
- const blocked = needsWords || (loggedIn && !canUse);
+ const blocked = needsWords;
  aibtn.disabled = blocked;
  aibtn.style.opacity = blocked ? '0.58' : '1';
  aibtn.textContent = (!needsWords && loggedIn && rem <= 0 && credits > 0) ? 'Mark by AI (1 credit)' : 'Mark by AI';
@@ -3066,6 +3088,7 @@ answerTextarea.addEventListener('input',()=>{
  const n=wc(answerTextarea.value);wordCountEl.textContent=n+' word'+(n!==1?'s':'');
  refreshAiMarkButton();
  if(sessionHistory[currentIdx])sessionHistory[currentIdx].answer=answerTextarea.value;
+ if(currentMode===MODE_CASPER && sessionActive && !window.K2_ACTIVE_CASPER_MOCK && n>20) triggerAutoSave(currentIdx);
 });
 
 function updateReflectionUI(){
@@ -3735,8 +3758,8 @@ async function manualRunAI(){
  const limits=auth.getLimits();
  const toolLimits=limits?.casper;
  const isPro=!!auth.isPro();
- const rem=isPro?99:(toolLimits?Math.max(0,toolLimits.limit-toolLimits.used):0);
- const credits=toolLimits?.credits||0;
+ const rem=isPro?99:casperFreeRemaining(toolLimits,0);
+ const credits=casperCreditBalance(toolLimits);
  const canUse=isPro||rem>0||credits>0;
  if(!canUse){ refreshAiMarkButton(); return; }
  aiButtons.forEach(b=>{b.textContent=(rem<=0&&credits>0)?'Mark by AI (1 credit)':'Mark by AI';});
@@ -3763,26 +3786,13 @@ async function runAI(idx){
  return;
  }
 
- const limits = auth.getLimits();
- const toolLimits = limits?.casper;
- const freeRemaining = toolLimits ? Math.max(0, toolLimits.limit - toolLimits.used) : 0;
- const credits = toolLimits?.credits || 0;
- let useCredit = false;
+ await autoSaveResponse(buildAutoSaveRequest(idx));
 
- if(freeRemaining <= 0 && !auth.isPro()){
- if(credits > 0){ useCredit = true; }
- else {
- getAiFbEl().innerHTML=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-top:10px;">
- <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">Free AI review used for today</strong>
- <span style="font-size:0.82rem;color:#78350f;">Buy credits for more AI reviews, or use Friday class to see Dan's more realistic tutoring stations marked live.</span>
- <br><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
- <button onclick="openCreditShop()" style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Buy AI Credits -></button>
- <button onclick="location.href='casper-class.html?from=practice_free_used'" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Join Friday class -></button>
- </div>
- </div>`;
- updateLimitUI(); return;
- }
- }
+ const limits = await refreshPracticeLimits(auth) || auth.getLimits();
+ const toolLimits = limits?.casper;
+ const freeRemaining = auth.isPro() ? 99 : casperFreeRemaining(toolLimits, AI_LIMIT_MAX);
+ const credits = casperCreditBalance(toolLimits);
+ let useCredit = freeRemaining <= 0 && !auth.isPro() && credits > 0;
 
  const s=h.station;
  const stationContext = `SCENARIO: ${s.scenario || ''}
@@ -3822,19 +3832,35 @@ ${h.answer}
  }, delay));
  });
 
- const res = await fetch(`${API_BASE}/api/review/stream`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
- body: JSON.stringify({
- tool: 'casper', model: 'claude-sonnet-4-6', max_tokens: 1500,
- use_credit: useCredit,
+ const reviewPayload = {
+ tool: 'casper',
+ model: 'claude-sonnet-4-6',
+ max_tokens: 1500,
+ allow_paid_credit_fallback: true,
  messages: [{role:'user',content:p}],
  question_context: stationContext,
  user_response: h.answer,
  mock_exam: !!window.K2_ACTIVE_CASPER_MOCK,
  mock_tier: window.K2_ACTIVE_CASPER_MOCK?.tier || 'transcript',
- }),
+ };
+ const postReview = paid => fetch(`${API_BASE}/api/review/stream`, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+ body: JSON.stringify({ ...reviewPayload, use_credit: !!paid }),
  });
+
+ let res = await postReview(useCredit);
+ if((res.status === 429 || res.status === 402) && !useCredit){
+ const d = await res.clone().json().catch(()=>({}));
+ const latest = await refreshPracticeLimits(auth) || auth.getLimits();
+ const latestCredits = casperCreditBalance(latest?.casper) || casperCreditBalance({ credits: d.credits });
+ if(latestCredits > 0){
+ useCredit = true;
+ const el = msgEl();
+ if(el) el.textContent = 'Using one paid CASPer credit...';
+ res = await postReview(true);
+ }
+ }
 
  clearStreamTimers();
 
@@ -3850,6 +3876,20 @@ ${h.answer}
  </div>
  </div>`;
  updateLimitUI(); return;
+ }
+ if(res.status === 402){
+ const d = await res.json().catch(()=>({}));
+ if(['no_credits','free_trials_disabled'].includes(d.error)){
+ container.innerHTML=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-top:10px;">
+ <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">CASPer AI credit needed</strong>
+ <span style="font-size:0.82rem;color:#78350f;">${d.message||'Buy credits for more AI reviews, or wait until your free review resets.'}</span>
+ <br><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+ <button onclick="openCreditShop()" style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Buy AI Credits -></button>
+ <button onclick="location.href='casper-class.html?from=practice_credit_needed'" style="background:#f59e0b;color:#0a1628;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Join Friday class -></button>
+ </div>
+ </div>`;
+ updateLimitUI(); return;
+ }
  }
  if(isAiBusyStatus(res.status)){
  const d = await res.json().catch(()=>({}));
@@ -3886,6 +3926,7 @@ ${h.answer}
  h.score = fb.score;
  h.feedback = fb;
  h.aiSaved = true;
+ await refreshPracticeLimits(auth);
  recordCompetencyProgress(h.station,fb);
  const _sid = getStationHistoryId(h.station, currentMode);
  if(!_sessionRecordedIds.has(_sid)){_sessionRecordedIds.add(_sid);StationHistory.record(_sid,fb.score);}
