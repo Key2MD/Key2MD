@@ -70,9 +70,10 @@ window.mmiHideCentralTimer = function() {
 
 // -- Helpers -----------------------------------------------------------------
 const _$ = id => document.getElementById(id);
+const _promptIndexes = () => Array.from({ length: Number(window.MMI_MAX_PROMPTS || 5) }, (_, i) => i + 1);
 
 function _showWrap(idx, content) {
- // idx is 1-based (1=prompt1Wrap ... 4=prompt4Wrap)
+ // idx is 1-based (1=prompt1Wrap ... 5=prompt5Wrap)
  const w = _$(`prompt${idx}Wrap`);
  if (!w) return;
  if (content !== undefined) {
@@ -84,7 +85,7 @@ function _showWrap(idx, content) {
 }
 
 function _hideAllWraps() {
- [1,2,3,4].forEach(i => {
+ _promptIndexes().forEach(i => {
  const w = _$(`prompt${i}Wrap`);
  if (w) w.style.display = 'none';
  });
@@ -92,7 +93,7 @@ function _hideAllWraps() {
 
 function _highlightWrap(idx) {
  // idx 1-based
- [1,2,3,4].forEach(i => {
+ _promptIndexes().forEach(i => {
  const w = _$(`prompt${i}Wrap`);
  if (!w) return;
  w.classList.toggle('qf-active-prompt', i === idx);
@@ -100,7 +101,7 @@ function _highlightWrap(idx) {
 }
 
 function _removeAllHighlights() {
- [1,2,3,4].forEach(i => {
+ _promptIndexes().forEach(i => {
  const w = _$(`prompt${i}Wrap`);
  if (w) w.classList.remove('qf-active-prompt');
  });
@@ -252,9 +253,9 @@ window.mmiStartRandom = function(allPrompts, cfg) {
  _randWarnShown = false;
  if (_randTimer) clearInterval(_randTimer);
 
- // Decide number of follow-ups
- const min = cfg.followUpMin || 1, max = cfg.followUpMax || 2;
- const count = min + Math.floor(Math.random() * (max - min + 1));
+ // The user-selected question count controls how many follow-ups can appear.
+ // Random mode randomises timing, not the number of questions the student chose.
+ const count = Math.max(0, Math.min(allPrompts.length - 1, Number(cfg.promptCount || allPrompts.length) - 1));
  const total = cfg.recordingTime;
 
  // Space follow-ups evenly with small jitter
@@ -432,7 +433,7 @@ window.mmiDispatchStartWriting = function() {
 
  const s = pool[currentIdx];
  const cfg = window.getMMIConfig ? getMMIConfig() : { revealMode: 'all_at_once', recordingTime: 300, promptCount: 3 };
- const allP = (window.getPrompts ? getPrompts(s) : [s.prompt1, s.prompt2, s.prompt3, s.prompt4].filter(Boolean)).slice(0, cfg.promptCount);
+ const allP = (window.getPrompts ? getPrompts(s) : [s.prompt1, s.prompt2, s.prompt3, s.prompt4, s.prompt5].filter(Boolean)).slice(0, cfg.promptCount);
 
  // Populate all text elements up front
  allP.forEach((p, i) => { const t = _$(`prompt${i+1}Text`); if (t) t.textContent = p; });
