@@ -157,7 +157,6 @@ const Key2MDAuth = (() => {
  const toolLimits = _limits[_config.tool];
  if (toolLimits?.unlimited) return { allowed: true };
  if (_user.tier === 'pro' && _config.tool === 'casper') return { allowed: true };
- if (toolLimits && toolLimits.remaining <= 0 && !toolLimits.credits) return { allowed: false, reason: 'limit_reached' };
  return { allowed: true };
  }
 
@@ -173,6 +172,10 @@ const Key2MDAuth = (() => {
  }
 
  const token = getToken();
+ const toolLimits = _limits?.[_config.tool];
+ const freeRemaining = Number.isFinite(Number(toolLimits?.remaining)) ? Number(toolLimits.remaining) : null;
+ const creditBalance = Number(toolLimits?.credits || 0);
+ const shouldUseCredit = !!extraContext.use_credit || (_config.tool === 'casper' && _user?.tier !== 'pro' && freeRemaining !== null && freeRemaining <= 0 && creditBalance > 0);
  const res = await fetch(`${_config.apiBase}/api/review`, {
  method: 'POST',
  headers: getTrackingHeaders({
@@ -184,7 +187,8 @@ const Key2MDAuth = (() => {
  model: extraContext.model || 'claude-sonnet-4-6',
  max_tokens: extraContext.max_tokens || 625,
  system: extraContext.system || undefined,
- use_credit: extraContext.use_credit || false,
+ use_credit: shouldUseCredit,
+ allow_paid_credit_fallback: extraContext.allow_paid_credit_fallback || shouldUseCredit || _config.tool === 'casper',
  messages,
  question_context: extraContext.question || '',
  user_response: extraContext.response || '',
@@ -242,7 +246,7 @@ const Key2MDAuth = (() => {
 
  async function loadLimits() {
  const token = getToken();
- if (!token) return;
+ if (!token) return _limits;
 
  try {
  const res = await fetch(`${_config.apiBase}/api/limits`, {
@@ -251,8 +255,10 @@ const Key2MDAuth = (() => {
  _limits = await res.json();
  _config.onLimitsLoaded(_limits);
  updateLimitUI();
+ return _limits;
  } catch {
  // silent fail
+ return _limits;
  }
  }
 
@@ -740,6 +746,7 @@ const Key2MDAuth = (() => {
  getToken,
  getTrackingHeaders,
  getApiBase,
+ refreshLimits: loadLimits,
  canReview,
  canMakeRequest,
  requestReview,

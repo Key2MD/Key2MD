@@ -271,9 +271,10 @@
  .competency-bar{height:5px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;margin-top:4px;}
  .competency-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));border-radius:99px;}
  .signal-stack{display:flex;gap:4px;align-items:center;flex-wrap:wrap;}
- .signal-chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:999px;border:1px solid var(--border);font-size:0.62rem;font-weight:750;color:var(--muted);background:rgba(255,255,255,0.04);}
- .signal-chip.low{color:var(--red);border-color:var(--red-border);background:var(--red-dim);}
- .signal-chip.high{color:var(--green);border-color:var(--green-border);background:var(--green-dim);}
+.signal-chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:999px;border:1px solid var(--border);font-size:0.62rem;font-weight:750;color:var(--muted);background:rgba(255,255,255,0.04);}
+.signal-chip.low{color:var(--red);border-color:var(--red-border);background:var(--red-dim);}
+.signal-chip.high{color:var(--green);border-color:var(--green-border);background:var(--green-dim);}
+.signal-chip.warn{color:var(--amber);border-color:var(--amber-border);background:var(--amber-dim);}
  .admin-note{border:1px solid var(--border);background:rgba(255,255,255,0.035);border-radius:10px;padding:10px 12px;color:var(--muted);font-size:0.76rem;line-height:1.55;}
  .admin-note strong{color:var(--text);}
  .admin-note.blue{border-color:var(--blue-border);background:var(--blue-dim);}
@@ -3337,10 +3338,13 @@ function renderReviews() {
  rows.forEach(row => {
  const fb = parseFb(row.ai_feedback);
  const score = fb?.score;
+ const hasFeedback = !!String(row.ai_feedback || '').trim();
+ const answerWords = String(row.response_text || '').trim().split(/\s+/).filter(Boolean).length;
+ const canRerun = answerWords >= 20;
  const dt = fmtDate(row.created_at);
  const p = parseQ(row.question_text);
  const prev = (p?.scenario||row.question_text||'').substring(0,100);
- const signals = renderReviewSignals(fb);
+ const signals = hasFeedback ? renderReviewSignals(fb) : '<span class="signal-chip warn">No AI saved</span>';
 
  const dr = document.createElement('tr');
  dr.className = 'data-row';
@@ -3361,9 +3365,12 @@ function renderReviews() {
  <div class="detail-box"><div class="detail-box-hd">AI Feedback</div>${renderFbBox(row.ai_feedback)}</div>
  <div class="detail-box">
  <div class="detail-box-hd">Admin correction</div>
- <div class="detail-box-body">Remove this station from the student's saved history and leaderboard score if it was a misclick or false mark.</div>
+ <div class="detail-box-body">${hasFeedback ? 'Remove this station from the student history if it was a misclick, or re-run feedback if the original feedback looks broken.' : 'This response is saved without AI feedback. Re-run it here without charging a credit/free attempt.'}</div>
  <div class="detail-box-row" style="margin-top:8px;"><strong>Review ID:</strong> ${esc(row.id || '-')}</div>
- <button class="btn red" style="margin-top:10px;" onclick='removeReviewFromHistory(${jsArg(row.id)}, "casper")'>Remove from history</button>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+ ${canRerun ? `<button class="btn blue" onclick='rerunReviewFeedback(${jsArg(row.id)})'>Re-run AI feedback</button>` : ''}
+ <button class="btn red" onclick='removeReviewFromHistory(${jsArg(row.id)}, "casper")'>Remove from history</button>
+ </div>
  </div>
  </div></td>`;
  dr.addEventListener('click', () => { xr.classList.toggle('open'); dr.classList.toggle('expanded'); });
@@ -3376,6 +3383,44 @@ function findReviewById(reviewId) {
  return (S.reviews || []).find(row => String(row.id || '') === id)
  || (S.s2Reviews || []).find(row => String(row.id || '') === id)
  || null;
+}
+
+async function rerunReviewFeedback(reviewId) {
+ const row = findReviewById(reviewId);
+ if (!row?.id) {
+  alert('Could not find that saved response in the currently loaded admin table.');
+  return;
+ }
+ const answerWords = String(row.response_text || '').trim().split(/\s+/).filter(Boolean).length;
+ if (answerWords < 20) {
+  alert('That saved response is too short to re-run.');
+  return;
+ }
+ const label = [
+  row.email || 'unknown student',
+  row.tool || 'review',
+  row.created_at ? fmtDate(row.created_at)?.date : '',
+  `ID ${row.id}`,
+ ].filter(Boolean).join(' | ');
+ if (!confirm(`Re-run AI feedback for this saved response?\n\n${label}\n\nThis does not charge a credit or free attempt.`)) return;
+ const statusId = row.tool === 'gamsat' ? 's2Status' : 'revStatus';
+ setText(statusId, 'Re-running AI feedback...');
+ try {
+  const res = await api('/admin/reviews/rerun', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify({ id: row.id }),
+  });
+  const data = await res.json().catch(()=>({}));
+  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not re-run review');
+  if (row.tool === 'gamsat') await loadS2Reviews();
+  else await loadReviews();
+  updateDashboard();
+  setText(statusId, 'AI feedback re-run saved.');
+ } catch(e) {
+  setText(statusId, `Re-run failed: ${e.message}`);
+  alert(`Could not re-run this response: ${e.message}`);
+ }
 }
 
 async function removeReviewFromHistory(reviewId, tool = '') {
