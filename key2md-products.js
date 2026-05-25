@@ -95,7 +95,7 @@
  area: 'Strategy',
  title: '15-minute preferences discussion',
  price: '$75',
- href: 'https://buy.stripe.com/cNibIUbWNeko8qigbBfjG01',
+ href: 'booking.html?type=intro',
  cta: 'Pay $75 and request times',
  bestFor: 'When you want Dan to sanity-check your chances, preference order, or edge-case admissions rules before GEMSAS closes.',
  tags: ['strategy', 'call', 'preference']
