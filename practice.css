@@ -455,9 +455,43 @@
  .mmi-options { display:flex; flex-direction:column; gap:8px; }
  .mmi-opt-row { display:flex; align-items:center; justify-content:space-between; font-size:0.83rem; color:var(--gray600); }
  .mmi-opt-label { font-size:0.83rem; color:var(--gray600); }
+ .mmi-sidebar-note { border:1px solid rgba(124,58,237,0.16); background:linear-gradient(180deg,#fff,#faf7ff); border-radius:10px; padding:11px 12px; color:var(--gray600); font-size:0.76rem; line-height:1.5; margin-bottom:12px; }
+ .mmi-sidebar-note strong { display:block; color:#6d28d9; font-weight:900; margin-bottom:3px; }
  .mmi-prompt-count-btn { min-height:34px; border:1px solid var(--gray200); border-radius:8px; background:#fff; color:var(--gray700); font-family:inherit; font-size:0.82rem; font-weight:800; cursor:pointer; transition:background 0.16s,border-color 0.16s,color 0.16s,box-shadow 0.16s; }
  .mmi-prompt-count-btn:hover { border-color:rgba(14,165,233,0.45); color:var(--teal3); }
  .mmi-prompt-count-btn.active { background:var(--navy); border-color:var(--navy); color:#fff; box-shadow:0 5px 12px rgba(10,22,40,0.14); }
+
+ .mmi-timer-picker { margin:26px auto 0; max-width:640px; text-align:left; }
+ .mmi-timer-picker-head { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:10px; }
+ .mmi-timer-kicker { font-size:0.68rem; font-weight:900; letter-spacing:0.12em; text-transform:uppercase; color:#6d28d9; }
+ .mmi-timer-title { font-size:0.92rem; font-weight:900; color:var(--navy); line-height:1.25; margin-top:2px; }
+ .mmi-timer-selected { flex-shrink:0; border:1px solid rgba(124,58,237,0.2); background:rgba(124,58,237,0.07); color:#6d28d9; border-radius:999px; padding:5px 10px; font-size:0.68rem; font-weight:900; white-space:nowrap; }
+ .mmi-timer-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+ .mmi-timer-choice { min-height:86px; border-color:#d8d5e6; background:linear-gradient(135deg,#fff,#f9f7ff); }
+ .mmi-timer-picker .mmi-timer-choice:hover { border-color:#7c3aed; background:linear-gradient(135deg,#fff,rgba(124,58,237,0.06)); transform:translateY(-1px); }
+ .mmi-timer-picker .mmi-timer-choice.active { border-color:#7c3aed; background:linear-gradient(135deg,rgba(124,58,237,0.11),#fff); box-shadow:0 8px 20px rgba(124,58,237,0.12); }
+ .mmi-timer-choice .preset-name { display:block; font-size:0.82rem; font-weight:900; color:var(--navy); margin-bottom:4px; }
+ .mmi-timer-choice .preset-detail { display:block; font-size:0.69rem; color:var(--gray600); line-height:1.38; }
+ .mmi-timer-picker .mmi-timer-choice.active .preset-name, .mmi-timer-picker .mmi-timer-choice.active .preset-detail { color:#6d28d9; }
+ .mmi-timer-choice-custom { grid-column:1/-1; min-height:72px; }
+ .mmi-timer-picker .mmi-custom-config { margin-top:10px; border-color:rgba(124,58,237,0.18); background:linear-gradient(180deg,#fff,#fbfaff); }
+ .mmi-custom-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+ .mmi-custom-grid label { display:block; min-width:0; }
+ .mmi-custom-grid select,
+ .mmi-custom-grid input[type="number"] { width:100%; min-height:38px; padding:8px 10px; border:1px solid var(--gray200); border-radius:8px; background:#fff; color:var(--gray800); font-family:inherit; font-size:0.82rem; font-weight:700; outline:none; }
+ .mmi-custom-grid select:focus,
+ .mmi-custom-grid input[type="number"]:focus { border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,0.1); }
+ .mmi-custom-hint { font-size:0.72rem; color:var(--gray500); line-height:1.45; margin-top:8px; }
+ .mmi-central-timer { align-items:center; justify-content:space-between; gap:16px; width:min(520px,100%); margin:0 auto 14px; padding:15px 18px; border:1px solid rgba(124,58,237,0.2); border-radius:14px; background:linear-gradient(135deg,#fff,rgba(124,58,237,0.06)); box-shadow:0 12px 28px rgba(10,22,40,0.08); font-family:inherit; }
+ .mmi-central-timer.is-reading { border-color:rgba(124,58,237,0.24); background:linear-gradient(135deg,#fff,rgba(124,58,237,0.08)); }
+ .mmi-central-timer.is-answer { border-color:rgba(239,68,68,0.2); background:linear-gradient(135deg,#fff,rgba(239,68,68,0.055)); }
+ .mmi-central-copy { display:flex; flex-direction:column; min-width:110px; }
+ .mmi-central-label { font-size:0.68rem; font-weight:900; letter-spacing:0.1em; text-transform:uppercase; color:#6d28d9; }
+ .mmi-central-timer.is-answer .mmi-central-label { color:#dc2626; }
+ .mmi-central-sub { font-size:0.72rem; color:var(--gray500); font-weight:700; margin-top:2px; }
+ .mmi-central-number { flex:1; text-align:center; font-size:2.25rem; line-height:1; font-weight:950; color:var(--navy); font-variant-numeric:tabular-nums; letter-spacing:0; }
+ .mmi-central-number.urgent { color:var(--red); }
+ .mmi-central-remaining { min-width:70px; text-align:right; font-size:0.68rem; color:var(--gray400); font-weight:900; text-transform:uppercase; letter-spacing:0.08em; }
 
  /* -- Download button -- */
  .btn-download { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:50px; border:1.5px solid var(--teal3); background:rgba(14,165,233,0.06); color:var(--teal3); font-size:0.83rem; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:inherit; white-space:nowrap; }
@@ -521,6 +555,14 @@
  .station-num { font-size:0.7rem; }
  .timer-mode-card { min-height:80px; padding:12px 12px 11px 54px; }
  .tmc-icon { left:12px; top:12px; width:31px; height:31px; font-size:1.08rem; }
+ .mmi-timer-picker { max-width:100%; margin-top:22px; }
+ .mmi-timer-picker-head { align-items:flex-start; flex-direction:column; gap:7px; }
+ .mmi-timer-selected { white-space:normal; }
+ .mmi-timer-grid, .mmi-custom-grid { grid-template-columns:1fr; }
+ .mmi-timer-choice-custom { grid-column:auto; }
+ .mmi-central-timer { flex-direction:column; align-items:center; gap:9px; text-align:center; padding:14px; }
+ .mmi-central-copy, .mmi-central-remaining { min-width:0; text-align:center; }
+ .mmi-central-number { font-size:2rem; }
  .practice-coach-strip { grid-template-columns:1fr; padding:16px; }
  .practice-coach-actions { min-width:0; width:100%; }
  .practice-insights-head { display:block; padding:16px; }

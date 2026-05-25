@@ -18,45 +18,38 @@ window.mmiShowCentralTimer = function(totalSec, label, colorClass) {
  if (!el) {
  el = document.createElement('div');
  el.id = 'mmiCentralTimer';
- el.style.cssText = [
- 'display:flex','align-items:center','justify-content:space-between',
- 'gap:10px','padding:12px 20px',
- 'background:rgba(14,165,233,0.07)','border:1px solid rgba(14,165,233,0.18)',
- 'border-radius:12px','margin-bottom:14px','font-family:inherit',
- 'transition:background 0.3s,border-color 0.3s',
- ].join(';');
+ el.className = 'mmi-central-timer';
  el.innerHTML = `
- <span id="mmiCtLabel" style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--teal3);min-width:80px;"></span>
- <span id="mmiCtNum" style="font-size:1.9rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;text-align:center;flex:1;"></span>
- <span style="font-size:0.68rem;color:var(--gray400);font-weight:500;min-width:60px;text-align:right;">remaining</span>
+ <div class="mmi-central-copy">
+ <span id="mmiCtLabel" class="mmi-central-label"></span>
+ <span id="mmiCtSub" class="mmi-central-sub">MMI station timer</span>
+ </div>
+ <span id="mmiCtNum" class="mmi-central-number">--:--</span>
+ <span class="mmi-central-remaining">remaining</span>
  `;
  const pa = document.getElementById('promptsArea');
  if (pa) pa.insertBefore(el, pa.firstChild);
  }
  if (_ctInterval) clearInterval(_ctInterval);
+ el.className = 'mmi-central-timer ' + (colorClass === 'red' ? 'is-answer' : colorClass === 'purple' ? 'is-reading' : '');
  el.style.display = 'flex';
 
  const numEl = document.getElementById('mmiCtNum');
  const labelEl = document.getElementById('mmiCtLabel');
+ const subEl = document.getElementById('mmiCtSub');
  if (labelEl) labelEl.textContent = label || '';
-
- // color variants
- el.style.background = colorClass === 'red' ? 'rgba(239,68,68,0.06)' :
- colorClass === 'purple' ? 'rgba(99,102,241,0.07)' :
- 'rgba(14,165,233,0.07)';
- el.style.borderColor = colorClass === 'red' ? 'rgba(239,68,68,0.2)' :
- colorClass === 'purple' ? 'rgba(99,102,241,0.2)' :
- 'rgba(14,165,233,0.18)';
+ if (subEl) subEl.textContent = colorClass === 'red' ? 'Answer aloud' : 'Read and plan';
 
  const fmt = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
  let sLeft = totalSec;
  if (numEl) numEl.textContent = fmt(sLeft);
+ if (numEl) numEl.classList.toggle('urgent', sLeft <= 30);
 
  _ctInterval = setInterval(() => {
  sLeft = Math.max(0, sLeft - 1);
  if (numEl) {
  numEl.textContent = fmt(sLeft);
- numEl.style.color = sLeft <= 30 ? '#ef4444' : 'var(--navy)';
+ numEl.classList.toggle('urgent', sLeft <= 30);
  }
  if (sLeft <= 0) clearInterval(_ctInterval);
  }, 1000);
