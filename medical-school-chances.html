@@ -1138,6 +1138,17 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div class="field-hint">Your <a href="blog-gemsas-gpa-explained.html" style="color:var(--teal3);text-decoration:underline;">GEMSAS-calculated GPA</a>, not your university GPA. Need an estimate? Use the <a href="gemsas-gpa-calculator.html" style="color:var(--teal3);text-decoration:underline;">GEMSAS GPA calculator</a>.</div>
  <div class="input-error" id="gpaErr">Enter a GPA between 4.0 and 7.0.</div>
+            <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <label for="gpaFlindersInput" style="font-size:0.72rem;font-weight:600;color:var(--gray400);white-space:nowrap;">Flinders GPA <span style="font-weight:400;">(optional)</span></label>
+              <input type="number" id="gpaFlindersInput" step="0.01" min="4" max="7" placeholder="e.g. 6.60" inputmode="decimal" autocomplete="off" style="width:110px;min-height:34px;border:1px solid var(--gray200);border-radius:8px;padding:0 10px;font:inherit;font-size:0.85rem;font-weight:700;color:var(--navy);">
+              <details style="display:inline;font-size:0.68rem;color:var(--gray400);">
+                <summary style="display:inline;cursor:pointer;color:var(--gray400);font-size:0.68rem;list-style:none;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dotted;">Flinders only. What GPA to use?</summary>
+                <div style="margin-top:8px;padding:10px 12px;background:#f8fafc;border:1px solid var(--gray200);border-radius:8px;font-size:0.72rem;color:var(--gray600);line-height:1.6;max-width:340px;">
+                  Flinders calculates its own weighted GPA — it is not the same as your GEMSAS GPA. If you have already run the Flinders wGPA calculation from their Application Guide, use that figure here.<br><br>
+                  If you haven't, use your <strong>home university GPA</strong> (the raw GPA on your transcript, out of 7). That is a closer approximation than GEMSAS GPA, which applies a different weighting formula. Do <strong>not</strong> use your GEMSAS GPA here.
+                </div>
+              </details>
+            </div>
  </div>
  <div class="field">
  <label>GAMSAT score</label>
@@ -2311,6 +2322,7 @@ document.getElementById('scoreModeSections').addEventListener('click', () => set
 const calcBtn = document.getElementById('calcBtn');
 const recalcBtn = document.getElementById('recalcBtn');
 const gpaIn = document.getElementById('gpaInput');
+const gpaFlindersIn = document.getElementById('gpaFlindersInput');
 const gamWeightedIn = document.getElementById('gamsatWeightedInput');
 const gamUnweightedIn = document.getElementById('gamsatUnweightedInput');
 const gamS1In = document.getElementById('gamsatS1Input');
@@ -3469,7 +3481,10 @@ function renderCasperBadge(u) {
 
 function renderFlindersCard(u, gpa, scores) {
  const gam = scores.weighted;
- const combo = gpa / 7 + gam / 100;
+ const flindersGpaRaw = gpaFlindersIn ? parseFloat(gpaFlindersIn.value) : NaN;
+ const flindersGpa = (!isNaN(flindersGpaRaw) && flindersGpaRaw >= 4 && flindersGpaRaw <= 7) ? flindersGpaRaw : gpa;
+ const usingFlindersGpa = flindersGpa !== gpa;
+ const combo = flindersGpa / 7 + gam / 100;
  const isInternal = !!(state.bonuses['flinders'] && state.bonuses['flinders'].includes('flindersDegree'));
  const iv = isInternal ? u.interview : u.interviewExternal;
  const cutoff = state.rural ? (u.cutoffR || 1.413) : (isInternal ? u.cutoffNR : (u.cutoffNRExternal || 1.60));
@@ -3491,19 +3506,24 @@ function renderFlindersCard(u, gpa, scores) {
  const medPct = pctOf(iv.med);
  const cutoffPct = pctOf(cutoff);
  rangeHtml = `
- <div class="range-bar-wrap">
- <div class="range-bar-track">
- <div class="range-bar-fill" style="left:${Math.min(cutoffPct,medPct).toFixed(2)}%;width:${Math.abs(medPct-cutoffPct).toFixed(2)}%;"></div>
- <div class="range-bar-cutoff${cutoffPct < 10 ? ' at-left' : (cutoffPct > 90 ? ' at-right' : '')}" style="left:${cutoffPct.toFixed(2)}%;"></div>
- <div class="range-bar-median" style="left:${medPct.toFixed(2)}%;"></div>
- <div class="range-bar-you${youPct < 10 ? ' at-left' : (youPct > 90 ? ' at-right' : '')}" style="left:${youPct.toFixed(2)}%;"></div>
- </div>
- <div class="range-bar-legend">
- <span class="l-you">You (${combo.toFixed(3)})</span>
- <span class="l-median">Median offer (${iv.med.toFixed(3)})</span>
- <span class="l-cutoff">Cut-off (${cutoff.toFixed(3)})</span>
- </div>
- </div>`;
+    <div class="range-bar-wrap">
+      <div class="range-bar-title">Position vs 2025 offer cohort</div>
+      <div class="range-bar-ticks-top">
+        <span>${low.toFixed(3)}</span>
+        <span>${((low + high) / 2).toFixed(3)}</span>
+        <span>${high.toFixed(3)}</span>
+      </div>
+      <div class="range-bar">
+        <div class="range-bar-cutoff${cutoffPct < 10 ? ' at-left' : (cutoffPct > 90 ? ' at-right' : '')}" style="left:${cutoffPct.toFixed(2)}%;"></div>
+        <div class="range-bar-median" style="left:${medPct.toFixed(2)}%;"></div>
+        <div class="range-bar-you${youPct < 10 ? ' at-left' : (youPct > 90 ? ' at-right' : '')}" style="left:${youPct.toFixed(2)}%;"></div>
+      </div>
+      <div class="range-bar-legend">
+        <span class="l-you">You (${combo.toFixed(3)})</span>
+        <span class="l-median">Median offer (${iv.med.toFixed(3)})</span>
+        <span class="l-cutoff">Cut-off (${cutoff.toFixed(3)})</span>
+      </div>
+    </div>`;
  }
 
  return `
@@ -3519,7 +3539,8 @@ function renderFlindersCard(u, gpa, scores) {
  </div>
  <div class="uni-body">
  Combo ${combo.toFixed(3)} vs ${cutoff.toFixed(3)} ${state.rural ? 'rural' : (isInternal ? 'internal' : 'external')} cutoff (${aboveBelow}).
- ${!isInternal && !state.rural ? '<div style="margin-top:6px;font-size:0.8rem;color:var(--gray500);">Tick "Flinders University graduate" in the bonus panel if you are a Flinders graduate — the cutoff drops to ~1.47.</div>' : ''}
+ ${usingFlindersGpa ? '<div style="margin-top:5px;font-size:0.78rem;color:#7c3aed;font-weight:600;">Using your Flinders GPA (' + flindersGpa.toFixed(2) + ') — not GEMSAS GPA.</div>' : '<div style="margin-top:5px;font-size:0.78rem;color:#b45309;font-weight:600;">⚠ Using GEMSAS GPA as fallback — enter your Flinders GPA in the input above for a more accurate result.</div>'}
+ ${!isInternal && !state.rural ? '<div style="margin-top:5px;font-size:0.8rem;color:var(--gray500);">Tick "Flinders University graduate" in the bonus panel if you are a Flinders graduate — the cutoff drops to ~1.47.</div>' : ''}
  </div>
  ${rangeHtml}
  <div class="uni-notes" style="background:#faf5ff;border-left-color:#7c3aed;">
