@@ -744,6 +744,15 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <strong style="color:#7c3aed;display:block;margin-bottom:4px;">MMI AI Feedback - Credits Required</strong>
  MMI AI feedback uses paid credits or MMI Pro access because spoken-response review includes transcription, criterion marking and optional presentation analysis. The timed MMI station bank remains free to practise with.
  </div>
+ <div id="mmiFounderPracticeCard" style="font-size:0.75rem;color:var(--gray700);line-height:1.55;padding:10px 12px;background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(14,165,233,0.07));border:1px solid rgba(124,58,237,0.22);border-radius:8px;margin-bottom:8px;">
+ <strong style="color:#6d28d9;display:block;margin-bottom:4px;">MMI Founder pricing</strong>
+ 10% off MMI Transcript Pro or 25% off MMI Premium Pro for early MMI users. This is for the early phase while Dan keeps polishing the system - most bugs are ironed out, and if anything odd appears, Dan is very responsive :P
+ <div id="mmiFounderPracticeStatus" style="font-size:0.72rem;color:var(--gray500);margin-top:7px;">Applies to MMI Pro only. Credit packs keep their normal bundle savings.</div>
+ <div style="display:flex;gap:8px;margin-top:8px;">
+ <button type="button" id="mmiFounderPracticeBtn" onclick="claimMMIFounderPricingFromPractice(this)" style="flex:1;padding:8px;border:none;border-radius:8px;background:#7c3aed;color:#fff;font-size:0.76rem;font-weight:800;font-family:inherit;cursor:pointer;">Claim founder pricing</button>
+ <a href="plans.html#mmi-section" style="flex:1;padding:8px;border-radius:8px;background:#fff;border:1px solid rgba(124,58,237,0.25);color:#6d28d9;font-size:0.76rem;font-weight:800;text-align:center;text-decoration:none;">View plans</a>
+ </div>
+ </div>
  <div class="mmi-credit-info">
  <div class="mmi-credit-row">
  <span class="mmi-credit-label" id="mmiCreditLabel">Transcript access</span>
@@ -2158,6 +2167,8 @@ async function updateMMILimitsUI() {
  const res = await fetch(API_BASE + '/api/mmi/limits', { headers: { 'Authorization': `Bearer ${token}` } });
  if(!res.ok) return;
  const data = await res.json();
+ mmiFounderPracticeState = data;
+ updateMMIFounderPracticeCard(data);
  const selectedTier = mmiPremiumMode ? 'premium' : 'transcript';
  const access = data[selectedTier] || {};
  const rawCredits = selectedTier === 'premium' ? data.mmi_premium_credits : data.mmi_transcript_credits;
@@ -2173,6 +2184,106 @@ async function updateMMILimitsUI() {
  : `${rawCredits ?? access.remaining ?? 0} ${tierLabel.toLowerCase()} credit${Number(rawCredits ?? access.remaining ?? 0) === 1 ? '' : 's'} available.`;
  }
  } catch {}
+}
+
+let mmiFounderPracticeState = null;
+
+function isPracticeMMIFounderActive(state = mmiFounderPracticeState) {
+ if (!state) return false;
+ if (state.founding_member_active) return true;
+ const expiry = Number(state.founding_member_expires_at || state.expires_at || 0);
+ return !!state.founding_member && (!expiry || expiry > Date.now());
+}
+
+function updateMMIFounderPracticeCard(state = mmiFounderPracticeState) {
+ const status = document.getElementById('mmiFounderPracticeStatus');
+ const btn = document.getElementById('mmiFounderPracticeBtn');
+ if (!status || !btn) return;
+ if (isPracticeMMIFounderActive(state)) {
+ const expiry = Number(state?.founding_member_expires_at || state?.expires_at || 0);
+ let until = '';
+ try { if (expiry) until = ` until ${new Date(expiry).toLocaleDateString([], { month:'short', day:'numeric' })}`; } catch {}
+ status.textContent = `Founder pricing is active${until}. It applies automatically to MMI Pro checkout.`;
+ btn.textContent = 'Founder active';
+ btn.disabled = true;
+ btn.style.opacity = '0.65';
+ btn.style.cursor = 'default';
+ return;
+ }
+ if (state?.reason === 'expired' || state?.expired) {
+ status.textContent = 'Your MMI founder pricing has expired. Standard MMI Pro pricing now applies.';
+ btn.textContent = 'Expired';
+ btn.disabled = true;
+ btn.style.opacity = '0.65';
+ btn.style.cursor = 'default';
+ return;
+ }
+ if (state?.reason === 'slots_full') {
+ status.textContent = 'Founder slots are currently full. Credit pack bundle savings still apply.';
+ btn.textContent = 'Slots full';
+ btn.disabled = true;
+ btn.style.opacity = '0.65';
+ btn.style.cursor = 'default';
+ return;
+ }
+ status.textContent = 'Applies to MMI Pro only. Credit packs keep their normal bundle savings.';
+ btn.textContent = 'Claim founder pricing';
+ btn.disabled = false;
+ btn.style.opacity = '1';
+ btn.style.cursor = 'pointer';
+}
+
+async function claimMMIFounderPricingFromPractice(btn) {
+ if (!Key2MDAuth?.isLoggedIn?.()) {
+ Key2MDAuth.showAuthModal('signup');
+ return;
+ }
+ const status = document.getElementById('mmiFounderPracticeStatus');
+ const originalText = btn?.textContent || 'Claim founder pricing';
+ if (btn) {
+ btn.disabled = true;
+ btn.textContent = 'Claiming...';
+ btn.style.opacity = '0.75';
+ }
+ if (status) status.textContent = 'Checking founder availability...';
+ try {
+ const token = Key2MDAuth.getToken();
+ const res = await fetch(API_BASE + '/api/mmi/founding', {
+ method:'POST',
+ headers:{ 'Authorization': `Bearer ${token}` },
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok && !['slots_full','expired'].includes(data.reason)) throw new Error(data.message || data.error || 'Could not claim founder pricing.');
+ mmiFounderPracticeState = ['slots_full','expired'].includes(data.reason)
+ ? { reason:data.reason, expired:data.reason === 'expired' }
+ : {
+ ...data,
+ founding_member: 1,
+ founding_member_active: true,
+ founding_member_expires_at: data.expires_at || data.founding_member_expires_at || null,
+ };
+ updateMMIFounderPracticeCard(mmiFounderPracticeState);
+ if (typeof showPracticeNotice === 'function' && !['slots_full','expired'].includes(data.reason)) {
+ showPracticeNotice('MMI founder pricing is active for Pro checkout.', 'success');
+ }
+ } catch (err) {
+ if (status) status.textContent = err?.message || 'Could not claim founder pricing. Please try again.';
+ if (btn) {
+ btn.disabled = false;
+ btn.textContent = originalText;
+ btn.style.opacity = '1';
+ }
+ }
+}
+
+function maybeShowMMIFounderNudge() {
+ try {
+ if (sessionStorage.getItem('k2md_mmi_founder_nudge_seen_v1')) return;
+ sessionStorage.setItem('k2md_mmi_founder_nudge_seen_v1', '1');
+ } catch {}
+ if (typeof showPracticeNotice === 'function') {
+ showPracticeNotice('MMI founder pricing is open: 10% off Transcript Pro or 25% off Premium Pro. See the MMI sidebar to claim.', 'success');
+ }
 }
 </script>
 <script>
@@ -2934,7 +3045,10 @@ function setMode(mode) {
  setPracticeSessionRunning(false);
  reviewPanel.classList.remove('show');scenarioCard.style.display='';
  updateLimitUI();
- if (currentMode === MODE_MMI) updateMMILimitsUI();
+ if (currentMode === MODE_MMI) {
+ updateMMILimitsUI();
+ maybeShowMMIFounderNudge();
+ }
  updateLibraryCoverage();
  renderStarredRevisionQueue();
  updatePersistentCompetencyProgress();

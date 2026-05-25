@@ -848,6 +848,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Why credits, not free?</div>
  <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.65;margin:0;">MMI feedback requires speech-to-text transcription plus spoken-response analysis, so it costs significantly more than a CASPer text review to run. The station bank is free to practise with; AI-marked MMI feedback uses credits or MMI Pro.</p>
  </div>
+ <div style="margin-bottom:22px;padding:15px 18px;background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(14,165,233,0.1));border:1px solid rgba(196,181,253,0.34);border-radius:14px;">
+ <div style="font-size:0.72rem;font-weight:800;color:#ddd6fe;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">MMI Founder pricing</div>
+ <p style="font-size:0.88rem;color:rgba(255,255,255,0.78);line-height:1.65;margin:0 0 8px;"><strong style="color:#fff;">10% off Transcript Pro</strong> or <strong style="color:#fff;">25% off Premium Pro</strong> for early MMI users.</p>
+ <p style="font-size:0.78rem;color:rgba(255,255,255,0.58);line-height:1.6;margin:0;">This is offered while Dan keeps polishing the early MMI system. Most bugs are already ironed out, but if anything odd happens, Dan is very responsive - as anyone who has messaged him knows :P</p>
+ </div>
  <div class="pro-feats">
  <div class="pro-feat">
  <div class="pro-feat-icon">R</div>
@@ -881,6 +886,18 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="pro-active-actions">
  <button class="btn-mmi-manage-sm" onclick="openBillingPortalFromPlans(this)">Billing</button>
  <button class="btn-cancel-sm" id="mmiCancelBtn" onclick="handleCancelMMI()">Cancel</button>
+ </div>
+ </div>
+
+ <div id="mmiFounderCard" style="margin-bottom:16px;padding:13px 14px;background:rgba(124,58,237,0.1);border:1px solid rgba(167,139,250,0.28);border-radius:12px;">
+ <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+ <div>
+ <div style="font-size:0.68rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#c4b5fd;margin-bottom:5px;">Early-bird founder offer</div>
+ <div id="mmiFounderTierText" style="font-size:0.86rem;font-weight:800;color:#fff;line-height:1.35;">Transcript Pro: 10% off</div>
+ <p style="font-size:0.74rem;color:rgba(255,255,255,0.6);line-height:1.55;margin:6px 0 0;">Applies to MMI Pro only. Credit packs keep their normal bundle savings.</p>
+ <div id="mmiFounderStatus" style="font-size:0.72rem;color:rgba(255,255,255,0.52);line-height:1.45;margin-top:7px;">Sign in and claim before checkout.</div>
+ </div>
+ <button id="mmiFounderClaimBtn" onclick="claimMMIFounderPricing(this)" style="flex:0 0 auto;border:none;border-radius:999px;background:#fff;color:#5b21b6;font-weight:800;font-family:inherit;font-size:0.75rem;padding:9px 12px;cursor:pointer;white-space:nowrap;">Claim</button>
  </div>
  </div>
 
@@ -1358,12 +1375,14 @@ let selectedPackId = null;
 let pendingAction = null;
 let plansBillingSummary = null;
 let plansBillingLoadInFlight = null;
+let plansMMIFounderState = null;
 
 document.addEventListener('DOMContentLoaded', () => {
  Key2MDAuth.init({ tool:'casper', apiBase:API_BASE, onAuthChange:updateUI });
  initFadeObserver();
  renderMMICreditPacks('transcript');
  updateMMIValueAnchor();
+ updateMMIFounderCard();
 });
 
 function updateUI() {
@@ -1400,6 +1419,7 @@ function updateUI() {
  // MMI active banner — driven from billing summary once loaded
  // Initial state from user object (mmi_pro field if present)
  updateMMIActiveState(user);
+ refreshMMIFounderState();
 }
 
 function updateMMIActiveState(user) {
@@ -1435,6 +1455,133 @@ function updateMMIActiveState(user) {
  mmiBanner.style.display = 'none';
  if (mmiCancelBtn) { mmiCancelBtn.textContent = 'Cancel'; mmiCancelBtn.disabled = false; }
  if (mmiProBtn) { mmiProBtn.disabled = false; mmiProBtn.style.opacity = '1'; }
+ }
+}
+
+function getMMIFounderDiscountPercent(tier = mmiTier) {
+ return tier === 'premium' ? 25 : 10;
+}
+
+function isMMIFounderActive(state = plansMMIFounderState) {
+ if (!state) return false;
+ if (state.founding_member_active) return true;
+ const expiry = Number(state.founding_member_expires_at || state.expires_at || 0);
+ return !!state.founding_member && (!expiry || expiry > Date.now());
+}
+
+function formatMMIFounderExpiry(value) {
+ const expiry = Number(value || 0);
+ if (!expiry) return '';
+ try {
+ return new Date(expiry).toLocaleDateString([], { month:'short', day:'numeric' });
+ } catch {
+ return '';
+ }
+}
+
+function updateMMIFounderCard(state = plansMMIFounderState) {
+ const tierText = document.getElementById('mmiFounderTierText');
+ const status = document.getElementById('mmiFounderStatus');
+ const btn = document.getElementById('mmiFounderClaimBtn');
+ const tierLabel = mmiTier === 'premium' ? 'Premium Pro' : 'Transcript Pro';
+ const percent = getMMIFounderDiscountPercent(mmiTier);
+ if (tierText) tierText.textContent = `${tierLabel}: ${percent}% off`;
+ if (!status || !btn) return;
+
+ const active = isMMIFounderActive(state);
+ const expiryText = formatMMIFounderExpiry(state?.founding_member_expires_at || state?.expires_at);
+ if (active) {
+ status.textContent = `Founder pricing active${expiryText ? ` until ${expiryText}` : ''}. It applies automatically to MMI Pro checkout.`;
+ btn.textContent = 'Active';
+ btn.disabled = true;
+ btn.style.opacity = '0.65';
+ btn.style.cursor = 'default';
+ return;
+ }
+
+ if (state?.reason === 'expired' || state?.expired) {
+ status.textContent = 'Your MMI founder pricing has expired. Standard MMI Pro pricing now applies.';
+ btn.textContent = 'Expired';
+ btn.disabled = true;
+ btn.style.opacity = '0.65';
+ btn.style.cursor = 'default';
+ return;
+ }
+
+ if (state?.reason === 'slots_full') {
+ status.textContent = 'Founder slots are currently full. Standard MMI pricing still applies.';
+ btn.textContent = 'Full';
+ btn.disabled = true;
+ btn.style.opacity = '0.65';
+ btn.style.cursor = 'default';
+ return;
+ }
+
+ status.textContent = Key2MDAuth?.isLoggedIn?.()
+ ? 'Claim founder pricing before starting MMI Pro checkout.'
+ : 'Sign in and claim before checkout.';
+ btn.textContent = 'Claim';
+ btn.disabled = false;
+ btn.style.opacity = '1';
+ btn.style.cursor = 'pointer';
+}
+
+async function refreshMMIFounderState() {
+ if (!Key2MDAuth?.isLoggedIn?.()) {
+ plansMMIFounderState = null;
+ updateMMIFounderCard();
+ return null;
+ }
+ try {
+ const token = Key2MDAuth.getToken();
+ const res = await fetch(`${API_BASE}/api/mmi/limits`, { headers:{ 'Authorization':`Bearer ${token}` } });
+ if (!res.ok) return null;
+ const data = await res.json();
+ plansMMIFounderState = data;
+ updateMMIFounderCard(data);
+ return data;
+ } catch {
+ return null;
+ }
+}
+
+async function claimMMIFounderPricing(btn) {
+ if (!Key2MDAuth?.isLoggedIn?.()) {
+ Key2MDAuth.showAuthModal('signup');
+ return;
+ }
+ const status = document.getElementById('mmiFounderStatus');
+ const originalText = btn?.textContent || 'Claim';
+ if (btn) {
+ btn.disabled = true;
+ btn.textContent = 'Claiming...';
+ btn.style.opacity = '0.75';
+ }
+ if (status) status.textContent = 'Checking founder availability...';
+ try {
+ const token = Key2MDAuth.getToken();
+ const res = await fetch(`${API_BASE}/api/mmi/founding`, {
+ method:'POST',
+ headers:{ 'Authorization':`Bearer ${token}` },
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok && !['slots_full','expired'].includes(data.reason)) throw new Error(data.message || data.error || 'Could not claim founder pricing.');
+ plansMMIFounderState = ['slots_full','expired'].includes(data.reason)
+ ? { reason:data.reason, expired:data.reason === 'expired' }
+ : {
+ ...data,
+ founding_member: 1,
+ founding_member_active: true,
+ founding_member_expires_at: data.expires_at || data.founding_member_expires_at || null,
+ };
+ updateMMIFounderCard(plansMMIFounderState);
+ } catch (err) {
+ if (status) status.textContent = err?.message || 'Could not claim founder pricing. Please try again.';
+ if (btn) {
+ btn.disabled = false;
+ btn.textContent = originalText;
+ btn.style.opacity = '1';
+ }
  }
 }
 
@@ -1926,6 +2073,7 @@ function switchMMITier(tier) {
  const costNote = document.getElementById('mmiPremiumCostNote');
  if (costNote) costNote.style.display = tier === 'premium' ? 'block' : 'none';
  updateMMIValueAnchor();
+ updateMMIFounderCard();
 }
 
 function renderMMICreditPacks(tier) {
@@ -1997,8 +2145,11 @@ function handleMMIPro() {
  const tierLabel = mmiTier === 'transcript' ? 'MMI Transcript Pro' : 'MMI Premium Pro';
  const prices = MMI_PRO_PRICES[mmiTier];
  const price = mmiProFreq === 'weekly' ? `${prices.weekly} AUD/week` : `${prices.monthly} AUD/month`;
+ const founderLine = isMMIFounderActive()
+ ? ` | Founder ${getMMIFounderDiscountPercent(mmiTier)}% off applied at checkout`
+ : '';
  openMMIModal(`${tierLabel} - ${mmiProFreq.charAt(0).toUpperCase() + mmiProFreq.slice(1)}`,
- `${price} | Unlimited MMI reviews | Cancel anytime`, 'mmi_pro');
+ `${price}${founderLine} | Unlimited MMI reviews | Cancel anytime`, 'mmi_pro');
 }
 
 function handleMMICredits() {
