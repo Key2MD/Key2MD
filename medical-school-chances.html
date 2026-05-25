@@ -1651,13 +1651,13 @@ const UNIS = [
  noteNR:'UNDF uses unweighted GAMSAT and CASPer as formal selection components. A Q4 typically required to compete at this combo range.',
  noteCasperRural:'Rural applicants usually need at least a Q2 CASPer.' },
  { id:'flinders', name:'Flinders University Doctor of Medicine', short:'Flinders', gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 },
- nInt:52, nRej:2,
- interview:{ med:1.5771, std:0.0613 },
- interviewExternal:{ med:1.6743, std:0.0931 },
- cutoffNR:1.474, cutoffNRExternal:1.60, cutoffR:1.413,
- casper:false, uow:false, flinders:true,
- noteNR:'Flinders requires a direct application — not GEMSAS. Up to 75% of SA Bedford Park places reserved for Flinders graduates (internal cutoff ~1.47+, n=35 offers from 2025 cycle). External/non-Flinders applicants face an effective cutoff of ~1.60+ (n=17 offers). Dataset: 52 offer records, 2 rejections from 2025 cycle.',
- noteRural:'SA rural (SARM) and NT (NTMP) sub-quotas with dedicated places. Rural offers observed down to combo 1.41 (n=10 offers, 2025 cycle data).' },
+   wgpaHurdle:5.0,
+   gamsat:{ internalMed:64, internalMin:57, internalMax:78, externalMed:75, externalMin:61, externalMax:81, ruralMed:62, ruralMin:58, ruralMax:72 },
+   nOffers:52, nRej:2,
+   casper:false, uow:false, flinders:true,
+   noteNR:'Flinders is a direct application — not GEMSAS. Interview shortlisting is on GAMSAT overall score only within sub-quota pools. wGPA ≥ 5.0 is an eligibility hurdle only and does not affect interview ranking. Final offer = equal weight of GAMSAT + wGPA + interview. Up to 75% of SA Bedford Park places reserved for Flinders graduates. Dataset: 52 offer records, 2 rejections from 2025 cycle.',
+   noteRural:'SA rural (SARM) and NT (NTMP) sub-quotas with dedicated places. Rural GAMSAT offers observed 58–72 (median ~62) in 2025 cycle data.' }
+
  { id:'uow', name:'The University of Wollongong', short:'UoW', gamsatMode:'hurdle', nInt:40, nRej:59, interview:null, cutoffNR:null, cutoffR:null, casper:true, uow:true,
  hurdles:{ gpaMin:5.5, gamsatMin:50, sectionMin:50, casperReq:'Q4 typically', bonusReq:'UOW bonuses are weighted equally and combined with Casper for interview ranking' } },
 ];
@@ -3484,76 +3484,108 @@ function renderFlindersCard(u, gpa, scores) {
  const flindersGpaRaw = gpaFlindersIn ? parseFloat(gpaFlindersIn.value) : NaN;
  const flindersGpa = (!isNaN(flindersGpaRaw) && flindersGpaRaw >= 4 && flindersGpaRaw <= 7) ? flindersGpaRaw : gpa;
  const usingFlindersGpa = flindersGpa !== gpa;
- const combo = flindersGpa / 7 + gam / 100;
  const isInternal = !!(state.bonuses['flinders'] && state.bonuses['flinders'].includes('flindersDegree'));
- const iv = isInternal ? u.interview : u.interviewExternal;
- const cutoff = state.rural ? (u.cutoffR || 1.413) : (isInternal ? u.cutoffNR : (u.cutoffNRExternal || 1.60));
- const margin = combo - cutoff;
- const aboveBelow = margin >= 0 ? `+${margin.toFixed(3)} above` : `${margin.toFixed(3)} below`;
- let verdictClass, verdictLabel;
- if (margin >= 0.04) { verdictClass = 'green'; verdictLabel = isInternal ? 'Competitive (internal)' : 'Competitive (external)'; }
- else if (margin >= -0.02) { verdictClass = 'amber'; verdictLabel = isInternal ? 'Borderline (internal)' : 'Borderline (external)'; }
- else { verdictClass = 'red'; verdictLabel = isInternal ? 'Below internal cutoff' : 'Below external cutoff'; }
- const note = state.rural ? (u.noteRural || u.noteNR) : u.noteNR;
+ const isRural = !!state.rural;
+ const note = isRural ? (u.noteRural || u.noteNR) : u.noteNR;
  const bonusImpact = getBonusImpact(u, gpa, scores);
 
- let rangeHtml = '';
- if (iv) {
- const low = cutoff - 2 * iv.std;
- const high = iv.med + 2 * iv.std;
- const pctOf = v => Math.max(0, Math.min(100, ((v - low) / (high - low)) * 100));
- const youPct = pctOf(combo);
- const medPct = pctOf(iv.med);
- const cutoffPct = pctOf(cutoff);
- rangeHtml = `
+ const wgpaHurdleMet = flindersGpa >= u.wgpaHurdle;
+ const gamsatSectionMet = scores.sections
+   ? [scores.sections.s1, scores.sections.s2, scores.sections.s3].every(s => s >= 50)
+   : null;
+ const gamsatOverallValid = !isNaN(gam) && gam >= 50;
+
+ const g = u.gamsat;
+ const poolMed   = isRural ? g.ruralMed   : (isInternal ? g.internalMed   : g.externalMed);
+ const poolMin   = isRural ? g.ruralMin   : (isInternal ? g.internalMin   : g.externalMin);
+ const poolMax   = isRural ? g.ruralMax   : (isInternal ? g.internalMax   : g.externalMax);
+ const poolLabel = isRural ? 'rural/SARM' : (isInternal ? 'internal (Flinders grad)' : 'external');
+ const poolN     = isRural ? '~10'        : (isInternal ? 'n=35' : 'n=17');
+
+ let verdictClass, verdictLabel;
+ if (!wgpaHurdleMet || !gamsatOverallValid) {
+   verdictClass = 'red'; verdictLabel = 'Eligibility hurdle not met';
+ } else if (gam >= poolMed) {
+   verdictClass = 'green'; verdictLabel = isRural ? 'Above rural median GAMSAT' : (isInternal ? 'Above internal pool median' : 'Above external pool median');
+ } else if (gam >= poolMin + (poolMed - poolMin) * 0.4) {
+   verdictClass = 'amber'; verdictLabel = 'Below pool median — in competitive range';
+ } else {
+   verdictClass = 'red'; verdictLabel = 'Below most observed offer GAMSATs';
+ }
+
+ const barLow  = poolMin - 2;
+ const barHigh = poolMax + 2;
+ const pctOf = v => Math.max(0, Math.min(100, ((v - barLow) / (barHigh - barLow)) * 100));
+ const youPct = pctOf(gam);
+ const medPct = pctOf(poolMed);
+ const minPct = pctOf(poolMin);
+ const maxPct = pctOf(poolMax);
+
+ const rangeHtml = `
     <div class="range-bar-wrap">
-      <div class="range-bar-title">Position vs 2025 offer cohort</div>
+      <div class="range-bar-title">Your GAMSAT vs ${poolLabel} offer pool (2025 cycle, ${poolN} offers)</div>
       <div class="range-bar-ticks-top">
-        <span>${low.toFixed(3)}</span>
-        <span>${((low + high) / 2).toFixed(3)}</span>
-        <span>${high.toFixed(3)}</span>
+        <span>${barLow}</span>
+        <span>${Math.round((barLow + barHigh) / 2)}</span>
+        <span>${barHigh}</span>
       </div>
-      <div class="range-bar">
-        <div class="range-bar-cutoff${cutoffPct < 10 ? ' at-left' : (cutoffPct > 90 ? ' at-right' : '')}" style="left:${cutoffPct.toFixed(2)}%;"></div>
-        <div class="range-bar-median" style="left:${medPct.toFixed(2)}%;"></div>
-        <div class="range-bar-you${youPct < 10 ? ' at-left' : (youPct > 90 ? ' at-right' : '')}" style="left:${youPct.toFixed(2)}%;"></div>
+      <div class="range-bar" style="overflow:visible;">
+        <div style="position:absolute;top:0;bottom:0;left:${minPct.toFixed(1)}%;width:${(maxPct - minPct).toFixed(1)}%;background:rgba(14,165,233,0.18);border-radius:4px;"></div>
+        <div class="range-bar-median" style="left:${medPct.toFixed(1)}%;"></div>
+        <div class="range-bar-you${youPct < 10 ? ' at-left' : (youPct > 90 ? ' at-right' : '')}" style="left:${youPct.toFixed(1)}%;"></div>
       </div>
       <div class="range-bar-legend">
-        <span class="l-you">You (${combo.toFixed(3)})</span>
-        <span class="l-median">Median offer (${iv.med.toFixed(3)})</span>
-        <span class="l-cutoff">Cut-off (${cutoff.toFixed(3)})</span>
+        <span class="l-you">Your GAMSAT (${gam.toFixed(1)})</span>
+        <span class="l-median">Median offer (${poolMed})</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--gray500);"><span style="display:inline-block;width:20px;height:8px;background:rgba(14,165,233,0.25);border-radius:2px;"></span>Offer range ${poolMin}–${poolMax}</span>
       </div>
     </div>`;
- }
+
+ const hurdleRow = (ok, label) =>
+   `<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:700;color:${ok ? '#15803d' : '#dc2626'};">` +
+   `<span style="font-size:0.9rem;">${ok ? '✓' : '✗'}</span>${label}</span>`;
+
+ const hurdlesHtml = `
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
+      ${hurdleRow(wgpaHurdleMet, 'wGPA \u2265 5.0 ' + (wgpaHurdleMet ? '(\u2713 ' + flindersGpa.toFixed(2) + ')' : '(\u2717 ' + flindersGpa.toFixed(2) + ')'))}
+      ${hurdleRow(gamsatOverallValid, 'GAMSAT \u2265 50 overall ' + (gamsatOverallValid ? '(\u2713 ' + gam.toFixed(0) + ')' : '(\u2717 not met)'))}
+      ${gamsatSectionMet !== null ? hurdleRow(gamsatSectionMet, 'All sections \u2265 50') : '<span style="font-size:0.72rem;color:var(--gray400);">Enter sections above to check section minimums</span>'}
+    </div>`;
 
  return `
  <div class="uni-card-top">
- <div>
- <div class="uni-name">${escapeHtml(u.name)}</div>
- <div class="uni-n" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
- <span style="display:inline-block;background:#7c3aed;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 8px;border-radius:4px;letter-spacing:0.04em;">DIRECT APPLY — NOT GEMSAS</span>
- <span>${isInternal ? 'Internal Flinders grad · n=35 offers' : 'External applicant · n=17 offers'} · 2025 cycle real data</span>
- </div>
- </div>
- <div class="uni-verdict ${verdictClass}">${verdictLabel}</div>
+   <div>
+     <div class="uni-name">${escapeHtml(u.name)}</div>
+     <div class="uni-n" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+       <span style="display:inline-block;background:#7c3aed;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 8px;border-radius:4px;letter-spacing:0.04em;">DIRECT APPLY \u2014 NOT GEMSAS</span>
+       <span>${isInternal ? 'Internal (Flinders grad)' : isRural ? 'Rural sub-quota' : 'External applicant'} \u00b7 2025 cycle data</span>
+     </div>
+   </div>
+   <div class="uni-verdict ${verdictClass}">${verdictLabel}</div>
  </div>
  <div class="uni-body">
- Combo ${combo.toFixed(3)} vs ${cutoff.toFixed(3)} ${state.rural ? 'rural' : (isInternal ? 'internal' : 'external')} cutoff (${aboveBelow}).
- ${usingFlindersGpa ? '<div style="margin-top:5px;font-size:0.78rem;color:#7c3aed;font-weight:600;">Using your Flinders GPA (' + flindersGpa.toFixed(2) + ') — not GEMSAS GPA.</div>' : '<div style="margin-top:5px;font-size:0.78rem;color:#b45309;font-weight:600;">⚠ Using GEMSAS GPA as fallback — enter your Flinders GPA in the input above for a more accurate result.</div>'}
- ${!isInternal && !state.rural ? '<div style="margin-top:5px;font-size:0.8rem;color:var(--gray500);">Tick "Flinders University graduate" in the bonus panel if you are a Flinders graduate — the cutoff drops to ~1.47.</div>' : ''}
+   <div style="font-size:0.82rem;line-height:1.75;color:var(--gray700);">
+     <strong>How Flinders selects:</strong> Interview shortlisting is on <strong>GAMSAT score only</strong> within your sub-quota pool. wGPA \u2265 5.0 is an eligibility hurdle \u2014 it does not affect your interview ranking. Final offer = equal weight of GAMSAT + wGPA + interview.
+   </div>
+   ${hurdlesHtml}
+   ${usingFlindersGpa
+     ? '<div style="margin-top:8px;font-size:0.75rem;color:#7c3aed;font-weight:600;">Using your Flinders wGPA (' + flindersGpa.toFixed(2) + ') for the hurdle check.</div>'
+     : '<div style="margin-top:8px;font-size:0.75rem;color:#b45309;font-weight:600;">\u26a0 Using GEMSAS GPA as a proxy \u2014 enter your Flinders wGPA in the input above if you have it.</div>'}
+   ${!isInternal && !isRural ? '<div style="margin-top:6px;font-size:0.78rem;color:var(--gray500);">Tick \u201cFlinders University graduate\u201d in the bonus panel if applicable \u2014 you\u2019d compete in the internal pool where GAMSAT cutoffs are lower.</div>' : ''}
  </div>
  ${rangeHtml}
  <div class="uni-notes" style="background:#faf5ff;border-left-color:#7c3aed;">
- <strong>⚠ Separate application required — not covered by your GEMSAS application.</strong><br>${escapeHtml(note)}
+   <strong>\u26a0 Separate application required \u2014 not covered by your GEMSAS application.</strong><br>${escapeHtml(note)}
  </div>
  ${renderBonusImpact(bonusImpact)}
  <div class="uni-notes" style="margin-top:8px;">
- Official sources:
- <a href="https://www.flinders.edu.au/study/courses/postgraduate-doctor-medicine" target="_blank" rel="noopener" style="color:var(--teal3);text-decoration:underline;">Flinders MD page</a> ·
- <a href="https://www.flinders.edu.au/content/dam/documents/study/domestic/apply/md-admissions-guide.pdf" target="_blank" rel="noopener" style="color:var(--teal3);text-decoration:underline;">Application guide (PDF)</a>
+   Official sources:
+   <a href="https://www.flinders.edu.au/study/courses/postgraduate-doctor-medicine" target="_blank" rel="noopener" style="color:var(--teal3);text-decoration:underline;">Flinders MD page</a> \u00b7
+   <a href="https://www.flinders.edu.au/content/dam/documents/study/domestic/apply/md-admissions-guide.pdf" target="_blank" rel="noopener" style="color:var(--teal3);text-decoration:underline;">Application guide (PDF)</a>
  </div>
  `;
 }
+
 
 function renderUoWCard(u, gpa, scores) {
  const gam = scores.weighted;
