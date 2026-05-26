@@ -3338,8 +3338,13 @@ function renderPartialReportNotice(rows) {
     });
     const panel = byId('mockStationReviewPanel');
     if (panel) {
-     panel.innerHTML = stationReviewHtml(row);
-     if (row?.type === 'video') setTimeout(() => initMockVideoPlayer('mockStationVideoPlayer'), 0);
+     try {
+      panel.innerHTML = stationReviewHtml(row);
+      if (row?.type === 'video') setTimeout(() => initMockVideoPlayer('mockStationVideoPlayer'), 0);
+     } catch (err) {
+      console.error('Mock station render failed:', err, row);
+      panel.innerHTML = `<div class="k2mr-notice" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.25);"><strong style="color:var(--red);">Station could not render.</strong> The report is still saved. Try refreshing, or open History later.</div>`;
+     }
     }
    }
 
@@ -3352,6 +3357,7 @@ function renderPartialReportNotice(rows) {
     const station = row.station || {};
     const isVideo = row.type === 'video';
     const stationType = isVideo ? 'Video' : 'Typed';
+    const scenario = splitScenarioRole(station.scenario || '');
     const prompts = [station.prompt1, station.prompt2].filter(Boolean).map((prompt, i) => `
      <div class="k2mr-prompt">
       <div class="k2mr-prompt-num">Prompt ${i + 1}</div>
@@ -3361,11 +3367,24 @@ function renderPartialReportNotice(rows) {
     return `
      <div class="k2mr-scenario-card">
       <div class="k2mr-card-title">Scenario &middot; ${stationType} ${row.localIndex || ''} &middot; ${esc(station.category || 'CASPer')}</div>
-      <div class="k2mr-scenario-text">${esc(station.scenario || '')}</div>
+      ${scenario.role ? `<div class="k2mr-role-card"><div class="k2mr-role-label">Role</div><div class="k2mr-role-value">${esc(scenario.role)}</div></div>` : ''}
+      ${scenario.body ? `<div class="k2mr-scenario-text">${esc(scenario.body)}</div>` : ''}
       ${prompts ? `<div class="k2mr-prompts">${prompts}</div>` : ''}
      </div>
     `;
    }
+
+ function splitScenarioRole(value) {
+ const text = String(value || '').trim();
+ if (!/^Role\s*:/i.test(text)) return { role: '', body: text };
+ const withoutLabel = text.replace(/^Role\s*:\s*/i, '').trim();
+ if (!withoutLabel) return { role: '', body: '' };
+ const newlineMatch = withoutLabel.match(/^([^\n\r]+)[\n\r]+([\s\S]*)$/);
+ if (newlineMatch) return { role: newlineMatch[1].trim(), body: newlineMatch[2].trim() };
+ const inlineMatch = withoutLabel.match(/^(.+?)\s+((?:You|Your|You're|You\u2019re)\b[\s\S]*)$/i);
+ if (inlineMatch) return { role: inlineMatch[1].trim(), body: inlineMatch[2].trim() };
+ return { role: withoutLabel, body: '' };
+ }
 
  function mockVideoDuration(row) {
  const candidates = [
@@ -3586,8 +3605,8 @@ function renderPartialReportNotice(rows) {
 
   function typedStationReviewHtml(row) {
     const fb = row.feedback || {};
-    const score = numericScore(row);
-    const scoreColor = score >= 7 ? 'var(--green)' : score >= 5.5 ? 'var(--teal2)' : score >= 4.5 ? '#fbbf24' : 'var(--red)';
+    const score = scoreValue(row.score10 ?? row.score ?? row.feedback?.score ?? row.feedback?.overall?.score);
+    const scoreColor = Number.isFinite(score) ? (score >= 7 ? 'var(--green)' : score >= 5.5 ? 'var(--teal2)' : score >= 4.5 ? '#fbbf24' : 'var(--red)') : 'rgba(255,255,255,0.45)';
     const rowTiming = row.accessTiming || row.access_timing || row.timing?.access_timing || accessTimingPayload();
     const timingKey = normaliseAccessTiming(rowTiming.key || rowTiming);
     const timingOption = accessTimingOption(timingKey);
@@ -3960,6 +3979,7 @@ function renderPartialReportNotice(rows) {
 	 const isVideo = row?.type === 'video';
 	 const title = `${isVideo ? 'Video' : 'Typed'} ${row?.localIndex || row?.order || ''}`.trim();
 	 const station = row?.station || {};
+	 const scenario = splitScenarioRole(station.scenario || '');
 	 const fb = row?.feedback || {};
 	 const overall = fb.overall || {};
 	 const strength = isVideo ? overall.biggest_strength : fb.strengths;
@@ -3968,7 +3988,7 @@ function renderPartialReportNotice(rows) {
 	 const answerText = isVideo ? row?.transcript : row?.answer;
 	 return `<article class="station">
 	 <div class="station-head">
-	 <div><div class="station-title">${esc(title)} - ${esc(station.category || 'CASPer')}</div><div class="text">${esc(station.scenario || '')}</div></div>
+	 <div><div class="station-title">${esc(title)} - ${esc(station.category || 'CASPer')}</div>${scenario.role ? `<div class="label">Role</div><div class="text"><strong>${esc(scenario.role)}</strong></div>` : ''}${scenario.body ? `<div class="label">Scenario</div><div class="text">${esc(scenario.body)}</div>` : ''}</div>
 	 <div class="score">${esc(rowScoreLabel(row))}</div>
 	 </div>
 	 ${station.prompt1 || station.prompt2 ? `<div class="label">Prompts</div><div class="text">${station.prompt1 ? `1. ${esc(station.prompt1)}` : ''}${station.prompt2 ? `\n2. ${esc(station.prompt2)}` : ''}</div>` : ''}

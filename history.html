@@ -136,6 +136,9 @@
 	 .mock-station-grid { display:grid; grid-template-columns:minmax(240px,0.95fr) minmax(0,1.05fr); gap:14px; align-items:start; }
 	 .mock-section-label { font-size:0.66rem; font-weight:850; color:var(--teal3); letter-spacing:0.08em; text-transform:uppercase; margin:10px 0 5px; }
 	 .mock-text { font-size:0.82rem; color:var(--gray600); line-height:1.65; white-space:pre-wrap; }
+	 .mock-role-card { display:grid; grid-template-columns:auto minmax(0,1fr); gap:9px; align-items:center; background:#eff6ff; border:1px solid rgba(14,165,233,0.22); border-radius:10px; padding:9px 11px; margin:5px 0 9px; }
+	 .mock-role-label { font-size:0.62rem; font-weight:900; letter-spacing:0.09em; text-transform:uppercase; color:var(--teal3); }
+	 .mock-role-value { font-size:0.86rem; font-weight:900; color:var(--navy); line-height:1.35; }
 	 .mock-transcript { max-height:210px; overflow:auto; border:1px solid var(--gray200); border-radius:10px; background:var(--gray50); padding:11px 12px; }
 	 .mock-sync-transcript { max-height:250px; overflow:auto; border:1px solid var(--gray200); border-radius:10px; background:#fff; padding:8px; display:grid; gap:4px; }
 	 .mock-sync-segment { width:100%; border:0; background:transparent; color:var(--gray600); border-radius:8px; padding:7px 8px; text-align:left; font:inherit; font-size:0.8rem; line-height:1.55; cursor:pointer; }
@@ -1092,6 +1095,23 @@ function mockOverviewHTML(attempt) {
  `;
 }
 
+function splitMockScenarioRole(value) {
+ const text = String(value || '').trim();
+ if (!/^Role\s*:/i.test(text)) return { role: '', body: text };
+ const rest = text.replace(/^Role\s*:\s*/i, '').trim();
+ if (!rest) return { role: '', body: '' };
+ const newlineMatch = rest.match(/^([^\n\r]+)[\n\r]+([\s\S]*)$/);
+ if (newlineMatch) return { role: newlineMatch[1].trim(), body: newlineMatch[2].trim() };
+ const inlineMatch = rest.match(/^(.+?)\s+((?:You|Your|You're|You\u2019re)\b[\s\S]*)$/i);
+ if (inlineMatch) return { role: inlineMatch[1].trim(), body: inlineMatch[2].trim() };
+ return { role: rest, body: '' };
+}
+
+function mockScenarioHTML(value) {
+ const parts = splitMockScenarioRole(value);
+ return `${parts.role ? `<div class="mock-role-card"><div class="mock-role-label">Role</div><div class="mock-role-value">${escapeHtml(parts.role)}</div></div>` : ''}${parts.body ? `<div class="mock-text">${escapeHtml(parts.body)}</div>` : ''}`;
+}
+
 function mockStationHTML(attempt, row, index) {
  const isVideo = row.type === 'video';
  const title = `${isVideo ? 'Video' : 'Typed'} ${row.localIndex || index + 1}`;
@@ -1112,7 +1132,7 @@ function mockStationHTML(attempt, row, index) {
  </div>
  <div>
  <div class="mock-section-label">Scenario</div>
- <div class="mock-text">${escapeHtml(row.station?.scenario || '')}</div>
+ ${mockScenarioHTML(row.station?.scenario || '')}
  ${row.station?.prompt1 || row.station?.prompt2 ? `<div class="mock-section-label">Prompts</div><div class="mock-text">${row.station?.prompt1 ? `1. ${escapeHtml(row.station.prompt1)}` : ''}${row.station?.prompt2 ? `\n2. ${escapeHtml(row.station.prompt2)}` : ''}</div>` : ''}
  <div class="mock-feedback-grid">
  <div class="mock-feedback-item"><strong>Strength</strong><p>${escapeHtml(feedback.strength)}</p></div>

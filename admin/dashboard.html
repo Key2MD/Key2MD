@@ -336,6 +336,69 @@
 .mock-issue-detail{font-size:0.78rem;color:var(--text);line-height:1.55;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere;}
 .mock-issue-action{font-size:0.72rem;color:var(--muted);line-height:1.55;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
 .mock-issue-empty{border:1px solid var(--green-border);background:var(--green-dim);color:var(--green);border-radius:12px;padding:14px 16px;font-size:0.82rem;line-height:1.55;}
+ .mmi-overview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+ .mmi-kpi{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.045);padding:13px 14px;min-height:82px;}
+ .mmi-kpi.good{border-color:var(--green-border);background:var(--green-dim);}
+ .mmi-kpi.warn{border-color:var(--amber-border);background:var(--amber-dim);}
+ .mmi-kpi.blue{border-color:var(--blue-border);background:var(--blue-dim);}
+ .mmi-kpi-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted2);font-weight:850;margin-bottom:6px;}
+ .mmi-kpi-value{font-size:1.45rem;font-weight:900;letter-spacing:-0.03em;color:var(--text);}
+ .mmi-kpi-sub{font-size:0.68rem;color:var(--muted);line-height:1.4;margin-top:3px;}
+ .mmi-workbench{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:14px;align-items:start;}
+ .mmi-list-panel,.mmi-viewer-panel{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);overflow:hidden;}
+ .mmi-list{display:flex;flex-direction:column;gap:8px;padding:10px;max-height:calc(100vh - 270px);overflow:auto;}
+ .mmi-review-card{width:100%;border:1px solid var(--border);background:rgba(255,255,255,0.035);border-radius:11px;padding:11px;text-align:left;color:var(--text);cursor:pointer;transition:background 0.15s,border-color 0.15s,transform 0.15s;}
+ .mmi-review-card:hover{background:rgba(255,255,255,0.06);border-color:var(--border2);transform:translateY(-1px);}
+ .mmi-review-card.active{border-color:rgba(56,189,248,0.5);background:rgba(56,189,248,0.11);}
+ .mmi-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px;}
+ .mmi-card-email{font-size:0.8rem;font-weight:850;line-height:1.25;overflow-wrap:anywhere;}
+ .mmi-card-time{font-size:0.66rem;color:var(--muted2);white-space:nowrap;}
+ .mmi-card-title{font-size:0.75rem;color:var(--muted);line-height:1.45;margin:6px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+ .mmi-card-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+ .mmi-dot{width:7px;height:7px;border-radius:99px;background:var(--muted2);display:inline-block;}
+ .mmi-dot.good{background:var(--green);}
+ .mmi-dot.warn{background:var(--amber);}
+ .mmi-dot.bad{background:var(--red);}
+ .mmi-viewer-panel{min-height:620px;}
+ .mmi-viewer-empty{min-height:520px;display:grid;place-items:center;text-align:center;padding:36px;color:var(--muted);}
+ .mmi-empty-mark{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue);font-size:0.78rem;font-weight:900;letter-spacing:0.08em;}
+ .mmi-empty-title{font-size:1rem;font-weight:900;color:var(--text);margin-bottom:6px;}
+ .mmi-empty-copy{font-size:0.78rem;line-height:1.6;max-width:380px;}
+ .mmi-viewer-head{padding:16px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(56,189,248,0.1),rgba(74,222,128,0.055));display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start;}
+ .mmi-viewer-title{font-size:1.05rem;font-weight:900;line-height:1.25;overflow-wrap:anywhere;}
+ .mmi-viewer-sub{font-size:0.74rem;color:var(--muted);line-height:1.55;margin-top:5px;}
+ .mmi-score-tile{min-width:88px;border:1px solid var(--border2);border-radius:12px;background:rgba(0,0,0,0.18);padding:10px 12px;text-align:center;}
+ .mmi-score-tile strong{display:block;font-size:1.35rem;letter-spacing:-0.04em;}
+ .mmi-score-tile span{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted2);font-weight:850;}
+ .mmi-viewer-actions{display:flex;gap:7px;flex-wrap:wrap;padding:11px 18px;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.12);}
+ .mmi-viewer-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,0.9fr);gap:14px;padding:14px;}
+ .mmi-stack{display:flex;flex-direction:column;gap:12px;}
+ .mmi-section{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.035);overflow:hidden;}
+ .mmi-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);}
+ .mmi-section-title{font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);}
+ .mmi-section-body{padding:14px;color:var(--muted);font-size:0.8rem;line-height:1.7;}
+ .mmi-scenario{font-size:0.86rem;color:var(--text);line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:12px;}
+ .mmi-prompt-list{display:flex;flex-direction:column;gap:8px;}
+ .mmi-prompt{border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.14);padding:10px 11px;}
+ .mmi-prompt-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);font-weight:900;margin-bottom:5px;display:flex;justify-content:space-between;gap:8px;}
+ .mmi-prompt-text{font-size:0.82rem;color:var(--text);line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;}
+ .mmi-transcript{max-height:360px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--text);line-height:1.75;}
+ .mmi-media-stage{border:1px dashed var(--border2);border-radius:12px;background:rgba(0,0,0,0.18);min-height:210px;display:grid;place-items:center;padding:14px;text-align:center;color:var(--muted);}
+ .mmi-media-stage video,.mmi-media-stage audio{width:100%;max-height:380px;border-radius:10px;outline:none;}
+ .mmi-media-note{font-size:0.75rem;color:var(--muted2);line-height:1.55;margin-top:8px;}
+ .mmi-feedback-card{border:1px solid var(--border);border-radius:11px;background:rgba(0,0,0,0.12);padding:12px;margin-bottom:10px;}
+ .mmi-feedback-card:last-child{margin-bottom:0;}
+ .mmi-feedback-title{font-size:0.72rem;font-weight:900;color:var(--text);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+ .mmi-feedback-text{font-size:0.8rem;color:var(--muted);line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;}
+ .mmi-criteria-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:9px;}
+ .mmi-criterion{border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,0.028);padding:9px;}
+ .mmi-criterion-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:5px;font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);}
+ .mmi-criterion-score{font-size:0.78rem;color:var(--text);}
+ .mmi-metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px;}
+ .mmi-metric{border:1px solid var(--border);border-radius:9px;background:rgba(0,0,0,0.12);padding:9px;}
+ .mmi-metric span{display:block;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted2);font-weight:850;margin-bottom:4px;}
+ .mmi-metric strong{font-size:0.95rem;color:var(--text);}
+ .mmi-json{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.68rem;line-height:1.55;color:var(--muted);white-space:pre-wrap;overflow:auto;max-height:210px;border:1px solid var(--border);border-radius:9px;background:rgba(0,0,0,0.18);padding:10px;}
  .broadcast-audience{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:10px 0 14px;padding:11px 12px;border:1px solid var(--blue-border);background:var(--blue-dim);border-radius:10px;}
  .broadcast-audience-main{font-size:0.82rem;font-weight:800;color:var(--text);}
  .broadcast-audience-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;line-height:1.45;}
@@ -631,15 +694,21 @@
  .command-actions{justify-content:flex-start;}
  .mini-metric-row{grid-template-columns:1fr;}
  .mock-admin-grid,.mock-command-strip,.mock-filter-top{grid-template-columns:1fr;}
+ .mmi-workbench,.mmi-viewer-grid,.mmi-overview{grid-template-columns:1fr;}
+ .mmi-list{max-height:none;}
+ .mmi-viewer-head{grid-template-columns:1fr;}
  }
  @media(max-width:1100px){
  .dash-grid,.ops-grid,.command-card,.mock-command-strip{grid-template-columns:1fr 1fr;}
  .stats-grid{grid-template-columns:repeat(3,1fr);}
+ .mmi-overview{grid-template-columns:repeat(3,minmax(0,1fr));}
+ .mmi-viewer-grid{grid-template-columns:1fr;}
  }
  @media(max-width:620px){
  .stats-grid{grid-template-columns:1fr 1fr;}
  .activity-item{grid-template-columns:1fr;}
  .mock-command-strip,.mock-filter-top{grid-template-columns:1fr;}
+ .mmi-overview,.mmi-metric-grid,.mmi-criteria-grid{grid-template-columns:1fr;}
  }
  </style>
 </head>
@@ -1814,10 +1883,10 @@
  <div class="page-header">
  <div>
  <div class="page-title">MMI Reviews</div>
- <div class="page-sub">All MMI AI feedback sessions - transcripts, scores, tier, duration</div>
+ <div class="page-sub">Interactive review room - prompts, recordings, transcripts, feedback, and coaching notes</div>
  </div>
  <div class="page-actions">
- <button class="btn" onclick="loadMMI()">Refresh Refresh</button>
+ <button class="btn" onclick="loadMMI()">Refresh</button>
  </div>
  </div>
  <div class="controls">
@@ -1836,12 +1905,18 @@
  <option value="premium">Premium</option>
  </select>
  <select class="ctrl-sel" id="mmiScore" onchange="renderMMI()">
- <option value="">All scores</option>
- <option value="5">Excellent (5)</option>
- <option value="4">Good (4)</option>
- <option value="3">Satisfactory (3)</option>
- <option value="2">Unsatisfactory (2)</option>
- <option value="1">Poor (1)</option>
+ <option value="">All feedback</option>
+ <option value="high">Strong / excellent</option>
+ <option value="mid">Passable</option>
+ <option value="low">Needs work</option>
+ <option value="none">No feedback</option>
+ </select>
+ <select class="ctrl-sel" id="mmiMedia" onchange="renderMMI()">
+ <option value="">All media</option>
+ <option value="recording">Has recording</option>
+ <option value="no_recording">No retained recording</option>
+ <option value="transcript">Has transcript</option>
+ <option value="trap">Trap flagged</option>
  </select>
  <select class="ctrl-sel" id="mmiLimit" onchange="loadMMI()">
  <option value="50">50 rows</option>
@@ -1852,12 +1927,20 @@
  </select>
  <button class="btn" onclick="loadMMI()">Refresh</button>
  </div>
- <div class="tbl-wrap">
+ <div class="mmi-overview" id="mmiOverview"></div>
+ <div class="mmi-workbench">
+ <section class="mmi-list-panel">
  <div class="tbl-toolbar"><span class="tbl-status" id="mmiStatus">-</span></div>
- <div class="tbl-scroller"><table><thead><tr>
- <th style="width:26px;"></th><th>Time</th><th>Student</th><th>Category</th><th>Tier</th><th>Score</th><th>Duration</th><th>Specialist</th><th>COGS</th>
- </tr></thead><tbody id="mmiBody"></tbody></table></div>
+ <div class="mmi-list" id="mmiList"></div>
  <div class="empty hidden" id="mmiEmpty">No MMI reviews found.</div>
+ </section>
+ <section class="mmi-viewer-panel" id="mmiViewer">
+ <div class="mmi-viewer-empty">
+ <div class="mmi-empty-mark">MMI</div>
+ <div class="mmi-empty-title">Select a review</div>
+ <div class="mmi-empty-copy">Choose a session on the left to inspect the station, transcript, retained media, and AI feedback.</div>
+ </div>
+ </section>
  </div>
  </div>
 
@@ -2199,7 +2282,7 @@ const S = {
  reviews: [], s2Reviews: [], users: [], warmLeads: [], sharingWatchlist: [], enquiries: [], subscribers: [],
  pipeline: null, outreachRoi: null, abandonedCheckouts: null, studentTimeline: null, nextActions: [], productFunnel: null, retentionRisks: [],
  conversations: [], filteredConvs: [],
- mmiReviews: [], mockAttempts: [], mockManualReviews: [], mockBank: null, revenue: [], payers: [], payersFromServer: false, revenueSummary: null, paymentHealth: null, monitoring: null,
+ mmiReviews: [], mmiSelectedId: null, mmiRecordingCache: new Map(), mockAttempts: [], mockManualReviews: [], mockBank: null, revenue: [], payers: [], payersFromServer: false, revenueSummary: null, paymentHealth: null, monitoring: null,
  casperClass: null, masterclasses: null,
  broadcastHistory: [],
  activeConv: null,
@@ -7903,89 +7986,346 @@ async function quickMockStatus(id, status) {
 async function loadMMI() {
  const limit = document.getElementById('mmiLimit')?.value||'5000';
  try {
+ const status = document.getElementById('mmiStatus');
+ if (status) status.textContent = 'Loading MMI reviews...';
  const res = await api(`/admin/mmi?limit=${limit}`);
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.error||'Failed');
  S.mmiReviews = data.rows||[];
+ if (S.mmiSelectedId && !S.mmiReviews.some(r => String(r.id) === String(S.mmiSelectedId))) S.mmiSelectedId = null;
+ if (!S.mmiSelectedId && S.mmiReviews[0]) S.mmiSelectedId = String(S.mmiReviews[0].id || '');
  renderMMI();
  updateDashboard();
- } catch(e) { console.error('MMI load error:', e); }
+ } catch(e) {
+ console.error('MMI load error:', e);
+ const status = document.getElementById('mmiStatus');
+ if (status) status.textContent = e.message || 'MMI load failed';
+ }
 }
 
 function renderMMI() {
+ const rows = filteredMMIRows();
+ if (S.mmiSelectedId && !rows.some(r => String(r.id) === String(S.mmiSelectedId))) S.mmiSelectedId = null;
+ if (!S.mmiSelectedId && rows[0]) S.mmiSelectedId = String(rows[0].id || '');
+ renderMMIOverview(rows);
+ renderMMIList(rows);
+ renderMMIViewer(rows.find(r => String(r.id) === String(S.mmiSelectedId)) || rows[0] || null);
+}
+
+function filteredMMIRows() {
  const q = (document.getElementById('mmiSearch')?.value||'').toLowerCase();
  const category = document.getElementById('mmiCategory')?.value||'';
  const tier = document.getElementById('mmiTier')?.value||'';
  const scoreF = document.getElementById('mmiScore')?.value||'';
- const rows = S.mmiReviews.filter(r => {
+ const mediaF = document.getElementById('mmiMedia')?.value||'';
+ const terms = q.split(/\s+/).filter(Boolean);
+ return S.mmiReviews.filter(r => {
  const fb = parseMMIFb(r.ai_feedback_json);
- const sm = !q || [r.email,r.name,r.station_category,r.station_scenario].some(v=>String(v||'').toLowerCase().includes(q));
+ const prompts = parseMMIPrompts(r);
+ const scoreInfo = mmiScoreInfo(r, fb);
+ const searchText = [
+ r.email, r.name, r.station_category, r.station_scenario, r.tier, r.station_id,
+ r.transcript_text, prompts.map(p => p.text).join(' '),
+ fb?.overall?.biggest_strength, fb?.overall?.biggest_improvement, fb?.overall?.excellent_version,
+ Array.isArray(fb?.per_prompt) ? fb.per_prompt.map(p => [p.prompt_text, p.summary, p.specific_quote].join(' ')).join(' ') : '',
+ ].join(' ').toLowerCase();
+ const sm = !terms.length || terms.every(t => searchText.includes(t));
  const cm = !category || r.station_category===category;
  const tm = !tier || r.tier===tier;
- const sc = !scoreF || String(fb?.overall?.score||'')===scoreF;
- return sm&&cm&&tm&&sc;
- });
- document.getElementById('mmiStatus').textContent = `${rows.length} MMI session${rows.length===1?'':'s'}`;
- document.getElementById('mmiEmpty').classList.toggle('hidden', rows.length>0);
- const tbody = document.getElementById('mmiBody');
- tbody.innerHTML = '';
- rows.forEach(row => {
- const fb = parseMMIFb(row.ai_feedback_json);
- const dt = fmtDate(row.created_at);
- const dur = row.recording_duration_seconds ? `${Math.floor(row.recording_duration_seconds/60)}:${String(row.recording_duration_seconds%60).padStart(2,'0')}` : '-';
- const score = fb?.overall?.score;
- const scoreLabel = fb?.overall?.label||'';
- const dr = document.createElement('tr');
- dr.className = 'data-row';
- dr.innerHTML = `
- <td><div class="expander">v</div></td>
- <td><div class="cell-main">${dt?.date||'-'}</div><div class="cell-sub">${dt?.time||''}</div></td>
- <td><div class="cell-main">${emailWithDuplicateFlag(row.email,row)}</div><div class="cell-sub">${esc(row.name||'')}</div></td>
- <td><span class="badge badge-default">${esc(row.station_category||'-')}</span></td>
- <td><span class="badge badge-${row.tier==='premium'?'pro':'casper'}">${esc(row.tier||'-')}</span></td>
- <td>${score ? `<div class="score-box ${mmiScoreC(score)}" title="${esc(scoreLabel)}">${score}</div>` : '<span style="color:var(--muted2);">-</span>'}</td>
- <td>${esc(dur)}</td>
- <td>${row.specialist_mode ? '<span class="badge badge-pro">Specialist</span>' : '<span style="color:var(--muted2);">-</span>'}</td>
- <td><span style="color:var(--muted2);font-size:0.75rem;">${row.cogs_cents ? `${row.cogs_cents}` : '-'}</span></td>`;
- const xr = document.createElement('tr');
- xr.className = 'detail-row';
- xr.innerHTML = `<td colspan="9" class="detail-panel"><div class="detail-inner">${renderMMIDetail(row, fb)}</div></td>`;
- dr.addEventListener('click', () => { xr.classList.toggle('open'); dr.classList.toggle('expanded'); });
- tbody.appendChild(dr); tbody.appendChild(xr);
+ const sc = mmiScoreFilterMatch(scoreF, scoreInfo);
+ const mediaMatch = mmiMediaFilterMatch(mediaF, r, fb);
+ return sm&&cm&&tm&&sc&&mediaMatch;
  });
 }
 
-function renderMMIDetail(row, fb) {
- const prompts = (() => { try { return JSON.parse(row.prompts_json||'[]'); } catch { return []; } })();
- const promptsHtml = prompts.map((p,i)=>`<div style="margin-bottom:6px;"><span style="font-size:0.63rem;font-weight:700;color:var(--muted);text-transform:uppercase;">Prompt ${i+1}</span><div class="detail-box-body">${esc(typeof p==='object'?p.prompt:p)}</div></div>`).join('');
- const perPromptHtml = fb?.per_prompt?.map((pp,i) => {
- const scores = pp.scores||{};
- const scoreItems = Object.entries(scores).map(([k,v])=>`<span style="font-size:0.72rem;color:var(--muted);margin-right:8px;">${esc(k)}: <strong style="color:var(--text);">${v.score||'-'}</strong></span>`).join('');
- return `<div style="margin-bottom:10px;padding:8px;background:rgba(0,0,0,0.1);border-radius:8px;">
- <div style="font-size:0.63rem;font-weight:700;color:var(--blue);text-transform:uppercase;margin-bottom:4px;">Prompt ${i+1}</div>
- <div style="margin-bottom:4px;">${scoreItems}</div>
- ${pp.summary?`<div class="detail-box-body">${esc(pp.summary)}</div>`:''}
- ${pp.specific_quote?`<div style="margin-top:4px;font-style:italic;color:var(--muted2);font-size:0.75rem;">"${esc(pp.specific_quote)}"</div>`:''}
+function mmiScoreFilterMatch(filter, scoreInfo) {
+ if (!filter) return true;
+ const score = Number(scoreInfo?.score);
+ if (filter === 'none') return !Number.isFinite(score);
+ if (!Number.isFinite(score)) return false;
+ const max = Number(scoreInfo?.max || 5);
+ if (filter === 'high') return max > 5 ? score >= 7 : score >= 4;
+ if (filter === 'mid') return max > 5 ? score >= 5.5 && score < 7 : score === 3;
+ if (filter === 'low') return max > 5 ? score < 5.5 : score <= 2;
+ return true;
+}
+
+function mmiMediaFilterMatch(filter, row, fb) {
+ if (!filter) return true;
+ if (filter === 'recording') return !!row.recording_url;
+ if (filter === 'no_recording') return !row.recording_url;
+ if (filter === 'transcript') return String(row.transcript_text || '').trim().length > 0;
+ if (filter === 'trap') return !!fb?.polished_auditor_detected;
+ return true;
+}
+
+function renderMMIOverview(rows) {
+ const el = document.getElementById('mmiOverview');
+ if (!el) return;
+ const scored = rows.map(r => mmiScoreInfo(r, parseMMIFb(r.ai_feedback_json))).filter(s => Number.isFinite(Number(s.score)));
+ const avgPct = scored.length ? scored.reduce((sum, s) => sum + (Number(s.score) / Number(s.max || 5)), 0) / scored.length : 0;
+ const recordings = rows.filter(r => !!r.recording_url).length;
+ const transcripts = rows.filter(r => String(r.transcript_text || '').trim()).length;
+ const traps = rows.filter(r => parseMMIFb(r.ai_feedback_json)?.polished_auditor_detected).length;
+ const premium = rows.filter(r => r.tier === 'premium').length;
+ el.innerHTML = `
+ <div class="mmi-kpi blue"><div class="mmi-kpi-label">Sessions</div><div class="mmi-kpi-value">${rows.length}</div><div class="mmi-kpi-sub">Filtered MMI rows</div></div>
+ <div class="mmi-kpi good"><div class="mmi-kpi-label">Avg score</div><div class="mmi-kpi-value">${scored.length ? `${Math.round(avgPct * 100)}%` : '-'}</div><div class="mmi-kpi-sub">${scored.length} scored response${scored.length===1?'':'s'}</div></div>
+ <div class="mmi-kpi"><div class="mmi-kpi-label">Recordings</div><div class="mmi-kpi-value">${recordings}</div><div class="mmi-kpi-sub">Retained media available</div></div>
+ <div class="mmi-kpi"><div class="mmi-kpi-label">Transcripts</div><div class="mmi-kpi-value">${transcripts}</div><div class="mmi-kpi-sub">Answers readable now</div></div>
+ <div class="mmi-kpi warn"><div class="mmi-kpi-label">Review flags</div><div class="mmi-kpi-value">${traps}</div><div class="mmi-kpi-sub">${premium} premium session${premium===1?'':'s'}</div></div>`;
+}
+
+function renderMMIList(rows) {
+ const list = document.getElementById('mmiList');
+ const empty = document.getElementById('mmiEmpty');
+ const status = document.getElementById('mmiStatus');
+ if (status) status.textContent = `${rows.length} MMI session${rows.length===1?'':'s'} loaded`;
+ if (empty) empty.classList.toggle('hidden', rows.length>0);
+ if (!list) return;
+ if (!rows.length) {
+ list.innerHTML = '';
+ return;
+ }
+ list.innerHTML = rows.map(row => {
+ const fb = parseMMIFb(row.ai_feedback_json);
+ const dt = fmtDate(row.created_at);
+ const scoreInfo = mmiScoreInfo(row, fb);
+ const prompts = parseMMIPrompts(row);
+ const selected = String(row.id) === String(S.mmiSelectedId);
+ const mediaDot = row.recording_url ? 'good' : 'warn';
+ const transcriptWords = wordCount(row.transcript_text);
+ return `<button type="button" class="mmi-review-card ${selected?'active':''}" onclick='selectMMIReview(${jsArg(row.id)})'>
+ <div class="mmi-card-top">
+ <div class="mmi-card-email">${emailWithDuplicateFlag(row.email || 'Unknown student', row)}</div>
+ <div class="mmi-card-time">${esc(relTime(row.created_at))}</div>
+ </div>
+ <div class="mmi-card-title">${esc(row.station_scenario || row.station_category || 'No scenario text saved')}</div>
+ <div class="mmi-card-meta">
+ <span class="badge badge-default">${esc(row.station_category || 'MMI')}</span>
+ <span class="badge badge-${row.tier==='premium'?'pro':'casper'}">${esc(row.tier || 'transcript')}</span>
+ ${scoreInfo.score ? `<span class="score-box ${mmiScoreC(scoreInfo.score, scoreInfo.max)}" title="${esc(scoreInfo.label)}">${esc(scoreInfo.score)}</span>` : '<span class="badge badge-free">No score</span>'}
+ <span class="badge badge-default">${prompts.length} prompt${prompts.length===1?'':'s'}</span>
+ <span class="badge badge-default"><span class="mmi-dot ${mediaDot}"></span>${row.recording_url?'media':'no media'}</span>
+ <span class="badge badge-default">${transcriptWords} words</span>
+ </div>
+ </button>`;
+ }).join('');
+}
+
+function selectMMIReview(id) {
+ S.mmiSelectedId = String(id || '');
+ renderMMI();
+}
+
+function renderMMIViewer(row) {
+ const viewer = document.getElementById('mmiViewer');
+ if (!viewer) return;
+ if (!row) {
+ viewer.innerHTML = `<div class="mmi-viewer-empty"><div><div class="mmi-empty-mark">MMI</div><div class="mmi-empty-title">No matching reviews</div><div class="mmi-empty-copy">Adjust the filters or refresh the MMI review list.</div></div></div>`;
+ return;
+ }
+ const fb = parseMMIFb(row.ai_feedback_json);
+ const prompts = parseMMIPrompts(row);
+ const scoreInfo = mmiScoreInfo(row, fb);
+ const dt = fmtDate(row.created_at);
+ const transcriptWords = wordCount(row.transcript_text);
+ viewer.innerHTML = `
+ <div class="mmi-viewer-head">
+ <div>
+ <div class="mmi-viewer-title">${emailWithDuplicateFlag(row.email || 'Unknown student', row)}</div>
+ <div class="mmi-viewer-sub">${esc(row.name || '')}${row.name ? ' | ' : ''}${esc(row.station_category || 'MMI')} | ${esc(dt?.date || '-')}${dt?.time ? ` at ${esc(dt.time)}` : ''} | ${esc(mmiDuration(row))}</div>
+ <div class="mmi-card-meta" style="margin-top:9px;">
+ <span class="badge badge-${row.tier==='premium'?'pro':'casper'}">${esc(row.tier || 'transcript')}</span>
+ ${row.specialist_mode ? '<span class="badge badge-pro">Specialist mode</span>' : ''}
+ ${row.recording_url ? '<span class="badge badge-yes">Recording retained</span>' : '<span class="badge badge-free">No retained recording</span>'}
+ ${fb?.polished_auditor_detected ? '<span class="badge badge-paid">Trap flagged</span>' : ''}
+ <span class="badge badge-default">${transcriptWords} transcript words</span>
+ </div>
+ </div>
+ <div class="mmi-score-tile ${scoreInfo.score ? mmiScoreC(scoreInfo.score, scoreInfo.max) : ''}">
+ <strong>${scoreInfo.score ? esc(scoreInfo.score) : '-'}</strong>
+ <span>${scoreInfo.score ? `/${scoreInfo.max}` : 'No score'}</span>
+ </div>
+ </div>
+ <div class="mmi-viewer-actions">
+ ${row.email ? `<button class="btn" onclick='openStudentDrawer(${jsArg(row.email)})'>Student drawer</button>` : ''}
+ ${row.email ? `<button class="btn" onclick='openTimelineForEmail(${jsArg(row.email)})'>Timeline</button>` : ''}
+ ${row.email ? `<button class="btn blue" onclick='viewAsStudent(${jsArg(row.user_id || '')},${jsArg(row.email)})'>View as student</button>` : ''}
+ <button class="btn green" onclick='copyMMICoachingBrief(${jsArg(row.id)})'>Copy coaching brief</button>
+ <button class="btn" onclick='copyMMITranscript(${jsArg(row.id)})'>Copy transcript</button>
+ </div>
+ <div class="mmi-viewer-grid">
+ <div class="mmi-stack">
+ ${renderMMIMediaPanel(row)}
+ ${renderMMIStationPanel(row, prompts)}
+ ${renderMMITranscriptPanel(row)}
+ </div>
+ <div class="mmi-stack">
+ ${renderMMIOverallFeedback(row, fb)}
+ ${renderMMIPromptFeedback(row, fb, prompts)}
+ ${renderMMIMetrics(row, fb)}
+ ${renderMMIMetadata(row)}
+ </div>
  </div>`;
- }).join('')||'';
+}
+
+function renderMMIMediaPanel(row) {
+ const cached = S.mmiRecordingCache?.get(String(row.id || ''));
+ const body = row.recording_url
+ ? `<div class="mmi-media-stage" id="mmiMediaStage-${mmiDomId(row.id)}">${cached ? renderMMIRecordingElement(cached) : `<div><button class="btn blue" onclick='loadMMIRecording(${jsArg(row.id)})'>Load recording</button><div class="mmi-media-note">Uses a short-lived admin playback URL. Video appears when the session saved video; otherwise audio controls appear.</div></div>`}</div>`
+ : `<div class="mmi-media-stage"><div><div class="mmi-empty-title">No retained recording</div><div class="mmi-media-note">This row has a transcript, but no playable media key. Free/temp MMI recordings are transcribed then deleted; retained media appears for active MMI Pro, founding, and mock rows.</div></div></div>`;
+ return `<div class="mmi-section">
+ <div class="mmi-section-head"><div class="mmi-section-title">Recording</div>${row.recording_url ? `<button class="btn" onclick='copyText(${jsArg(row.recording_url)}, "Recording key copied")'>Copy key</button>` : ''}</div>
+ <div class="mmi-section-body">${body}</div>
+ </div>`;
+}
+
+function renderMMIRecordingElement(data) {
+ const type = String(data?.content_type || '').toLowerCase();
+ const src = esc(data?.playback_url || '');
+ const size = data?.size ? `${Math.round(Number(data.size) / 1024 / 1024 * 10) / 10} MB` : 'size unknown';
+ const media = type.startsWith('audio/')
+ ? `<audio controls src="${src}"></audio>`
+ : `<video controls playsinline src="${src}"></video>`;
+ return `<div style="width:100%;">${media}<div class="mmi-media-note">Playback link expires soon | ${esc(type || 'video/webm')} | ${esc(size)}</div></div>`;
+}
+
+async function loadMMIRecording(id) {
+ const row = findMMIReviewById(id);
+ if (!row?.recording_url) return;
+ const stage = document.getElementById(`mmiMediaStage-${mmiDomId(row.id)}`);
+ try {
+ if (stage) stage.innerHTML = '<div class="mmi-media-note">Preparing secure playback...</div>';
+ const res = await api('/api/admin/mmi/recording-token', {
+ method:'POST',
+ headers:{'Content-Type':'application/json'},
+ body: JSON.stringify({ key: row.recording_url })
+ });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Recording unavailable');
+ S.mmiRecordingCache.set(String(row.id), data);
+ if (stage) stage.innerHTML = renderMMIRecordingElement(data);
+ } catch(e) {
+ if (stage) stage.innerHTML = `<div class="mmi-media-note" style="color:var(--red);">${esc(e.message || 'Could not load recording')}</div>`;
+ }
+}
+
+function renderMMIStationPanel(row, prompts) {
+ const promptHtml = prompts.length ? prompts.map((p, i) => `
+ <div class="mmi-prompt">
+ <div class="mmi-prompt-label"><span>Prompt ${i+1}</span>${Number.isFinite(p.revealed) ? `<span>${p.revealed}s</span>` : ''}</div>
+ <div class="mmi-prompt-text">${esc(p.text || '-')}</div>
+ </div>`).join('') : '<div class="mmi-media-note">No prompt rows were returned for this review.</div>';
  return `
- <div class="detail-box">
- <div class="detail-box-hd">Station</div>
- <div class="detail-box-row">Category: <strong>${esc(row.station_category||'-')}</strong></div>
- <div class="detail-box-row">Tier: <strong>${esc(row.tier||'-')}</strong></div>
- <div class="detail-box-row">Specialist: <strong>${row.specialist_mode?'Yes':'No'}</strong></div>
- <div style="margin-top:8px;">${promptsHtml}</div>
+ <div class="mmi-section">
+ <div class="mmi-section-head"><div class="mmi-section-title">Station and prompts</div><span class="badge badge-default">${esc(row.reveal_mode || 'all_at_once')}</span></div>
+ <div class="mmi-section-body">
+ <div class="mmi-scenario">${esc(row.station_scenario || 'No scenario saved for this row.')}</div>
+ <div class="mmi-prompt-list">${promptHtml}</div>
  </div>
- <div class="detail-box">
- <div class="detail-box-hd">Transcript</div>
- <div class="detail-box-body">${esc(row.transcript_text||'No transcript available.')}</div>
+ </div>`;
+}
+
+function renderMMITranscriptPanel(row) {
+ return `<div class="mmi-section">
+ <div class="mmi-section-head"><div class="mmi-section-title">Transcript</div><span class="badge badge-default">${wordCount(row.transcript_text)} words</span></div>
+ <div class="mmi-section-body"><div class="mmi-transcript">${esc(row.transcript_text || 'No transcript available.')}</div></div>
+ </div>`;
+}
+
+function renderMMIOverallFeedback(row, fb) {
+ if (!fb) return `<div class="mmi-section"><div class="mmi-section-head"><div class="mmi-section-title">AI feedback</div></div><div class="mmi-section-body">No parsed AI feedback is available for this row.</div></div>`;
+ const scoreInfo = mmiScoreInfo(row, fb);
+ const o = fb.overall || {};
+ const presentation = fb.presentation || null;
+ return `<div class="mmi-section">
+ <div class="mmi-section-head"><div class="mmi-section-title">Overall feedback</div>${scoreInfo.score ? `<span class="score-box ${mmiScoreC(scoreInfo.score, scoreInfo.max)}">${esc(scoreInfo.score)}</span>` : ''}</div>
+ <div class="mmi-section-body">
+ ${o.label ? `<div class="mmi-feedback-card"><div class="mmi-feedback-title">Overall signal <span class="badge badge-default">${esc(o.label)}</span></div><div class="mmi-feedback-text">${esc(`Score ${scoreInfo.score || '-'} / ${scoreInfo.max || '-'}`)}</div></div>` : ''}
+ ${fb.polished_auditor_detected ? `<div class="mmi-feedback-card" style="border-color:var(--amber-border);background:var(--amber-dim);"><div class="mmi-feedback-title" style="color:var(--amber);">Polished Auditor Trap flagged</div><div class="mmi-feedback-text">${esc(fb.polished_auditor_explanation || 'Flagged by the model.')}</div></div>` : ''}
+ ${o.biggest_strength ? `<div class="mmi-feedback-card"><div class="mmi-feedback-title">Biggest strength</div><div class="mmi-feedback-text">${esc(o.biggest_strength)}</div></div>` : ''}
+ ${o.biggest_improvement ? `<div class="mmi-feedback-card"><div class="mmi-feedback-title">Biggest improvement</div><div class="mmi-feedback-text">${esc(o.biggest_improvement)}</div></div>` : ''}
+ ${o.excellent_version ? `<div class="mmi-feedback-card"><div class="mmi-feedback-title">Excellent version</div><div class="mmi-feedback-text">${esc(o.excellent_version)}</div></div>` : ''}
+ ${presentation ? renderMMIPresentationFeedback(presentation) : ''}
  </div>
- <div class="detail-box">
- <div class="detail-box-hd">AI Feedback ${fb?.overall ? `- ${esc(fb.overall.label||'')} (${fb.overall.score}/5)` : ''}</div>
- ${fb?.polished_auditor_detected ? `<div style="margin-bottom:8px;padding:6px 10px;border-radius:7px;background:var(--amber-dim);border:1px solid var(--amber-border);color:var(--amber);font-size:0.75rem;font-weight:700;">Polished Auditor Trap detected</div>` : ''}
- ${fb?.overall?.biggest_strength ? `<div style="margin-bottom:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--green);text-transform:uppercase;margin-bottom:3px;">Biggest Strength</div><div class="detail-box-body">${esc(fb.overall.biggest_strength)}</div></div>` : ''}
- ${fb?.overall?.biggest_improvement ? `<div style="margin-bottom:6px;"><div style="font-size:0.63rem;font-weight:700;color:var(--red);text-transform:uppercase;margin-bottom:3px;">Biggest Improvement</div><div class="detail-box-body">${esc(fb.overall.biggest_improvement)}</div></div>` : ''}
- ${perPromptHtml}
+ </div>`;
+}
+
+function renderMMIPresentationFeedback(presentation) {
+ const rows = [
+ ['Pace', presentation.pace],
+ ['Clarity', presentation.clarity],
+ ['Confidence', presentation.confidence],
+ ['Visual presence', presentation.visual_presence],
+ ['Facial expression', presentation.facial_expression],
+ ['Visual evidence', presentation.visual_evidence],
+ ['One improvement', presentation.one_improvement],
+ ].filter(([,v]) => String(v || '').trim());
+ return rows.map(([k,v]) => `<div class="mmi-feedback-card"><div class="mmi-feedback-title">${esc(k)}</div><div class="mmi-feedback-text">${esc(v)}</div></div>`).join('');
+}
+
+function renderMMIPromptFeedback(row, fb, prompts) {
+ const items = Array.isArray(fb?.per_prompt) ? fb.per_prompt : [];
+ const body = items.length ? items.map((pp, i) => {
+ const scores = pp.scores && typeof pp.scores === 'object' ? Object.entries(pp.scores) : [];
+ const criteriaHtml = scores.length ? `<div class="mmi-criteria-grid">${scores.map(([key, val]) => {
+ const crit = val && typeof val === 'object' ? val : { score: val };
+ return `<div class="mmi-criterion"><div class="mmi-criterion-head"><span>${esc(formatMMIKey(key))}</span><span class="mmi-criterion-score">${esc(crit.score ?? '-')}/5</span></div><div class="mmi-feedback-text">${esc(crit.comment || crit.label || '')}</div></div>`;
+ }).join('')}</div>` : '';
+ const promptText = pp.prompt_text || prompts[i]?.text || '';
+ return `<div class="mmi-feedback-card">
+ <div class="mmi-feedback-title">Prompt ${i+1}${pp.summary ? '' : ' feedback'} ${pp.specific_quote ? '<span class="badge badge-default">has quote</span>' : ''}</div>
+ ${promptText ? `<div class="mmi-feedback-text" style="color:var(--text);margin-bottom:8px;">${esc(promptText)}</div>` : ''}
+ ${pp.summary ? `<div class="mmi-feedback-text">${esc(pp.summary)}</div>` : ''}
+ ${pp.specific_quote ? `<div class="mmi-feedback-text" style="margin-top:8px;color:var(--blue);">Student quote: ${esc(pp.specific_quote)}</div>` : ''}
+ ${criteriaHtml}
+ </div>`;
+ }).join('') : '<div class="mmi-media-note">No per-prompt feedback was parsed.</div>';
+ return `<div class="mmi-section"><div class="mmi-section-head"><div class="mmi-section-title">Per-prompt marking</div><span class="badge badge-default">${items.length} item${items.length===1?'':'s'}</span></div><div class="mmi-section-body">${body}</div></div>`;
+}
+
+function renderMMIMetrics(row, fb) {
+ const voice = parseJsonObject(row.voice_metrics_json);
+ const visual = parseJsonObject(row.visual_metrics_json);
+ const voiceGrid = voice ? `<div class="mmi-metric-grid">
+ <div class="mmi-metric"><span>Pace</span><strong>${esc(voice.pace_wpm ?? '-')} wpm</strong></div>
+ <div class="mmi-metric"><span>Fillers</span><strong>${esc(voice.filler_density_pct ?? '-')}%</strong></div>
+ <div class="mmi-metric"><span>Pauses</span><strong>${esc(voice.pause_count ?? '-')}</strong></div>
+ <div class="mmi-metric"><span>Words</span><strong>${esc(voice.word_count ?? '-')}</strong></div>
+ <div class="mmi-metric"><span>Longest pause</span><strong>${esc(voice.longest_pause_seconds ?? '-')}s</strong></div>
+ <div class="mmi-metric"><span>Total pause</span><strong>${esc(voice.total_pause_seconds ?? '-')}s</strong></div>
+ </div>${voice.pace_trend ? `<div class="mmi-feedback-text">${esc(voice.pace_trend)}</div>` : ''}` : '<div class="mmi-media-note">No voice metrics saved for this row.</div>';
+ const visualSummary = visual ? [
+ ['Eye contact', visual.eye_contact],
+ ['Posture', visual.posture],
+ ['Composure', visual.composure],
+ ['Engagement', visual.engagement],
+ ['Facial expression', visual.facial_expression],
+ ['Summary', visual.summary],
+ ['Distractions', Array.isArray(visual.distractions) ? visual.distractions.join(', ') : visual.distractions],
+ ].filter(([,v]) => String(v || '').trim()).map(([k,v]) => `<div class="mmi-feedback-card"><div class="mmi-feedback-title">${esc(k)}</div><div class="mmi-feedback-text">${esc(v)}</div></div>`).join('') : '<div class="mmi-media-note">No visual metrics saved for this row.</div>';
+ return `<div class="mmi-section">
+ <div class="mmi-section-head"><div class="mmi-section-title">Voice and visual signals</div><span class="badge badge-default">${esc(row.tier || '-')}</span></div>
+ <div class="mmi-section-body">
+ <div class="mmi-feedback-title">Voice metrics</div>${voiceGrid}
+ <div class="mmi-feedback-title" style="margin-top:12px;">Visual metrics</div>${visualSummary}
+ </div>
+ </div>`;
+}
+
+function renderMMIMetadata(row) {
+ return `<div class="mmi-section">
+ <div class="mmi-section-head"><div class="mmi-section-title">Admin metadata</div><button class="btn" onclick='copyText(${jsArg(row.id || '')}, "Review ID copied")'>Copy ID</button></div>
+ <div class="mmi-section-body">
+ <div class="detail-box-row"><strong>Review ID:</strong> ${esc(row.id || '-')}</div>
+ <div class="detail-box-row"><strong>User ID:</strong> ${esc(row.user_id || '-')}</div>
+ <div class="detail-box-row"><strong>Station ID:</strong> ${esc(row.station_id || '-')}</div>
+ <div class="detail-box-row"><strong>Timing:</strong> ${esc(row.timing_preset || '-')} | ${esc(row.reveal_mode || '-')}</div>
+ <div class="detail-box-row"><strong>Charge:</strong> ${esc(mmiChargeLabel(row))}</div>
+ <div class="detail-box-row"><strong>COGS:</strong> ${esc(row.cogs_cents ?? '-')} cents</div>
+ <div class="detail-box-row"><strong>Recording key:</strong> ${esc(row.recording_url || '-')}</div>
+ </div>
  </div>`;
 }
 
@@ -7995,7 +8335,116 @@ function parseMMIFb(raw) {
  try { return JSON.parse(String(raw)); } catch { return null; }
 }
 
-function mmiScoreC(s) { const n=parseInt(s,10); return n>=4?'score-h':n>=3?'score-m':'score-l'; }
+function parseMMIPrompts(row) {
+ const raw = row?.prompts_json;
+ let arr = [];
+ if (Array.isArray(raw)) arr = raw;
+ else {
+ try { arr = JSON.parse(String(raw || '[]')); } catch { arr = []; }
+ }
+ return arr.map((p, i) => {
+ if (p && typeof p === 'object') {
+ const revealed = Number(p.revealed_at_seconds ?? p.revealed_at_recording_seconds ?? p.revealed_at ?? NaN);
+ return { text: String(p.prompt || p.prompt_text || p.text || '').trim(), revealed: Number.isFinite(revealed) ? Math.round(revealed * 10) / 10 : NaN, index: i };
+ }
+ return { text: String(p || '').trim(), revealed: NaN, index: i };
+ }).filter(p => p.text);
+}
+
+function parseJsonObject(raw) {
+ if (!raw) return null;
+ if (typeof raw === 'object') return raw;
+ try {
+ const parsed = JSON.parse(String(raw));
+ return parsed && typeof parsed === 'object' ? parsed : null;
+ } catch {
+ return null;
+ }
+}
+
+function mmiScoreInfo(row, fb) {
+ const raw = Number(fb?.overall?.score ?? fb?.score);
+ if (!Number.isFinite(raw)) return { score:null, max:null, label:'' };
+ const max = raw > 5 || String(row?.recording_url || '').startsWith('casper_mock/') ? 10 : 5;
+ return { score: Math.round(raw * 10) / 10, max, label: fb?.overall?.label || fb?.label || '' };
+}
+
+function mmiScoreC(s, max = 5) {
+ const n = Number(s);
+ if (!Number.isFinite(n)) return '';
+ return Number(max) > 5 ? (n>=7?'score-h':n>=5.5?'score-m':'score-l') : (n>=4?'score-h':n>=3?'score-m':'score-l');
+}
+
+function wordCount(value) {
+ return String(value || '').trim().split(/\s+/).filter(Boolean).length;
+}
+
+function mmiDuration(row) {
+ const sec = Number(row?.recording_duration_seconds || 0);
+ if (!Number.isFinite(sec) || sec <= 0) return '-';
+ return `${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,'0')}`;
+}
+
+function mmiDomId(value) {
+ return String(value || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+}
+
+function findMMIReviewById(id) {
+ return (S.mmiReviews || []).find(r => String(r.id) === String(id));
+}
+
+function formatMMIKey(value) {
+ return String(value || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function mmiChargeLabel(row) {
+ if (Number(row?.charged_credit || 0)) return 'Paid credit';
+ if (Number(row?.charged_pro || 0)) return 'MMI Pro';
+ return 'Free / not charged';
+}
+
+async function copyMMITranscript(id) {
+ const row = findMMIReviewById(id);
+ await copyText(row?.transcript_text || '', 'Transcript copied');
+}
+
+async function copyMMICoachingBrief(id) {
+ const row = findMMIReviewById(id);
+ if (!row) return;
+ await copyText(buildMMICoachingBrief(row), 'MMI coaching brief copied');
+}
+
+function buildMMICoachingBrief(row) {
+ const fb = parseMMIFb(row.ai_feedback_json);
+ const prompts = parseMMIPrompts(row);
+ const scoreInfo = mmiScoreInfo(row, fb);
+ const lines = [
+ `MMI review: ${row.email || 'Unknown student'}`,
+ `Date: ${fmtDate(row.created_at)?.date || row.created_at || '-'}`,
+ `Category: ${row.station_category || '-'}`,
+ `Tier: ${row.tier || '-'}`,
+ `Score: ${scoreInfo.score ? `${scoreInfo.score}/${scoreInfo.max}` : '-'}`,
+ '',
+ 'Scenario:',
+ row.station_scenario || '-',
+ '',
+ 'Prompts:',
+ ...prompts.map((p, i) => `${i+1}. ${p.text}`),
+ '',
+ 'Transcript:',
+ row.transcript_text || '-',
+ '',
+ 'AI feedback:',
+ fb?.overall?.biggest_strength ? `Strength: ${fb.overall.biggest_strength}` : '',
+ fb?.overall?.biggest_improvement ? `Improvement: ${fb.overall.biggest_improvement}` : '',
+ fb?.overall?.excellent_version ? `Excellent version: ${fb.overall.excellent_version}` : '',
+ fb?.polished_auditor_detected ? `Trap flag: ${fb.polished_auditor_explanation || 'Polished Auditor Trap detected.'}` : '',
+ '',
+ 'Per-prompt notes:',
+ ...(Array.isArray(fb?.per_prompt) ? fb.per_prompt.map((p, i) => `Prompt ${i+1}: ${p.summary || ''}${p.specific_quote ? ` Quote: ${p.specific_quote}` : ''}`) : []),
+ ].filter(line => line !== '');
+ return lines.join('\n');
+}
 
 // ======================================================
 // REVENUE
