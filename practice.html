@@ -755,6 +755,14 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <span class="phase-badge phase-idle" id="phaseBadge">Idle</span>
  <span class="timer-num" id="timerNum">-:--</span>
  </div>
+ <label class="casper-reflection-toggle" id="casperReflectionToggle" title="Practising without reflection time will force you to think faster, and the real CASPer will seem easier. If you're struggling, turn it on and see how much the reflection helps." style="display:none;">
+ <input type="checkbox" id="reflectionTimeToggle" onchange="setCasperReflectionTime(this.checked)" aria-describedby="reflectionTimeHelp">
+ <span class="reflection-toggle-copy">
+ <span class="reflection-toggle-title">Reflection time <span class="reflection-new-chip">New!</span></span>
+ <span class="reflection-toggle-sub">optional</span>
+ </span>
+ <span class="reflection-help" id="reflectionTimeHelp" tabindex="0" aria-label="Practising without reflection time will force you to think faster, and the real CASPer will seem easier. If you're struggling, turn it on and see how much the reflection helps.">?</span>
+ </label>
  </div>
  <div class="progress-outer"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
 
@@ -3013,6 +3021,7 @@ function beep(vol,long){
 function setPhaseUI(p){
  phase=p;phaseBadge.className='phase-badge';progressFill.className='progress-fill';
  if(p==='reading'){phaseBadge.classList.add('phase-reading');phaseBadge.textContent='📖 Reading';progressFill.classList.add('reading');}
+ else if(p==='reflection'){phaseBadge.classList.add('phase-reflection');phaseBadge.textContent='Reflecting';progressFill.classList.add('reflection');}
  else if(p==='writing'){phaseBadge.classList.add('phase-writing');phaseBadge.textContent='✍️ Writing';progressFill.classList.add('writing');}
 else if(p==='done'){phaseBadge.classList.add('phase-done');phaseBadge.textContent='Done';}
  else{phaseBadge.classList.add('phase-idle');phaseBadge.textContent='Idle';}
@@ -3023,7 +3032,8 @@ else if(p==='done'){phaseBadge.classList.add('phase-done');phaseBadge.textConten
 function updateBtns(){
  prevBtn.disabled=!sessionActive||currentIdx===0;
  nextBtn.disabled=!sessionActive;
- skipBtn.disabled=!sessionActive||phase!=='reading';
+ skipBtn.disabled=!sessionActive||!(phase==='reading'||phase==='reflection');
+ skipBtn.title=phase==='reflection'?'Skip reflection time and start answering now':'Skip the reading timer and start answering now';
  const inlineRestart=$('restartSessionBtn');
  if(inlineRestart) inlineRestart.disabled=!sessionActive;
  if(phase==='done')nextBtn.textContent='Next Station ->';
@@ -3148,6 +3158,7 @@ function applyModeUI(mode) {
  }
 
  syncIdleTimerPickers();
+ updateCasperReflectionUI();
 }
 
 function setMode(mode) {
@@ -3569,9 +3580,18 @@ function loadStation(){
  } else {
  setPhaseUI('reading');
  if(isMmi && typeof mmiShowCentralTimer==='function') mmiShowCentralTimer(rt,'Reading','purple');
- runTimer(rt,()=>startWriting());
+ runTimer(rt,()=>startCasperReflectionOrWriting());
  }
  syncAutoSaveHeartbeat();
+}
+
+function startCasperReflectionOrWriting(){
+ if(currentMode===MODE_CASPER&&casperReflectionEnabled&&currentTimerMode!=='off'){
+ setPhaseUI('reflection');
+ runTimer(CASPER_REFLECTION_SECONDS,()=>startWriting());
+ return;
+ }
+ startWriting();
 }
 
 function startWriting(){
@@ -5274,9 +5294,13 @@ const TIMER_MODES={
 };
 let currentTimerMode='standard';
 const ACCOMMODATION_KEY='k2md_casper_accommodation_multiplier';
+const CASPER_REFLECTION_KEY='k2md_casper_reflection_time_enabled';
+const CASPER_REFLECTION_SECONDS=30;
 let currentAccommodationMultiplier=1;
 try{currentAccommodationMultiplier=Number(localStorage.getItem(ACCOMMODATION_KEY)||'1')||1;}catch(e){}
 if(![1,1.5,2].includes(currentAccommodationMultiplier)) currentAccommodationMultiplier=1;
+let casperReflectionEnabled=false;
+try{casperReflectionEnabled=window.localStorage.getItem(CASPER_REFLECTION_KEY)==='1';}catch(e){}
 
 function applyCasperTiming(){
  const base=TIMER_MODES[currentTimerMode]||TIMER_MODES.standard;
@@ -5301,6 +5325,29 @@ function setAccommodationMultiplier(mult,opts={}){
  applyCasperTiming();
  updateAccommodationUI();
  updateTimerModeHint();
+}
+
+function updateCasperReflectionUI(){
+ const wrap=document.getElementById('casperReflectionToggle');
+ const input=document.getElementById('reflectionTimeToggle');
+ if(input) input.checked=!!casperReflectionEnabled;
+ if(wrap){
+ wrap.classList.toggle('active',!!casperReflectionEnabled);
+ wrap.style.display=currentMode===MODE_CASPER?'inline-flex':'none';
+ }
+}
+
+function setCasperReflectionTime(enabled,opts={}){
+ casperReflectionEnabled=!!enabled;
+ if(opts.persist!==false){
+ try{window.localStorage.setItem(CASPER_REFLECTION_KEY,casperReflectionEnabled?'1':'0');}catch(e){}
+ }
+ updateCasperReflectionUI();
+ updateTimerModeHint();
+ if(currentMode===MODE_CASPER&&phase==='reflection'&&!casperReflectionEnabled){
+ clearTimer();
+ startWriting();
+ }
 }
 
 function updateAccommodationUI(){
@@ -5338,7 +5385,10 @@ function updateTimerModeHint(){
  const accom=currentAccommodationMultiplier===1||currentTimerMode==='off'
  ? ''
  : ` <span style="color:var(--teal3);font-weight:700;">Special Accommodations ${currentAccommodationMultiplier}x:</span> ${fmt(readingTime)} read | ${fmt(writingTime)} write.`;
- hint.innerHTML=` <strong style="color:var(--gray600);">${names[currentTimerMode]}</strong> - ${m.hint}${accom}`;
+ const reflection=casperReflectionEnabled&&currentTimerMode!=='off'
+ ? ` <span style="color:#7c3aed;font-weight:800;">Reflection time on:</span> ${fmt(CASPER_REFLECTION_SECONDS)} before writing.`
+ : '';
+ hint.innerHTML=` <strong style="color:var(--gray600);">${names[currentTimerMode]}</strong> - ${m.hint}${accom}${reflection}`;
 }
 
 function setTimerMode(mode){
@@ -5355,6 +5405,7 @@ function setTimerMode(mode){
 
 setTimerMode(currentTimerMode);
 setAccommodationMultiplier(currentAccommodationMultiplier,{persist:false});
+setCasperReflectionTime(casperReflectionEnabled,{persist:false});
 
 
 const STREAK_KEY='k2md_streak';
@@ -5516,7 +5567,7 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
  if(phase==='writing'&&currentMode===MODE_MMI){
  clearTimer();stopRecording();setPhaseUI('done');updateBtns();return;
  }
- if(phase==='done'||phase==='reading'||currentMode===MODE_MMI){
+ if(phase==='done'||phase==='reading'||phase==='reflection'||currentMode===MODE_MMI){
  if(currentMode===MODE_CASPER && !sessionHistory[currentIdx]?.aiSaved) triggerAutoSave(currentIdx);
  const _advH = sessionHistory[currentIdx];
  if(_advH && _advH.station){
@@ -5535,7 +5586,7 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
 });
 
 skipBtn.addEventListener('click',()=>{
- if(!sessionActive||phase!=='reading')return;
+ if(!sessionActive||!(phase==='reading'||phase==='reflection'))return;
  clearTimer();startWriting();
 });
 
