@@ -210,6 +210,10 @@
  .score-mid { background:rgba(245,158,11,0.12); color:#92400e; }
  .score-low { background:rgba(239,68,68,0.12); color:#dc2626; }
  .score-none { background:var(--gray100); color:var(--gray400); }
+ .review-card-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+ .review-delete-btn { border:1px solid rgba(220,38,38,0.18); background:rgba(220,38,38,0.055); color:#b91c1c; border-radius:999px; padding:5px 10px; font-family:inherit; font-size:0.7rem; font-weight:800; cursor:pointer; transition:background 0.16s,border-color 0.16s,color 0.16s; }
+ .review-delete-btn:hover { background:rgba(220,38,38,0.11); border-color:rgba(220,38,38,0.34); color:#991b1b; }
+ .review-delete-btn:disabled { cursor:wait; opacity:0.55; }
 
  .chevron { font-size:0.75rem; color:var(--gray400); transition:transform 0.2s; flex-shrink:0; }
  .review-card.open .chevron { transform:rotate(180deg); }
@@ -1410,6 +1414,9 @@ function renderReviews() {
  header.closest('.review-card').classList.toggle('open');
  });
  });
+ list.querySelectorAll('[data-delete-review-id]').forEach(btn => {
+ btn.addEventListener('click', event => deleteReviewFromHistory(event, btn.dataset.deleteReviewId));
+ });
 }
 
 function reviewCardHTML(r, i) {
@@ -1446,8 +1453,11 @@ function reviewCardHTML(r, i) {
  <div class="review-scenario">${escapeHtml(scenario)}${r.question_text && r.question_text.length > 120 ? '...' : ''}</div>
  <div class="review-date">${date}${creditLabel}</div>
  </div>
+ <div class="review-card-actions">
  ${scoreHTML}
+ <button type="button" class="review-delete-btn" data-delete-review-id="${escapeAttr(r.id)}" title="Remove this station from your saved history">Delete</button>
  <span class="chevron">v</span>
+ </div>
  </div>
  <div class="review-card-body">
  ${bodyHTML}
@@ -1647,6 +1657,47 @@ async function saveEditedResponse(reviewId, textareaId, statusId, btnId) {
  }
 }
 window.saveEditedResponse = saveEditedResponse;
+
+async function deleteReviewFromHistory(event, reviewId) {
+ event?.preventDefault?.();
+ event?.stopPropagation?.();
+ const review = allReviews.find(item => String(item.id || '') === String(reviewId || ''));
+ if (!review) return;
+ const label = review.tool === 'gamsat' ? 'Writing GAMSAT response' : 'CASPer station';
+ const isSavedOnly = review.credit_source === 'saved' || !review.ai_feedback;
+ const warning = isSavedOnly
+ ? `Delete this saved ${label.toLowerCase()} from your history?`
+ : `Delete this AI-reviewed ${label.toLowerCase()} from your history?`;
+ if (!confirm(`${warning}\n\nThis only removes it from your saved history. It does not refund or restore any AI credit/free attempt already used.`)) return;
+
+ const btn = event?.currentTarget || null;
+ if (btn) {
+ btn.disabled = true;
+ btn.textContent = 'Deleting...';
+ }
+
+ try {
+ const token = localStorage.getItem(TOKEN_KEY);
+ const res = await fetch(`${API_BASE}/api/responses/${encodeURIComponent(reviewId)}`, {
+ method: 'DELETE',
+ headers: { 'Authorization': `Bearer ${token}` },
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) throw new Error(data.message || data.error || 'Delete failed');
+ allReviews = allReviews.filter(item => String(item.id || '') !== String(reviewId));
+ _editedIds.delete(reviewId);
+ updateStats();
+ renderCompetencyProgress();
+ renderReviews();
+ } catch (err) {
+ if (btn) {
+ btn.disabled = false;
+ btn.textContent = 'Delete';
+ }
+ alert(err.message || 'Could not delete this station. Try again.');
+ }
+}
+window.deleteReviewFromHistory = deleteReviewFromHistory;
 
 function showState(state) {
 	 document.getElementById('loadingState').style.display = state === 'loading' ? 'flex' : 'none';

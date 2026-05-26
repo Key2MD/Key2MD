@@ -950,7 +950,7 @@
  <button class="btn" onclick="exportCsv('reviews')">Download CSV</button>
  </div>
  <div class="tbl-wrap">
- <div class="tbl-toolbar"><span class="tbl-status" id="revStatus">-</span></div>
+ <div class="tbl-toolbar"><span class="tbl-status" id="revStatus">AI-reviewed CASPer stations only. Saved/interrupted half-attempts are hidden here.</span></div>
  <div class="tbl-scroller"><table><thead><tr>
  <th style="width:26px;"></th><th>Time</th><th>Student</th><th>Tier</th><th>Score</th><th>Signals</th><th>Scenario</th><th>Response</th>
  </tr></thead><tbody id="revBody"></tbody></table></div>
@@ -3389,10 +3389,10 @@ function renderReviewQuality() {
 async function loadReviews() {
  const limit = document.getElementById('revLimit')?.value||'5000';
  try {
- const res = await api(`/admin/reviews?tool=casper&limit=${limit}`);
+ const res = await api(`/admin/reviews?tool=casper&reviewed=1&limit=${limit}`);
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.error||'Failed');
- S.reviews = data.rows||[];
+ S.reviews = (data.rows||[]).filter(row => String(row.ai_feedback || '').trim() && String(row.credit_source || '') !== 'saved');
  renderReviews();
  updateDashboard();
  } catch(e) { console.error('Reviews load error:', e); }
@@ -3414,7 +3414,7 @@ function renderReviews() {
  || (scoreFilter==='low' && score>0 && score<5);
  return sm&&tm&&trm&&scm;
  });
- document.getElementById('revStatus').textContent = `${rows.length} review${rows.length===1?'':'s'}`;
+ document.getElementById('revStatus').textContent = `${rows.length} AI-reviewed CASPer station${rows.length===1?'':'s'}`;
  document.getElementById('revEmpty').classList.toggle('hidden', rows.length>0);
  const tbody = document.getElementById('revBody');
  tbody.innerHTML = '';
@@ -9087,7 +9087,7 @@ async function exportCsv(type) {
  let extra = '';
  if (type === 'reviews') {
  limit = document.getElementById('revLimit')?.value || '5000';
- extra = '&tool=casper';
+ extra = '&tool=casper&reviewed=1';
  } else if (type === 's2') {
  endpoint = 'reviews';
  limit = document.getElementById('s2Limit')?.value || '5000';

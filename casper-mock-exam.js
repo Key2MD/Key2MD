@@ -1085,7 +1085,7 @@ const res = await fetch(`${apiBase()}/api/casper-mock/checkout`, {
  if (total > 0) {
  return `${total} active ${pluralise(total, 'mock')}; ${Math.max(0, available)} unused for this account. Key2MD automatically selects the next unused mock.`;
  }
- return '3 active private mocks are live. Key2MD automatically selects the next unused mock for this account, with more being added.';
+ return '5 all-new private mocks are live. Every question is hand-written by Dan, and Key2MD automatically selects the next unused mock for this account.';
  }
 
  function checkoutButtonText() {
