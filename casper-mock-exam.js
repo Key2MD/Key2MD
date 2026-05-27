@@ -21,6 +21,8 @@ window.FullCasperMock = (() => {
  transcript: { standard: 59, pro: 41, value: 69, video: 20 },
  premium: { standard: 79, pro: 55, value: 97, video: 48 },
  };
+ const MOCK_PUBLIC_DISCOUNT_CODE = 'MOCK15';
+ const MOCK_PUBLIC_DISCOUNT_COPY = '15% off transcript and premium mock purchases until Sunday midnight.';
 const MOCK_ACCESS_TIMING_KEY = 'k2md_full_mock_access_timing_v1';
  const ACCESS_TIMING_OPTIONS = {
  standard: {
@@ -97,6 +99,38 @@ function byId(id) {
  return String(value ?? '').replace(/[&<>"']/g, ch => ({
  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
  }[ch]));
+ }
+
+ function normaliseMockDiscountCode(value) {
+ return String(value || '').trim().toUpperCase().replace(/\s+/g, '');
+ }
+
+ function readMockDiscountCode() {
+ const inputs = Array.from(document.querySelectorAll('[data-mock-discount-code]'));
+ const populated = inputs.find(input => normaliseMockDiscountCode(input.value));
+ return normaliseMockDiscountCode(populated?.value || '');
+ }
+
+ function syncMockDiscountCode(value) {
+ const clean = normaliseMockDiscountCode(value);
+ document.querySelectorAll('[data-mock-discount-code]').forEach(input => {
+ if (input.value !== clean) input.value = clean;
+ });
+ }
+
+ function mockDiscountInputHtml(context = 'mock') {
+ const current = readMockDiscountCode();
+ const isSidebar = context === 'sidebar';
+ return `
+ <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.24);border-radius:10px;padding:${isSidebar ? '10px' : '12px'};margin:${isSidebar ? '0 0 14px' : '0 auto 18px'};max-width:${isSidebar ? 'none' : '440px'};text-align:left;">
+ <label for="mockDiscountCode-${esc(context)}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:0.68rem;font-weight:900;text-transform:uppercase;color:#15803d;margin-bottom:7px;">
+ <span>Coupon code</span>
+ <span style="background:#dcfce7;border:1px solid rgba(22,163,74,0.28);color:#15803d;border-radius:50px;padding:2px 7px;font-size:0.62rem;letter-spacing:0;">New</span>
+ </label>
+ <input id="mockDiscountCode-${esc(context)}" data-mock-discount-code type="text" autocomplete="off" placeholder="${MOCK_PUBLIC_DISCOUNT_CODE}" value="${esc(current)}" oninput="FullCasperMock.syncMockDiscountCode(this.value)" style="width:100%;box-sizing:border-box;border:1px solid rgba(14,165,233,0.28);border-radius:9px;padding:10px 11px;background:#fff;color:var(--navy);font:inherit;font-size:0.84rem;font-weight:850;text-transform:uppercase;outline:none;">
+ <div style="font-size:${isSidebar ? '0.68rem' : '0.74rem'};color:var(--gray500);line-height:1.45;margin-top:7px;">Use <strong style="color:#15803d;">${MOCK_PUBLIC_DISCOUNT_CODE}</strong> for ${MOCK_PUBLIC_DISCOUNT_COPY}</div>
+ </div>
+ `;
  }
 
  function normaliseAccessTiming(value) {
@@ -1014,6 +1048,8 @@ function returnedFromCheckout(tier = config.tier) {
  const successUrl = `${window.location.origin}${window.location.pathname}?tab=mock&mock_payment=success&mock_tier=${encodeURIComponent(tier)}`;
  const cancelUrl = `${window.location.origin}${window.location.pathname}?tab=mock&mock_payment=cancelled`;
 const checkoutBody = { tier, success_url: successUrl, cancel_url: cancelUrl };
+const discountCode = readMockDiscountCode();
+if (discountCode) checkoutBody.discount_code = discountCode;
 const res = await fetch(`${apiBase()}/api/casper-mock/checkout`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -1237,6 +1273,8 @@ const res = await fetch(`${apiBase()}/api/casper-mock/checkout`, {
  <div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:7px;">Includes your next unused 11-station mock, 7 typed-station CASPer AI markings, optional equity access timing, and 4 CASPer video analyses. CASPer Pro subscribers save about 30%.</div>
  </div>
 
+ ${mockDiscountInputHtml('sidebar')}
+
  <div style="background:rgba(10,22,40,0.04);border:1px solid var(--gray200);border-radius:10px;padding:11px 12px;margin-bottom:14px;">
  <div style="font-size:0.72rem;color:var(--gray500);margin-bottom:4px;">Approximate exam time</div>
  <div style="font-size:1rem;font-weight:800;color:var(--navy);">65-110 minutes</div>
@@ -1457,6 +1495,7 @@ const res = await fetch(`${apiBase()}/api/casper-mock/checkout`, {
  </button>
  </div>
  </div>
+ ${mockDiscountInputHtml('idle')}
  <button type="button" class="mock-checkout-btn" style="position:relative;z-index:81;pointer-events:auto;padding:13px 30px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.94rem;font-weight:800;cursor:pointer;font-family:inherit;">${checkoutButtonText()}</button>
  <div class="mock-checkout-status" style="display:none;margin-top:10px;font-size:0.78rem;color:var(--gray500);line-height:1.45;"></div>
  <div data-mock-tier-copy="short" style="max-width:620px;margin:13px auto 0;font-size:0.78rem;color:var(--gray500);line-height:1.55;">Transcript analyses what you said in the video stations, without voice or presentation review. <a href="plans.html#mock" style="color:var(--teal3);font-weight:800;text-decoration:none;">See full details</a>.</div>
@@ -4308,6 +4347,7 @@ function renderPartialReportNotice(rows) {
  startFreshMock,
  setTier,
  setAccessTiming,
+ syncMockDiscountCode,
  refreshPricing,
  checkoutMock,
  restoreDraft,
