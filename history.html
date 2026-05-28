@@ -149,6 +149,16 @@
 	 .mock-video-load { width:100%; min-height:150px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; border:0; background:#07111f; color:#fff; cursor:pointer; font-family:inherit; padding:18px; }
 	 .mock-video-load strong { font-size:0.9rem; }
 	 .mock-video-load span { font-size:0.75rem; color:rgba(255,255,255,0.62); line-height:1.45; }
+	 .mock-video-controls { border-top:1px solid rgba(255,255,255,0.09); background:linear-gradient(180deg,rgba(7,17,31,0.96),rgba(7,17,31,1)); padding:10px 12px 12px; }
+	 .mock-video-control-row { display:flex; align-items:center; gap:10px; }
+	 .mock-video-play { min-width:58px; height:32px; border-radius:50px; border:1px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.08); color:#fff; font-size:0.68rem; font-weight:850; font-family:inherit; cursor:pointer; }
+	 .mock-video-play:hover { background:rgba(255,255,255,0.15); }
+	 .mock-video-track { position:relative; height:18px; flex:1; display:flex; align-items:center; }
+	 .mock-video-track-bg { position:absolute; left:0; right:0; height:4px; border-radius:99px; background:rgba(255,255,255,0.16); overflow:hidden; }
+	 .mock-video-fill { height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,var(--teal3),var(--teal)); }
+	 .mock-video-range { position:absolute; inset:0; width:100%; opacity:0; cursor:pointer; }
+	 .mock-video-time { min-width:76px; text-align:right; color:rgba(255,255,255,0.72); font-size:0.68rem; font-weight:850; font-variant-numeric:tabular-nums; }
+	 .mock-video-status { margin-top:7px; color:rgba(255,255,255,0.55); font-size:0.68rem; line-height:1.4; }
 	 .mock-video-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
 	 .mock-recording-download { min-height:34px; padding:8px 12px; border-radius:50px; border:1px solid rgba(14,165,233,0.3); background:#fff; color:var(--teal3); font-size:0.74rem; font-weight:850; font-family:inherit; cursor:pointer; }
 	 .mock-recording-download:hover { background:rgba(14,165,233,0.07); border-color:var(--teal); }
@@ -1150,20 +1160,32 @@ function mockStationHTML(attempt, row, index) {
 }
 
 function mockVideoHTML(attempt, row, index) {
- const videoId = `mockvid-${attempt.id}-${index}`.replace(/[^a-zA-Z0-9_-]/g, '');
- const canLoad = row.recording_key && !attempt.expired;
- const segments = Array.isArray(row.transcript_segments) ? row.transcript_segments : [];
- const issue = row.processing_error ? `<div class="mock-analysis-issue"><strong>Analysis issue.</strong> ${escapeHtml(row.processing_error)}${row.recording_key && !attempt.expired ? ' The recording is still available below during the 30-day window.' : ''}</div>` : '';
- return `
- <div class="mock-video-box">
- <video id="${escapeAttr(videoId)}" controls playsinline preload="metadata" data-attempt-id="${escapeAttr(attempt.id)}" data-recording-key="${escapeAttr(row.recording_key || '')}"></video>
- ${canLoad ? `<button type="button" class="mock-video-load" onclick="loadMockRecording(event,'${escapeAttr(videoId)}')"><strong>Load recording</strong><span>Authenticated playback. Expires ${escapeHtml(formatDate(attempt.expires_at))}.</span></button>` : `<div class="mock-video-load" style="cursor:default;"><strong>${attempt.expired ? 'Recording expired' : 'No recording saved'}</strong><span>${attempt.expired ? 'The 30-day playback window has passed.' : 'Transcript and feedback are still shown below.'}</span></div>`}
- </div>
- ${canLoad ? `<div class="mock-video-actions"><button type="button" class="mock-recording-download" onclick="downloadMockRecording(event,'${escapeAttr(videoId)}')">Download recording only</button></div>` : ''}
- ${row.duration_sec ? `<div class="mock-card-meta" style="margin-top:7px;">Duration ${escapeHtml(formatDuration(row.duration_sec))}</div>` : ''}
- ${issue}
- ${segments.length ? `<div class="mock-section-label">Synced transcript</div>${mockSyncedTranscriptHTML(videoId, segments)}` : (row.transcript ? `<div class="mock-section-label">Transcript used for marking</div><div class="mock-transcript mock-text">${escapeHtml(row.transcript)}</div>` : '')}
- `;
+	 const videoId = `mockvid-${attempt.id}-${index}`.replace(/[^a-zA-Z0-9_-]/g, '');
+	 const canLoad = row.recording_key && !attempt.expired;
+	 const segments = Array.isArray(row.transcript_segments) ? row.transcript_segments : [];
+	 const issue = row.processing_error ? `<div class="mock-analysis-issue"><strong>Analysis issue.</strong> ${escapeHtml(row.processing_error)}${row.recording_key && !attempt.expired ? ' The recording is still available below during the 30-day window.' : ''}</div>` : '';
+	 const duration = Number(row.duration_sec || row.recording_duration_seconds || 0);
+	 return `
+	 <div class="mock-video-box">
+	 <video id="${escapeAttr(videoId)}" playsinline preload="metadata" data-attempt-id="${escapeAttr(attempt.id)}" data-recording-key="${escapeAttr(row.recording_key || '')}" data-duration="${escapeAttr(duration || '')}"></video>
+	 ${canLoad ? `<button type="button" id="${escapeAttr(videoId)}Load" class="mock-video-load" onclick="loadMockRecording(event,'${escapeAttr(videoId)}')"><strong>Load recording</strong><span>Authenticated playback. Expires ${escapeHtml(formatDate(attempt.expires_at))}.</span></button>` : `<div class="mock-video-load" style="cursor:default;"><strong>${attempt.expired ? 'Recording expired' : 'No recording saved'}</strong><span>${attempt.expired ? 'The 30-day playback window has passed.' : 'Transcript and feedback are still shown below.'}</span></div>`}
+	 ${canLoad ? `<div id="${escapeAttr(videoId)}Controls" class="mock-video-controls" hidden>
+	 <div class="mock-video-control-row">
+	 <button type="button" id="${escapeAttr(videoId)}Play" class="mock-video-play" onclick="toggleMockHistoryVideo(event,'${escapeAttr(videoId)}')">Load</button>
+	 <div class="mock-video-track">
+	 <div class="mock-video-track-bg"><div id="${escapeAttr(videoId)}Fill" class="mock-video-fill"></div></div>
+	 <input id="${escapeAttr(videoId)}Range" class="mock-video-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording" oninput="seekMockHistoryVideo(event,'${escapeAttr(videoId)}')">
+	 </div>
+	 <div id="${escapeAttr(videoId)}Time" class="mock-video-time">0:00 / ${duration ? escapeHtml(formatDuration(duration)) : '--:--'}</div>
+	 </div>
+	 <div id="${escapeAttr(videoId)}Status" class="mock-video-status">Recording ready to load.</div>
+	 </div>` : ''}
+	 </div>
+	 ${canLoad ? `<div class="mock-video-actions"><button type="button" class="mock-recording-download" onclick="downloadMockRecording(event,'${escapeAttr(videoId)}')">Download recording only</button></div>` : ''}
+	 ${duration ? `<div class="mock-card-meta" style="margin-top:7px;">Duration ${escapeHtml(formatDuration(duration))}</div>` : ''}
+	 ${issue}
+	 ${segments.length ? `<div class="mock-section-label">Synced transcript</div>${mockSyncedTranscriptHTML(videoId, segments)}` : (row.transcript ? `<div class="mock-section-label">Transcript used for marking</div><div class="mock-transcript mock-text">${escapeHtml(row.transcript)}</div>` : '')}
+	 `;
 }
 
 function mockSyncedTranscriptHTML(videoId, segments) {
@@ -1240,48 +1262,176 @@ async function toggleMockAttempt(id) {
 }
 window.toggleMockAttempt = toggleMockAttempt;
 
+function mockHistoryVideoDuration(video) {
+	 const native = Number(video?.duration);
+	 const hinted = Number(video?.dataset?.duration || 0);
+	 const hasNative = Number.isFinite(native) && native > 0 && native < 86400;
+	 const hasHint = Number.isFinite(hinted) && hinted > 0 && hinted < 86400;
+	 if (hasNative && hasHint) {
+	 if (native < hinted * 0.55 || native > hinted * 1.8) return hinted;
+	 return native;
+	 }
+	 if (hasNative) return native;
+	 if (hasHint) return hinted;
+	 return 0;
+}
+
+function setMockHistoryVideoStatus(videoId, message) {
+	 const status = document.getElementById(`${videoId}Status`);
+	 if (status) status.textContent = message || '';
+}
+
+function updateMockHistoryVideo(videoId) {
+	 const video = document.getElementById(videoId);
+	 if (!video) return;
+	 const duration = mockHistoryVideoDuration(video);
+	 const current = Math.max(0, Number(video.currentTime) || 0);
+	 const pct = duration ? Math.max(0, Math.min(1, current / duration)) : 0;
+	 const fill = document.getElementById(`${videoId}Fill`);
+	 const range = document.getElementById(`${videoId}Range`);
+	 const time = document.getElementById(`${videoId}Time`);
+	 const play = document.getElementById(`${videoId}Play`);
+	 if (fill) fill.style.width = `${pct * 100}%`;
+	 if (range) range.value = String(Math.round(pct * 1000));
+	 if (time) time.textContent = `${formatDuration(current)} / ${duration ? formatDuration(duration) : '--:--'}`;
+	 if (play) play.textContent = video.dataset.loaded === '1' ? (video.paused || video.ended ? 'Play' : 'Pause') : 'Load';
+	 syncMockTranscript(videoId, current);
+}
+
+function applyMockHistorySeek(video, target) {
+	 if (!video) return;
+	 const safeTarget = Math.max(0, Number(target) || 0);
+	 try {
+	 video.currentTime = safeTarget;
+	 video.dataset.pendingSeek = '';
+	 } catch {
+	 video.dataset.pendingSeek = String(safeTarget);
+	 }
+}
+
+function applyPendingMockHistorySeek(videoId) {
+	 const video = document.getElementById(videoId);
+	 const pending = Number(video?.dataset?.pendingSeek || NaN);
+	 if (!video || !Number.isFinite(pending)) return;
+	 applyMockHistorySeek(video, pending);
+	 updateMockHistoryVideo(videoId);
+}
+
+function bindMockHistoryVideo(videoId) {
+	 const video = document.getElementById(videoId);
+	 if (!video || video.dataset.historyVideoBound === '1') return;
+	 video.dataset.historyVideoBound = '1';
+	 video.addEventListener('click', event => toggleMockHistoryVideo(event, videoId));
+	 ['loadedmetadata', 'loadeddata', 'durationchange'].forEach(eventName => video.addEventListener(eventName, () => applyPendingMockHistorySeek(videoId)));
+	 ['loadedmetadata', 'loadeddata', 'durationchange', 'timeupdate', 'play', 'pause', 'ended', 'seeked'].forEach(eventName => video.addEventListener(eventName, () => updateMockHistoryVideo(videoId)));
+	 video.addEventListener('error', () => {
+	 if (video.dataset.blobUrl) URL.revokeObjectURL(video.dataset.blobUrl);
+	 video.dataset.blobUrl = '';
+	 video.dataset.loaded = '';
+	 video.removeAttribute('src');
+	 try { video.load(); } catch {}
+	 const load = document.getElementById(`${videoId}Load`);
+	 if (load) load.style.display = 'flex';
+	 const controls = document.getElementById(`${videoId}Controls`);
+	 if (controls) controls.hidden = true;
+	 setMockHistoryVideoStatus(videoId, 'Playback failed. Load the recording again to fetch a fresh copy.');
+	 });
+	 updateMockHistoryVideo(videoId);
+}
+
+async function ensureMockHistoryRecording(videoId, loadButton = null) {
+	 const video = document.getElementById(videoId);
+	 if (!video) return false;
+	 bindMockHistoryVideo(videoId);
+	 if (video.dataset.loaded === '1' && video.getAttribute('src')) {
+	 video.style.display = 'block';
+	 const controls = document.getElementById(`${videoId}Controls`);
+	 if (controls) controls.hidden = false;
+	 return true;
+	 }
+	 const token = localStorage.getItem(TOKEN_KEY);
+	 if (!token) {
+	 setMockHistoryVideoStatus(videoId, 'Please log in again before loading this recording.');
+	 return false;
+	 }
+	 const btn = loadButton || document.getElementById(`${videoId}Load`);
+	 if (btn) {
+	 btn.disabled = true;
+	 const label = btn.querySelector('span');
+	 if (label) label.textContent = 'Loading secure playback...';
+	 }
+	 setMockHistoryVideoStatus(videoId, 'Loading secure recording...');
+	 try {
+	 const url = mockRecordingUrl(video);
+	 const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+	 if (!res.ok) {
+	 const data = await res.json().catch(() => ({}));
+	 throw new Error(data.message || data.error || 'Recording unavailable.');
+	 }
+	 const blob = await res.blob();
+	 const type = String(blob.type || '');
+	 if (type && !type.startsWith('video/') && type !== 'application/octet-stream') {
+	 throw new Error('The saved file is not a playable video recording.');
+	 }
+	 if (video.dataset.blobUrl) URL.revokeObjectURL(video.dataset.blobUrl);
+	 const objectUrl = URL.createObjectURL(blob);
+	 video.dataset.blobUrl = objectUrl;
+	 video.dataset.loaded = '1';
+	 video.src = objectUrl;
+	 video.style.display = 'block';
+	 video.load();
+	 bindMockTranscriptSync(video);
+	 const controls = document.getElementById(`${videoId}Controls`);
+	 if (controls) controls.hidden = false;
+	 if (btn) btn.style.display = 'none';
+	 setMockHistoryVideoStatus(videoId, 'Recording ready.');
+	 updateMockHistoryVideo(videoId);
+	 return true;
+	 } catch (err) {
+	 if (btn) {
+	 btn.disabled = false;
+	 btn.innerHTML = `<strong>Could not load recording</strong><span>${escapeHtml(err.message || 'Try again later.')}</span>`;
+	 }
+	 setMockHistoryVideoStatus(videoId, err.message || 'Could not load recording.');
+	 return false;
+	 }
+}
+
 async function loadMockRecording(event, videoId) {
- if (event) event.stopPropagation();
- const video = document.getElementById(videoId);
- if (!video) return;
- const btn = event?.currentTarget || null;
- if (video.dataset.loaded === '1') {
- video.style.display = 'block';
- video.play().catch(() => {});
- return;
- }
- const token = localStorage.getItem(TOKEN_KEY);
- if (!token) return;
- if (btn) {
- btn.disabled = true;
- const label = btn.querySelector('span');
- if (label) label.textContent = 'Loading secure playback...';
- }
- try {
- const url = `${API_BASE}/api/casper-mock/recording?attempt_id=${encodeURIComponent(video.dataset.attemptId || '')}&key=${encodeURIComponent(video.dataset.recordingKey || '')}`;
- const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
- if (!res.ok) {
- const data = await res.json().catch(() => ({}));
- throw new Error(data.message || data.error || 'Recording unavailable.');
- }
- const blob = await res.blob();
- if (video.dataset.blobUrl) URL.revokeObjectURL(video.dataset.blobUrl);
- const objectUrl = URL.createObjectURL(blob);
- video.dataset.blobUrl = objectUrl;
- video.dataset.loaded = '1';
- video.src = objectUrl;
- video.style.display = 'block';
- bindMockTranscriptSync(video);
- if (btn) btn.style.display = 'none';
- video.play().catch(() => {});
- } catch (err) {
- if (btn) {
- btn.disabled = false;
- btn.innerHTML = `<strong>Could not load recording</strong><span>${escapeHtml(err.message || 'Try again later.')}</span>`;
- }
- }
+	 if (event) event.stopPropagation();
+	 const ready = await ensureMockHistoryRecording(videoId, event?.currentTarget || null);
+	 if (!ready) return;
+	 const video = document.getElementById(videoId);
+	 video?.play?.().catch(() => {});
 }
 window.loadMockRecording = loadMockRecording;
+
+async function toggleMockHistoryVideo(event, videoId) {
+	 if (event) {
+	 event.preventDefault();
+	 event.stopPropagation();
+	 }
+	 const ready = await ensureMockHistoryRecording(videoId);
+	 if (!ready) return;
+	 const video = document.getElementById(videoId);
+	 if (!video) return;
+	 if (video.paused || video.ended) video.play().catch(() => {});
+	 else video.pause();
+}
+window.toggleMockHistoryVideo = toggleMockHistoryVideo;
+
+async function seekMockHistoryVideo(event, videoId) {
+	 if (event) event.stopPropagation();
+	 const ready = await ensureMockHistoryRecording(videoId);
+	 if (!ready) return;
+	 const video = document.getElementById(videoId);
+	 const range = document.getElementById(`${videoId}Range`);
+	 const duration = mockHistoryVideoDuration(video);
+	 if (!video || !range || !duration) return;
+	 applyMockHistorySeek(video, (Number(range.value) / 1000) * duration);
+	 updateMockHistoryVideo(videoId);
+}
+window.seekMockHistoryVideo = seekMockHistoryVideo;
 
 function mockRecordingUrl(video) {
  if (!video?.dataset?.attemptId || !video?.dataset?.recordingKey) {
@@ -1371,12 +1521,16 @@ function syncMockTranscript(videoId, time) {
  }
 }
 
-function jumpMockTranscript(videoId, start) {
- const video = document.getElementById(videoId);
- if (!video) return;
- video.currentTime = Math.max(0, Number(start) || 0);
- syncMockTranscript(videoId, video.currentTime);
- if (video.dataset.loaded === '1') video.play().catch(() => {});
+async function jumpMockTranscript(videoId, start) {
+	 const video = document.getElementById(videoId);
+	 if (!video) return;
+	 if (video.dataset.recordingKey && video.dataset.loaded !== '1') {
+	 const ready = await ensureMockHistoryRecording(videoId);
+	 if (!ready) return;
+	 }
+	 applyMockHistorySeek(video, Math.max(0, Number(start) || 0));
+	 syncMockTranscript(videoId, video.currentTime);
+	 if (video.dataset.loaded === '1') video.play().catch(() => {});
 }
 window.jumpMockTranscript = jumpMockTranscript;
 

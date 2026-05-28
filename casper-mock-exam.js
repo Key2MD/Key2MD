@@ -3496,24 +3496,102 @@ function renderPartialReportNotice(rows) {
 	 }
 	 }
 
-	 function jumpTranscript(videoId, start) {
+	 async function jumpTranscript(videoId, start) {
 	 const video = byId(videoId);
 	 if (!video) return;
-	 video.currentTime = Math.max(0, Number(start) || 0);
+	 if (!video.getAttribute('src') && video.dataset.recordingKey) {
+	 const ready = await ensureMockVideoSource(videoId);
+	 if (!ready) return;
+	 }
+	 applyMockVideoSeek(video, Math.max(0, Number(start) || 0));
 	 syncMockTranscript(videoId, video.currentTime || 0);
 	 if (video.getAttribute('src')) video.play().catch(() => {});
 	 }
 
+	 function applyMockVideoSeek(video, target) {
+	 if (!video) return;
+	 const safeTarget = Math.max(0, Number(target) || 0);
+	 try {
+	 video.currentTime = safeTarget;
+	 video.dataset.pendingSeek = '';
+	 } catch {
+	 video.dataset.pendingSeek = String(safeTarget);
+	 }
+	 }
+
+	 function applyPendingMockVideoSeek(id) {
+	 const video = byId(id);
+	 const pending = Number(video?.dataset?.pendingSeek || NaN);
+	 if (!video || !Number.isFinite(pending)) return;
+	 applyMockVideoSeek(video, pending);
+	 syncMockTranscript(id, video.currentTime || pending || 0);
+	 }
+
+ function mockRecordingRequestUrl(video) {
+ if (!video?.dataset?.attemptId || !video?.dataset?.recordingKey) return '';
+ const params = new URLSearchParams({
+ attempt_id: video.dataset.attemptId,
+ key: video.dataset.recordingKey,
+ });
+ return `${apiBase()}/api/casper-mock/recording?${params.toString()}`;
+ }
+
+ async function fetchMockRecordingBlob(video) {
+ const url = mockRecordingRequestUrl(video);
+ if (!url) throw new Error('Recording details are missing for this station.');
+ const token = authTokenOrThrow();
+ const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+ if (!res.ok) {
+ const data = await res.json().catch(() => ({}));
+ throw new Error(data.message || data.error || `Recording unavailable (${res.status}).`);
+ }
+ const blob = await res.blob();
+ const type = String(blob.type || '');
+ if (type && !type.startsWith('video/') && type !== 'application/octet-stream') {
+ throw new Error('The saved file is not a playable video recording.');
+ }
+ return blob;
+ }
+
+ async function ensureMockVideoSource(id = 'mockStationVideoPlayer') {
+ const video = byId(id);
+ if (!video) return false;
+ if (video.getAttribute('src') && video.dataset.loaded === '1') return true;
+ const status = byId(`${id}Status`);
+ const btn = byId(`${id}Btn`);
+ if (!video.dataset.recordingKey) {
+ if (status) status.textContent = 'No saved recording key is attached to this station.';
+ return false;
+ }
+ if (status) status.textContent = 'Loading secure recording...';
+ if (btn) btn.textContent = 'Load';
+ try {
+ const blob = await fetchMockRecordingBlob(video);
+ if (video.dataset.blobUrl) URL.revokeObjectURL(video.dataset.blobUrl);
+ const url = URL.createObjectURL(blob);
+ video.dataset.blobUrl = url;
+ video.dataset.loaded = '1';
+ video.src = url;
+ video.load();
+ if (status) status.textContent = 'Recording ready.';
+ return true;
+ } catch (err) {
+ if (status) status.textContent = err.message || 'Could not load recording.';
+ return false;
+ }
+ }
+
 	 function mockVideoPlayerHtml(row, id = 'mockStationVideoPlayer') {
 	  const src_url = row?.recordingUrl || '';
+	  const recordingKey = row?.recordingKey || row?.recording_key || row?.rawFeedback?.recording_key || row?.rawFeedback?.recording_url || '';
 	  const duration = mockVideoDuration(row);
 	  return `
 	   <div id="${id}Shell" style="background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;">
-	    <video id="${id}" playsinline preload="metadata" src="${esc(src_url)}" data-duration="${duration || ''}" style="width:100%;aspect-ratio:16/9;background:#000;display:block;cursor:pointer;"></video>
+	    <video id="${id}" playsinline preload="metadata" ${src_url ? `src="${esc(src_url)}"` : ''} data-attempt-id="${esc(mockAttemptId || savedAttemptId || '')}" data-recording-key="${esc(recordingKey)}" data-duration="${duration || ''}" data-loaded="${src_url ? '1' : ''}" style="width:100%;aspect-ratio:16/9;background:#000;display:block;cursor:pointer;"></video>
 	    <div style="padding:11px 14px 13px;background:linear-gradient(180deg,rgba(0,0,0,0.3),rgba(0,0,0,0.6));border-top:1px solid rgba(255,255,255,0.08);">
 	     <div style="display:flex;align-items:center;gap:10px;">
-	      <button type="button" id="${id}Btn" aria-label="Play recording" style="min-width:54px;height:32px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">PLAY</button>
-	      ${src_url ? `<button type="button" onclick="FullCasperMock.downloadLocalRecording('${esc(id)}')" style="min-width:78px;height:32px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">DL</button>` : ''}
+	      <button type="button" id="${id}Btn" aria-label="Play recording" style="min-width:54px;height:32px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${src_url ? 'PLAY' : 'LOAD'}</button>
+	      ${src_url || recordingKey ? `<button type="button" onclick="FullCasperMock.downloadLocalRecording('${esc(id)}')" style="min-width:78px;height:32px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">DL</button>` : ''}
 	      <div style="position:relative;height:16px;flex:1;display:flex;align-items:center;">
 	       <div style="position:absolute;left:0;right:0;height:4px;border-radius:99px;background:rgba(255,255,255,0.15);overflow:hidden;">
 	        <div id="${id}Fill" style="height:100%;width:0%;background:linear-gradient(90deg,var(--teal3),var(--teal2));border-radius:99px;"></div>
@@ -3522,6 +3600,7 @@ function renderPartialReportNotice(rows) {
 	      </div>
 	      <div id="${id}Time" style="min-width:74px;text-align:right;color:rgba(255,255,255,0.7);font-family:var(--mono);font-size:0.7rem;font-weight:700;font-variant-numeric:tabular-nums;">0:00 / ${duration ? mockTime(duration) : '--:--'}</div>
 	     </div>
+	     <div id="${id}Status" style="font-family:var(--mono);font-size:0.66rem;color:rgba(255,255,255,0.48);line-height:1.45;margin-top:7px;">${src_url ? 'Recording ready.' : recordingKey ? 'Saved recording available. Press Load.' : 'No saved recording attached.'}</div>
 	    </div>
 	   </div>
 	  `;
@@ -3551,17 +3630,20 @@ function renderPartialReportNotice(rows) {
  range.value = String(Math.round(pct * 1000));
  fill.style.width = `${pct * 100}%`;
 	 time.textContent = `${mockTime(current)} / ${d ? mockTime(d) : '--:--'}`;
-	 btn.textContent = video.paused || video.ended ? 'Play' : 'Pause';
+	 btn.textContent = !video.getAttribute('src') ? 'Load' : (video.paused || video.ended ? 'Play' : 'Pause');
 	 syncMockTranscript(id, current);
 	 };
- const seek = () => {
+ const seek = async () => {
+ const ready = await ensureMockVideoSource(id);
+ if (!ready) return;
  const d = usableDuration();
  if (!d) return;
- video.currentTime = (Number(range.value) / 1000) * d;
- update();
- };
- const toggle = () => {
- if (!video.getAttribute('src')) return;
+	 applyMockVideoSeek(video, (Number(range.value) / 1000) * d);
+	 update();
+	 };
+ const toggle = async () => {
+ const ready = await ensureMockVideoSource(id);
+ if (!ready) return;
  if (video.paused || video.ended) video.play().catch(() => {});
  else video.pause();
  };
@@ -3571,16 +3653,35 @@ function renderPartialReportNotice(rows) {
  btn.addEventListener('click', toggle);
  video.addEventListener('click', toggle);
  range.addEventListener('input', seek);
- ['loadedmetadata', 'durationchange', 'timeupdate', 'play', 'pause', 'ended', 'seeked'].forEach(eventName => {
- video.addEventListener(eventName, update);
+	 ['loadedmetadata', 'loadeddata', 'durationchange'].forEach(eventName => {
+	 video.addEventListener(eventName, () => applyPendingMockVideoSeek(id));
+	 });
+	 ['loadedmetadata', 'durationchange', 'timeupdate', 'play', 'pause', 'ended', 'seeked'].forEach(eventName => {
+	 video.addEventListener(eventName, update);
+	 });
+ video.addEventListener('error', () => {
+ const status = byId(`${id}Status`);
+ if (video.dataset.blobUrl) {
+ URL.revokeObjectURL(video.dataset.blobUrl);
+ video.dataset.blobUrl = '';
+ }
+ video.removeAttribute('src');
+ try { video.load(); } catch {}
+ video.dataset.loaded = '';
+ if (status) status.textContent = video.dataset.recordingKey ? 'Playback failed. Press Load again to fetch a fresh copy.' : 'Playback failed. No saved recording key is attached.';
  });
  }
  update();
  }
 
- function downloadLocalRecording(id = 'mockRecordingPlayer') {
+ async function downloadLocalRecording(id = 'mockRecordingPlayer') {
  const video = byId(id);
- const src = video?.currentSrc || video?.getAttribute?.('src') || '';
+ let src = video?.currentSrc || video?.getAttribute?.('src') || '';
+ if (!src && video?.dataset?.recordingKey) {
+ const ready = await ensureMockVideoSource(id);
+ if (!ready) return;
+ src = video.currentSrc || video.getAttribute('src') || '';
+ }
  if (!src) return;
  const a = document.createElement('a');
  a.href = src;
@@ -3807,15 +3908,27 @@ function renderPartialReportNotice(rows) {
  btn.style.border = activeTab ? '1px solid var(--navy)' : '1px solid var(--gray200)';
  });
  const player = byId('mockRecordingPlayer');
- if (player && row?.recordingUrl) {
- if (player.getAttribute('src') !== row.recordingUrl) {
- player.src = row.recordingUrl;
+ if (player) {
+ const recordingKey = row?.recordingKey || row?.recording_key || row?.rawFeedback?.recording_key || row?.rawFeedback?.recording_url || '';
+ const localUrl = row?.recordingUrl || '';
+ if (player.dataset.blobUrl) {
+ URL.revokeObjectURL(player.dataset.blobUrl);
+ player.dataset.blobUrl = '';
+ }
+ player.dataset.attemptId = mockAttemptId || savedAttemptId || '';
+ player.dataset.recordingKey = recordingKey || '';
+ player.dataset.duration = mockVideoDuration(row) || '';
+ player.dataset.loaded = localUrl ? '1' : '';
+ if (localUrl) {
+ if (player.getAttribute('src') !== localUrl) {
+ player.src = localUrl;
+ }
+ } else {
+ player.removeAttribute('src');
  player.load();
  }
- player.dataset.duration = mockVideoDuration(row) || '';
- } else if (player) {
- player.removeAttribute('src');
- player.dataset.duration = '';
+ const status = byId('mockRecordingPlayerStatus');
+ if (status) status.textContent = localUrl ? 'Recording ready.' : (recordingKey ? 'Saved recording available. Press Load.' : 'No saved recording attached.');
  player.load();
  }
  const meta = byId('mockRecordingMeta');

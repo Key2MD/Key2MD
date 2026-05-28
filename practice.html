@@ -3253,10 +3253,8 @@ function startRecording(){
  const opts=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
  MediaRecorder.isTypeSupported('video/webm')?{mimeType:'video/webm'}:{};
  const recorderOpts = { ...opts };
- if (window.K2_ACTIVE_CASPER_MOCK) {
  recorderOpts.videoBitsPerSecond = 850000;
  recorderOpts.audioBitsPerSecond = 96000;
- }
  mediaRecorder=new MediaRecorder(webcamStream,recorderOpts);
  mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
  mediaRecorder.onstop=()=>{

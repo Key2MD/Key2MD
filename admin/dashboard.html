@@ -383,9 +383,18 @@
  .mmi-prompt-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);font-weight:900;margin-bottom:5px;display:flex;justify-content:space-between;gap:8px;}
  .mmi-prompt-text{font-size:0.82rem;color:var(--text);line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;}
  .mmi-transcript{max-height:360px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--text);line-height:1.75;}
- .mmi-media-stage{border:1px dashed var(--border2);border-radius:12px;background:rgba(0,0,0,0.18);min-height:210px;display:grid;place-items:center;padding:14px;text-align:center;color:var(--muted);}
- .mmi-media-stage video,.mmi-media-stage audio{width:100%;max-height:380px;border-radius:10px;outline:none;}
- .mmi-media-note{font-size:0.75rem;color:var(--muted2);line-height:1.55;margin-top:8px;}
+.mmi-media-stage{border:1px dashed var(--border2);border-radius:12px;background:rgba(0,0,0,0.18);min-height:210px;display:grid;place-items:center;padding:14px;text-align:center;color:var(--muted);}
+.mmi-media-stage video,.mmi-media-stage audio{width:100%;max-height:380px;border-radius:10px;outline:none;}
+.mmi-media-note{font-size:0.75rem;color:var(--muted2);line-height:1.55;margin-top:8px;}
+.mmi-playback-controls{margin-top:9px;padding:10px 11px;border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.2);}
+.mmi-playback-row{display:flex;align-items:center;gap:10px;}
+.mmi-playback-btn{min-width:58px;height:32px;border-radius:50px;border:1px solid var(--border2);background:rgba(255,255,255,0.06);color:var(--text);font-size:0.68rem;font-weight:850;font-family:inherit;cursor:pointer;}
+.mmi-playback-btn:hover{background:rgba(14,165,233,0.13);border-color:rgba(14,165,233,0.35);}
+.mmi-playback-track{position:relative;flex:1;height:18px;display:flex;align-items:center;}
+.mmi-playback-bg{position:absolute;left:0;right:0;height:4px;border-radius:99px;background:rgba(255,255,255,0.16);overflow:hidden;}
+.mmi-playback-fill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--green));}
+.mmi-playback-range{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;}
+.mmi-playback-time{min-width:78px;text-align:right;color:var(--muted);font-size:0.68rem;font-weight:850;font-variant-numeric:tabular-nums;}
  .mmi-feedback-card{border:1px solid var(--border);border-radius:11px;background:rgba(0,0,0,0.12);padding:12px;margin-bottom:10px;}
  .mmi-feedback-card:last-child{margin-bottom:0;}
  .mmi-feedback-title{font-size:0.72rem;font-weight:900;color:var(--text);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -8171,7 +8180,9 @@ function renderMMIViewer(row) {
 }
 
 function renderMMIMediaPanel(row) {
- const cached = S.mmiRecordingCache?.get(String(row.id || ''));
+ const cachedRaw = S.mmiRecordingCache?.get(String(row.id || ''));
+ const cached = cachedRaw && (cachedRaw.blob_url || !cachedRaw.expires_at || Number(cachedRaw.expires_at) > Date.now() + 15000) ? cachedRaw : null;
+ if (cachedRaw && !cached && S.mmiRecordingCache) S.mmiRecordingCache.delete(String(row.id || ''));
  const body = row.recording_url
  ? `<div class="mmi-media-stage" id="mmiMediaStage-${mmiDomId(row.id)}">${cached ? renderMMIRecordingElement(cached) : `<div><button class="btn blue" onclick='loadMMIRecording(${jsArg(row.id)})'>Load recording</button><div class="mmi-media-note">Uses a short-lived admin playback URL. Video appears when the session saved video; otherwise audio controls appear.</div></div>`}</div>`
  : `<div class="mmi-media-stage"><div><div class="mmi-empty-title">No retained recording</div><div class="mmi-media-note">This row has a transcript, but no playable media key. Free/temp MMI recordings are transcribed then deleted; retained media appears for active MMI Pro, founding, and mock rows.</div></div></div>`;
@@ -8182,13 +8193,101 @@ function renderMMIMediaPanel(row) {
 }
 
 function renderMMIRecordingElement(data) {
- const type = String(data?.content_type || '').toLowerCase();
- const src = esc(data?.playback_url || '');
- const size = data?.size ? `${Math.round(Number(data.size) / 1024 / 1024 * 10) / 10} MB` : 'size unknown';
- const media = type.startsWith('audio/')
- ? `<audio controls src="${src}"></audio>`
- : `<video controls playsinline src="${src}"></video>`;
- return `<div style="width:100%;">${media}<div class="mmi-media-note">Playback link expires soon | ${esc(type || 'video/webm')} | ${esc(size)}</div></div>`;
+	 const type = String(data?.content_type || '').toLowerCase();
+	 const src = esc(data?.playback_url || '');
+	 const size = data?.size ? `${Math.round(Number(data.size) / 1024 / 1024 * 10) / 10} MB` : 'size unknown';
+	 const rowId = data?.review_id || data?.row_id || '';
+	 const key = data?.recording_key || '';
+	 const duration = Number(data?.duration_seconds || data?.recording_duration_seconds || 0);
+	 const mediaId = `mmiRecording-${mmiDomId(rowId || key || 'media')}`;
+	 const fallbackAttr = key && rowId && !data?.blob_url
+	 ? ` onerror='loadMMIRecordingBlobFallback(${jsArg(rowId)}, ${jsArg(key)})'`
+	 : '';
+	 const mode = data?.blob_url ? 'Loaded by fallback' : 'Playback link expires soon';
+	 const media = type.startsWith('audio/')
+	 ? `<audio controls preload="metadata" src="${src}"${fallbackAttr}></audio>`
+	 : `<video id="${esc(mediaId)}" playsinline preload="metadata" src="${src}" data-duration="${esc(duration || '')}" data-loaded="1" onloadedmetadata='updateMMIRecordingPlayer(${jsArg(mediaId)})' onloadeddata='applyPendingMMIRecordingSeek(${jsArg(mediaId)});updateMMIRecordingPlayer(${jsArg(mediaId)})' ondurationchange='applyPendingMMIRecordingSeek(${jsArg(mediaId)});updateMMIRecordingPlayer(${jsArg(mediaId)})' ontimeupdate='updateMMIRecordingPlayer(${jsArg(mediaId)})' onplay='updateMMIRecordingPlayer(${jsArg(mediaId)})' onpause='updateMMIRecordingPlayer(${jsArg(mediaId)})' onended='updateMMIRecordingPlayer(${jsArg(mediaId)})' onseeked='updateMMIRecordingPlayer(${jsArg(mediaId)})'${fallbackAttr}></video>`;
+	 const controls = type.startsWith('audio/') ? '' : `<div class="mmi-playback-controls">
+	 <div class="mmi-playback-row">
+	 <button type="button" id="${esc(mediaId)}Btn" class="mmi-playback-btn" onclick='toggleMMIRecordingPlayer(${jsArg(mediaId)})'>Play</button>
+	 <div class="mmi-playback-track">
+	 <div class="mmi-playback-bg"><div id="${esc(mediaId)}Fill" class="mmi-playback-fill"></div></div>
+	 <input id="${esc(mediaId)}Range" class="mmi-playback-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording" oninput='seekMMIRecordingPlayer(${jsArg(mediaId)})'>
+	 </div>
+	 <div id="${esc(mediaId)}Time" class="mmi-playback-time">0:00 / ${duration ? mmiMediaTime(duration) : '--:--'}</div>
+	 </div>
+	 </div>`;
+	 return `<div style="width:100%;">${media}${controls}<div class="mmi-media-note">${esc(mode)} | ${esc(type || 'video/webm')} | ${esc(size)}</div></div>`;
+}
+
+function mmiMediaTime(seconds) {
+	 const total = Math.max(0, Math.round(Number(seconds) || 0));
+	 return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+}
+
+function mmiMediaDuration(video) {
+	 const native = Number(video?.duration);
+	 const hinted = Number(video?.dataset?.duration || 0);
+	 const hasNative = Number.isFinite(native) && native > 0 && native < 86400;
+	 const hasHint = Number.isFinite(hinted) && hinted > 0 && hinted < 86400;
+	 if (hasNative && hasHint) {
+	 if (native < hinted * 0.55 || native > hinted * 1.8) return hinted;
+	 return native;
+	 }
+	 if (hasNative) return native;
+	 if (hasHint) return hinted;
+	 return 0;
+}
+
+function updateMMIRecordingPlayer(id) {
+	 const video = document.getElementById(id);
+	 if (!video) return;
+	 const duration = mmiMediaDuration(video);
+	 const current = Math.max(0, Number(video.currentTime) || 0);
+	 const pct = duration ? Math.max(0, Math.min(1, current / duration)) : 0;
+	 const fill = document.getElementById(`${id}Fill`);
+	 const range = document.getElementById(`${id}Range`);
+	 const time = document.getElementById(`${id}Time`);
+	 const btn = document.getElementById(`${id}Btn`);
+	 if (fill) fill.style.width = `${pct * 100}%`;
+	 if (range) range.value = String(Math.round(pct * 1000));
+	 if (time) time.textContent = `${mmiMediaTime(current)} / ${duration ? mmiMediaTime(duration) : '--:--'}`;
+	 if (btn) btn.textContent = video.paused || video.ended ? 'Play' : 'Pause';
+}
+
+function applyMMIRecordingSeek(video, target) {
+	 if (!video) return;
+	 const safeTarget = Math.max(0, Number(target) || 0);
+	 try {
+	 video.currentTime = safeTarget;
+	 video.dataset.pendingSeek = '';
+	 } catch {
+	 video.dataset.pendingSeek = String(safeTarget);
+	 }
+}
+
+function applyPendingMMIRecordingSeek(id) {
+	 const video = document.getElementById(id);
+	 const pending = Number(video?.dataset?.pendingSeek || NaN);
+	 if (!video || !Number.isFinite(pending)) return;
+	 applyMMIRecordingSeek(video, pending);
+}
+
+function seekMMIRecordingPlayer(id) {
+	 const video = document.getElementById(id);
+	 const range = document.getElementById(`${id}Range`);
+	 const duration = mmiMediaDuration(video);
+	 if (!video || !range || !duration) return;
+	 applyMMIRecordingSeek(video, (Number(range.value) / 1000) * duration);
+	 updateMMIRecordingPlayer(id);
+}
+
+function toggleMMIRecordingPlayer(id) {
+	 const video = document.getElementById(id);
+	 if (!video) return;
+	 if (video.paused || video.ended) video.play().catch(() => {});
+	 else video.pause();
+	 updateMMIRecordingPlayer(id);
 }
 
 async function loadMMIRecording(id) {
@@ -8203,7 +8302,44 @@ async function loadMMIRecording(id) {
  body: JSON.stringify({ key: row.recording_url })
  });
  const data = await res.json().catch(()=>({}));
- if (!res.ok) throw new Error(data?.message || data?.error || 'Recording unavailable');
+	 if (!res.ok) throw new Error(data?.message || data?.error || 'Recording unavailable');
+	 data.review_id = row.id;
+	 data.recording_key = row.recording_url;
+	 data.duration_seconds = Number(row.recording_duration_seconds || row.duration_sec || 0);
+	 data.expires_at = Date.now() + Number(data.expires_in || 600) * 1000;
+ S.mmiRecordingCache.set(String(row.id), data);
+ if (stage) stage.innerHTML = renderMMIRecordingElement(data);
+ } catch(e) {
+ if (stage) stage.innerHTML = `<div class="mmi-media-note" style="color:var(--red);">${esc(e.message || 'Could not load recording')}</div>`;
+ }
+}
+
+async function loadMMIRecordingBlobFallback(id, key) {
+ const row = findMMIReviewById(id);
+ const recordingKey = key || row?.recording_url || '';
+ if (!row || !recordingKey) return;
+ const stage = document.getElementById(`mmiMediaStage-${mmiDomId(row.id)}`);
+ try {
+ if (stage) stage.innerHTML = '<div class="mmi-media-note">Stream failed, loading recording by fallback...</div>';
+ const res = await api(`/api/admin/mmi/recording?key=${encodeURIComponent(recordingKey)}`);
+ if (!res.ok) {
+ const data = await res.json().catch(()=>({}));
+ throw new Error(data?.message || data?.error || `Fallback failed (${res.status})`);
+ }
+ const blob = await res.blob();
+ const existing = S.mmiRecordingCache.get(String(row.id));
+ if (existing?.blob_object_url) URL.revokeObjectURL(existing.blob_object_url);
+ const objectUrl = URL.createObjectURL(blob);
+	 const data = {
+	 playback_url: objectUrl,
+	 blob_object_url: objectUrl,
+	 blob_url: true,
+	 content_type: blob.type || existing?.content_type || 'video/webm',
+	 size: blob.size || existing?.size || null,
+	 duration_seconds: Number(row.recording_duration_seconds || row.duration_sec || existing?.duration_seconds || 0),
+	 review_id: row.id,
+	 recording_key: recordingKey,
+	 };
  S.mmiRecordingCache.set(String(row.id), data);
  if (stage) stage.innerHTML = renderMMIRecordingElement(data);
  } catch(e) {
