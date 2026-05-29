@@ -126,7 +126,7 @@
  {
  "@type": "Question",
  "name": "How does the AI feedback work?",
- "acceptedAnswer": {"@type": "Answer", "text": "After completing a station, you can request AI feedback on your response. The AI uses Dan Brittain's Q1-Q4 practice framework and a competency-style review to identify what your response demonstrated well, what it missed, and what to edit. The score is a practice estimate only. Free users receive one AI feedback per day. Pro subscribers receive unlimited feedback."}
+ "acceptedAnswer": {"@type": "Answer", "text": "After completing a station, you can request AI feedback on your response. The AI uses Dan Brittain's Q1-Q4 practice framework and a competency-style review to identify what your response demonstrated well, what it missed, and what to edit. Confident students aiming for Q4 should expect to reach 8/10 consistently. The marker also now treats both CASPer prompts as equal-value parts of the station, so ignoring one prompt is penalised instead of being treated as a complete one-question response. The score is a practice estimate only. Free users receive one AI feedback per day. Pro subscribers receive unlimited feedback."}
  }
  ]
  }
@@ -692,7 +692,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <strong style="color:var(--navy);display:block;margin-bottom:6px;">This isn't generic AI feedback.</strong>
  Dan has spent 300+ hours developing the marking criteria, prompt architecture, and scoring rubrics that power this tool - drawing directly from his experience coaching 200+ students through CASPer and MMI.
  <br><br>
- Every response is assessed using <strong style="color:var(--navy);">Dan's Q1-Q4 practice framework</strong>, the same teaching lens he uses in live 1:1 sessions. The AI is specifically trained to penalise the exact mistakes Dan sees students make - robotic framework-speak, buzzword answers, lack of genuine empathy - things ChatGPT would happily praise.
+ Every response is assessed using <strong style="color:var(--navy);">Dan's Q1-Q4 practice framework</strong>, the same teaching lens he uses in live 1:1 sessions. The AI is specifically trained to penalise the exact mistakes Dan sees students make - robotic framework-speak, buzzword answers, lack of genuine empathy, and spending all your time on one prompt while neglecting the other - things ChatGPT would happily praise.
+ <br><br>
+ <strong style="color:var(--navy);">Both prompts matter.</strong> CASPer stations usually test whether you can divide attention under time pressure. The marker now treats prompt 1 and prompt 2 as equal-value parts of the station, so a polished answer to only one question cannot carry the whole mark. Think of it like diminishing returns on investment: once one answer is strong enough, extra time there gives less benefit than moving on and earning the marks available in the second question.
  <br><br>
  <strong style="color:var(--navy);">Dan is generally sceptical of AI feedback.</strong> Most AI marking tools give vague, encouraging responses that don't actually help you improve. This one was built with the opposite philosophy: honest, specific, sometimes uncomfortable feedback - because that's what moves scores.
  <br><br>
@@ -4103,7 +4105,8 @@ qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus 
  </div>
  ${scoreReminderHtml}
 The AI score is a practice calibration, not an official Acuity result. The scale has recently been recalibrated: it is no longer artificially capped at the top end, so genuinely exceptional responses can now receive 10s. That means 7s and 8s are more achievable than they were under the older, compressed scale.<br><br>
-<strong style="color:var(--gray700);">How to read the new scale:</strong> averaging 7+ is likely Q4 territory. Consistent 7s mean you are doing well; consistent 8s put you in a good position. High-Q4 students will often produce 9s, but you do not need every response to be a 9 for the score to be useful.<br><br>
+<strong style="color:var(--gray700);">How to read the new scale:</strong> confident students who expect Q4 should be reaching 8/10 consistently. Consistent 7s still mean you are doing well, but 8s are the clearer sign that your response quality is reliably in strong territory. High-Q4 students will often produce 9s, but you do not need every response to be a 9 for the score to be useful.<br><br>
+<strong style="color:var(--gray700);">A recent marking change:</strong> the AI now treats the two CASPer prompts as equal-value halves of the station. Earlier versions could over-reward a student who answered only one prompt very well, because the AI sometimes interpreted that as the whole task. Now, if you neglect one question, you are giving up roughly half the available marks. There is a diminishing return on investment once one answer is strong; spending another minute polishing it usually helps less than giving the second question a solid, complete answer.<br><br>
 <strong style="color:var(--gray700);">School context matters.</strong> If you are aiming for Notre Dame, consistent 7s or 8s should be reassuring. For UoW, assume you need regular 8s and 9s because CASPer carries more weight. Use the written feedback to find the repeatable habits behind the number.
  </div>
  </div>`;
