@@ -341,6 +341,28 @@
       return bits.join(' | ');
     }
 
+    function attemptCompletionSummary(attempt){
+      const rows=attempt?.rows||[];
+      const saved=rows.length;
+      const savedTerminal=rows.filter(row=>row && (row.type==='video'
+        ? (!!row.recording_key || !!row.feedback || !!row.processing_error || !!row.reprocess_error || !!row.transcript)
+        : (String(row.answer||'').trim().length>0 || !!row.feedback || !!row.processing_error || !!row.reprocess_error)
+      )).length;
+      const status=String(attempt?.status||'').toLowerCase();
+      const completed=status==='completed' || !!attempt?.completed_at || saved>=11 || !!attempt?.report || !!attempt?.has_report;
+      const tel=telemetryForAttempt(attempt);
+      const lastSeen=tel.last_server_seen_at || tel.last_seen_at || attempt?.updated_at || '';
+      const lastSeenMs=Date.parse(lastSeen||'');
+      const active=Number.isFinite(lastSeenMs) && Date.now()-lastSeenMs < 5*60*1000 && !completed;
+      const current=tel.current_station || tel.current || null;
+      const reachedUnsaved=current?.order && saved < Number(current.order);
+      if(completed && saved>=11)return {tone:'good',label:'Completed full mock',detail:`${savedTerminal}/11 stations have terminal evidence. Repair/quality flags are not evidence the student quit.`};
+      if(active)return {tone:'good',label:'Active now',detail:`Currently around ${current?.station_label || `station ${current?.order || saved+1}`}.`};
+      if(reachedUnsaved)return {tone:'warn',label:'Likely technical interruption',detail:`Browser reached station ${current.order}, but only ${saved}/11 stations were saved.`};
+      if(saved>0 && saved<11)return {tone:'warn',label:'Left before finishing or paused',detail:`Only ${saved}/11 stations are saved. Last seen ${timeAgo(lastSeen) || 'unknown'}.`};
+      return {tone:'warn',label:'No saved progress',detail:lastSeen?`Last seen ${timeAgo(lastSeen)}.`:'No usable timing trail.'};
+    }
+
     function startAdminHandoff(){
       if(adminToken || !handoffId || !('BroadcastChannel' in window))return;
       const channel = new BroadcastChannel(MOCK_READER_CHANNEL_PREFIX + handoffId);
@@ -824,6 +846,9 @@
       const typedCount=rows.filter(r=>r.type!=='video').length;
       const reprocessIssueCount=rows.filter(needsStationReprocess).length;
       const issueSummaries=stationIssueSummaries(rows);
+      const completionSummary=attemptCompletionSummary(a);
+      const trueIssueCount=rows.filter(row=>row?.processing_error || row?.reprocess_error || needsTypedReprocess(row) || (needsVideoReprocess(row) && !videoNeedsOnlyVisualRepair(row))).length;
+      const visualIssueCount=rows.filter(videoNeedsOnlyVisualRepair).length;
       const accessTiming=attemptAccessTiming(a);
       const tabs=rows.map((r,i)=>{
         const score=stationScore(r);
@@ -838,9 +863,14 @@
             <div class="muted">${esc(a.user_email||'No email')} | <span class="pill">${esc(a.tier||'mock')}</span> | <span class="pill">${esc(accessTiming.short)} typed timing</span> | ${esc(statusText(a.manual_review_status||'pending_review'))}</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-          ${reprocessIssueCount?`<button id="reprocessIssuesBtn" class="secondary" onclick="reprocessAttemptIssues()">Check + reprocess ${reprocessIssueCount} issue${reprocessIssueCount===1?'':'s'}</button>`:''}
+          ${reprocessIssueCount?`<button id="reprocessIssuesBtn" class="secondary" onclick="reprocessAttemptIssues()">Check + reprocess ${reprocessIssueCount} flag${reprocessIssueCount===1?'':'s'}</button>`:''}
           <button class="secondary" onclick="saveNotes()">Save notes</button>
           </div>
+        </div>
+        <div class="monitor-grid" style="margin:14px 0 4px;">
+          ${monitorTile('Attempt interpretation',completionSummary.label,completionSummary.detail,completionSummary.tone)}
+          ${monitorTile('True processing issues',trueIssueCount,visualIssueCount?`${visualIssueCount} visual-only flag${visualIssueCount===1?'':'s'} separately`:'',trueIssueCount?'warn':'good')}
+          ${monitorTile('Visual-only flags',visualIssueCount,visualIssueCount?'Premium video can be visually refreshed from playback frames':'No premium visual repair flags',visualIssueCount?'warn':'good')}
         </div>
         <div class="metric-row">
           <div class="metric"><strong>${esc(avg)}</strong><span>Average reviewed score</span></div>
@@ -852,7 +882,8 @@
         </div>
         ${attemptMonitoringHtml(a)}
         ${issueSummaries.length?`<div class="qa-chip-row" style="margin:12px 0 0;">${issueSummaries.map(item=>`<button class="qa-chip warn" type="button" onclick="currentStation=${item.index};renderAttempt()">${esc(item.label)}: ${esc(item.detail)}</button>`).join('')}</div>`:''}
-        ${reprocessIssueCount?`<div id="bulkReprocessStatus" class="muted" style="margin:0 0 12px;"></div>`:''}
+          ${reprocessIssueCount?`<div id="bulkReprocessStatus" class="muted" style="margin:0 0 12px;">Flags include genuine failed analyses and premium visual-only refreshes. Completed 11/11 mocks are not half-finished just because visual repair flags remain.</div>`:''}
+        ${attemptCompletionNotesHtml(a)}
         <div class="tabs">${tabs}</div>
         <div>${stationHtml(rows[currentStation])}</div>
         <div class="review-box" style="margin-top:16px">
@@ -946,6 +977,7 @@
           ${monitorTile('Status',statusText,timeAgo(lastSeen),statusTone)}
           ${monitorTile('Started',fmtDateTime(tel.started_at || attempt?.started_at),tel.browser?.timezone || '')}
           ${monitorTile('Last seen',fmtDateTime(lastSeen),timeAgo(lastSeen))}
+          ${monitorTile('Last heartbeat',tel.last_heartbeat_reason || tel.last_reason || '-','')}
           ${monitorTile('Saved stations',`${rows.length}/11`,reachedUnsaved?'student reached a later unsaved station':'')}
           ${monitorTile('Typed timing',accessTiming.short,`${fmtTime(accessTiming.seconds)} per typed station`)}
           ${monitorTile('Current page',currentLine,'',reachedUnsaved?'warn':'')}
@@ -958,6 +990,23 @@
           recovery: recoveryRows.slice(-4).map(e=>`${fmtDateTime(e.at)}: server progress repaired from ${e.db_current_station_order||'?'} to ${e.saved_next_station_order||'?'}${e.rescue_pending?' (SOS pending)':''}`).join('; ')
         })}</div>`:''}
         ${tel.browser?`<details class="raw"><summary>Browser/session details</summary><pre>${esc(JSON.stringify(tel.browser,null,2))}</pre></details>`:''}
+      </div>`;
+    }
+
+    function attemptCompletionNotesHtml(attempt){
+      const rows=attempt?.rows||[];
+      const summary=attemptCompletionSummary(attempt);
+      const tel=telemetryForAttempt(attempt);
+      const breakRows=Array.isArray(tel.breaks)?tel.breaks:[];
+      const clues=[];
+      if(summary.tone==='good' && rows.length>=11)clues.push('This mock is complete from a saved-station perspective.');
+      if(summary.label.includes('technical'))clues.push('This looks more like a save/progress interruption than an intentional quit.');
+      if(summary.label.includes('Left before'))clues.push('This is the group that may have intentionally quit, paused, lost connection, or decided to only practise part of the mock.');
+      if(breakRows.some(b=>b?.skipped))clues.push('Skipped breaks are common and do not by themselves mean the student quit.');
+      if(!clues.length)return '';
+      return `<div class="review-box soft" style="margin-top:12px;margin-bottom:12px;">
+        <div class="section-label">Quit vs bug read</div>
+        <div class="text-block">${esc(clues.join(' '))}</div>
       </div>`;
     }
 
@@ -1100,12 +1149,12 @@
       }
       return `<div class="mock-video-shell">
         <div class="mock-video-stage">
-          <video id="${id}" crossorigin="anonymous" playsinline preload="metadata" data-recording-key="${esc(recordingKey)}" data-duration="${duration||''}" style="cursor:pointer"></video>
+          <video id="${id}" crossorigin="anonymous" controls playsinline preload="metadata" data-recording-key="${esc(recordingKey)}" data-duration="${duration||''}" style="cursor:pointer"></video>
           <button type="button" id="${id}Overlay" class="mock-video-overlay" data-video-action="play" data-video-id="${esc(id)}">
             <span>
               <span class="mock-video-playmark">&#9658;</span>
               <span class="mock-video-overlay-title" id="${id}OverlayTitle">Load recording</span>
-              <span class="mock-video-overlay-sub" id="${id}OverlaySub">Creates a short-lived secure stream. The timeline uses the saved recording length if browser metadata is unreliable.</span>
+              <span class="mock-video-overlay-sub" id="${id}OverlaySub">Uses the same secure admin dashboard loader, with a fallback if the stream fails.</span>
             </span>
           </button>
         </div>
@@ -1123,7 +1172,7 @@
           <div id="${id}Status" class="mock-video-status">Recording is ready to load.</div>
         </div>
         <div class="mock-video-actions">
-          <button type="button" id="${id}LoadBtn" class="mock-video-action" data-video-action="load" data-video-id="${esc(id)}">Load stream</button>
+          <button type="button" id="${id}LoadBtn" class="mock-video-action" data-video-action="load" data-video-id="${esc(id)}">Load recording</button>
           <button type="button" id="${id}RetryBtn" class="mock-video-action" data-video-action="retry" data-video-id="${esc(id)}" hidden>Retry stream</button>
           <a id="${id}Download" class="mock-video-action" href="#" target="_blank" rel="noopener" download hidden>Download original</a>
           <button type="button" class="mock-video-action" data-video-action="copy" data-video-id="${esc(id)}">Copy key</button>
@@ -1232,25 +1281,6 @@
       return `Stream ready for about ${mins} min. Retry creates a fresh stream if this page stays open.`;
     }
 
-    function waitForAdminVideoReady(video,timeoutMs=8000){
-      return new Promise((resolve,reject)=>{
-        if(!video){reject(new Error('Recording player missing.'));return;}
-        if(video.readyState>=1){resolve(true);return;}
-        let done=false;
-        const cleanup=()=>{
-          clearTimeout(timer);
-          ['loadedmetadata','loadeddata','canplay'].forEach(eventName=>video.removeEventListener(eventName,onReady));
-          video.removeEventListener('error',onError);
-        };
-        const finish=(fn,value)=>{if(done)return;done=true;cleanup();fn(value);};
-        const onReady=()=>finish(resolve,true);
-        const onError=()=>finish(reject,new Error('The browser could not decode the secure stream.'));
-        const timer=setTimeout(()=>finish(reject,new Error('The secure stream did not start.')),timeoutMs);
-        ['loadedmetadata','loadeddata','canplay'].forEach(eventName=>video.addEventListener(eventName,onReady,{once:true}));
-        video.addEventListener('error',onError,{once:true});
-      });
-    }
-
     function tryCaptureAdminPoster(video){
       if(!video || video.dataset.posterCaptureStarted==='1')return;
       video.dataset.posterCaptureStarted='1';
@@ -1277,7 +1307,7 @@
     }
 
     async function createAdminPlaybackUrl(key){
-      const res=await fetch(API_BASE+'/api/admin/casper-mock/recording-token',{
+      const res=await fetch(API_BASE+'/api/admin/mmi/recording-token',{
         method:'POST',
         headers:{...authHeaders(),'Content-Type':'application/json'},
         body:JSON.stringify({key})
@@ -1293,7 +1323,7 @@
       if(load){
         load.hidden=state==='ready'||state==='playing';
         load.disabled=state==='loading';
-        load.textContent=state==='loading'?'Creating stream...':'Load stream';
+        load.textContent=state==='loading'?'Loading...':'Load recording';
       }
       if(retry)retry.hidden=state!=='error';
     }
@@ -1352,7 +1382,7 @@
       video.dataset.loading='1';
       video.dataset.streamFallbackTried='';
       setVideoActionState(id,'loading');
-      setVideoState(id,'loading','Creating stream...','Preparing a short-lived secure stream for this recording.');
+      setVideoState(id,'loading','Preparing secure playback...','Using the same admin dashboard loader for this recording.');
       try{
         const data=await createAdminPlaybackUrl(key);
         const expiresIn=Number(data.expires_in||600);
@@ -1363,7 +1393,6 @@
         video.dataset.playbackExpires=String(Date.now()+expiresIn*1000);
         attachVideoDownload(id,data.playback_url,key);
         video.load();
-        await waitForAdminVideoReady(video,9000);
         initVideoPlayer(id);
         setVideoActionState(id,'ready');
         setVideoState(id,'ready','Ready to play',streamReadyMessage(expiresIn));
@@ -1378,9 +1407,9 @@
     async function loadAdminRecordingFallback(id,key,opts={},streamErr=null){
       const video=document.getElementById(id);
       if(!video)return;
-      setVideoState(id,'loading','Trying fallback...','The streaming endpoint did not respond, so admin is trying the older secure download path.');
+      setVideoState(id,'loading','Loading recording...','Dashboard stream failed, so mock-reader is using the admin fallback download path.');
       try{
-        const res=await fetch(API_BASE+'/api/admin/casper-mock/recording?key='+encodeURIComponent(key),{headers:authHeaders()});
+        const res=await fetch(API_BASE+'/api/admin/mmi/recording?key='+encodeURIComponent(key),{headers:authHeaders()});
         if(!res.ok){
           const data=await res.json().catch(()=>({}));
           throw new Error(data.message||data.error||`Fallback recording fetch failed (${res.status}).`);
@@ -1396,10 +1425,9 @@
         video.dataset.playbackExpires='';
         attachVideoDownload(id,url,key);
         video.load();
-        await waitForAdminVideoReady(video,9000);
         initVideoPlayer(id);
         setVideoActionState(id,'ready');
-        setVideoState(id,'ready','Ready to play','Loaded by fallback. If streaming is still not deployed, this mode may take longer for large recordings.');
+        setVideoState(id,'ready','Ready to play','Loaded through reliable admin playback. Use +/-15s or drag the timeline.');
         const shouldPlay=opts.playAfterLoad || video.dataset.playWhenReady==='1';
         video.dataset.playWhenReady='';
         if(shouldPlay)await playAdminRecording(id);

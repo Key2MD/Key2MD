@@ -1651,7 +1651,7 @@
  <div class="form-row">
  <label class="form-lbl">Auto-email access page at</label>
  <input class="form-in" id="ccAutoEmailAt" type="datetime-local">
- <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">The Worker emails the protected access page, not the raw Zoom link. If the private link is missing, it emails Dan and retries every 5 minutes.</div>
+ <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">The Worker emails the protected access page, not the raw Zoom link. Cloudflare Cron should check this every 5 minutes; this dashboard also arms a browser backup while it is open.</div>
  </div>
  <div class="form-row">
  <label class="form-lbl">Automatic email</label>
@@ -2316,6 +2316,7 @@ const S = {
  actionStatusMap: null,
  drawerTimelineCache: new Map(),
 };
+let casperClassAutoEmailTimer = null;
 
 // ======================================================
 // INIT - restore session from sessionStorage
@@ -6469,15 +6470,65 @@ function renderCasperClassEmailState(state, settings={}, accessCount=0) {
  const enabled = settings.auto_email_enabled !== false;
  const status = state?.status || (enabled ? 'pending' : 'paused');
  const when = autoAt ? new Date(autoAt).toLocaleString('en-AU', { dateStyle:'medium', timeStyle:'short' }) : 'not set';
+ const now = Date.now();
+ const sent = !!state?.sent_at;
+ const retryAt = Number(state?.next_retry_at || 0);
+ const waitingForStudents = state?.status === 'no_recipients' && accessCount <= 0;
+ const dueTarget = sent || !enabled || !autoAt || waitingForStudents ? 0 : (retryAt && retryAt > now ? retryAt : autoAt);
+ const backupText = dueTarget
+ ? (dueTarget <= now
+ ? 'Dashboard backup: due now - the next refresh/check will run it.'
+ : `Dashboard backup armed for ${new Date(dueTarget).toLocaleTimeString('en-AU', { hour:'numeric', minute:'2-digit' })}.`)
+ : (sent ? 'Dashboard backup: already sent.' : waitingForStudents ? 'Dashboard backup: waiting for authorised students.' : 'Dashboard backup: not armed.');
  const parts = [
  `<strong style="color:var(--text);">Auto-email:</strong> ${enabled ? 'enabled' : 'paused'}`,
  `<strong style="color:var(--text);">Send time:</strong> ${esc(when)}`,
  `<strong style="color:var(--text);">Students:</strong> ${accessCount}`,
  `<strong style="color:var(--text);">Status:</strong> ${esc(status.replace(/_/g, ' '))}`,
+ `<strong style="color:var(--text);">${esc(backupText)}</strong>`,
  ];
  if (state?.sent_at) parts.push(`<strong style="color:var(--text);">Sent:</strong> ${esc(new Date(Number(state.sent_at)).toLocaleString('en-AU', { dateStyle:'medium', timeStyle:'short' }))} (${state.sent_count || 0}/${state.recipient_count || state.sent_count || 0})`);
+ if (state?.last_attempt_at) parts.push(`<strong style="color:var(--text);">Last checked:</strong> ${esc(new Date(Number(state.last_attempt_at)).toLocaleString('en-AU', { dateStyle:'medium', timeStyle:'short' }))}`);
  if (state?.last_message) parts.push(`<span style="color:${status === 'missing_link' || status === 'send_failed' ? 'var(--orange)' : 'var(--muted)'};">${esc(state.last_message)}</span>`);
  el.innerHTML = parts.join('<br>');
+ scheduleCasperClassAutoEmailBackup(settings, state, accessCount);
+}
+
+function scheduleCasperClassAutoEmailBackup(settings={}, state={}, accessCount=0) {
+ if (casperClassAutoEmailTimer) {
+ clearTimeout(casperClassAutoEmailTimer);
+ casperClassAutoEmailTimer = null;
+ }
+ const autoAt = Number(settings.auto_email_at || 0);
+ if (settings.auto_email_enabled === false || !autoAt || state?.sent_at || (state?.status === 'no_recipients' && accessCount <= 0)) return;
+ const now = Date.now();
+ const retryAt = Number(state?.next_retry_at || 0);
+ const target = retryAt && retryAt > now ? retryAt : autoAt;
+ const delay = Math.max(1500, Math.min(Math.max(0, target - now), 2147480000));
+ casperClassAutoEmailTimer = setTimeout(() => runCasperClassDueEmailCheck('dashboard_timer'), delay);
+}
+
+async function runCasperClassDueEmailCheck(source='dashboard_timer') {
+ const status = document.getElementById('ccStatus');
+ if (status) status.textContent = source === 'dashboard_timer' ? 'Auto-email due check...' : 'Checking email schedule...';
+ try {
+ const res = await api('/admin/casper-class/email/run', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ source }) });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not run scheduled email check');
+ S.casperClass = {
+ ...(S.casperClass || {}),
+ settings: data.settings || S.casperClass?.settings,
+ private: data.private || S.casperClass?.private,
+ access: data.access || S.casperClass?.access || [],
+ email_state: data.email_state || S.casperClass?.email_state || {},
+ };
+ renderCasperClass();
+ if (status) status.textContent = data.message || data.action || 'Auto-email checked';
+ } catch(e) {
+ if (status) status.textContent = e.message;
+ const el = document.getElementById('ccAutoEmailStatus');
+ if (el) el.innerHTML += `<br><span style="color:var(--red);">Dashboard backup failed: ${esc(e.message)}</span>`;
+ }
 }
 
 function setCasperClassAutoEmail530() {
