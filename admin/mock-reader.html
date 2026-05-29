@@ -117,15 +117,16 @@
     .mock-video-stage{position:relative;background:linear-gradient(135deg,#07111f,#10233a);min-height:190px}
     .mock-video-stage video{display:block;position:relative;z-index:1}
     .mock-video-overlay{position:absolute;inset:0;z-index:2;border:0;background:radial-gradient(circle at 50% 38%,rgba(14,165,233,.25),rgba(7,17,31,.94) 58%);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;cursor:pointer;font:inherit}
-    .mock-video-shell.is-playing .mock-video-overlay{opacity:0;pointer-events:none}
+    .mock-video-shell.is-loading .mock-video-overlay,.mock-video-shell.is-ready .mock-video-overlay,.mock-video-shell.is-playing .mock-video-overlay{opacity:0;pointer-events:none}
     .mock-video-shell.is-error .mock-video-overlay{background:linear-gradient(135deg,#3b0d0d,#07111f);cursor:default}
     .mock-video-playmark{width:62px;height:62px;border-radius:50%;background:#fff;color:var(--navy);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.4rem;font-weight:900;box-shadow:0 18px 44px rgba(0,0,0,.25)}
     .mock-video-overlay-title{font-size:.95rem;font-weight:900;margin-bottom:4px}
     .mock-video-overlay-sub{font-size:.78rem;color:rgba(255,255,255,.72);line-height:1.45;max-width:360px}
     .mock-video-bar{padding:11px 12px 12px;background:#07111f}
-    .mock-video-row{display:flex;align-items:center;gap:10px}
-    .mock-video-btn{width:38px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;padding:0;font-size:.82rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .mock-video-track{position:relative;height:18px;flex:1;display:flex;align-items:center}
+    .mock-video-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .mock-video-btn{min-width:38px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;padding:0 10px;font-size:.75rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .mock-video-btn.main{min-width:42px;background:rgba(14,165,233,.16);border-color:rgba(14,165,233,.42)}
+    .mock-video-track{position:relative;height:18px;flex:1 1 150px;display:flex;align-items:center;min-width:120px}
     .mock-video-bg{position:absolute;left:0;right:0;height:5px;border-radius:999px;background:rgba(255,255,255,.18);overflow:hidden}
     .mock-video-fill{height:100%;width:0;background:var(--blue);border-radius:999px}
     .mock-video-range{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}
@@ -133,7 +134,7 @@
     .mock-video-status{padding:7px 12px 0;color:rgba(255,255,255,.62);font-size:.72rem;line-height:1.35}
     .mock-video-actions{display:flex;gap:8px;flex-wrap:wrap;padding:0 12px 12px;background:#07111f}
     .mock-video-action{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:7px 10px;font-size:.72rem;font-weight:850;text-decoration:none;cursor:pointer}
-    .mock-video-action:hover{background:rgba(255,255,255,.14)}
+    .mock-video-btn:hover,.mock-video-action:hover{background:rgba(255,255,255,.14)}
     .mock-video-action[hidden]{display:none}
     .mock-sync-transcript{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:#fff;padding:8px;display:grid;gap:5px}
     .mock-sync-segment{width:100%;text-align:left;border:0;background:transparent;color:var(--ink);padding:8px 9px;border-radius:7px;font-weight:650;line-height:1.55;font-size:.84rem}
@@ -993,7 +994,7 @@
       return `<div class="review-box soft">
         <div class="section-label">Station monitoring</div>
         <div class="monitor-grid">${tiles.join('')}</div>
-        ${typedPasteRisk?`<div class="muted" style="margin-top:10px;color:#9a3412;">Possible paste or external draft pattern. This is a signal only: it records timing and paste/insert size, not clipboard contents.</div>`:''}
+        ${typedPasteRisk?`<div class="muted" style="margin-top:10px;color:#9a3412;"><strong>Admin-only timing signal, not a marking error.</strong> This records paste/large-insert size and timing only, not clipboard contents. It does not block the student's report.</div>`:''}
         ${Array.isArray(timing.events)&&timing.events.length?`<details class="raw"><summary>Timing events</summary><pre>${esc(JSON.stringify(timing.events,null,2))}</pre></details>`:''}
       </div>`;
     }
@@ -1110,7 +1111,9 @@
         </div>
         <div class="mock-video-bar">
           <div class="mock-video-row">
-            <button type="button" id="${id}Btn" class="mock-video-btn" data-video-action="play" data-video-id="${esc(id)}" aria-label="Play recording">&#9658;</button>
+            <button type="button" class="mock-video-btn" data-video-action="skip" data-video-id="${esc(id)}" data-video-delta="-15">-15s</button>
+            <button type="button" id="${id}Btn" class="mock-video-btn main" data-video-action="play" data-video-id="${esc(id)}" aria-label="Play recording">&#9658;</button>
+            <button type="button" class="mock-video-btn" data-video-action="skip" data-video-id="${esc(id)}" data-video-delta="15">+15s</button>
             <div class="mock-video-track">
               <div class="mock-video-bg"><div id="${id}Fill" class="mock-video-fill"></div></div>
               <input id="${id}Range" class="mock-video-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording">
@@ -1229,6 +1232,25 @@
       return `Stream ready for about ${mins} min. Retry creates a fresh stream if this page stays open.`;
     }
 
+    function waitForAdminVideoReady(video,timeoutMs=8000){
+      return new Promise((resolve,reject)=>{
+        if(!video){reject(new Error('Recording player missing.'));return;}
+        if(video.readyState>=1){resolve(true);return;}
+        let done=false;
+        const cleanup=()=>{
+          clearTimeout(timer);
+          ['loadedmetadata','loadeddata','canplay'].forEach(eventName=>video.removeEventListener(eventName,onReady));
+          video.removeEventListener('error',onError);
+        };
+        const finish=(fn,value)=>{if(done)return;done=true;cleanup();fn(value);};
+        const onReady=()=>finish(resolve,true);
+        const onError=()=>finish(reject,new Error('The browser could not decode the secure stream.'));
+        const timer=setTimeout(()=>finish(reject,new Error('The secure stream did not start.')),timeoutMs);
+        ['loadedmetadata','loadeddata','canplay'].forEach(eventName=>video.addEventListener(eventName,onReady,{once:true}));
+        video.addEventListener('error',onError,{once:true});
+      });
+    }
+
     function tryCaptureAdminPoster(video){
       if(!video || video.dataset.posterCaptureStarted==='1')return;
       video.dataset.posterCaptureStarted='1';
@@ -1297,6 +1319,7 @@
       if(action==='play')playAdminRecording(id);
       else if(action==='load')loadAdminRecording(id);
       else if(action==='retry')reloadAdminRecording(id);
+      else if(action==='skip')skipAdminRecording(id,Number(control.dataset.videoDelta||0));
       else if(action==='copy')copyRecordingKey(id);
     });
 
@@ -1340,6 +1363,7 @@
         video.dataset.playbackExpires=String(Date.now()+expiresIn*1000);
         attachVideoDownload(id,data.playback_url,key);
         video.load();
+        await waitForAdminVideoReady(video,9000);
         initVideoPlayer(id);
         setVideoActionState(id,'ready');
         setVideoState(id,'ready','Ready to play',streamReadyMessage(expiresIn));
@@ -1372,6 +1396,7 @@
         video.dataset.playbackExpires='';
         attachVideoDownload(id,url,key);
         video.load();
+        await waitForAdminVideoReady(video,9000);
         initVideoPlayer(id);
         setVideoActionState(id,'ready');
         setVideoState(id,'ready','Ready to play','Loaded by fallback. If streaming is still not deployed, this mode may take longer for large recordings.');
@@ -1433,6 +1458,8 @@
         ['loadedmetadata','loadeddata'].forEach(ev=>video.addEventListener(ev,()=>{applyPendingAdminVideoSeek(id);tryCaptureAdminPoster(video);update();}));
         video.addEventListener('durationchange',()=>applyPendingAdminVideoSeek(id));
         ['durationchange','timeupdate','play','pause','ended','seeked'].forEach(ev=>video.addEventListener(ev,update));
+        video.addEventListener('waiting',()=>setVideoState(id,'loading','Buffering...','The recording is buffering. You can retry the stream if it does not resume.'));
+        video.addEventListener('stalled',()=>setVideoState(id,'loading','Connection stalled','Retry the stream if playback does not resume.'));
         video.addEventListener('error',()=>{
           const key=video.dataset.recordingKey||'';
           if(video.dataset.playbackMode==='stream' && key && video.dataset.streamFallbackTried!=='1'){
@@ -1466,6 +1493,22 @@
       }catch{
         setVideoState(id,'ready','Ready to play','Your browser blocked autoplay. Press the play button once more.');
       }
+    }
+
+    async function skipAdminRecording(id='adminVideoPlayer',delta=0){
+      const video=document.getElementById(id);
+      if(!video)return;
+      if(video.dataset.loaded!=='1' || !video.getAttribute('src') || adminPlaybackExpired(video)){
+        const current=Number(video.currentTime)||0;
+        await loadAdminRecording(id,{force:adminPlaybackExpired(video)});
+        if(!video.getAttribute('src'))return;
+        applyAdminVideoSeek(video,current);
+      }
+      const duration=effectiveVideoDuration(video);
+      const target=(Number(video.currentTime)||0)+Number(delta||0);
+      applyAdminVideoSeek(video,Math.max(0,Math.min(duration||Number.MAX_SAFE_INTEGER,target)));
+      syncAdminTranscript(id,Number(video.currentTime)||0);
+      initVideoPlayer(id);
     }
 
     async function copyRecordingKey(id='adminVideoPlayer'){

@@ -3536,6 +3536,19 @@ function renderPartialReportNotice(rows) {
  return `${apiBase()}/api/casper-mock/recording?${params.toString()}`;
  }
 
+ async function mockRecordingStreamUrl(video) {
+ const token = authTokenOrThrow();
+ if (!video?.dataset?.attemptId || !video?.dataset?.recordingKey) throw new Error('Recording details are missing for this station.');
+ const res = await fetch(`${apiBase()}/api/casper-mock/recording-token`, {
+ method:'POST',
+ headers:{ Authorization:`Bearer ${token}`, 'Content-Type':'application/json' },
+ body: JSON.stringify({ attempt_id: video.dataset.attemptId, key: video.dataset.recordingKey }),
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok || !data.playback_url) throw new Error(data.message || data.error || 'Could not create secure playback.');
+ return data;
+ }
+
  async function fetchMockRecordingBlob(video) {
  const url = mockRecordingRequestUrl(video);
  if (!url) throw new Error('Recording details are missing for this station.');
@@ -3553,31 +3566,76 @@ function renderPartialReportNotice(rows) {
  return blob;
  }
 
+ function mockPlaybackExpired(video) {
+ const expires = Number(video?.dataset?.playbackExpires || 0);
+ return Number.isFinite(expires) && expires > 0 && Date.now() + 15000 >= expires;
+ }
+
+ function waitForMockVideoReady(video, timeoutMs = 8000) {
+ return new Promise((resolve, reject) => {
+ if (!video) { reject(new Error('Recording player missing.')); return; }
+ if (video.readyState >= 1) { resolve(true); return; }
+ let done = false;
+ const cleanup = () => {
+ clearTimeout(timer);
+ ['loadedmetadata', 'loadeddata', 'canplay'].forEach(eventName => video.removeEventListener(eventName, ready));
+ video.removeEventListener('error', failed);
+ };
+ const finish = (fn, value) => {
+ if (done) return;
+ done = true;
+ cleanup();
+ fn(value);
+ };
+ const ready = () => finish(resolve, true);
+ const failed = () => finish(reject, new Error('The browser could not decode the secure stream.'));
+ const timer = setTimeout(() => finish(reject, new Error('The secure stream did not start.')), timeoutMs);
+ ['loadedmetadata', 'loadeddata', 'canplay'].forEach(eventName => video.addEventListener(eventName, ready, { once:true }));
+ video.addEventListener('error', failed, { once:true });
+ });
+ }
+
  async function ensureMockVideoSource(id = 'mockStationVideoPlayer') {
  const video = byId(id);
  if (!video) return false;
- if (video.getAttribute('src') && video.dataset.loaded === '1') return true;
+ if (video.getAttribute('src') && video.dataset.loaded === '1' && !mockPlaybackExpired(video)) return true;
  const status = byId(`${id}Status`);
  const btn = byId(`${id}Btn`);
  if (!video.dataset.recordingKey) {
  if (status) status.textContent = 'No saved recording key is attached to this station.';
  return false;
  }
- if (status) status.textContent = 'Loading secure recording...';
+ if (status) status.textContent = 'Creating secure stream...';
  if (btn) btn.textContent = 'Load';
+ try {
+ if (video.dataset.blobUrl) URL.revokeObjectURL(video.dataset.blobUrl);
+ video.dataset.blobUrl = '';
+ const stream = await mockRecordingStreamUrl(video);
+ video.dataset.loaded = '1';
+ video.dataset.playbackExpires = String(Date.now() + Number(stream.expires_in || 600) * 1000);
+ video.src = stream.playback_url;
+ video.load();
+ await waitForMockVideoReady(video, 9000);
+ if (status) status.textContent = 'Ready. Use play, +/-15s, or drag the timeline.';
+ return true;
+ } catch (streamErr) {
+ if (status) status.textContent = 'Stream was slow, loading the original recording instead...';
  try {
  const blob = await fetchMockRecordingBlob(video);
  if (video.dataset.blobUrl) URL.revokeObjectURL(video.dataset.blobUrl);
  const url = URL.createObjectURL(blob);
  video.dataset.blobUrl = url;
+ video.dataset.playbackExpires = '';
  video.dataset.loaded = '1';
  video.src = url;
  video.load();
- if (status) status.textContent = 'Recording ready.';
+ await waitForMockVideoReady(video, 9000);
+ if (status) status.textContent = 'Ready using fallback download.';
  return true;
  } catch (err) {
- if (status) status.textContent = err.message || 'Could not load recording.';
+ if (status) status.textContent = `${streamErr.message || 'Stream failed.'} ${err.message || 'Fallback failed.'}`;
  return false;
+ }
  }
  }
 
@@ -3589,10 +3647,12 @@ function renderPartialReportNotice(rows) {
 	   <div id="${id}Shell" style="background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;">
 	    <video id="${id}" playsinline preload="metadata" ${src_url ? `src="${esc(src_url)}"` : ''} data-attempt-id="${esc(mockAttemptId || savedAttemptId || '')}" data-recording-key="${esc(recordingKey)}" data-duration="${duration || ''}" data-loaded="${src_url ? '1' : ''}" style="width:100%;aspect-ratio:16/9;background:#000;display:block;cursor:pointer;"></video>
 	    <div style="padding:11px 14px 13px;background:linear-gradient(180deg,rgba(0,0,0,0.3),rgba(0,0,0,0.6));border-top:1px solid rgba(255,255,255,0.08);">
-	     <div style="display:flex;align-items:center;gap:10px;">
-	      <button type="button" id="${id}Btn" aria-label="Play recording" style="min-width:54px;height:32px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${src_url ? 'PLAY' : 'LOAD'}</button>
+	     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+	      <button type="button" onclick="FullCasperMock.skipRecording('${esc(id)}', -15)" style="min-width:48px;height:32px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">-15s</button>
+	      <button type="button" id="${id}Btn" aria-label="Play recording" style="min-width:58px;height:32px;border-radius:50px;border:1px solid rgba(14,165,233,0.42);background:rgba(14,165,233,0.16);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${src_url ? 'PLAY' : 'LOAD'}</button>
+	      <button type="button" onclick="FullCasperMock.skipRecording('${esc(id)}', 15)" style="min-width:48px;height:32px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+15s</button>
 	      ${src_url || recordingKey ? `<button type="button" onclick="FullCasperMock.downloadLocalRecording('${esc(id)}')" style="min-width:78px;height:32px;border-radius:50px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.08);color:#fff;font-family:var(--mono);font-size:0.7rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;display:flex;align-items:center;justify-content:center;flex-shrink:0;">DL</button>` : ''}
-	      <div style="position:relative;height:16px;flex:1;display:flex;align-items:center;">
+	      <div style="position:relative;height:16px;flex:1 1 150px;min-width:120px;display:flex;align-items:center;">
 	       <div style="position:absolute;left:0;right:0;height:4px;border-radius:99px;background:rgba(255,255,255,0.15);overflow:hidden;">
 	        <div id="${id}Fill" style="height:100%;width:0%;background:linear-gradient(90deg,var(--teal3),var(--teal2));border-radius:99px;"></div>
 	       </div>
@@ -3659,6 +3719,14 @@ function renderPartialReportNotice(rows) {
 	 ['loadedmetadata', 'durationchange', 'timeupdate', 'play', 'pause', 'ended', 'seeked'].forEach(eventName => {
 	 video.addEventListener(eventName, update);
 	 });
+ video.addEventListener('waiting', () => {
+ const status = byId(`${id}Status`);
+ if (status) status.textContent = 'Buffering recording...';
+ });
+ video.addEventListener('stalled', () => {
+ const status = byId(`${id}Status`);
+ if (status) status.textContent = 'Connection stalled. Press Load again if it does not resume.';
+ });
  video.addEventListener('error', () => {
  const status = byId(`${id}Status`);
  if (video.dataset.blobUrl) {
@@ -3672,6 +3740,18 @@ function renderPartialReportNotice(rows) {
  });
  }
  update();
+ }
+
+ async function skipRecording(id = 'mockStationVideoPlayer', delta = 0) {
+ const video = byId(id);
+ if (!video) return;
+ const ready = await ensureMockVideoSource(id);
+ if (!ready) return;
+ const hint = Number(video.dataset.duration || 0);
+ const native = Number(video.duration);
+ const duration = Number.isFinite(native) && native > 0 && native < 86400 ? native : (Number.isFinite(hint) && hint > 0 ? hint : 0);
+ applyMockVideoSeek(video, Math.max(0, Math.min(duration || Number.MAX_SAFE_INTEGER, (Number(video.currentTime) || 0) + Number(delta || 0))));
+ syncMockTranscript(id, Number(video.currentTime) || 0);
  }
 
  async function downloadLocalRecording(id = 'mockRecordingPlayer') {
@@ -4472,6 +4552,7 @@ function renderPartialReportNotice(rows) {
 	 showReviewStation,
 	 showRecording,
 	 jumpTranscript,
+	 skipRecording,
 	 downloadLocalRecording,
 	 downloadRescueRecording,
 	 checkpointMockAttempt,

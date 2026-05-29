@@ -387,10 +387,10 @@
 .mmi-media-stage video,.mmi-media-stage audio{width:100%;max-height:380px;border-radius:10px;outline:none;}
 .mmi-media-note{font-size:0.75rem;color:var(--muted2);line-height:1.55;margin-top:8px;}
 .mmi-playback-controls{margin-top:9px;padding:10px 11px;border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.2);}
-.mmi-playback-row{display:flex;align-items:center;gap:10px;}
+.mmi-playback-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .mmi-playback-btn{min-width:58px;height:32px;border-radius:50px;border:1px solid var(--border2);background:rgba(255,255,255,0.06);color:var(--text);font-size:0.68rem;font-weight:850;font-family:inherit;cursor:pointer;}
 .mmi-playback-btn:hover{background:rgba(14,165,233,0.13);border-color:rgba(14,165,233,0.35);}
-.mmi-playback-track{position:relative;flex:1;height:18px;display:flex;align-items:center;}
+.mmi-playback-track{position:relative;flex:1 1 150px;min-width:120px;height:18px;display:flex;align-items:center;}
 .mmi-playback-bg{position:absolute;left:0;right:0;height:4px;border-radius:99px;background:rgba(255,255,255,0.16);overflow:hidden;}
 .mmi-playback-fill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--green));}
 .mmi-playback-range{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;}
@@ -8209,7 +8209,9 @@ function renderMMIRecordingElement(data) {
 	 : `<video id="${esc(mediaId)}" playsinline preload="metadata" src="${src}" data-duration="${esc(duration || '')}" data-loaded="1" onloadedmetadata='updateMMIRecordingPlayer(${jsArg(mediaId)})' onloadeddata='applyPendingMMIRecordingSeek(${jsArg(mediaId)});updateMMIRecordingPlayer(${jsArg(mediaId)})' ondurationchange='applyPendingMMIRecordingSeek(${jsArg(mediaId)});updateMMIRecordingPlayer(${jsArg(mediaId)})' ontimeupdate='updateMMIRecordingPlayer(${jsArg(mediaId)})' onplay='updateMMIRecordingPlayer(${jsArg(mediaId)})' onpause='updateMMIRecordingPlayer(${jsArg(mediaId)})' onended='updateMMIRecordingPlayer(${jsArg(mediaId)})' onseeked='updateMMIRecordingPlayer(${jsArg(mediaId)})'${fallbackAttr}></video>`;
 	 const controls = type.startsWith('audio/') ? '' : `<div class="mmi-playback-controls">
 	 <div class="mmi-playback-row">
+	 <button type="button" class="mmi-playback-btn" onclick='skipMMIRecordingPlayer(${jsArg(mediaId)}, -15)'>-15s</button>
 	 <button type="button" id="${esc(mediaId)}Btn" class="mmi-playback-btn" onclick='toggleMMIRecordingPlayer(${jsArg(mediaId)})'>Play</button>
+	 <button type="button" class="mmi-playback-btn" onclick='skipMMIRecordingPlayer(${jsArg(mediaId)}, 15)'>+15s</button>
 	 <div class="mmi-playback-track">
 	 <div class="mmi-playback-bg"><div id="${esc(mediaId)}Fill" class="mmi-playback-fill"></div></div>
 	 <input id="${esc(mediaId)}Range" class="mmi-playback-range" type="range" min="0" max="1000" value="0" aria-label="Seek recording" oninput='seekMMIRecordingPlayer(${jsArg(mediaId)})'>
@@ -8279,6 +8281,15 @@ function seekMMIRecordingPlayer(id) {
 	 const duration = mmiMediaDuration(video);
 	 if (!video || !range || !duration) return;
 	 applyMMIRecordingSeek(video, (Number(range.value) / 1000) * duration);
+	 updateMMIRecordingPlayer(id);
+}
+
+function skipMMIRecordingPlayer(id, delta) {
+	 const video = document.getElementById(id);
+	 if (!video) return;
+	 const duration = mmiMediaDuration(video);
+	 const target = (Number(video.currentTime) || 0) + Number(delta || 0);
+	 applyMMIRecordingSeek(video, Math.max(0, Math.min(duration || Number.MAX_SAFE_INTEGER, target)));
 	 updateMMIRecordingPlayer(id);
 }
 
