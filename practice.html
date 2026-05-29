@@ -306,12 +306,13 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="practice-hero-inner">
  <div class="practice-hero-eyebrow">* Free Practice Tool - Key2MD</div>
  <h1 class="practice-hero-title">Free CASPer practice for Australian medical applicants <br><span class="practice-hero-accent">plus MMI stations and AI feedback.</span></h1>
- <p class="practice-hero-sub">90+ real-style ethics, conflict and policy scenarios. Timed CASPer practice, MMI stations, AI-powered feedback, and optional expert marking from Dan - a University of Melbourne MD student who's coached 200+ students across MMI, CASPer and GAMSAT.</p>
+ <p class="practice-hero-sub"><span id="heroScenarioCount">90+</span> real-style scenarios across ethics, conflict, teamwork, public health, cultural competence and policy. Timed CASPer practice, MMI stations, AI-powered feedback, and optional expert marking from Dan - a University of Melbourne MD student who's coached 200+ students across MMI, CASPer and GAMSAT.</p>
  <div class="practice-hero-stats">
- <div class="practice-hero-stat"><span class="practice-hero-stat-num">90+</span><span class="practice-hero-stat-label">Stations</span></div>
+ <div class="practice-hero-stat"><span class="practice-hero-stat-num" id="heroStationCount">90+</span><span class="practice-hero-stat-label">Free stations</span></div>
  <div class="practice-hero-stat"><span class="practice-hero-stat-num">Free</span><span class="practice-hero-stat-label">AI review daily</span></div>
  <div class="practice-hero-stat"><span class="practice-hero-stat-num">48hr</span><span class="practice-hero-stat-label">Expert turnaround</span></div>
  </div>
+ <div class="practice-hero-cred" style="display:inline-flex;align-items:center;gap:8px;margin:2px 0 18px;padding:7px 15px;border-radius:50px;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.34);color:#fbbf24;font-weight:800;font-size:0.82rem;letter-spacing:0.01em;">&#9733; Chosen by the r/GAMSAT moderators &middot; Free CASPer &amp; MMI station bank</div>
  <a href="#practice-app" class="practice-hero-cta" onclick="event.preventDefault();document.getElementById('practice-app').scrollIntoView({behavior:'smooth',block:'start'});">Start Practising Free </a>
  </div>
 </section>
@@ -1369,6 +1370,18 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 <script>
 window.STATIONS = STATIONS;
 window.MMI_STATIONS = MMI_STATIONS;
+(function () {
+  try {
+    var total = (typeof STATIONS !== 'undefined' ? STATIONS.length : 0) + (typeof MMI_STATIONS !== 'undefined' ? MMI_STATIONS.length : 0);
+    var apply = function () {
+      if (!total) return;
+      var a = document.getElementById('heroStationCount'); if (a) a.textContent = total;
+      var b = document.getElementById('heroScenarioCount'); if (b) b.textContent = total;
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
+    else apply();
+  } catch (e) {}
+})();
 
 const MMI_MAX_PROMPTS = 5;
 const MMI_DEFAULT_PROMPT_COUNT = 3;

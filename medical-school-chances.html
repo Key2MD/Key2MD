@@ -27,17 +27,17 @@
 
  <meta property="og:title" content="Medical School Chances Calculator 2026 | UCAT + GAMSAT">
  <meta property="og:description" content="Free Australian medical school chances calculator for UCAT, ATAR, GPA and GAMSAT applicants. Compare schools, bonuses and interview strategy.">
- <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
+ <meta property="og:image" content="https://www.key2md.com/key2md-chances-og.png">
  <meta property="og:image:width" content="1200">
  <meta property="og:image:height" content="630">
- <meta property="og:image:alt" content="Key2MD - MMI, CASPer and GAMSAT Section II coaching.">
+ <meta property="og:image:alt" content="Key2MD Medical School Chances Calculator - see where you stand against real Australian admissions data.">
  <meta property="og:type" content="website">
  <meta property="og:url" content="https://www.key2md.com/medical-school-chances.html">
  <meta name="twitter:card" content="summary_large_image">
  <meta name="twitter:title" content="Medical School Chances Calculator 2026 | UCAT + GAMSAT">
  <meta name="twitter:description" content="Free Australian medical school chances calculator for UCAT, ATAR, GPA and GAMSAT applicants. Compare schools, bonuses and interview strategy.">
- <meta name="twitter:image" content="https://www.key2md.com/key2md-og.png">
- <meta name="twitter:image:alt" content="Key2MD - MMI, CASPer and GAMSAT Section II coaching.">
+ <meta name="twitter:image" content="https://www.key2md.com/key2md-chances-og.png">
+ <meta name="twitter:image:alt" content="Key2MD Medical School Chances Calculator - see where you stand against real Australian admissions data.">
  <meta name="author" content="Key2MD - Dan - Australian medical school applicant coach">
 
 
@@ -47,7 +47,7 @@
  "@type": ["WebApplication", "LearningResource"],
  "name": "Australian Medical School Chances Calculator",
  "url": "https://www.key2md.com/medical-school-chances.html",
- "image": "https://www.key2md.com/key2md-og.png",
+ "image": "https://www.key2md.com/key2md-chances-og.png",
  "applicationCategory": "EducationalApplication",
  "operatingSystem": "Any (web browser)",
  "browserRequirements": "Requires JavaScript and a modern browser",
@@ -807,6 +807,9 @@
  }
  .result-shortlist.show { display: block; }
  .result-shortlist-title { color: #fff; font-weight: 800; font-size: 0.88rem; margin-bottom: 10px; }
+ .result-headline { display: none; max-width: 560px; margin: 0 auto 18px; padding: 14px 20px; border-radius: 14px; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.34); color: #fff; font-weight: 800; font-size: 1.12rem; line-height: 1.3; }
+ .result-headline.show { display: block; }
+ .result-headline span { color: var(--teal2); }
  .result-shortlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
  .result-shortlist-item { background: rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; }
  .result-shortlist-item strong { display: block; color: var(--teal2); font-size: 0.88rem; margin-bottom: 3px; }
@@ -1429,6 +1432,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="post-result" id="postResult">
  <h3>Want this turned into an application plan?</h3>
  <p>Send yourself the shortlist and next step, copy it for later, or book a focused 15-minute discussion if you want Dan to sanity-check your preference strategy.</p>
+ <div class="result-headline" id="resultHeadline"></div>
  <div class="result-shortlist" id="resultShortlist"></div>
  <div class="result-actions">
  <button type="button" class="result-action-btn" id="copyResultBtn">Copy my result</button>
@@ -2131,6 +2135,9 @@ function setLatestCalculatorPlan(plan) {
  url: 'https://www.key2md.com/medical-school-chances.html',
  }, plan);
  try { localStorage.setItem(K2_LATEST_CALCULATOR_PLAN_KEY, JSON.stringify(latestCalculatorPlan)); } catch (e) {}
+ if (typeof renderResultHeadline === 'function' && Number.isFinite(latestCalculatorPlan.schoolCount)) {
+ renderResultHeadline(latestCalculatorPlan.competitiveCount, latestCalculatorPlan.schoolCount);
+ }
  if (window.Key2MDTrack && typeof window.Key2MDTrack.funnel === 'function') {
  window.Key2MDTrack.funnel('calculator_result_saved', { mode: latestCalculatorPlan.mode || 'unknown' });
  }
@@ -2167,20 +2174,154 @@ async function copyLatestCalculatorPlan() {
  trackCalculatorEvent('calculator_result_copy', { event_label: latestCalculatorPlan?.mode || 'unknown' });
 }
 
+function buildResultHeadlineText(comp, total) {
+ if (!total) return '';
+ if (comp <= 0) return 'On these inputs, no schools are above their observed cutoff yet';
+ return 'Competitive at ' + comp + ' of ' + total + ' schools on these inputs';
+}
+
+function renderResultHeadline(comp, total) {
+ const el = document.getElementById('resultHeadline');
+ if (!el) return;
+ if (!total) { el.classList.remove('show'); el.innerHTML = ''; return; }
+ if (comp > 0) {
+ el.innerHTML = 'Competitive at <span>' + comp + '</span> of <span>' + total + '</span> schools on these inputs.';
+ } else {
+ el.textContent = buildResultHeadlineText(comp, total);
+ }
+ el.classList.add('show');
+}
+
+function _k2RoundRect(ctx, x, y, w, h, r) {
+ r = Math.min(r, w / 2, h / 2);
+ ctx.beginPath();
+ ctx.moveTo(x + r, y);
+ ctx.arcTo(x + w, y, x + w, y + h, r);
+ ctx.arcTo(x + w, y + h, x, y + h, r);
+ ctx.arcTo(x, y + h, x, y, r);
+ ctx.arcTo(x, y, x + w, y, r);
+ ctx.closePath();
+}
+
+function _k2DrawSpaced(ctx, str, x, y, ls) {
+ let cx = x;
+ for (const ch of str) {
+ ctx.fillText(ch, cx, y);
+ cx += ctx.measureText(ch).width + ls;
+ }
+}
+
+async function buildResultShareCardBlob() {
+ const plan = latestCalculatorPlan;
+ if (!plan) return null;
+ try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+ const scale = 2, W = 1200, H = 630;
+ const canvas = document.createElement('canvas');
+ canvas.width = W * scale; canvas.height = H * scale;
+ const ctx = canvas.getContext('2d');
+ ctx.scale(scale, scale);
+ const FS = "'DM Sans', system-ui, -apple-system, sans-serif";
+ const M = 72;
+ const g = ctx.createLinearGradient(0, 0, 0, H);
+ g.addColorStop(0, '#071326'); g.addColorStop(1, '#0c1e3a');
+ ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+ const rg = ctx.createRadialGradient(W * 0.9, H * 0.08, 60, W * 0.9, H * 0.08, 540);
+ rg.addColorStop(0, 'rgba(14,165,233,0.20)'); rg.addColorStop(1, 'rgba(14,165,233,0)');
+ ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+ ctx.textBaseline = 'alphabetic';
+ ctx.fillStyle = '#0ea5e9'; ctx.font = '800 22px ' + FS;
+ _k2DrawSpaced(ctx, 'MEDICAL SCHOOL CHANCES CALCULATOR', M, 92, 3);
+ const comp = plan.competitiveCount, total = plan.schoolCount;
+ ctx.fillStyle = '#ffffff';
+ if (total && comp > 0) {
+ ctx.font = '800 78px ' + FS;
+ ctx.fillText('Competitive at ' + comp + ' of ' + total, M, 196);
+ ctx.fillText('schools on my inputs', M, 280);
+ } else if (total) {
+ ctx.font = '800 70px ' + FS; ctx.fillText('My competitiveness read', M, 200);
+ ctx.font = '500 30px ' + FS; ctx.fillStyle = '#78c4ec';
+ ctx.fillText('Run against real Australian admissions data', M, 250);
+ } else {
+ ctx.font = '800 70px ' + FS; ctx.fillText('My med school chances', M, 200);
+ ctx.font = '500 30px ' + FS; ctx.fillStyle = '#78c4ec';
+ ctx.fillText('Run against real Australian admissions data', M, 250);
+ }
+ const bx = M, bw = W - M * 2, by = 360, bh = 30;
+ const bg = ctx.createLinearGradient(bx, 0, bx + bw, 0);
+ bg.addColorStop(0, '#e24b4a'); bg.addColorStop(0.5, '#f59e0b'); bg.addColorStop(1, '#22c55e');
+ _k2RoundRect(ctx, bx, by, bw, bh, bh / 2); ctx.fillStyle = bg; ctx.fill();
+ ctx.font = '700 18px ' + FS;
+ ctx.textAlign = 'left'; ctx.fillStyle = '#e24b4a'; ctx.fillText('Below', bx, by + bh + 26);
+ ctx.textAlign = 'center'; ctx.fillStyle = '#f59e0b'; ctx.fillText('Borderline', bx + bw / 2, by + bh + 26);
+ ctx.textAlign = 'right'; ctx.fillStyle = '#22c55e'; ctx.fillText('Competitive', bx + bw, by + bh + 26);
+ ctx.textAlign = 'left';
+ const ratio = Math.max(0.05, Math.min(0.95, (typeof plan.ratio === 'number' ? plan.ratio : 0.5)));
+ const yx = bx + bw * ratio;
+ ctx.fillStyle = '#ffffff'; ctx.fillRect(yx - 2, by, 4, bh);
+ ctx.fillStyle = '#fbbf24';
+ ctx.beginPath(); ctx.moveTo(yx, by - 8); ctx.lineTo(yx - 16, by - 32); ctx.lineTo(yx + 16, by - 32); ctx.closePath(); ctx.fill();
+ ctx.font = '800 18px ' + FS;
+ const pw = ctx.measureText('YOU').width + 26;
+ _k2RoundRect(ctx, yx - pw / 2, by - 74, pw, 34, 17); ctx.fillStyle = '#fbbf24'; ctx.fill();
+ ctx.fillStyle = '#071326'; ctx.textAlign = 'center'; ctx.fillText('YOU', yx, by - 51); ctx.textAlign = 'left';
+ const fits = (plan.strongest || []).slice(0, 3).map(s => s.name).filter(Boolean);
+ if (fits.length) {
+ ctx.font = '700 19px ' + FS; ctx.fillStyle = '#9eb2cc'; ctx.fillText('Strongest fits', M, 468);
+ let cx = M; const cy = 484; ctx.font = '800 20px ' + FS;
+ fits.forEach(name => {
+ const tw = ctx.measureText(name).width + 34;
+ _k2RoundRect(ctx, cx, cy, tw, 44, 22);
+ ctx.fillStyle = 'rgba(20,44,78,1)'; ctx.fill();
+ ctx.strokeStyle = 'rgba(40,76,122,1)'; ctx.lineWidth = 1; ctx.stroke();
+ ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle'; ctx.fillText(name, cx + 17, cy + 23);
+ ctx.textBaseline = 'alphabetic'; cx += tw + 14;
+ });
+ }
+ const fy = 566;
+ ctx.font = '800 30px ' + FS; ctx.fillStyle = '#ffffff'; ctx.fillText('Key', M, fy);
+ const kw = ctx.measureText('Key').width;
+ ctx.fillStyle = '#fbbf24'; ctx.fillText('2', M + kw, fy);
+ const k2 = ctx.measureText('2').width;
+ ctx.fillStyle = '#ffffff'; ctx.fillText('MD', M + kw + k2, fy);
+ const mdw = ctx.measureText('MD').width;
+ ctx.font = '600 19px ' + FS; ctx.fillStyle = '#9eb2cc';
+ ctx.fillText('key2md.com/chances  \u00b7  Informational only, not admissions advice', M + kw + k2 + mdw + 20, fy - 1);
+ return await new Promise(res => canvas.toBlob(res, 'image/png'));
+}
+
 async function shareLatestCalculatorPlan() {
  const text = formatLatestCalculatorPlan();
+ const shareUrl = latestCalculatorPlan?.url || 'https://www.key2md.com/medical-school-chances.html';
+ let blob = null;
+ try { blob = await buildResultShareCardBlob(); } catch (e) { blob = null; }
+ if (blob && navigator.canShare) {
+ const file = new File([blob], 'key2md-chances.png', { type: 'image/png' });
+ if (navigator.canShare({ files: [file] })) {
+ try {
+ await navigator.share({ files: [file], title: 'My Key2MD chances result', text: latestCalculatorPlan?.headline || 'My Australian medical school chances result.', url: shareUrl });
+ trackCalculatorEvent('calculator_result_share', { event_label: latestCalculatorPlan?.mode || 'unknown', method: 'image' });
+ return;
+ } catch (err) { if (err && err.name === 'AbortError') return; }
+ }
+ }
+ if (blob) {
+ try {
+ const a = document.createElement('a');
+ a.href = URL.createObjectURL(blob);
+ a.download = 'key2md-chances.png';
+ document.body.appendChild(a); a.click(); a.remove();
+ setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+ setResultStatus('Share image saved to your device.');
+ trackCalculatorEvent('calculator_result_share', { event_label: latestCalculatorPlan?.mode || 'unknown', method: 'download' });
+ return;
+ } catch (e) {}
+ }
  if (navigator.share) {
  try {
- await navigator.share({
- title: 'My Key2MD chances result',
- text,
- url: latestCalculatorPlan?.url || 'https://www.key2md.com/medical-school-chances.html',
- });
- trackCalculatorEvent('calculator_result_share', { event_label: latestCalculatorPlan?.mode || 'unknown' });
+ await navigator.share({ title: 'My Key2MD chances result', text, url: shareUrl });
+ trackCalculatorEvent('calculator_result_share', { event_label: latestCalculatorPlan?.mode || 'unknown', method: 'text' });
  return;
- } catch (err) {
- if (err && err.name === 'AbortError') return;
- }
+ } catch (err) { if (err && err.name === 'AbortError') return; }
  }
  await copyLatestCalculatorPlan();
 }
@@ -2624,6 +2765,7 @@ recalcBtn.addEventListener('click', () => {
  document.getElementById('comboDisplay').classList.remove('show');
  document.getElementById('unisWrap').classList.remove('show');
  document.getElementById('postResult').classList.remove('show');
+ { const _h = document.getElementById('resultHeadline'); if (_h) { _h.classList.remove('show'); _h.innerHTML = ''; } }
  document.getElementById('calcCard').scrollIntoView({behavior:'smooth', block:'start'});
 });
 
@@ -2961,6 +3103,10 @@ function updateUndergradPostResultSummary(assessments, profile) {
  box.classList.add('show');
  setLatestCalculatorPlan({
  mode: 'undergraduate',
+ competitiveCount: assessments.filter(a => a.verdictClass === 'green').length,
+ schoolCount: assessments.length,
+ ratio: assessments.length ? assessments.filter(a => a.verdictClass === 'green').length / assessments.length : 0,
+ headline: buildResultHeadlineText(assessments.filter(a => a.verdictClass === 'green').length, assessments.length),
  focus: profile.percentile === null ? 'UCAT data and school shortlist' : 'Undergraduate shortlist and interview conversion',
  summary: `Undergraduate profile: ATAR ${profile.atar.toFixed(2)}, UCAT ${profile.percentile !== null ? `${profile.percentile.toFixed(1)} percentile${profile.percentileEstimated ? ' estimated' : ''}` : 'not entered'}, ${profile.rural ? 'rural/regional' : 'non-rural'} applicant.`,
  strongest: strongest.map(item => ({ name: item.school.short, detail: `${item.verdict} - ${item.school.type}` })),
@@ -3117,6 +3263,10 @@ function updatePostResultSummary(gpa, scores) {
  box.classList.add('show');
  setLatestCalculatorPlan({
  mode: 'graduate',
+ competitiveCount: ranked.filter(r => r.margin >= 0).length,
+ schoolCount: ranked.length,
+ ratio: ranked.length ? ranked.filter(r => r.margin >= 0).length / ranked.length : 0,
+ headline: buildResultHeadlineText(ranked.filter(r => r.margin >= 0).length, ranked.length),
  focus: strategy.focus,
  summary: `Graduate profile: GPA ${gpa.toFixed(2)}, weighted GAMSAT ${scores.weighted.toFixed(1)}, unweighted GAMSAT ${scores.unweighted.toFixed(1)}, ${state.rural ? 'rural' : 'non-rural'} benchmark.`,
  strongest: strongest.map(item => ({
