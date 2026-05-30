@@ -1409,6 +1409,7 @@ let mmiRecordingInterval = null;
 let mmiRecordingStartedAt = null;
 let mmiCurrentPrompts = [];
 let mmiRecordingDurationSec = 0;
+let mmiFeedbackUploadInFlight = false;
 
 let mmiQuickfireCurrentPrompt = 0;
 let mmiExtendedPromptsShown = 0;
@@ -1796,6 +1797,7 @@ function mmiOnRecordingStop() {
  if(sb) sb.style.display = 'none';
  const sw = document.getElementById('mmiSubmitWrap');
  if(sw) sw.style.display = window.K2_ACTIVE_CASPER_MOCK ? 'none' : 'block';
+ resetMMISubmitState();
 }
 
 function mmiResetForRestart() {
@@ -1804,6 +1806,10 @@ function mmiResetForRestart() {
  mmiPromptsRevealedCount = 0;
  mmiRecordingStartedAt = null;
  mmiCurrentPrompts = [];
+ mmiRecordingDurationSec = 0;
+ recordedChunks=[];recordingBlob=null;
+ audioChunks=[];audioBlob=null;
+ mmiLiveFrameBlobs=[];mmiLiveFrameSamples=[];
  const sw = document.getElementById('mmiSubmitWrap');
  if(sw) sw.style.display = 'none';
  const sb = document.getElementById('mmiRecordingStatus');
@@ -1811,7 +1817,26 @@ function mmiResetForRestart() {
  const bnr = document.getElementById('btnRevealNext');
  if(bnr) bnr.style.display = 'none';
  MMIFeedbackRender.clear(document.getElementById('aiFeedbackWrapMMI'));
+ resetMMISubmitState();
  if(typeof mmiEngineReset==='function') mmiEngineReset();
+}
+
+function resetMMISubmitState(label = 'Get AI Feedback') {
+ mmiFeedbackUploadInFlight = false;
+ const btn = document.getElementById('btnMMISubmit');
+ if(!btn) return;
+ btn.disabled = false;
+ btn.textContent = label;
+ btn.removeAttribute('aria-busy');
+}
+
+function setMMISubmitBusy(label) {
+ mmiFeedbackUploadInFlight = true;
+ const btn = document.getElementById('btnMMISubmit');
+ if(!btn) return;
+ btn.disabled = true;
+ btn.textContent = label || 'Uploading...';
+ btn.setAttribute('aria-busy', 'true');
 }
 
 function mmiRevealNextPrompt() {
@@ -1858,6 +1883,7 @@ async function submitMMIForFeedback() {
  const isCasperMockReview = !!window.K2_ACTIVE_CASPER_MOCK;
  const requireVideoUpload = isCasperMockReview && isPremium;
 
+ if(mmiFeedbackUploadInFlight) return;
 
 
  if(!audioBlob && audioRecorder && audioRecorder.state === 'inactive' && audioChunks.length > 0) {
@@ -1881,7 +1907,7 @@ async function submitMMIForFeedback() {
  return;
  }
 
- if(btn) { btn.disabled = true; btn.textContent = isPremium ? ' Preparing Premium analysis...' : 'Uploading...'; }
+ setMMISubmitBusy(isPremium ? 'Preparing Premium analysis...' : 'Uploading...');
  if(sw) sw.style.display = 'none';
  MMIFeedbackRender.renderLoading(feedbackWrap, tier);
 
@@ -1889,14 +1915,14 @@ async function submitMMIForFeedback() {
  if(!auth) {
  MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_loading', message: 'The login system is still loading. Please wait a moment and try again.' });
  if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
+ resetMMISubmitState();
  return;
  }
  if(!auth.isLoggedIn()) {
  auth.showAuthModal?.('signup');
  MMIFeedbackRender.clear(feedbackWrap);
  if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
+ resetMMISubmitState();
  return;
  }
 
@@ -1965,12 +1991,12 @@ async function submitMMIForFeedback() {
  const MAX_RETRIES = 3;
  let lastError = null;
 
- if(btn) btn.textContent = isPremium ? ' Uploading for analysis...' : 'Uploading...';
+ setMMISubmitBusy(isPremium ? 'Uploading for analysis...' : 'Uploading...');
 
  for(let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
  try {
  if(attempt > 1) {
- if(btn) btn.textContent = ` Retrying... (${attempt}/${MAX_RETRIES})`;
+  setMMISubmitBusy(`Retrying... (${attempt}/${MAX_RETRIES})`);
  await new Promise(r => setTimeout(r, 1500 * attempt));
  }
 
@@ -1982,25 +2008,25 @@ async function submitMMIForFeedback() {
 
 
  if(res.status === 401) {
- Key2MDAuth.showAuthModal('signup');
- MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_required', message: 'Sign in to get AI feedback on your MMI response.' });
- if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
- return;
- }
+  Key2MDAuth.showAuthModal('signup');
+  MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_required', message: 'Sign in to get AI feedback on your MMI response.' });
+  if(sw) sw.style.display = 'block';
+  resetMMISubmitState();
+  return;
+  }
  if(res.status === 402) {
- const data = await res.json().catch(() => ({}));
- MMIFeedbackRender.renderError(feedbackWrap, { code: 'no_credits', message: data.message || `You need MMI ${tier} credits to get AI feedback.` });
- if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
- return;
- }
- if(res.status === 413) {
- MMIFeedbackRender.renderError(feedbackWrap, { code: 'file_too_large', message: 'Recording is too large to upload. Try a shorter recording.' });
- if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
- return;
- }
+  const data = await res.json().catch(() => ({}));
+  MMIFeedbackRender.renderError(feedbackWrap, { code: 'no_credits', message: data.message || `You need MMI ${tier} credits to get AI feedback.` });
+  if(sw) sw.style.display = 'block';
+  resetMMISubmitState();
+  return;
+  }
+  if(res.status === 413) {
+  MMIFeedbackRender.renderError(feedbackWrap, { code: 'file_too_large', message: 'Recording is too large to upload. Try a shorter recording.' });
+  if(sw) sw.style.display = 'block';
+  resetMMISubmitState();
+  return;
+  }
 
  if(!res.ok) {
  const data = await res.json().catch(() => ({}));
@@ -2008,12 +2034,12 @@ async function submitMMIForFeedback() {
  if(res.status >= 500 && attempt < MAX_RETRIES) {
  lastError = data.message || 'Server error';
  continue;
- }
- MMIFeedbackRender.renderError(feedbackWrap, { code: data.error, message: data.message || 'Something went wrong. Please try again.' });
- if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
- return;
- }
+  }
+  MMIFeedbackRender.renderError(feedbackWrap, { code: data.error, message: data.message || 'Something went wrong. Please try again.' });
+  if(sw) sw.style.display = 'block';
+  resetMMISubmitState();
+  return;
+  }
 
  const data = await res.json();
  MMIFeedbackRender.render(feedbackWrap, data, {
@@ -2022,17 +2048,18 @@ async function submitMMIForFeedback() {
  stationCategory: s.category || '',
  durationSec: mmiRecordingDurationSec,
  visualDegraded,
- });
- updateMMILimitsUI();
- return;
+  });
+  updateMMILimitsUI();
+  mmiFeedbackUploadInFlight = false;
+  return;
 
  } catch(err) {
  lastError = err.message;
- if(attempt < MAX_RETRIES) continue;
- MMIFeedbackRender.renderError(feedbackWrap, { code: 'network_error', message: `Upload failed after ${MAX_RETRIES} attempts. Check your connection and try again.` });
- if(sw) sw.style.display = 'block';
- if(btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
- }
+  if(attempt < MAX_RETRIES) continue;
+  MMIFeedbackRender.renderError(feedbackWrap, { code: 'network_error', message: `Upload failed after ${MAX_RETRIES} attempts. Check your connection and try again.` });
+  if(sw) sw.style.display = 'block';
+  resetMMISubmitState();
+  }
  }
 }
 
@@ -3254,6 +3281,7 @@ function startRecording(){
  audioChunks=[];audioBlob=null;
  mmiLiveFrameBlobs=[];
  mmiLiveFrameSamples=[];
+ resetMMISubmitState();
  stopPremiumLiveFrameCapture();
 
  const rc=$('recordingControls');const pc=$('playbackControls');
@@ -3550,6 +3578,12 @@ function loadStation(){
 
  const isMmi=currentMode===MODE_MMI;
  if(isMmi){
+ resetMMISubmitState();
+ recordedChunks=[];recordingBlob=null;
+ audioChunks=[];audioBlob=null;
+ mmiLiveFrameBlobs=[];mmiLiveFrameSamples=[];
+ mmiRecordingStartedAt=null;
+ mmiRecordingDurationSec=0;
  const cfg=getMMIConfig();
  const allPrompts=getPrompts(s).slice(0,cfg.promptCount);
  allPrompts.forEach((p,i)=>{ const t=$(`prompt${i+1}Text`); if(t)t.textContent=p; });
@@ -5565,6 +5599,10 @@ $('reviewAgainBtn').addEventListener('click',()=>{
 
 prevBtn.addEventListener('click',()=>{
  if(!sessionActive||currentIdx===0)return;
+ if(currentMode===MODE_MMI && mmiFeedbackUploadInFlight){
+ if(typeof showPracticeNotice === 'function') showPracticeNotice('Wait for this MMI feedback upload to finish before changing stations.', 'error');
+ return;
+ }
  clearTimer();
  if(currentMode===MODE_MMI)stopRecording();
  else saveAnswer();
@@ -5575,6 +5613,10 @@ prevBtn.addEventListener('click',()=>{
 
 nextBtn.addEventListener('click',async()=>{
  if(!sessionActive)return;
+ if(currentMode===MODE_MMI && mmiFeedbackUploadInFlight){
+ if(typeof showPracticeNotice === 'function') showPracticeNotice('Wait for this MMI feedback upload to finish before moving to the next station.', 'error');
+ return;
+ }
 if(phase==='writing'&&currentMode===MODE_CASPER){
  clearTimer();saveAnswer();setPhaseUI('done');
  }
