@@ -336,7 +336,7 @@
 .mock-issue-detail{font-size:0.78rem;color:var(--text);line-height:1.55;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere;}
 .mock-issue-action{font-size:0.72rem;color:var(--muted);line-height:1.55;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
 .mock-issue-empty{border:1px solid var(--green-border);background:var(--green-dim);color:var(--green);border-radius:12px;padding:14px 16px;font-size:0.82rem;line-height:1.55;}
- .mmi-overview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+ .mmi-overview{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:14px;}
  .mmi-kpi{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.045);padding:13px 14px;min-height:82px;}
  .mmi-kpi.good{border-color:var(--green-border);background:var(--green-dim);}
  .mmi-kpi.warn{border-color:var(--amber-border);background:var(--amber-dim);}
@@ -347,6 +347,9 @@
  .mmi-workbench{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:14px;align-items:start;}
  .mmi-list-panel,.mmi-viewer-panel{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);overflow:hidden;}
  .mmi-list{display:flex;flex-direction:column;gap:8px;padding:10px;max-height:calc(100vh - 270px);overflow:auto;}
+ .mmi-day-divider{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 9px;border:1px solid var(--border);border-radius:9px;background:rgba(15,23,42,0.94);box-shadow:0 8px 16px rgba(0,0,0,0.12);}
+ .mmi-day-title{font-size:0.7rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--text);}
+ .mmi-day-meta{font-size:0.66rem;color:var(--muted);font-weight:750;text-align:right;}
  .mmi-review-card{width:100%;border:1px solid var(--border);background:rgba(255,255,255,0.035);border-radius:11px;padding:11px;text-align:left;color:var(--text);cursor:pointer;transition:background 0.15s,border-color 0.15s,transform 0.15s;}
  .mmi-review-card:hover{background:rgba(255,255,255,0.06);border-color:var(--border2);transform:translateY(-1px);}
  .mmi-review-card.active{border-color:rgba(56,189,248,0.5);background:rgba(56,189,248,0.11);}
@@ -1770,7 +1773,7 @@
  </div>
  <div class="controls">
  <input class="ctrl-in" id="subSearch" type="text" placeholder=" Filter by email..." oninput="renderSubscribers()">
- <button class="btn" onclick="loadSubscribers()">Refresh Refresh</button>
+ <button class="btn" onclick="loadSubscribers()">Refresh</button>
  </div>
  <div class="tbl-wrap">
  <div class="tbl-toolbar"><span class="tbl-status" id="subStatus">-</span><span id="subRemovedNote" style="font-size:0.72rem;color:var(--amber);margin-left:12px;display:none;"></span></div>
@@ -1900,6 +1903,18 @@
  </div>
  <div class="controls">
  <input class="ctrl-in" id="mmiSearch" type="text" placeholder=" Search email, scenario, category..." oninput="renderMMI()">
+ <select class="ctrl-sel" id="mmiSource" onchange="renderMMI()">
+ <option value="">All sources</option>
+ <option value="mmi_tool">MMI practice tool</option>
+ <option value="casper_mock">CASPer mock videos</option>
+ </select>
+ <select class="ctrl-sel" id="mmiDay" onchange="renderMMI()">
+ <option value="">All days</option>
+ <option value="today">Today</option>
+ <option value="yesterday">Yesterday</option>
+ <option value="7d">Last 7 days</option>
+ <option value="30d">Last 30 days</option>
+ </select>
  <select class="ctrl-sel" id="mmiCategory" onchange="renderMMI()">
  <option value="">All categories</option>
  <option value="Ethics">Ethics</option>
@@ -1926,6 +1941,15 @@
  <option value="no_recording">No retained recording</option>
  <option value="transcript">Has transcript</option>
  <option value="trap">Trap flagged</option>
+ </select>
+ <select class="ctrl-sel" id="mmiSort" onchange="renderMMI()">
+ <option value="day" selected>Grouped by day</option>
+ <option value="newest">Newest first</option>
+ <option value="oldest">Oldest first</option>
+ <option value="day_volume">Busiest day first</option>
+ <option value="score_desc">Highest score</option>
+ <option value="cost_desc">Highest COGS</option>
+ <option value="student">Student A-Z</option>
  </select>
  <select class="ctrl-sel" id="mmiLimit" onchange="loadMMI()">
  <option value="50">50 rows</option>
@@ -1964,7 +1988,7 @@
  <div class="page-actions">
  <span class="refresh-note" id="rvReconcileStatus"></span>
  <button class="btn amber" onclick="reconcileSubscriptionPayments()">Reconcile renewals</button>
- <button class="btn" onclick="loadRevenue()">Refresh Refresh</button>
+ <button class="btn" onclick="loadRevenue()">Refresh</button>
  </div>
  </div>
  <div class="stats-grid" style="margin-bottom:20px;">
@@ -2048,7 +2072,7 @@
  <div class="page-sub">Parse failures, Whisper errors, COGS, and founding member slots</div>
  </div>
  <div class="page-actions">
- <button class="btn" onclick="loadMonitoring()">Refresh Refresh</button>
+ <button class="btn" onclick="loadMonitoring()">Refresh</button>
  </div>
  </div>
 
@@ -8074,27 +8098,119 @@ function renderMMI() {
 
 function filteredMMIRows() {
  const q = (document.getElementById('mmiSearch')?.value||'').toLowerCase();
+ const sourceF = document.getElementById('mmiSource')?.value||'';
+ const dayF = document.getElementById('mmiDay')?.value||'';
  const category = document.getElementById('mmiCategory')?.value||'';
  const tier = document.getElementById('mmiTier')?.value||'';
  const scoreF = document.getElementById('mmiScore')?.value||'';
  const mediaF = document.getElementById('mmiMedia')?.value||'';
  const terms = q.split(/\s+/).filter(Boolean);
- return S.mmiReviews.filter(r => {
+ const rows = S.mmiReviews.filter(r => {
  const fb = parseMMIFb(r.ai_feedback_json);
  const prompts = parseMMIPrompts(r);
  const scoreInfo = mmiScoreInfo(r, fb);
+ const source = mmiReviewSource(r);
  const searchText = [
  r.email, r.name, r.station_category, r.station_scenario, r.tier, r.station_id,
+ mmiSourceLabel(source),
  r.transcript_text, prompts.map(p => p.text).join(' '),
  fb?.overall?.biggest_strength, fb?.overall?.biggest_improvement, fb?.overall?.excellent_version,
  Array.isArray(fb?.per_prompt) ? fb.per_prompt.map(p => [p.prompt_text, p.summary, p.specific_quote].join(' ')).join(' ') : '',
  ].join(' ').toLowerCase();
  const sm = !terms.length || terms.every(t => searchText.includes(t));
+ const sourceMatch = !sourceF || source === sourceF;
+ const dayMatch = mmiDateRangeMatch(dayF, r);
  const cm = !category || r.station_category===category;
  const tm = !tier || r.tier===tier;
  const sc = mmiScoreFilterMatch(scoreF, scoreInfo);
  const mediaMatch = mmiMediaFilterMatch(mediaF, r, fb);
- return sm&&cm&&tm&&sc&&mediaMatch;
+ return sm&&sourceMatch&&dayMatch&&cm&&tm&&sc&&mediaMatch;
+ });
+ return sortMMIRows(rows);
+}
+
+function mmiReviewSource(row) {
+ const explicit = String(row?.review_source || '').trim();
+ if (explicit === 'casper_mock' || explicit === 'mmi_tool') return explicit;
+ const recordingKey = String(row?.recording_url || '');
+ return recordingKey.startsWith('casper_mock/') ? 'casper_mock' : 'mmi_tool';
+}
+
+function mmiSourceLabel(source) {
+ return source === 'casper_mock' ? 'CASPer mock video' : 'MMI practice tool';
+}
+
+function mmiSourceBadge(row) {
+ const source = mmiReviewSource(row);
+ const cls = source === 'casper_mock' ? 'badge-paid' : 'badge-mmi';
+ return `<span class="badge ${cls}">${mmiSourceLabel(source)}</span>`;
+}
+
+function mmiLocalDayStart(value) {
+ const d = value ? new Date(value) : new Date();
+ if (Number.isNaN(d.getTime())) return null;
+ return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function mmiDayAge(value) {
+ const day = mmiLocalDayStart(value);
+ const today = mmiLocalDayStart(new Date());
+ if (!day || !today) return null;
+ return Math.floor((today.getTime() - day.getTime()) / 86400000);
+}
+
+function mmiDateRangeMatch(filter, row) {
+ if (!filter) return true;
+ const age = mmiDayAge(row?.created_at);
+ if (!Number.isFinite(age)) return false;
+ if (filter === 'today') return age === 0;
+ if (filter === 'yesterday') return age === 1;
+ if (filter === '7d') return age >= 0 && age < 7;
+ if (filter === '30d') return age >= 0 && age < 30;
+ return true;
+}
+
+function mmiDayKey(row) {
+ const d = mmiLocalDayStart(row?.created_at);
+ if (!d) return 'unknown';
+ const mm = String(d.getMonth() + 1).padStart(2, '0');
+ const dd = String(d.getDate()).padStart(2, '0');
+ return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
+function mmiDayLabel(row) {
+ const d = mmiLocalDayStart(row?.created_at);
+ if (!d) return 'Unknown date';
+ const age = mmiDayAge(row?.created_at);
+ const label = d.toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+ if (age === 0) return `Today - ${label}`;
+ if (age === 1) return `Yesterday - ${label}`;
+ return label;
+}
+
+function mmiScorePct(row) {
+ const info = mmiScoreInfo(row, parseMMIFb(row.ai_feedback_json));
+ const score = Number(info?.score);
+ const max = Number(info?.max || 5);
+ return Number.isFinite(score) && max > 0 ? score / max : -1;
+}
+
+function sortMMIRows(rows) {
+ const sort = document.getElementById('mmiSort')?.value || 'day';
+ const dayCounts = new Map();
+ rows.forEach(r => dayCounts.set(mmiDayKey(r), (dayCounts.get(mmiDayKey(r)) || 0) + 1));
+ return [...rows].sort((a,b) => {
+ const at = new Date(a.created_at || 0).getTime() || 0;
+ const bt = new Date(b.created_at || 0).getTime() || 0;
+ if (sort === 'oldest') return at - bt;
+ if (sort === 'student') return String(a.email || a.name || '').localeCompare(String(b.email || b.name || ''));
+ if (sort === 'score_desc') return mmiScorePct(b) - mmiScorePct(a) || bt - at;
+ if (sort === 'cost_desc') return Number(b.cogs_cents || 0) - Number(a.cogs_cents || 0) || bt - at;
+ if (sort === 'day_volume') {
+ const dc = (dayCounts.get(mmiDayKey(b)) || 0) - (dayCounts.get(mmiDayKey(a)) || 0);
+ return dc || bt - at;
+ }
+ return bt - at;
  });
 }
 
@@ -8125,14 +8241,19 @@ function renderMMIOverview(rows) {
  const scored = rows.map(r => mmiScoreInfo(r, parseMMIFb(r.ai_feedback_json))).filter(s => Number.isFinite(Number(s.score)));
  const avgPct = scored.length ? scored.reduce((sum, s) => sum + (Number(s.score) / Number(s.max || 5)), 0) / scored.length : 0;
  const recordings = rows.filter(r => !!r.recording_url).length;
- const transcripts = rows.filter(r => String(r.transcript_text || '').trim()).length;
+ const mmiTool = rows.filter(r => mmiReviewSource(r) === 'mmi_tool').length;
+ const mockVideo = rows.filter(r => mmiReviewSource(r) === 'casper_mock').length;
+ const today = rows.filter(r => mmiDateRangeMatch('today', r)).length;
+ const totalCogs = rows.reduce((sum, r) => sum + Number(r.cogs_cents || 0), 0);
+ const avgCogs = rows.length ? Math.round(totalCogs / rows.length) : 0;
  const traps = rows.filter(r => parseMMIFb(r.ai_feedback_json)?.polished_auditor_detected).length;
  const premium = rows.filter(r => r.tier === 'premium').length;
  el.innerHTML = `
- <div class="mmi-kpi blue"><div class="mmi-kpi-label">Sessions</div><div class="mmi-kpi-value">${rows.length}</div><div class="mmi-kpi-sub">Filtered MMI rows</div></div>
+ <div class="mmi-kpi blue"><div class="mmi-kpi-label">Sessions</div><div class="mmi-kpi-value">${rows.length}</div><div class="mmi-kpi-sub">${mmiTool} MMI tool | ${mockVideo} mock video</div></div>
+ <div class="mmi-kpi"><div class="mmi-kpi-label">Today</div><div class="mmi-kpi-value">${today}</div><div class="mmi-kpi-sub">Rows matching current filters</div></div>
  <div class="mmi-kpi good"><div class="mmi-kpi-label">Avg score</div><div class="mmi-kpi-value">${scored.length ? `${Math.round(avgPct * 100)}%` : '-'}</div><div class="mmi-kpi-sub">${scored.length} scored response${scored.length===1?'':'s'}</div></div>
  <div class="mmi-kpi"><div class="mmi-kpi-label">Recordings</div><div class="mmi-kpi-value">${recordings}</div><div class="mmi-kpi-sub">Retained media available</div></div>
- <div class="mmi-kpi"><div class="mmi-kpi-label">Transcripts</div><div class="mmi-kpi-value">${transcripts}</div><div class="mmi-kpi-sub">Answers readable now</div></div>
+ <div class="mmi-kpi"><div class="mmi-kpi-label">Est. COGS</div><div class="mmi-kpi-value">${totalCogs ? `$${(totalCogs/100).toFixed(2)}` : '-'}</div><div class="mmi-kpi-sub">${avgCogs || '-'} cents avg / row</div></div>
  <div class="mmi-kpi warn"><div class="mmi-kpi-label">Review flags</div><div class="mmi-kpi-value">${traps}</div><div class="mmi-kpi-sub">${premium} premium session${premium===1?'':'s'}</div></div>`;
 }
 
@@ -8140,14 +8261,21 @@ function renderMMIList(rows) {
  const list = document.getElementById('mmiList');
  const empty = document.getElementById('mmiEmpty');
  const status = document.getElementById('mmiStatus');
- if (status) status.textContent = `${rows.length} MMI session${rows.length===1?'':'s'} loaded`;
+ const mmiTool = rows.filter(r => mmiReviewSource(r) === 'mmi_tool').length;
+ const mockVideo = rows.filter(r => mmiReviewSource(r) === 'casper_mock').length;
+ const totalCogs = rows.reduce((sum, r) => sum + Number(r.cogs_cents || 0), 0);
+ if (status) status.textContent = `${rows.length} row${rows.length===1?'':'s'} shown | ${mmiTool} MMI tool | ${mockVideo} CASPer mock | est. COGS $${(totalCogs/100).toFixed(2)}`;
  if (empty) empty.classList.toggle('hidden', rows.length>0);
  if (!list) return;
  if (!rows.length) {
  list.innerHTML = '';
  return;
  }
- list.innerHTML = rows.map(row => {
+ const groupByDay = ['day','day_volume'].includes(document.getElementById('mmiSort')?.value || 'day');
+ const daily = buildMMIDailySummary(rows);
+ let lastDay = null;
+ const parts = [];
+ rows.forEach(row => {
  const fb = parseMMIFb(row.ai_feedback_json);
  const dt = fmtDate(row.created_at);
  const scoreInfo = mmiScoreInfo(row, fb);
@@ -8155,13 +8283,20 @@ function renderMMIList(rows) {
  const selected = String(row.id) === String(S.mmiSelectedId);
  const mediaDot = row.recording_url ? 'good' : 'warn';
  const transcriptWords = wordCount(row.transcript_text);
- return `<button type="button" class="mmi-review-card ${selected?'active':''}" onclick='selectMMIReview(${jsArg(row.id)})'>
+ const dayKey = mmiDayKey(row);
+ if (groupByDay && dayKey !== lastDay) {
+ const sum = daily.get(dayKey) || { total:0, mmi:0, mock:0, cogs:0 };
+ parts.push(`<div class="mmi-day-divider"><div class="mmi-day-title">${esc(mmiDayLabel(row))}</div><div class="mmi-day-meta">${sum.total} row${sum.total===1?'':'s'} | ${sum.mmi} MMI | ${sum.mock} mock | $${(sum.cogs/100).toFixed(2)}</div></div>`);
+ lastDay = dayKey;
+ }
+ parts.push(`<button type="button" class="mmi-review-card ${selected?'active':''}" onclick='selectMMIReview(${jsArg(row.id)})'>
  <div class="mmi-card-top">
  <div class="mmi-card-email">${emailWithDuplicateFlag(row.email || 'Unknown student', row)}</div>
  <div class="mmi-card-time">${esc(relTime(row.created_at))}</div>
  </div>
  <div class="mmi-card-title">${esc(row.station_scenario || row.station_category || 'No scenario text saved')}</div>
  <div class="mmi-card-meta">
+ ${mmiSourceBadge(row)}
  <span class="badge badge-default">${esc(row.station_category || 'MMI')}</span>
  <span class="badge badge-${row.tier==='premium'?'pro':'casper'}">${esc(row.tier || 'transcript')}</span>
  ${scoreInfo.score ? `<span class="score-box ${mmiScoreC(scoreInfo.score, scoreInfo.max)}" title="${esc(scoreInfo.label)}">${esc(scoreInfo.score)}</span>` : '<span class="badge badge-free">No score</span>'}
@@ -8169,8 +8304,23 @@ function renderMMIList(rows) {
  <span class="badge badge-default"><span class="mmi-dot ${mediaDot}"></span>${row.recording_url?'media':'no media'}</span>
  <span class="badge badge-default">${transcriptWords} words</span>
  </div>
- </button>`;
- }).join('');
+ </button>`);
+ });
+ list.innerHTML = parts.join('');
+}
+
+function buildMMIDailySummary(rows) {
+ const map = new Map();
+ rows.forEach(row => {
+ const key = mmiDayKey(row);
+ const current = map.get(key) || { total:0, mmi:0, mock:0, cogs:0 };
+ current.total += 1;
+ if (mmiReviewSource(row) === 'casper_mock') current.mock += 1;
+ else current.mmi += 1;
+ current.cogs += Number(row.cogs_cents || 0);
+ map.set(key, current);
+ });
+ return map;
 }
 
 function selectMMIReview(id) {
@@ -8194,8 +8344,9 @@ function renderMMIViewer(row) {
  <div class="mmi-viewer-head">
  <div>
  <div class="mmi-viewer-title">${emailWithDuplicateFlag(row.email || 'Unknown student', row)}</div>
- <div class="mmi-viewer-sub">${esc(row.name || '')}${row.name ? ' | ' : ''}${esc(row.station_category || 'MMI')} | ${esc(dt?.date || '-')}${dt?.time ? ` at ${esc(dt.time)}` : ''} | ${esc(mmiDuration(row))}</div>
+ <div class="mmi-viewer-sub">${esc(row.name || '')}${row.name ? ' | ' : ''}${esc(mmiSourceLabel(mmiReviewSource(row)))} | ${esc(row.station_category || 'MMI')} | ${esc(dt?.date || '-')}${dt?.time ? ` at ${esc(dt.time)}` : ''} | ${esc(mmiDuration(row))}</div>
  <div class="mmi-card-meta" style="margin-top:9px;">
+ ${mmiSourceBadge(row)}
  <span class="badge badge-${row.tier==='premium'?'pro':'casper'}">${esc(row.tier || 'transcript')}</span>
  ${row.specialist_mode ? '<span class="badge badge-pro">Specialist mode</span>' : ''}
  ${row.recording_url ? '<span class="badge badge-yes">Recording retained</span>' : '<span class="badge badge-free">No retained recording</span>'}
@@ -8516,6 +8667,7 @@ function renderMMIMetadata(row) {
  return `<div class="mmi-section">
  <div class="mmi-section-head"><div class="mmi-section-title">Admin metadata</div><button class="btn" onclick='copyText(${jsArg(row.id || '')}, "Review ID copied")'>Copy ID</button></div>
  <div class="mmi-section-body">
+ <div class="detail-box-row"><strong>Source:</strong> ${esc(mmiSourceLabel(mmiReviewSource(row)))}</div>
  <div class="detail-box-row"><strong>Review ID:</strong> ${esc(row.id || '-')}</div>
  <div class="detail-box-row"><strong>User ID:</strong> ${esc(row.user_id || '-')}</div>
  <div class="detail-box-row"><strong>Station ID:</strong> ${esc(row.station_id || '-')}</div>
@@ -8939,12 +9091,16 @@ function renderMonitoring() {
  if (!m) return;
 
  const stats = m.mmi_stats || {};
+ const bySource = Array.isArray(m.mmi_stats_by_source) ? m.mmi_stats_by_source : [];
+ const sourceStat = source => bySource.find(r => r.source === source) || {};
+ const mmiToolStats = sourceStat('mmi_tool');
+ const mockVideoStats = sourceStat('casper_mock');
  const setEl = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
 
  setEl('mFoundingCount', m.founding_count||0);
  setEl('mFoundingSub', `${m.slots_remaining} slot${m.slots_remaining===1?'':'s'} remaining`);
  setEl('mTotalReviews', stats.total_reviews||0);
- setEl('mReviewSplit', `T1: ${stats.transcript_count||0} | T2: ${stats.premium_count||0}`);
+ setEl('mReviewSplit', `${mmiToolStats.total_reviews||0} MMI tool | ${mockVideoStats.total_reviews||0} mock video`);
  setEl('mAvgCogs', stats.avg_cogs_cents ? `${stats.avg_cogs_cents}` : '-');
  setEl('mAvgCogsSub', `T1: ${stats.avg_cogs_transcript||'-'} | T2: ${stats.avg_cogs_premium||'-'}`);
  setEl('mTotalCogs', stats.total_cogs_cents ? `$${(stats.total_cogs_cents/100).toFixed(2)}` : '-');
@@ -8953,12 +9109,26 @@ function renderMonitoring() {
 
  // COGS breakdown card
  const cogsEl = document.getElementById('mCogsBreakdown');
+ const dailyStats = Array.isArray(m.mmi_daily_stats) ? m.mmi_daily_stats : [];
+ const dailyRows = dailyStats.slice(0, 14).map(r => `
+ <tr>
+ <td>${esc(r.day || '-')}</td>
+ <td><span class="badge ${r.source === 'casper_mock' ? 'badge-paid' : 'badge-mmi'}">${esc(mmiSourceLabel(r.source))}</span></td>
+ <td style="text-align:center;">${esc(r.total_reviews || 0)}</td>
+ <td style="text-align:center;">${esc(r.premium_count || 0)}</td>
+ <td style="text-align:right;">$${(Number(r.total_cogs_cents || 0)/100).toFixed(2)}</td>
+ </tr>`).join('');
  if (cogsEl) cogsEl.innerHTML = `
  <div class="mini-metric-row" style="grid-template-columns:1fr 1fr;">
  <div class="mini-metric"><div>Transcript avg</div><div>${stats.avg_cogs_transcript||'-'}</div></div>
  <div class="mini-metric"><div>Premium avg</div><div>${stats.avg_cogs_premium||'-'}</div></div>
  <div class="mini-metric"><div>Max single review</div><div>${stats.max_cogs_cents||'-'}</div></div>
  <div class="mini-metric"><div>Total all-time</div><div>$${stats.total_cogs_cents?(stats.total_cogs_cents/100).toFixed(2):'-'}</div></div>
+ <div class="mini-metric"><div>MMI tool COGS</div><div>$${(Number(mmiToolStats.total_cogs_cents || 0)/100).toFixed(2)}</div></div>
+ <div class="mini-metric"><div>Mock video COGS</div><div>$${(Number(mockVideoStats.total_cogs_cents || 0)/100).toFixed(2)}</div></div>
+ </div>
+ <div style="margin-top:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+ <table style="width:100%;"><thead><tr><th>Day</th><th>Source</th><th style="text-align:center;">Rows</th><th style="text-align:center;">Premium</th><th style="text-align:right;">COGS</th></tr></thead><tbody>${dailyRows || '<tr><td colspan="5" style="color:var(--muted);">No daily rows yet.</td></tr>'}</tbody></table>
  </div>
  ${stats.avg_cogs_cents > 150 ? `<div style="margin-top:8px;padding:8px 10px;background:var(--red-dim);border:1px solid var(--red-border);border-radius:7px;color:var(--red);font-size:0.78rem;font-weight:600;">Avg COGS above 150 - consider reviewing pricing</div>` : ''}`;
 
