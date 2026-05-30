@@ -21,6 +21,7 @@ const MMIRecording = (() => {
  let onFeedbackCallback = null;
  let onStateChangeCallback = null;
  let onErrorCallback = null;
+ const UPLOAD_TIMEOUT_MS = 4 * 60 * 1000;
 
  // -- Public API -------------------------------------------------
 
@@ -185,6 +186,7 @@ const MMIRecording = (() => {
 
  function finishRecording() {
  if (recorder && recorder.state === 'recording') {
+ try { recorder.requestData(); } catch (e) {}
  recorder.stop();
  }
  }
@@ -220,7 +222,7 @@ const MMIRecording = (() => {
  const token = Key2MDAuth.getToken();
 
  try {
- const res = await fetch(Key2MDAuth.getApiBase() + '/api/mmi-review', {
+ const res = await fetchWithTimeout(Key2MDAuth.getApiBase() + '/api/mmi-review', {
  method: 'POST',
  headers: token ? { 'Authorization': `Bearer ${token}` } : {},
  body: fd,
@@ -260,11 +262,29 @@ const MMIRecording = (() => {
 
  } catch (err) {
  setState('error');
- onErrorCallback({ code: 'network_error', message: 'Network error. Please check your connection and try again.' });
+ onErrorCallback({ code: err.code || 'network_error', message: err.code === 'upload_timeout' ? 'Upload took too long and was stopped safely. Your recording remains on this page; wait a moment and try again.' : 'Network error. Please check your connection and try again.' });
  }
  }
 
  // -- Helpers ----------------------------------------------------
+
+ async function fetchWithTimeout(url, options = {}, timeoutMs = UPLOAD_TIMEOUT_MS) {
+ if (typeof AbortController === 'undefined') return fetch(url, options);
+ const controller = new AbortController();
+ const timer = setTimeout(() => controller.abort(), timeoutMs);
+ try {
+  return await fetch(url, { ...options, signal: controller.signal });
+ } catch (err) {
+  if (err?.name === 'AbortError') {
+  const timeoutErr = new Error('upload_timeout');
+  timeoutErr.code = 'upload_timeout';
+  throw timeoutErr;
+  }
+  throw err;
+ } finally {
+  clearTimeout(timer);
+ }
+ }
 
  function setState(newState) {
  state = newState;

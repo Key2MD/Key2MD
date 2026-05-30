@@ -1,13 +1,13 @@
 (function () {
  var PRODUCTS = [
  {
- id: 'casper_class_package',
+ id: 'casper_class',
  area: 'CASPer',
- title: '2-class CASPer sprint',
- price: '$230 upfront',
+ title: 'Final Friday CASPer class',
+ price: '$120',
  href: 'casper-class.html',
- cta: 'Join the 2-class June package',
- bestFor: 'Students aiming for the June 11 CASPer who want the two remaining Friday live reviews before the last June 5 class.',
+ cta: 'Register for the final class',
+ bestFor: 'Students aiming for the June 11 CASPer who want one last live pass through Dan\'s realistic tutoring stations.',
  tags: ['casper', 'uow', 'notre dame', 'class', 'june']
  },
  {
@@ -135,7 +135,7 @@
  var recs = [];
 
  if (/uow|notre|und|casper|q4/.test(text)) {
- addUnique(recs, 'casper_class_package', 'Your latest admissions read is CASPer-sensitive, so live review has high leverage.');
+ addUnique(recs, 'casper_class', 'Your latest admissions read is CASPer-sensitive, so live review has high leverage.');
  addUnique(recs, count >= 5 || avg < 7 ? 'casper_pro' : 'casper_credits', count >= 5 ? 'You are doing enough reps that the daily free cap will slow you down.' : 'Use paid checks only when a response needs scoring.');
  }
 

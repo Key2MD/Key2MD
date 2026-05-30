@@ -1171,7 +1171,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="practice-action-kicker">Friday CASPer classes</div>
  <div class="practice-action-title">Dan's tutoring stations, marked live</div>
  <p class="practice-action-copy">Want your answers to Dan's CASPer tutoring stations marked? The class questions are different from the free bank, more realistic, and designed to show where good-looking answers break under pressure.</p>
- <div class="practice-action-meta"><span class="practice-mini-tag">Fridays 6pm AEST</span><span class="practice-mini-tag">$120 once</span><span class="practice-mini-tag">$230 package</span></div>
+ <div class="practice-action-meta"><span class="practice-mini-tag">Friday 6pm AEST</span><span class="practice-mini-tag">$120 final class</span><span class="practice-mini-tag">Live marking</span></div>
  <button type="button" class="practice-action-btn" data-track="class_checkout_intent" data-track-detail="practice_insights_next" onclick="location.href='casper-class.html?from=practice_next'">Register / Pay</button>
  </article>
  <article class="practice-action-card">
@@ -1839,6 +1839,74 @@ function setMMISubmitBusy(label) {
  btn.setAttribute('aria-busy', 'true');
 }
 
+const MMI_RECORDING_FINALISE_TIMEOUT_MS = 6000;
+const MMI_REVIEW_UPLOAD_TIMEOUT_MS = 4 * 60 * 1000;
+
+function mmiDelay(ms) {
+ return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function mmiBlobReady(blob) {
+ return !!(blob && Number(blob.size) > 0);
+}
+
+function rebuildMMIRecordingBlobsFromChunks() {
+ if(!mmiBlobReady(recordingBlob) && Array.isArray(recordedChunks) && recordedChunks.length) {
+  recordingBlob = new Blob(recordedChunks, { type: mediaRecorder?.mimeType || 'video/webm' });
+ }
+ if(!mmiBlobReady(audioBlob) && Array.isArray(audioChunks) && audioChunks.length) {
+  audioBlob = new Blob(audioChunks, { type: audioRecorder?.mimeType || 'audio/webm' });
+ }
+}
+
+function mmiRecorderStillFinalising() {
+ return !!(
+  (mediaRecorder && mediaRecorder.state !== 'inactive') ||
+  (audioRecorder && audioRecorder.state !== 'inactive')
+ );
+}
+
+async function waitForMMIRecordingReady(options = {}) {
+ const requireVideo = !!options.requireVideo;
+ const audioExpected = !!audioRecorder;
+ const started = Date.now();
+ while(Date.now() - started < MMI_RECORDING_FINALISE_TIMEOUT_MS) {
+  rebuildMMIRecordingBlobsFromChunks();
+  const audioReady = mmiBlobReady(audioBlob);
+  const videoReady = mmiBlobReady(recordingBlob);
+  if(requireVideo ? (videoReady && (!audioExpected || audioReady)) : (audioReady || (!audioExpected && videoReady))) return true;
+  if(!mmiRecorderStillFinalising() && recordedChunks.length === 0 && audioChunks.length === 0) return false;
+  await mmiDelay(150);
+ }
+ rebuildMMIRecordingBlobsFromChunks();
+ return requireVideo ? mmiBlobReady(recordingBlob) : (mmiBlobReady(audioBlob) || mmiBlobReady(recordingBlob));
+}
+
+async function fetchMMIReviewWithTimeout(url, options = {}, timeoutMs = MMI_REVIEW_UPLOAD_TIMEOUT_MS) {
+ if(typeof AbortController === 'undefined') return fetch(url, options);
+ const controller = new AbortController();
+ const timer = setTimeout(() => controller.abort(), timeoutMs);
+ try {
+  return await fetch(url, { ...options, signal: controller.signal });
+ } catch(err) {
+  if(err?.name === 'AbortError') {
+   const timeoutErr = new Error('mmi_upload_timeout');
+   timeoutErr.code = 'mmi_upload_timeout';
+   throw timeoutErr;
+  }
+  throw err;
+ } finally {
+  clearTimeout(timer);
+ }
+}
+
+function mmiUploadErrorMessage(err) {
+ if(err?.code === 'mmi_upload_timeout' || err?.message === 'mmi_upload_timeout') {
+  return 'The upload took longer than expected and was stopped safely. Your browser still has the recording on this page - wait a moment, then try again. If feedback later appears in your history, do not submit this same recording again.';
+ }
+ return 'Upload failed. Check your connection and try again. Your recording is still on this page.';
+}
+
 function mmiRevealNextPrompt() {
  if(mmiPromptsRevealedCount >= mmiCurrentPrompts.length) return;
  const elapsed = (Date.now() - mmiRecordingStartedAt) / 1000;
@@ -1885,18 +1953,11 @@ async function submitMMIForFeedback() {
 
  if(mmiFeedbackUploadInFlight) return;
 
-
- if(!audioBlob && audioRecorder && audioRecorder.state === 'inactive' && audioChunks.length > 0) {
- await new Promise(r => setTimeout(r, 400));
- }
-
-
- if(!recordingBlob && mediaRecorder && mediaRecorder.state === 'inactive' && recordedChunks.length > 0) {
- await new Promise(r => setTimeout(r, 400));
- }
+ setMMISubmitBusy('Finalising recording...');
+ const recordingReady = await waitForMMIRecordingReady({ requireVideo: requireVideoUpload });
 
  const uploadBlob = requireVideoUpload ? recordingBlob : (audioBlob || recordingBlob);
- if(!uploadBlob) {
+ if(!recordingReady || !uploadBlob) {
  MMIFeedbackRender.renderError(feedbackWrap, {
  code: 'no_recording',
  message: requireVideoUpload
@@ -1904,6 +1965,7 @@ async function submitMMIForFeedback() {
  : 'No recording found. Please record your response first.'
  });
  if(sw) sw.style.display = 'block';
+ resetMMISubmitState();
  return;
  }
 
@@ -2000,11 +2062,11 @@ async function submitMMIForFeedback() {
  await new Promise(r => setTimeout(r, 1500 * attempt));
  }
 
- const res = await fetch(API_BASE + '/api/mmi-review', {
- method: 'POST',
- headers: token ? { 'Authorization': `Bearer ${token}` } : {},
- body: buildFormData(),
- });
+  const res = await fetchMMIReviewWithTimeout(API_BASE + '/api/mmi-review', {
+  method: 'POST',
+  headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+  body: buildFormData(),
+  });
 
 
  if(res.status === 401) {
@@ -2055,15 +2117,16 @@ async function submitMMIForFeedback() {
 
  } catch(err) {
  lastError = err.message;
-  if(attempt < MAX_RETRIES) continue;
-  MMIFeedbackRender.renderError(feedbackWrap, { code: 'network_error', message: `Upload failed after ${MAX_RETRIES} attempts. Check your connection and try again.` });
+  MMIFeedbackRender.renderError(feedbackWrap, { code: err.code || 'network_error', message: mmiUploadErrorMessage(err) });
   if(sw) sw.style.display = 'block';
   resetMMISubmitState();
+  return;
   }
  }
 }
 
 function createMMIMockReviewSnapshot() {
+ rebuildMMIRecordingBlobsFromChunks();
  const isPremium = mmiPremiumMode;
  const tier = isPremium ? 'premium' : 'transcript';
  const requireVideoUpload = !!window.K2_ACTIVE_CASPER_MOCK;
@@ -2164,11 +2227,11 @@ function submitMMIMockReviewSilently() {
  let lastError = null;
  for(let attempt = 1; attempt <= 3; attempt++) {
  try {
- if(attempt > 1) await new Promise(r => setTimeout(r, 1500 * attempt));
- const res = await fetch(API_BASE + '/api/mmi-review', {
- method: 'POST',
- headers: token ? { 'Authorization': `Bearer ${token}` } : {},
- body: buildMMIMockFormData(snapshot, frames, visualDegraded),
+  if(attempt > 1) await mmiDelay(1500 * attempt);
+  const res = await fetchMMIReviewWithTimeout(API_BASE + '/api/mmi-review', {
+  method: 'POST',
+  headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+  body: buildMMIMockFormData(snapshot, frames, visualDegraded),
  });
  const data = await res.json().catch(() => ({}));
  if(!res.ok) {
@@ -2183,12 +2246,13 @@ function submitMMIMockReviewSilently() {
  visual_degraded: visualDegraded || !!data.visual_degraded,
  durationSec: snapshot.durationSec,
  stationCategory: snapshot.station.category || '',
- };
- } catch(err) {
- lastError = err.message;
- autoRepairContext.lastError = lastError;
- if(attempt >= 3) throw new Error(lastError || 'Video analysis failed.');
- }
+  };
+  } catch(err) {
+  const transportError = err?.code === 'mmi_upload_timeout' || err?.message === 'mmi_upload_timeout' || err?.name === 'TypeError';
+  lastError = transportError ? mmiUploadErrorMessage(err) : err.message;
+  autoRepairContext.lastError = lastError;
+  throw new Error(lastError || 'Video analysis failed.');
+  }
  }
  throw new Error(lastError || 'Video analysis failed.');
  })();
@@ -3204,6 +3268,13 @@ function applyModeUI(mode) {
 }
 
 function setMode(mode) {
+ const previousMode = currentMode;
+ if(previousMode === MODE_MMI && mode !== MODE_MMI) {
+  clearTimer();
+  if(webcamActive) stopRecording();
+  resetMMISubmitState();
+  if(typeof mmiEngineReset === 'function') mmiEngineReset();
+ }
  currentMode = mode;
  applyModeUI(mode);
 
@@ -3277,6 +3348,9 @@ async function initWebcam(){
 }
 function startRecording(){
  if(!webcamReady||!webcamStream)return;
+ if(webcamActive)return;
+ mediaRecorder=null;
+ audioRecorder=null;
  recordedChunks=[];recordingBlob=null;
  audioChunks=[];audioBlob=null;
  mmiLiveFrameBlobs=[];
@@ -3298,11 +3372,12 @@ function startRecording(){
  const recorderOpts = { ...opts };
  recorderOpts.videoBitsPerSecond = 850000;
  recorderOpts.audioBitsPerSecond = 96000;
- mediaRecorder=new MediaRecorder(webcamStream,recorderOpts);
- mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
- mediaRecorder.onstop=()=>{
+ const videoRecorder = new MediaRecorder(webcamStream,recorderOpts);
+ mediaRecorder=videoRecorder;
+ videoRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
+ videoRecorder.onstop=()=>{
  if(window._elapsedInterval){clearInterval(window._elapsedInterval);window._elapsedInterval=null;}
- recordingBlob=new Blob(recordedChunks,{type:mediaRecorder.mimeType||'video/webm'});
+ recordingBlob=new Blob(recordedChunks,{type:videoRecorder.mimeType||'video/webm'});
  const url=URL.createObjectURL(recordingBlob);
  const pv=$('webcamPlayback');
 
@@ -3328,7 +3403,7 @@ function startRecording(){
 
  if(currentMode===MODE_MMI) mmiOnRecordingStop();
  };
- mediaRecorder.start(1000);
+ videoRecorder.start(1000);
 
  if(currentMode===MODE_MMI){
  try{
@@ -3339,12 +3414,13 @@ function startRecording(){
  ? {mimeType:'audio/webm;codecs=opus'}
  : MediaRecorder.isTypeSupported('audio/webm')
  ? {mimeType:'audio/webm'} : {};
- audioRecorder = new MediaRecorder(audioStream, audioOpts);
- audioRecorder.ondataavailable = e => { if(e.data.size>0) audioChunks.push(e.data); };
- audioRecorder.onstop = () => {
- audioBlob = new Blob(audioChunks, {type: audioRecorder.mimeType || 'audio/webm'});
- };
- audioRecorder.start(1000);
+  const voiceRecorder = new MediaRecorder(audioStream, audioOpts);
+  audioRecorder = voiceRecorder;
+  voiceRecorder.ondataavailable = e => { if(e.data.size>0) audioChunks.push(e.data); };
+  voiceRecorder.onstop = () => {
+  audioBlob = new Blob(audioChunks, {type: voiceRecorder.mimeType || 'audio/webm'});
+  };
+  voiceRecorder.start(1000);
  }
  }catch(e){ console.warn('Audio-only recorder failed, will fall back to video blob:', e); }
  }
@@ -3359,8 +3435,14 @@ function startRecording(){
 function stopRecording(){
  if(window._elapsedInterval){clearInterval(window._elapsedInterval);window._elapsedInterval=null;}
  stopPremiumLiveFrameCapture();
- if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
- if(audioRecorder&&audioRecorder.state!=='inactive')audioRecorder.stop();
+ if(mediaRecorder&&mediaRecorder.state!=='inactive'){
+ try{ if(mediaRecorder.state==='recording') mediaRecorder.requestData(); }catch(e){}
+ mediaRecorder.stop();
+ }
+ if(audioRecorder&&audioRecorder.state!=='inactive'){
+ try{ if(audioRecorder.state==='recording') audioRecorder.requestData(); }catch(e){}
+ audioRecorder.stop();
+ }
  webcamActive=false;
 }
 
