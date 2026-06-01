@@ -2103,8 +2103,9 @@ async function submitMMIForFeedback() {
   return;
   }
 
- const data = await res.json();
- MMIFeedbackRender.render(feedbackWrap, data, {
+  const data = await res.json();
+  recordStationSeen(s, MODE_MMI, data?.score ?? data?.feedback?.score ?? null);
+  MMIFeedbackRender.render(feedbackWrap, data, {
  tier,
  specialistMode: mmiSpecialistMode,
  stationCategory: s.category || '',
@@ -2608,6 +2609,15 @@ function buildWeightedPool(stations) {
 
 let _sessionRecordedIds = new Set();
 let pool=[],currentIdx=0,completed=0,sessionPool=[];
+
+function recordStationSeen(station, mode = currentMode, score = null) {
+ const stationId = getStationHistoryId(station, mode);
+ if (!stationId || _sessionRecordedIds.has(stationId)) return false;
+ _sessionRecordedIds.add(stationId);
+ StationHistory.record(stationId, score);
+ updateLibraryCoverage();
+ return true;
+}
 
 window.pool = pool;
 Object.defineProperty(window,'currentIdx',{get:()=>currentIdx,set:(v)=>{currentIdx=v;},configurable:true});
@@ -3774,6 +3784,7 @@ async function finishStation(){
  saveAnswer();
  }
  setPhaseUI('done');updateBtns();
+ if(isMmi) recordStationSeen(s, MODE_MMI, null);
  if(!isMmi){
  const aiwrap=$('btnGetAIWrap');
  if(aiwrap){
@@ -4128,8 +4139,7 @@ ${h.answer}
  h.aiSaved = true;
  await refreshPracticeLimits(auth);
  recordCompetencyProgress(h.station,fb);
- const _sid = getStationHistoryId(h.station, currentMode);
- if(!_sessionRecordedIds.has(_sid)){_sessionRecordedIds.add(_sid);StationHistory.record(_sid,fb.score);}
+ recordStationSeen(h.station, currentMode, fb.score);
  updateLimitUI();
  updateLibraryCoverage();
  if(pool[currentIdx]) { updateSeenPill(pool[currentIdx]); updateStarBtn(pool[currentIdx]); }
@@ -5821,17 +5831,19 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
  clearTimer();saveAnswer();setPhaseUI('done');
  }
  if(phase==='writing'&&currentMode===MODE_MMI){
- clearTimer();stopRecording();setPhaseUI('done');updateBtns();return;
+ clearTimer();stopRecording();setPhaseUI('done');
+ const _stopH = sessionHistory[currentIdx];
+ if(_stopH && _stopH.station) recordStationSeen(_stopH.station, MODE_MMI, _stopH.score!=null?_stopH.score:null);
+ updateBtns();return;
  }
  if(phase==='done'||phase==='reading'||phase==='reflection'||currentMode===MODE_MMI){
  if(currentMode===MODE_CASPER && !sessionHistory[currentIdx]?.aiSaved) triggerAutoSave(currentIdx);
  const _advH = sessionHistory[currentIdx];
  if(_advH && _advH.station){
- const _advId = getStationHistoryId(_advH.station, currentMode);
- if(!_sessionRecordedIds.has(_advId) && _advH.answer && _advH.answer.length>=50){
- _sessionRecordedIds.add(_advId);
- StationHistory.record(_advId, _advH.score!=null?_advH.score:null);
- }
+ const shouldRecordSeen = currentMode === MODE_MMI
+ ? phase === 'done'
+ : (_advH.answer && _advH.answer.length >= 50);
+ if(shouldRecordSeen) recordStationSeen(_advH.station, currentMode, _advH.score!=null?_advH.score:null);
  }
  answerTextarea.readOnly=false;answerTextarea.classList.remove('locked','flash-expired');
  const _b=$('timeUpBanner');_b.classList.remove('show','open-mode','strict-mode');_b.textContent='';
