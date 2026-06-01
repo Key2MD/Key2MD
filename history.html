@@ -640,7 +640,7 @@ async function loadReviews() {
  }
 
 	 const data = await res.json();
-	 allReviews = data.reviews || [];
+	 allReviews = dedupeReviewHistory(data.reviews || []);
 	 mockAttempts = await loadMockAttempts(token);
 	 mmiReviews = await loadMMIReviews(token);
 	 mockAttempts = await hydrateMockAttemptScores(mockAttempts);
@@ -751,6 +751,42 @@ function extractScore(review) {
  } catch {
  return null;
  }
+}
+
+function reviewHistoryKey(review) {
+ const tool = String(review?.tool || '').toLowerCase();
+ const question = String(review?.question_text || '').toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 650);
+ return `${tool}:${question}`;
+}
+
+function reviewCreatedMs(review) {
+ const t = Date.parse(review?.created_at || '');
+ return Number.isFinite(t) ? t : 0;
+}
+
+function isMarkedReview(review) {
+ return !!(review?.ai_feedback && review.credit_source !== 'saved');
+}
+
+function isSavedDraftReview(review) {
+ return review?.credit_source === 'saved' || !review?.ai_feedback;
+}
+
+function dedupeReviewHistory(reviews) {
+ const rows = [...(reviews || [])].sort((a, b) => reviewCreatedMs(b) - reviewCreatedMs(a));
+ const markedByKey = new Map();
+ rows.forEach(review => {
+ if (!isMarkedReview(review)) return;
+ const key = reviewHistoryKey(review);
+ if (!markedByKey.has(key)) markedByKey.set(key, []);
+ markedByKey.get(key).push(review);
+ });
+ return rows.filter(review => {
+ if (!isSavedDraftReview(review)) return true;
+ const matches = markedByKey.get(reviewHistoryKey(review)) || [];
+ const t = reviewCreatedMs(review);
+ return !matches.some(marked => Math.abs(reviewCreatedMs(marked) - t) <= 60 * 60 * 1000);
+ });
 }
 
 

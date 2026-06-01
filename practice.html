@@ -3891,8 +3891,10 @@ async function autoSaveResponse(saveRequest, options) {
  if (data.id) _savedReviewIds[req.saveKey] = data.id;
  _autoSaveFingerprints[req.saveKey] = fingerprint;
  showSaveToast();
+ return data.id || existingId || null;
  }
  } catch { /* silent - never block the user */ }
+ return null;
 }
 
 function showSaveToast() {
@@ -3982,7 +3984,8 @@ async function runAI(idx){
  return;
  }
 
- await autoSaveResponse(buildAutoSaveRequest(idx));
+ const savedReviewRequest = buildAutoSaveRequest(idx);
+ const savedReviewId = await autoSaveResponse(savedReviewRequest);
 
  const limits = await refreshPracticeLimits(auth) || auth.getLimits();
  const toolLimits = limits?.casper;
@@ -4036,6 +4039,7 @@ ${h.answer}
  messages: [{role:'user',content:p}],
  question_context: stationContext,
  user_response: h.answer,
+ saved_review_id: savedReviewId || (savedReviewRequest ? _savedReviewIds[savedReviewRequest.saveKey] : '') || '',
  mock_exam: !!window.K2_ACTIVE_CASPER_MOCK,
  mock_tier: window.K2_ACTIVE_CASPER_MOCK?.tier || 'transcript',
  };
@@ -4166,7 +4170,8 @@ function getCalibrationQuartile(){
 function showFeedback(score,fb,options){
  if(!fb)return;
  const forceScoreDisclaimer = !!(options && options.forceScoreDisclaimer);
- if(score>=8) triggerConfetti();
+ if(score>=10) triggerPerfectTenCelebration();
+ else if(score>=8) triggerConfetti();
  const qi=getQuartile(score);
  const cal=getCalibrationQuartile();
  const calHtml=cal?`
@@ -5368,6 +5373,119 @@ function triggerConfetti(){
  msg.style.transform='translate(-50%,-60%) scale(1.1)';
  setTimeout(()=>msg.remove(),400);
  },1200);
+}
+
+function triggerPerfectTenCelebration(){
+ if (document.body.dataset.perfectTenActive === '1') return;
+ document.body.dataset.perfectTenActive = '1';
+ const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const canvas=document.createElement('canvas');
+ canvas.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:10040;';
+ document.body.appendChild(canvas);
+ const ctx=canvas.getContext('2d');
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+ const resize=()=>{canvas.width=Math.floor(window.innerWidth*dpr);canvas.height=Math.floor(window.innerHeight*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);};
+ resize();
+ const W=()=>window.innerWidth;
+ const H=()=>window.innerHeight;
+ const COLORS=['#0ea5e9','#22c55e','#f59e0b','#fde68a','#f472b6','#a78bfa','#ffffff','#34d399','#60a5fa'];
+ const pieces=[];
+ const maxPieces=reducedMotion?140:620;
+ const makePiece=(x,y,boost=1,kind='confetti')=>{
+ const angle=Math.random()*Math.PI*2;
+ const speed=(Math.random()*9+4)*boost;
+ pieces.push({
+ x,y,
+ vx:Math.cos(angle)*speed,
+ vy:Math.sin(angle)*speed-(kind==='cannon'?Math.random()*8:0),
+ size:Math.random()*9+3,
+ len:Math.random()*18+6,
+ color:COLORS[Math.floor(Math.random()*COLORS.length)],
+ alpha:1,
+ rot:Math.random()*Math.PI*2,
+ spin:(Math.random()-0.5)*0.28,
+ gravity:0.14+Math.random()*0.16,
+ kind
+ });
+ };
+ const burst=(x,y,count,boost,kind)=>{for(let i=0;i<count&&pieces.length<maxPieces;i++)makePiece(x+(Math.random()-0.5)*60,y+(Math.random()-0.5)*45,boost,kind);};
+ burst(W()*0.5,H()*0.48,reducedMotion?90:230,1.25,'star');
+ if(!reducedMotion){
+ burst(W()*0.16,H()*0.8,120,1.1,'cannon');
+ burst(W()*0.84,H()*0.8,120,1.1,'cannon');
+ setTimeout(()=>burst(W()*0.5,H()*0.2,120,1.4,'star'),280);
+ setTimeout(()=>burst(W()*0.24,H()*0.38,80,1.1,'confetti'),620);
+ setTimeout(()=>burst(W()*0.76,H()*0.38,80,1.1,'confetti'),760);
+ }
+ const overlay=document.createElement('div');
+ overlay.setAttribute('aria-live','polite');
+ overlay.style.cssText=`position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:10050;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;`;
+ overlay.innerHTML=`
+ <div id="perfectTenCard" style="text-align:center;transform:scale(.64);opacity:0;filter:drop-shadow(0 30px 55px rgba(14,165,233,.34));transition:transform .48s cubic-bezier(.18,1.7,.28,1),opacity .28s ease;">
+ <div style="position:relative;display:inline-grid;place-items:center;width:min(340px,78vw);aspect-ratio:1;border-radius:999px;background:radial-gradient(circle at 35% 28%,#fff 0 9%,#fde68a 10% 20%,#22c55e 21% 38%,#0ea5e9 39% 66%,#0a1628 67%);box-shadow:0 0 0 12px rgba(14,165,233,.12),0 0 80px rgba(34,197,94,.42),inset 0 0 40px rgba(255,255,255,.22);">
+ <div style="position:absolute;inset:-16px;border-radius:999px;border:2px solid rgba(253,230,138,.72);animation:k2PerfectSpin 1.8s linear infinite;"></div>
+ <div style="position:absolute;inset:16px;border-radius:999px;border:1px dashed rgba(255,255,255,.44);animation:k2PerfectSpin 2.7s linear reverse infinite;"></div>
+ <div>
+ <div style="font-size:clamp(3.8rem,14vw,7.5rem);font-weight:950;letter-spacing:-.08em;line-height:.86;color:#fff;text-shadow:0 6px 24px rgba(0,0,0,.38);">10<span style="font-size:.38em;letter-spacing:0;color:#fde68a;">/10</span></div>
+ <div style="margin-top:10px;font-size:clamp(.86rem,3.4vw,1.1rem);font-weight:950;letter-spacing:.18em;text-transform:uppercase;color:#fef3c7;">Perfect station</div>
+ </div>
+ </div>
+ <div style="margin:18px auto 0;width:min(520px,86vw);background:rgba(10,22,40,.92);color:#fff;border:1px solid rgba(253,230,138,.34);border-radius:18px;padding:16px 20px;box-shadow:0 22px 60px rgba(10,22,40,.35);">
+ <div style="font-size:1rem;font-weight:900;margin-bottom:4px;">That is the top calibration signal.</div>
+ <div style="font-size:.82rem;line-height:1.55;color:rgba(255,255,255,.76);">Exceptional timed judgement, empathy and structure. Now the target is repeatability.</div>
+ </div>
+ </div>`;
+ document.body.appendChild(overlay);
+ if(!document.getElementById('k2PerfectTenStyle')){
+ const style=document.createElement('style');
+ style.id='k2PerfectTenStyle';
+ style.textContent='@keyframes k2PerfectSpin{to{transform:rotate(360deg)}}';
+ document.head.appendChild(style);
+ }
+ requestAnimationFrame(()=>{const card=document.getElementById('perfectTenCard');if(card){card.style.opacity='1';card.style.transform='scale(1)';}});
+ let frame=0;
+ const total=reducedMotion?150:280;
+ function drawStar(p){
+ const spikes=5,outer=p.size*1.45,inner=p.size*.62;
+ ctx.beginPath();
+ for(let i=0;i<spikes*2;i++){
+ const r=i%2===0?outer:inner;
+ const a=p.rot+i*Math.PI/spikes;
+ const x=Math.cos(a)*r,y=Math.sin(a)*r;
+ if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+ }
+ ctx.closePath();ctx.fill();
+ }
+ function draw(){
+ ctx.clearRect(0,0,W(),H());
+ const cx=W()/2,cy=H()/2;
+ const glowAlpha=Math.max(0,1-frame/total);
+ if(glowAlpha>0){
+ const g=ctx.createRadialGradient(cx,cy,20,cx,cy,Math.max(W(),H())*.62);
+ g.addColorStop(0,`rgba(253,230,138,${0.22*glowAlpha})`);
+ g.addColorStop(.32,`rgba(34,197,94,${0.12*glowAlpha})`);
+ g.addColorStop(1,'rgba(14,165,233,0)');
+ ctx.fillStyle=g;ctx.fillRect(0,0,W(),H());
+ }
+ pieces.forEach(p=>{
+ p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.vx*=.992;p.rot+=p.spin;
+ if(frame>total*.66)p.alpha=Math.max(0,1-(frame-total*.66)/(total*.34));
+ ctx.save();ctx.globalAlpha=p.alpha;ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.color;
+ if(p.kind==='star')drawStar(p);
+ else ctx.fillRect(-p.len/2,-p.size/2,p.len,p.size);
+ ctx.restore();
+ });
+ frame++;
+ if(frame<total)requestAnimationFrame(draw);
+ else{
+ canvas.remove();
+ overlay.style.transition='opacity .32s ease,transform .32s ease';
+ overlay.style.opacity='0';
+ overlay.style.transform='scale(1.03)';
+ setTimeout(()=>{overlay.remove();delete document.body.dataset.perfectTenActive;},360);
+ }
+ }
+ draw();
 }
 
 let lbOpen=false;
