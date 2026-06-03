@@ -1383,7 +1383,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="input-error" id="intlErr" style="margin-bottom:12px;">Please enter your scores above.</div>
  </div>
 
- <button class="calc-btn calc-initial-only" id="calcBtn">Calculate my GAMSAT chances -></button>
+ <button class="calc-btn calc-initial-only" id="calcBtn">Calculate my interview chances -></button>
 
 
  <div class="combo-display" id="comboDisplay">
@@ -2517,9 +2517,9 @@ function setEntryMode(mode) {
  if (intlPanel) intlPanel.hidden = !isIntl;
  const calcBtnEl = document.getElementById('calcBtn');
  if (calcBtnEl) {
- if (isUndergrad) calcBtnEl.textContent = 'Calculate my UCAT chances ->';
+ if (isUndergrad) calcBtnEl.textContent = 'Calculate my interview chances ->';
  else if (isIntl) calcBtnEl.textContent = 'Show my international chances ->';
- else calcBtnEl.textContent = 'Calculate my GAMSAT chances ->';
+ else calcBtnEl.textContent = 'Calculate my interview chances ->';
  }
 }
 
