@@ -17,6 +17,7 @@ window.FullCasperMock = (() => {
  const CASPER_REFLECTION_SECONDS = 30;
  const CASPER_TYPED_SECONDS = 210;
  const MOCK_DRAFT_KEY = 'k2md_full_mock_draft_v1';
+ const FINAL_REPORT_MAX_WAIT_MS = 6 * 60 * 1000;
  const MOCK_PRICES = {
  transcript: { standard: 59, pro: 41, value: 69, video: 20 },
  premium: { standard: 79, pro: 55, value: 97, video: 48 },
@@ -77,6 +78,7 @@ const MOCK_ACCESS_TIMING_KEY = 'k2md_full_mock_access_timing_v1';
  let latestReport = null;
  let draftTimer = null;
  let pendingDraftAnswer = null;
+ let debriefRenderToken = 0;
  let serverCheckpointBusy = false;
  let queuedCheckpointReason = null;
  let lastRescueRecording = null;
@@ -681,13 +683,9 @@ function returnedFromCheckout(tier = config.tier) {
 
  function draftIsFinished(draft) {
  if (!draft) return false;
- const rows = Array.isArray(draft.rows) ? draft.rows : [];
- const sequenceLength = draftSequenceLength(draft);
  return !!draft.completed
  || draft.status === 'completed'
- || draft.phase === 'completed'
- || rows.length >= sequenceLength
- || Number(draft.index || 0) >= sequenceLength;
+ || draft.phase === 'completed';
  }
 
  function draftBelongsToCurrentUser(draft) {
@@ -1681,14 +1679,18 @@ function returnedFromCheckout(tier = config.tier) {
  }
 
  function renderProcessingScreen() {
- const pending = results.filter(r => r.feedbackTask).length;
+ const pending = results.filter(r => r.feedbackTask && !r.feedbackSettled).length;
  return `
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:38px 32px;text-align:center;">
  <div style="width:34px;height:34px;border:3px solid var(--gray200);border-top-color:var(--teal);border-radius:50%;animation:mmi-spin 0.8s linear infinite;margin:0 auto 16px;"></div>
  <div style="font-size:0.72rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:8px;">Building your debrief</div>
  <h2 style="font-size:1.45rem;color:var(--navy);line-height:1.25;margin:0 0 8px;">Analysing the full mock together.</h2>
- <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;max-width:620px;margin:0 auto;">Your station feedback has been submitted in the background. Keep this tab open while the final report pulls together video, typed responses, stamina, and cross-station patterns.</p>
+ <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;max-width:660px;margin:0 auto;">Your station feedback has been submitted in the background. Your station saves are protected; keeping this tab open is best while the final report pulls together video, typed responses, stamina, and cross-station patterns.</p>
  <div style="font-size:0.78rem;color:var(--gray400);margin-top:14px;">${pending} analysis task${pending === 1 ? '' : 's'} finalising</div>
+ <div style="margin-top:20px;display:flex;justify-content:center;">
+ <button type="button" onclick="FullCasperMock.showPartialReportNow()" style="padding:10px 18px;border-radius:50px;border:1px solid var(--gray200);background:#fff;color:var(--navy);font-size:0.84rem;font-weight:850;cursor:pointer;font-family:inherit;">Show available report now</button>
+ </div>
+ <div style="font-size:0.74rem;color:var(--gray400);line-height:1.5;margin:10px auto 0;max-width:520px;">Use this if analysis takes unusually long. Any unfinished station will be clearly flagged so Dan can repair it from admin.</div>
  </div>
  `;
  }
@@ -1853,6 +1855,49 @@ function returnedFromCheckout(tier = config.tier) {
  task,
  new Promise((_, reject) => setTimeout(() => reject(new Error('Background repair timed out.')), 4 * 60 * 1000)),
  ])));
+ }
+
+ function markPendingAnalysesDeferred(message) {
+ const reason = message || 'Analysis is still running. This report is shown with completed analyses so far; Dan can repair unfinished stations from admin.';
+ results.forEach(row => {
+ if (row?.feedbackTask && !row.feedbackSettled) {
+ applyMockFeedbackError(row, new Error(reason));
+ }
+ if (row?.autoRepairTask && mockVideoNeedsAutoRepair(row) && !row.autoRepairError) {
+ row.autoRepairError = reason;
+ }
+ });
+ saveMockDraft({ phase: 'analysis_deferred', analysis_deferred_at: new Date().toISOString() });
+ }
+
+ async function settleFinalAnalysisTasks({ skipWait = false } = {}) {
+ if (skipWait) {
+ markPendingAnalysesDeferred('The report was opened before every analysis task finished. This station is saved; Dan can repair it from admin if needed.');
+ return;
+ }
+ let timedOut = false;
+ const settling = (async () => {
+ await settleMockFeedbackTasks();
+ await settleMockAutoRepairTasks();
+ })();
+ await Promise.race([
+ settling,
+ new Promise(resolve => {
+ setTimeout(() => {
+ timedOut = true;
+ markPendingAnalysesDeferred('Analysis took longer than expected. This report is shown with the completed analyses so far; Dan can repair any unfinished station from admin.');
+ resolve();
+ }, FINAL_REPORT_MAX_WAIT_MS);
+ }),
+ ]);
+ if (timedOut) return;
+ await settling;
+ }
+
+ function showPartialReportNow() {
+ renderDebrief({ skipAnalysisWait: true }).catch(err => {
+ console.warn('Partial mock report failed', err);
+ });
  }
 
  function prepareMockFeedbackTask(row) {
@@ -3126,7 +3171,8 @@ const report = { rows, overallAvg, scoredCount, expectedCount, isPartial: scored
  return report;
  }
 
- async function renderDebrief() {
+ async function renderDebrief(options = {}) {
+ const renderToken = ++debriefRenderToken;
  ensureMockTelemetry('mock_completed');
  addTelemetryEvent('mock_completed');
  stopMockTelemetry();
@@ -3146,8 +3192,8 @@ const report = { rows, overallAvg, scoredCount, expectedCount, isPartial: scored
  area.style.display = 'block';
  area.innerHTML = renderProcessingScreen();
 
- await settleMockFeedbackTasks();
- await settleMockAutoRepairTasks();
+ await settleFinalAnalysisTasks({ skipWait: !!options.skipAnalysisWait });
+ if (renderToken !== debriefRenderToken) return;
 
  const rows = buildRows();
  const typed = rows.filter(r => r.type === 'typed');
@@ -4518,6 +4564,7 @@ function renderPartialReportNotice(rows) {
 	 checkpointMockAttempt,
 	 copyReportSummary,
  printReport,
+ showPartialReportNow,
  skipBreak,
  };
 })();

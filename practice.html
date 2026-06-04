@@ -2325,10 +2325,7 @@ function submitWrittenMockReviewSilently(idx) {
  if(!auth?.isLoggedIn?.()) throw new Error('Sign in required for mock written analysis.');
  const token = auth.getToken();
  const prompt = buildCasperReviewPrompt(station, answer, accessTiming);
- const res = await fetch(`${API_BASE}/api/review/stream`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
- body: JSON.stringify({
+ const requestPayload = {
  tool: 'casper',
  model: 'claude-sonnet-4-6',
  max_tokens: 1500,
@@ -2342,11 +2339,30 @@ function submitWrittenMockReviewSilently(idx) {
  mock_station_order: window.K2_ACTIVE_CASPER_MOCK?.station_order || idx + 1,
  mock_station_id: window.K2_ACTIVE_CASPER_MOCK?.station_id || station.id || '',
  mock_access_timing: accessTiming,
- }),
+ };
+ const shouldRetryMockWrittenError = (err) => {
+ const status = Number(err?.status || 0);
+ if (status && status < 500 && ![408, 425, 429].includes(status)) return false;
+ if (err?.retryable) return true;
+ if (status) return [408, 425, 429, 500, 502, 503, 504, 529].includes(status);
+ return /temporarily busy|unreadable|malformed|invalid json|network|failed to fetch|timeout/i.test(String(err?.message || ''));
+ };
+ const waitForWrittenRetry = (attempt) => new Promise(resolve => {
+ setTimeout(resolve, 900 * attempt + Math.floor(Math.random() * 300));
+ });
+ let lastError = null;
+ for (let attempt = 1; attempt <= 3; attempt += 1) {
+ try {
+ const res = await fetch(`${API_BASE}/api/review/stream`, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+ body: JSON.stringify(requestPayload),
  });
  if(!res.ok) {
  const d = await res.json().catch(() => ({}));
- throw new Error(d.message || d.error || `Written analysis failed (${res.status})`);
+ const err = new Error(d.message || d.error || `Written analysis failed (${res.status})`);
+ err.status = res.status;
+ throw err;
  }
  const reader = res.body.getReader();
  const decoder = new TextDecoder();
@@ -2358,13 +2374,30 @@ function submitWrittenMockReviewSilently(idx) {
  }
  buffer += decoder.decode();
  const cleanJson = extractCleanJsonFromAI(buffer);
- if(!cleanJson) throw new Error('AI returned unreadable written feedback.');
- const fb = JSON.parse(cleanJson);
+ if(!cleanJson) {
+ const err = new Error('AI returned unreadable written feedback.');
+ err.retryable = true;
+ throw err;
+ }
+ let fb;
+ try {
+ fb = JSON.parse(cleanJson);
+ } catch(parseErr) {
+ parseErr.retryable = true;
+ throw parseErr;
+ }
  fb.competencies = normalizeCompetencies(fb.competencies);
  h.score = fb.score;
  h.feedback = fb;
  h.aiSaved = true;
  return { score: fb.score, feedback: fb };
+ } catch(err) {
+ lastError = err;
+ if (attempt >= 3 || !shouldRetryMockWrittenError(err)) throw err;
+ await waitForWrittenRetry(attempt);
+ }
+ }
+ throw lastError || new Error('Written analysis failed.');
  })();
  return {
  kind: 'mock_written_submission',
