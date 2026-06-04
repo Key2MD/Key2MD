@@ -1213,7 +1213,7 @@
       grad.addColorStop(1,'#07111f');
       ctx.fillStyle=grad; ctx.fillRect(0,0,1280,720);
       ctx.fillStyle='rgba(14,165,233,0.18)'; ctx.beginPath(); ctx.arc(640,300,170,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle='#ffffff'; ctx.beginPath(); ctx.moveTo(605,260); ctx.lineTo(605,380); ctx.lineTo(705,320); ctx.close(); ctx.fill();
+      ctx.fillStyle='#ffffff'; ctx.beginPath(); ctx.moveTo(605,260); ctx.lineTo(605,380); ctx.lineTo(705,320); ctx.closePath(); ctx.fill();
       ctx.font='700 36px Inter, system-ui, sans-serif'; ctx.textAlign='center'; ctx.fillText('CASPer mock recording',640,470);
       video.poster=canvas.toDataURL('image/jpeg',0.82);
     }
