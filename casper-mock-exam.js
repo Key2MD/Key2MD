@@ -73,12 +73,14 @@ const MOCK_ACCESS_TIMING_KEY = 'k2md_full_mock_access_timing_v1';
  let transitionTimer = null;
  let transitionActive = false;
  let transitionNextIndex = null;
+ let pendingMediaSafety = null;
  let mockAttemptId = null;
  let savedAttemptId = null;
  let latestReport = null;
  let draftTimer = null;
  let pendingDraftAnswer = null;
  let debriefRenderToken = 0;
+ let mockSafetyAcknowledged = { audio: false, visual: false };
  let serverCheckpointBusy = false;
  let queuedCheckpointReason = null;
  let lastRescueRecording = null;
@@ -809,6 +811,7 @@ function returnedFromCheckout(tier = config.tier) {
  visualMetrics: row.visual_metrics || null,
  visualDegraded: !!row.visual_degraded,
  durationSec: row.duration_sec || null,
+ mediaDiagnostics: row.media_diagnostics || row.mediaDiagnostics || null,
  accessTiming: row.access_timing || row.accessTiming || row.timing?.access_timing || null,
  plannedWritingSec: row.planned_writing_sec || row.plannedWritingSec || row.timing?.planned_writing_sec || null,
  processingError: row.processing_error || null,
@@ -895,10 +898,12 @@ function returnedFromCheckout(tier = config.tier) {
  breakLeft = 0;
  stationToken += 1;
  advancing = false;
+ pendingMediaSafety = null;
  mockAttemptId = null;
  savedAttemptId = null;
  latestReport = null;
  pendingDraftAnswer = null;
+ mockSafetyAcknowledged = { audio: false, visual: false };
  serverCheckpointBusy = false;
  queuedCheckpointReason = null;
  lastRescueRecording = null;
@@ -1608,27 +1613,33 @@ function returnedFromCheckout(tier = config.tier) {
  results = restoredAttempt?.rows ? hydrateResultsFromDraft(restoredAttempt.rows) : [];
  const resumeOrder = Number(mock.current_station_order || results.length + 1 || 1);
  const hasFullSavedSequence = results.length >= sequence.length;
- if (mock.resumed && hasFullSavedSequence) {
- try {
- await saveMockAttempt(results, restoredAttempt?.report || null, 'completed');
- } catch (err) {
- console.warn('Could not close already-complete mock attempt during resume:', err);
- }
- resetMockRuntimeState();
- active = true;
+ let retryFinalTypedRow = null;
+ if (mock.resumed && hasFullSavedSequence && mockRowNeedsFinalTypedRetry(results[sequence.length - 1])) {
+ retryFinalTypedRow = results.pop();
+ sequence[sequence.length - 1].station = retryFinalTypedRow.station || sequence[sequence.length - 1].station || null;
+ } else if (mock.resumed && hasFullSavedSequence) {
+ index = sequence.length;
+ latestReport = restoredAttempt?.report || null;
+ pendingDraftAnswer = null;
+ stationToken = 0;
+ advancing = false;
+ started = true;
+ syncActiveMockContext();
+ startMockTelemetry('mock_resumed_final_report');
+ startDraftMonitor();
+ saveMockDraft({ phase: 'resumed_final_report' });
  setCheckoutState(false);
- await refreshMockPassStatus().catch(() => {});
- renderIdle();
- const status = document.querySelector('.mock-checkout-status');
- if (status) {
- status.textContent = 'That previous mock was already complete, so it has been closed. Start again to use your next unused mock.';
- status.style.display = 'block';
- }
+ byId('casperMockMainArea')?.style.setProperty('display', 'none');
+ launchCurrent();
  return;
  }
- index = hasFullSavedSequence ? sequence.length : Math.max(0, Math.min(resumeOrder - 1, sequence.length - 1));
+ index = retryFinalTypedRow ? sequence.length - 1 : (hasFullSavedSequence ? sequence.length : Math.max(0, Math.min(resumeOrder - 1, sequence.length - 1)));
  latestReport = null;
- pendingDraftAnswer = null;
+ pendingDraftAnswer = retryFinalTypedRow ? {
+ index: sequence.length - 1,
+ type: 'typed',
+ answer: retryFinalTypedRow.answer || '',
+ } : null;
  stationToken = 0;
  advancing = false;
  started = true;
@@ -1747,9 +1758,181 @@ function returnedFromCheckout(tier = config.tier) {
  row.processingError = err?.message || 'Feedback processing failed.';
  }
 
+ function mockRowHasTerminalAnalysis(row) {
+ if (!row) return false;
+ if (row.type === 'video') {
+ return !!(row.feedback || row.transcript || row.processingError || row.processing_error || row.reprocess_error || row.recordingKey || row.recording_key);
+ }
+ return !!(row.feedback || Number.isFinite(scoreValue(row.score ?? row.score10)) || row.processingError || row.processing_error || row.reprocess_error);
+ }
+
+ function mockRowNeedsFinalTypedRetry(row) {
+ return !!(row && row.type === 'typed' && String(row.answer || '').trim().length >= 20 && !mockRowHasTerminalAnalysis(row));
+ }
+
  function hasMockVisualMetrics(row) {
  const value = row?.visualMetrics || row?.visual_metrics || row?.rawFeedback?.visual_metrics;
  return !!(value && typeof value === 'object' && Object.keys(value).length);
+ }
+
+ function mockVideoLocalIndex(row) {
+ const idx = results.filter(item => item?.type === 'video').indexOf(row);
+ return idx >= 0 ? idx + 1 : Number(row?.localIndex || row?.order || 1);
+ }
+
+ function mockMediaDiagnostics(row) {
+ return row?.mediaDiagnostics || row?.media_diagnostics || {};
+ }
+
+ function mockAudioConcern(row) {
+ if (!row || row.type !== 'video') return null;
+ const diag = mockMediaDiagnostics(row);
+ const audio = diag.audio || {};
+ const blobs = diag.blobs || {};
+ const transcript = String(row.transcript || '').trim();
+ const processing = String(row.processingError || row.processing_error || '').trim();
+ const duration = Number(row.durationSec || row.duration_sec || diag.durationSec || 0);
+ const notes = [];
+ let level = 'warn';
+ if (/transcription|whisper|speech|audio|microphone|decode|could not be decoded|no speech/i.test(processing)) {
+ notes.push(processing);
+ level = 'critical';
+ }
+ if (!transcript && row.feedbackSettled && !row.feedback) {
+ notes.push('No usable transcript was created from this recording.');
+ level = 'critical';
+ }
+ if (duration > 0 && duration < 12) {
+ notes.push(`The saved response is very short (${formatTime(Math.max(0, Math.round(duration)))}).`);
+ }
+ if (audio.hasAudioTrack === false) {
+ notes.push('The browser did not report an available microphone track.');
+ level = 'critical';
+ }
+ if (audio.trackEnabled === false || audio.trackMuted === true) {
+ notes.push('The microphone track looked disabled or muted.');
+ level = 'critical';
+ }
+ const maxRms = Number(audio.maxRms || 0);
+ const sampleCount = Number(audio.sampleCount || 0);
+ if (sampleCount >= 6 && maxRms < 0.012 && !audio.monitorError) {
+ notes.push('The microphone signal was extremely low during the answer.');
+ level = 'critical';
+ }
+ const audioBytes = Number(blobs.audioBytes || 0);
+ if (!transcript && audioBytes > 0 && audioBytes < 2048) {
+ notes.push('The audio-only recording file was too small to be reliable.');
+ level = 'critical';
+ }
+ if (!notes.length) return null;
+ return {
+ type: 'audio',
+ level,
+ title: 'Microphone or speech may not have recorded properly',
+ body: 'This station was saved, but the audio signal may not be strong enough for transcript-based feedback. If you continue, the mock can still proceed, but this station may need Dan to repair it from admin.',
+ notes,
+ };
+ }
+
+ function mockVisualConcern(row) {
+ if (!row || row.type !== 'video') return null;
+ const tier = row.tier || config.tier;
+ if (tier !== 'premium') return null;
+ const diag = mockMediaDiagnostics(row);
+ const visual = diag.visual || {};
+ const video = diag.video || {};
+ const notes = [];
+ if (video.hasVideoTrack === false) notes.push('The browser did not report an available camera track.');
+ if (video.trackEnabled === false || video.trackMuted === true) notes.push('The camera track looked disabled or muted.');
+ if (Number(visual.frameCount || 0) < 1) notes.push('No answer-time camera frames were available for premium visual analysis.');
+ if (row.visualDegraded || !hasMockVisualMetrics(row)) notes.push('Premium camera-based visual analysis is unavailable or degraded for this station.');
+ if (!notes.length) return null;
+ return {
+ type: 'visual',
+ level: 'warn',
+ title: 'Premium visual analysis may be limited',
+ body: 'Your answer can still be transcribed and marked, but camera-based presentation feedback needs usable video frames. If your camera is intentionally off, you can continue; just know the premium visual component will be limited.',
+ notes: [...new Set(notes)],
+ };
+ }
+
+ function mockMediaSafetyIssues(row) {
+ const issues = [mockAudioConcern(row), mockVisualConcern(row)].filter(Boolean);
+ return issues.filter(issue => {
+ if (issue.type === 'audio') return !mockSafetyAcknowledged.audio;
+ if (issue.type === 'visual') return !mockSafetyAcknowledged.visual;
+ return true;
+ });
+ }
+
+ function mockMediaSafetySubject(row) {
+ return encodeURIComponent(`Full CASPer Mock video ${mockVideoLocalIndex(row)} recording issue`);
+ }
+
+ function mockMediaSafetyBody(row, issues) {
+ const lines = [
+ 'Hi Dan,',
+ '',
+ `My full CASPer mock showed a recording warning after video ${mockVideoLocalIndex(row)}.`,
+ `Attempt ID: ${savedAttemptId || mockAttemptId || 'unknown'}`,
+ `Recording key: ${row?.recordingKey || row?.recording_key || 'not available'}`,
+ '',
+ 'Warnings:',
+ ...issues.flatMap(issue => [`- ${issue.title}`, ...issue.notes.map(note => `  - ${note}`)]),
+ '',
+ 'Can you please check whether the recording/transcript is usable?',
+ ];
+ return encodeURIComponent(lines.join('\n'));
+ }
+
+ function renderMockMediaSafetyWarning(row, issues, nextIndex) {
+ restoreSubmit();
+ window.K2PracticeBridge?.hardStopSession?.();
+ setStationChrome(false);
+ hideStationReflection();
+ byId('webcamPanel')?.style.setProperty('display', 'none');
+ byId('scenarioCard')?.style.setProperty('display', 'none');
+ renderProgress();
+ const area = ensureMainArea();
+ if (!area) return;
+ const videoNumber = mockVideoLocalIndex(row);
+ const issueCards = issues.map(issue => `
+ <div style="border:1px solid ${issue.type === 'audio' ? '#fecaca' : '#fed7aa'};background:${issue.type === 'audio' ? '#fef2f2' : '#fff7ed'};border-radius:12px;padding:14px 16px;text-align:left;">
+ <div style="font-size:0.72rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;color:${issue.type === 'audio' ? '#b91c1c' : '#c2410c'};margin-bottom:6px;">${issue.type === 'audio' ? 'Audio safety check' : 'Premium visual check'}</div>
+ <div style="font-size:0.95rem;font-weight:900;color:var(--navy);margin-bottom:6px;">${esc(issue.title)}</div>
+ <div style="font-size:0.84rem;color:var(--gray600);line-height:1.55;margin-bottom:10px;">${esc(issue.body)}</div>
+ <ul style="margin:0;padding-left:18px;font-size:0.78rem;color:var(--gray600);line-height:1.55;">${issue.notes.map(note => `<li>${esc(note)}</li>`).join('')}</ul>
+ </div>
+ `).join('');
+ pendingMediaSafety = { nextIndex, completedType: 'video', issueTypes: issues.map(issue => issue.type) };
+ area.style.display = 'block';
+ area.innerHTML = `
+ <div style="background:#fff;border:1px solid #fed7aa;border-radius:16px;padding:32px 30px;">
+ <div style="font-size:0.72rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:#c2410c;margin-bottom:8px;text-align:center;">Recording safety check</div>
+ <h2 style="font-size:1.45rem;color:var(--navy);line-height:1.25;margin:0 0 8px;text-align:center;">Check video ${videoNumber} before continuing.</h2>
+ <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;max-width:680px;margin:0 auto 18px;text-align:center;">The station itself has been saved. This warning is here so you do not reach the end of the mock and only then discover that audio or premium visual feedback was limited.</p>
+ <div style="display:grid;gap:12px;margin:18px auto;max-width:760px;">${issueCards}</div>
+ <div style="display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:18px;">
+ <button type="button" onclick="FullCasperMock.continueAfterMediaSafety()" style="padding:11px 22px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.86rem;font-weight:850;cursor:pointer;font-family:inherit;">Continue mock anyway</button>
+ <a href="mailto:brittainmbbs@gmail.com?subject=${mockMediaSafetySubject(row)}&body=${mockMediaSafetyBody(row, issues)}" style="display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border-radius:50px;border:1px solid rgba(14,165,233,0.28);background:#fff;color:var(--teal3);font-size:0.84rem;font-weight:850;text-decoration:none;">Contact Dan first</a>
+ </div>
+ <div style="font-size:0.74rem;color:var(--gray400);line-height:1.5;margin:12px auto 0;max-width:620px;text-align:center;">If you contact Dan, keep this page open. If you intentionally disabled camera for a premium mock, continuing is fine; the transcript/voice portions can still be used if the microphone recorded clearly.</div>
+ </div>
+ `;
+ }
+
+ function continueAfterMediaSafety() {
+ if (!pendingMediaSafety) return;
+ pendingMediaSafety.issueTypes.forEach(type => {
+ if (type === 'audio') mockSafetyAcknowledged.audio = true;
+ if (type === 'visual') mockSafetyAcknowledged.visual = true;
+ });
+ const nextIndex = pendingMediaSafety.nextIndex;
+ const completedType = pendingMediaSafety.completedType;
+ pendingMediaSafety = null;
+ advancing = true;
+ transitionActive = true;
+ renderStationTransition(nextIndex, completedType);
  }
 
  function mockVideoNeedsAutoRepair(row) {
@@ -1936,6 +2119,7 @@ function returnedFromCheckout(tier = config.tier) {
  voice_metrics: row.voiceMetrics || row.rawFeedback?.voice_metrics || null,
  visual_metrics: row.visualMetrics || row.rawFeedback?.visual_metrics || null,
  visual_degraded: !!(row.visualDegraded || row.rawFeedback?.visual_degraded),
+ media_diagnostics: row.mediaDiagnostics || row.media_diagnostics || null,
  duration_sec: row.durationSec || row.duration_sec || row.rawFeedback?.durationSec || (row.localRescuePending ? 1 : null),
  tier: row.tier || (row.type === 'video' ? config.tier : 'typed'),
  access_timing: row.accessTiming || row.access_timing || row.timing?.access_timing || (row.type === 'typed' ? accessTimingPayload() : null),
@@ -2449,6 +2633,7 @@ function returnedFromCheckout(tier = config.tier) {
  feedbackTask: isVideoSubmission || isWrittenSubmission ? payload.promise : null,
  recordingUrl: isVideoSubmission ? payload.recordingUrl : null,
  durationSec: isVideoSubmission ? payload.durationSec : null,
+ mediaDiagnostics: isVideoSubmission ? payload.mediaDiagnostics || null : null,
  processingError: null,
  autoRepairTask: null,
  autoRepairAttempted: false,
@@ -2473,7 +2658,17 @@ function returnedFromCheckout(tier = config.tier) {
  if (submittedRow.feedbackTask) {
  const feedbackTask = prepareMockFeedbackTask(submittedRow);
  if (submittedRow.type === 'typed') {
+ const isFinalStation = index >= sequence.length - 1;
+ if (isFinalStation) {
+ renderStationSaving(item.type);
+ try {
+ await withAnalysisTimeout(feedbackTask, submittedRow);
+ } catch (err) {
+ applyMockFeedbackError(submittedRow, err);
+ }
+ } else {
  feedbackTask.catch(() => {});
+ }
  } else {
  renderStationSaving(item.type);
  try {
@@ -2514,6 +2709,15 @@ function returnedFromCheckout(tier = config.tier) {
  }
 
  const nextIndex = index + 1;
+ if (submittedRow.type === 'video') {
+ const safetyIssues = mockMediaSafetyIssues(submittedRow);
+ if (safetyIssues.length) {
+ advancing = false;
+ transitionActive = false;
+ renderMockMediaSafetyWarning(submittedRow, safetyIssues, nextIndex);
+ return;
+ }
+ }
  renderStationTransition(nextIndex, item.type);
  }
 
@@ -4553,6 +4757,7 @@ function renderPartialReportNotice(rows) {
  discardDraft,
  proceedAfterRules,
  continueAfterStation,
+ continueAfterMediaSafety,
  enableCameraAndStartVideoStation,
 	 requestManualReview,
 	 showReviewStation,
