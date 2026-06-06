@@ -95,8 +95,8 @@
  <h2 class="section-h2">Pay once, access privately.</h2>
  <div class="benefit-list">
  <div class="benefit"><strong>Create or log into Key2MD</strong><span>This protects the Zoom link and ties your registration to your account.</span></div>
- <div class="benefit"><strong>Pay securely through Stripe</strong><span>Your registration is confirmed automatically and visible in your account.</span></div>
- <div class="benefit"><strong>Return here before the session</strong><span>Dan pastes the Zoom link in the admin backend and it appears here for registered students at the release time.</span></div>
+ <div class="benefit"><strong>Pay securely through Stripe</strong><span>Your registration is confirmed automatically and you will receive a confirmation email from Key2MD.</span></div>
+ <div class="benefit"><strong>Return here before the session</strong><span>The protected access page, where the Zoom link appears, is emailed again shortly before the session. Dan pastes the Zoom link in the admin backend and it appears here for registered students at the release time.</span></div>
  </div>
  </section>
 
@@ -120,7 +120,7 @@
  <button class="secondary-action" id="mcSignupBtn" onclick="openMasterclassAuth('signup')">Create free account</button>
  <button class="secondary-action" onclick="refreshMasterclassStatus()">Refresh access</button>
  </div>
- <p style="font-size:.76rem;color:var(--muted);line-height:1.5;margin:14px 0 0;">The exact time will be set around interview release dates. Once it is locked in, this page and your protected access state update from the admin backend.</p>
+ <p style="font-size:.76rem;color:var(--muted);line-height:1.5;margin:14px 0 0;">After payment, you will receive a confirmation email from dan@key2md.net. The protected access page, where the Zoom link appears, will be emailed again shortly before the session. Safelist dan@key2md.net and brittainmbbs@gmail.com.</p>
  </div>
  </aside>
  </div>
@@ -164,12 +164,12 @@
  login.style.display='none'; signup.style.display='none'; pay.style.display='flex';
  if(data.has_access){
  pay.style.display='none';
- if(data.join_url){ linkBox.style.display='block'; document.getElementById('mcJoinLink').href=data.join_url; setStatus('You are registered. The Zoom link is ready below.','ok'); }
- else setStatus('You are registered. The Zoom link will appear here at the release time once Dan has pasted it.','ok');
+ if(data.join_url){ linkBox.style.display='block'; document.getElementById('mcJoinLink').href=data.join_url; setStatus('You are registered. The Zoom link is ready below. A reminder email is also sent before the session.','ok'); }
+ else setStatus('You are registered. A confirmation email has been sent; the protected access page where the Zoom link appears will also be emailed again shortly before the session. The Zoom link appears here at the release time once Dan has pasted it.','ok');
  } else {
  pay.disabled = mc.status !== 'open';
  pay.textContent = mc.status === 'open' ? `Pay $${MASTERCLASS_PRICE} and register` : 'Registration closed';
- setStatus(mc.status === 'open' ? 'Registration is open. Payment is handled securely by Stripe.' : 'Registration is currently closed.', mc.status === 'open' ? '' : 'warn');
+ setStatus(mc.status === 'open' ? 'Registration is open. Payment is handled securely by Stripe. After payment, you will receive a confirmation email and the protected access page where the Zoom link appears is emailed again before the session.' : 'Registration is currently closed.', mc.status === 'open' ? '' : 'warn');
  }
  }catch(e){ setStatus('Could not check your access. Try refreshing.','err'); }
  }

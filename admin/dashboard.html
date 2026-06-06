@@ -17,7 +17,7 @@
  --amber:#fbbf24; --amber-dim:rgba(251,191,36,0.12); --amber-border:rgba(251,191,36,0.22);
  --red:#f87171; --red-dim:rgba(248,113,113,0.12); --red-border:rgba(248,113,113,0.22);
  --purple:#a78bfa; --purple-dim:rgba(167,139,250,0.12);
- --sidebar:220px; --radius:12px; --font:'Inter',ui-sans-serif,system-ui,sans-serif;
+ --sidebar:252px; --radius:12px; --font:'Inter',ui-sans-serif,system-ui,sans-serif;
  }
  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
  html{font-size:14px;}
@@ -77,29 +77,42 @@
  .sidebar-logo-text span{color:var(--blue);}
  .sidebar-admin{font-size:0.68rem;color:var(--muted2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
- .sidebar-section{padding:16px 10px 6px;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);margin-top:4px;}
+ .sidebar-quick{padding:12px 10px 10px;border-bottom:1px solid var(--border);}
+ .nav-helper{font-size:0.66rem;color:var(--muted2);line-height:1.35;padding:0 2px 2px;}
+ .sidebar-nav{padding:8px 0 12px;}
+ .sidebar-section{padding:14px 12px 5px;font-size:0.6rem;font-weight:850;letter-spacing:0.11em;text-transform:uppercase;color:var(--muted2);margin-top:2px;}
  .nav-item{
- display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;
+ display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;min-height:40px;
  font-size:0.82rem;font-weight:600;color:var(--muted);cursor:pointer;
  transition:all 0.15s;margin:1px 8px;border:none;background:none;width:calc(100% - 16px);
  text-align:left;position:relative;
  }
  .nav-item:hover{background:var(--surface2);color:var(--text);}
  .nav-item.active{background:var(--blue-dim);color:var(--blue);}
- .nav-item .icon{width:18px;text-align:center;font-size:0.9rem;flex-shrink:0;}
+ .nav-item .icon{width:28px;height:24px;border-radius:8px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.62rem;font-weight:900;letter-spacing:0.01em;flex-shrink:0;background:rgba(255,255,255,0.055);border:1px solid rgba(255,255,255,0.07);color:var(--muted);}
+ .nav-item:hover .icon{color:var(--text);border-color:var(--border2);}
+ .nav-item.active .icon{background:var(--blue);border-color:var(--blue);color:#03111f;}
+ .nav-text{min-width:0;display:flex;flex-direction:column;gap:1px;line-height:1.15;}
+ .nav-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .nav-note{font-size:0.65rem;font-weight:650;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .nav-item.active .nav-note{color:rgba(125,211,252,0.82);}
  .nav-badge{
  margin-left:auto;min-width:18px;height:18px;border-radius:9px;
  background:var(--red);color:#fff;font-size:0.62rem;font-weight:800;
  display:none;align-items:center;justify-content:center;padding:0 5px;
  }
  .nav-badge.show{display:flex;}
- .nav-details{margin:2px 8px 0;}
- .nav-details summary{list-style:none;cursor:pointer;padding:8px 12px;border-radius:9px;color:var(--muted2);font-size:0.74rem;font-weight:800;display:flex;align-items:center;justify-content:space-between;}
+ .nav-details{margin:5px 8px 0;border:1px solid transparent;border-radius:12px;}
+ .nav-details[open]{background:rgba(255,255,255,0.018);border-color:rgba(255,255,255,0.045);padding-bottom:4px;}
+ .nav-details summary{list-style:none;cursor:pointer;padding:9px 10px;border-radius:10px;color:var(--muted);font-size:0.75rem;font-weight:850;display:flex;align-items:center;justify-content:space-between;gap:8px;}
  .nav-details summary::-webkit-details-marker{display:none;}
  .nav-details summary:hover{background:var(--surface2);color:var(--muted);}
- .nav-details summary::after{content:'+';font-size:0.82rem;color:var(--muted2);}
+ .nav-details summary::after{content:'+';font-size:0.86rem;color:var(--muted2);flex-shrink:0;}
  .nav-details[open] summary::after{content:'-';}
- .nav-details .nav-item{margin-left:0;margin-right:0;width:100%;font-size:0.76rem;padding-left:14px;}
+ .nav-summary-text{min-width:0;display:flex;flex-direction:column;gap:1px;}
+ .nav-summary-text span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .nav-summary-text small{font-size:0.62rem;color:var(--muted2);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ .nav-details .nav-item{margin-left:5px;margin-right:5px;width:calc(100% - 10px);font-size:0.76rem;padding-left:8px;}
  .nav-item.compact{font-size:0.78rem;}
 
  .sidebar-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid var(--border);}
@@ -108,6 +121,9 @@
  .btn-command{width:100%;margin-bottom:8px;padding:10px 11px;border-radius:10px;border:1px solid rgba(56,189,248,0.28);background:rgba(56,189,248,0.08);color:var(--text);font-size:0.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:all 0.18s;}
  .btn-command:hover{border-color:rgba(56,189,248,0.55);background:rgba(56,189,248,0.14);}
  .btn-command kbd{font-size:0.62rem;color:var(--muted);border:1px solid var(--border2);border-radius:5px;padding:2px 5px;background:rgba(255,255,255,0.04);}
+ .btn-privacy{width:100%;margin:0 0 8px;padding:10px 11px;border-radius:10px;border:1px solid var(--amber-border);background:var(--amber-dim);color:var(--amber);font-size:0.78rem;font-weight:800;cursor:pointer;text-align:left;transition:all 0.18s;}
+ .btn-privacy:hover{background:rgba(251,191,36,0.18);}
+ .btn-privacy.on{border-color:var(--green-border);background:var(--green-dim);color:var(--green);}
 
  /* == MAIN CONTENT == */
  .main{flex:1;overflow-y:auto;min-width:0;}
@@ -118,6 +134,14 @@
  .page.active{display:block;}
  .page-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
  .refresh-note{font-size:0.72rem;color:var(--muted2);white-space:nowrap;}
+ .privacy-banner{display:none;margin:18px 24px 0;padding:12px 14px;border:1px solid var(--green-border);border-radius:12px;background:var(--green-dim);color:var(--green);font-size:0.82rem;font-weight:750;align-items:center;justify-content:space-between;gap:12px;}
+ .privacy-safe-card{display:none;margin:0 0 18px;padding:18px 20px;border:1px dashed var(--green-border);border-radius:var(--radius);background:rgba(74,222,128,0.07);color:var(--muted);font-size:0.86rem;line-height:1.5;}
+ body.privacy-mode .privacy-banner{display:flex;}
+ body.privacy-mode .privacy-safe-card{display:block;}
+ body.privacy-mode .private-only,
+ body.privacy-mode .sensitive-internal{display:none!important;}
+ body.privacy-mode .spend{font-size:0!important;}
+ body.privacy-mode .spend::after{content:'hidden';font-size:0.74rem;color:var(--muted2);font-weight:800;text-transform:uppercase;letter-spacing:0.04em;}
 
  /* == STATS GRID == */
  .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:18px;}
@@ -750,51 +774,75 @@
  <div class="sidebar-admin" id="sidebarAdmin">-</div>
  </div>
 
- <div class="sidebar-section">Overview</div>
- <button class="nav-item active" data-page="dashboard" onclick="nav('dashboard')"><span class="icon"></span> Command</button>
+ <div class="sidebar-quick">
+ <button class="btn-command" onclick="openCommandPalette()">Search dashboard <kbd>Ctrl K</kbd></button>
+ <div class="nav-helper">Find a student, mock, payment, enquiry, or page.</div>
+ </div>
 
- <div class="sidebar-section">Work Queues</div>
- <button class="nav-item" data-page="growth" onclick="nav('growth')"><span class="icon">$</span> Growth Command <span class="nav-badge" id="growthBadge">0</span></button>
- <button class="nav-item" data-page="inbox" onclick="nav('inbox')"><span class="icon"></span> Inbox <span class="nav-badge" id="inboxBadge">0</span></button>
- <button class="nav-item" data-page="mocks" onclick="nav('mocks')"><span class="icon">M</span> Mock Exams <span class="nav-badge" id="mockBadge">0</span></button>
- <button class="nav-item" data-page="sharing" onclick="nav('sharing')"><span class="icon">ID</span> Sharing Watchlist <span class="nav-badge" id="sharingBadge">0</span></button>
+ <nav class="sidebar-nav" aria-label="Admin navigation">
+ <div class="sidebar-section">Today</div>
+ <button class="nav-item active" data-page="dashboard" onclick="nav('dashboard')" title="Daily priorities and dashboard health"><span class="icon">CC</span><span class="nav-text"><span class="nav-title">Command Center</span><span class="nav-note">daily priorities</span></span></button>
+ <button class="nav-item" data-page="inbox" onclick="nav('inbox')" title="Unread student conversations"><span class="icon">IN</span><span class="nav-text"><span class="nav-title">Inbox</span><span class="nav-note">student replies</span></span><span class="nav-badge" id="inboxBadge">0</span></button>
+ <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')" title="Website contact form submissions"><span class="icon">EQ</span><span class="nav-text"><span class="nav-title">Enquiries</span><span class="nav-note">new leads and bugs</span></span><span class="nav-badge" id="enqBadge">0</span></button>
+ <button class="nav-item" data-page="mocks" onclick="nav('mocks')" title="Full CASPer mock exams and manual review queue"><span class="icon">MO</span><span class="nav-text"><span class="nav-title">Mock Exams</span><span class="nav-note">saved attempts</span></span><span class="nav-badge" id="mockBadge">0</span></button>
+ <button class="nav-item" data-page="growth" onclick="nav('growth')" title="Growth workspace with warm leads, retention, and checkout recovery"><span class="icon">GR</span><span class="nav-text"><span class="nav-title">Growth Command</span><span class="nav-note">sales follow-up</span></span><span class="nav-badge" id="growthBadge">0</span></button>
 
- <div class="sidebar-section">Students</div>
- <button class="nav-item" data-page="users" onclick="nav('users')"><span class="icon"></span> Users</button>
- <button class="nav-item" data-page="reviews" onclick="nav('reviews')"><span class="icon"></span> CASPer Reviews</button>
- <button class="nav-item" data-page="s2" onclick="nav('s2')"><span class="icon">S2</span> S2 Essays <span class="nav-badge" id="s2Badge">0</span></button>
- <button class="nav-item" data-page="mmi" onclick="nav('mmi')"><span class="icon"></span> MMI Reviews <span class="nav-badge" id="mmiBadge">0</span></button>
- <button class="nav-item" data-page="timeline" onclick="nav('timeline')"><span class="icon">T</span> Timeline</button>
-
- <div class="sidebar-section">Comms</div>
- <button class="nav-item" data-page="enquiries" onclick="nav('enquiries')"><span class="icon"></span> Enquiries <span class="nav-badge" id="enqBadge">0</span></button>
- <button class="nav-item" data-page="broadcast" onclick="nav('broadcast')"><span class="icon"></span> Broadcast</button>
- <button class="nav-item" data-page="class" onclick="nav('class')"><span class="icon">C</span> CASPer Class</button>
- <button class="nav-item" data-page="masterclasses" onclick="nav('masterclasses')"><span class="icon">MC</span> Masterclasses</button>
- <button class="nav-item" data-page="subscribers" onclick="nav('subscribers')"><span class="icon"></span> Subscribers</button>
-
- <div class="sidebar-section">Reports</div>
- <button class="nav-item" data-page="revenue" onclick="nav('revenue')"><span class="icon"></span> Revenue</button>
- <button class="nav-item" data-page="monitoring" onclick="nav('monitoring')"><span class="icon"></span> Monitoring</button>
- <details class="nav-details">
- <summary>Growth reports</summary>
- <button class="nav-item compact" data-page="actions" onclick="nav('actions')"><span class="icon">!</span> Next Actions</button>
- <button class="nav-item compact" data-page="warmleads" onclick="nav('warmleads')"><span class="icon">$</span> Warm Leads <span class="nav-badge" id="warmLeadBadge">0</span></button>
- <button class="nav-item compact" data-page="pipeline" onclick="nav('pipeline')"><span class="icon">P</span> Pipeline</button>
- <button class="nav-item compact" data-page="outreach" onclick="nav('outreach')"><span class="icon">ROI</span> Outreach ROI</button>
- <button class="nav-item compact" data-page="funnel" onclick="nav('funnel')"><span class="icon">F</span> Product Funnel</button>
- <button class="nav-item compact" data-page="abandoned" onclick="nav('abandoned')"><span class="icon">A</span> Abandoned</button>
- <button class="nav-item compact" data-page="retention" onclick="nav('retention')"><span class="icon">R</span> Retention</button>
+ <details class="nav-details" open>
+ <summary><span class="nav-summary-text"><span>Review Queues</span><small>AI feedback work</small></span></summary>
+ <button class="nav-item compact" data-page="reviews" onclick="nav('reviews')" title="Typed CASPer AI reviews"><span class="icon">CA</span><span class="nav-text"><span class="nav-title">CASPer AI Reviews</span></span></button>
+ <button class="nav-item compact" data-page="mmi" onclick="nav('mmi')" title="MMI AI reviews and recording history"><span class="icon">MM</span><span class="nav-text"><span class="nav-title">MMI Reviews</span></span><span class="nav-badge" id="mmiBadge">0</span></button>
+ <button class="nav-item compact" data-page="s2" onclick="nav('s2')" title="GAMSAT Section 2 essay reviews"><span class="icon">S2</span><span class="nav-text"><span class="nav-title">S2 Essays</span></span><span class="nav-badge" id="s2Badge">0</span></button>
  </details>
 
+ <details class="nav-details">
+ <summary><span class="nav-summary-text"><span>Students</span><small>accounts and history</small></span></summary>
+ <button class="nav-item compact" data-page="users" onclick="nav('users')" title="Student accounts, credits, subscriptions, and admin actions"><span class="icon">US</span><span class="nav-text"><span class="nav-title">Student Accounts</span></span></button>
+ <button class="nav-item compact" data-page="timeline" onclick="nav('timeline')" title="One-student timeline across reviews, payments, and messages"><span class="icon">TL</span><span class="nav-text"><span class="nav-title">Student Timeline</span></span></button>
+ <button class="nav-item compact" data-page="sharing" onclick="nav('sharing')" title="Possible duplicate-account or account-sharing signals"><span class="icon">ID</span><span class="nav-text"><span class="nav-title">Sharing Watchlist</span></span><span class="nav-badge" id="sharingBadge">0</span></button>
+ </details>
+
+ <details class="nav-details">
+ <summary><span class="nav-summary-text"><span>Growth & Sales</span><small>follow-up and funnel</small></span></summary>
+ <button class="nav-item compact" data-page="actions" onclick="nav('actions')" title="Prioritised growth and student-success action list"><span class="icon">NX</span><span class="nav-text"><span class="nav-title">Next Actions</span></span></button>
+ <button class="nav-item compact" data-page="warmleads" onclick="nav('warmleads')" title="Recently active non-paying students"><span class="icon">WL</span><span class="nav-text"><span class="nav-title">Warm Leads</span></span><span class="nav-badge" id="warmLeadBadge">0</span></button>
+ <button class="nav-item compact" data-page="pipeline" onclick="nav('pipeline')" title="Lead pipeline board"><span class="icon">PI</span><span class="nav-text"><span class="nav-title">Pipeline</span></span></button>
+ <button class="nav-item compact" data-page="abandoned" onclick="nav('abandoned')" title="Expired Stripe checkout sessions and recovery notes"><span class="icon">AB</span><span class="nav-text"><span class="nav-title">Abandoned Checkouts</span></span></button>
+ <button class="nav-item compact" data-page="funnel" onclick="nav('funnel')" title="Product views, checkout starts, purchases, and tracking health"><span class="icon">FN</span><span class="nav-text"><span class="nav-title">Product Funnel</span></span></button>
+ <button class="nav-item compact" data-page="retention" onclick="nav('retention')" title="Paid students who may need a useful nudge"><span class="icon">RT</span><span class="nav-text"><span class="nav-title">Retention Risk</span></span></button>
+ <button class="nav-item compact" data-page="outreach" onclick="nav('outreach')" title="Who buys after emails, warm-lead notes, and broadcasts"><span class="icon">ROI</span><span class="nav-text"><span class="nav-title">Outreach ROI</span></span></button>
+ </details>
+
+ <details class="nav-details">
+ <summary><span class="nav-summary-text"><span>Messaging</span><small>broadcasts and lists</small></span></summary>
+ <button class="nav-item compact" data-page="broadcast" onclick="nav('broadcast')" title="Send segmented emails"><span class="icon">BC</span><span class="nav-text"><span class="nav-title">Broadcast</span></span></button>
+ <button class="nav-item compact" data-page="subscribers" onclick="nav('subscribers')" title="Newsletter and subscriber list"><span class="icon">NL</span><span class="nav-text"><span class="nav-title">Subscribers</span></span></button>
+ </details>
+
+ <details class="nav-details">
+ <summary><span class="nav-summary-text"><span>Classes & Events</span><small>links and access</small></span></summary>
+ <button class="nav-item compact" data-page="class" onclick="nav('class')" title="CASPer class access, passes, and Zoom link"><span class="icon">CL</span><span class="nav-text"><span class="nav-title">CASPer Class</span></span></button>
+ <button class="nav-item compact" data-page="masterclasses" onclick="nav('masterclasses')" title="CASPer/MMI masterclass gates and student access"><span class="icon">MC</span><span class="nav-text"><span class="nav-title">Masterclasses</span></span></button>
+ </details>
+
+ <details class="nav-details private-only">
+ <summary><span class="nav-summary-text"><span>Private Ops</span><small>money and system cost</small></span></summary>
+ <button class="nav-item compact" data-page="revenue" onclick="nav('revenue')" title="Payment and revenue records"><span class="icon">$</span><span class="nav-text"><span class="nav-title">Revenue</span></span></button>
+ <button class="nav-item compact" data-page="monitoring" onclick="nav('monitoring')" title="AI failures, transcription errors, COGS, and founding member slots"><span class="icon">CO</span><span class="nav-text"><span class="nav-title">Monitoring</span></span></button>
+ </details>
+ </nav>
+
  <div class="sidebar-bottom">
- <button class="btn-command" onclick="openCommandPalette()">Quick search <kbd>Ctrl K</kbd></button>
+ <button class="btn-privacy" id="privacyModeBtn" onclick="togglePrivacyMode()">Screen-share mode: off</button>
  <button class="btn-logout" onclick="doLogout()">Log out</button>
  </div>
  </aside>
 
  <!-- MAIN -->
  <main class="main">
+ <div class="privacy-banner" id="privacyBanner">
+ <span>Screen-share mode is on. Private finance, COGS, spend, and internal growth context are hidden.</span>
+ <button class="btn" onclick="togglePrivacyMode()">Turn off</button>
+ </div>
 
  <!-- -- DASHBOARD -- -->
  <div id="pageDashboard" class="page active">
@@ -808,7 +856,8 @@
  <button class="btn blue" onclick="refreshAll()">Refresh all</button>
  </div>
  </div>
- <div class="command-card">
+ <div class="privacy-safe-card">Screen-share mode is hiding dashboard-level business, growth, and finance details. Turn it off when you are working privately.</div>
+ <div class="command-card sensitive-internal">
  <div>
  <div class="command-kicker">Today at a glance</div>
  <div class="command-title" id="dashHeadline">Loading platform health...</div>
@@ -822,8 +871,8 @@
  <button class="btn amber" onclick="nav('inbox')">Open inbox</button>
  </div>
  </div>
- <div class="focus-grid" id="dashFocusGrid"></div>
- <details class="dash-totals">
+ <div class="focus-grid sensitive-internal" id="dashFocusGrid"></div>
+ <details class="dash-totals sensitive-internal">
  <summary>Platform totals and slower-moving metrics</summary>
  <div class="stats-grid" id="dashStats">
  <div class="stat"><div class="stat-label">Total Users</div><div class="stat-val" id="dUsers">-</div><div class="stat-sub" id="dUsersSub">registered</div></div>
@@ -843,7 +892,7 @@
  <div class="stat amber"><div class="stat-label">Inbox</div><div class="stat-val" id="dUnread">-</div><div class="stat-sub">unread conversations</div></div>
  </div>
  </details>
- <div class="ops-grid">
+ <div class="ops-grid sensitive-internal">
  <div class="ops-card">
  <div class="dash-card-title">Daily Action Queue <span class="badge badge-default" id="dashQueueCount">-</span></div>
  <div class="queue-toolbar">
@@ -865,7 +914,7 @@
  <div class="insight-grid" id="dashInsights"></div>
  </div>
  </div>
- <div class="dash-grid">
+ <div class="dash-grid sensitive-internal">
  <div class="dash-card">
  <div class="dash-card-title">Recent Activity</div>
  <div class="dash-list" id="dashActivity"><div style="color:var(--muted2);font-size:0.8rem;">Loading...</div></div>
@@ -875,7 +924,7 @@
  <div class="dash-list" id="dashReviewQuality"><div style="color:var(--muted2);font-size:0.8rem;">Loading...</div></div>
  </div>
  </div>
- <div class="dash-grid">
+ <div class="dash-grid sensitive-internal">
  <div class="dash-card">
  <div class="dash-card-title">Recent Enquiries <button class="btn" style="font-size:0.68rem;padding:3px 8px;" onclick="nav('enquiries')">View all</button></div>
  <div class="dash-list" id="dashRecentEnq"><div style="color:var(--muted2);font-size:0.8rem;">Loading...</div></div>
@@ -1003,9 +1052,9 @@
  <select class="ctrl-sel" id="s2Limit" onchange="loadS2Reviews()">
  <option value="50">50 rows</option>
  <option value="100">100 rows</option>
- <option value="250">250 rows</option>
+ <option value="250" selected>250 rows</option>
  <option value="1000">1,000 rows</option>
- <option value="5000" selected>All rows</option>
+ <option value="5000">All rows</option>
  </select>
  <button class="btn" onclick="loadS2Reviews()">Refresh</button>
  <button class="btn" onclick="exportCsv('s2')">Download CSV</button>
@@ -1055,9 +1104,9 @@
  <select class="ctrl-sel" id="usrLimit" onchange="loadUsers()">
  <option value="50">50 rows</option>
  <option value="100">100 rows</option>
- <option value="250">250 rows</option>
+ <option value="250" selected>250 rows</option>
  <option value="1000">1,000 rows</option>
- <option value="5000" selected>All rows</option>
+ <option value="5000">All rows</option>
  </select>
  <button class="btn" onclick="loadUsers()">Refresh</button>
  <button class="btn" onclick="exportCsv('users')">Download CSV</button>
@@ -1398,8 +1447,9 @@
  <select class="ctrl-sel" id="enqLimit" onchange="loadEnquiries()">
  <option value="50">50 rows</option>
  <option value="100">100 rows</option>
+ <option value="250" selected>250 rows</option>
  <option value="1000">1,000 rows</option>
- <option value="5000" selected>All rows</option>
+ <option value="5000">All rows</option>
  </select>
  <button class="btn" onclick="loadEnquiries()">Refresh</button>
  </div>
@@ -1701,66 +1751,119 @@
  <div class="page-header">
  <div>
  <div class="page-title">Masterclasses</div>
- <div class="page-sub">Paid CASPer/MMI masterclass registration gates. Paste Zoom links here; registered students see them on the protected pages at the release time.</div>
+ <div class="page-sub">Paid CASPer/MMI masterclass registration gates. Paste Zoom links here; paid or manually authorised students see the protected access page at the release time.</div>
  </div>
  <div class="page-actions">
  <span class="refresh-note" id="mcStatus">Not loaded</span>
- <button class="btn blue" onclick="reconcileMasterclasses()">Recover Stripe masterclass payments</button>
+ <button class="btn blue" onclick="reconcileMasterclasses()">Sync Stripe masterclass payments</button>
  <button class="btn" onclick="loadMasterclasses()">Refresh</button>
  </div>
  </div>
 
- <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:18px;align-items:start;">
- <div class="bc-card" style="max-width:100%;" data-masterclass-card="casper">
- <div class="bc-title">CASPer Masterclass</div>
- <div class="bc-sub">June 11, 12pm. Students register at casper-masterclass.html.</div>
- <div class="form-row"><label class="form-lbl">Title</label><input class="form-in" id="mc_casper_title" type="text"></div>
- <div class="form-row"><label class="form-lbl">Masterclass ID</label><input class="form-in" id="mc_casper_class_id" type="text"><div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">Use a new ID if you run a new masterclass later.</div></div>
- <div class="form-row"><label class="form-lbl">Date/time label</label><input class="form-in" id="mc_casper_starts_at" type="text"></div>
- <div class="form-row"><label class="form-lbl">Show link from</label><input class="form-in" id="mc_casper_link_available_at" type="datetime-local"></div>
- <div class="form-row"><label class="form-lbl">Hide link after</label><input class="form-in" id="mc_casper_expires_at" type="datetime-local"></div>
- <div class="form-row"><label class="form-lbl">Private Zoom/Meet link</label><input class="form-in" id="mc_casper_join_url" type="url" placeholder="https://zoom.us/j/..."></div>
- <div class="form-row"><label class="form-lbl">Auto-email access page at</label><input class="form-in" id="mc_casper_auto_email_at" type="datetime-local"></div>
- <div class="form-row"><label class="form-lbl">Automatic email</label><select class="form-sel" id="mc_casper_auto_email_enabled"><option value="1">Enabled</option><option value="0">Paused</option></select></div>
- <div class="form-row"><label class="form-lbl">Checkout status</label><select class="form-sel" id="mc_casper_status"><option value="open">Open - checkout enabled</option><option value="closed">Closed</option></select></div>
+ <div style="display:flex;flex-direction:column;gap:18px;">
+ <div data-masterclass-card="casper" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,0.85fr);gap:18px;align-items:start;">
+ <div class="bc-card" style="max-width:100%;">
+ <div class="bc-title">CASPer masterclass gate</div>
+ <div class="bc-sub">June 11, 1pm AEST. Paste the private Zoom link here; students register on casper-masterclass.html and receive the protected access page.</div>
+ <div class="form-row">
+ <label class="form-lbl">Title</label>
+ <input class="form-in" id="mc_casper_title" type="text" placeholder="Key2MD CASPer Masterclass">
+ </div>
+ <div class="form-row">
+ <label class="form-lbl">Masterclass ID</label>
+ <input class="form-in" id="mc_casper_class_id" type="text" placeholder="2026-06-11-casper-masterclass">
+ <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">Use a new ID if you run a new masterclass later, so old buyers do not see the next link.</div>
+ </div>
+ <div class="form-row">
+ <label class="form-lbl">Date/time label</label>
+ <input class="form-in" id="mc_casper_starts_at" type="text" placeholder="Thursday 11 June, 1:00pm AEST">
+ </div>
+ <div class="form-row">
+ <label class="form-lbl">Show link from</label>
+ <input class="form-in" id="mc_casper_link_available_at" type="datetime-local">
+ </div>
+ <div class="form-row">
+ <label class="form-lbl">Hide link after</label>
+ <input class="form-in" id="mc_casper_expires_at" type="datetime-local">
+ </div>
+ <div class="form-row">
+ <label class="form-lbl">Private Zoom/Meet link</label>
+ <input class="form-in" id="mc_casper_join_url" type="url" placeholder="https://zoom.us/j/...">
+ </div>
+ <div class="form-row">
+ <label class="form-lbl">Auto-email access page at</label>
+ <input class="form-in" id="mc_casper_auto_email_at" type="datetime-local">
+ <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">The Worker emails the protected access page, not the raw Zoom link. Cloudflare Cron should check this every 5 minutes; this dashboard also arms a browser backup while it is open.</div>
+ </div>
+ <div class="form-row">
+ <label class="form-lbl">Automatic email</label>
+ <select class="form-sel" id="mc_casper_auto_email_enabled">
+ <option value="1">Enabled - email paid/authorised students automatically</option>
+ <option value="0">Paused - do not auto-send</option>
+ </select>
+ </div>
+ <div class="form-row">
+ <label class="form-lbl">Checkout status</label>
+ <select class="form-sel" id="mc_casper_status">
+ <option value="open">Open - checkout enabled</option>
+ <option value="closed">Closed - checkout disabled</option>
+ </select>
+ </div>
  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
  <button class="btn primary" onclick="saveMasterclass('casper')">Save CASPer gate</button>
- <button class="btn" onclick="setMasterclassRelease('casper')">Set 11:30am release</button>
- <button class="btn green" onclick="runMasterclassEmailCheck('casper')">Run email check</button>
- <button class="btn blue" onclick="copyMasterclassPageLink('casper')">Copy page</button>
+ <button class="btn" onclick="setMasterclassRelease('casper')">Set 12:30pm release</button>
+ <button class="btn green" onclick="runMasterclassEmailCheck('casper')">Run email check now</button>
+ <button class="btn blue" onclick="copyMasterclassPageLink('casper')">Copy student page</button>
  </div>
  <div id="mc_casper_email_status" style="margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:0.78rem;line-height:1.55;">Auto-email status not loaded.</div>
- <div style="height:1px;background:var(--border);margin:16px 0;"></div>
- <div class="form-row"><label class="form-lbl">Manual access emails</label><textarea class="form-ta" id="mc_casper_manual_emails" rows="3" placeholder="student@email.com"></textarea></div>
- <button class="btn green" onclick="authoriseMasterclass('casper')">Authorise CASPer emails</button>
- <div class="tbl-toolbar" style="margin-top:14px;"><span class="tbl-status" id="mc_casper_access_status">No students loaded.</span></div>
- <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:280px;"><table><thead><tr><th>Email</th><th>Source</th><th>Amount</th><th>Expires</th><th>Added</th><th>Action</th></tr></thead><tbody id="mc_casper_access_body"></tbody></table></div></div>
  </div>
 
- <div class="bc-card" style="max-width:100%;" data-masterclass-card="mmi">
- <div class="bc-title">MMI Masterclass</div>
- <div class="bc-sub">TBD. Very early September, likely 1-5 depending on interview release dates. Set exact date/time here when confirmed.</div>
- <div class="form-row"><label class="form-lbl">Title</label><input class="form-in" id="mc_mmi_title" type="text"></div>
+ <div class="bc-card" style="max-width:100%;">
+ <div class="bc-title">CASPer registered students</div>
+ <div class="bc-sub">Paid students are added automatically by Stripe. Use manual access for comp places, backup fixes, or direct-payment students.</div>
+ <div class="form-row">
+ <label class="form-lbl">Add emails manually</label>
+ <textarea class="form-ta" id="mc_casper_manual_emails" rows="4" placeholder="student@email.com, another@email.com"></textarea>
+ <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">Manual access grants the protected page. It does not send the raw Zoom link by itself.</div>
+ </div>
+ <button class="btn green" onclick="authoriseMasterclass('casper')">Authorise CASPer emails</button>
+ <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+ <div class="tbl-toolbar"><span class="tbl-status" id="mc_casper_access_status">No students loaded.</span></div>
+ <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:420px;"><table><thead><tr><th>Email</th><th>Source</th><th>Amount</th><th>Expires</th><th>Added</th><th style="width:80px;">Action</th></tr></thead><tbody id="mc_casper_access_body"></tbody></table></div></div>
+ </div>
+ </div>
+
+ <div data-masterclass-card="mmi" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,0.85fr);gap:18px;align-items:start;">
+ <div class="bc-card" style="max-width:100%;">
+ <div class="bc-title">MMI masterclass gate</div>
+ <div class="bc-sub">TBD. Very early September, likely September 1-5 depending on interview release dates. Set the exact date/time here when confirmed.</div>
+ <div class="form-row"><label class="form-lbl">Title</label><input class="form-in" id="mc_mmi_title" type="text" placeholder="Key2MD MMI Masterclass"></div>
  <div class="form-row"><label class="form-lbl">Masterclass ID</label><input class="form-in" id="mc_mmi_class_id" type="text"><div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">Use a new ID if you run a new masterclass later.</div></div>
  <div class="form-row"><label class="form-lbl">Date/time label</label><input class="form-in" id="mc_mmi_starts_at" type="text"></div>
  <div class="form-row"><label class="form-lbl">Show link from</label><input class="form-in" id="mc_mmi_link_available_at" type="datetime-local"></div>
  <div class="form-row"><label class="form-lbl">Hide link after</label><input class="form-in" id="mc_mmi_expires_at" type="datetime-local"></div>
  <div class="form-row"><label class="form-lbl">Private Zoom/Meet link</label><input class="form-in" id="mc_mmi_join_url" type="url" placeholder="https://zoom.us/j/..."></div>
- <div class="form-row"><label class="form-lbl">Auto-email access page at</label><input class="form-in" id="mc_mmi_auto_email_at" type="datetime-local"></div>
- <div class="form-row"><label class="form-lbl">Automatic email</label><select class="form-sel" id="mc_mmi_auto_email_enabled"><option value="1">Enabled</option><option value="0">Paused</option></select></div>
- <div class="form-row"><label class="form-lbl">Checkout status</label><select class="form-sel" id="mc_mmi_status"><option value="open">Open - checkout enabled</option><option value="closed">Closed</option></select></div>
+ <div class="form-row"><label class="form-lbl">Auto-email access page at</label><input class="form-in" id="mc_mmi_auto_email_at" type="datetime-local"><div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">The Worker emails the protected access page. Keep this page open near release time if you want the dashboard backup armed.</div></div>
+ <div class="form-row"><label class="form-lbl">Automatic email</label><select class="form-sel" id="mc_mmi_auto_email_enabled"><option value="1">Enabled - email paid/authorised students automatically</option><option value="0">Paused - do not auto-send</option></select></div>
+ <div class="form-row"><label class="form-lbl">Checkout status</label><select class="form-sel" id="mc_mmi_status"><option value="open">Open - checkout enabled</option><option value="closed">Closed - checkout disabled</option></select></div>
  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
  <button class="btn primary" onclick="saveMasterclass('mmi')">Save MMI gate</button>
  <button class="btn" onclick="setMasterclassRelease('mmi')">Set release from date</button>
- <button class="btn green" onclick="runMasterclassEmailCheck('mmi')">Run email check</button>
- <button class="btn blue" onclick="copyMasterclassPageLink('mmi')">Copy page</button>
+ <button class="btn green" onclick="runMasterclassEmailCheck('mmi')">Run email check now</button>
+ <button class="btn blue" onclick="copyMasterclassPageLink('mmi')">Copy student page</button>
  </div>
  <div id="mc_mmi_email_status" style="margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:0.78rem;line-height:1.55;">Auto-email status not loaded.</div>
- <div style="height:1px;background:var(--border);margin:16px 0;"></div>
- <div class="form-row"><label class="form-lbl">Manual access emails</label><textarea class="form-ta" id="mc_mmi_manual_emails" rows="3" placeholder="student@email.com"></textarea></div>
+ </div>
+
+ <div class="bc-card" style="max-width:100%;">
+ <div class="bc-title">MMI registered students</div>
+ <div class="bc-sub">Paid students are added automatically by Stripe. Use manual access for comp places, backup fixes, or direct-payment students.</div>
+ <div class="form-row"><label class="form-lbl">Add emails manually</label><textarea class="form-ta" id="mc_mmi_manual_emails" rows="4" placeholder="student@email.com, another@email.com"></textarea></div>
  <button class="btn green" onclick="authoriseMasterclass('mmi')">Authorise MMI emails</button>
- <div class="tbl-toolbar" style="margin-top:14px;"><span class="tbl-status" id="mc_mmi_access_status">No students loaded.</span></div>
- <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:280px;"><table><thead><tr><th>Email</th><th>Source</th><th>Amount</th><th>Expires</th><th>Added</th><th>Action</th></tr></thead><tbody id="mc_mmi_access_body"></tbody></table></div></div>
+ <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+ <div class="tbl-toolbar"><span class="tbl-status" id="mc_mmi_access_status">No students loaded.</span></div>
+ <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:420px;"><table><thead><tr><th>Email</th><th>Source</th><th>Amount</th><th>Expires</th><th>Added</th><th style="width:80px;">Action</th></tr></thead><tbody id="mc_mmi_access_body"></tbody></table></div></div>
+ </div>
  </div>
  </div>
  </div>
@@ -1977,7 +2080,7 @@
  </div>
 
  <!-- -- REVENUE -- -->
- <div id="pageRevenue" class="page">
+ <div id="pageRevenue" class="page private-only">
  <div class="page-header">
  <div>
  <div class="page-title">Revenue</div>
@@ -2049,9 +2152,9 @@
  </select>
  <select class="ctrl-sel" id="rvLimit" onchange="loadRevenue()">
  <option value="100">100 rows</option>
- <option value="250">250 rows</option>
+ <option value="250" selected>250 rows</option>
  <option value="1000">1,000 rows</option>
- <option value="5000" selected>All rows</option>
+ <option value="5000">All rows</option>
  </select>
  </div>
  <div class="tbl-wrap">
@@ -2064,11 +2167,11 @@
  </div>
 
  <!-- -- MONITORING -- -->
- <div id="pageMonitoring" class="page">
+ <div id="pageMonitoring" class="page private-only">
  <div class="page-header">
  <div>
- <div class="page-title">Monitoring</div>
- <div class="page-sub">Parse failures, Whisper errors, COGS, and founding member slots</div>
+ <div class="page-title">Private Monitoring</div>
+ <div class="page-sub">AI failures, transcription errors, COGS, and founding member slots. Hidden in screen-share mode.</div>
  </div>
  <div class="page-actions">
  <button class="btn" onclick="loadMonitoring()">Refresh</button>
@@ -2307,6 +2410,7 @@ const IMPERSONATION_HANDOFF_PREFIX = 'k2md_impersonation_handoff_';
 const WARM_OUTREACH_LOCAL_KEY = 'k2md_warm_outreach_local_v1';
 const NAV_SEEN_KEY = 'k2md_admin_nav_seen_v1';
 const ACTION_STATUS_KEY = 'k2md_admin_action_status_v1';
+const PRIVACY_MODE_KEY = 'k2md_admin_privacy_mode_v1';
 const NAV_NOTIFY_PAGES = new Set(['s2','mmi','mocks','warmleads','sharing','enquiries','growth']);
 const REVIEW_RENDER_LIMIT = 450;
 const MMI_RENDER_LIMIT = 260;
@@ -2347,6 +2451,8 @@ const S = {
  drawerTimelineCache: new Map(),
 };
 let casperClassAutoEmailTimer = null;
+let masterclassAutoEmailTimers = {};
+initPrivacyMode();
 
 // ======================================================
 // INIT - restore session from sessionStorage
@@ -2430,6 +2536,38 @@ async function api(path, opts={}) {
 // NAVIGATION
 // ======================================================
 const ADMIN_PAGES = new Set(['dashboard','growth','reviews','s2','mmi','mocks','users','warmleads','pipeline','timeline','actions','outreach','funnel','abandoned','retention','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','masterclasses','subscribers']);
+const PRIVATE_ADMIN_PAGES = new Set(['revenue','monitoring']);
+
+function isPrivacyMode() {
+ return document.body.classList.contains('privacy-mode');
+}
+
+function updatePrivacyModeButton() {
+ const btn = document.getElementById('privacyModeBtn');
+ if (!btn) return;
+ const on = isPrivacyMode();
+ btn.textContent = `Screen-share mode: ${on ? 'on' : 'off'}`;
+ btn.classList.toggle('on', on);
+}
+
+function applyPrivacyMode(enabled, opts={}) {
+ document.body.classList.toggle('privacy-mode', !!enabled);
+ try { localStorage.setItem(PRIVACY_MODE_KEY, enabled ? '1' : '0'); } catch {}
+ updatePrivacyModeButton();
+ if (enabled && !opts.skipNav && !document.getElementById('appWrap')?.classList.contains('hidden') && PRIVATE_ADMIN_PAGES.has(currentHashPage())) {
+  nav('dashboard', { replace: true });
+ }
+}
+
+function togglePrivacyMode() {
+ applyPrivacyMode(!isPrivacyMode());
+}
+
+function initPrivacyMode() {
+ let enabled = false;
+ try { enabled = localStorage.getItem(PRIVACY_MODE_KEY) === '1'; } catch {}
+ applyPrivacyMode(enabled, { skipNav: true });
+}
 
 function normalisePage(page) {
  const key = String(page || 'dashboard').replace(/^#/, '').trim().toLowerCase();
@@ -2442,6 +2580,9 @@ function currentHashPage() {
 
 function nav(page, opts={}) {
  const target = normalisePage(page);
+ if (isPrivacyMode() && PRIVATE_ADMIN_PAGES.has(target)) {
+  return target === 'dashboard' ? null : nav('dashboard', { replace: true });
+ }
  const pageEl = document.getElementById(`page${target.charAt(0).toUpperCase()+target.slice(1)}`);
  if (!pageEl) {
  return target === 'dashboard' ? null : nav('dashboard', { replace: true });
@@ -2540,25 +2681,30 @@ function commandHay(item) {
 
 function buildCommandItems() {
  const items = [
- {kind:'Page', title:'Command', sub:'Owner priorities, daily actions, revenue, workload, and activity', action:()=>nav('dashboard'), hint:'Open'},
- {kind:'Page', title:'Growth Command', sub:'Daily warm leads, checkout recovery, retention risk, funnel health, and outreach', action:()=>nav('growth'), hint:'Open'},
- {kind:'Page', title:'Users', sub:'Search students, adjust credits, and change tiers', action:()=>nav('users'), hint:'Open'},
- {kind:'Page', title:'Warm Leads', sub:'Active non-subscribers with tailored outreach drafts', action:()=>nav('warmleads'), hint:'Open'},
- {kind:'Page', title:'Lead Pipeline', sub:'Board view from first signal to paid or retention risk', action:()=>nav('pipeline'), hint:'Open'},
- {kind:'Page', title:'Student Timeline', sub:'One-student history across reviews, payments, outreach, enquiries, and checkout', action:()=>nav('timeline'), hint:'Open'},
- {kind:'Page', title:'Next Actions', sub:'Prioritised growth and student-success queue', action:()=>nav('actions'), hint:'Open'},
- {kind:'Page', title:'Outreach ROI', sub:'Track who buys after tutor emails and broadcasts', action:()=>nav('outreach'), hint:'Open'},
- {kind:'Page', title:'Product Funnel', sub:'Product views, pricing clicks, checkout starts, purchases, and revenue', action:()=>nav('funnel'), hint:'Open'},
- {kind:'Page', title:'Abandoned Checkouts', sub:'Expired Stripe checkout sessions and recovery actions', action:()=>nav('abandoned'), hint:'Open'},
- {kind:'Page', title:'Retention Risk', sub:'Paid students who may need a useful nudge', action:()=>nav('retention'), hint:'Open'},
- {kind:'Page', title:'Sharing Watchlist', sub:'Check possible account sharing by device, network, and region signals', action:()=>nav('sharing'), hint:'Open'},
- {kind:'Page', title:'S2 Essay Reviews', sub:'GAMSAT essays, band scores, evidence critique, and feedback', action:()=>nav('s2'), hint:'Open'},
- {kind:'Page', title:'Inbox', sub:'Student conversations and replies', action:()=>nav('inbox'), hint:'Open'},
- {kind:'Page', title:'Broadcast', sub:'Send segmented emails with preview', action:()=>nav('broadcast'), hint:'Open'},
- {kind:'Page', title:'CASPer Class', sub:'Set the paid class link and authorise students', action:()=>nav('class'), hint:'Open'},
- {kind:'Page', title:'Masterclasses', sub:'Set CASPer/MMI registration gates, Zoom links, and paid access', action:()=>nav('masterclasses'), hint:'Open'},
- {kind:'Page', title:'Mock Exams', sub:'Saved full CASPer mocks and manual review queue', action:()=>nav('mocks'), hint:'Open'},
- {kind:'Page', title:'Monitoring', sub:'AI parse failures, Whisper failures, and margin checks', action:()=>nav('monitoring'), hint:'Open'},
+ {kind:'Page', title:'Command Center', sub:'Daily priorities, urgent work, and platform health', keywords:'dashboard today overview command', action:()=>nav('dashboard'), hint:'Open'},
+ {kind:'Page', title:'Inbox', sub:'Student conversations and unread replies', keywords:'messages replies email support', action:()=>nav('inbox'), hint:'Open'},
+ {kind:'Page', title:'Enquiries', sub:'Website contact form submissions, bugs, and new leads', keywords:'contact form leads bug reports', action:()=>nav('enquiries'), hint:'Open'},
+ {kind:'Page', title:'Mock Exams', sub:'Saved full CASPer mocks, QA, and manual review queue', keywords:'full casper mock reader exams', action:()=>nav('mocks'), hint:'Open'},
+ {kind:'Page', title:'CASPer AI Reviews', sub:'Typed CASPer AI feedback sessions', keywords:'casper reviews typed ai marking', action:()=>nav('reviews'), hint:'Open'},
+ {kind:'Page', title:'MMI Reviews', sub:'MMI AI reviews, recordings, and feedback history', keywords:'mmi spoken transcript premium', action:()=>nav('mmi'), hint:'Open'},
+ {kind:'Page', title:'S2 Essays', sub:'GAMSAT essays, band scores, evidence critique, and feedback', keywords:'gamsat section 2 essay reviews', action:()=>nav('s2'), hint:'Open'},
+ {kind:'Page', title:'Student Accounts', sub:'Search students, adjust credits, manage tiers, and view access', keywords:'users accounts credits subscriptions tiers', action:()=>nav('users'), hint:'Open'},
+ {kind:'Page', title:'Student Timeline', sub:'One-student history across reviews, payments, outreach, enquiries, and checkout', keywords:'history timeline student', action:()=>nav('timeline'), hint:'Open'},
+ {kind:'Page', title:'Sharing Watchlist', sub:'Possible account sharing by device, network, and region signals', keywords:'duplicate account sharing devices networks', action:()=>nav('sharing'), hint:'Open'},
+ {kind:'Page', title:'Growth Command', sub:'Daily warm leads, checkout recovery, retention risk, funnel health, and outreach', keywords:'growth sales leads revenue', action:()=>nav('growth'), hint:'Open'},
+ {kind:'Page', title:'Next Actions', sub:'Prioritised growth and student-success queue', keywords:'todo tasks follow up', action:()=>nav('actions'), hint:'Open'},
+ {kind:'Page', title:'Warm Leads', sub:'Active non-subscribers with tailored outreach drafts', keywords:'warm leads active students outreach', action:()=>nav('warmleads'), hint:'Open'},
+ {kind:'Page', title:'Pipeline', sub:'Board view from first signal to paid or retention risk', keywords:'lead pipeline sales board', action:()=>nav('pipeline'), hint:'Open'},
+ {kind:'Page', title:'Abandoned Checkouts', sub:'Expired Stripe checkout sessions and recovery actions', keywords:'stripe checkout recovery abandoned', action:()=>nav('abandoned'), hint:'Open'},
+ {kind:'Page', title:'Product Funnel', sub:'Product views, checkout starts, purchases, and tracking health', keywords:'funnel tracking conversion products', action:()=>nav('funnel'), hint:'Open'},
+ {kind:'Page', title:'Retention Risk', sub:'Paid students who may need a useful nudge', keywords:'retention churn cancel subscription', action:()=>nav('retention'), hint:'Open'},
+ {kind:'Page', title:'Outreach ROI', sub:'Track who buys after tutor emails and broadcasts', keywords:'roi email broadcast sales', action:()=>nav('outreach'), hint:'Open'},
+ {kind:'Page', title:'Broadcast', sub:'Send segmented emails with preview', keywords:'email campaign newsletter send', action:()=>nav('broadcast'), hint:'Open'},
+ {kind:'Page', title:'Subscribers', sub:'Newsletter and subscriber list', keywords:'newsletter list subscribers', action:()=>nav('subscribers'), hint:'Open'},
+ {kind:'Page', title:'CASPer Class', sub:'Class access, passes, Zoom link, and student authorisation', keywords:'friday class casper zoom access passes', action:()=>nav('class'), hint:'Open'},
+ {kind:'Page', title:'Masterclasses', sub:'CASPer/MMI registration gates, Zoom links, and paid access', keywords:'masterclass event zoom access', action:()=>nav('masterclasses'), hint:'Open'},
+ {kind:'Page', title:'Revenue', sub:'Payment and revenue records', keywords:'payments stripe money private ops', action:()=>nav('revenue'), hint:'Open'},
+ {kind:'Page', title:'Monitoring', sub:'AI failures, transcription errors, COGS, and founding member slots', keywords:'cogs failures whisper parse private ops', action:()=>nav('monitoring'), hint:'Open'},
  ];
 
  S.users.forEach(u => items.push({
@@ -3612,7 +3758,7 @@ async function removeReviewFromHistory(reviewId, tool = '') {
 // S2 ESSAY REVIEWS
 // ======================================================
 async function loadS2Reviews() {
- const limit = document.getElementById('s2Limit')?.value||'5000';
+ const limit = document.getElementById('s2Limit')?.value||'250';
  try {
  const res = await api(`/admin/reviews?tool=gamsat&limit=${limit}`);
  const data = await res.json().catch(()=>({}));
@@ -3738,7 +3884,7 @@ function renderS2Detail(row, fb) {
 }
 
 async function loadUsers() {
- const limit = document.getElementById('usrLimit')?.value||'5000';
+ const limit = document.getElementById('usrLimit')?.value||'250';
  const tier = document.getElementById('usrTier')?.value||'';
  const q = (document.getElementById('usrSearch')?.value||'').trim();
  const status = document.getElementById('usrStatus');
@@ -6018,7 +6164,7 @@ function studentReportPlainText(p, mode) {
 }
 
 async function loadEnquiries() {
- const limit = document.getElementById('enqLimit')?.value||'5000';
+ const limit = document.getElementById('enqLimit')?.value||'250';
  try {
  const res = await api(`/admin/enquiries?limit=${limit}`);
  const data = await res.json().catch(()=>({}));
@@ -6750,6 +6896,17 @@ function renderMasterclasses() {
  ['casper','mmi'].forEach(kind => renderMasterclass(kind, masterclassItem(kind)));
 }
 
+function mergeMasterclassPayload(data) {
+ S.masterclasses = {
+ ...(S.masterclasses || {}),
+ ...(data || {}),
+ items: {
+ ...(S.masterclasses?.items || {}),
+ ...(data?.items || {}),
+ },
+ };
+}
+
 function renderMasterclass(kind, item) {
  const s = item.settings || {};
  const privateData = item.private || {};
@@ -6792,16 +6949,60 @@ function renderMasterclassEmailState(kind, state, settings={}, accessCount=0) {
  const enabled = settings.auto_email_enabled !== false;
  const status = state?.status || (enabled ? 'pending' : 'paused');
  const releaseAt = Number(settings.link_available_at || 0);
+ const now = Date.now();
+ const sent = !!state?.sent_at;
+ const retryAt = Number(state?.next_retry_at || 0);
+ const waitingForStudents = state?.status === 'no_recipients' && accessCount <= 0;
+ const dueTarget = sent || !enabled || !autoAt || waitingForStudents ? 0 : (retryAt && retryAt > now ? retryAt : autoAt);
+ const backupText = dueTarget
+ ? (dueTarget <= now
+ ? 'Dashboard backup: due now - the next refresh/check will run it.'
+ : `Dashboard backup armed for ${new Date(dueTarget).toLocaleTimeString('en-AU', { hour:'numeric', minute:'2-digit' })}.`)
+ : (sent ? 'Dashboard backup: already sent.' : waitingForStudents ? 'Dashboard backup: waiting for registered students.' : 'Dashboard backup: not armed.');
  const parts = [
  `<strong style="color:var(--text);">Auto-email:</strong> ${enabled ? 'enabled' : 'paused'}`,
  `<strong style="color:var(--text);">Send time:</strong> ${autoAt ? esc(new Date(autoAt).toLocaleString('en-AU', { dateStyle:'medium', timeStyle:'short' })) : 'not set'}`,
  `<strong style="color:var(--text);">Link release:</strong> ${releaseAt ? esc(new Date(releaseAt).toLocaleString('en-AU', { dateStyle:'medium', timeStyle:'short' })) : 'as soon as pasted'}`,
  `<strong style="color:var(--text);">Students:</strong> ${accessCount}`,
  `<strong style="color:var(--text);">Status:</strong> ${esc(String(status).replace(/_/g, ' '))}`,
+ `<strong style="color:var(--text);">${esc(backupText)}</strong>`,
  ];
  if (state?.sent_at) parts.push(`<strong style="color:var(--text);">Sent:</strong> ${esc(new Date(Number(state.sent_at)).toLocaleString('en-AU', { dateStyle:'medium', timeStyle:'short' }))} (${state.sent_count || 0}/${state.recipient_count || state.sent_count || 0})`);
+ if (state?.last_attempt_at) parts.push(`<strong style="color:var(--text);">Last checked:</strong> ${esc(new Date(Number(state.last_attempt_at)).toLocaleString('en-AU', { dateStyle:'medium', timeStyle:'short' }))}`);
  if (state?.last_message) parts.push(`<span style="color:${status === 'missing_link' || status === 'send_failed' ? 'var(--orange)' : 'var(--muted)'};">${esc(state.last_message)}</span>`);
  el.innerHTML = parts.join('<br>');
+ scheduleMasterclassAutoEmailBackup(kind, settings, state, accessCount);
+}
+
+function scheduleMasterclassAutoEmailBackup(kind, settings={}, state={}, accessCount=0) {
+ if (masterclassAutoEmailTimers[kind]) {
+ clearTimeout(masterclassAutoEmailTimers[kind]);
+ delete masterclassAutoEmailTimers[kind];
+ }
+ const autoAt = Number(settings.auto_email_at || 0);
+ if (settings.auto_email_enabled === false || !autoAt || state?.sent_at || (state?.status === 'no_recipients' && accessCount <= 0)) return;
+ const now = Date.now();
+ const retryAt = Number(state?.next_retry_at || 0);
+ const target = retryAt && retryAt > now ? retryAt : autoAt;
+ const delay = Math.max(1500, Math.min(Math.max(0, target - now), 2147480000));
+ masterclassAutoEmailTimers[kind] = setTimeout(() => runMasterclassDueEmailCheck(kind, 'dashboard_timer'), delay);
+}
+
+async function runMasterclassDueEmailCheck(kind, source='dashboard_timer') {
+ const status = document.getElementById('mcStatus');
+ if (status) status.textContent = source === 'dashboard_timer' ? `${kind.toUpperCase()} auto-email due check...` : 'Checking masterclass email schedule...';
+ try {
+ const res = await api('/admin/masterclasses/email/run', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, source }) });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.result?.message || data?.message || data?.error || 'Could not run scheduled email check');
+ mergeMasterclassPayload(data);
+ renderMasterclasses();
+ if (status) status.textContent = data.result?.message || 'Masterclass auto-email checked';
+ } catch(e) {
+ if (status) status.textContent = e.message;
+ const el = document.getElementById(`mc_${kind}_email_status`);
+ if (el) el.innerHTML += `<br><span style="color:var(--red);">Dashboard backup failed: ${esc(e.message)}</span>`;
+ }
 }
 
 function setMasterclassRelease(kind) {
@@ -6809,7 +7010,7 @@ function setMasterclassRelease(kind) {
  const releaseInput = document.getElementById(`mc_${kind}_link_available_at`);
  const emailInput = document.getElementById(`mc_${kind}_auto_email_at`);
  if (kind === 'casper') {
- const releaseMs = Date.parse('2026-06-11T11:30:00+10:00');
+ const releaseMs = Date.parse('2026-06-11T12:30:00+10:00');
  if (releaseInput) releaseInput.value = datetimeLocalFromMs(releaseMs);
  if (emailInput) emailInput.value = datetimeLocalFromMs(releaseMs);
  return;
@@ -6822,16 +7023,21 @@ function setMasterclassRelease(kind) {
 
 async function saveMasterclass(kind) {
  const status = document.getElementById('mcStatus');
- if (status) status.textContent = `Saving ${kind}...`;
+ const label = kind === 'casper' ? 'CASPer' : 'MMI';
+ if (status) status.textContent = `Saving ${label} masterclass...`;
+ const linkAvailableAt = datetimeLocalToMs(document.getElementById(`mc_${kind}_link_available_at`)?.value || '');
+ let autoEmailAt = datetimeLocalToMs(document.getElementById(`mc_${kind}_auto_email_at`)?.value || '');
+ const autoEnabled = (document.getElementById(`mc_${kind}_auto_email_enabled`)?.value || '1') !== '0';
+ if (autoEnabled && !autoEmailAt && linkAvailableAt) autoEmailAt = linkAvailableAt;
  const body = {
  kind,
  title: document.getElementById(`mc_${kind}_title`)?.value || '',
  class_id: document.getElementById(`mc_${kind}_class_id`)?.value || '',
  starts_at: document.getElementById(`mc_${kind}_starts_at`)?.value || '',
- link_available_at: datetimeLocalToMs(document.getElementById(`mc_${kind}_link_available_at`)?.value || ''),
+ link_available_at: linkAvailableAt,
  expires_at: datetimeLocalToMs(document.getElementById(`mc_${kind}_expires_at`)?.value || ''),
- auto_email_enabled: (document.getElementById(`mc_${kind}_auto_email_enabled`)?.value || '1') !== '0',
- auto_email_at: datetimeLocalToMs(document.getElementById(`mc_${kind}_auto_email_at`)?.value || ''),
+ auto_email_enabled: autoEnabled,
+ auto_email_at: autoEmailAt,
  join_url: document.getElementById(`mc_${kind}_join_url`)?.value || '',
  status: document.getElementById(`mc_${kind}_status`)?.value || 'open',
  };
@@ -6839,9 +7045,9 @@ async function saveMasterclass(kind) {
  const res = await api('/admin/masterclasses', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not save masterclass');
- S.masterclasses = data;
+ mergeMasterclassPayload(data);
  renderMasterclasses();
- if (status) status.textContent = 'Saved';
+ if (status) status.textContent = `${label} masterclass saved`;
  } catch(e) {
  if (status) status.textContent = e.message;
  alert(e.message);
@@ -6849,14 +7055,15 @@ async function saveMasterclass(kind) {
 }
 
 async function runMasterclassEmailCheck(kind) {
- if (!confirm(`Run the ${kind.toUpperCase()} masterclass email check now? If the private link is pasted and students are registered, this will email them immediately.`)) return;
+ const label = kind === 'casper' ? 'CASPer' : 'MMI';
+ if (!confirm(`Run the ${label} masterclass email check now? If the private link is pasted and students are registered, this will email them immediately.`)) return;
  const status = document.getElementById('mcStatus');
- if (status) status.textContent = 'Running email check...';
+ if (status) status.textContent = `Running ${label} email check...`;
  try {
  const res = await api('/admin/masterclasses/email/run', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, force:true }) });
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.result?.message || data?.message || data?.error || 'Could not run email check');
- S.masterclasses = data;
+ mergeMasterclassPayload(data);
  renderMasterclasses();
  if (status) status.textContent = data.result?.message || 'Email check complete';
  alert(data.result?.message || 'Email check complete.');
@@ -6867,14 +7074,14 @@ async function runMasterclassEmailCheck(kind) {
 }
 
 async function reconcileMasterclasses() {
- if (!confirm('Check recent Stripe checkout sessions and recover paid masterclass students into this dashboard? This will not email students.')) return;
+ if (!confirm('Check recent Stripe checkout sessions and recover paid masterclass students into this dashboard? This checks the last 45 days and will not email students.')) return;
  const status = document.getElementById('mcStatus');
  if (status) status.textContent = 'Checking Stripe...';
  try {
- const res = await api('/admin/masterclasses/reconcile', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ days: 14 }) });
+ const res = await api('/admin/masterclasses/reconcile', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ days: 45 }) });
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not reconcile Stripe payments');
- S.masterclasses = data;
+ mergeMasterclassPayload(data);
  renderMasterclasses();
  const message = `Recovered/confirmed ${data.recovered || 0} masterclass payment${Number(data.recovered || 0)===1?'':'s'} from ${data.checked || 0} matching Stripe session${Number(data.checked || 0)===1?'':'s'}.`;
  if (status) status.textContent = message;
@@ -6892,16 +7099,17 @@ async function authoriseMasterclass(kind) {
  alert(parsed.invalid.length ? `Fix invalid email: ${parsed.invalid[0]}` : 'Paste at least one valid email.');
  return;
  }
+ const label = kind === 'casper' ? 'CASPer' : 'MMI';
  const status = document.getElementById('mcStatus');
- if (status) status.textContent = 'Authorising...';
+ if (status) status.textContent = `Authorising ${label} students...`;
  try {
- const res = await api('/admin/masterclasses/authorize', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, emails }) });
+ const res = await api('/admin/masterclasses/authorize', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, emails: parsed.emails.join(',') }) });
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not authorise students');
- S.masterclasses = data;
+ mergeMasterclassPayload(data);
  document.getElementById(`mc_${kind}_manual_emails`).value = '';
  renderMasterclasses();
- if (status) status.textContent = `Authorised ${data.granted || parsed.emails.length}`;
+ if (status) status.textContent = `Authorised ${data.granted || parsed.emails.length} ${label} student${Number(data.granted || parsed.emails.length)===1?'':'s'}`;
  } catch(e) {
  if (status) status.textContent = e.message;
  alert(e.message);
@@ -6909,16 +7117,17 @@ async function authoriseMasterclass(kind) {
 }
 
 async function removeMasterclassAccess(kind, email, userId) {
- if (!confirm(`Remove ${kind.toUpperCase()} masterclass access for ${email || userId}?`)) return;
+ const label = kind === 'casper' ? 'CASPer' : 'MMI';
+ if (!confirm(`Remove ${label} masterclass access for ${email || userId}?`)) return;
  const status = document.getElementById('mcStatus');
- if (status) status.textContent = 'Removing access...';
+ if (status) status.textContent = `Removing ${label} access...`;
  try {
  const res = await api('/admin/masterclasses/remove', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, email, user_id: userId }) });
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not remove access');
- S.masterclasses = data;
+ mergeMasterclassPayload(data);
  renderMasterclasses();
- if (status) status.textContent = 'Access removed';
+ if (status) status.textContent = `${label} access removed`;
  } catch(e) {
  if (status) status.textContent = e.message;
  alert(e.message);
@@ -8844,7 +9053,7 @@ function buildMMICoachingBrief(row) {
 // REVENUE
 // ======================================================
 async function loadRevenue() {
- const limit = document.getElementById('rvLimit')?.value||'5000';
+ const limit = document.getElementById('rvLimit')?.value||'250';
  try {
  const res = await api(`/admin/payments?limit=${limit}`);
  const data = await res.json().catch(()=>({}));

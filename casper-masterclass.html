@@ -350,7 +350,7 @@
             <div class="mc-include-item"><div class="mc-check"></div><span><strong>AI analysis of 5000+ responses</strong></span></div>
             <div class="mc-include-item"><div class="mc-check"></div><span><strong>Live Q&amp;A</strong> &mdash; open floor before the exam</span></div>
           </div>
-          <p class="mc-reg-fine">Use the same Key2MD account/email for payment and access. Add dan@key2md.net to safe senders before the session.</p>
+          <p class="mc-reg-fine">After payment, you will receive a confirmation email from dan@key2md.net. The protected access page, where the Zoom link appears, will also be emailed again shortly before the session; if it lands in junk, log in here and refresh. Add dan@key2md.net and brittainmbbs@gmail.com to safe senders.</p>
         </div>
       </div>
 
@@ -499,11 +499,16 @@
             </div>
             <div class="mc-price-note">One-time &bull; Secure payment via Stripe</div>
             <div class="mc-status" id="mcStatusMobile">Checking your access...</div>
+            <div class="mc-linkbox" id="mcLinkBoxMobile">
+              <p>Your masterclass link</p>
+              <a id="mcJoinLinkMobile" href="#" target="_blank" rel="noopener">Open Zoom link &rarr;</a>
+            </div>
             <div class="mc-action-stack">
               <button class="mc-btn-primary" id="mcPayBtnMobile" onclick="startMasterclassCheckout()">Pay $300 and register &rarr;</button>
               <button class="mc-btn-secondary" id="mcLoginBtnMobile" onclick="openMasterclassAuth('login')">Log in</button>
               <button class="mc-btn-secondary" id="mcSignupBtnMobile" onclick="openMasterclassAuth('signup')">Create free account</button>
             </div>
+            <p class="mc-reg-fine">After payment, check your confirmation email from dan@key2md.net. The protected access page, where the Zoom link appears, is emailed again shortly before the session.</p>
           </div>
         </div>
       </div>
@@ -520,7 +525,7 @@
       <h2>One session. Right before the exam.</h2>
       <p>Wednesday June 11 &bull; 1:00pm AEST &bull; 2&ndash;2.5 hours &bull; Live via Zoom &bull; Spots are capped.</p>
       <a href="#registration" class="mc-cta-btn">Register for $300 &rarr;</a>
-      <div class="mc-cta-sub">Secure payment via Stripe &bull; Protected Zoom link via your Key2MD account</div>
+      <div class="mc-cta-sub">Secure payment via Stripe &bull; Confirmation by email &bull; Protected Zoom link via your Key2MD account</div>
     </div>
   </div>
 </section>
@@ -578,8 +583,10 @@
       document.getElementById('mcTime').textContent = mc.starts_at || 'Wednesday 11 June 2026 \u2022 1:00pm AEST';
       const pay=document.getElementById('mcPayBtn'), login=document.getElementById('mcLoginBtn'), signup=document.getElementById('mcSignupBtn'), linkBox=document.getElementById('mcLinkBox');
       const payM=document.getElementById('mcPayBtnMobile'), loginM=document.getElementById('mcLoginBtnMobile'), signupM=document.getElementById('mcSignupBtnMobile');
+      const linkBoxM=document.getElementById('mcLinkBoxMobile'), joinM=document.getElementById('mcJoinLinkMobile');
       function show(el,v){if(el)el.style.display=v;}
-      linkBox.style.display='none';
+      if(linkBox) linkBox.style.display='none';
+      if(linkBoxM) linkBoxM.style.display='none';
       if(!data.authenticated){
         setStatus('Log in or create a free Key2MD account before paying. This keeps the Zoom link protected.');
         show(pay,'none'); show(login,'flex'); show(signup,'flex');
@@ -590,13 +597,19 @@
       show(loginM,'none'); show(signupM,'none'); show(payM,'flex');
       if(data.has_access){
         show(pay,'none'); show(payM,'none');
-        if(data.join_url){ linkBox.style.display='block'; document.getElementById('mcJoinLink').href=data.join_url; setStatus('You are registered. The Zoom link is ready below.','ok'); }
-        else setStatus('You are registered. The Zoom link will appear here at the release time.','ok');
+        if(data.join_url){
+          if(linkBox) linkBox.style.display='block';
+          if(linkBoxM) linkBoxM.style.display='block';
+          document.getElementById('mcJoinLink').href=data.join_url;
+          if(joinM) joinM.href=data.join_url;
+          setStatus('You are registered. The Zoom link is ready below. A reminder email is also sent before the session.','ok');
+        }
+        else setStatus('You are registered. A confirmation email has been sent; the protected access page where the Zoom link appears will also be emailed again shortly before the session. The Zoom link appears here at the release time.','ok');
       } else {
         const isOpen = mc.status === 'open';
         if(pay){ pay.disabled = !isOpen; pay.textContent = isOpen ? `Pay $${MASTERCLASS_PRICE} and register \u2192` : 'Registration closed'; }
         if(payM){ payM.disabled = !isOpen; payM.textContent = isOpen ? `Pay $${MASTERCLASS_PRICE} and register \u2192` : 'Registration closed'; }
-        setStatus(isOpen ? 'Registration is open. Payment is handled securely by Stripe.' : 'Registration is currently closed.', isOpen ? '' : 'warn');
+        setStatus(isOpen ? 'Registration is open. Payment is handled securely by Stripe. After payment, you will receive a confirmation email and the protected access page where the Zoom link appears is emailed again before the session.' : 'Registration is currently closed.', isOpen ? '' : 'warn');
       }
     } catch(e){ setStatus('Could not check your access. Try refreshing.','err'); }
   }
