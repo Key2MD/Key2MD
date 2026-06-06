@@ -6873,12 +6873,38 @@ const MASTERCLASS_PAGE_URLS = {
  mmi: 'https://www.key2md.com/mmi-masterclass.html',
 };
 
+async function readMasterclassApiData(res) {
+ const text = await res.text().catch(() => '');
+ if (!text) return {};
+ try { return JSON.parse(text); } catch { return { message: text }; }
+}
+
+function masterclassRouteMissing(data) {
+ const msg = String(data?.message || data?.error || '').toLowerCase();
+ return !msg || msg.includes('not found') || msg.includes('not_found');
+}
+
+async function masterclassApi(path, opts={}) {
+ const candidates = path.startsWith('/api/') ? [path] : [path, `/api${path}`];
+ let last = null;
+ for (const candidate of candidates) {
+ const res = await api(candidate, opts);
+ const data = await readMasterclassApiData(res);
+ last = { res, data, path: candidate };
+ if (res.status !== 404 || !masterclassRouteMissing(data)) return last;
+ }
+ const err = new Error('Masterclass admin endpoint is missing from the live Worker. Deploy the current private Worker to Cloudflare, refresh this dashboard, then try again.');
+ err.status = last?.res?.status;
+ err.data = last?.data;
+ err.path = last?.path;
+ throw err;
+}
+
 async function loadMasterclasses() {
  const status = document.getElementById('mcStatus');
  if (status) status.textContent = 'Loading...';
  try {
- const res = await api('/admin/masterclasses');
- const data = await res.json().catch(()=>({}));
+ const { res, data } = await masterclassApi('/admin/masterclasses');
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not load masterclasses');
  S.masterclasses = data;
  renderMasterclasses();
@@ -6992,8 +7018,7 @@ async function runMasterclassDueEmailCheck(kind, source='dashboard_timer') {
  const status = document.getElementById('mcStatus');
  if (status) status.textContent = source === 'dashboard_timer' ? `${kind.toUpperCase()} auto-email due check...` : 'Checking masterclass email schedule...';
  try {
- const res = await api('/admin/masterclasses/email/run', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, source }) });
- const data = await res.json().catch(()=>({}));
+ const { res, data } = await masterclassApi('/admin/masterclasses/email/run', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, source }) });
  if (!res.ok) throw new Error(data?.result?.message || data?.message || data?.error || 'Could not run scheduled email check');
  mergeMasterclassPayload(data);
  renderMasterclasses();
@@ -7042,8 +7067,7 @@ async function saveMasterclass(kind) {
  status: document.getElementById(`mc_${kind}_status`)?.value || 'open',
  };
  try {
- const res = await api('/admin/masterclasses', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
- const data = await res.json().catch(()=>({}));
+ const { res, data } = await masterclassApi('/admin/masterclasses', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not save masterclass');
  mergeMasterclassPayload(data);
  renderMasterclasses();
@@ -7060,8 +7084,7 @@ async function runMasterclassEmailCheck(kind) {
  const status = document.getElementById('mcStatus');
  if (status) status.textContent = `Running ${label} email check...`;
  try {
- const res = await api('/admin/masterclasses/email/run', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, force:true }) });
- const data = await res.json().catch(()=>({}));
+ const { res, data } = await masterclassApi('/admin/masterclasses/email/run', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, force:true }) });
  if (!res.ok) throw new Error(data?.result?.message || data?.message || data?.error || 'Could not run email check');
  mergeMasterclassPayload(data);
  renderMasterclasses();
@@ -7078,8 +7101,7 @@ async function reconcileMasterclasses() {
  const status = document.getElementById('mcStatus');
  if (status) status.textContent = 'Checking Stripe...';
  try {
- const res = await api('/admin/masterclasses/reconcile', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ days: 45 }) });
- const data = await res.json().catch(()=>({}));
+ const { res, data } = await masterclassApi('/admin/masterclasses/reconcile', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ days: 45 }) });
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not reconcile Stripe payments');
  mergeMasterclassPayload(data);
  renderMasterclasses();
@@ -7103,8 +7125,7 @@ async function authoriseMasterclass(kind) {
  const status = document.getElementById('mcStatus');
  if (status) status.textContent = `Authorising ${label} students...`;
  try {
- const res = await api('/admin/masterclasses/authorize', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, emails: parsed.emails.join(',') }) });
- const data = await res.json().catch(()=>({}));
+ const { res, data } = await masterclassApi('/admin/masterclasses/authorize', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, emails: parsed.emails.join(',') }) });
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not authorise students');
  mergeMasterclassPayload(data);
  document.getElementById(`mc_${kind}_manual_emails`).value = '';
@@ -7122,8 +7143,7 @@ async function removeMasterclassAccess(kind, email, userId) {
  const status = document.getElementById('mcStatus');
  if (status) status.textContent = `Removing ${label} access...`;
  try {
- const res = await api('/admin/masterclasses/remove', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, email, user_id: userId }) });
- const data = await res.json().catch(()=>({}));
+ const { res, data } = await masterclassApi('/admin/masterclasses/remove', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, email, user_id: userId }) });
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not remove access');
  mergeMasterclassPayload(data);
  renderMasterclasses();
