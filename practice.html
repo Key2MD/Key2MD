@@ -407,6 +407,18 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button class="btn-start" id="startBtn"><span id="startBtnIcon">></span><span id="startBtnText">Start Session</span></button>
 
 
+ <div class="sidebar-card casper-masterclass-card" id="casperMasterclassCard">
+ <div class="casper-masterclass-kicker">CASPer Masterclass</div>
+ <div class="casper-masterclass-title">Live final calibration before the June CASPer.</div>
+ <p class="casper-masterclass-copy">June 11 at 1pm AEST. Dan breaks down what strong answers actually do, where students lose marks, and how to answer with clearer judgement under time.</p>
+ <div class="casper-masterclass-tags">
+ <span>2-2.5 hr Zoom</span>
+ <span>Live Q&A</span>
+ <span>$300 AUD</span>
+ </div>
+ <button type="button" class="casper-masterclass-btn" data-track="casper_masterclass_practice_card" onclick="location.href='casper-masterclass.html?from=practice_sidebar'">View the Masterclass -></button>
+ </div>
+
 
 
 
@@ -3434,11 +3446,13 @@ function applyModeUI(mode) {
  const ccard = $('categoryCard'), chdr = $('categoryCardHeader');
  const sq = $('starredQueueCard');
  const classCard = $('casperClassCard');
+ const masterclassCard = $('casperMasterclassCard');
  if (cc) cc.style.display = isCasper ? '' : 'none';
  if (mc) mc.style.display = isMMI ? '' : 'none';
  if (mo) mo.style.display = isMMI ? '' : 'none';
  if (sq) sq.style.display = isCasper ? '' : 'none';
  if (classCard) classCard.style.display = isCasper ? '' : 'none';
+ if (masterclassCard) masterclassCard.style.display = isCasper ? '' : 'none';
  if (ccard) ccard.style.display = isMock ? 'none' : '';
  if (chdr) chdr.textContent = isCasper ? 'Category' : isMMI ? 'MMI Station Type' : 'Full Mock';
 
@@ -4098,6 +4112,114 @@ function showSaveToast() {
  }, 2000);
 }
 
+function casperMasterclassNudgeStorageKey(kind = 'casper') {
+ const auth = getK2Auth();
+ const user = auth?.getUser?.();
+ return `k2md_masterclass_ai_nudge_state_${kind}_${user?.id || user?.email || 'local'}_v2`;
+}
+
+function getLocalCasperMasterclassNudgeState(kind = 'casper') {
+ try {
+ const raw = localStorage.getItem(casperMasterclassNudgeStorageKey(kind));
+ return raw ? JSON.parse(raw) : {};
+ } catch {
+ return {};
+ }
+}
+
+function setLocalCasperMasterclassNudgeState(kind = 'casper', updates = {}) {
+ try {
+ const current = getLocalCasperMasterclassNudgeState(kind);
+ localStorage.setItem(casperMasterclassNudgeStorageKey(kind), JSON.stringify({ ...current, ...updates, updatedAt: Date.now() }));
+ } catch {}
+}
+
+function localCasperMasterclassNudgeAllowsShow(kind = 'casper') {
+ const state = getLocalCasperMasterclassNudgeState(kind);
+ if (state.status === 'dismissed' || state.status === 'clicked') return false;
+ if (state.status === 'snoozed') {
+ const now = Date.now();
+ const remindAt = Number(state.remindAt || 0);
+ const submitted = Math.max(0, Number(state.localReviewCount || 0));
+ const remindAfter = Math.max(0, Number(state.remindAfterLocalReviewCount || 0));
+ if ((remindAt && now >= remindAt) || (remindAfter && submitted >= remindAfter)) return true;
+ return false;
+ }
+ return true;
+}
+
+async function saveCasperMasterclassNudgeAction(kind = 'casper', action = 'dismissed') {
+ const auth = getK2Auth();
+ const token = auth?.getToken?.();
+ const now = Date.now();
+ const current = getLocalCasperMasterclassNudgeState(kind);
+ const localReviewCount = Math.max(0, Number(current.localReviewCount || 0));
+ if (action === 'snooze') {
+ setLocalCasperMasterclassNudgeState(kind, {
+ status: 'snoozed',
+ snoozedAt: now,
+ remindAt: now + 24 * 60 * 60 * 1000,
+ remindAfterLocalReviewCount: localReviewCount + 5,
+ });
+ } else if (action === 'clicked') {
+ setLocalCasperMasterclassNudgeState(kind, { status: 'clicked', clickedAt: now });
+ } else if (action === 'shown') {
+ setLocalCasperMasterclassNudgeState(kind, { status: current.status || 'shown', lastShownAt: now, shownCount: Math.max(0, Number(current.shownCount || 0)) + 1 });
+ return;
+ } else {
+ setLocalCasperMasterclassNudgeState(kind, { status: 'dismissed', dismissedAt: now });
+ }
+ if (!token) return;
+ try {
+ await fetch(`${API_BASE}/api/masterclass/nudge-seen`, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+ body: JSON.stringify({ kind, action, source: 'practice_ai_popup' }),
+ });
+ } catch {}
+}
+
+function maybeShowCasperMasterclassNudge(kind) {
+ if (kind !== 'casper') return;
+ const current = getLocalCasperMasterclassNudgeState(kind);
+ setLocalCasperMasterclassNudgeState(kind, { localReviewCount: Math.max(0, Number(current.localReviewCount || 0)) + 1 });
+ if (!localCasperMasterclassNudgeAllowsShow(kind)) return;
+ setTimeout(() => {
+ const modal = document.getElementById('casperMasterclassNudge');
+ if (!modal) return;
+ modal.classList.add('open');
+ modal.dataset.previousOverflow = document.body.style.overflow || '';
+ document.body.style.overflow = 'hidden';
+ saveCasperMasterclassNudgeAction(kind, 'shown');
+ if (window.Key2MDTrack?.funnel) window.Key2MDTrack.funnel('casper_masterclass_popup_shown', { source: 'practice_ai' });
+ }, 450);
+}
+
+function closeCasperMasterclassNudge(action = 'snooze') {
+ const modal = document.getElementById('casperMasterclassNudge');
+ if (!modal) return;
+ const cleanAction = action === 'dismissed' || action === 'clicked' ? action : 'snooze';
+ modal.classList.remove('open');
+ document.body.style.overflow = modal.dataset.previousOverflow || '';
+ saveCasperMasterclassNudgeAction('casper', cleanAction);
+ if (window.Key2MDTrack?.funnel) window.Key2MDTrack.funnel(`casper_masterclass_popup_${cleanAction}`, { source: 'practice_ai' });
+}
+
+function goToCasperMasterclass() {
+ if (window.Key2MDTrack?.funnel) window.Key2MDTrack.funnel('casper_masterclass_popup_click', { source: 'practice_ai' });
+ saveCasperMasterclassNudgeAction('casper', 'clicked');
+ window.location.href = 'https://www.key2md.com/casper-masterclass.html';
+}
+
+document.addEventListener('click', event => {
+ const modal = document.getElementById('casperMasterclassNudge');
+ if (modal?.classList.contains('open') && event.target === modal) closeCasperMasterclassNudge();
+});
+
+document.addEventListener('keydown', event => {
+ if (event.key === 'Escape') closeCasperMasterclassNudge();
+});
+
 function triggerAutoSave(idx) {
  clearTimeout(_saveDebounceTimer);
  const req = buildAutoSaveRequest(idx);
@@ -4292,6 +4414,7 @@ ${h.answer}
  return;
  }
 
+ const masterclassNudgeKind = res.headers.get('X-Key2MD-Masterclass-Nudge') || '';
  const reader = res.body.getReader();
  const decoder = new TextDecoder();
  let buffer = '';
@@ -4325,6 +4448,7 @@ ${h.answer}
  try{ showScoreCalibrationReminder = k2TrackCompletion(fb.score) === true; }catch(e){}
  showFeedback(fb.score,fb,{forceScoreDisclaimer:showScoreCalibrationReminder});updateTrend();updateAvgStat();updatePersistentCompetencyProgress();
  refreshLeaderboardData({silent:true});
+ maybeShowCasperMasterclassNudge(masterclassNudgeKind);
 
  }catch(err){
  clearStreamTimers();
@@ -6784,6 +6908,37 @@ document.addEventListener('DOMContentLoaded', function(){
  <a href="https://www.key2md.com/testimonials.html">Student Results</a>
  <a href="https://www.key2md.com/about.html">About Dan</a>
  </div>
+
+<div class="masterclass-nudge-overlay" id="casperMasterclassNudge" role="dialog" aria-modal="true" aria-labelledby="casperMasterclassNudgeTitle" aria-describedby="casperMasterclassNudgeDesc">
+ <div class="masterclass-nudge-card">
+ <div class="masterclass-nudge-head">
+ <button type="button" class="masterclass-nudge-close" onclick="closeCasperMasterclassNudge()" aria-label="Close">x</button>
+ <div class="masterclass-nudge-kicker">Live CASPer Masterclass - June 11</div>
+ <h2 class="masterclass-nudge-title" id="casperMasterclassNudgeTitle">Turn solo practice into exam-ready judgement.</h2>
+ <p class="masterclass-nudge-sub" id="casperMasterclassNudgeDesc">A 2-2.5 hour live Zoom session with Dan at 1pm AEST. Built for students who want a final calibration pass before CASPer, not another generic framework lecture.</p>
+ </div>
+ <div class="masterclass-nudge-body">
+ <div class="masterclass-nudge-facts">
+ <div class="masterclass-nudge-fact"><strong>$300 AUD</strong><span>One-time registration</span></div>
+ <div class="masterclass-nudge-fact"><strong>Live Q&A</strong><span>Ask your edge cases</span></div>
+ <div class="masterclass-nudge-fact"><strong>5,000+</strong><span>Response patterns analysed</span></div>
+ </div>
+ <div class="masterclass-nudge-panel"><strong>Why this is useful after AI practice:</strong> the tool can tell you what went wrong in one answer. The masterclass shows the repeated patterns Dan sees across thousands of responses, and how top-quartile answers handle the same pressure without sounding rehearsed.</div>
+ <div class="masterclass-nudge-list">
+ <div class="masterclass-nudge-item"><span class="masterclass-nudge-dot"></span><span>Dan walks through what strong CASPer answers consistently do differently: judgement, tone, trade-offs, structure, and when to be decisive.</span></div>
+ <div class="masterclass-nudge-item"><span class="masterclass-nudge-dot"></span><span>High-yield station speed run: common traps, common answer types, and the phrases students use when they understand the dilemma.</span></div>
+ <div class="masterclass-nudge-item"><span class="masterclass-nudge-dot"></span><span>Designed as a final reset for the June 11 sitting, and still useful as final-week calibration if your CASPer is later in June.</span></div>
+ <div class="masterclass-nudge-item"><span class="masterclass-nudge-dot"></span><span>You can ask Dan questions live about timing, phrasing, empathy, policy stations, conflict stations, and the answers that look good but quietly lose marks.</span></div>
+ </div>
+ <div class="masterclass-nudge-actions">
+ <button type="button" class="masterclass-nudge-primary" onclick="goToCasperMasterclass()">View details / register -></button>
+ <button type="button" class="masterclass-nudge-secondary" onclick="closeCasperMasterclassNudge('snooze')">Remind me later</button>
+ <button type="button" class="masterclass-nudge-secondary danger" onclick="closeCasperMasterclassNudge('dismissed')">Don't show again</button>
+ </div>
+ <div class="masterclass-nudge-note">Remind me later shows this again after 5 more CASPer AI-marked stations or after 24 hours, whichever comes first.</div>
+ </div>
+ </div>
+</div>
 
 <div id="bookModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
  <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:40px 36px;max-width:480px;width:100%;position:relative;font-family:'DM Sans',system-ui,sans-serif;">

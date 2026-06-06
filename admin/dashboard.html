@@ -937,7 +937,7 @@
  <div class="page-sub">Typed CASPer AI feedback sessions - empathy, reasoning, quartile-style scores, and scenario patterns.</div>
  </div>
  <div class="controls">
- <input class="ctrl-in" id="revSearch" type="text" placeholder=" Search email, name, scenario..." oninput="renderReviews()">
+ <input class="ctrl-in" id="revSearch" type="text" placeholder=" Search email, name, scenario..." oninput="queueReviewSearch()">
  <select class="ctrl-sel" id="revTier" onchange="renderReviews()">
  <option value="">All tiers</option>
  <option value="free">Free</option>
@@ -954,9 +954,9 @@
  <select class="ctrl-sel" id="revLimit" onchange="loadReviews()">
  <option value="50">50 rows</option>
  <option value="100">100 rows</option>
- <option value="250">250 rows</option>
+ <option value="250" selected>250 rows</option>
  <option value="1000">1,000 rows</option>
- <option value="5000" selected>All rows</option>
+ <option value="5000">All rows</option>
  </select>
  <button class="btn" onclick="loadReviews()">Refresh</button>
  <button class="btn" onclick="exportCsv('reviews')">Download CSV</button>
@@ -1902,8 +1902,8 @@
  </div>
  </div>
  <div class="controls">
- <input class="ctrl-in" id="mmiSearch" type="text" placeholder=" Search email, scenario, category..." oninput="renderMMI()">
- <select class="ctrl-sel" id="mmiSource" onchange="renderMMI()">
+ <input class="ctrl-in" id="mmiSearch" type="text" placeholder=" Search email, scenario, category..." oninput="queueMMISearch()">
+ <select class="ctrl-sel" id="mmiSource" onchange="queueMMISearch()">
  <option value="">All sources</option>
  <option value="mmi_tool">MMI practice tool</option>
  <option value="casper_mock">CASPer mock videos</option>
@@ -1948,15 +1948,14 @@
  <option value="oldest">Oldest first</option>
  <option value="day_volume">Busiest day first</option>
  <option value="score_desc">Highest score</option>
- <option value="cost_desc">Highest COGS</option>
  <option value="student">Student A-Z</option>
  </select>
  <select class="ctrl-sel" id="mmiLimit" onchange="loadMMI()">
  <option value="50">50 rows</option>
  <option value="100">100 rows</option>
- <option value="250">250 rows</option>
+ <option value="250" selected>250 rows</option>
  <option value="1000">1,000 rows</option>
- <option value="5000" selected>All rows</option>
+ <option value="5000">All rows</option>
  </select>
  <button class="btn" onclick="loadMMI()">Refresh</button>
  </div>
@@ -2309,6 +2308,8 @@ const WARM_OUTREACH_LOCAL_KEY = 'k2md_warm_outreach_local_v1';
 const NAV_SEEN_KEY = 'k2md_admin_nav_seen_v1';
 const ACTION_STATUS_KEY = 'k2md_admin_action_status_v1';
 const NAV_NOTIFY_PAGES = new Set(['s2','mmi','mocks','warmleads','sharing','enquiries','growth']);
+const REVIEW_RENDER_LIMIT = 450;
+const MMI_RENDER_LIMIT = 260;
 
 const S = {
  token: null,
@@ -2330,6 +2331,11 @@ const S = {
  mockPassModalUserId: null,
  duplicateFlagModalUserId: null,
  duplicateFlagModalEmail: '',
+ reviewSearchTimer: null,
+ reviewsRemoteQuery: '',
+ mmiSearchTimer: null,
+ mmiRemoteQuery: '',
+ mmiRemoteSource: '',
  mockScope: localStorage.getItem('k2md_mock_admin_scope') || 'all',
  mockSort: localStorage.getItem('k2md_mock_admin_sort') || 'recent',
  userSegment: 'all',
@@ -3421,15 +3427,31 @@ function renderReviewQuality() {
 // REVIEWS
 // ======================================================
 async function loadReviews() {
- const limit = document.getElementById('revLimit')?.value||'5000';
+ const limit = document.getElementById('revLimit')?.value||'250';
+ const q = String(document.getElementById('revSearch')?.value || '').trim();
+ const remoteQuery = q.length >= 3 ? q : '';
  try {
- const res = await api(`/admin/reviews?tool=casper&reviewed=1&limit=${limit}`);
+ const status = document.getElementById('revStatus');
+ if (status) status.textContent = remoteQuery ? `Searching CASPer reviews for "${remoteQuery}"...` : 'Loading recent CASPer reviews...';
+ const params = new URLSearchParams({ tool:'casper', reviewed:'1', limit });
+ if (remoteQuery) params.set('q', remoteQuery);
+ const res = await api(`/admin/reviews?${params.toString()}`);
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.error||'Failed');
+ S.reviewsRemoteQuery = remoteQuery;
  S.reviews = (data.rows||[]).filter(row => String(row.ai_feedback || '').trim() && String(row.credit_source || '') !== 'saved');
  renderReviews();
  updateDashboard();
  } catch(e) { console.error('Reviews load error:', e); }
+}
+
+function queueReviewSearch() {
+ renderReviews();
+ clearTimeout(S.reviewSearchTimer);
+ const q = String(document.getElementById('revSearch')?.value || '').trim();
+ if (q.length >= 3 || S.reviewsRemoteQuery) {
+ S.reviewSearchTimer = setTimeout(() => loadReviews(), 320);
+ }
 }
 
 function renderReviews() {
@@ -3448,11 +3470,14 @@ function renderReviews() {
  || (scoreFilter==='low' && score>0 && score<5);
  return sm&&tm&&trm&&scm;
  });
- document.getElementById('revStatus').textContent = `${rows.length} AI-reviewed CASPer station${rows.length===1?'':'s'}`;
+ const displayRows = rows.slice(0, REVIEW_RENDER_LIMIT);
+ const remoteNote = S.reviewsRemoteQuery ? ` | server search: "${S.reviewsRemoteQuery}"` : '';
+ const clippedNote = rows.length > displayRows.length ? ` | showing first ${displayRows.length}; narrow search for more` : '';
+ document.getElementById('revStatus').textContent = `${rows.length} AI-reviewed CASPer station${rows.length===1?'':'s'}${clippedNote}${remoteNote}`;
  document.getElementById('revEmpty').classList.toggle('hidden', rows.length>0);
  const tbody = document.getElementById('revBody');
  tbody.innerHTML = '';
- rows.forEach(row => {
+ displayRows.forEach(row => {
  const fb = parseFb(row.ai_feedback);
  const score = fb?.score;
  const hasFeedback = !!String(row.ai_feedback || '').trim();
@@ -8068,13 +8093,21 @@ async function quickMockStatus(id, status) {
 }
 
 async function loadMMI() {
- const limit = document.getElementById('mmiLimit')?.value||'5000';
+ const limit = document.getElementById('mmiLimit')?.value||'250';
+ const q = String(document.getElementById('mmiSearch')?.value || '').trim();
+ const remoteQuery = q.length >= 3 ? q : '';
+ const source = document.getElementById('mmiSource')?.value || '';
  try {
  const status = document.getElementById('mmiStatus');
- if (status) status.textContent = 'Loading MMI reviews...';
- const res = await api(`/admin/mmi?limit=${limit}`);
+ if (status) status.textContent = remoteQuery ? `Searching MMI reviews for "${remoteQuery}"...` : (source ? 'Filtering MMI reviews...' : 'Loading recent MMI reviews...');
+ const params = new URLSearchParams({ limit });
+ if (remoteQuery) params.set('q', remoteQuery);
+ if (source) params.set('source', source);
+ const res = await api(`/admin/mmi?${params.toString()}`);
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.error||'Failed');
+ S.mmiRemoteQuery = remoteQuery;
+ S.mmiRemoteSource = source;
  S.mmiReviews = data.rows||[];
  if (S.mmiSelectedId && !S.mmiReviews.some(r => String(r.id) === String(S.mmiSelectedId))) S.mmiSelectedId = null;
  if (!S.mmiSelectedId && S.mmiReviews[0]) S.mmiSelectedId = String(S.mmiReviews[0].id || '');
@@ -8084,6 +8117,17 @@ async function loadMMI() {
  console.error('MMI load error:', e);
  const status = document.getElementById('mmiStatus');
  if (status) status.textContent = e.message || 'MMI load failed';
+ }
+}
+
+function queueMMISearch() {
+ renderMMI();
+ clearTimeout(S.mmiSearchTimer);
+ const q = String(document.getElementById('mmiSearch')?.value || '').trim();
+ const source = document.getElementById('mmiSource')?.value || '';
+ const remoteSource = S.mmiRemoteSource || '';
+ if (q.length >= 3 || source !== remoteSource || S.mmiRemoteQuery) {
+ S.mmiSearchTimer = setTimeout(() => loadMMI(), 320);
  }
 }
 
@@ -8205,7 +8249,6 @@ function sortMMIRows(rows) {
  if (sort === 'oldest') return at - bt;
  if (sort === 'student') return String(a.email || a.name || '').localeCompare(String(b.email || b.name || ''));
  if (sort === 'score_desc') return mmiScorePct(b) - mmiScorePct(a) || bt - at;
- if (sort === 'cost_desc') return Number(b.cogs_cents || 0) - Number(a.cogs_cents || 0) || bt - at;
  if (sort === 'day_volume') {
  const dc = (dayCounts.get(mmiDayKey(b)) || 0) - (dayCounts.get(mmiDayKey(a)) || 0);
  return dc || bt - at;
@@ -8244,8 +8287,6 @@ function renderMMIOverview(rows) {
  const mmiTool = rows.filter(r => mmiReviewSource(r) === 'mmi_tool').length;
  const mockVideo = rows.filter(r => mmiReviewSource(r) === 'casper_mock').length;
  const today = rows.filter(r => mmiDateRangeMatch('today', r)).length;
- const totalCogs = rows.reduce((sum, r) => sum + Number(r.cogs_cents || 0), 0);
- const avgCogs = rows.length ? Math.round(totalCogs / rows.length) : 0;
  const traps = rows.filter(r => parseMMIFb(r.ai_feedback_json)?.polished_auditor_detected).length;
  const premium = rows.filter(r => r.tier === 'premium').length;
  el.innerHTML = `
@@ -8253,7 +8294,7 @@ function renderMMIOverview(rows) {
  <div class="mmi-kpi"><div class="mmi-kpi-label">Today</div><div class="mmi-kpi-value">${today}</div><div class="mmi-kpi-sub">Rows matching current filters</div></div>
  <div class="mmi-kpi good"><div class="mmi-kpi-label">Avg score</div><div class="mmi-kpi-value">${scored.length ? `${Math.round(avgPct * 100)}%` : '-'}</div><div class="mmi-kpi-sub">${scored.length} scored response${scored.length===1?'':'s'}</div></div>
  <div class="mmi-kpi"><div class="mmi-kpi-label">Recordings</div><div class="mmi-kpi-value">${recordings}</div><div class="mmi-kpi-sub">Retained media available</div></div>
- <div class="mmi-kpi"><div class="mmi-kpi-label">Est. COGS</div><div class="mmi-kpi-value">${totalCogs ? `$${(totalCogs/100).toFixed(2)}` : '-'}</div><div class="mmi-kpi-sub">${avgCogs || '-'} cents avg / row</div></div>
+ <div class="mmi-kpi"><div class="mmi-kpi-label">Premium</div><div class="mmi-kpi-value">${premium}</div><div class="mmi-kpi-sub">Voice / visual feedback sessions</div></div>
  <div class="mmi-kpi warn"><div class="mmi-kpi-label">Review flags</div><div class="mmi-kpi-value">${traps}</div><div class="mmi-kpi-sub">${premium} premium session${premium===1?'':'s'}</div></div>`;
 }
 
@@ -8263,8 +8304,13 @@ function renderMMIList(rows) {
  const status = document.getElementById('mmiStatus');
  const mmiTool = rows.filter(r => mmiReviewSource(r) === 'mmi_tool').length;
  const mockVideo = rows.filter(r => mmiReviewSource(r) === 'casper_mock').length;
- const totalCogs = rows.reduce((sum, r) => sum + Number(r.cogs_cents || 0), 0);
- if (status) status.textContent = `${rows.length} row${rows.length===1?'':'s'} shown | ${mmiTool} MMI tool | ${mockVideo} CASPer mock | est. COGS $${(totalCogs/100).toFixed(2)}`;
+ const displayRows = rows.slice(0, MMI_RENDER_LIMIT);
+ const clippedNote = rows.length > displayRows.length ? ` | showing first ${displayRows.length}; narrow search for more` : '';
+ const remoteParts = [];
+ if (S.mmiRemoteQuery) remoteParts.push(`server search: "${S.mmiRemoteQuery}"`);
+ if (S.mmiRemoteSource) remoteParts.push(`source: ${S.mmiRemoteSource === 'casper_mock' ? 'CASPer mock' : 'MMI tool'}`);
+ const remoteNote = remoteParts.length ? ` | ${remoteParts.join(' | ')}` : '';
+ if (status) status.textContent = `${rows.length} row${rows.length===1?'':'s'} shown | ${mmiTool} MMI tool | ${mockVideo} CASPer mock${clippedNote}${remoteNote}`;
  if (empty) empty.classList.toggle('hidden', rows.length>0);
  if (!list) return;
  if (!rows.length) {
@@ -8272,10 +8318,10 @@ function renderMMIList(rows) {
  return;
  }
  const groupByDay = ['day','day_volume'].includes(document.getElementById('mmiSort')?.value || 'day');
- const daily = buildMMIDailySummary(rows);
+ const daily = buildMMIDailySummary(displayRows);
  let lastDay = null;
  const parts = [];
- rows.forEach(row => {
+ displayRows.forEach(row => {
  const fb = parseMMIFb(row.ai_feedback_json);
  const dt = fmtDate(row.created_at);
  const scoreInfo = mmiScoreInfo(row, fb);
@@ -8285,8 +8331,8 @@ function renderMMIList(rows) {
  const transcriptWords = wordCount(row.transcript_text);
  const dayKey = mmiDayKey(row);
  if (groupByDay && dayKey !== lastDay) {
- const sum = daily.get(dayKey) || { total:0, mmi:0, mock:0, cogs:0 };
- parts.push(`<div class="mmi-day-divider"><div class="mmi-day-title">${esc(mmiDayLabel(row))}</div><div class="mmi-day-meta">${sum.total} row${sum.total===1?'':'s'} | ${sum.mmi} MMI | ${sum.mock} mock | $${(sum.cogs/100).toFixed(2)}</div></div>`);
+ const sum = daily.get(dayKey) || { total:0, mmi:0, mock:0 };
+ parts.push(`<div class="mmi-day-divider"><div class="mmi-day-title">${esc(mmiDayLabel(row))}</div><div class="mmi-day-meta">${sum.total} row${sum.total===1?'':'s'} | ${sum.mmi} MMI | ${sum.mock} mock</div></div>`);
  lastDay = dayKey;
  }
  parts.push(`<button type="button" class="mmi-review-card ${selected?'active':''}" onclick='selectMMIReview(${jsArg(row.id)})'>
@@ -8313,11 +8359,10 @@ function buildMMIDailySummary(rows) {
  const map = new Map();
  rows.forEach(row => {
  const key = mmiDayKey(row);
- const current = map.get(key) || { total:0, mmi:0, mock:0, cogs:0 };
+ const current = map.get(key) || { total:0, mmi:0, mock:0 };
  current.total += 1;
  if (mmiReviewSource(row) === 'casper_mock') current.mock += 1;
  else current.mmi += 1;
- current.cogs += Number(row.cogs_cents || 0);
  map.set(key, current);
  });
  return map;
@@ -8673,7 +8718,6 @@ function renderMMIMetadata(row) {
  <div class="detail-box-row"><strong>Station ID:</strong> ${esc(row.station_id || '-')}</div>
  <div class="detail-box-row"><strong>Timing:</strong> ${esc(row.timing_preset || '-')} | ${esc(row.reveal_mode || '-')}</div>
  <div class="detail-box-row"><strong>Charge:</strong> ${esc(mmiChargeLabel(row))}</div>
- <div class="detail-box-row"><strong>COGS:</strong> ${esc(row.cogs_cents ?? '-')} cents</div>
  <div class="detail-box-row"><strong>Recording key:</strong> ${esc(row.recording_url || '-')}</div>
  </div>
  </div>`;
