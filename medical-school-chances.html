@@ -967,62 +967,18 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  }
  .bonus-school-pill.active .bonus-pill-badge { background: rgba(255,255,255,0.3); }
 
-/* ---- GPA inputs ---- */
-.gpa-row { margin-bottom: 12px; }
-.gpa-row label { display:block; font-size:0.78rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--gray500); margin-bottom:6px; }
-.gpa-tip { position:relative; display:inline-block; }
-.gpa-tip-icon { display:inline-flex; align-items:center; justify-content:center; width:13px; height:13px; border-radius:50%; background:var(--gray200); color:var(--gray500); font-size:0.58rem; font-weight:900; font-style:normal; cursor:default; margin-left:3px; vertical-align:middle; user-select:none; }
-.gpa-tip-box { display:none; position:absolute; bottom:calc(100% + 6px); left:0; width:220px; background:var(--navy); color:rgba(255,255,255,0.88); font-size:0.70rem; line-height:1.5; padding:8px 10px; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.22); z-index:99; pointer-events:none; font-weight:400; text-transform:none; letter-spacing:0; }
-.gpa-tip-box::after { content:''; position:absolute; top:100%; left:16px; border:5px solid transparent; border-top-color:var(--navy); }
-.gpa-tip:hover .gpa-tip-box, .gpa-tip:focus-within .gpa-tip-box { display:block; }
-.gpa-fallback-btn { background:none; border:none; padding:0; font:inherit; font-size:0.72rem; font-weight:600; color:var(--gray400); cursor:pointer; text-decoration:underline; text-underline-offset:2px; text-decoration-style:dotted; display:inline-flex; align-items:center; gap:4px; margin-top:8px; }
-.gpa-fallback-btn:hover { color:var(--gray600); }
-.gpa-fallback-btn .gpa-fb-arr { font-style:normal; transition:transform 0.16s; font-size:0.58rem; }
-.gpa-fallback-btn.open .gpa-fb-arr { transform:rotate(90deg); }
-.gpa-fallback-panel { display:none; margin-top:8px; }
-.gpa-fallback-panel.open { display:block; }
-.gpa-fallback-inner { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-.gpa-fallback-inner label { font-size:0.72rem; font-weight:600; color:var(--gray500); white-space:nowrap; text-transform:none; letter-spacing:0; margin-bottom:0; }
-.gpa-fallback-inp { width:90px; min-height:36px; border:1.5px solid var(--gray200); border-radius:8px; padding:0 8px; font:inherit; font-size:0.9rem; font-weight:700; color:var(--navy); background:#fff; }
-.gpa-fallback-inp:focus { outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(14,165,233,0.10); }
-.gpa-fallback-note { font-size:0.68rem; color:#92400e; line-height:1.45; padding:6px 9px; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; }
-.gpa-yearly-toggle-row { margin-top:8px; }
-.gpa-yearly-toggle-btn { background:none; border:none; padding:0; font:inherit; font-size:0.72rem; font-weight:600; color:var(--teal3); cursor:pointer; text-decoration:underline; text-underline-offset:2px; text-decoration-style:dotted; display:inline-flex; align-items:center; gap:4px; }
-.gpa-yearly-toggle-btn:hover { color:var(--teal2); }
-.gpa-yearly-toggle-btn .gpa-yr-arr { font-style:normal; transition:transform 0.16s; font-size:0.58rem; }
-.gpa-yearly-toggle-btn.open .gpa-yr-arr { transform:rotate(90deg); }
-.gpa-yearly-panel { display:none; margin-top:8px; background:#f8fafc; border:1px solid var(--gray200); border-radius:10px; padding:12px; }
-.gpa-yearly-panel.open { display:block; animation:gpaFadeIn 0.15s ease-out; }
-@keyframes gpaFadeIn { from{opacity:0;transform:translateY(-3px)} to{opacity:1;transform:translateY(0)} }
-.gpa-deg-toggle { display:flex; gap:5px; margin-bottom:10px; background:var(--gray100); border-radius:8px; padding:3px; border:1px solid var(--gray200); }
-.gpa-deg-toggle button { flex:1; padding:6px 4px; border-radius:6px; border:none; background:transparent; font:inherit; font-size:0.70rem; font-weight:700; color:var(--gray500); cursor:pointer; transition:all 0.16s; line-height:1.3; }
-.gpa-deg-toggle button.active { background:var(--white); color:var(--navy); box-shadow:0 1px 4px rgba(10,22,40,0.10); }
-.gpa-year-rows { display:grid; gap:8px; margin-bottom:10px; }
-.gpa-year-row { display:flex; align-items:flex-start; gap:8px; justify-content:space-between; }
-.gpa-year-lbl { font-size:0.74rem; font-weight:700; color:var(--navy); line-height:1.3; flex:1; }
-.gpa-year-sub { font-size:0.64rem; color:var(--gray400); line-height:1.3; margin-top:1px; }
-.gpa-year-inp { width:72px; flex-shrink:0; min-height:32px; border:1.5px solid var(--gray200); border-radius:7px; padding:0 7px; font:inherit; font-size:0.85rem; font-weight:700; color:var(--navy); background:#fff; text-align:right; }
-.gpa-year-inp:focus { outline:none; border-color:var(--teal); box-shadow:0 0 0 2px rgba(14,165,233,0.12); }
-.gpa-hon-row { margin-top:4px; padding:8px 10px; background:#f0fdf4; border:1px solid rgba(34,197,94,0.25); border-radius:7px; display:none; }
-.gpa-hon-row.show { display:block; }
-.gpa-hon-chk-label { display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.72rem; font-weight:700; color:var(--navy); }
-.gpa-hon-chk-label input[type="checkbox"] { width:13px; height:13px; accent-color:var(--teal3); }
-.gpa-hon-cls { margin-top:8px; display:none; }
-.gpa-hon-cls.show { display:block; }
-.gpa-hon-cls select { width:100%; min-height:32px; border:1.5px solid var(--gray200); border-radius:7px; padding:0 8px; font:inherit; font-size:0.78rem; font-weight:700; color:var(--navy); background:#fff; }
-.gpa-hon-note { margin-top:6px; font-size:0.65rem; color:#166534; line-height:1.4; }
-.gpa-yearly-results { background:#fff; border:1px solid var(--gray200); border-radius:8px; padding:9px 11px; margin-bottom:8px; }
-.gpa-yr-result-row { display:flex; justify-content:space-between; align-items:baseline; gap:6px; padding:3px 0; }
-.gpa-yr-result-row + .gpa-yr-result-row { border-top:1px dashed var(--gray200); margin-top:3px; padding-top:6px; }
-.gpa-yr-result-lbl { font-size:0.68rem; color:var(--gray500); font-weight:600; flex:1; line-height:1.3; }
-.gpa-yr-result-lbl small { display:block; font-size:0.62rem; font-weight:400; color:var(--gray400); }
-.gpa-yr-result-val { font-size:0.92rem; font-weight:900; color:var(--navy); white-space:nowrap; }
-.gpa-yr-result-val.hi { color:var(--teal3); }
-.gpa-yearly-apply-btn { width:100%; padding:8px; border-radius:7px; border:1.5px solid var(--teal3); background:rgba(14,165,233,0.07); color:var(--teal3); font:inherit; font-size:0.74rem; font-weight:700; cursor:pointer; transition:all 0.16s; margin-bottom:8px; }
-.gpa-yearly-apply-btn:hover { background:var(--teal3); color:#fff; }
-.gpa-yearly-apply-btn:disabled { opacity:0.4; cursor:not-allowed; }
-.gpa-wt-note { font-size:0.65rem; color:var(--gray400); line-height:1.5; padding-top:6px; border-top:1px dashed var(--gray200); }
-.gpa-wt-note strong { color:var(--gray600); }
+/* ---- International section improvements ---- */
+.intl-gamsat-toggle { display:flex; gap:6px; margin-bottom:12px; background:var(--gray100); border-radius:8px; padding:3px; }
+.intl-gamsat-toggle button { flex:1; padding:7px 4px; border-radius:6px; border:none; background:transparent; font:inherit; font-size:0.74rem; font-weight:700; color:var(--gray500); cursor:pointer; transition:all 0.18s; }
+.intl-gamsat-toggle button.active { background:var(--white); color:var(--navy); box-shadow:0 1px 4px rgba(10,22,40,0.10); }
+.intl-section-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
+.intl-score-preview { margin-top:6px; padding:8px 10px; border-radius:8px; background:#fff; border:1px dashed var(--gray200); font-size:0.76rem; color:var(--gray600); line-height:1.5; }
+.intl-mcat-hurdle { margin-top:8px; font-size:0.74rem; line-height:1.5; padding:6px 10px; border-radius:7px; }
+.intl-mcat-hurdle.pass { background:#f0fdf4; color:#166534; border:1px solid rgba(34,197,94,0.25); }
+.intl-mcat-hurdle.fail { background:#fef2f2; color:#991b1b; border:1px solid rgba(239,68,68,0.25); }
+.intl-mcat-hurdle.neutral { background:#f8fafc; color:var(--gray600); border:1px solid var(--gray200); }
+.intl-gamsat-note { margin-top:6px; font-size:0.72rem; color:var(--gray500); line-height:1.45; }
+.intl-school-score-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border-radius:999px; background:rgba(14,165,233,0.09); color:#075985; border:1px solid rgba(14,165,233,0.22); font-size:0.70rem; font-weight:700; margin-top:8px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
@@ -1193,95 +1149,23 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div id="graduateCalculatorPanel" class="entry-panel">
  <div class="calc-grid calc-initial-only">
  <div class="field">
-
-  <!-- Weighted GPA -->
-  <div class="gpa-row">
-    <label for="gpaInput">Weighted GPA
-      <span class="gpa-tip" tabindex="0"><i class="gpa-tip-icon">?</i><span class="gpa-tip-box">Standard GEMSAS GPA — final year counts triple (1:2:3 weighting). Used by most schools: Deakin, ANU, UWA, UQ, Macquarie, UNDS, UNDF, UoW.</span></span>
-    </label>
-    <div class="input-wrap">
-      <input type="number" id="gpaInput" step="0.01" min="4" max="7" placeholder="e.g. 6.45" inputmode="decimal" autocomplete="off">
-    </div>
-  </div>
-
-  <!-- Unweighted GPA -->
-  <div class="gpa-row">
-    <label for="gpaUnweightedInput">Unweighted GPA <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.72rem;">(optional)</span>
-      <span class="gpa-tip" tabindex="0"><i class="gpa-tip-icon">?</i><span class="gpa-tip-box">Plain average of all 3 years equally weighted. Griffith uses this. Leave blank and Griffith falls back to your weighted GPA — slightly less accurate.</span></span>
-    </label>
-    <div class="input-wrap">
-      <input type="number" id="gpaUnweightedInput" step="0.01" min="4" max="7" placeholder="e.g. 6.30" inputmode="decimal" autocomplete="off">
-    </div>
-  </div>
-
-  <div class="input-error" id="gpaErr">Enter at least one GPA between 4.0 and 7.0.</div>
-
-  <!-- Best-guess fallback -->
-  <button type="button" class="gpa-fallback-btn" id="gpaFallbackToggle" aria-expanded="false">
-    <i class="gpa-fb-arr">&#9658;</i> Unsure? Use your best guess
-  </button>
-  <div class="gpa-fallback-panel" id="gpaFallbackPanel">
-    <div class="gpa-fallback-inner">
-      <label for="gpaFallbackInput">My GPA is roughly</label>
-      <input type="number" id="gpaFallbackInput" class="gpa-fallback-inp" step="0.01" min="4" max="7" placeholder="e.g. 6.7" inputmode="decimal" autocomplete="off">
-    </div>
-    <div class="gpa-fallback-note">Used across all schools as a blanket estimate. Without knowing weighted vs unweighted, accuracy drops slightly for Griffith and Melbourne.</div>
-  </div>
-
-  <!-- Yearly breakdown -->
-  <div class="gpa-yearly-toggle-row">
-    <button type="button" class="gpa-yearly-toggle-btn" id="gpaYearlyToggleBtn" aria-expanded="false">
-      <i class="gpa-yr-arr">&#9658;</i> Know your yearly GPAs? Calculate both automatically
-    </button>
-  </div>
-  <div class="gpa-yearly-panel" id="gpaYearlyPanel" aria-hidden="true">
-    <div class="gpa-deg-toggle" role="group">
-      <button type="button" id="gpaDegStd" class="active">Standard bachelor<br><span style="font-size:0.60rem;opacity:0.7;font-weight:400">3 or 4 yr — last 3 used</span></button>
-      <button type="button" id="gpaDegHon">Standalone honours<br><span style="font-size:0.60rem;opacity:0.7;font-weight:400">Honours + 2 bachelor years</span></button>
-    </div>
-    <div class="gpa-year-rows" id="gpaYearRows"></div>
-    <div class="gpa-yearly-results" aria-live="polite">
-      <div class="gpa-yr-result-row">
-        <span class="gpa-yr-result-lbl">Weighted (1:2:3)<small>Most schools</small></span>
-        <span class="gpa-yr-result-val hi" id="gpaCalcW">—</span>
-      </div>
-      <div class="gpa-yr-result-row">
-        <span class="gpa-yr-result-lbl">Unweighted (avg)<small>Griffith</small></span>
-        <span class="gpa-yr-result-val" id="gpaCalcU">—</span>
-      </div>
-      <div class="gpa-yr-result-row">
-        <span class="gpa-yr-result-lbl">Melbourne (1:2:2)<small>UoM only</small></span>
-        <span class="gpa-yr-result-val" id="gpaCalcM">—</span>
-      </div>
-    </div>
-    <button type="button" class="gpa-yearly-apply-btn" id="gpaYearlyApply" disabled>Fill GPA fields above</button>
-    <div class="gpa-wt-note"><strong>Griffith</strong> uses unweighted. <strong>Melbourne</strong> uses 1:2:2. All others use standard 1:2:3 weighted.</div>
-  </div>
-
-  <!-- Flinders + Melbourne school-specific GPAs -->
-  <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-    <label for="gpaFlindersInput" style="font-size:0.72rem;font-weight:600;color:var(--gray400);white-space:nowrap;">Flinders GPA <span style="font-weight:400;">(optional)</span></label>
-    <input type="number" id="gpaFlindersInput" step="0.01" min="4" max="7" placeholder="e.g. 6.60" inputmode="decimal" autocomplete="off" style="width:110px;min-height:34px;border:1px solid var(--gray200);border-radius:8px;padding:0 10px;font:inherit;font-size:0.85rem;font-weight:700;color:var(--navy);">
-    <details style="display:inline;font-size:0.68rem;color:var(--gray400);">
-      <summary style="display:inline;cursor:pointer;color:var(--gray400);font-size:0.68rem;list-style:none;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dotted;">Flinders only. What GPA to use?</summary>
-      <div style="margin-top:8px;padding:10px 12px;background:#f8fafc;border:1px solid var(--gray200);border-radius:8px;font-size:0.72rem;color:var(--gray600);line-height:1.6;max-width:340px;">
-        Flinders calculates its own weighted GPA — it is not the same as your GEMSAS GPA. If you have already run the Flinders wGPA calculation from their Application Guide, use that figure here.<br><br>
-        If you haven't, use your <strong>home university GPA</strong> (the raw GPA on your transcript, out of 7). That is a closer approximation than GEMSAS GPA, which applies a different weighting formula. Do <strong>not</strong> use your GEMSAS GPA here.
-      </div>
-    </details>
-  </div>
-  <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-    <label for="gpaUomInput" style="font-size:0.72rem;font-weight:600;color:var(--gray400);white-space:nowrap;">Melbourne GPA <span style="font-weight:400;">(optional)</span></label>
-    <input type="number" id="gpaUomInput" step="0.01" min="4" max="7" placeholder="e.g. 6.55" inputmode="decimal" autocomplete="off" style="width:110px;min-height:34px;border:1px solid var(--gray200);border-radius:8px;padding:0 10px;font:inherit;font-size:0.85rem;font-weight:700;color:var(--navy);">
-    <details style="display:inline;font-size:0.68rem;color:var(--gray400);">
-      <summary style="display:inline;cursor:pointer;color:var(--gray400);font-size:0.68rem;list-style:none;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dotted;">Melbourne only. What GPA to use?</summary>
-      <div style="margin-top:8px;padding:10px 12px;background:#f8fafc;border:1px solid var(--gray200);border-radius:8px;font-size:0.72rem;color:var(--gray600);line-height:1.6;max-width:340px;">
-        Melbourne uses its own 1:2:2 weighted GPA — final year counts double, not triple like most GEMSAS schools. Enter it here if you know it.<br><br>
-        If unsure, leave blank and the calculator will use your standard weighted GPA as a fallback. Use the yearly breakdown above to calculate it.
-      </div>
-    </details>
-  </div>
-
+ <label for="gpaInput">GEMSAS GPA (out of 7)</label>
+ <div class="input-wrap">
+ <input type="number" id="gpaInput" step="0.01" min="4" max="7" placeholder="e.g. 6.45" inputmode="decimal" autocomplete="off">
+ </div>
+ <div class="field-hint">Your <a href="blog-gemsas-gpa-explained.html" style="color:var(--teal3);text-decoration:underline;">GEMSAS-calculated GPA</a>, not your university GPA. Need an estimate? Use the <a href="gemsas-gpa-calculator.html" style="color:var(--teal3);text-decoration:underline;">GEMSAS GPA calculator</a>.</div>
+ <div class="input-error" id="gpaErr">Enter a GPA between 4.0 and 7.0.</div>
+            <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <label for="gpaFlindersInput" style="font-size:0.72rem;font-weight:600;color:var(--gray400);white-space:nowrap;">Flinders GPA <span style="font-weight:400;">(optional)</span></label>
+              <input type="number" id="gpaFlindersInput" step="0.01" min="4" max="7" placeholder="e.g. 6.60" inputmode="decimal" autocomplete="off" style="width:110px;min-height:34px;border:1px solid var(--gray200);border-radius:8px;padding:0 10px;font:inherit;font-size:0.85rem;font-weight:700;color:var(--navy);">
+              <details style="display:inline;font-size:0.68rem;color:var(--gray400);">
+                <summary style="display:inline;cursor:pointer;color:var(--gray400);font-size:0.68rem;list-style:none;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dotted;">Flinders only. What GPA to use?</summary>
+                <div style="margin-top:8px;padding:10px 12px;background:#f8fafc;border:1px solid var(--gray200);border-radius:8px;font-size:0.72rem;color:var(--gray600);line-height:1.6;max-width:340px;">
+                  Flinders calculates its own weighted GPA — it is not the same as your GEMSAS GPA. If you have already run the Flinders wGPA calculation from their Application Guide, use that figure here.<br><br>
+                  If you haven't, use your <strong>home university GPA</strong> (the raw GPA on your transcript, out of 7). That is a closer approximation than GEMSAS GPA, which applies a different weighting formula. Do <strong>not</strong> use your GEMSAS GPA here.
+                </div>
+              </details>
+            </div>
  </div>
  <div class="field">
  <label>GAMSAT score</label>
@@ -1490,13 +1374,57 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="input-wrap">
  <input type="number" id="intlGpaInput" step="0.01" min="4" max="7" placeholder="e.g. 6.5" inputmode="decimal" autocomplete="off">
  </div>
- <div class="field-hint">Your GEMSAS-equivalent GPA.</div>
+ <div class="field-hint">Your GEMSAS-converted GPA on a 7-point scale. GEMSAS converts overseas grades using your transcript's grading schema. If unsure, use the official <a href="https://applygemsas.edu.au/gemsas/#/gpa-calc" target="_blank" rel="noopener" style="color:var(--teal3);text-decoration:underline;">GEMSAS GPA calculator</a> as a guide.</div>
  </div>
  <div class="field" id="intlTestScoreField">
- <label for="intlTestScoreInput" id="intlTestScoreLabel">GAMSAT overall (out of 100)</label>
- <div class="input-wrap">
- <input type="number" id="intlTestScoreInput" step="0.1" min="0" max="100" placeholder="e.g. 65" inputmode="decimal" autocomplete="off">
- </div>
+  <label for="intlTestScoreInput" id="intlTestScoreLabel">GAMSAT overall (out of 100)</label>
+
+  <!-- GAMSAT input: overall OR sections -->
+  <div id="intlGamsatPanel">
+    <div class="intl-gamsat-toggle" id="intlGamsatToggle">
+      <button type="button" id="intlGamsatOverallBtn" class="active" onclick="setIntlGamsatMode('overall')">Overall score</button>
+      <button type="button" id="intlGamsatSectionsBtn" onclick="setIntlGamsatMode('sections')">S1 / S2 / S3</button>
+    </div>
+    <div id="intlGamsatOverallPanel">
+      <div class="input-wrap">
+        <input type="number" id="intlTestScoreInput" step="0.1" min="0" max="100" placeholder="e.g. 65" inputmode="decimal" autocomplete="off">
+      </div>
+      <div class="intl-gamsat-note">ACER overall weighted score. UoM and UQ use section averages — enter S1/S2/S3 for more accurate results at those schools.</div>
+    </div>
+    <div id="intlGamsatSectionsPanel" style="display:none">
+      <div class="intl-section-grid">
+        <div class="field" style="margin-bottom:0;">
+          <label for="intlS1Input" style="font-size:0.72rem;">Section 1</label>
+          <div class="input-wrap"><input type="number" id="intlS1Input" step="1" min="0" max="100" placeholder="S1" inputmode="decimal" autocomplete="off"></div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="intlS2Input" style="font-size:0.72rem;">Section 2</label>
+          <div class="input-wrap"><input type="number" id="intlS2Input" step="1" min="0" max="100" placeholder="S2" inputmode="decimal" autocomplete="off"></div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="intlS3Input" style="font-size:0.72rem;">Section 3</label>
+          <div class="input-wrap"><input type="number" id="intlS3Input" step="1" min="0" max="100" placeholder="S3" inputmode="decimal" autocomplete="off"></div>
+        </div>
+      </div>
+      <div class="intl-score-preview" id="intlSectionPreview">Enter S1, S2 and S3 to calculate scores automatically.</div>
+    </div>
+  </div>
+
+  <!-- MCAT input (hidden until MCAT mode) -->
+  <div id="intlMcatPanel" style="display:none">
+    <div class="input-wrap">
+      <input type="number" id="intlMcatInput" step="1" min="472" max="528" placeholder="e.g. 512" inputmode="numeric" autocomplete="off">
+    </div>
+    <div class="intl-gamsat-note">MCAT total (472–528). Only accepted for international applicants residing <em>outside</em> Australia at time of application. Minimum requirements vary by school — shown on each card below.</div>
+  </div>
+
+  <!-- DAT input (hidden until DAT mode) -->
+  <div id="intlDatPanel" style="display:none">
+    <div class="input-wrap">
+      <input type="number" id="intlTestScoreInputDat" step="1" min="1" max="30" placeholder="e.g. 22" inputmode="numeric" autocomplete="off">
+    </div>
+  </div>
+
  </div>
  <div class="field" id="intlWamField" style="display:none">
  <label for="intlWamInput">WAM (out of 100)</label>
@@ -1507,7 +1435,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
  <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.82rem;color:#0c4a6e;line-height:1.55;">
- <strong>International / overseas applicant data</strong> — self-reported 2025 application cycle outcomes. Sample sizes are smaller than domestic data. Treat cutoffs as indicative zones, not hard thresholds.
+ <strong>International / overseas applicant data</strong> — self-reported 2025 application cycle outcomes. Sample sizes are smaller than domestic data. Treat cutoffs as indicative zones, not hard thresholds. International applicants apply directly to each university — GEMSAS is for domestic applicants only.
  </div>
  <div class="input-error" id="intlErr" style="margin-bottom:12px;">Please enter your scores above.</div>
  </div>
@@ -2602,7 +2530,6 @@ const calcBtn = document.getElementById('calcBtn');
 const recalcBtn = document.getElementById('recalcBtn');
 const gpaIn = document.getElementById('gpaInput');
 const gpaFlindersIn = document.getElementById('gpaFlindersInput');
-const gpaUomIn = document.getElementById('gpaUomInput');
 const gamWeightedIn = document.getElementById('gamsatWeightedInput');
 const gamUnweightedIn = document.getElementById('gamsatUnweightedInput');
 const gamS1In = document.getElementById('gamsatS1Input');
@@ -2721,17 +2648,8 @@ function getGamsatScores() {
 function validate(){
  let ok = true;
  let gamsatOk = true;
-
- const gpaFromInput    = parseFloat(gpaIn.value);
- const gpaFromYearly   = (window._gpaYearly && window._gpaYearly.hasData) ? window._gpaYearly.weighted : NaN;
- const gpaFromFallback = parseFloat((document.getElementById('gpaFallbackInput') || {}).value);
-
- const gpa = !isNaN(gpaFromInput)    && gpaFromInput    >= 4 && gpaFromInput    <= 7 ? gpaFromInput    :
-             !isNaN(gpaFromYearly)   && gpaFromYearly   >= 4 && gpaFromYearly   <= 7 ? gpaFromYearly   :
-             !isNaN(gpaFromFallback) && gpaFromFallback >= 4 && gpaFromFallback <= 7 ? gpaFromFallback :
-             NaN;
-
- if (isNaN(gpa)) {
+ const gpa = parseFloat(gpaIn.value);
+ if (isNaN(gpa) || gpa < 4 || gpa > 7) {
  gpaIn.setAttribute('aria-invalid', 'true');
  document.getElementById('gpaErr').classList.add('show');
  ok = false;
@@ -3288,8 +3206,7 @@ function getRankedSchoolMargins(gpa, scores) {
  const cutoff = state.rural ? u.cutoffR : u.cutoffNR;
  const hurdleStatus = getGamsatHurdleStatus(u, scores);
  if (cutoff === null || cutoff === undefined || hurdleStatus.failed) return null;
- const schoolGpa = typeof getGpaForSchool === 'function' ? getGpaForSchool(u.id, gpa) : gpa;
- const impact = getBonusImpact(u, schoolGpa, scores);
+ const impact = getBonusImpact(u, gpa, scores);
  return {
  school: u,
  margin: impact.adjustedCombo - cutoff,
@@ -3630,26 +3547,17 @@ function renderUni(u, gpa, scores) {
  const card = document.createElement('div');
  card.className = 'uni-card';
 
- // Route per-school GPA: yearly breakdown data > manual UoM/Flinders inputs > getGpaForSchool fallback
- let schoolGpa = typeof getGpaForSchool === 'function' ? getGpaForSchool(u.id, gpa) : gpa;
- let usingUomProxy = false;
- if (u.id === 'uom') {
-  const uomRaw = gpaUomIn ? parseFloat(gpaUomIn.value) : NaN;
-  if (!isNaN(uomRaw) && uomRaw >= 4 && uomRaw <= 7) { schoolGpa = uomRaw; }
-  else { usingUomProxy = !(window._gpaYearly && window._gpaYearly.hasData); }
- }
-
  if (u.flinders) {
- card.innerHTML = renderFlindersCard(u, schoolGpa, scores);
+ card.innerHTML = renderFlindersCard(u, gpa, scores);
  return card;
  }
 
  if (u.uow) {
- card.innerHTML = renderUoWCard(u, schoolGpa, scores);
+ card.innerHTML = renderUoWCard(u, gpa, scores);
  return card;
  }
 
- const impact = getBonusImpact(u, schoolGpa, scores);
+ const impact = getBonusImpact(u, gpa, scores);
  const combo = impact.adjustedCombo;
  const baseCombo = impact.baseCombo;
  const cutoff = state.rural ? u.cutoffR : u.cutoffNR;
@@ -3761,7 +3669,6 @@ function renderUni(u, gpa, scores) {
  ${impact.applied ? `<div class="bonus-adjustment-badge">${escapeHtml(impact.badge)} applied to ${escapeHtml(u.short)}</div>` : ''}
  ${renderBonusImpact(impact)}
  ${getScoreForUni(u, scores).estimated ? `<div class="uni-notes">Because you did not enter section scores or an unweighted average, this school's result uses your weighted overall score as a placeholder. Enter S1/S2/S3 for the accurate UoM/UQ/Notre Dame calculation.</div>` : ''}
- ${usingUomProxy ? '<div style="margin-top:8px;font-size:0.75rem;color:#b45309;font-weight:600;">&#9888; Using your standard GEMSAS GPA as a proxy &mdash; Melbourne uses a 1:2:2 weighting which may differ. Enter your Melbourne GPA above or use the yearly breakdown for a more accurate result.</div>' : ''}
  ${casperBadge}
  ${noteHtml.length ? `<div class="uni-notes">${noteHtml.join(' ')}</div>` : ''}
  `;
@@ -4084,6 +3991,81 @@ const INTL_SCHOOLS = {
 let intlTestMode = 'GAMSAT';
 const intlChartInstances = {};
 
+// MCAT minimum requirements per school (total score min, section min)
+const INTL_MCAT_MINS = {
+  anu_m:   { total: 500, section: 125, note: 'Min 125 per section' },
+  flinders_m: { total: 500, section: null, note: 'Min score required; check Flinders directly' },
+  griffith_m: { total: 500, section: null, note: 'Standard MCAT minimum applies' },
+  unds_m:  { total: 500, section: null, note: 'Min 500 total or unweighted GAMSAT 50' },
+  undf_m:  { total: 500, section: null, note: 'Min 500 total or unweighted GAMSAT 50' },
+  uq_m:    { total: 500, section: null, note: 'UQ accepts MCAT — apply directly' },
+  uom_m:   { total: 492, section: null, note: 'Min 492 total. Overseas applicants only (not onshore).' },
+  uwa_m:   { total: 500, section: 124, note: 'Min 500 total, 124 per section' },
+  usyd_m:  { total: null, section: null, note: 'USyd uses MCAT section-based ranking; no published overall min' },
+};
+
+// GAMSAT mode per school: which score is used for international GAMSAT applicants
+const INTL_GAMSAT_MODE = {
+  uom:   'unweighted', // UoM uses unweighted average
+  uq:    'unweighted', // UQ uses unweighted average
+  unds:  'unweighted', // UNDS uses unweighted average
+  undf:  'unweighted', // UNDF uses unweighted average
+  // all others use ACER overall weighted score
+};
+
+let intlGamsatMode = 'overall'; // 'overall' | 'sections'
+let intlGamsatSections = { s1: null, s2: null, s3: null };
+
+function setIntlGamsatMode(mode) {
+  intlGamsatMode = mode;
+  document.getElementById('intlGamsatOverallBtn').classList.toggle('active', mode === 'overall');
+  document.getElementById('intlGamsatSectionsBtn').classList.toggle('active', mode === 'sections');
+  document.getElementById('intlGamsatOverallPanel').style.display = mode === 'overall' ? '' : 'none';
+  document.getElementById('intlGamsatSectionsPanel').style.display = mode === 'sections' ? '' : 'none';
+}
+
+function intlGetGamsatForSchool(school, overallScore) {
+  // If sections entered, compute the right score per school
+  const { s1, s2, s3 } = intlGamsatSections;
+  const hasAllSections = s1 !== null && s2 !== null && s3 !== null;
+  const mode = INTL_GAMSAT_MODE[school.id] || 'weighted';
+  if (hasAllSections && intlGamsatMode === 'sections') {
+    if (mode === 'unweighted') return { score: (s1 + s2 + s3) / 3, label: 'Unweighted avg', estimated: false };
+    // weighted: (S1 + S2 + 2*S3) / 4
+    return { score: (s1 + s2 + 2 * s3) / 4, label: 'ACER weighted', estimated: false };
+  }
+  // Overall mode: for unweighted schools, we have to use overall as approximation
+  const estimated = (mode === 'unweighted');
+  return { score: overallScore, label: estimated ? 'Overall (estimated)' : 'ACER overall', estimated };
+}
+
+// Wire section inputs to live preview
+function initIntlSectionListeners() {
+  ['intlS1Input','intlS2Input','intlS3Input'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      const s1 = parseFloat(document.getElementById('intlS1Input').value);
+      const s2 = parseFloat(document.getElementById('intlS2Input').value);
+      const s3 = parseFloat(document.getElementById('intlS3Input').value);
+      intlGamsatSections.s1 = Number.isFinite(s1) ? s1 : null;
+      intlGamsatSections.s2 = Number.isFinite(s2) ? s2 : null;
+      intlGamsatSections.s3 = Number.isFinite(s3) ? s3 : null;
+      const prev = document.getElementById('intlSectionPreview');
+      if (!prev) return;
+      if (intlGamsatSections.s1 !== null && intlGamsatSections.s2 !== null && intlGamsatSections.s3 !== null) {
+        const { s1, s2, s3 } = intlGamsatSections;
+        const weighted = ((s1 + s2 + 2 * s3) / 4).toFixed(1);
+        const unweighted = ((s1 + s2 + s3) / 3).toFixed(1);
+        prev.innerHTML = `ACER weighted: <strong>${weighted}</strong> &nbsp;|&nbsp; Unweighted avg: <strong>${unweighted}</strong> &nbsp;<span style="color:var(--gray400);font-size:0.68rem;">(UoM / UQ use unweighted)</span>`;
+      } else {
+        prev.textContent = 'Enter S1, S2 and S3 to calculate scores automatically.';
+      }
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', initIntlSectionListeners);
+
 function setIntlTest(mode) {
  intlTestMode = mode;
  ['GAMSAT','MCAT','GPA','DAT'].forEach(m => {
@@ -4097,24 +4079,38 @@ function setIntlTest(mode) {
  const scoreField = document.getElementById('intlTestScoreField');
  const wamField = document.getElementById('intlWamField');
  const label = document.getElementById('intlTestScoreLabel');
- const scoreInput = document.getElementById('intlTestScoreInput');
+ const gamsatPanel = document.getElementById('intlGamsatPanel');
+ const mcatPanel   = document.getElementById('intlMcatPanel');
+ const datPanel    = document.getElementById('intlDatPanel');
+
+ // Reset all panels
+ if (gamsatPanel) gamsatPanel.style.display = 'none';
+ if (mcatPanel)   mcatPanel.style.display   = 'none';
+ if (datPanel)    datPanel.style.display    = 'none';
+
  if (mode === 'GPA') {
- if (gpaField) gpaField.style.display = 'none';
- if (scoreField) scoreField.style.display = 'none';
- if (wamField) wamField.style.display = '';
+   if (gpaField)   gpaField.style.display   = 'none';
+   if (scoreField) scoreField.style.display  = 'none';
+   if (wamField)   wamField.style.display    = '';
+ } else if (mode === 'DAT') {
+   if (gpaField)   gpaField.style.display   = 'none';
+   if (scoreField) scoreField.style.display  = '';
+   if (wamField)   wamField.style.display    = 'none';
+   if (datPanel)   datPanel.style.display    = '';
+   if (label)      label.textContent         = 'DAT score';
+ } else if (mode === 'MCAT') {
+   if (gpaField)   gpaField.style.display   = '';
+   if (scoreField) scoreField.style.display  = '';
+   if (wamField)   wamField.style.display    = 'none';
+   if (mcatPanel)  mcatPanel.style.display   = '';
+   if (label)      label.textContent         = 'MCAT total (472–528)';
  } else {
- if (gpaField) gpaField.style.display = '';
- if (scoreField) scoreField.style.display = '';
- if (wamField) wamField.style.display = 'none';
- if (label) {
- const labels = { GAMSAT:'GAMSAT overall (out of 100)', MCAT:'MCAT total (out of 528)', DAT:'DAT score' };
- label.textContent = labels[mode] || '';
- }
- if (scoreInput) {
- const placeholders = { GAMSAT:'e.g. 65', MCAT:'e.g. 512', DAT:'e.g. 22' };
- scoreInput.placeholder = placeholders[mode] || '';
- scoreInput.max = mode === 'MCAT' ? 528 : (mode === 'DAT' ? 30 : 100);
- }
+   // GAMSAT
+   if (gpaField)    gpaField.style.display   = '';
+   if (scoreField)  scoreField.style.display  = '';
+   if (wamField)    wamField.style.display    = 'none';
+   if (gamsatPanel) gamsatPanel.style.display = '';
+   if (label)       label.textContent         = 'GAMSAT score';
  }
 }
 
@@ -4207,70 +4203,127 @@ function intlDrawChart(canvasId, pts, userVal) {
 function calculateInternational() {
  const errEl = document.getElementById('intlErr');
  const gpaEl = document.getElementById('intlGpaInput');
- const scoreEl = document.getElementById('intlTestScoreInput');
  const wamEl = document.getElementById('intlWamInput');
  const gpa = gpaEl ? parseFloat(gpaEl.value) : NaN;
- const testScore = scoreEl ? parseFloat(scoreEl.value) : NaN;
  const wam = wamEl ? parseFloat(wamEl.value) : NaN;
+
+ // Resolve GAMSAT overall score (from overall input or derived from sections)
+ let overallGamsat = NaN;
+ if (intlTestMode === 'GAMSAT') {
+   if (intlGamsatMode === 'sections') {
+     const { s1, s2, s3 } = intlGamsatSections;
+     if (s1 !== null && s2 !== null && s3 !== null) {
+       overallGamsat = (s1 + s2 + 2 * s3) / 4; // ACER weighted (fallback for overall display)
+     }
+   } else {
+     const el = document.getElementById('intlTestScoreInput');
+     overallGamsat = el ? parseFloat(el.value) : NaN;
+   }
+ }
+
+ // Resolve MCAT score
+ const mcatEl = document.getElementById('intlMcatInput');
+ const mcatScore = mcatEl ? parseFloat(mcatEl.value) : NaN;
+
+ // Resolve DAT score
+ const datEl = document.getElementById('intlTestScoreInputDat');
+ const datScore = datEl ? parseFloat(datEl.value) : NaN;
+
  let userVal = null;
  let comboText = '';
+
  if (intlTestMode === 'GPA') {
- if (!wam || isNaN(wam)) { if(errEl){errEl.style.display='block';} return; }
- userVal = wam;
- comboText = 'WAM <strong>' + wam.toFixed(1) + '</strong> — Monash graduate MD entry';
+   if (!wam || isNaN(wam)) { if(errEl){errEl.style.display='block';} return; }
+   userVal = wam;
+   comboText = 'WAM <strong>' + wam.toFixed(1) + '</strong> — Monash graduate MD entry';
  } else if (intlTestMode === 'DAT') {
- if (!testScore || isNaN(testScore)) { if(errEl){errEl.style.display='block';} return; }
- userVal = testScore;
- comboText = 'DAT <strong>' + testScore + '</strong> — USyd DMD international';
+   if (!datScore || isNaN(datScore)) { if(errEl){errEl.style.display='block';} return; }
+   userVal = datScore;
+   comboText = 'DAT <strong>' + datScore + '</strong> — USyd DMD international';
  } else if (intlTestMode === 'MCAT') {
- if (!gpa || isNaN(gpa) || !testScore || isNaN(testScore)) { if(errEl){errEl.style.display='block';} return; }
- const normMcat = testScore * (100/528);
- userVal = intlCalcCombo(gpa, normMcat);
- comboText = 'GPA ' + gpa.toFixed(2) + ' + MCAT ' + Math.round(testScore) + ' → normalised combo <strong>' + userVal.toFixed(4) + '</strong>';
+   if (!gpa || isNaN(gpa) || !mcatScore || isNaN(mcatScore)) { if(errEl){errEl.style.display='block';} return; }
+   const normMcat = mcatScore * (100/528);
+   userVal = intlCalcCombo(gpa, normMcat);
+   comboText = 'GPA ' + gpa.toFixed(2) + ' + MCAT ' + Math.round(mcatScore) + ' → normalised combo <strong>' + userVal.toFixed(4) + '</strong>';
  } else {
- if (!gpa || isNaN(gpa) || !testScore || isNaN(testScore)) { if(errEl){errEl.style.display='block';} return; }
- userVal = intlCalcCombo(gpa, testScore);
- comboText = 'GPA ' + gpa.toFixed(2) + ' + GAMSAT ' + testScore + ' → combo <strong>' + userVal.toFixed(4) + '</strong>';
+   // GAMSAT
+   if (!gpa || isNaN(gpa) || isNaN(overallGamsat)) { if(errEl){errEl.style.display='block';} return; }
+   // userVal uses the ACER weighted score for the combo display figure; per-school uses intlGetGamsatForSchool
+   userVal = intlCalcCombo(gpa, overallGamsat);
+   const { s1, s2, s3 } = intlGamsatSections;
+   const hasSections = intlGamsatMode === 'sections' && s1 !== null && s2 !== null && s3 !== null;
+   if (hasSections) {
+     const uw = ((s1 + s2 + s3) / 3).toFixed(1);
+     comboText = 'GPA ' + gpa.toFixed(2) + ' + S1 ' + s1 + ' / S2 ' + s2 + ' / S3 ' + s3 +
+       ' → weighted GAMSAT <strong>' + overallGamsat.toFixed(1) + '</strong>, unweighted <strong>' + uw + '</strong>';
+   } else {
+     comboText = 'GPA ' + gpa.toFixed(2) + ' + GAMSAT ' + overallGamsat.toFixed(1) + ' → combo <strong>' + userVal.toFixed(4) + '</strong>';
+   }
  }
+
  if(errEl) errEl.style.display = 'none';
  const schools = INTL_SCHOOLS[intlTestMode] || [];
  const comboEl = document.getElementById('intlComboDisplay');
  if (comboEl) comboEl.innerHTML = comboText;
  const list = document.getElementById('intlUniList');
  list.innerHTML = '';
+
  schools.forEach((school, idx) => {
- const pts = intlGetDataPoints(school, intlTestMode);
- const allPts = [...pts.intOffers,...pts.intRej,...pts.finOffers,...pts.finRej,...pts.finWait];
- const hasData = allPts.length > 0;
- let status;
- if (intlTestMode === 'GPA') {
- status = wam >= 82 ? 'competitive' : wam >= 77 ? 'borderline' : 'low';
- } else if (intlTestMode === 'DAT') {
- status = testScore >= 22 ? 'competitive' : testScore >= 20 ? 'borderline' : 'low';
- } else {
- status = intlGetStatus(userVal, pts);
- }
- const pillMap = { competitive:'<span class="intl-pill intl-pill-green">Competitive</span>', borderline:'<span class="intl-pill intl-pill-amber">Borderline</span>', low:'<span class="intl-pill intl-pill-red">Below observed</span>', unknown:'<span class="intl-pill intl-pill-gray">Insufficient data</span>' };
- const canvasId = 'intlchart_' + school.id + '_' + Date.now();
- const card = document.createElement('div');
- card.className = 'uni-card';
- card.innerHTML = '<div class="uni-card-top"><div><div class="uni-name">' + escapeHtml(school.name) + ' <span style="font-weight:400;color:var(--gray500);font-size:0.82rem;">' + escapeHtml(school.degree) + '</span></div><div class="uni-n">International applicant data · 2025 cycle · self-reported</div></div><div class="uni-verdict ' + (status === 'competitive' ? 'green' : status === 'borderline' ? 'amber' : status === 'unknown' ? 'gray' : 'red') + '">' + (pillMap[status] || '').replace(/<[^>]+>/g,'') + '</div></div>' +
- '<div class="uni-body" style="padding:' + (hasData ? '0' : '') + ';">' +
- (hasData ? '<div style="position:relative;width:100%;height:110px;margin:8px 0;"><canvas id="' + canvasId + '" role="img" aria-label="Scatter chart of international outcomes for ' + escapeHtml(school.name) + '"></canvas></div>' : '<div class="uni-notes" style="margin:0;">Insufficient numeric data to plot. See note below.</div>') +
- '</div>' +
- '<div class="uni-notes" style="margin-top:8px;">' + escapeHtml(school.note) + '</div>' +
- '<div class="intl-coaching-note">Interview performance matters significantly — applicants with similar combo scores get different final outcomes depending on how they perform. <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener">Book interview coaching with Dan ($300)</a> to work on this before offers come out.</div>';
- list.appendChild(card);
- if (hasData) {
- setTimeout(() => intlDrawChart(canvasId, pts, userVal), 80 * idx);
- }
+   // For GAMSAT mode, get the school-specific score (weighted vs unweighted)
+   let schoolUserVal = userVal;
+   let scoreBadgeHtml = '';
+   if (intlTestMode === 'GAMSAT') {
+     const scoreInfo = intlGetGamsatForSchool(school, overallGamsat);
+     const schoolCombo = intlCalcCombo(gpa, scoreInfo.score);
+     schoolUserVal = schoolCombo;
+     const estNote = scoreInfo.estimated ? ' (estimated from overall)' : '';
+     scoreBadgeHtml = `<div class="intl-school-score-badge">GAMSAT used: ${scoreInfo.label} ${scoreInfo.score.toFixed(1)}${estNote} → combo ${schoolCombo.toFixed(4)}</div>`;
+   } else if (intlTestMode === 'MCAT') {
+     // Show MCAT hurdle check per school
+     const mins = INTL_MCAT_MINS[school.id];
+     if (mins) {
+       const passTotal = !mins.total || (!isNaN(mcatScore) && mcatScore >= mins.total);
+       const passSection = true; // we don't collect per-section MCAT
+       const cls = passTotal ? 'pass' : 'fail';
+       const icon = passTotal ? '✓' : '✗';
+       scoreBadgeHtml = `<div class="intl-mcat-hurdle ${cls}">${icon} ${mins.note}${mins.total ? ' (min ' + mins.total + ')' : ''}</div>`;
+     }
+   }
+
+   const pts = intlGetDataPoints(school, intlTestMode);
+   const allPts = [...pts.intOffers,...pts.intRej,...pts.finOffers,...pts.finRej,...pts.finWait];
+   const hasData = allPts.length > 0;
+   let status;
+   if (intlTestMode === 'GPA') {
+     status = wam >= 82 ? 'competitive' : wam >= 77 ? 'borderline' : 'low';
+   } else if (intlTestMode === 'DAT') {
+     status = datScore >= 22 ? 'competitive' : datScore >= 20 ? 'borderline' : 'low';
+   } else {
+     status = intlGetStatus(schoolUserVal, pts);
+   }
+   const pillMap = { competitive:'<span class="intl-pill intl-pill-green">Competitive</span>', borderline:'<span class="intl-pill intl-pill-amber">Borderline</span>', low:'<span class="intl-pill intl-pill-red">Below observed</span>', unknown:'<span class="intl-pill intl-pill-gray">Insufficient data</span>' };
+   const canvasId = 'intlchart_' + school.id + '_' + Date.now();
+   const card = document.createElement('div');
+   card.className = 'uni-card';
+   card.innerHTML = '<div class="uni-card-top"><div><div class="uni-name">' + escapeHtml(school.name) + ' <span style="font-weight:400;color:var(--gray500);font-size:0.82rem;">' + escapeHtml(school.degree) + '</span></div><div class="uni-n">International applicant data · 2025 cycle · self-reported</div></div><div class="uni-verdict ' + (status === 'competitive' ? 'green' : status === 'borderline' ? 'amber' : status === 'unknown' ? 'gray' : 'red') + '">' + (pillMap[status] || '').replace(/<[^>]+>/g,'') + '</div></div>' +
+   '<div class="uni-body" style="padding:' + (hasData ? '0' : '') + ';">' +
+   (hasData ? '<div style="position:relative;width:100%;height:110px;margin:8px 0;"><canvas id="' + canvasId + '" role="img" aria-label="Scatter chart of international outcomes for ' + escapeHtml(school.name) + '"></canvas></div>' : '<div class="uni-notes" style="margin:0;">Insufficient numeric data to plot. See note below.</div>') +
+   '</div>' +
+   scoreBadgeHtml +
+   '<div class="uni-notes" style="margin-top:8px;">' + escapeHtml(school.note) + '</div>' +
+   '<div class="intl-coaching-note">Interview performance matters significantly — applicants with similar combo scores get different final outcomes depending on how they perform. <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener">Book interview coaching with Dan ($300)</a> to work on this before offers come out.</div>';
+   list.appendChild(card);
+   if (hasData) {
+     const chartUserVal = schoolUserVal;
+     setTimeout(() => intlDrawChart(canvasId, pts, chartUserVal), 80 * idx);
+   }
  });
  const wrap = document.getElementById('intlResultsWrap');
  if (wrap) wrap.style.display = 'block';
  document.getElementById('calcCard').classList.add('calc-hide-on-results');
  setTimeout(() => {
- const wrap2 = document.getElementById('intlResultsWrap');
- if (wrap2) wrap2.scrollIntoView({behavior:'smooth',block:'start'});
+   const wrap2 = document.getElementById('intlResultsWrap');
+   if (wrap2) wrap2.scrollIntoView({behavior:'smooth',block:'start'});
  }, 100);
  trackCalculatorEvent('calculate_international', { test_mode: intlTestMode });
 }
@@ -4319,162 +4372,6 @@ document.getElementById('emailForm').addEventListener('submit', (e) => {
  });
  trackCalculatorEvent('calculator_plan_email', { event_label: latestCalculatorPlan?.mode || 'unknown' });
 });
-
-// Routes the correct GPA to each school.
-// Priority: yearly breakdown data > explicit inputs > base gpa from validate()
-function getGpaForSchool(schoolId, baseGpa) {
-  const yr = window._gpaYearly;
-  if (yr && yr.hasData) {
-    switch ((schoolId || '').toLowerCase()) {
-      case 'griffith': return yr.unweighted !== null ? yr.unweighted : baseGpa;
-      case 'uom':      return yr.melbourne  !== null ? yr.melbourne  : baseGpa;
-      default:         return yr.weighted   !== null ? yr.weighted   : baseGpa;
-    }
-  }
-  const unweightedRaw = parseFloat((document.getElementById('gpaUnweightedInput') || {}).value);
-  const hasUnweighted = !isNaN(unweightedRaw) && unweightedRaw >= 4 && unweightedRaw <= 7;
-  if ((schoolId || '').toLowerCase() === 'griffith' && hasUnweighted) return unweightedRaw;
-  return baseGpa;
-}
-
-// Best-guess fallback toggle
-(function () {
-  const btn = document.getElementById('gpaFallbackToggle');
-  const panel = document.getElementById('gpaFallbackPanel');
-  if (!btn || !panel) return;
-  btn.addEventListener('click', () => {
-    const open = panel.classList.toggle('open');
-    btn.classList.toggle('open', open);
-    btn.setAttribute('aria-expanded', String(open));
-  });
-})();
-
-// GPA yearly breakdown
-(function () {
-  'use strict';
-  const HON_GPA = { first: 7.0, '2a': 6.0, '2b': 5.0, third: 4.0 };
-  const yVals = { y2: null, y1: null, y0: null };
-  let degMode = 'standard', isHon = false, honCls = null;
-
-  window._gpaYearly = { hasData: false, weighted: null, unweighted: null, melbourne: null };
-
-  const panel     = document.getElementById('gpaYearlyPanel');
-  const toggleBtn = document.getElementById('gpaYearlyToggleBtn');
-  const applyBtn  = document.getElementById('gpaYearlyApply');
-  const rowsEl    = document.getElementById('gpaYearRows');
-  const gpaWInput = document.getElementById('gpaInput');
-  const gpaUInput = document.getElementById('gpaUnweightedInput');
-
-  if (!panel || !toggleBtn || !rowsEl) return;
-
-  toggleBtn.addEventListener('click', () => {
-    const open = panel.classList.toggle('open');
-    toggleBtn.classList.toggle('open', open);
-    toggleBtn.setAttribute('aria-expanded', String(open));
-    panel.setAttribute('aria-hidden', String(!open));
-    if (open && !rowsEl.children.length) buildRows();
-  });
-
-  document.getElementById('gpaDegStd').addEventListener('click', () => {
-    degMode = 'standard';
-    document.getElementById('gpaDegStd').classList.add('active');
-    document.getElementById('gpaDegHon').classList.remove('active');
-    buildRows();
-  });
-  document.getElementById('gpaDegHon').addEventListener('click', () => {
-    degMode = 'honours';
-    document.getElementById('gpaDegHon').classList.add('active');
-    document.getElementById('gpaDegStd').classList.remove('active');
-    buildRows();
-  });
-
-  function buildRows() {
-    rowsEl.innerHTML = '';
-    const rows = [
-      { key: 'y2', lbl: 'Final-2 year', sub: degMode === 'honours' ? 'Second-last bachelor year (×1)' : 'Oldest of 3 years (×1 weight)' },
-      { key: 'y1', lbl: 'Final-1 year', sub: degMode === 'honours' ? 'Last bachelor year, pre-honours (×2)' : 'Middle year (×2 weight)' },
-      { key: 'y0', lbl: 'Final year',   sub: degMode === 'honours' ? 'Honours year (×3 at most schools)' : 'Most recent year (×3 weight)' },
-    ];
-    rows.forEach((r, idx) => {
-      const isLast = idx === rows.length - 1;
-      const rowDiv = document.createElement('div');
-      rowDiv.className = 'gpa-year-row';
-      const lblBlock = document.createElement('div');
-      lblBlock.innerHTML = `<div class="gpa-year-lbl">${r.lbl}</div><div class="gpa-year-sub">${r.sub}</div>`;
-      const inp = document.createElement('input');
-      inp.type = 'number'; inp.className = 'gpa-year-inp'; inp.step = '0.01';
-      inp.min = '0'; inp.max = '7'; inp.placeholder = '0–7'; inp.inputMode = 'decimal'; inp.autocomplete = 'off';
-      if (yVals[r.key] !== null) inp.value = yVals[r.key];
-      inp.addEventListener('input', () => {
-        const v = parseFloat(inp.value);
-        yVals[r.key] = (Number.isFinite(v) && v >= 0 && v <= 7) ? v : null;
-        recalc();
-      });
-      rowDiv.appendChild(lblBlock); rowDiv.appendChild(inp); rowsEl.appendChild(rowDiv);
-
-      if (isLast && degMode === 'honours') {
-        const honRow = document.createElement('div');
-        honRow.className = 'gpa-hon-row show';
-        honRow.innerHTML =
-          `<label class="gpa-hon-chk-label"><input type="checkbox" id="gpaHonChk"${isHon ? ' checked' : ''}>Completed honours (classification known)</label>` +
-          `<div class="gpa-hon-cls${isHon ? ' show' : ''}" id="gpaHonClsWrap">` +
-            `<select id="gpaHonClsSel">` +
-              `<option value="">Select classification</option>` +
-              `<option value="first"${honCls==='first'?' selected':''}>First Class (H1) — GPA 7.0</option>` +
-              `<option value="2a"${honCls==='2a'?' selected':''}>Class 2A (H2A) — GPA 6.0</option>` +
-              `<option value="2b"${honCls==='2b'?' selected':''}>Class 2B (H2B) — GPA 5.0</option>` +
-              `<option value="third"${honCls==='third'?' selected':''}>Third Class (H3) — GPA 4.0</option>` +
-            `</select>` +
-            `<div class="gpa-hon-note">UQ and Griffith use the honours classification as your final-year GPA. At UQ, First Class = GPA 7.0, same as a completed PhD.</div>` +
-          `</div>`;
-        const chk = honRow.querySelector('#gpaHonChk');
-        const clsWrap = honRow.querySelector('#gpaHonClsWrap');
-        const sel = honRow.querySelector('#gpaHonClsSel');
-        chk.addEventListener('change', () => { isHon = chk.checked; clsWrap.classList.toggle('show', isHon); if (!isHon) { honCls = null; sel.value = ''; } recalc(); });
-        sel.addEventListener('change', () => { honCls = sel.value || null; recalc(); });
-        rowsEl.appendChild(honRow);
-      }
-    });
-    recalc();
-  }
-
-  function recalc() {
-    const { y2, y1, y0 } = yVals;
-    const allFilled = y2 !== null && y1 !== null && y0 !== null;
-    const hGpa = (isHon && honCls && HON_GPA[honCls] !== undefined) ? HON_GPA[honCls] : null;
-    const f0 = hGpa !== null ? hGpa : y0;
-    const weighted   = allFilled ? ((y2 + y1 * 2 + f0 * 3) / 6) : null;
-    const unweighted = allFilled ? ((y2 + y1 + f0) / 3) : null;
-    const melbourne  = allFilled ? ((y2 + y1 * 2 + f0 * 2) / 5) : null;
-    window._gpaYearly = { hasData: allFilled, weighted, unweighted, melbourne };
-    const wEl = document.getElementById('gpaCalcW');
-    const uEl = document.getElementById('gpaCalcU');
-    const mEl = document.getElementById('gpaCalcM');
-    if (wEl) wEl.textContent = weighted   !== null ? weighted.toFixed(2)   : '—';
-    if (uEl) uEl.textContent = unweighted !== null ? unweighted.toFixed(2) : '—';
-    if (mEl) mEl.textContent = melbourne  !== null ? melbourne.toFixed(2)  : '—';
-    if (applyBtn) {
-      applyBtn.disabled = !allFilled;
-      applyBtn.textContent = allFilled
-        ? `Fill GPA fields above (weighted ${weighted.toFixed(2)}, unweighted ${unweighted.toFixed(2)})`
-        : 'Fill GPA fields above';
-    }
-  }
-
-  function flash(el) {
-    el.style.transition = 'box-shadow 0.3s';
-    el.style.boxShadow = '0 0 0 4px rgba(14,165,233,0.28)';
-    setTimeout(() => { el.style.boxShadow = ''; }, 1100);
-  }
-
-  // Single button fills both weighted and unweighted at once
-  if (applyBtn) applyBtn.addEventListener('click', () => {
-    const yr = window._gpaYearly;
-    if (!yr || !yr.hasData) return;
-    if (gpaWInput && yr.weighted !== null) { gpaWInput.value = yr.weighted.toFixed(2); gpaWInput.dispatchEvent(new Event('input', { bubbles: true })); flash(gpaWInput); }
-    if (gpaUInput && yr.unweighted !== null) { gpaUInput.value = yr.unweighted.toFixed(2); gpaUInput.dispatchEvent(new Event('input', { bubbles: true })); flash(gpaUInput); }
-  });
-})();
 </script>
 
 <script src="key2md-tracking.js" defer></script>
