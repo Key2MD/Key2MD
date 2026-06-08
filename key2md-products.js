@@ -16,8 +16,8 @@
  title: 'CASPer Masterclass',
  price: '$300',
  href: 'casper-masterclass.html',
- cta: 'Register for June 11',
- bestFor: 'Students sitting the June 11 CASPer who want a final exam-day reset with key points fresh and clear.',
+ cta: 'Register for Thu 11 June',
+ bestFor: 'Students sitting the Thursday, 11 June CASPer who want a final 1pm AEST exam-day reset with key points fresh and clear.',
  tags: ['casper', 'masterclass', 'june', 'exam day']
  },
  {
