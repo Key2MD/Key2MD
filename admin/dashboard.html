@@ -9833,7 +9833,7 @@ async function exportResearchSource(item, date, setStatus) {
  }
  if (skipped > 0) console.warn(`${item.label} skipped ${skipped} malformed or missing saved object(s) on part ${page}.`);
  if (isMock) {
-  attemptOffset += RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH;
+  attemptOffset += attempts > RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH ? attempts : RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH;
   if (attempts < RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH) break;
  } else {
   offset += rows;
