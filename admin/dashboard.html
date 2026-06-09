@@ -2416,7 +2416,10 @@ const PRIVACY_MODE_KEY = 'k2md_admin_privacy_mode_v1';
 const NAV_NOTIFY_PAGES = new Set(['s2','mmi','mocks','warmleads','sharing','enquiries','growth']);
 const REVIEW_RENDER_LIMIT = 450;
 const MMI_RENDER_LIMIT = 260;
-const RESEARCH_EXPORT_LIMIT = 20000;
+const RESEARCH_EXPORT_TOTAL_LIMIT = 20000;
+const RESEARCH_EXPORT_PAGE_LIMIT = 500;
+const RESEARCH_EXPORT_MOCK_STATION_LIMIT = 800;
+const RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH = 50;
 const RESEARCH_EXPORT_CHUNK_CHARS = 7_500_000;
 const RESEARCH_EXPORT_SOURCES = [
  { source:'casper', label:'CASPer reviews', file:'key2md-casper_reviews' },
@@ -9772,6 +9775,73 @@ async function downloadResearchText(baseName, text, ext, type) {
  return chunks.length;
 }
 
+function countJsonlRows(text) {
+ return String(text || '').split('\n').filter(line => line.trim()).length;
+}
+
+function wait(ms) {
+ return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function apiWithRetry(path, opts = {}, attempts = 3) {
+ let lastErr = null;
+ for (let attempt = 1; attempt <= attempts; attempt += 1) {
+ try {
+  return await api(path, opts);
+ } catch (err) {
+  lastErr = err;
+  if (attempt < attempts) await wait(650 * attempt);
+ }
+ }
+ throw lastErr || new Error('Request failed');
+}
+
+async function exportResearchSource(item, date, setStatus) {
+ let fileCount = 0;
+ let totalRows = 0;
+ let page = 0;
+ let offset = 0;
+ let attemptOffset = 0;
+ while (totalRows < RESEARCH_EXPORT_TOTAL_LIMIT) {
+ page += 1;
+ setStatus(`Downloading ${item.label} part ${page}...`);
+ const isMock = item.source === 'casper_mock';
+ const params = new URLSearchParams({
+  source: item.source,
+  limit: String(isMock ? RESEARCH_EXPORT_MOCK_STATION_LIMIT : RESEARCH_EXPORT_PAGE_LIMIT),
+ });
+ if (isMock) {
+  params.set('attempt_limit', String(RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH));
+  params.set('attempt_offset', String(attemptOffset));
+ } else {
+  params.set('offset', String(offset));
+ }
+ const res = await apiWithRetry(`/admin/research-export.jsonl?${params.toString()}`);
+ if (!res.ok) {
+  const detail = await res.text().catch(() => '');
+  throw new Error(`${item.label} export failed${detail ? `: ${detail.slice(0, 160)}` : ''}`);
+ }
+ const text = await res.text();
+ const rows = Number(res.headers.get('X-Key2MD-Export-Rows') || countJsonlRows(text) || 0);
+ const attempts = Number(res.headers.get('X-Key2MD-Export-Attempts') || 0);
+ if (rows > 0) {
+  const pageSuffix = `-page-${String(page).padStart(3, '0')}`;
+  fileCount += await downloadResearchText(`${item.file}-${date}${pageSuffix}`, text, 'jsonl', 'application/x-ndjson;charset=utf-8');
+  totalRows += rows;
+ }
+ if (isMock) {
+  attemptOffset += RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH;
+  if (attempts < RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH) break;
+ } else {
+  offset += rows;
+  if (rows < RESEARCH_EXPORT_PAGE_LIMIT || rows <= 0) break;
+ }
+ if (page > 200) throw new Error(`${item.label} export stopped after 200 parts to avoid an accidental endless loop.`);
+ }
+ setStatus(`Downloaded ${item.label}: ${totalRows.toLocaleString()} rows`);
+ return fileCount;
+}
+
 async function exportResearchBundle() {
  const button = document.getElementById('researchExportBtn');
  const status = document.getElementById('researchExportStatus');
@@ -9792,15 +9862,7 @@ async function exportResearchBundle() {
 
  let fileCount = 2;
  for (const item of RESEARCH_EXPORT_SOURCES) {
-  setStatus(`Downloading ${item.label}...`);
-  const extra = item.source === 'casper_mock' ? '&attempt_limit=1000' : '';
-  const res = await api(`/admin/research-export.jsonl?source=${encodeURIComponent(item.source)}&limit=${RESEARCH_EXPORT_LIMIT}${extra}`);
-  if (!res.ok) {
-  const detail = await res.text().catch(() => '');
-  throw new Error(`${item.label} export failed${detail ? `: ${detail.slice(0, 160)}` : ''}`);
-  }
-  const text = await res.text();
-  fileCount += await downloadResearchText(`${item.file}-${date}`, text, 'jsonl', 'application/x-ndjson;charset=utf-8');
+  fileCount += await exportResearchSource(item, date, setStatus);
  }
  setStatus(`Downloaded ${fileCount} research file${fileCount === 1 ? '' : 's'}`);
  } catch (e) {
