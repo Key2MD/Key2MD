@@ -9824,11 +9824,13 @@ async function exportResearchSource(item, date, setStatus) {
  const text = await res.text();
  const rows = Number(res.headers.get('X-Key2MD-Export-Rows') || countJsonlRows(text) || 0);
  const attempts = Number(res.headers.get('X-Key2MD-Export-Attempts') || 0);
+ const skipped = Number(res.headers.get('X-Key2MD-Export-Skipped') || 0);
  if (rows > 0) {
   const pageSuffix = `-page-${String(page).padStart(3, '0')}`;
   fileCount += await downloadResearchText(`${item.file}-${date}${pageSuffix}`, text, 'jsonl', 'application/x-ndjson;charset=utf-8');
   totalRows += rows;
  }
+ if (skipped > 0) console.warn(`${item.label} skipped ${skipped} malformed or missing saved object(s) on part ${page}.`);
  if (isMock) {
   attemptOffset += RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH;
   if (attempts < RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH) break;
