@@ -1009,6 +1009,8 @@
  </select>
  <button class="btn" onclick="loadReviews()">Refresh</button>
  <button class="btn" onclick="exportCsv('reviews')">Download CSV</button>
+ <button class="btn blue" id="researchExportBtn" onclick="exportResearchBundle()">Research export</button>
+ <span class="refresh-note" id="researchExportStatus"></span>
  </div>
  <div class="tbl-wrap">
  <div class="tbl-toolbar"><span class="tbl-status" id="revStatus">AI-reviewed CASPer stations only. Saved/interrupted half-attempts are hidden here.</span></div>
@@ -2414,6 +2416,14 @@ const PRIVACY_MODE_KEY = 'k2md_admin_privacy_mode_v1';
 const NAV_NOTIFY_PAGES = new Set(['s2','mmi','mocks','warmleads','sharing','enquiries','growth']);
 const REVIEW_RENDER_LIMIT = 450;
 const MMI_RENDER_LIMIT = 260;
+const RESEARCH_EXPORT_LIMIT = 20000;
+const RESEARCH_EXPORT_CHUNK_CHARS = 7_500_000;
+const RESEARCH_EXPORT_SOURCES = [
+ { source:'casper', label:'CASPer reviews', file:'key2md-casper_reviews' },
+ { source:'gamsat', label:'GAMSAT S2 reviews', file:'key2md-gamsat_s2_reviews' },
+ { source:'mmi', label:'MMI spoken reviews', file:'key2md-mmi_spoken_reviews' },
+ { source:'casper_mock', label:'CASPer mock stations', file:'key2md-casper_mock_stations' },
+];
 
 const S = {
  token: null,
@@ -9722,6 +9732,86 @@ window.resetPremiumMockPassForEmail = resetPremiumMockPassForEmail;
 // ======================================================
 // CSV EXPORT
 // ======================================================
+function downloadTextFile(filename, text, type = 'text/plain;charset=utf-8') {
+ const blob = new Blob([text], { type });
+ const a = document.createElement('a');
+ a.href = URL.createObjectURL(blob);
+ a.download = filename;
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+
+function splitJsonlChunks(text, maxChars = RESEARCH_EXPORT_CHUNK_CHARS) {
+ const clean = String(text || '');
+ if (clean.length <= maxChars) return [clean];
+ const chunks = [];
+ let current = '';
+ const lines = clean.split('\n');
+ for (const line of lines) {
+ const next = current ? `${current}\n${line}` : line;
+ if (next.length > maxChars && current) {
+  chunks.push(current.endsWith('\n') ? current : `${current}\n`);
+  current = line;
+ } else {
+  current = next;
+ }
+ }
+ if (current.trim()) chunks.push(current.endsWith('\n') ? current : `${current}\n`);
+ return chunks;
+}
+
+async function downloadResearchText(baseName, text, ext, type) {
+ const chunks = ext === 'jsonl' ? splitJsonlChunks(text) : [String(text || '')];
+ chunks.forEach((chunk, idx) => {
+ const suffix = chunks.length > 1 ? `-part-${String(idx + 1).padStart(3, '0')}` : '';
+ downloadTextFile(`${baseName}${suffix}.${ext}`, chunk, type);
+ });
+ await new Promise(resolve => setTimeout(resolve, 180));
+ return chunks.length;
+}
+
+async function exportResearchBundle() {
+ const button = document.getElementById('researchExportBtn');
+ const status = document.getElementById('researchExportStatus');
+ const date = new Date().toISOString().slice(0, 10);
+ const setStatus = text => { if (status) status.textContent = text; };
+ if (button) button.disabled = true;
+ try {
+ setStatus('Preparing dictionary...');
+ const dictionaryRes = await api('/admin/research-export-dictionary.md');
+ if (!dictionaryRes.ok) throw new Error('Could not download data dictionary');
+ await downloadResearchText(`key2md-research-data-dictionary-${date}`, await dictionaryRes.text(), 'md', 'text/markdown;charset=utf-8');
+
+ setStatus('Preparing summary...');
+ const summaryRes = await api('/admin/research-export-summary');
+ const summaryData = await summaryRes.json().catch(() => ({}));
+ if (!summaryRes.ok) throw new Error(summaryData?.message || summaryData?.error || 'Could not download export summary');
+ await downloadResearchText(`key2md-research-summary-${date}`, JSON.stringify(summaryData, null, 2), 'json', 'application/json;charset=utf-8');
+
+ let fileCount = 2;
+ for (const item of RESEARCH_EXPORT_SOURCES) {
+  setStatus(`Downloading ${item.label}...`);
+  const extra = item.source === 'casper_mock' ? '&attempt_limit=1000' : '';
+  const res = await api(`/admin/research-export.jsonl?source=${encodeURIComponent(item.source)}&limit=${RESEARCH_EXPORT_LIMIT}${extra}`);
+  if (!res.ok) {
+  const detail = await res.text().catch(() => '');
+  throw new Error(`${item.label} export failed${detail ? `: ${detail.slice(0, 160)}` : ''}`);
+  }
+  const text = await res.text();
+  fileCount += await downloadResearchText(`${item.file}-${date}`, text, 'jsonl', 'application/x-ndjson;charset=utf-8');
+ }
+ setStatus(`Downloaded ${fileCount} research file${fileCount === 1 ? '' : 's'}`);
+ } catch (e) {
+ console.error('Research export failed:', e);
+ setStatus('Research export failed');
+ alert(e.message || 'Research export failed');
+ } finally {
+ if (button) button.disabled = false;
+ }
+}
+
 async function exportCsv(type) {
  let endpoint = type;
  let limit = document.getElementById('usrLimit')?.value || '5000';
