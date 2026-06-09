@@ -1010,6 +1010,7 @@
  <button class="btn" onclick="loadReviews()">Refresh</button>
  <button class="btn" onclick="exportCsv('reviews')">Download CSV</button>
  <button class="btn blue" id="researchExportBtn" onclick="exportResearchBundle()">Research export</button>
+ <button class="btn" id="mockResearchExportBtn" onclick="exportCasperMockResearchBundle()">Mock export</button>
  <span class="refresh-note" id="researchExportStatus"></span>
  </div>
  <div class="tbl-wrap">
@@ -2417,9 +2418,9 @@ const NAV_NOTIFY_PAGES = new Set(['s2','mmi','mocks','warmleads','sharing','enqu
 const REVIEW_RENDER_LIMIT = 450;
 const MMI_RENDER_LIMIT = 260;
 const RESEARCH_EXPORT_TOTAL_LIMIT = 20000;
-const RESEARCH_EXPORT_PAGE_LIMIT = 500;
-const RESEARCH_EXPORT_MOCK_STATION_LIMIT = 800;
-const RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH = 50;
+const RESEARCH_EXPORT_PAGE_LIMIT = 100;
+const RESEARCH_EXPORT_MOCK_STATION_LIMIT = 120;
+const RESEARCH_EXPORT_MOCK_ATTEMPT_BATCH = 8;
 const RESEARCH_EXPORT_CHUNK_CHARS = 7_500_000;
 const RESEARCH_EXPORT_SOURCES = [
  { source:'casper', label:'CASPer reviews', file:'key2md-casper_reviews' },
@@ -9844,26 +9845,31 @@ async function exportResearchSource(item, date, setStatus) {
  return fileCount;
 }
 
-async function exportResearchBundle() {
- const button = document.getElementById('researchExportBtn');
+async function exportResearchSources(sourceItems = RESEARCH_EXPORT_SOURCES, options = {}) {
+ const button = options.buttonId ? document.getElementById(options.buttonId) : document.getElementById('researchExportBtn');
  const status = document.getElementById('researchExportStatus');
  const date = new Date().toISOString().slice(0, 10);
  const setStatus = text => { if (status) status.textContent = text; };
  if (button) button.disabled = true;
  try {
+ const includeDictionary = options.includeDictionary !== false;
+ let fileCount = 0;
+ if (includeDictionary) {
  setStatus('Preparing dictionary...');
  const dictionaryRes = await api('/admin/research-export-dictionary.md');
  if (!dictionaryRes.ok) throw new Error('Could not download data dictionary');
  await downloadResearchText(`key2md-research-data-dictionary-${date}`, await dictionaryRes.text(), 'md', 'text/markdown;charset=utf-8');
+ fileCount += 1;
 
  setStatus('Preparing summary...');
  const summaryRes = await api('/admin/research-export-summary');
  const summaryData = await summaryRes.json().catch(() => ({}));
  if (!summaryRes.ok) throw new Error(summaryData?.message || summaryData?.error || 'Could not download export summary');
  await downloadResearchText(`key2md-research-summary-${date}`, JSON.stringify(summaryData, null, 2), 'json', 'application/json;charset=utf-8');
+ fileCount += 1;
+ }
 
- let fileCount = 2;
- for (const item of RESEARCH_EXPORT_SOURCES) {
+ for (const item of sourceItems) {
   fileCount += await exportResearchSource(item, date, setStatus);
  }
  setStatus(`Downloaded ${fileCount} research file${fileCount === 1 ? '' : 's'}`);
@@ -9874,6 +9880,16 @@ async function exportResearchBundle() {
  } finally {
  if (button) button.disabled = false;
  }
+}
+
+async function exportResearchBundle() {
+ return exportResearchSources(RESEARCH_EXPORT_SOURCES, { buttonId:'researchExportBtn', includeDictionary:true });
+}
+
+async function exportCasperMockResearchBundle() {
+ const mockSource = RESEARCH_EXPORT_SOURCES.find(item => item.source === 'casper_mock');
+ if (!mockSource) return alert('CASPer mock export source is missing.');
+ return exportResearchSources([mockSource], { buttonId:'mockResearchExportBtn', includeDictionary:false });
 }
 
 async function exportCsv(type) {
