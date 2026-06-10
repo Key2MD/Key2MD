@@ -368,7 +368,7 @@ const Key2MDAuth = (() => {
  if (_user.cancel_requested) return { ok: true, already_cancelled: true, period_end: _user.pro_period_end || null };
  const endLabel = formatPeriodEnd(_user.pro_period_end);
  const shouldConfirm = options.confirm !== false;
- if (shouldConfirm && !window.confirm(`Cancel CASPer Pro renewal?\n\nYou will not be billed again. Your Pro access stays active until ${endLabel}, then returns to Free automatically.`)) return null;
+ if (shouldConfirm && !window.confirm(`Cancel CASPer Pro renewal?\n\nYou will not be billed again. Your Pro access stays active until ${endLabel}, then returns to Free automatically. Elapsed days are not refunded.`)) return null;
  const res = await fetch(`${_config.apiBase}/api/pro/cancel`, {
  method: 'POST',
  headers: getTrackingHeaders({ 'Authorization': `Bearer ${token}` }),
@@ -378,7 +378,7 @@ const Key2MDAuth = (() => {
  await checkSession();
  if (options.alert !== false) {
  const confirmedEnd = formatPeriodEnd(data.period_end || _user?.pro_period_end);
- window.alert(`Cancellation confirmed. You will not be billed again. CASPer Pro remains active until ${confirmedEnd}.`);
+ window.alert(`Cancellation confirmed. You will not be billed again. CASPer Pro remains active until ${confirmedEnd}. Elapsed days are not refunded.`);
  }
  return data;
  }

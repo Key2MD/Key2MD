@@ -99,8 +99,8 @@
  <h1>Practice for RACGP CASPer without sounding like a clinical note.</h1>
  <p class="hero-sub">AGPT and FSP applicants already have medical experience. The work is making your empathy, reasoning and reflection visible in a timed situational judgement format.</p>
  <div class="hero-actions">
- <a class="btn btn-primary" href="practice.html?mode=casper&amp;utm_source=seo&amp;utm_medium=landing_page&amp;utm_campaign=racgp_casper_practice" data-track="practice_start" data-track-detail="racgp_practice_hero">Open timed practice</a>
- <a class="btn btn-outline" href="racgp-casper-tutor.html">RACGP tutoring</a>
+ <a class="btn btn-primary" href="practice.html?mode=casper&amp;audience=racgp&amp;utm_source=seo&amp;utm_medium=landing_page&amp;utm_campaign=racgp_casper_practice" data-track="practice_start" data-track-detail="racgp_practice_hero">Open timed practice</a>
+ <button class="btn btn-outline" type="button" onclick="buyRacgpPass(this)" data-track="racgp_subscription_checkout_intent" data-track-detail="racgp_practice_hero">Start RACGP Pro - $80/week</button>
  </div>
  </div>
  </header>
@@ -165,8 +165,8 @@
  </thead>
  <tbody>
  <tr><td>No account</td><td>Try 3 timed practice stations on the device. AI feedback and saved history are not available without an account.</td></tr>
- <tr><td>Free account</td><td>Use the full CASPer station bank, save responses, track progress, and receive 1 free CASPer AI review per day.</td></tr>
- <tr><td>CASPer Pro</td><td>Use unlimited CASPer AI feedback while active, with heavier practice before the sitting.</td></tr>
+ <tr><td>Free account</td><td>Use the full CASPer station bank, save responses, track progress, and receive 1 standard CASPer AI review per day.</td></tr>
+ <tr><td>RACGP CASPer Pro</td><td>$80/week. Unlimited RACGP-mode typed AI feedback while subscribed, calibrated for AGPT/FSP doctors rather than school-leaver medical applicants.</td></tr>
  </tbody>
  </table>
  </div>
@@ -177,10 +177,10 @@
 
  <div class="school-action-strip">
  <div>
- <strong>Start with a timed baseline.</strong>
- <span>Answer a station, then check whether your rationale, empathy and reflection are actually visible.</span>
+ <strong>Start with a timed baseline, then get doctor-standard feedback.</strong>
+ <span>RACGP Pro unlocks unlimited RACGP-mode marking focused on rationale, empathy, uncertainty, dignity and human tone.</span>
  </div>
- <a class="btn btn-primary" href="practice.html?mode=casper&amp;utm_source=seo&amp;utm_medium=landing_page&amp;utm_campaign=racgp_casper_practice_bottom" data-track="practice_start" data-track-detail="racgp_practice_bottom">Open practice tool</a>
+ <button class="btn btn-primary" type="button" onclick="buyRacgpPass(this)" data-track="racgp_subscription_checkout_intent" data-track-detail="racgp_practice_bottom">Start RACGP Pro</button>
  </div>
 
  <div class="mini-cta">
@@ -208,9 +208,9 @@
  </div>
  <div class="side-card">
  <h2>Practice next</h2>
- <p>Use the general CASPer tool, but hold each answer to a doctor standard: more visible rationale, more specific empathy, less clinical shorthand.</p>
+ <p>Use the general CASPer engine in RACGP mode, but hold each answer to a doctor standard: more visible rationale, more specific empathy, less clinical shorthand.</p>
  <ul>
- <li><a href="practice.html?mode=casper&amp;utm_source=seo&amp;utm_medium=landing_page&amp;utm_campaign=racgp_casper_practice_sidebar">Timed CASPer practice</a></li>
+ <li><a href="practice.html?mode=casper&amp;audience=racgp&amp;utm_source=seo&amp;utm_medium=landing_page&amp;utm_campaign=racgp_casper_practice_sidebar">Timed CASPer practice</a></li>
  <li><a href="why-doctors-underperform-casper.html">Why doctors underperform</a></li>
  <li><a href="testimonials.html">Student and doctor results</a></li>
  </ul>
@@ -225,6 +225,45 @@
  <div class="footer-links"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="ai-disclaimer.html">AI Disclaimer</a></div>
  </div>
  </footer>
+ <script src="auth.js"></script>
+ <script>
+ const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+ document.addEventListener('DOMContentLoaded', function(){
+ if (window.Key2MDAuth) Key2MDAuth.init({ tool:'casper', apiBase:API_BASE });
+ const params = new URLSearchParams(window.location.search);
+ if (params.get('racgp') === 'success') {
+ const url = new URL(window.location.href);
+ url.searchParams.delete('racgp');
+ window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+ setTimeout(function(){ alert('RACGP CASPer Pro confirmed. Open RACGP mode to start doctor-calibrated feedback.'); }, 600);
+ }
+ });
+ async function buyRacgpPass(btn){
+ if (!window.Key2MDAuth || !Key2MDAuth.isLoggedIn()) {
+ Key2MDAuth?.showAuthModal?.('signup');
+ return;
+ }
+ const original = btn ? btn.textContent : 'Start RACGP Pro';
+ if (btn) { btn.disabled = true; btn.textContent = 'Redirecting to Stripe...'; }
+ try {
+ const res = await fetch(API_BASE + '/api/racgp/checkout', {
+ method:'POST',
+ headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + Key2MDAuth.getToken() },
+ body:JSON.stringify({
+ success_url: location.origin + '/practice.html?mode=casper&audience=racgp&racgp=success',
+ cancel_url: location.origin + '/racgp-casper-practice.html?racgp=cancelled',
+ })
+ });
+ const data = await res.json().catch(function(){ return {}; });
+ if (data.checkout_url) { location.href = data.checkout_url; return; }
+ if (data.error === 'subscription_already_active' || data.error === 'pass_already_active') { location.href = 'practice.html?mode=casper&audience=racgp'; return; }
+ throw new Error(data.message || data.error || 'Could not start checkout.');
+ } catch (err) {
+ alert(err.message || 'Could not start checkout.');
+ if (btn) { btn.disabled = false; btn.textContent = original; }
+ }
+ }
+ </script>
  <script src="/key2md-tracking.js" defer></script>
 </body>
 </html>

@@ -116,7 +116,7 @@
     <div class="status-list" id="subscriptionList">
      <div class="empty">Log in to see subscriptions.</div>
     </div>
-    <div class="help">Use the cancel button beside an active subscription to stop the next renewal. Your access stays active until the end of the paid period, and the row changes to Cancelling once Key2MD has confirmed it.</div>
+    <div class="help">Use the cancel button beside an active subscription, or the Stripe billing portal where available, to stop the next renewal. Cancellation is your responsibility. Access stays active until the end of the paid period. Forgotten renewals are not refunded for elapsed days; accidental purchases may be reviewed for unused future days after cancellation.</div>
    </div>
 
    <div class="panel card">
@@ -376,7 +376,7 @@
    },
   }[kind];
   if (!config) return;
-  if (!window.confirm(`Cancel ${config.label} renewal?\n\nYou will not be billed again. Current paid access stays active until the end of the paid period.`)) return;
+  if (!window.confirm(`Cancel ${config.label} renewal?\n\nYou will not be billed again. Current paid access stays active until the end of the paid period. Elapsed days are not refunded.`)) return;
   const old = btn?.textContent || '';
   if (btn) { btn.disabled = true; btn.textContent = 'Cancelling...'; }
   try {

@@ -21,6 +21,16 @@
  tags: ['casper', 'masterclass', 'june', 'exam day']
  },
  {
+ id: 'racgp_casper_subscription',
+ area: 'RACGP CASPer',
+ title: 'RACGP CASPer Pro',
+ price: '$80/week',
+ href: 'racgp-casper-practice.html',
+ cta: 'Start RACGP Pro',
+ bestFor: 'Doctors applying to RACGP AGPT or FSP who want weekly doctor-standard CASPer feedback.',
+ tags: ['racgp', 'agpt', 'fsp', 'gp', 'casper', 'doctor']
+ },
+ {
  id: 'casper_pro',
  area: 'CASPer',
  title: 'CASPer Pro',
@@ -133,6 +143,11 @@
  var avg = Number(progress.avgScore || 0);
  var plateau = !!progress.plateau;
  var recs = [];
+
+ if (/racgp|agpt|fsp|gp training|general practice|registrar|doctor/.test(text)) {
+ addUnique(recs, 'racgp_casper_subscription', 'RACGP applicants need doctor-standard feedback, with more weight on empathy, visible rationale, uncertainty, dignity and tone.');
+ addUnique(recs, 'full_mock', 'A full timed run is useful once your answer style is stable and you need stamina plus consistency.');
+ }
 
  if (/uow|notre|und|casper|q4/.test(text)) {
  addUnique(recs, 'casper_class', 'Your latest admissions read is CASPer-sensitive, so live review has high leverage.');

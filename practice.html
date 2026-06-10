@@ -379,6 +379,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <strong style="display:block;color:#0a1628;font-size:0.92rem;margin-bottom:6px;">AI review credits</strong>
  <span style="display:block;color:#475569;font-size:0.8rem;line-height:1.5;">Pay per review if you only need occasional extra CASPer or GAMSAT S2 feedback.</span>
  </a>
+ <a href="racgp-casper-practice.html" style="display:block;background:#fff;border:1px solid #bae6fd;border-radius:12px;padding:18px;text-decoration:none;">
+ <strong style="display:block;color:#0a1628;font-size:0.92rem;margin-bottom:6px;">RACGP CASPer Pro</strong>
+ <span style="display:block;color:#475569;font-size:0.8rem;line-height:1.5;">$80/week doctor-calibrated feedback for AGPT/FSP: empathy, rationale, uncertainty, dignity and human tone.</span>
+ </a>
  </div>
  </div>
 </section>
@@ -737,6 +741,16 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 
  <p class="api-note" style="margin-top:6px;" id="aiLimitNote">Create a free account to unlock AI reviews.</p>
+ </div>
+
+ <div id="racgpPassCard" style="display:none;margin-top:12px;padding:13px 14px;background:linear-gradient(135deg,rgba(10,22,40,0.97),rgba(13,31,60,0.96));border:1.5px solid rgba(14,165,233,0.34);border-radius:10px;color:#fff;">
+ <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+ <span style="font-size:0.64rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;background:rgba(14,165,233,0.18);border:1px solid rgba(125,211,252,0.28);color:#7dd3fc;padding:3px 8px;border-radius:50px;">RACGP</span>
+ <span id="racgpPassTitle" style="font-size:0.84rem;font-weight:850;color:#fff;">Doctor-calibrated feedback</span>
+ </div>
+ <p id="racgpPassCopy" style="font-size:0.75rem;color:rgba(255,255,255,0.64);line-height:1.55;margin:0 0 10px;">Unlock unlimited RACGP-mode reviews calibrated for AGPT/FSP doctors: empathy, rationale, uncertainty, dignity and human tone.</p>
+ <button type="button" id="racgpPassBtn" onclick="buyRacgpPass(this)" style="width:100%;min-height:36px;border:none;border-radius:50px;background:#fff;color:#0a1628;font-size:0.78rem;font-weight:900;font-family:inherit;cursor:pointer;">Start RACGP Pro - $80/week</button>
+ <button type="button" onclick="practiceAudience='';updateLimitUI();refreshAiMarkButton();showPracticeNotice('Standard CASPer feedback mode is active.', 'info');" style="width:100%;margin-top:7px;min-height:32px;border:1px solid rgba(255,255,255,0.16);border-radius:50px;background:transparent;color:rgba(255,255,255,0.78);font-size:0.74rem;font-weight:800;font-family:inherit;cursor:pointer;">Use standard CASPer mode</button>
  </div>
 
 
@@ -2820,6 +2834,8 @@ window.K2PracticeBridge = {
 
 const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
 window.API_BASE = API_BASE;
+const PRACTICE_URL_PARAMS = new URLSearchParams(window.location.search);
+let practiceAudience = /^(racgp|agpt|fsp)$/i.test(PRACTICE_URL_PARAMS.get('audience') || '') ? 'racgp' : '';
 function showPracticeNotice(message, tone = 'info') {
  let toast = document.getElementById('practiceNoticeToast');
  if(!toast) {
@@ -2893,6 +2909,24 @@ function casperFreeRemaining(toolLimits, fallback){
 function casperCreditBalance(toolLimits){
  return Math.max(0, numericLimitValue(toolLimits?.credits, 0));
 }
+function isRacgpPracticeMode(){
+ return currentMode === MODE_CASPER && practiceAudience === 'racgp';
+}
+function getRacgpPassState(){
+ const auth = getK2Auth();
+ const pass = auth?.getLimits?.()?.racgp || null;
+ return pass && typeof pass === 'object' ? pass : null;
+}
+function hasActiveRacgpPass(){
+ const pass = getRacgpPassState();
+ return !!(pass?.active || pass?.unlimited);
+}
+function formatRacgpPassExpiry(value){
+ const expiry = Number(value || 0);
+ if(!expiry) return 'the end of the current paid week';
+ try { return new Date(expiry).toLocaleDateString([], { month:'short', day:'numeric', year:'numeric' }); }
+ catch { return 'the end of the current paid week'; }
+}
 async function refreshPracticeLimits(auth){
  if(auth?.refreshLimits){
  try { return await auth.refreshLimits(); } catch {}
@@ -2917,10 +2951,17 @@ function updateLimitUI(){
  const creditCount = document.getElementById('creditCount');
  const buyBtn = document.getElementById('buyCreditsBtnWrap');
  const mmiNote = document.getElementById('mmiAiNote');
+ const racgpCard = document.getElementById('racgpPassCard');
+ const racgpTitle = document.getElementById('racgpPassTitle');
+ const racgpCopy = document.getElementById('racgpPassCopy');
+ const racgpBtn = document.getElementById('racgpPassBtn');
+ const statusEl = document.getElementById('aiStatusEl');
  const isMMIMode = currentMode === MODE_MMI;
+ const isRacgpMode = isRacgpPracticeMode();
 
 
  if(mmiNote) mmiNote.style.display = isMMIMode ? 'block' : 'none';
+ if(racgpCard) racgpCard.style.display = isRacgpMode ? 'block' : 'none';
 
  if(!loggedIn){
  const remaining = anonymousPracticeRemaining();
@@ -2928,13 +2969,21 @@ function updateLimitUI(){
  if(fill){fill.style.width=isMMIMode ? '0%' : ((remaining / ANON_PRACTICE_LIMIT) * 100) + '%';fill.className='ai-limit-fill';}
  if(noteEl) noteEl.textContent=isMMIMode
  ? 'Sign in to check MMI transcript/premium access.'
+ : isRacgpMode
+ ? 'Create a free account first. RACGP-calibrated AI feedback is account-only and subscription-gated.'
  : `No-account practice: ${ANON_PRACTICE_LIMIT - remaining}/${ANON_PRACTICE_LIMIT} stations used. Create a free account for AI feedback and saved progress.`;
+ if(isRacgpMode){
+ if(racgpTitle) racgpTitle.textContent='RACGP mode needs an account';
+ if(racgpCopy) racgpCopy.textContent='Create a free Key2MD account, then unlock doctor-calibrated feedback for AGPT/FSP practice.';
+ if(racgpBtn) racgpBtn.textContent='Create account first';
+ }
  if(creditWrap) creditWrap.style.display='none';
  if(buyBtn) buyBtn.style.display='none';
  return;
  }
 
  if(isMMIMode){
+ if(racgpCard) racgpCard.style.display='none';
  if(el){el.textContent='MMI access shown below';el.className='ai-limit-count';}
  if(fill){fill.style.width='100%';fill.className='ai-limit-fill';}
  if(noteEl) noteEl.textContent='MMI uses its own transcript/premium credits. CASPer AI credits are separate and are hidden here.';
@@ -2948,13 +2997,36 @@ function updateLimitUI(){
  const tool = limits.casper;
  if(!tool) return;
 
+ const racgpPass = getRacgpPassState();
+ const racgpActive = isRacgpMode && hasActiveRacgpPass();
+ if(statusEl && loggedIn){
+ statusEl.innerHTML = '<span class="sdot sdot-green"></span>' + (isRacgpMode ? (racgpActive ? 'RACGP - Unlimited' : 'RACGP Pro') : (auth.isPro?.() ? 'Pro - Unlimited' : 'Free - 1/day'));
+ }
+ if(isRacgpMode){
+ const expiry = formatRacgpPassExpiry(racgpPass?.expires_at);
+ if(racgpTitle) racgpTitle.textContent = racgpActive ? 'RACGP Pro active' : 'RACGP Pro required';
+ if(racgpCopy) racgpCopy.textContent = racgpActive
+ ? `Doctor-calibrated unlimited feedback is active until ${expiry}.`
+ : 'RACGP-mode marking is deliberately different from standard CASPer feedback. It is calibrated for AGPT/FSP doctors and requires RACGP Pro.';
+ if(racgpBtn){
+ racgpBtn.textContent = racgpActive ? `Active until ${expiry}` : 'Start RACGP Pro - $80/week';
+ racgpBtn.disabled = racgpActive;
+ racgpBtn.style.opacity = racgpActive ? '0.62' : '1';
+ racgpBtn.style.cursor = racgpActive ? 'default' : 'pointer';
+ }
+ }
+
  const rem = casperFreeRemaining(tool, 0);
  const limit = Math.max(1, numericLimitValue(tool.limit, AI_LIMIT_MAX));
  const pct = tool.unlimited ? 100 : (rem / limit * 100);
  const credits = casperCreditBalance(tool);
 
  if(el){
- if(tool.unlimited){
+ if(racgpActive){
+ el.textContent='Unlimited (RACGP)';
+ } else if(isRacgpMode){
+ el.textContent='Pro required';
+ } else if(tool.unlimited){
  el.textContent='Unlimited (Pro)';
  } else if(rem > 0){
  el.textContent=rem + ' free remaining';
@@ -2963,13 +3035,13 @@ function updateLimitUI(){
  } else {
  el.textContent='Used for today';
  }
- el.className='ai-limit-count'+((rem===0 && credits===0)?' exhausted':'');
+ el.className='ai-limit-count'+(((rem===0 && credits===0) || (isRacgpMode && !racgpActive))?' exhausted':'');
  }
- if(fill){fill.style.width=pct+'%';fill.className='ai-limit-fill'+((rem===0 && credits===0)?' exhausted':'');}
+ if(fill){fill.style.width=(racgpActive ? '100' : isRacgpMode ? '0' : pct)+'%';fill.className='ai-limit-fill'+(((rem===0 && credits===0) || (isRacgpMode && !racgpActive))?' exhausted':'');}
 
 
  if(creditWrap && creditCount){
- if(credits > 0){
+ if(!isRacgpMode && credits > 0){
  creditWrap.style.display='block';
  creditCount.textContent=credits;
  } else {
@@ -2978,11 +3050,15 @@ function updateLimitUI(){
  }
 
 
- if(buyBtn) buyBtn.style.display = loggedIn ? 'block' : 'none';
+ if(buyBtn) buyBtn.style.display = loggedIn && !isRacgpMode ? 'block' : 'none';
 
 
  if(noteEl){
- if(rem > 0){
+ if(racgpActive){
+ noteEl.textContent='RACGP mode: unlimited doctor-calibrated AI reviews are active.';
+ } else if(isRacgpMode){
+ noteEl.textContent='RACGP mode uses a doctor-standard marker. Start RACGP Pro or switch to standard CASPer mode.';
+ } else if(rem > 0){
  noteEl.textContent='1 free AI review per day. Buy credits for more.';
  } else if(credits > 0){
  noteEl.textContent='Using purchased credits. Buy more anytime.';
@@ -3451,12 +3527,16 @@ function refreshAiMarkButton(){
  const toolLimits = limits?.casper;
  const loggedIn = !!auth?.isLoggedIn?.();
  const isPro = !!auth?.isPro?.();
- const rem = !loggedIn ? 0 : (isPro ? 99 : casperFreeRemaining(toolLimits, AI_LIMIT_MAX));
+ const racgpMode = isRacgpPracticeMode();
+ const racgpActive = racgpMode && hasActiveRacgpPass();
+ const rem = !loggedIn ? 0 : (racgpActive ? 99 : isPro ? 99 : casperFreeRemaining(toolLimits, AI_LIMIT_MAX));
  const credits = casperCreditBalance(toolLimits);
  const needsWords = n <= 20;
  [$('btnAIRemaining'),$('btnAIRemainingTop')].filter(Boolean).forEach(remEl=>{
  if(needsWords) remEl.textContent='Write 20+ words to mark';
  else if(!loggedIn) remEl.textContent='Sign up to mark by AI';
+ else if(racgpActive) remEl.textContent='RACGP doctor feedback active';
+ else if(racgpMode) remEl.textContent='RACGP Pro required';
  else if(isPro) remEl.textContent='Unlimited reviews';
  else if(rem > 0) remEl.textContent=rem+' free left today';
  else if(credits > 0) remEl.textContent=credits+' credit'+(credits!==1?'s':'')+' remaining';
@@ -3466,7 +3546,7 @@ function refreshAiMarkButton(){
  const blocked = needsWords;
  aibtn.disabled = blocked;
  aibtn.style.opacity = blocked ? '0.58' : '1';
- aibtn.textContent = (!needsWords && loggedIn && rem <= 0 && credits > 0) ? 'Mark by AI (1 credit)' : (!loggedIn ? 'Sign up for AI' : 'Mark by AI');
+ aibtn.textContent = racgpActive ? 'Mark by RACGP AI' : racgpMode ? 'Start RACGP Pro' : (!needsWords && loggedIn && rem <= 0 && credits > 0) ? 'Mark by AI (1 credit)' : (!loggedIn ? 'Sign up for AI' : 'Mark by AI');
  });
 }
 
@@ -4352,11 +4432,13 @@ async function manualRunAI(){
  const limits=auth.getLimits();
  const toolLimits=limits?.casper;
  const isPro=!!auth.isPro();
- const rem=isPro?99:casperFreeRemaining(toolLimits,0);
+ const racgpMode=isRacgpPracticeMode();
+ const racgpActive=racgpMode&&hasActiveRacgpPass();
+ const rem=racgpActive?99:(isPro?99:casperFreeRemaining(toolLimits,0));
  const credits=casperCreditBalance(toolLimits);
- const canUse=isPro||rem>0||credits>0;
+ const canUse=racgpMode?racgpActive:(isPro||rem>0||credits>0);
  if(!canUse){ refreshAiMarkButton(); return; }
- aiButtons.forEach(b=>{b.textContent=(rem<=0&&credits>0)?'Mark by AI (1 credit)':'Mark by AI';});
+ aiButtons.forEach(b=>{b.textContent=racgpActive?'Mark by RACGP AI':(rem<=0&&credits>0)?'Mark by AI (1 credit)':'Mark by AI';});
  refreshAiMarkButton();
 }
 
@@ -4386,9 +4468,11 @@ async function runAI(idx){
 
  const limits = await refreshPracticeLimits(auth) || auth.getLimits();
  const toolLimits = limits?.casper;
- const freeRemaining = auth.isPro() ? 99 : casperFreeRemaining(toolLimits, AI_LIMIT_MAX);
+ const racgpMode = isRacgpPracticeMode();
+ const racgpActive = racgpMode && hasActiveRacgpPass();
+ const freeRemaining = racgpActive ? 99 : auth.isPro() ? 99 : casperFreeRemaining(toolLimits, AI_LIMIT_MAX);
  const credits = casperCreditBalance(toolLimits);
- let useCredit = freeRemaining <= 0 && !auth.isPro() && credits > 0;
+ let useCredit = racgpMode ? false : (freeRemaining <= 0 && !auth.isPro() && credits > 0);
 
  const s=h.station;
  const stationContext = `SCENARIO: ${s.scenario || ''}
@@ -4433,6 +4517,8 @@ ${h.answer}
  model: 'claude-sonnet-4-6',
  max_tokens: 1500,
  allow_paid_credit_fallback: true,
+ audience: racgpMode ? 'racgp' : 'student',
+ review_context: racgpMode ? 'racgp' : '',
  messages: [{role:'user',content:p}],
  question_context: stationContext,
  user_response: h.answer,
@@ -4476,6 +4562,17 @@ ${h.answer}
  }
  if(res.status === 402){
  const d = await res.json().catch(()=>({}));
+ if(d.error === 'racgp_pass_required'){
+ container.innerHTML=`<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;margin-top:10px;">
+ <strong style="color:#075985;font-size:0.88rem;display:block;margin-bottom:4px;">RACGP Pro required</strong>
+ <span style="font-size:0.82rem;color:#164e63;">${d.message||'RACGP-calibrated AI feedback requires an active RACGP CASPer Pro subscription.'}</span>
+ <br><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+ <button onclick="buyRacgpPass(this)" style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Start RACGP Pro - $80/week</button>
+ <button onclick="practiceAudience='';updateLimitUI();refreshAiMarkButton();showPracticeNotice('Standard CASPer feedback mode is active.', 'info');" style="background:#fff;color:#075985;border:1px solid #bfdbfe;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Use standard mode</button>
+ </div>
+ </div>`;
+ updateLimitUI(); return;
+ }
  if(['no_credits','free_trials_disabled'].includes(d.error)){
  container.innerHTML=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-top:10px;">
  <strong style="color:#92400e;font-size:0.88rem;display:block;margin-bottom:4px;">CASPer AI credit needed</strong>
@@ -6499,7 +6596,7 @@ window.addEventListener('DOMContentLoaded',function(){
  var statusEl = document.getElementById('aiStatusEl');
  if(statusEl){
  if(user){
- statusEl.innerHTML = '<span class="sdot sdot-green"></span>' + (user.tier === 'pro' ? 'Pro - Unlimited' : 'Free - 1/day');
+ statusEl.innerHTML = '<span class="sdot sdot-green"></span>' + (isRacgpPracticeMode() && hasActiveRacgpPass() ? 'RACGP - Unlimited' : user.tier === 'pro' ? 'Pro - Unlimited' : 'Free - 1/day');
  } else {
  statusEl.innerHTML = '<span class="sdot sdot-green"></span>Sign up - 1 free review/day';
  }
@@ -6669,6 +6766,62 @@ function purchaseCredits(){
 }
 window.purchaseCredits = purchaseCredits;
 
+async function buyRacgpPass(btn){
+ const auth = getK2Auth();
+ if(!auth){
+ showAuthLoadingMessage();
+ return;
+ }
+ if(!auth.isLoggedIn()){
+ auth.showAuthModal?.('signup');
+ return;
+ }
+ if(hasActiveRacgpPass()){
+ showPracticeNotice('RACGP CASPer Pro is already active on this account.', 'success');
+ return;
+ }
+ const original = btn?.textContent || 'Start RACGP Pro - $80/week';
+ if(btn){
+ btn.disabled = true;
+ btn.textContent = 'Redirecting to Stripe...';
+ btn.style.opacity = '0.75';
+ }
+ try{
+ const token = auth.getToken();
+ const res = await fetch(API_BASE + '/api/racgp/checkout', {
+ method: 'POST',
+ headers: {
+ 'Content-Type': 'application/json',
+ 'Authorization': 'Bearer ' + token,
+ },
+ body: JSON.stringify({
+ success_url: window.location.origin + window.location.pathname + '?mode=casper&audience=racgp&racgp=success',
+ cancel_url: window.location.origin + '/racgp-casper-practice.html?racgp=cancelled',
+ })
+ });
+ const data = await res.json().catch(()=>({}));
+ if(data.checkout_url){
+ window.location.href = data.checkout_url;
+ return;
+ }
+ if(data.error === 'subscription_already_active' || data.error === 'pass_already_active'){
+ await refreshPracticeLimits(auth);
+ updateLimitUI();
+ showPracticeNotice('RACGP CASPer Pro is already active.', 'success');
+ return;
+ }
+ throw new Error(data.message || data.error || 'Could not start RACGP checkout.');
+ }catch(e){
+ showPracticeNotice(e.message || 'Could not start RACGP checkout.', 'error');
+ if(btn){
+ btn.disabled = false;
+ btn.textContent = original;
+ btn.style.opacity = '1';
+ }
+ }
+}
+window.buyRacgpPass = buyRacgpPass;
+
 (function handlePaymentReturn(){
  const params = new URLSearchParams(window.location.search);
  function clearPaymentParams(names){
@@ -6690,6 +6843,16 @@ window.purchaseCredits = purchaseCredits;
  }, 1500);
  } else if(params.get('payment') === 'cancelled'){
  clearPaymentParams(['payment']);
+ } else if(params.get('racgp') === 'success'){
+ clearPaymentParams(['racgp']);
+ practiceAudience = 'racgp';
+ setTimeout(async function(){
+ await Key2MDAuth.checkSession();
+ updateLimitUI();
+ showPracticeNotice('RACGP CASPer Pro confirmed. Doctor-calibrated feedback is active.', 'success');
+ }, 1200);
+ } else if(params.get('racgp') === 'cancelled'){
+ clearPaymentParams(['racgp']);
  } else if(params.get('pro') === 'success'){
  clearPaymentParams(['pro']);
  setTimeout(function(){
