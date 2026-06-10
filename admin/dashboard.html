@@ -1547,6 +1547,9 @@
  <option value="users">All registered users</option>
  <option value="both">Everyone - subscribers + users (deduplicated)</option>
  </optgroup>
+ <optgroup label=" Fresh leads">
+ <option value="recent_users_90">Newest 90 registered accounts</option>
+ </optgroup>
  <optgroup label=" By payment">
  <option value="paying">Paying customers only (ever purchased)</option>
  <option value="non_paying">Non-paying users (never purchased)</option>
@@ -1581,6 +1584,11 @@
  <div class="broadcast-audience-sub" id="bcAudienceSub">Use preview before sending anything larger than a test.</div>
  </div>
  <button class="btn blue" onclick="refreshBroadcastAudience()">Preview audience</button>
+ </div>
+
+ <div style="margin-bottom:14px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid var(--amber-border);border-radius:8px;font-size:0.75rem;color:var(--muted);line-height:1.5;">
+ <strong style="color:var(--text);">Fresh-lead shortcut:</strong> choose <strong style="color:var(--amber);">Newest 90 registered accounts</strong>, preview the audience, send yourself a test, then send. This skips unsubscribed accounts where the account flag exists.
+ <div style="margin-top:8px;"><button class="btn" type="button" onclick="insertMasterclassFinalEmail()" style="padding:7px 11px;font-size:0.74rem;">Build masterclass final message</button></div>
  </div>
 
  <div class="form-row">
@@ -7328,6 +7336,27 @@ function insertCasperClassEmail() {
  updateBcPreview();
 }
 
+function insertMasterclassFinalEmail() {
+ const link = 'https://www.key2md.com/casper-masterclass.html';
+ const al = document.getElementById('bcAlert');
+ document.getElementById('bcSubject').value = 'Final CASPer masterclass today at 1pm';
+ setBcMode('rich');
+ document.getElementById('bcRichEditor').innerHTML = `
+ <p style="margin:0 0 14px;color:#374151;font-size:15px;line-height:1.75;">Hi there,</p>
+ <p style="margin:0 0 14px;color:#374151;font-size:15px;line-height:1.75;">Quick final note in case CASPer is still on your mind today.</p>
+ <p style="margin:0 0 14px;color:#374151;font-size:15px;line-height:1.75;">I am running the Key2MD CASPer Masterclass today at <strong>1pm AEST</strong>. It is built around the things I keep seeing cost students marks: answers that sound sensible, but do not show enough empathy, rationale, judgement, or human intent for a marker to reward them properly.</p>
+ <p style="margin:0 0 14px;color:#374151;font-size:15px;line-height:1.75;">We will go through camera hygiene, common red flags, the marking logic, difficult stations, model answers, judgement calls, when safety matters, and how to make your thinking visible without sounding robotic.</p>
+ <p style="margin:0 0 18px;color:#374151;font-size:15px;line-height:1.75;">If you are sitting today, it is a final reset. If you are sitting June 21, it gives you a clean framework for the next 10 days.</p>
+ <div style="text-align:center;margin:24px 0;">
+ <a href="${esc(link)}" style="display:inline-block;background:#0ea5e9;color:#fff;font-weight:800;padding:13px 28px;border-radius:50px;text-decoration:none;font-size:15px;">View the CASPer Masterclass</a>
+ </div>
+ <p style="margin:0 0 14px;color:#374151;font-size:15px;line-height:1.75;">If you are unsure whether it is worth it for where you are at, reply with your test date and how prepared you feel. I will be honest.</p>
+ <p style="margin:22px 0 0;color:#374151;font-size:15px;line-height:1.75;">Dan</p>
+ `;
+ if (al) { al.className = 'alert ok'; al.textContent = 'Masterclass final message drafted. Choose the newest 90 audience, preview it, send a test, then send.'; }
+ updateBcPreview();
+}
+
 function setBcMode(mode) {
  bcMode = mode;
  document.getElementById('bcModeRich').classList.toggle('active', mode==='rich');
@@ -7396,7 +7425,8 @@ function buildBroadcastHtml(subject, bodyHtml) {
  <tr><td style="background:#f8fafc;border-top:1px solid #e5e7eb;border-radius:0 0 16px 16px;padding:16px 44px;">
  <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.7;text-align:center;">
  Key2MD | <a href="https://www.key2md.com" style="color:#0ea5e9;text-decoration:none;">key2md.com</a><br>
- Reply to this email and it comes straight to Dan.
+ Reply to this email and it comes straight to Dan.<br>
+ No longer want Key2MD emails? <a href="https://www.key2md.com/unsubscribe.html" style="color:#64748b;text-decoration:underline;">Unsubscribe</a>.
  </p>
  </td></tr>
 </table>
@@ -7444,6 +7474,7 @@ function getBcListLabel(list) {
  subscribers:'Newsletter subscribers',
  users: 'All registered users',
  both: 'Everyone (subscribers + users)',
+ recent_users_90: 'Newest 90 registered accounts',
  paying: 'Paying customers only',
  non_paying: 'Non-paying users',
  pro: 'CASPer Pro subscribers',
@@ -7501,6 +7532,12 @@ function getLocalAudienceEstimate(list, customEmail = '') {
  if (list === 'custom' && customEmail) parseBroadcastEmails(customEmail).emails.forEach(email => set.add(email));
  if (list === 'subscribers' || list === 'both') S.subscribers.forEach(s=>s.email&&set.add(s.email.toLowerCase()));
  if (list === 'users' || list === 'both') S.users.forEach(u=>u.email&&set.add(u.email.toLowerCase()));
+ if (list === 'recent_users_90') S.users
+ .filter(u=>u.email && Number(u.unsubscribed || 0) !== 1)
+ .slice()
+ .sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')))
+ .slice(0,90)
+ .forEach(u=>set.add(String(u.email).toLowerCase()));
  if (list === 'paying') S.users.filter(u=>Number(u.total_spend_aud||0)>0).forEach(u=>u.email&&set.add(u.email.toLowerCase()));
  if (list === 'non_paying') S.users.filter(u=>Number(u.total_spend_aud||0)<=0).forEach(u=>u.email&&set.add(u.email.toLowerCase()));
  if (list === 'pro') S.users.filter(u=>String(u.tier||'').toLowerCase()==='pro').forEach(u=>u.email&&set.add(u.email.toLowerCase()));
