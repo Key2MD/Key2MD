@@ -24,6 +24,136 @@
 
  var FUNNEL_KEY = 'key2md_funnel_v1';
  var FUNNEL_ENDPOINT = 'https://key2md-api.brittainmbbs.workers.dev/api/funnel-event';
+ var ATTRIBUTION_KEY = 'k2md_attribution';
+ var ANON_KEY = 'k2md_anon_id';
+ var CF_WEB_ANALYTICS_TOKEN = '134e62e87abb4de7b27a7e543bebf782';
+ var CHECKOUT_RE = /\/api\/(?:checkout\/create|pro\/checkout|gamsat-s2\/checkout|casper-class\/checkout|masterclass\/checkout|casper-mock\/checkout|casper-mock\/manual-review\/checkout|mmi\/checkout|tutoring\/checkout|marking\/checkout|marking\/bundle\/checkout)(?:[?#]|$)/;
+
+ function safeJsonParse(raw, fallback) {
+ try { return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
+ }
+
+ function cleanText(value, max) {
+ return String(value || '').trim().slice(0, max || 240);
+ }
+
+ function anonId() {
+ try {
+ var existing = localStorage.getItem(ANON_KEY);
+ if (existing) return existing;
+ var random = (window.crypto && crypto.getRandomValues)
+ ? Array.from(crypto.getRandomValues(new Uint8Array(12))).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('')
+ : Math.random().toString(36).slice(2) + Date.now().toString(36);
+ var id = 'anon_' + random;
+ localStorage.setItem(ANON_KEY, id);
+ return id;
+ } catch (e) {
+ return 'anon_unavailable';
+ }
+ }
+
+ function captureAttribution() {
+ try {
+ var existing = safeJsonParse(localStorage.getItem(ATTRIBUTION_KEY), null);
+ if (existing && existing.first_seen) return existing;
+ var qs = new URLSearchParams(location.search || '');
+ var data = {
+ first_seen: new Date().toISOString(),
+ landing_page: location.pathname + location.search,
+ referrer: document.referrer || '',
+ anonymous_id: anonId()
+ };
+ ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(function (key) {
+ var value = qs.get(key);
+ if (value) data[key] = cleanText(value, 180);
+ });
+ if (!data.utm_source && document.referrer) {
+ try { data.referrer_host = new URL(document.referrer).hostname; } catch (e) {}
+ }
+ localStorage.setItem(ATTRIBUTION_KEY, JSON.stringify(data));
+ return data;
+ } catch (e) {
+ return { anonymous_id: anonId(), landing_page: location.pathname + location.search, referrer: document.referrer || '' };
+ }
+ }
+
+ function getAttribution() {
+ var data = safeJsonParse(localStorage.getItem(ATTRIBUTION_KEY), null) || captureAttribution();
+ if (!data.anonymous_id) data.anonymous_id = anonId();
+ return data;
+ }
+
+ function withAttributionPayload(payload) {
+ var body = payload && typeof payload === 'object' && !Array.isArray(payload) ? Object.assign({}, payload) : {};
+ if (!body.attribution && !body.k2md_attribution) body.attribution = getAttribution();
+ if (!body.anonymous_id && !body.k2md_anonymous_id) body.anonymous_id = anonId();
+ return body;
+ }
+
+ function attributionEventParams(params) {
+ var attr = getAttribution();
+ return Object.assign({
+ anonymous_id: anonId(),
+ utm_source: attr.utm_source || '',
+ utm_medium: attr.utm_medium || '',
+ utm_campaign: attr.utm_campaign || '',
+ utm_term: attr.utm_term || '',
+ utm_content: attr.utm_content || '',
+ referrer: attr.referrer || '',
+ landing_page: attr.landing_page || ''
+ }, cleanParams(params || {}));
+ }
+
+ function sendToolEvent(stage, params) {
+ var data = attributionEventParams(Object.assign({ source: 'browser_tool_telemetry' }, params || {}));
+ funnel(stage, data);
+ }
+
+ function loadCloudflareWebAnalytics() {
+ try {
+ var token = cleanText(window.KEY2MD_CF_WEB_ANALYTICS_TOKEN || (document.querySelector('meta[name="cf-web-analytics-token"]') || {}).content || CF_WEB_ANALYTICS_TOKEN, 120);
+ if (!token || token === 'REPLACE_WITH_CLOUDFLARE_WEB_ANALYTICS_TOKEN') return;
+ if (document.querySelector('script[src*="cloudflareinsights.com/beacon.min.js"]')) return;
+ var s = document.createElement('script');
+ s.defer = true;
+ s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+ s.setAttribute('data-cf-beacon', JSON.stringify({ token: token }));
+ document.head.appendChild(s);
+ } catch (e) {}
+ }
+
+ function instrumentFetch() {
+ if (window.__k2mdFetchInstrumented || typeof window.fetch !== 'function') return;
+ var originalFetch = window.fetch.bind(window);
+ window.fetch = function (input, init) {
+ var url = typeof input === 'string' ? input : (input && input.url) || '';
+ var options = init ? Object.assign({}, init) : {};
+ try {
+ var method = String(options.method || (input && input.method) || 'GET').toUpperCase();
+ var isCheckout = method === 'POST' && CHECKOUT_RE.test(url);
+ if (isCheckout && typeof options.body === 'string') {
+ var parsed = safeJsonParse(options.body, null);
+ if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+ options.body = JSON.stringify(withAttributionPayload(parsed));
+ sendToolEvent('checkout_started', { path: new URL(url, location.origin).pathname });
+ }
+ }
+ if (method === 'POST' && /\/api\/review\/stream(?:[?#]|$)/.test(url)) sendToolEvent('feedback_requested', { path: '/api/review/stream' });
+ if (method === 'POST' && /\/api\/casper-mock\/start(?:[?#]|$)/.test(url)) sendToolEvent('mock_started', { path: '/api/casper-mock/start' });
+ if (/\/api\/casper-mock\/station(?:[?#]|$)/.test(url)) sendToolEvent('station_started', { path: '/api/casper-mock/station', mode: 'mock' });
+ } catch (e) {}
+ var response = originalFetch(input, options);
+ try {
+ if (/\/api\/auth\/signup(?:[?#]|$)/.test(url)) {
+ response.then(function (res) {
+ if (res && res.ok) sendToolEvent('signup_completed', { path: '/api/auth/signup' });
+ }).catch(function () {});
+ }
+ } catch (e) {}
+ return response;
+ };
+ window.__k2mdFetchInstrumented = true;
+ }
 
  function cleanParams(params) {
  var out = {};
@@ -223,9 +353,114 @@
 	 });
 	 }
 
+ function newsletterPageKind() {
+ var path = location.pathname.split('/').pop() || 'index.html';
+ if (/^blog-[^/]+\.html$/i.test(path)) return 'blog';
+ if (/^(gemsas-gpa-calculator|medical-school-chances)\.html$/i.test(path)) return 'calculator';
+ return '';
+ }
+
+ function newsletterCopy(kind) {
+ if (kind === 'calculator') {
+ return {
+ badge: 'Weekly admissions tips',
+ title: 'Get your next admissions move in plain English.',
+ body: 'Join Dan\'s weekly Key2MD email for CASPer, MMI, GAMSAT S2 and preference strategy notes that are specific enough to use.',
+ source: 'calculator_bottom_capture'
+ };
+ }
+ return {
+ badge: 'Free weekly teaching notes',
+ title: 'Get the next useful Key2MD breakdown.',
+ body: 'One short email each week from Dan: examiner logic, common answer mistakes, and what stronger students actually do differently.',
+ source: 'blog_bottom_capture'
+ };
+ }
+
+ function injectNewsletterCapture() {
+ var kind = newsletterPageKind();
+ if (!kind || document.querySelector('.k2md-newsletter-capture')) return;
+ var footer = document.querySelector('footer');
+ var main = document.querySelector('main') || document.body;
+ if (!footer && !main) return;
+ var copy = newsletterCopy(kind);
+ var wrap = document.createElement('section');
+ wrap.className = 'k2md-newsletter-capture';
+ wrap.innerHTML = [
+ '<style>',
+ '.k2md-newsletter-capture{font-family:Inter,DM Sans,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#071326;color:#fff;padding:36px 18px;border-top:1px solid rgba(14,165,233,.16);border-bottom:1px solid rgba(14,165,233,.16)}',
+ '.k2md-newsletter-capture *{box-sizing:border-box}',
+ '.k2md-newsletter-inner{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,420px);gap:24px;align-items:center}',
+ '.k2md-newsletter-badge{display:inline-flex;width:max-content;margin-bottom:10px;padding:5px 10px;border-radius:999px;background:rgba(14,165,233,.12);border:1px solid rgba(56,189,248,.25);color:#7dd3fc;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}',
+ '.k2md-newsletter-title{margin:0 0 8px;color:#fff;font-size:clamp(1.35rem,2.2vw,2rem);line-height:1.15;font-weight:850;letter-spacing:0}',
+ '.k2md-newsletter-body{margin:0;color:rgba(255,255,255,.68);font-size:.95rem;line-height:1.65;max-width:620px}',
+ '.k2md-newsletter-form{display:flex;gap:10px;align-items:stretch}',
+ '.k2md-newsletter-input{min-width:0;flex:1;height:46px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;padding:0 14px;font:inherit;font-size:.9rem;outline:none}',
+ '.k2md-newsletter-input:focus{border-color:#38bdf8;background:rgba(14,165,233,.09)}',
+ '.k2md-newsletter-input::placeholder{color:rgba(255,255,255,.42)}',
+ '.k2md-newsletter-btn{height:46px;border:0;border-radius:8px;background:#f59e0b;color:#0a1628;padding:0 18px;font:inherit;font-size:.86rem;font-weight:850;cursor:pointer;white-space:nowrap}',
+ '.k2md-newsletter-btn:disabled{opacity:.65;cursor:wait}',
+ '.k2md-newsletter-note{margin:8px 0 0;color:rgba(255,255,255,.42);font-size:.75rem;line-height:1.45}',
+ '.k2md-newsletter-status{display:none;margin-top:8px;font-size:.82rem;font-weight:750;line-height:1.45}',
+ '.k2md-newsletter-status.ok{display:block;color:#86efac}.k2md-newsletter-status.err{display:block;color:#fca5a5}',
+ '@media(max-width:760px){.k2md-newsletter-inner{grid-template-columns:1fr}.k2md-newsletter-form{flex-direction:column}.k2md-newsletter-btn,.k2md-newsletter-input{width:100%}}',
+ '</style>',
+ '<div class="k2md-newsletter-inner">',
+ '<div><div class="k2md-newsletter-badge">' + copy.badge + '</div><h2 class="k2md-newsletter-title">' + copy.title + '</h2><p class="k2md-newsletter-body">' + copy.body + '</p></div>',
+ '<form class="k2md-newsletter-form" data-source="' + copy.source + '">',
+ '<div style="flex:1;min-width:0"><input class="k2md-newsletter-input" type="email" name="email" placeholder="Your email address" autocomplete="email"><div class="k2md-newsletter-status" aria-live="polite"></div><p class="k2md-newsletter-note">No spam. Unsubscribe anytime. Reply directly to reach Dan.</p></div>',
+ '<button class="k2md-newsletter-btn" type="submit">Subscribe</button>',
+ '</form>',
+ '</div>'
+ ].join('');
+ if (footer && footer.parentNode) footer.parentNode.insertBefore(wrap, footer);
+ else main.appendChild(wrap);
+ funnel('newsletter_capture_shown', { source: copy.source, page_kind: kind });
+ var form = wrap.querySelector('form');
+ var input = wrap.querySelector('input');
+ var button = wrap.querySelector('button');
+ var status = wrap.querySelector('.k2md-newsletter-status');
+ form.addEventListener('submit', function (event) {
+ event.preventDefault();
+ var email = cleanText(input.value, 180).toLowerCase();
+ if (!email || email.indexOf('@') === -1 || email.indexOf('.') === -1) {
+ status.className = 'k2md-newsletter-status err';
+ status.textContent = 'Enter a valid email address.';
+ input.focus();
+ return;
+ }
+ button.disabled = true;
+ button.textContent = 'Subscribing...';
+ status.className = 'k2md-newsletter-status';
+ status.textContent = '';
+ fetch('https://key2md-api.brittainmbbs.workers.dev/api/email/subscribe', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify(withAttributionPayload({ email: email, source: copy.source, page: location.pathname }))
+ }).then(function (res) {
+ if (!res.ok) throw new Error('subscribe_failed');
+ status.className = 'k2md-newsletter-status ok';
+ status.textContent = 'You are in. Check your inbox for Dan.';
+ form.classList.add('is-done');
+ input.disabled = true;
+ button.textContent = 'Subscribed';
+ track('email_subscribe', { event_category: 'conversion', event_label: copy.source });
+ funnel('email_subscribe', { source: copy.source, page_kind: kind });
+ }).catch(function () {
+ status.className = 'k2md-newsletter-status err';
+ status.textContent = 'That did not send. Try again, or email Dan directly.';
+ button.disabled = false;
+ button.textContent = 'Subscribe';
+ });
+ });
+ }
+
  window.Key2MDTrack = window.Key2MDTrack || {};
  window.Key2MDTrack.track = track;
  window.Key2MDTrack.funnel = funnel;
+ window.Key2MDTrack.getAttribution = getAttribution;
+ window.Key2MDTrack.anonymousId = anonId;
+ window.Key2MDTrack.toolEvent = sendToolEvent;
  window.Key2MDTrack.classPlanSelect = function (plan) {
  track('class_plan_select', { event_category: 'conversion', event_label: plan, plan: plan });
  funnel('class_plan_select', { plan: plan });
@@ -238,12 +473,16 @@
 	 track('stripe_redirect', { event_category: 'conversion', event_label: product + (plan ? ':' + plan : ''), product: product, plan: plan || '' });
 	 funnel('stripe_redirect', { product: product, plan: plan || '' });
 	 };
+	 captureAttribution();
+	 instrumentFetch();
+	 loadCloudflareWebAnalytics();
 	 onReady(function () {
 	 enhanceSimpleNav();
 	 enhanceStandaloneNav();
 	 enhanceK2Nav();
+	 injectNewsletterCapture();
 	 });
-	 funnel('page_view', { referrer: document.referrer || '' });
+	 funnel('page_view', attributionEventParams({ referrer: document.referrer || '', source: 'browser_page_view' }));
 
  document.addEventListener('click', function (event) {
  var target = event.target.closest('a,button');

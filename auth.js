@@ -424,7 +424,7 @@ const Key2MDAuth = (() => {
  <div class="k2md-auth-sub">Unlock AI-powered feedback on your responses</div>
  <div class="k2md-auth-perks">
  <div class="k2md-auth-perk">Server-saved practice history</div>
- <div class="k2md-auth-perk">1 free AI reviews per day (CASPer)</div>
+ <div class="k2md-auth-perk">1 free CASPer AI review per day</div>
  <div class="k2md-auth-perk">1 free AI review per week (GAMSAT S2)</div>
  <div class="k2md-auth-perk">Track your progress over time</div>
  </div>
@@ -488,6 +488,9 @@ const Key2MDAuth = (() => {
  function showAuthModal(view = 'signup') {
  const modal = document.getElementById('k2mdAuthModal');
  if (!modal) return;
+ if (view === 'signup') {
+ try { window.Key2MDTrack?.toolEvent?.('signup_prompt_shown', { path: location.pathname }); } catch (e) {}
+ }
 
  document.getElementById('k2mdAuthSignup').style.display = view === 'signup' ? 'block' : 'none';
  document.getElementById('k2mdAuthLogin').style.display = view === 'login' ? 'block' : 'none';
@@ -590,7 +593,7 @@ const Key2MDAuth = (() => {
  } else {
  bar.innerHTML = `
  <div style="display:flex;flex-direction:column;gap:8px;padding:14px 16px;background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.15);border-radius:10px;">
- <div style="font-size:0.82rem;color:var(--gray600,#475569);line-height:1.4;">Create a free account to unlock AI-powered feedback</div>
+ <div style="font-size:0.82rem;color:var(--gray600,#475569);line-height:1.4;">Create a free account to unlock AI feedback and saved progress</div>
  <div style="display:flex;gap:8px;">
  <button onclick="Key2MDAuth.showAuthModal('signup')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#0ea5e9;color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Sign Up Free</button>
  <button onclick="Key2MDAuth.showAuthModal('login')" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--gray200,#e2e8f0);background:transparent;color:var(--gray600,#475569);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;">Log In</button>
