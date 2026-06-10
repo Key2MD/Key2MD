@@ -143,6 +143,15 @@
     .agenda-icon{width:38px;height:38px;border-radius:10px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:14px;}
     .agenda-card h3{font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:800;color:#fff;margin-bottom:6px;line-height:1.3;}
     .agenda-card p{font-size:0.83rem;color:rgba(255,255,255,0.52);line-height:1.6;margin:0;}
+    .agenda-list{display:grid;gap:10px;max-width:860px;margin:0 auto;}
+    .agenda-row{display:grid;grid-template-columns:44px 1fr;align-items:center;background:rgba(14,165,233,0.07);border:1px solid rgba(56,189,248,0.18);border-radius:12px;padding:14px 18px;transition:border-color 0.2s,background 0.2s;}
+    .agenda-row:hover{border-color:rgba(56,189,248,0.36);background:rgba(14,165,233,0.1);}
+    .agenda-row.featured{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.62);}
+    .agenda-num{font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:900;color:var(--teal2);line-height:1;}
+    .agenda-row.featured .agenda-num{color:#fbbf24;}
+    .agenda-copy h3{font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:850;color:#fff;margin:0 0 2px;line-height:1.25;}
+    .agenda-copy p{font-size:0.78rem;color:rgba(255,255,255,0.62);line-height:1.45;margin:0;}
+    .agenda-row.featured .agenda-copy p{color:#fde68a;}
 
     /* Gold highlight card */
     .mc-gold-card{background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(251,191,36,0.06));border:1px solid rgba(245,158,11,0.28);border-radius:18px;padding:28px 30px;margin:40px 0 0;}
@@ -229,6 +238,7 @@
     }
     @media(max-width:700px){
       .agenda-grid{grid-template-columns:1fr;}
+      .agenda-row{grid-template-columns:36px 1fr;padding:13px 14px;}
       .mc-who-grid{grid-template-columns:1fr;}
     }
   </style>
@@ -343,12 +353,12 @@
           </div>
           <div class="mc-includes">
             <div class="mc-includes-label">What's included</div>
-            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Opening vibe check</strong> &mdash; where to be at right now</span></div>
-            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Framework revision</strong> &mdash; key skills refreshed</span></div>
-            <div class="mc-include-item"><div class="mc-check"></div><span><strong>High-yield station speed run</strong></span></div>
-            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Marking walkthrough</strong> &mdash; how Dan marks &amp; what he believes it looks like</span></div>
-            <div class="mc-include-item"><div class="mc-check"></div><span><strong>AI analysis of 5000+ responses</strong></span></div>
-            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Live Q&amp;A</strong> &mdash; open floor before the exam</span></div>
+            <div class="mc-include-item"><div class="mc-check"></div><span><strong>5000+ response audit</strong> &mdash; score patterns, standouts and costly mistakes</span></div>
+            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Exam-day setup</strong> &mdash; camera hygiene and preparation</span></div>
+            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Framework and first 15 seconds</strong> &mdash; start human, not robotic</span></div>
+            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Marking scheme and red flags</strong> &mdash; what markers can actually reward</span></div>
+            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Policy and safety nets</strong> &mdash; judgement calls, not reflex escalation</span></div>
+            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Live Q&amp;A</strong> &mdash; clear up edge cases before the exam</span></div>
           </div>
           <p class="mc-reg-fine">After payment, you will receive a confirmation email from dan@key2md.net. The protected access page, where the Zoom link appears, will also be emailed again shortly before the session; if it lands in junk, log in here and refresh. Add dan@key2md.net and brittainmbbs@gmail.com to safe senders.</p>
         </div>
@@ -389,39 +399,49 @@
     <div class="container">
       <div class="fade-up">
         <div class="section-eyebrow">What we cover</div>
-        <h2>The last things you want fresh.</h2>
-        <p class="lead">Around 2 to 2.5 hours live, depending on how long Q&amp;A runs. Every segment is chosen for exam-day impact.</p>
+        <h2>A proper crash course through the points that matter.</h2>
+        <p class="lead">Around 2+ hours live, depending on Q&amp;A. The agenda is built around the audit findings, the marking logic, and the last high-yield skills students need before CASPer.</p>
       </div>
-      <div class="agenda-grid fade-up delay-1">
-        <div class="agenda-card">
-          <div class="agenda-icon">&#x1F4CB;</div>
-          <h3>Opening vibe check</h3>
-          <p>Where you should actually be at this stage of prep, what to stop worrying about, and how to carry yourself into the room.</p>
+      <div class="agenda-list fade-up delay-1">
+        <div class="agenda-row">
+          <div class="agenda-num">1</div>
+          <div class="agenda-copy"><h3>Camera hygiene and preparing for the day</h3><p>Set yourself up so the test starts calmly, not chaotically.</p></div>
         </div>
-        <div class="agenda-card">
-          <div class="agenda-icon">&#x1F9E0;</div>
-          <h3>Key skills and framework revision</h3>
-          <p>The highest-yield CASPer principles brought back to the front of your mind: empathy, fairness, transparency, safety, reflection, and practical escalation.</p>
+        <div class="agenda-row">
+          <div class="agenda-num">2</div>
+          <div class="agenda-copy"><h3>My CASPer perspective recap</h3><p>What CASPer is really testing, and why many good students underperform.</p></div>
         </div>
-        <div class="agenda-card">
-          <div class="agenda-icon">&#x26A1;</div>
-          <h3>High-yield station speed run</h3>
-          <p>Dan runs through his most high-yield stations and walks through every talking point he'd want to hear in a genuinely great answer.</p>
+        <div class="agenda-row">
+          <div class="agenda-num">3</div>
+          <div class="agenda-copy"><h3>Common red flags and pitfalls</h3><p>The answer patterns that sound generic, robotic, unsafe or unmarkable.</p></div>
         </div>
-        <div class="agenda-card">
-          <div class="agenda-icon">&#x1F4CA;</div>
-          <h3>Key questions from the slides</h3>
-          <p>The specific questions that separate well-prepared students from the rest, with worked examples of how to hit them cleanly.</p>
+        <div class="agenda-row">
+          <div class="agenda-num">4</div>
+          <div class="agenda-copy"><h3>Framework</h3><p>A clear way to approach stations without sounding like you memorised a template.</p></div>
         </div>
-        <div class="agenda-card">
-          <div class="agenda-icon">&#x1F916;</div>
-          <h3>AI analysis of 5000+ responses</h3>
-          <p>Key2MD's AI has marked 5,000+ responses this year. Dan has personally marked and reviewed 3,000+ over three years. The data is analysed and the most common mistakes are shown so you know exactly what to avoid.</p>
+        <div class="agenda-row featured">
+          <div class="agenda-num">5</div>
+          <div class="agenda-copy"><h3>The first 15 seconds in action</h3><p>How to start an answer so it immediately shows you understand the human problem.</p></div>
         </div>
-        <div class="agenda-card">
-          <div class="agenda-icon">&#x1F64B;</div>
-          <h3>Live Q&amp;A</h3>
-          <p>Open floor. Whatever is still sitting in your head before the exam, we clear it up together.</p>
+        <div class="agenda-row">
+          <div class="agenda-num">6</div>
+          <div class="agenda-copy"><h3>Key skills: action and articulation</h3><p>Move beyond "I would communicate" into believable action and visible reasoning.</p></div>
+        </div>
+        <div class="agenda-row">
+          <div class="agenda-num">7</div>
+          <div class="agenda-copy"><h3>The marking scheme</h3><p>What markers can reward, what they cannot, and how to make your thought process easier to score.</p></div>
+        </div>
+        <div class="agenda-row">
+          <div class="agenda-num">8</div>
+          <div class="agenda-copy"><h3>Policy: when to violate rules and make judgement calls</h3><p>Confidentiality, unfair rules, unsafe requests, hierarchy and competing duties.</p></div>
+        </div>
+        <div class="agenda-row">
+          <div class="agenda-num">9</div>
+          <div class="agenda-copy"><h3>Safety nets: when and when not</h3><p>When safety genuinely matters, and when escalation sounds forced.</p></div>
+        </div>
+        <div class="agenda-row">
+          <div class="agenda-num">10</div>
+          <div class="agenda-copy"><h3>Live Q&amp;A</h3><p>Bring the stations, fears and edge cases still bothering you.</p></div>
         </div>
       </div>
 
