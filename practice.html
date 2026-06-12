@@ -883,32 +883,12 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="webcam-permission-text" id="webcamPermissionText">Enable camera to record your answer</div>
  <button class="btn-webcam-start" id="btnStartWebcam">Enable Camera</button>
  </div>
- <div id="playbackPlayOverlay" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);cursor:pointer;" onclick="togglePlayback()">
- <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;">
- <span id="playOverlayIcon" style="font-size:1.2rem;margin-left:3px;">&#9654;</span>
- </div>
- </div>
  </div>
  <div class="webcam-controls" id="recordingControls">
  <button class="btn-webcam-restart" id="btnRestartRecording" disabled title="Re-record (erases current recording)" onclick="confirmRestartRecording()">&#8635; Restart</button>
  <button class="btn-webcam-dl" id="btnDownloadVideo" disabled title="Save recording to your device">&#11015; Save</button>
  </div>
- <div id="playbackControls" style="display:none;padding:8px 10px;background:rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.06);">
- <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
- <span id="pbCurrentTime" style="font-size:0.7rem;font-weight:700;color:var(--teal2);font-variant-numeric:tabular-nums;min-width:32px;">0:00</span>
- <div id="pbProgressTrack" style="flex:1;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;cursor:pointer;position:relative;" onclick="seekPlayback(event)">
- <div id="pbProgressFill" style="height:100%;background:var(--teal);border-radius:2px;width:0%;"></div>
- </div>
- <span id="pbDuration" style="font-size:0.7rem;color:rgba(255,255,255,0.4);font-variant-numeric:tabular-nums;min-width:32px;text-align:right;">--:--</span>
- </div>
- <div style="display:flex;align-items:center;gap:6px;">
- <button onclick="togglePlayback()" id="pbPlayBtn" style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:50px;background:rgba(14,165,233,0.15);color:var(--teal2);border:1px solid rgba(14,165,233,0.3);font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;">> Play</button>
- <button onclick="restartPlayback()" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:50px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.1);font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;">&#9198; Rewind</button>
- <div style="flex:1;"></div>
- <button class="btn-webcam-dl" id="btnDownloadVideo2" disabled title="Save video to device">&#11015; Save video</button>
- <button class="btn-webcam-restart" id="btnReRecordBtn" disabled title="Re-record this station" onclick="confirmRestartRecording()">&#8635; Re-record</button>
- </div>
- </div>
+ <div id="playbackControls" style="display:none;"></div>
  </div>
  </div>
 
@@ -1553,6 +1533,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
 <script src="practice-stations.js"></script>
 <script src="mmi-recording.js"></script>
+<script src="mmi-player.js"></script>
 <script src="mmi-engine.js"></script>
 <script src="mmi-feedback-render.js"></script>
 <script src="casper-mock-exam.js"></script>
@@ -3991,8 +3972,10 @@ function startRecording(){
  stopPremiumLiveFrameCapture();
 
  const rc=$('recordingControls');const pc=$('playbackControls');
- if(rc)rc.style.display='flex';if(pc)pc.style.display='none';
- const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='none';
+ if(rc)rc.style.display='flex';if(pc){pc.style.display='none';pc.innerHTML='';}
+ const oldPv=$('webcamPlayback');
+ if(oldPv&&oldPv._mmiPlayer)oldPv._mmiPlayer.destroy();
+ if(window._pbObjectUrl){URL.revokeObjectURL(window._pbObjectUrl);window._pbObjectUrl=null;}
 
  $('btnDownloadVideo').disabled=false;
  $('webcamPlayback').style.display='none';
@@ -4010,28 +3993,36 @@ function startRecording(){
  videoRecorder.onstop=()=>{
  if(window._elapsedInterval){clearInterval(window._elapsedInterval);window._elapsedInterval=null;}
  recordingBlob=new Blob(recordedChunks,{type:videoRecorder.mimeType||'video/webm'});
+ if(window._pbObjectUrl)URL.revokeObjectURL(window._pbObjectUrl);
  const url=URL.createObjectURL(recordingBlob);
+ window._pbObjectUrl=url;
  const pv=$('webcamPlayback');
 
  pv.src=url;
  pv.dataset.duration=String(Math.max(0,Math.round(mmiRecordingDurationSec||0)));
  pv.style.display='block';
- pv.onloadedmetadata=()=>initPlaybackUI(pv);
- initPlaybackUI(pv);
 
  $('webcamLive').style.display='none';
  $('recDot').style.display='none';$('recLabel').style.display='none';
  $('webcamTitle').textContent='Review your response';
 
  const rc=$('recordingControls');const pc=$('playbackControls');
- if(rc)rc.style.display='none';if(pc)pc.style.display='block';
- const ppo=$('playbackPlayOverlay');
- if(ppo){ppo.style.display='flex';}
+ if(rc)rc.style.display='none';if(pc){pc.style.display='block';pc.innerHTML='';}
+
+ if(typeof MMIPlayer!=='undefined'){
+ MMIPlayer.attach(pv,{
+ wrap:document.querySelector('.webcam-video-wrap'),
+ fsTarget:document.querySelector('.webcam-float'),
+ mount:pc,
+ getFallbackDuration:()=>Number(pv.dataset.duration||0),
+ getDownloadBlob:()=>recordingBlob,
+ downloadName:(()=>{const s=pool[currentIdx];const cat=s?String(s.category||'MMI').replace(/[^a-zA-Z0-9]/g,'-'):'MMI';return 'Key2MD-MMI-'+cat+'-'+new Date().toISOString().slice(0,10);})(),
+ onReRecord:confirmRestartRecording,
+ });
+ }
 
  $('btnDownloadVideo').disabled=false;
  $('btnRestartRecording').disabled=false;
- const dl2=$('btnDownloadVideo2');if(dl2)dl2.disabled=false;
- const rr=$('btnReRecordBtn');if(rr)rr.disabled=false;
 
  if(currentMode===MODE_MMI) mmiOnRecordingStop();
  };
@@ -4080,72 +4071,6 @@ function stopRecording(){
  webcamActive=false;
 }
 
-function initPlaybackUI(vid) {
- const dur = getPlaybackDuration(vid);
- if(dur){
- $('pbDuration').textContent = fmt(Math.round(dur));
- }
- vid.addEventListener('timeupdate', updatePlaybackProgress);
- updatePlaybackProgress();
- vid.addEventListener('ended', ()=>{
- const btn=$('pbPlayBtn');if(btn)btn.textContent='> Play';
- const ppo=$('playbackPlayOverlay');if(ppo){ppo.style.display='flex';}
- const icon=$('playOverlayIcon');if(icon)icon.innerHTML='>';
- });
- vid.addEventListener('play',()=>{
- const btn=$('pbPlayBtn');if(btn)btn.textContent='Pause Pause';
- const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='none';
- });
- vid.addEventListener('pause',()=>{
- const btn=$('pbPlayBtn');if(btn)btn.textContent='> Play';
- if(!vid.ended){
- const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='flex';
- }
- });
-}
-
-function getPlaybackDuration(vid){
- if(!vid)return 0;
- const dur=Number(vid.duration);
- const fallback=Number(vid.dataset?.duration||0);
- const hasNative=Number.isFinite(dur)&&dur>0&&dur<86400;
- const hasFallback=Number.isFinite(fallback)&&fallback>0&&fallback<86400;
- if(hasNative&&hasFallback){
- if(dur < fallback*0.55 || dur > fallback*1.8)return fallback;
- return dur;
- }
- if(hasNative)return dur;
- return hasFallback?fallback:0;
-}
-
-function updatePlaybackProgress() {
- const vid=$('webcamPlayback');if(!vid)return;
- const dur=getPlaybackDuration(vid);
- if(!dur)return;
- const pct=(vid.currentTime/dur)*100;
- const fill=$('pbProgressFill');if(fill)fill.style.width=pct+'%';
- const cur=$('pbCurrentTime');if(cur)cur.textContent=fmt(Math.round(vid.currentTime));
-}
-
-function togglePlayback() {
- const vid=$('webcamPlayback');if(!vid||vid.style.display==='none')return;
- if(vid.paused||vid.ended){vid.play();}else{vid.pause();}
-}
-
-function restartPlayback() {
- const vid=$('webcamPlayback');if(!vid)return;
- vid.currentTime=0;vid.play();
-}
-
-function seekPlayback(e) {
- const vid=$('webcamPlayback');if(!vid)return;
- const dur=getPlaybackDuration(vid);if(!dur)return;
- const track=$('pbProgressTrack');if(!track)return;
- const rect=track.getBoundingClientRect();
- const pct=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
- vid.currentTime=pct*dur;
-}
-
 function confirmRestartRecording() {
  if(recordingBlob){
  if(!confirm('Re-record this station? Your current recording will be erased.'))return;
@@ -4153,16 +4078,16 @@ function confirmRestartRecording() {
  if(!sessionActive||currentMode!==MODE_MMI)return;
  if(typeof mmiResetForRestart==='function') mmiResetForRestart();
  stopRecording();
- const pv=$('webcamPlayback');pv.src='';pv.style.display='none';
+ const pv=$('webcamPlayback');
+ if(pv&&pv._mmiPlayer)pv._mmiPlayer.destroy();
+ if(window._pbObjectUrl){URL.revokeObjectURL(window._pbObjectUrl);window._pbObjectUrl=null;}
+ pv.src='';pv.style.display='none';
  $('webcamLive').style.display='block';
  const rc=$('recordingControls');const pc=$('playbackControls');
- if(rc)rc.style.display='flex';if(pc)pc.style.display='none';
- const ppo=$('playbackPlayOverlay');if(ppo)ppo.style.display='none';
+ if(rc)rc.style.display='flex';if(pc){pc.style.display='none';pc.innerHTML='';}
  const wcd=$('webcamTimerDisp');if(wcd)wcd.textContent='0:00';
  $('btnDownloadVideo').disabled=true;
  $('btnRestartRecording').disabled=true;
- const dl2=$('btnDownloadVideo2');if(dl2)dl2.disabled=true;
- const rr=$('btnReRecordBtn');if(rr)rr.disabled=true;
  recordedChunks=[];recordingBlob=null;
  audioChunks=[];audioBlob=null;
  mmiLiveFrameBlobs=[];mmiLiveFrameSamples=[];
@@ -4171,31 +4096,36 @@ function confirmRestartRecording() {
 }
 $('btnStartWebcam').addEventListener('click',async()=>{await initWebcam();});
 
+function saveBlobToDevice(blob, baseName) {
+ if(!blob)return;
+ const mime=String(blob.type||'').toLowerCase();
+ const ext=mime.includes('mp4')?'.mp4':mime.includes('ogg')?'.ogg':'.webm';
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+ a.href=url;a.download=baseName+ext;
+ document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),10000);
+}
+
 function downloadRecording() {
  const s = pool[currentIdx];
- const cat = s ? s.category.replace(/[^a-zA-Z0-9]/g,'-') : 'MMI';
+ const cat = s ? String(s.category||'MMI').replace(/[^a-zA-Z0-9]/g,'-') : 'MMI';
  const dateStr = new Date().toISOString().slice(0,10);
- const filename = `Key2MD-MMI-${cat}-${dateStr}.webm`;
+ const baseName = `Key2MD-MMI-${cat}-${dateStr}`;
 
  if(mediaRecorder&&mediaRecorder.state==='recording'){
  const snapChunks=[...recordedChunks];
  mediaRecorder.requestData();
  setTimeout(()=>{
  const allChunks=[...snapChunks,...recordedChunks.slice(snapChunks.length)];
- const snapBlob=new Blob(allChunks,{type:mediaRecorder.mimeType||'video/webm'});
- const a=document.createElement('a');a.href=URL.createObjectURL(snapBlob);
- a.download=filename;a.click();
+ saveBlobToDevice(new Blob(allChunks,{type:mediaRecorder.mimeType||'video/webm'}),baseName);
  },300);
  return;
  }
- if(!recordingBlob)return;
- const a=document.createElement('a');a.href=URL.createObjectURL(recordingBlob);
- a.download=filename;a.click();
+ saveBlobToDevice(recordingBlob,baseName);
 }
 
 $('btnDownloadVideo').addEventListener('click', downloadRecording);
-const _dl2 = document.getElementById('btnDownloadVideo2');
-if(_dl2) _dl2.addEventListener('click', downloadRecording);
 
 $('btnDownloadResponse').addEventListener('click',()=>{
  if(!pool[currentIdx])return;

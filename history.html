@@ -30,6 +30,7 @@
  <script src="auth.js" defer></script>
  <link rel="stylesheet" href="mmi-styles.css">
  <script src="mmi-feedback-render.js" defer></script>
+ <script src="mmi-player.js" defer></script>
  <style>
  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  :root {
@@ -1195,12 +1196,36 @@ async function playMMIRecording(reviewId, btn) {
   return;
  }
  const isAudio = (payload.content_type || '').startsWith('audio/');
- const tag = isAudio ? 'audio' : 'video';
  const card = document.getElementById(`mmi-${escapeAttr(reviewId)}`);
  const feedbackMount = card?.querySelector('.mmi-history-feedback-mount');
  const insertTarget = feedbackMount || btn.closest('.mmi-history-card-footer');
- insertTarget.insertAdjacentHTML('beforebegin',
-  `<div class="mmi-recording-player"><${tag} controls src="${escapeHtml(payload.playback_url)}" style="width:100%;"></${tag}><div class="mmi-recording-player-note">Playback link valid for 10 minutes.</div></div>`);
+ const playerBox = document.createElement('div');
+ playerBox.className = 'mmi-recording-player';
+ const mediaWrap = document.createElement('div');
+ mediaWrap.className = 'mmip-history-wrap';
+ const media = document.createElement(isAudio ? 'audio' : 'video');
+ media.src = payload.playback_url;
+ media.playsInline = true;
+ media.preload = 'metadata';
+ if (isAudio) media.style.display = 'none';
+ mediaWrap.appendChild(media);
+ playerBox.appendChild(mediaWrap);
+ const note = document.createElement('div');
+ note.className = 'mmi-recording-player-note';
+ note.textContent = 'Playback link valid for 10 minutes. Save the file to keep it.';
+ playerBox.appendChild(note);
+ insertTarget.parentNode.insertBefore(playerBox, insertTarget);
+ if (typeof MMIPlayer !== 'undefined') {
+  MMIPlayer.attach(media, {
+   wrap: mediaWrap,
+   audioOnly: isAudio,
+   downloadUrl: payload.playback_url,
+   downloadName: `Key2MD-MMI-review-${String(reviewId).slice(0, 8)}`,
+  });
+ } else {
+  media.controls = true;
+  if (isAudio) media.style.display = '';
+ }
  btn.style.display = 'none';
  } catch (err) {
  btn.textContent = 'Play recording';
