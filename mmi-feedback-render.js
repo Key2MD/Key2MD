@@ -477,9 +477,64 @@ const MMIFeedbackRender = (() => {
  </div>`;
  }
 
+ function computeCriterionAverages(feedback) {
+ const criteria = ['empathy','communication','reasoning','reflection','real_world_awareness'];
+ const sums = {}, counts = {};
+ for (const pp of (feedback?.per_prompt || [])) {
+  for (const key of criteria) {
+   const s = pp?.criteria?.[key]?.score;
+   if (typeof s === 'number') { sums[key] = (sums[key]||0)+s; counts[key]=(counts[key]||0)+1; }
+  }
+ }
+ const avgs = {};
+ for (const key of criteria) if (counts[key]) avgs[key] = Math.round((sums[key]/counts[key])*10)/10;
+ return avgs;
+ }
+
+ function renderDeltaSection(feedback, prevFeedback) {
+ const cur = computeCriterionAverages(feedback);
+ const prev = computeCriterionAverages(prevFeedback);
+ const curOverall = feedback?.overall?.score || null;
+ const prevOverall = prevFeedback?.overall?.score || null;
+ const criteria = ['empathy','communication','reasoning','reflection','real_world_awareness'];
+ const rows = criteria.map(key => {
+  const c = cur[key], p = prev[key];
+  if (!Number.isFinite(c) || !Number.isFinite(p)) return '';
+  const d = Math.round((c - p) * 10) / 10;
+  const sign = d > 0 ? '+' : '';
+  const cls = d > 0 ? 'delta-up' : d < 0 ? 'delta-down' : 'delta-same';
+  return `<div class="mmi-delta-row"><span class="mmi-delta-label">${esc(CRITERIA_LABELS[key])}</span><span class="mmi-delta-prev">${p}/5</span><span class="mmi-delta-arrow">-></span><span class="mmi-delta-now">${c}/5</span><span class="mmi-delta-badge ${cls}">${sign}${d}</span></div>`;
+ }).filter(Boolean);
+ if (!rows.length) return '';
+ const overallDelta = (typeof curOverall === 'number' && typeof prevOverall === 'number')
+  ? (() => { const d = curOverall - prevOverall; const s = d>0?'+':''; const cls=d>0?'delta-up':d<0?'delta-down':'delta-same'; return `<span class="mmi-delta-overall-badge ${cls}">${s}${d} overall</span>`; })()
+  : '';
+ return `<div class="mmi-delta-section"><div class="mmi-delta-title">Change from previous attempt ${overallDelta}</div><div class="mmi-delta-rows">${rows.join('')}</div></div>`;
+ }
+
+ function renderPredictionSection(feedback, predictedScores, calibrationStreak) {
+ if (!predictedScores || !feedback) return '';
+ const criteria = ['empathy','communication','reasoning','reflection','real_world_awareness'];
+ const actual = computeCriterionAverages(feedback);
+ let allClose = true;
+ const rows = criteria.map(key => {
+  const pred = predictedScores[key], act = actual[key];
+  if (!Number.isFinite(pred) || !Number.isFinite(act)) return '';
+  const diff = Math.round((act - pred) * 10) / 10;
+  const sign = diff > 0 ? '+' : '';
+  const cls = Math.abs(diff) <= 1 ? 'pred-close' : 'pred-off';
+  if (Math.abs(diff) > 1) allClose = false;
+  return `<div class="mmi-pred-row"><span class="mmi-pred-label">${esc(CRITERIA_LABELS[key])}</span><span class="mmi-pred-you">you: ${pred}</span><span class="mmi-pred-ai">AI: ${act.toFixed(1)}</span><span class="mmi-pred-diff ${cls}">${sign}${diff}</span></div>`;
+ }).filter(Boolean);
+ if (!rows.length) return '';
+ const streakHtml = calibrationStreak > 1 ? `<span class="mmi-pred-streak">${calibrationStreak} in a row within 1 point</span>` : '';
+ const overallMsg = allClose ? 'Good self-awareness this station.' : 'Check where your perception differs from the AI.';
+ return `<div class="mmi-prediction-section"><div class="mmi-pred-title">Your predictions vs AI scores ${streakHtml}</div><div class="mmi-pred-rows">${rows.join('')}</div><div class="mmi-pred-note">${overallMsg}</div></div>`;
+ }
+
  function render(container, data, context) {
  clearLoadingTimers();
- // context: { tier, specialistMode, stationCategory, durationSec }
+ // context: { tier, specialistMode, stationCategory, durationSec, previousFeedback, predictedScores, calibrationStreak }
  if (!container || !data) return;
 
  const feedback = data.feedback || data;
@@ -514,6 +569,9 @@ const MMIFeedbackRender = (() => {
  <div class="mmi-flag-body">${esc(feedback.polished_auditor_explanation || '')}</div>
  </div>` : '';
 
+ const deltaSection = context?.previousFeedback ? renderDeltaSection(feedback, context.previousFeedback) : '';
+ const predictionSection = context?.predictedScores ? renderPredictionSection(feedback, context.predictedScores, context.calibrationStreak || 0) : '';
+
  const html = `
  <div class="mmi-feedback" id="mmiFeedbackBlock">
 
@@ -525,6 +583,8 @@ const MMIFeedbackRender = (() => {
  </div>
 
  ${auditorFlag}
+ ${deltaSection}
+ ${predictionSection}
 
  <div id="mmiAnalyticsMount"></div>
 
@@ -557,6 +617,11 @@ const MMIFeedbackRender = (() => {
  The AI is less good at: subtle interpersonal nuance, the kind of judgement only experienced examiners bring, and the emotional weight of how something landed in the room.
  </div>
 
+ ${data.review_id ? `<div class="mmi-probe-wrap" id="mmiProbeWrap">
+  <button class="btn-probe-trigger" id="mmiProbeTrigger">Get a follow-up question an examiner would actually ask -></button>
+  <div class="mmi-probe-panel" id="mmiProbePanel" style="display:none"></div>
+ </div>` : ''}
+
  <div class="dan-marking-card">
  <div class="dan-marking-left">
  <div class="dan-marking-eyebrow">Want a human eye on this?</div>
@@ -573,11 +638,13 @@ const MMIFeedbackRender = (() => {
 
  container.innerHTML = html;
  window._lastMMIFeedback = feedback;
+ window._lastMMIReviewId = data.review_id || null;
  hydrateAnalytics(container, data, context);
+ if (data.review_id) hydrateProbe(container, data.review_id);
  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
  }
 
- function renderLoading(container, tier) {
+ function renderLoading(container, tier, opts) {
  if (!container) return;
  clearLoadingTimers();
  const isPremium = tier === 'premium';
@@ -588,7 +655,25 @@ const MMIFeedbackRender = (() => {
  <div class="mmi-loading-sub" id="mmiLoadingSub">${isPremium ? 'This usually takes 20-40 seconds. Please keep this tab open.' : 'This usually takes 15-30 seconds.'}</div>
  ${isPremium ? '<div class="mmi-loading-steps" id="mmiLoadingSteps"><span class="mmi-step active"> Transcribing</span><span class="mmi-step"> Analysing voice</span><span class="mmi-step"> Reviewing presentation</span><span class="mmi-step"> Generating feedback</span></div>' : ''}
  </div>`;
- if (isPremium) startLinearLoadingSteps();
+ if (isPremium && !opts?.useSSE) startLinearLoadingSteps();
+ }
+
+ function updateLoadingStage(container, stage) {
+ if (!container) return;
+ const text = document.getElementById('mmiLoadingText');
+ const sub = document.getElementById('mmiLoadingSub');
+ const steps = container.querySelectorAll('.mmi-step');
+ const isPremium = steps.length > 0;
+ if (stage === 'uploaded') {
+  if (text) text.textContent = isPremium ? 'Transcribing and analysing your response...' : 'Transcribing your response...';
+  if (isPremium) steps.forEach((s, i) => s.classList.toggle('active', i === 0));
+ } else if (stage === 'marking') {
+  if (text) text.textContent = 'Writing your feedback...';
+  if (isPremium) steps.forEach((s, i) => s.classList.toggle('active', i <= 3));
+ } else if (stage === 'still_working') {
+  if (text) text.textContent = 'Still working on the final feedback...';
+  if (sub) sub.textContent = 'Longer recordings can take a little extra time. Nothing has gone wrong.';
+ }
  }
 
  function clearLoadingTimers() {
@@ -645,6 +730,124 @@ const MMIFeedbackRender = (() => {
  if (container) container.innerHTML = '';
  }
 
- return { render, renderLoading, renderError, clear, selectSkill: key => { analyticsState.selectedKey = key || 'overall'; renderAnalytics(analyticsState); } };
+ function hydrateProbe(container, reviewId) {
+ const triggerBtn = container.querySelector('#mmiProbeTrigger');
+ const panel = container.querySelector('#mmiProbePanel');
+ if (!triggerBtn || !panel) return;
+
+ let probeState = 'idle';
+ let mediaRec = null, audioChunks = [], probeBlob = null, probeQuestion = '';
+ let timerInterval = null, elapsed = 0;
+ const MAX_SEC = 90;
+
+ function setPanel(html) { panel.innerHTML = html; panel.style.display = html ? '' : 'none'; }
+ function fmt(s) { return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+
+ function showQuestion(q) {
+  probeQuestion = q;
+  setPanel(`<div class="mmi-probe-question">${esc(q)}</div>
+  <p class="mmi-probe-instructions">Record a 60-90 second reply. Press Start when ready.</p>
+  <div class="mmi-probe-controls"><button class="btn-probe-record" id="probeRecordBtn">Start recording</button></div>`);
+  container.querySelector('#probeRecordBtn').addEventListener('click', startRec);
+ }
+
+ async function startRec() {
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch { setPanel(`<div class="mmi-probe-question">${esc(probeQuestion)}</div><div class="mmi-probe-error">Microphone access denied. Please allow microphone access and try again.</div>`); return; }
+  audioChunks = []; probeBlob = null; elapsed = 0;
+  const mime = ['audio/webm', 'audio/mp4', 'audio/ogg'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+  mediaRec = new MediaRecorder(stream, mime ? { mimeType: mime } : {});
+  mediaRec.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+  mediaRec.onstop = () => {
+   stream.getTracks().forEach(t => t.stop());
+   probeBlob = new Blob(audioChunks, { type: mime || 'audio/webm' });
+   clearInterval(timerInterval);
+   setPanel(`<div class="mmi-probe-question">${esc(probeQuestion)}</div>
+   <p class="mmi-probe-ready">Recording complete (${fmt(elapsed)}). Submit when ready.</p>
+   <div class="mmi-probe-controls">
+    <button class="btn-probe-submit" id="probeSubmitBtn">Submit reply -></button>
+    <button class="btn-probe-retry" id="probeRetryBtn">Re-record</button>
+   </div>`);
+   container.querySelector('#probeSubmitBtn').addEventListener('click', submitProbe);
+   container.querySelector('#probeRetryBtn').addEventListener('click', () => showQuestion(probeQuestion));
+  };
+  mediaRec.start(250);
+  probeState = 'recording';
+  setPanel(`<div class="mmi-probe-question">${esc(probeQuestion)}</div>
+  <div class="mmi-probe-timer" id="probeTimer">${fmt(0)} / ${fmt(MAX_SEC)}</div>
+  <button class="btn-probe-stop" id="probeStopBtn">Stop recording</button>`);
+  container.querySelector('#probeStopBtn').addEventListener('click', stopRec);
+  timerInterval = setInterval(() => {
+   elapsed++;
+   const el = container.querySelector('#probeTimer');
+   if (el) el.textContent = `${fmt(elapsed)} / ${fmt(MAX_SEC)}`;
+   if (elapsed >= MAX_SEC) stopRec();
+  }, 1000);
+ }
+
+ function stopRec() {
+  clearInterval(timerInterval);
+  if (mediaRec && mediaRec.state !== 'inactive') mediaRec.stop();
+ }
+
+ async function submitProbe() {
+  probeState = 'uploading';
+  setPanel('<div class="mmi-probe-loading">Transcribing and marking your reply...</div>');
+  const ext = (probeBlob.type || '').includes('mp4') ? 'mp4' : (probeBlob.type || '').includes('ogg') ? 'ogg' : 'webm';
+  const fd = new FormData();
+  fd.append('audio', probeBlob, `probe.${ext}`);
+  fd.append('review_id', reviewId);
+  fd.append('question', probeQuestion);
+  try {
+   const res = await fetch(`${apiBase()}/api/mmi/probe-mark`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${authToken()}` },
+    body: fd,
+   });
+   const payload = await res.json().catch(() => ({}));
+   if (!res.ok) throw new Error(payload.message || payload.error || 'Marking failed');
+   probeState = 'done';
+   const vtext = { yes: 'Weakness repaired', partly: 'Partial improvement', no: 'Weakness persists' }[payload.verdict] || '';
+   const vcls = { yes: 'probe-verdict-yes', partly: 'probe-verdict-partly', no: 'probe-verdict-no' }[payload.verdict] || '';
+   triggerBtn.style.display = 'none';
+   setPanel(`<div class="mmi-probe-question">${esc(probeQuestion)}</div>
+   <div class="mmi-probe-result">
+    <div class="probe-verdict ${vcls}">${esc(vtext)}</div>
+    <div class="probe-summary">${esc(payload.summary || '')}</div>
+   </div>`);
+  } catch (err) {
+   probeState = 'question';
+   setPanel(`<div class="mmi-probe-question">${esc(probeQuestion)}</div>
+   <div class="mmi-probe-error">${esc(err.message || 'Something went wrong.')} <button class="btn-probe-retry-submit" id="probeRetrySubmit">Try again</button></div>`);
+   container.querySelector('#probeRetrySubmit')?.addEventListener('click', submitProbe);
+  }
+ }
+
+ triggerBtn.addEventListener('click', async () => {
+  if (probeState !== 'idle') return;
+  probeState = 'loading';
+  triggerBtn.style.display = 'none';
+  panel.style.display = '';
+  setPanel('<div class="mmi-probe-loading">Generating your follow-up question...</div>');
+  try {
+   const res = await fetch(`${apiBase()}/api/mmi/probe-generate`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${authToken()}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ review_id: reviewId }),
+   });
+   const payload = await res.json().catch(() => ({}));
+   if (!res.ok) throw new Error(payload.message || payload.error || 'Could not generate question');
+   probeState = 'question';
+   showQuestion(payload.question);
+  } catch {
+   probeState = 'idle';
+   triggerBtn.style.display = '';
+   panel.style.display = 'none';
+  }
+ });
+ }
+
+ return { render, renderLoading, updateLoadingStage, renderError, clear, selectSkill: key => { analyticsState.selectedKey = key || 'overall'; renderAnalytics(analyticsState); } };
 
 })();

@@ -916,8 +916,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <h2 style="color:#fff;">Speak. Get marked.<br>Improve fast.</h2>
  <p style="color:rgba(255,255,255,0.72);">Record your MMI response, and get detailed feedback across 5 criteria - Empathy, Communication, Reasoning, Reflection, and Real-world Awareness - using the same examiner rubric Dan applies in live coaching.</p>
  <div style="margin-bottom:20px;padding:14px 18px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:12px;">
- <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Why credits, not free?</div>
- <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.65;margin:0;">MMI feedback requires speech-to-text transcription plus spoken-response analysis, so it costs significantly more than a CASPer text review to run. The station bank is free to practise with; AI-marked MMI feedback uses credits or MMI Pro.</p>
+ <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Your first review is free</div>
+ <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.65;margin:0 0 10px;">Record a station response and submit it - your first AI-marked Transcript review is free, no credit needed. One per account, no expiry.</p>
+ <p style="font-size:0.82rem;color:rgba(255,255,255,0.45);line-height:1.6;margin:0;">After that, MMI feedback uses credits or an MMI Pro subscription. Spoken-response marking includes real-time transcription and per-prompt criterion analysis, so it costs more to run than a CASPer text review.</p>
  </div>
  <div style="margin-bottom:22px;padding:15px 18px;background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(14,165,233,0.1));border:1px solid rgba(196,181,253,0.34);border-radius:14px;">
  <div style="font-size:0.72rem;font-weight:800;color:#ddd6fe;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">MMI Founder pricing</div>
@@ -2128,14 +2129,15 @@ let mmiTier = 'transcript';
 
 const MMI_PACKS = {
  transcript: [
- { id: 'mmi_transcript_1', label: '1 Transcript review', price: '$5.00', save: null },
- { id: 'mmi_transcript_5', label: ' 5 Transcript reviews', price: '$22.50', save: 'Save 10%' },
- { id: 'mmi_transcript_10', label: ' 10 Transcript reviews', price: '$40.00', save: 'Save 20%' },
+ { id: 'mmi_transcript_1', label: '1 Transcript review', price: '$7.00', save: null },
+ { id: 'mmi_transcript_5', label: '5 Transcript reviews', price: '$30.00', save: 'Save $5' },
+ { id: 'mmi_transcript_10', label: '10 Transcript reviews', price: '$56.00', save: 'Save $14' },
  ],
  premium: [
  { id: 'mmi_premium_1', label: '1 Premium review', price: '$12.00', save: null },
- { id: 'mmi_premium_5', label: '* 5 Premium reviews', price: '$54.00', save: 'Save 10%' },
- { id: 'mmi_premium_10', label: '* 10 Premium reviews', price: '$96.00', save: 'Save 20%' },
+ { id: 'mmi_premium_5', label: '5 Premium reviews', price: '$54.00', save: 'Save 10%' },
+ { id: 'mmi_premium_6', label: '6 Premium reviews', price: '$60.00', save: 'Save $12' },
+ { id: 'mmi_premium_10', label: '10 Premium reviews', price: '$96.00', save: 'Save 20%' },
  ],
 };
 
@@ -2145,17 +2147,18 @@ const MMI_PRO_PRICES = {
 };
 
 const MMI_CREDIT_LABELS = {
- mmi_transcript_1: '1 Transcript Review - $5.00',
- mmi_transcript_5: '5 Transcript Reviews - $22.50',
- mmi_transcript_10: '10 Transcript Reviews - $40.00',
+ mmi_transcript_1: '1 Transcript Review - $7.00',
+ mmi_transcript_5: '5 Transcript Reviews - $30.00',
+ mmi_transcript_10: '10 Transcript Reviews - $56.00',
  mmi_premium_1: '1 Premium Review - $12.00',
  mmi_premium_5: '5 Premium Reviews - $54.00',
+ mmi_premium_6: '6 Premium Reviews - $60.00',
  mmi_premium_10: '10 Premium Reviews - $96.00',
 };
 
 const MMI_CREDIT_PRICES = {
- mmi_transcript_1: '$5.00', mmi_transcript_5: '$22.50', mmi_transcript_10: '$40.00',
- mmi_premium_1: '$12.00', mmi_premium_5: '$54.00', mmi_premium_10: '$96.00',
+ mmi_transcript_1: '$7.00', mmi_transcript_5: '$30.00', mmi_transcript_10: '$56.00',
+ mmi_premium_1: '$12.00', mmi_premium_5: '$54.00', mmi_premium_6: '$60.00', mmi_premium_10: '$96.00',
 };
 
 function switchMMITier(tier) {

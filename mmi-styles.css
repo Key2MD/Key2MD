@@ -1,4 +1,4 @@
-/* ===============================================================
+﻿/* ===============================================================
  Key2MD MMI Phase 1 - New Styles
  Append to practice.css
  =============================================================== */
@@ -1057,4 +1057,309 @@ details[open] .mmi-premium-chevron { transform: rotate(180deg); }
  .mmi-overall-skill { width: 100%; }
  .mmi-analytics-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
  .mmi-chart-copy { flex-direction: column; }
+}
+
+/* -- Probe section ------------------------------------------------ */
+
+.mmi-probe-wrap {
+ margin: 16px 0 12px;
+}
+
+.btn-probe-trigger {
+ border: none;
+ background: none;
+ padding: 0;
+ font-family: inherit;
+ font-size: 0.84rem;
+ font-weight: 700;
+ color: var(--teal3);
+ cursor: pointer;
+ text-decoration: underline;
+ text-underline-offset: 3px;
+}
+
+.btn-probe-trigger:hover { color: var(--teal2); }
+
+.mmi-probe-panel {
+ margin-top: 10px;
+ background: rgba(14,165,233,0.04);
+ border: 1px solid rgba(14,165,233,0.2);
+ border-radius: 12px;
+ padding: 14px 16px;
+}
+
+.mmi-probe-loading {
+ font-size: 0.84rem;
+ color: var(--teal3);
+ padding: 4px 0;
+}
+
+.mmi-probe-question {
+ font-size: 0.92rem;
+ font-weight: 700;
+ color: var(--navy);
+ line-height: 1.5;
+ margin-bottom: 10px;
+}
+
+.mmi-probe-instructions {
+ font-size: 0.8rem;
+ color: var(--gray600);
+ margin: 0 0 10px;
+}
+
+.mmi-probe-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.btn-probe-record,.btn-probe-stop,.btn-probe-submit,.btn-probe-retry,.btn-probe-retry-submit {
+ padding: 8px 16px;
+ border-radius: 50px;
+ border: none;
+ font-family: inherit;
+ font-size: 0.8rem;
+ font-weight: 700;
+ cursor: pointer;
+ transition: background 0.16s;
+}
+
+.btn-probe-record,.btn-probe-submit { background: var(--teal); color: #fff; }
+.btn-probe-record:hover,.btn-probe-submit:hover { background: var(--teal2); }
+.btn-probe-stop { background: rgba(239,68,68,0.12); color: #dc2626; border: 1px solid rgba(239,68,68,0.25); }
+.btn-probe-retry,.btn-probe-retry-submit { background: var(--gray100); color: var(--gray600); }
+
+.mmi-probe-timer {
+ font-size: 0.8rem;
+ font-weight: 700;
+ color: var(--gray600);
+ margin-bottom: 8px;
+}
+
+.mmi-probe-ready {
+ font-size: 0.8rem;
+ color: var(--gray600);
+ margin-bottom: 10px;
+}
+
+.mmi-probe-error {
+ font-size: 0.82rem;
+ color: #dc2626;
+ margin: 6px 0;
+}
+
+.mmi-probe-result { margin-top: 8px; }
+
+.probe-verdict {
+ display: inline-block;
+ border-radius: 50px;
+ padding: 5px 14px;
+ font-size: 0.8rem;
+ font-weight: 900;
+ margin-bottom: 8px;
+}
+
+.probe-verdict-yes { background: rgba(34,197,94,0.12); color: #16a34a; }
+.probe-verdict-partly { background: rgba(245,158,11,0.12); color: #92400e; }
+.probe-verdict-no { background: rgba(239,68,68,0.1); color: #dc2626; }
+
+.probe-summary {
+ font-size: 0.86rem;
+ color: var(--gray600);
+ line-height: 1.65;
+}
+
+/* -- Delta section ------------------------------------------------ */
+
+.mmi-delta-section {
+ background: #f5f0ff;
+ border: 1px solid rgba(124,58,237,0.18);
+ border-radius: 12px;
+ padding: 12px 14px;
+ margin-bottom: 12px;
+}
+
+.mmi-delta-title {
+ font-size: 0.76rem;
+ font-weight: 850;
+ color: #6d28d9;
+ margin-bottom: 8px;
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ flex-wrap: wrap;
+}
+
+.mmi-delta-rows { display: grid; gap: 5px; }
+
+.mmi-delta-row {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ font-size: 0.8rem;
+}
+
+.mmi-delta-label { flex: 1; color: var(--gray600); font-weight: 600; }
+.mmi-delta-prev,.mmi-delta-now { color: var(--gray600); min-width: 32px; }
+.mmi-delta-arrow { color: var(--gray400); }
+
+.mmi-delta-badge,.mmi-delta-overall-badge {
+ border-radius: 50px;
+ padding: 2px 8px;
+ font-size: 0.72rem;
+ font-weight: 900;
+}
+
+.delta-up { background: rgba(34,197,94,0.12); color: #16a34a; }
+.delta-down { background: rgba(239,68,68,0.1); color: #dc2626; }
+.delta-same { background: var(--gray100); color: var(--gray400); }
+
+/* -- Self-prediction calibration ---------------------------------- */
+
+.mmi-prediction-wrap {
+ background: #fffbeb;
+ border: 1px solid rgba(245,158,11,0.28);
+ border-radius: 14px;
+ padding: 20px;
+ margin: 8px 0;
+}
+
+.mmi-prediction-title {
+ font-size: 1rem;
+ font-weight: 900;
+ color: var(--navy);
+ margin-bottom: 4px;
+}
+
+.mmi-prediction-sub {
+ font-size: 0.83rem;
+ color: var(--gray600);
+ line-height: 1.55;
+ margin-bottom: 16px;
+}
+
+.mmi-prediction-grid { display: grid; gap: 10px; margin-bottom: 16px; }
+
+.mmi-prediction-row {
+ display: flex;
+ align-items: center;
+ gap: 10px;
+ flex-wrap: wrap;
+}
+
+.mmi-prediction-label {
+ min-width: 160px;
+ font-size: 0.84rem;
+ font-weight: 700;
+ color: var(--navy);
+}
+
+.mmi-prediction-scores { display: flex; gap: 6px; }
+
+.pred-score-btn {
+ width: 36px;
+ height: 36px;
+ border-radius: 50%;
+ border: 1.5px solid var(--gray200);
+ background: #fff;
+ font-family: inherit;
+ font-size: 0.88rem;
+ font-weight: 700;
+ color: var(--gray600);
+ cursor: pointer;
+ transition: all 0.14s;
+}
+
+.pred-score-btn:hover { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.06); }
+
+.pred-score-btn.selected {
+ background: rgba(245,158,11,0.18);
+ border-color: #d97706;
+ color: #92400e;
+}
+
+.btn-show-feedback {
+ display: block;
+ width: 100%;
+ padding: 11px 20px;
+ background: var(--navy);
+ color: #fff;
+ border: none;
+ border-radius: 50px;
+ font-family: inherit;
+ font-size: 0.88rem;
+ font-weight: 700;
+ cursor: pointer;
+ transition: background 0.16s;
+ margin-bottom: 8px;
+}
+
+.btn-show-feedback:hover:not(:disabled) { background: #0d2040; }
+.btn-show-feedback:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.mmi-prediction-skip {
+ text-align: center;
+}
+
+.mmi-prediction-skip button {
+ border: none;
+ background: none;
+ font-family: inherit;
+ font-size: 0.78rem;
+ color: var(--gray400);
+ cursor: pointer;
+ text-decoration: underline;
+ text-underline-offset: 2px;
+}
+
+.mmi-pred-streak {
+ background: rgba(245,158,11,0.15);
+ color: #92400e;
+ border-radius: 50px;
+ padding: 2px 8px;
+ font-size: 0.7rem;
+ font-weight: 900;
+}
+
+.mmi-prediction-section {
+ background: #fffbeb;
+ border: 1px solid rgba(245,158,11,0.25);
+ border-radius: 12px;
+ padding: 12px 14px;
+ margin-bottom: 12px;
+}
+
+.mmi-pred-title {
+ font-size: 0.76rem;
+ font-weight: 850;
+ color: #92400e;
+ margin-bottom: 8px;
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ flex-wrap: wrap;
+}
+
+.mmi-pred-rows { display: grid; gap: 5px; margin-bottom: 8px; }
+
+.mmi-pred-row {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ font-size: 0.8rem;
+}
+
+.mmi-pred-label { flex: 1; color: var(--gray600); font-weight: 600; }
+.mmi-pred-you,.mmi-pred-ai { color: var(--gray600); min-width: 50px; }
+
+.mmi-pred-diff {
+ border-radius: 50px;
+ padding: 2px 8px;
+ font-size: 0.72rem;
+ font-weight: 900;
+}
+
+.pred-close { background: rgba(34,197,94,0.12); color: #16a34a; }
+.pred-off { background: rgba(239,68,68,0.1); color: #dc2626; }
+
+.mmi-pred-note {
+ font-size: 0.76rem;
+ color: #92400e;
 }

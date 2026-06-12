@@ -1674,6 +1674,45 @@
  </div>
  </div>
 
+ <div class="bc-card" style="max-width:680px;margin-top:20px;" id="qotwCard">
+  <div class="bc-title">Question of the Week</div>
+  <div class="bc-sub">Set the weekly featured question shown on the practice page.</div>
+  <div id="qotwCurrent" style="margin-bottom:12px;font-size:0.78rem;color:var(--muted);"></div>
+  <div class="form-row">
+   <label class="form-lbl">Category</label>
+   <select class="form-sel" id="qotwCategory" style="width:auto;">
+    <option value="casper">CASPer</option>
+    <option value="mmi">MMI</option>
+    <option value="any">Any / Both</option>
+   </select>
+  </div>
+  <div class="form-row">
+   <label class="form-lbl">Scenario + question</label>
+   <textarea id="qotwQuestion" class="form-ta" style="min-height:90px;" placeholder="Paste the full scenario and prompt text here."></textarea>
+  </div>
+  <div class="form-row">
+   <label class="form-lbl">Guidance / what to look for</label>
+   <textarea id="qotwGuidance" class="form-ta" style="min-height:60px;" placeholder="Optional: brief notes on what a good answer covers. Not shown to students."></textarea>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+   <button class="btn" onclick="loadQOTWAdmin()">Refresh</button>
+   <button class="btn primary" onclick="saveQOTW()">Set as this week's question</button>
+  </div>
+  <div class="alert" id="qotwAlert" style="margin-top:8px;"></div>
+ </div>
+
+ <div class="bc-card" style="max-width:680px;margin-top:20px;">
+  <div class="bc-title">CASPer to MMI Cross-sell</div>
+  <div class="bc-sub">Queue the 3-email sequence (day 0, 3, 8) for CASPer users not yet in MMI. Always dry-run first to see eligible count.</div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+   <label class="form-lbl" style="margin:0;white-space:nowrap;">Trigger day-0 email at</label>
+   <input class="form-in" id="crosssellTriggerAt" type="datetime-local" style="width:auto;flex:1;min-width:180px;">
+   <button class="btn amber" onclick="runCasperToMmiCrossSell(true)">Dry run</button>
+   <button class="btn primary" id="crosssellLiveBtn" onclick="runCasperToMmiCrossSell(false)" disabled>Enqueue live</button>
+  </div>
+  <div class="alert" id="crosssellAlert" style="margin-top:6px;"></div>
+ </div>
+
  <!-- -- CASPER CLASS -- -->
  <div id="pageClass" class="page">
  <div class="page-header">
@@ -1764,7 +1803,7 @@
  <div class="page-header">
  <div>
  <div class="page-title">Masterclasses</div>
- <div class="page-sub">Paid CASPer/MMI masterclass registration gates. Paste Zoom links here; paid or manually authorised students see the protected access page at the release time.</div>
+ <div class="page-sub">Paid CASPer/MMI masterclass gates for live links and protected recordings. Paid or manually authorised students see the protected access page from their account.</div>
  </div>
  <div class="page-actions">
  <span class="refresh-note" id="mcStatus">Not loaded</span>
@@ -1776,11 +1815,11 @@
  <div style="display:flex;flex-direction:column;gap:18px;">
  <div data-masterclass-card="casper" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,0.85fr);gap:18px;align-items:start;">
  <div class="bc-card" style="max-width:100%;">
- <div class="bc-title">CASPer masterclass gate</div>
- <div class="bc-sub">Thursday, 11 June, 1pm AEST. Paste the private Zoom link here; students register on casper-masterclass.html and receive the protected access page.</div>
+ <div class="bc-title">CASPer masterclass replay gate</div>
+ <div class="bc-sub">Paste the private recording key here after uploading the replay. Students buy $300 recording access on casper-masterclass.html and stream through the protected watermarked player.</div>
  <div class="form-row">
  <label class="form-lbl">Title</label>
- <input class="form-in" id="mc_casper_title" type="text" placeholder="Key2MD CASPer Masterclass">
+ <input class="form-in" id="mc_casper_title" type="text" placeholder="Key2MD CASPer Masterclass Recording">
  </div>
  <div class="form-row">
  <label class="form-lbl">Masterclass ID</label>
@@ -1789,24 +1828,29 @@
  </div>
  <div class="form-row">
  <label class="form-lbl">Date/time label</label>
- <input class="form-in" id="mc_casper_starts_at" type="text" placeholder="Thursday, 11 June, 1pm AEST">
+ <input class="form-in" id="mc_casper_starts_at" type="text" placeholder="Replay available now">
  </div>
  <div class="form-row">
- <label class="form-lbl">Show link from</label>
+ <label class="form-lbl">Show live link from</label>
  <input class="form-in" id="mc_casper_link_available_at" type="datetime-local">
  </div>
  <div class="form-row">
- <label class="form-lbl">Hide link after</label>
+ <label class="form-lbl">Hide live link after</label>
  <input class="form-in" id="mc_casper_expires_at" type="datetime-local">
  </div>
  <div class="form-row">
- <label class="form-lbl">Private Zoom/Meet link</label>
+ <label class="form-lbl">Private Zoom/Meet link (optional)</label>
  <input class="form-in" id="mc_casper_join_url" type="url" placeholder="https://zoom.us/j/...">
+ </div>
+ <div class="form-row">
+ <label class="form-lbl">Private recording key</label>
+ <input class="form-in" id="mc_casper_recording_key" type="text" placeholder="masterclasses/casper-2026-06-11.mp4">
+ <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">Upload the recording to private video storage, then paste its storage key here. Students never see this key.</div>
  </div>
  <div class="form-row">
  <label class="form-lbl">Auto-email access page at</label>
  <input class="form-in" id="mc_casper_auto_email_at" type="datetime-local">
- <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">The Worker emails the protected access page, not the raw Zoom link. Cloudflare Cron should check this every 5 minutes; this dashboard also arms a browser backup while it is open.</div>
+ <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">For replay-only sales, this can stay blank. The protected recording appears once the recording key is saved.</div>
  </div>
  <div class="form-row">
  <label class="form-lbl">Automatic email</label>
@@ -1824,7 +1868,7 @@
  </div>
  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
  <button class="btn primary" onclick="saveMasterclass('casper')">Save CASPer gate</button>
- <button class="btn" onclick="setMasterclassRelease('casper')">Set 12:30pm link release</button>
+ <button class="btn" onclick="setMasterclassRelease('casper')">Set replay defaults</button>
  <button class="btn green" onclick="runMasterclassEmailCheck('casper')">Run email check now</button>
  <button class="btn blue" onclick="copyMasterclassPageLink('casper')">Copy student page</button>
  </div>
@@ -1843,6 +1887,9 @@
  <div style="height:1px;background:var(--border);margin:16px 0;"></div>
  <div class="tbl-toolbar"><span class="tbl-status" id="mc_casper_access_status">No students loaded.</span></div>
  <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:420px;"><table><thead><tr><th>Email</th><th>Source</th><th>Amount</th><th>Expires</th><th>Added</th><th style="width:80px;">Action</th></tr></thead><tbody id="mc_casper_access_body"></tbody></table></div></div>
+ <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+ <div class="tbl-toolbar"><span class="tbl-status" id="mc_casper_playback_status">No recording playbacks yet.</span></div>
+ <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:260px;"><table><thead><tr><th>Student</th><th>Session</th><th>When</th><th>IP bucket</th></tr></thead><tbody id="mc_casper_playback_body"></tbody></table></div></div>
  </div>
  </div>
 
@@ -1856,6 +1903,7 @@
  <div class="form-row"><label class="form-lbl">Show link from</label><input class="form-in" id="mc_mmi_link_available_at" type="datetime-local"></div>
  <div class="form-row"><label class="form-lbl">Hide link after</label><input class="form-in" id="mc_mmi_expires_at" type="datetime-local"></div>
  <div class="form-row"><label class="form-lbl">Private Zoom/Meet link</label><input class="form-in" id="mc_mmi_join_url" type="url" placeholder="https://zoom.us/j/..."></div>
+ <div class="form-row"><label class="form-lbl">Private recording key</label><input class="form-in" id="mc_mmi_recording_key" type="text" placeholder="masterclasses/mmi-2026.mp4"><div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">Upload the recording to private video storage, then paste its storage key here. Students never see this key.</div></div>
  <div class="form-row"><label class="form-lbl">Auto-email access page at</label><input class="form-in" id="mc_mmi_auto_email_at" type="datetime-local"><div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">The Worker emails the protected access page. Keep this page open near release time if you want the dashboard backup armed.</div></div>
  <div class="form-row"><label class="form-lbl">Automatic email</label><select class="form-sel" id="mc_mmi_auto_email_enabled"><option value="1">Enabled - email paid/authorised students automatically</option><option value="0">Paused - do not auto-send</option></select></div>
  <div class="form-row"><label class="form-lbl">Checkout status</label><select class="form-sel" id="mc_mmi_status"><option value="open">Open - checkout enabled</option><option value="closed">Closed - checkout disabled</option></select></div>
@@ -1876,6 +1924,9 @@
  <div style="height:1px;background:var(--border);margin:16px 0;"></div>
  <div class="tbl-toolbar"><span class="tbl-status" id="mc_mmi_access_status">No students loaded.</span></div>
  <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:420px;"><table><thead><tr><th>Email</th><th>Source</th><th>Amount</th><th>Expires</th><th>Added</th><th style="width:80px;">Action</th></tr></thead><tbody id="mc_mmi_access_body"></tbody></table></div></div>
+ <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+ <div class="tbl-toolbar"><span class="tbl-status" id="mc_mmi_playback_status">No recording playbacks yet.</span></div>
+ <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:260px;"><table><thead><tr><th>Student</th><th>Session</th><th>When</th><th>IP bucket</th></tr></thead><tbody id="mc_mmi_playback_body"></tbody></table></div></div>
  </div>
  </div>
  </div>
@@ -2076,6 +2127,18 @@
  <button class="btn" onclick="loadMMI()">Refresh</button>
  </div>
  <div class="mmi-overview" id="mmiOverview"></div>
+ <div style="display:flex;align-items:center;gap:8px;margin:4px 0 8px;flex-wrap:wrap;">
+  <span style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted2);">MMI Funnel</span>
+  <select class="ctrl-sel" id="mmiFunnelDays" onchange="loadMmiFunnel()" style="width:auto;padding:3px 8px;font-size:0.75rem;">
+   <option value="7">7 days</option>
+   <option value="30" selected>30 days</option>
+   <option value="90">90 days</option>
+   <option value="180">180 days</option>
+  </select>
+  <button class="btn" onclick="loadMmiFunnel()" style="padding:3px 10px;font-size:0.75rem;">Refresh</button>
+  <span id="mmiFunnelStatus" style="font-size:0.72rem;color:var(--muted);">Not loaded</span>
+ </div>
+ <div class="mmi-overview" id="mmiFunnelKpi" style="margin-bottom:18px;"></div>
  <div class="mmi-workbench">
  <section class="mmi-list-panel">
  <div class="tbl-toolbar"><span class="tbl-status" id="mmiStatus">-</span></div>
@@ -2653,10 +2716,10 @@ function nav(page, opts={}) {
  if (target==='abandoned' && !S.abandonedCheckouts) loadAbandonedCheckouts();
  if (target==='retention' && !S.retentionRisks.length) loadRetentionRisk();
  if (target==='sharing' && !S.sharingWatchlist.length) loadSharingWatchlist();
- if (target==='broadcast') { updateBcStats(); if (!S.broadcastHistory.length) loadBroadcastHistory(); }
+ if (target==='broadcast') { updateBcStats(); if (!S.broadcastHistory.length) loadBroadcastHistory(); loadQOTWAdmin(); }
  if (target==='class') loadCasperClass();
  if (target==='masterclasses' && !S.masterclasses) loadMasterclasses();
- if (target==='mmi' && !S.mmiReviews.length) loadMMI();
+ if (target==='mmi') { if (!S.mmiReviews.length) loadMMI(); loadMmiFunnel(); }
  if (target==='s2' && !S.s2Reviews.length) loadS2Reviews();
  if (target==='revenue' && !S.revenue.length) loadRevenue();
  if (target==='monitoring') loadMonitoring();
@@ -2726,7 +2789,7 @@ function buildCommandItems() {
  {kind:'Page', title:'Broadcast', sub:'Send segmented emails with preview', keywords:'email campaign newsletter send', action:()=>nav('broadcast'), hint:'Open'},
  {kind:'Page', title:'Subscribers', sub:'Newsletter and subscriber list', keywords:'newsletter list subscribers', action:()=>nav('subscribers'), hint:'Open'},
  {kind:'Page', title:'CASPer Class', sub:'Class access, passes, Zoom link, and student authorisation', keywords:'friday class casper zoom access passes', action:()=>nav('class'), hint:'Open'},
- {kind:'Page', title:'Masterclasses', sub:'CASPer/MMI registration gates, Zoom links, and paid access', keywords:'masterclass event zoom access', action:()=>nav('masterclasses'), hint:'Open'},
+ {kind:'Page', title:'Masterclasses', sub:'CASPer/MMI gates, recordings, live links, and paid access', keywords:'masterclass event recording zoom access', action:()=>nav('masterclasses'), hint:'Open'},
  {kind:'Page', title:'Revenue', sub:'Payment and revenue records', keywords:'payments stripe money private ops', action:()=>nav('revenue'), hint:'Open'},
  {kind:'Page', title:'Monitoring', sub:'AI failures, transcription errors, COGS, and founding member slots', keywords:'cogs failures whisper parse private ops', action:()=>nav('monitoring'), hint:'Open'},
  ];
@@ -2930,7 +2993,7 @@ async function bootLoad() {
  await Promise.all([
  loadReviews(), loadS2Reviews(), loadUsers(), loadEnquiries(),
  loadSubscribers(), loadInbox(), loadMMI(), loadMockAdmin(), loadRevenue(), loadMonitoring(), loadBroadcastHistory(), loadWarmLeads(), loadSharingWatchlist(),
- loadNextActions(), loadProductFunnel(), loadAbandonedCheckouts(), loadRetentionRisk({ silent: true }), loadOutreachRoi(), loadMasterclasses(),
+ loadNextActions(), loadProductFunnel(), loadAbandonedCheckouts(), loadRetentionRisk({ silent: true }), loadOutreachRoi(), loadMasterclasses(), loadMmiFunnel(),
  ]);
  const lu = document.getElementById('lastUpdated');
  if (lu) lu.textContent = `Refreshed ${new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}`;
@@ -6893,7 +6956,7 @@ async function copyClassPageLink() {
 // MASTERCLASSES
 // ======================================================
 const MASTERCLASS_PAGE_URLS = {
- casper: 'https://www.key2md.com/casper-masterclass.html',
+ casper: 'https://www.key2md.com/casper-masterclass.html#registration',
  mmi: 'https://www.key2md.com/mmi-masterclass.html',
 };
 
@@ -6968,6 +7031,7 @@ function renderMasterclass(kind, item) {
  set('expires_at', datetimeLocalFromMs(s.expires_at));
  set('auto_email_at', datetimeLocalFromMs(s.auto_email_at));
  set('join_url', privateData.join_url || '');
+ set('recording_key', privateData.recording_key || '');
  set('status', s.status || 'open');
  set('auto_email_enabled', s.auto_email_enabled === false ? '0' : '1');
 
@@ -6990,6 +7054,25 @@ function renderMasterclass(kind, item) {
  <td><button class="btn" style="font-size:0.68rem;padding:3px 8px;background:var(--red-dim);border-color:var(--red-border);color:var(--red);" onclick='removeMasterclassAccess(${jsArg(kind)}, ${jsArg(row.email || '')}, ${jsArg(row.user_id || '')})'>Remove</button></td>
  </tr>`;
  }).join('') : '<tr><td colspan="6" style="color:var(--muted);padding:16px;">No one is registered yet.</td></tr>';
+ renderMasterclassPlaybackLogs(kind, item.playback_logs || []);
+}
+
+function renderMasterclassPlaybackLogs(kind, rows) {
+ const status = document.getElementById(`mc_${kind}_playback_status`);
+ if (status) status.textContent = rows.length ? `${rows.length} recent recording playback${rows.length===1?'':'s'}` : 'No recording playbacks yet.';
+ const body = document.getElementById(`mc_${kind}_playback_body`);
+ if (!body) return;
+ body.innerHTML = rows.length ? rows.map(row => {
+ const dt = fmtDate(row.created_at);
+ const session = String(row.session_id || '').replace(/^mc_/, '').slice(0, 10);
+ const agent = String(row.user_agent || '').slice(0, 90);
+ return `<tr class="data-row">
+ <td><div class="cell-main">${emailWithDuplicateFlag(row.email || row.user_id || '?',row)}</div><div class="cell-sub">${esc(row.name || agent || '')}</div></td>
+ <td><div class="cell-main">${esc(session || '-')}</div><div class="cell-sub">${esc(row.watermark_code || '')}</div></td>
+ <td><div class="cell-main">${dt?.date || '-'}</div><div class="cell-sub">${dt?.time || ''}</div></td>
+ <td><div class="cell-main">${esc(row.ip_key || '-')}</div></td>
+ </tr>`;
+ }).join('') : '<tr><td colspan="4" style="color:var(--muted);padding:16px;">No playback sessions logged yet.</td></tr>';
 }
 
 function renderMasterclassEmailState(kind, state, settings={}, accessCount=0) {
@@ -7055,13 +7138,16 @@ async function runMasterclassDueEmailCheck(kind, source='dashboard_timer') {
 }
 
 function setMasterclassRelease(kind) {
- const startsValue = document.getElementById(`mc_${kind}_starts_at`)?.value || '';
+ const startsInput = document.getElementById(`mc_${kind}_starts_at`);
+ const startsValue = startsInput?.value || '';
  const releaseInput = document.getElementById(`mc_${kind}_link_available_at`);
  const emailInput = document.getElementById(`mc_${kind}_auto_email_at`);
+ const expiresInput = document.getElementById(`mc_${kind}_expires_at`);
  if (kind === 'casper') {
- const releaseMs = Date.parse('2026-06-11T12:30:00+10:00');
- if (releaseInput) releaseInput.value = datetimeLocalFromMs(releaseMs);
- if (emailInput) emailInput.value = datetimeLocalFromMs(releaseMs);
+ if (startsInput) startsInput.value = 'Replay available now';
+ if (releaseInput) releaseInput.value = '';
+ if (emailInput) emailInput.value = '';
+ if (expiresInput) expiresInput.value = '';
  return;
  }
  const parsed = Date.parse(startsValue);
@@ -7088,6 +7174,7 @@ async function saveMasterclass(kind) {
  auto_email_enabled: autoEnabled,
  auto_email_at: autoEmailAt,
  join_url: document.getElementById(`mc_${kind}_join_url`)?.value || '',
+ recording_key: document.getElementById(`mc_${kind}_recording_key`)?.value || '',
  status: document.getElementById(`mc_${kind}_status`)?.value || 'open',
  };
  try {
@@ -7104,7 +7191,7 @@ async function saveMasterclass(kind) {
 
 async function runMasterclassEmailCheck(kind) {
  const label = kind === 'casper' ? 'CASPer' : 'MMI';
- if (!confirm(`Run the ${label} masterclass email check now? If the private link is pasted and students are registered, this will email them immediately.`)) return;
+ if (!confirm(`Run the ${label} masterclass email check now? If a private live link is pasted and students have access, this will email them immediately.`)) return;
  const status = document.getElementById('mcStatus');
  if (status) status.textContent = `Running ${label} email check...`;
  try {
@@ -7397,20 +7484,20 @@ function insertCasperClassEmail() {
 }
 
 function insertMasterclassFinalEmail() {
- const link = 'https://www.key2md.com/casper-masterclass.html';
+ const link = 'https://www.key2md.com/casper-masterclass.html#registration';
  const al = document.getElementById('bcAlert');
- document.getElementById('bcSubject').value = 'The highest-yield CASPer session I can offer';
+ document.getElementById('bcSubject').value = 'The CASPer masterclass replay is available';
  setBcMode('rich');
  document.getElementById('bcRichEditor').innerHTML = `
  <div style="margin:-6px 0 26px;padding:26px 28px;border-radius:18px;background:linear-gradient(135deg,#091525 0%,#0d2a52 62%,#07384d 100%);color:#ffffff;">
- <div style="display:inline-block;margin:0 0 14px;padding:6px 11px;border-radius:999px;background:rgba(56,189,248,0.14);border:1px solid rgba(125,211,252,0.35);color:#bae6fd;font-size:11px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;">CASPer Masterclass | Today 1pm AEST</div>
- <h1 style="margin:0 0 12px;color:#ffffff;font-size:28px;line-height:1.18;font-weight:900;letter-spacing:0;">The highest-yield CASPer session I can offer before the exam window.</h1>
- <p style="margin:0;color:#cbd5e1;font-size:15px;line-height:1.7;">A focused crash course through the major learning points that change how markable your answers sound: empathy, rationale, judgement, action and articulation.</p>
+ <div style="display:inline-block;margin:0 0 14px;padding:6px 11px;border-radius:999px;background:rgba(56,189,248,0.14);border:1px solid rgba(125,211,252,0.35);color:#bae6fd;font-size:11px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;">CASPer Masterclass Recording</div>
+ <h1 style="margin:0 0 12px;color:#ffffff;font-size:28px;line-height:1.18;font-weight:900;letter-spacing:0;">The highest-yield CASPer session I can offer before your sitting.</h1>
+ <p style="margin:0;color:#cbd5e1;font-size:15px;line-height:1.7;">A focused replay through the major learning points that change how markable your answers sound: empathy, rationale, judgement, action and articulation.</p>
  </div>
 
  <p style="margin:0 0 15px;color:#334155;font-size:15px;line-height:1.75;">Hi there,</p>
- <p style="margin:0 0 15px;color:#334155;font-size:15px;line-height:1.75;">Quick final note in case CASPer is still sitting in the back of your mind today.</p>
- <p style="margin:0 0 18px;color:#334155;font-size:15px;line-height:1.75;">I am running the Key2MD CASPer Masterclass today at <strong style="color:#0f172a;">1pm AEST</strong>. The whole session is designed around the things I repeatedly see cost students marks: answers that are sensible, but do not show enough empathy, rationale, judgement or human intent for a marker to reward them properly.</p>
+ <p style="margin:0 0 15px;color:#334155;font-size:15px;line-height:1.75;">Quick note in case CASPer is still sitting in the back of your mind.</p>
+ <p style="margin:0 0 18px;color:#334155;font-size:15px;line-height:1.75;">The Key2MD CASPer Masterclass recording is now available for $300 protected access. The whole session is designed around the things I repeatedly see cost students marks: answers that are sensible, but do not show enough empathy, rationale, judgement or human intent for a marker to reward them properly.</p>
 
  <div style="margin:22px 0;padding:18px 20px;border-radius:14px;background:#f0f9ff;border:1px solid #bae6fd;">
  <div style="margin:0 0 7px;color:#0369a1;font-size:12px;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;">What this is</div>
@@ -7427,18 +7514,18 @@ function insertMasterclassFinalEmail() {
  <li style="margin:0 0 4px;">The marking scheme</li>
  <li style="margin:0 0 4px;">Policy: when to violate rules and make judgement calls</li>
  <li style="margin:0 0 4px;">Safety nets: when they matter and when they do not</li>
- <li style="margin:0 0 4px;">Live Q&amp;A</li>
+ <li style="margin:0 0 4px;">Q&amp;A themes and edge cases</li>
  </ol>
 
  <div style="margin:24px 0;padding:20px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;">
  <p style="margin:0 0 10px;color:#9a3412;font-size:12px;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;">Why it matters</p>
- <p style="margin:0;color:#431407;font-size:15px;line-height:1.75;">If you are sitting today, this is a final reset before the test. If you are sitting June 21, it gives you a clear plan for the next 10 days. Either way, it is the most efficient thing I can give you to improve your odds quickly.</p>
+ <p style="margin:0;color:#431407;font-size:15px;line-height:1.75;">If your test is close, this is a final reset before the sitting. If you have a bit more time, it gives you a clear plan for what to practise next. Either way, it is the most efficient thing I can give you to improve your odds quickly.</p>
  </div>
 
  <p style="margin:0 0 18px;color:#334155;font-size:15px;line-height:1.75;">We will go through difficult station types, how to avoid robotic answers, how to sound human under pressure, and how to talk through your rationale so the marker can actually see what you are trying to protect, understand or repair.</p>
 
  <div style="text-align:center;margin:28px 0 24px;">
- <a href="${esc(link)}" style="display:inline-block;background:#0ea5e9;color:#ffffff;font-weight:900;padding:15px 30px;border-radius:999px;text-decoration:none;font-size:15px;box-shadow:0 10px 24px rgba(14,165,233,0.25);">Register for the CASPer Masterclass</a>
+ <a href="${esc(link)}" style="display:inline-block;background:#0ea5e9;color:#ffffff;font-weight:900;padding:15px 30px;border-radius:999px;text-decoration:none;font-size:15px;box-shadow:0 10px 24px rgba(14,165,233,0.25);">Buy CASPer recording access - $300</a>
  </div>
 
  <p style="margin:0 0 14px;color:#334155;font-size:15px;line-height:1.75;">If you are unsure whether it is worth it for where you are at, reply with your test date and how prepared you feel. I will be honest.</p>
@@ -8667,6 +8754,97 @@ function renderMMIOverview(rows) {
  <div class="mmi-kpi"><div class="mmi-kpi-label">Recordings</div><div class="mmi-kpi-value">${recordings}</div><div class="mmi-kpi-sub">Retained media available</div></div>
  <div class="mmi-kpi"><div class="mmi-kpi-label">Premium</div><div class="mmi-kpi-value">${premium}</div><div class="mmi-kpi-sub">Voice / visual feedback sessions</div></div>
  <div class="mmi-kpi warn"><div class="mmi-kpi-label">Review flags</div><div class="mmi-kpi-value">${traps}</div><div class="mmi-kpi-sub">${premium} premium session${premium===1?'':'s'}</div></div>`;
+}
+
+async function loadMmiFunnel() {
+ const days = document.getElementById('mmiFunnelDays')?.value || '30';
+ const status = document.getElementById('mmiFunnelStatus');
+ if (status) status.textContent = 'Loading...';
+ try {
+  const res = await api(`/admin/mmi-funnel?days=${days}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error || 'Failed');
+  renderMmiFunnel(data);
+  if (status) status.textContent = `${days}d window`;
+ } catch(e) {
+  if (status) status.textContent = e.message || 'Load failed';
+ }
+}
+
+function renderMmiFunnel(data) {
+ const el = document.getElementById('mmiFunnelKpi');
+ if (!el) return;
+ const f = data.funnel || {};
+ const p = data.purchases || {};
+ const c = data.conversion || {};
+ const fmt = n => (n == null ? '-' : Number(n).toLocaleString());
+ const pct = n => (n == null ? '-' : `${Math.round(n)}%`);
+ el.innerHTML = `
+  <div class="mmi-kpi blue"><div class="mmi-kpi-label">Stations started</div><div class="mmi-kpi-value">${fmt(f.station_started)}</div><div class="mmi-kpi-sub">Entered MMI tool</div></div>
+  <div class="mmi-kpi"><div class="mmi-kpi-label">Recordings done</div><div class="mmi-kpi-value">${fmt(f.recording_completed)}</div><div class="mmi-kpi-sub">Recorded a response</div></div>
+  <div class="mmi-kpi"><div class="mmi-kpi-label">Feedback requested</div><div class="mmi-kpi-value">${fmt(f.feedback_requested)}</div><div class="mmi-kpi-sub">Submitted for marking</div></div>
+  <div class="mmi-kpi warn"><div class="mmi-kpi-label">Paywall hits</div><div class="mmi-kpi-value">${fmt(f.paywall_viewed)}</div><div class="mmi-kpi-sub">${pct(c.paywall_to_paid_pct)} converted</div></div>
+  <div class="mmi-kpi good"><div class="mmi-kpi-label">Free reviews used</div><div class="mmi-kpi-value">${fmt(f.free_review_used)}</div><div class="mmi-kpi-sub">${pct(c.free_to_paid_pct)} free-to-paid</div></div>
+  <div class="mmi-kpi good"><div class="mmi-kpi-label">Purchases</div><div class="mmi-kpi-value">${fmt(p.total)}</div><div class="mmi-kpi-sub">${fmt(p.credit)} credit | ${fmt(p.subscription)} sub</div></div>`;
+}
+
+async function loadQOTWAdmin() {
+ const el = document.getElementById('qotwCurrent');
+ if (!el) return;
+ try {
+  const res = await api('/admin/qotw');
+  const data = await res.json().catch(() => ({}));
+  const q = data.qotw;
+  if (q) {
+   el.innerHTML = `<strong>Current (${esc(q.week_key)} | ${esc(q.category)})</strong><br>${esc(q.question.slice(0, 200))}${q.question.length > 200 ? '...' : ''}`;
+  } else {
+   el.textContent = 'No question set yet.';
+  }
+ } catch(e) {
+  el.textContent = 'Could not load current QOTW.';
+ }
+}
+
+async function saveQOTW() {
+ const alertEl = document.getElementById('qotwAlert');
+ const question = document.getElementById('qotwQuestion')?.value.trim();
+ const guidance = document.getElementById('qotwGuidance')?.value.trim();
+ const category = document.getElementById('qotwCategory')?.value || 'casper';
+ if (!question) { if (alertEl) { alertEl.textContent = 'Question text is required.'; alertEl.className = 'alert red'; } return; }
+ if (alertEl) { alertEl.textContent = 'Saving...'; alertEl.className = 'alert'; }
+ try {
+  const res = await api('/admin/qotw', { method: 'POST', body: JSON.stringify({ question, guidance, category }) });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error || 'Save failed');
+  if (alertEl) { alertEl.textContent = `Saved as ${data.qotw?.week_key}. Students will see it on the practice page.`; alertEl.className = 'alert green'; }
+  loadQOTWAdmin();
+ } catch(e) {
+  if (alertEl) { alertEl.textContent = e.message || 'Save failed'; alertEl.className = 'alert red'; }
+ }
+}
+
+async function runCasperToMmiCrossSell(dryRun) {
+ const alertEl = document.getElementById('crosssellAlert');
+ const liveBtn = document.getElementById('crosssellLiveBtn');
+ const triggerAt = document.getElementById('crosssellTriggerAt')?.value;
+ if (alertEl) { alertEl.textContent = dryRun ? 'Running dry run...' : 'Enqueueing...'; alertEl.className = 'alert'; }
+ try {
+  const body = { dry_run: dryRun };
+  if (triggerAt) body.trigger_at = new Date(triggerAt).toISOString();
+  const res = await api('/admin/crossell/casper-to-mmi', { method: 'POST', body: JSON.stringify(body) });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error || 'Request failed');
+  if (dryRun) {
+   const sample = (data.sample || []).map(u => u.email).join(', ');
+   if (alertEl) { alertEl.textContent = `Dry run: ${data.eligible} eligible. Sample: ${sample || 'none'}. Set trigger time then click Enqueue live.`; alertEl.className = 'alert blue'; }
+   if (liveBtn) liveBtn.disabled = false;
+  } else {
+   if (alertEl) { alertEl.textContent = `Enqueued: ${data.enrolled} enrolled, ${data.skipped} skipped (${data.total} eligible).`; alertEl.className = 'alert green'; }
+   if (liveBtn) liveBtn.disabled = true;
+  }
+ } catch(e) {
+  if (alertEl) { alertEl.textContent = e.message || 'Request failed'; alertEl.className = 'alert red'; }
+ }
 }
 
 function renderMMIList(rows) {

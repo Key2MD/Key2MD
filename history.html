@@ -198,7 +198,78 @@
  .mmi-history-prompt { font-size:0.8rem; color:var(--gray600); line-height:1.55; padding:8px 10px; background:#fff; border:1px solid var(--gray200); border-radius:8px; }
  .mmi-history-feedback-mount .mmi-feedback { margin-top:0; }
  .mmi-history-feedback-mount .dan-marking-card { display:none; }
+ .mmi-history-feedback-mount .mmi-probe-wrap { display:none; }
  .mmi-history-empty { background:#fff; border:1px dashed rgba(124,58,237,0.24); border-radius:12px; padding:18px; color:var(--gray600); font-size:0.86rem; line-height:1.6; }
+ .mmi-history-card-footer { display:flex; gap:8px; padding:10px 18px 14px; border-top:1px solid var(--gray100); flex-wrap:wrap; }
+ .btn-mmi-retry { border-radius:50px; padding:6px 14px; font-size:0.76rem; font-weight:850; border:1px solid rgba(124,58,237,0.28); background:#fff; color:#7c3aed; font-family:inherit; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; }
+ .btn-mmi-retry:hover { background:#f5f0ff; }
+ .btn-mmi-play { border-radius:50px; padding:6px 14px; font-size:0.76rem; font-weight:850; border:1px solid rgba(14,165,233,0.3); background:#fff; color:var(--teal3); font-family:inherit; cursor:pointer; }
+ .btn-mmi-play:hover { background:rgba(14,165,233,0.06); }
+ .btn-mmi-play:disabled { opacity:0.55; cursor:not-allowed; }
+ .mmi-recording-player { margin:12px 0 4px; background:var(--gray50); border:1px solid var(--gray200); border-radius:12px; padding:12px 14px; }
+ .mmi-recording-player audio { width:100%; height:36px; outline:none; }
+ .mmi-recording-player-note { font-size:0.76rem; color:var(--gray400); margin-top:6px; }
+ .mmi-mastery-section { margin-bottom:16px; }
+ .mmi-mastery-title { font-size:0.72rem; font-weight:850; letter-spacing:0.1em; text-transform:uppercase; color:#7c3aed; margin-bottom:10px; }
+ .mmi-mastery-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; margin-bottom:10px; }
+ .mmi-mastery-tile { background:#fff; border:1px solid rgba(124,58,237,0.15); border-radius:10px; padding:10px 12px; }
+ .mmi-mastery-cat { font-size:0.74rem; font-weight:700; color:var(--navy); line-height:1.3; margin-bottom:4px; }
+ .mmi-mastery-score { font-size:1.1rem; font-weight:900; color:#7c3aed; }
+ .mmi-mastery-score.mmi-mastery-na { color:var(--gray400); font-size:0.9rem; }
+ .mmi-mastery-count { font-size:0.68rem; color:var(--gray400); margin-top:2px; }
+ .mmi-mastery-cta { font-size:0.8rem; color:var(--gray600); }
+ .mmi-mastery-cta a { color:#7c3aed; font-weight:700; }
+ .mmi-delta-section { background:#f5f0ff; border:1px solid rgba(124,58,237,0.18); border-radius:12px; padding:12px 14px; margin-bottom:12px; }
+ .mmi-delta-title { font-size:0.76rem; font-weight:850; color:#6d28d9; margin-bottom:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+ .mmi-delta-rows { display:grid; gap:5px; }
+ .mmi-delta-row { display:flex; align-items:center; gap:8px; font-size:0.8rem; }
+ .mmi-delta-label { flex:1; color:var(--gray600); font-weight:600; }
+ .mmi-delta-prev,.mmi-delta-now { color:var(--gray600); min-width:32px; }
+ .mmi-delta-arrow { color:var(--gray400); }
+ .mmi-delta-badge { border-radius:50px; padding:2px 8px; font-size:0.72rem; font-weight:900; }
+ .mmi-delta-overall-badge { border-radius:50px; padding:3px 10px; font-size:0.72rem; font-weight:900; }
+ .delta-up { background:rgba(34,197,94,0.12); color:#16a34a; }
+ .delta-down { background:rgba(239,68,68,0.1); color:#dc2626; }
+ .delta-same { background:var(--gray100); color:var(--gray400); }
+ .mmi-prediction-section { background:#fffbeb; border:1px solid rgba(245,158,11,0.25); border-radius:12px; padding:12px 14px; margin-bottom:12px; }
+ .mmi-pred-title { font-size:0.76rem; font-weight:850; color:#92400e; margin-bottom:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+ .mmi-pred-streak { background:rgba(245,158,11,0.15); color:#92400e; border-radius:50px; padding:2px 8px; font-size:0.7rem; font-weight:900; }
+ .mmi-pred-rows { display:grid; gap:5px; margin-bottom:8px; }
+ .mmi-pred-row { display:flex; align-items:center; gap:8px; font-size:0.8rem; }
+ .mmi-pred-label { flex:1; color:var(--gray600); font-weight:600; }
+ .mmi-pred-you,.mmi-pred-ai { color:var(--gray600); min-width:50px; }
+ .mmi-pred-diff { border-radius:50px; padding:2px 8px; font-size:0.72rem; font-weight:900; }
+ .pred-close { background:rgba(34,197,94,0.12); color:#16a34a; }
+ .pred-off { background:rgba(239,68,68,0.1); color:#dc2626; }
+ .mmi-pred-note { font-size:0.76rem; color:#92400e; }
+
+ .mmi-prep-plan-wrap { background:var(--white); border:1px solid var(--gray200); border-radius:14px; padding:18px 20px; margin-bottom:16px; }
+ .mmi-prep-plan-title { font-size:0.82rem; font-weight:850; color:#0a1628; margin-bottom:10px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+ .mmi-interview-row { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+ .mmi-interview-input { border:1px solid var(--gray200); border-radius:8px; padding:7px 12px; font-size:0.85rem; font-family:inherit; color:#0a1628; background:var(--gray50); }
+ .mmi-interview-save { border-radius:50px; padding:7px 18px; font-size:0.78rem; font-weight:850; border:1px solid rgba(14,165,233,0.3); background:#fff; color:var(--teal3); font-family:inherit; cursor:pointer; }
+ .mmi-interview-save:hover { background:rgba(14,165,233,0.06); }
+ .mmi-interview-clear { border:none; background:none; color:var(--gray400); font-size:0.75rem; cursor:pointer; text-decoration:underline; font-family:inherit; }
+ .mmi-prep-weeks { display:grid; gap:6px; }
+ .mmi-prep-week { display:flex; gap:10px; align-items:flex-start; font-size:0.8rem; }
+ .mmi-prep-wlabel { font-weight:850; color:var(--teal3); min-width:60px; flex-shrink:0; }
+ .mmi-prep-wfocus { color:var(--gray600); }
+ .mmi-prep-notice { font-size:0.78rem; color:var(--gray500); margin-top:8px; }
+ .mmi-prep-nodate { font-size:0.82rem; color:var(--gray400); }
+
+ .mmi-referral-section { background:var(--white); border:1px solid var(--gray200); border-radius:14px; padding:18px 20px; margin-bottom:16px; }
+ .mmi-referral-title { font-size:0.88rem; font-weight:850; color:#0a1628; margin-bottom:4px; }
+ .mmi-referral-sub { font-size:0.78rem; color:var(--gray500); margin-bottom:12px; }
+ .mmi-referral-code-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+ .mmi-referral-code { background:var(--gray50); border:1px solid var(--gray200); border-radius:8px; padding:8px 14px; font-size:0.88rem; font-weight:850; letter-spacing:0.1em; color:#0a1628; font-family:monospace; }
+ .mmi-referral-copy { border-radius:50px; padding:6px 16px; font-size:0.76rem; font-weight:850; border:1px solid rgba(14,165,233,0.3); background:#fff; color:var(--teal3); font-family:inherit; cursor:pointer; }
+ .mmi-referral-copy:hover { background:rgba(14,165,233,0.06); }
+ .mmi-referral-link { font-size:0.76rem; color:var(--gray500); word-break:break-all; }
+ .mmi-referral-count { font-size:0.82rem; color:var(--gray600); margin-top:6px; }
+ .mmi-referral-reward { font-size:0.75rem; color:var(--gray400); margin-top:4px; }
+
+ .btn-export-prep { border-radius:50px; padding:6px 14px; font-size:0.76rem; font-weight:850; border:1px solid var(--gray200); background:#fff; color:var(--gray600); font-family:inherit; cursor:pointer; }
+ .btn-export-prep:hover { background:var(--gray50); }
 
  .reviews-list { display:flex; flex-direction:column; gap:14px; }
 
@@ -517,9 +588,18 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 	 <div class="mmi-history-title">Your saved MMI AI feedback</div>
 	 <div class="mmi-history-sub">Review the station, transcript and marked feedback from each spoken MMI attempt. This is separate from CASPer AI credits and full mock reports.</div>
 	 </div>
+	 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+	 <button class="btn-export-prep" onclick="exportPrepSummary()">Download prep summary</button>
 	 <a href="practice.html?mode=mmi" class="filter-btn" style="white-space:nowrap;">Practise MMI</a>
 	 </div>
+	 </div>
+	 <div id="mmiPrepPlan" class="mmi-prep-plan-wrap" style="display:none"></div>
+	 <div id="mmiCategoryMastery" class="mmi-mastery-section" style="display:none"></div>
 	 <div class="mmi-history-list" id="mmiHistoryList"></div>
+	 </section>
+
+	 <section class="mmi-referral-section" id="mmiReferralSection" style="display:none">
+	 <div id="mmiReferralContent"></div>
 	 </section>
 
 
@@ -650,6 +730,7 @@ async function loadReviews() {
 	 renderMMIHistory();
 	 renderCompetencyProgress();
 	 renderReviews();
+	 loadInterviewDateAndReferral(token);
  } catch (err) {
  showState('error');
  document.getElementById('errorMsg').textContent = err.message || 'Please try refreshing the page.';
@@ -971,6 +1052,28 @@ function renderMMIHistory() {
  }
  section.style.display = 'block';
  list.innerHTML = mmiReviews.map(mmiHistoryCardHTML).join('');
+ renderMMICategoryMastery();
+}
+
+function renderMMICategoryMastery() {
+ const el = document.getElementById('mmiCategoryMastery');
+ if (!el || mmiReviews.length < 2) { if (el) el.style.display = 'none'; return; }
+ const map = {};
+ mmiReviews.forEach(r => {
+ const cat = r.station_category || 'Unknown';
+ const fb = parseObject(r.ai_feedback_json) || {};
+ const score = safeNumericScore((fb.overall || {}).score);
+ if (!map[cat]) map[cat] = { total: 0, count: 0 };
+ if (Number.isFinite(score)) { map[cat].total += score; map[cat].count++; }
+ });
+ const entries = Object.entries(map)
+ .map(([cat, { total, count }]) => ({ cat, avg: count ? total/count : null, count }))
+ .sort((a, b) => (a.avg || 99) - (b.avg || 99));
+ const weakest = entries.find(e => e.avg !== null);
+ el.innerHTML = `<div class="mmi-mastery-title">Category breakdown</div>
+ <div class="mmi-mastery-grid">${entries.map(e => `<div class="mmi-mastery-tile"><div class="mmi-mastery-cat">${escapeHtml(e.cat)}</div><div class="mmi-mastery-score${e.avg===null?' mmi-mastery-na':''}">${e.avg!==null?e.avg.toFixed(1)+'/5':'-'}</div><div class="mmi-mastery-count">${e.count} station${e.count===1?'':'s'}</div></div>`).join('')}</div>
+ ${weakest?`<div class="mmi-mastery-cta">Focus area: <strong>${escapeHtml(weakest.cat)}</strong> (avg ${weakest.avg.toFixed(1)}/5) - <a href="practice.html?mode=mmi">Practise stations in this category -></a></div>`:''}`;
+ el.style.display = '';
 }
 
 function mmiHistoryCardHTML(review) {
@@ -1008,6 +1111,10 @@ function mmiHistoryCardHTML(review) {
  <div class="mmi-history-body">
  ${mmiHistoryContextHTML(review, prompts)}
  <div class="mmi-history-feedback-mount" id="mmi-feedback-${escapeAttr(review.id)}"></div>
+ </div>
+ <div class="mmi-history-card-footer">
+  ${review.station_id && review.station_id.startsWith('mmi_') ? `<a class="btn-mmi-retry" href="practice.html?mode=mmi&retry_station=${encodeURIComponent(review.station_id)}">Retry this station -></a>` : ''}
+  <button class="btn-mmi-play" data-review-id="${escapeAttr(review.id)}" onclick="playMMIRecording('${escapeAttr(review.id)}', this)">Play recording</button>
  </div>
  </article>
  `;
@@ -1069,6 +1176,39 @@ function toggleMMIReview(id) {
 }
 window.toggleMMIReview = toggleMMIReview;
 
+async function playMMIRecording(reviewId, btn) {
+ btn.disabled = true;
+ btn.textContent = 'Loading...';
+ const token = window.Key2MDAuth?.getToken?.() || localStorage.getItem('key2md_token') || '';
+ try {
+ const res = await fetch(`${API_BASE}/api/mmi/my-recording-token`, {
+  method: 'POST',
+  headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ review_id: reviewId }),
+ });
+ const payload = await res.json().catch(() => ({}));
+ if (!res.ok) {
+  const msg = payload.message || payload.error || 'Recording not available';
+  btn.closest('.mmi-history-card-footer').insertAdjacentHTML('beforeend',
+   `<div class="mmi-recording-player"><div class="mmi-recording-player-note">${escapeHtml(msg)}</div></div>`);
+  btn.style.display = 'none';
+  return;
+ }
+ const isAudio = (payload.content_type || '').startsWith('audio/');
+ const tag = isAudio ? 'audio' : 'video';
+ const card = document.getElementById(`mmi-${escapeAttr(reviewId)}`);
+ const feedbackMount = card?.querySelector('.mmi-history-feedback-mount');
+ const insertTarget = feedbackMount || btn.closest('.mmi-history-card-footer');
+ insertTarget.insertAdjacentHTML('beforebegin',
+  `<div class="mmi-recording-player"><${tag} controls src="${escapeHtml(payload.playback_url)}" style="width:100%;"></${tag}><div class="mmi-recording-player-note">Playback link valid for 10 minutes.</div></div>`);
+ btn.style.display = 'none';
+ } catch (err) {
+ btn.textContent = 'Play recording';
+ btn.disabled = false;
+ }
+}
+window.playMMIRecording = playMMIRecording;
+
 function renderMMIHistoryFeedback(review) {
  const mount = document.getElementById(`mmi-feedback-${review.id}`);
  if (!mount || mount.dataset.rendered === '1') return;
@@ -1082,15 +1222,21 @@ function renderMMIHistoryFeedback(review) {
  mount.innerHTML = '<div class="mmi-history-empty">The MMI feedback viewer is still loading. Please try opening this review again in a moment.</div>';
  return;
  }
+ const priorReview = review.station_id
+ ? mmiReviews.find(r => r.id !== review.id && r.station_id === review.station_id && r.created_at < review.created_at)
+ : null;
+ const prevFeedback = priorReview ? parseObject(priorReview.ai_feedback_json) : null;
  MMIFeedbackRender.render(mount, {
  feedback,
  voice_metrics: parseObject(review.voice_metrics_json),
  visual_metrics: parseObject(review.visual_metrics_json),
+ review_id: review.id,
  }, {
  tier: review.tier || 'transcript',
  specialistMode: Number(review.specialist_mode || 0) === 1,
  stationCategory: review.station_category || 'MMI',
  durationSec: Number(review.recording_duration_seconds || 0),
+ previousFeedback: prevFeedback || undefined,
  });
  mount.dataset.rendered = '1';
 }
@@ -2160,6 +2306,166 @@ function escapeHtml(str) {
 
 function escapeAttr(str) {
  return escapeHtml(str).replace(/`/g,'&#96;');
+}
+
+async function loadInterviewDateAndReferral(token) {
+ if (!token) return;
+ const headers = { Authorization: `Bearer ${token}` };
+ const [dateRes, refRes] = await Promise.all([
+  fetch(`${API_BASE}/api/user/interview-date`, { headers }).catch(() => null),
+  fetch(`${API_BASE}/api/user/referral-info`, { headers }).catch(() => null),
+ ]);
+ const dateData = dateRes?.ok ? await dateRes.json().catch(() => ({})) : {};
+ const refData = refRes?.ok ? await refRes.json().catch(() => ({})) : {};
+ renderPrepPlan(dateData.interview_date || null);
+ renderReferralSection(refData);
+}
+
+function renderPrepPlan(interviewDate) {
+ const el = document.getElementById('mmiPrepPlan');
+ if (!el) return;
+ const token = localStorage.getItem(TOKEN_KEY) || '';
+ const catMap = {};
+ mmiReviews.forEach(r => {
+  const cat = r.station_category || 'Unknown';
+  const fb = parseObject(r.ai_feedback_json) || {};
+  const score = typeof (fb.overall || {}).score === 'number' ? fb.overall.score : parseFloat((fb.overall || {}).score);
+  if (!catMap[cat]) catMap[cat] = { sum: 0, count: 0 };
+  if (Number.isFinite(score)) { catMap[cat].sum += score; catMap[cat].count++; }
+ });
+ const sortedCats = Object.entries(catMap)
+  .map(([cat, { sum, count }]) => ({ cat, avg: count ? sum / count : null }))
+  .filter(e => e.avg !== null)
+  .sort((a, b) => a.avg - b.avg);
+
+ const saveDate = async () => {
+  const input = document.getElementById('mmiInterviewInput');
+  const raw = (input?.value || '').trim();
+  const saveBtn = document.getElementById('mmiInterviewSaveBtn');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+  await fetch(`${API_BASE}/api/user/interview-date`, {
+   method: 'POST',
+   headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+   body: JSON.stringify({ interview_date: raw || null }),
+  }).catch(() => {});
+  renderPrepPlan(raw || null);
+ };
+
+ const clearDate = async () => {
+  await fetch(`${API_BASE}/api/user/interview-date`, {
+   method: 'POST',
+   headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+   body: JSON.stringify({ interview_date: null }),
+  }).catch(() => {});
+  renderPrepPlan(null);
+ };
+
+ let planHtml = '';
+ if (interviewDate) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const ivDay = new Date(interviewDate + 'T00:00:00');
+  const daysLeft = Math.round((ivDay - today) / 86400000);
+  const weeksLeft = Math.floor(daysLeft / 7);
+  if (daysLeft <= 0) {
+   planHtml = `<div class="mmi-prep-notice">Your interview was on ${escapeHtml(interviewDate)}. Well done on the preparation work.</div>`;
+  } else if (daysLeft < 14) {
+   planHtml = `<div class="mmi-prep-weeks"><div class="mmi-prep-week"><span class="mmi-prep-wlabel">Now</span><span class="mmi-prep-wfocus">Focus on Mock Circuit and full-length timed practice until your interview.</span></div></div><div class="mmi-prep-notice">${daysLeft} day${daysLeft === 1 ? '' : 's'} remaining.</div>`;
+  } else {
+   const pracWeeks = Math.max(weeksLeft - 2, 0);
+   const weeks = [];
+   let weekIdx = 0;
+   for (let i = 0; i < Math.min(sortedCats.length, Math.max(pracWeeks, 1)); i++) {
+    const label = pracWeeks <= 1 ? 'Week 1' : `Week${i * 2 + 1 === (i + 1) * 2 - 1 ? ' ' + (i * 2 + 1) : 's ' + (i * 2 + 1) + '-' + Math.min(i * 2 + 2, pracWeeks)}`;
+    weeks.push(`<div class="mmi-prep-week"><span class="mmi-prep-wlabel">${label}</span><span class="mmi-prep-wfocus">Prioritise <strong>${escapeHtml(sortedCats[i].cat)}</strong> stations (avg ${sortedCats[i].avg.toFixed(1)}/5)</span></div>`);
+    weekIdx = i + 1;
+   }
+   if (pracWeeks > sortedCats.length) {
+    weeks.push(`<div class="mmi-prep-week"><span class="mmi-prep-wlabel">Week${pracWeeks > sortedCats.length + 1 ? 's ' + (weekIdx * 2 + 1) + '-' + pracWeeks : ' ' + (weekIdx * 2 + 1)}</span><span class="mmi-prep-wfocus">Mixed practice across all categories</span></div>`);
+   }
+   weeks.push(`<div class="mmi-prep-week"><span class="mmi-prep-wlabel">Final 2 wks</span><span class="mmi-prep-wfocus">Mock Circuit and full-length timed sessions to simulate interview conditions</span></div>`);
+   planHtml = `<div class="mmi-prep-weeks">${weeks.join('')}</div><div class="mmi-prep-notice">${weeksLeft} week${weeksLeft === 1 ? '' : 's'} until ${escapeHtml(interviewDate)}.</div>`;
+  }
+ } else {
+  planHtml = `<div class="mmi-prep-nodate">Set your interview date to get a personalised week-by-week prep plan based on your weakest categories.</div>`;
+ }
+
+ el.innerHTML = `<div class="mmi-prep-plan-title">Prep plan<span style="font-weight:400;color:var(--gray400);font-size:0.75rem">based on your weakest categories</span></div>
+<div class="mmi-interview-row">
+ <input type="date" id="mmiInterviewInput" class="mmi-interview-input" value="${escapeAttr(interviewDate || '')}" placeholder="Interview date">
+ <button id="mmiInterviewSaveBtn" class="mmi-interview-save" onclick="document.getElementById('mmiInterviewSaveBtn')._save()">Save</button>
+ ${interviewDate ? `<button class="mmi-interview-clear" onclick="document.getElementById('mmiInterviewSaveBtn')._clear()">Clear</button>` : ''}
+</div>
+${planHtml}`;
+
+ const saveBtn = document.getElementById('mmiInterviewSaveBtn');
+ if (saveBtn) { saveBtn._save = saveDate; saveBtn._clear = clearDate; }
+ el.style.display = '';
+}
+
+function renderReferralSection(data) {
+ const section = document.getElementById('mmiReferralSection');
+ const content = document.getElementById('mmiReferralContent');
+ if (!section || !content || !data?.referral_code) return;
+ const code = data.referral_code;
+ const link = data.referral_link || '';
+ const count = Number(data.referred_count || 0);
+ content.innerHTML = `<div class="mmi-referral-title">Refer a friend</div>
+<div class="mmi-referral-sub">Share your referral link. When your friend makes their first $50 of purchases you get 1 free MMI transcript credit.</div>
+<div class="mmi-referral-code-row">
+ <span class="mmi-referral-code">${escapeHtml(code)}</span>
+ <button class="mmi-referral-copy" onclick="copyReferralLink('${escapeAttr(link)}', this)">Copy link</button>
+</div>
+<div class="mmi-referral-link">${escapeHtml(link)}</div>
+<div class="mmi-referral-count">${count} friend${count === 1 ? '' : 's'} referred so far</div>
+<div class="mmi-referral-reward">Credit is granted automatically once qualifying spend is reached.</div>`;
+ section.style.display = '';
+}
+
+function copyReferralLink(link, btn) {
+ navigator.clipboard.writeText(link).then(() => {
+  const orig = btn.textContent;
+  btn.textContent = 'Copied!';
+  setTimeout(() => { btn.textContent = orig; }, 2000);
+ }).catch(() => {
+  btn.textContent = 'Copy failed';
+  setTimeout(() => { btn.textContent = 'Copy link'; }, 2000);
+ });
+}
+
+function exportPrepSummary() {
+ const today = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+ const catMap = {};
+ mmiReviews.forEach(r => {
+  const cat = r.station_category || 'Unknown';
+  const fb = parseObject(r.ai_feedback_json) || {};
+  const score = typeof (fb.overall || {}).score === 'number' ? fb.overall.score : parseFloat((fb.overall || {}).score);
+  if (!catMap[cat]) catMap[cat] = { sum: 0, count: 0 };
+  if (Number.isFinite(score)) { catMap[cat].sum += score; catMap[cat].count++; }
+ });
+ const sortedCats = Object.entries(catMap)
+  .map(([cat, { sum, count }]) => ({ cat, avg: count ? sum / count : null }))
+  .filter(e => e.avg !== null)
+  .sort((a, b) => a.avg - b.avg);
+ const catRows = sortedCats.map(e =>
+  `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee">${escapeHtml(e.cat)}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:center">${e.avg.toFixed(1)}/5</td></tr>`
+ ).join('');
+ const recentRows = mmiReviews.slice(0, 10).map(r => {
+  const fb = parseObject(r.ai_feedback_json) || {};
+  const score = typeof (fb.overall || {}).score === 'number' ? fb.overall.score : parseFloat((fb.overall || {}).score);
+  return `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee">${escapeHtml(r.station_category || 'MMI')}</td><td style="padding:6px 12px;border-bottom:1px solid #eee">${escapeHtml(r.created_at ? r.created_at.slice(0, 10) : '')}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:center">${Number.isFinite(score) ? score + '/5' : '-'}</td></tr>`;
+ }).join('');
+ const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>MMI Prep Summary</title><style>body{font-family:sans-serif;color:#0a1628;max-width:700px;margin:40px auto;padding:0 24px}h1{font-size:1.4rem;margin:0 0 4px}p.sub{font-size:0.85rem;color:#666;margin:0 0 28px}h2{font-size:1rem;margin:24px 0 10px;border-bottom:2px solid #0ea5e9;padding-bottom:6px;color:#0a1628}table{width:100%;border-collapse:collapse;font-size:0.88rem}th{text-align:left;padding:6px 12px;border-bottom:2px solid #eee;color:#666;font-weight:600}@media print{body{margin:20px}}
+</style></head><body>
+<h1>MMI Prep Summary</h1><p class="sub">Generated ${escapeHtml(today)} - key2md.com</p>
+${sortedCats.length ? `<h2>Category breakdown</h2><table><thead><tr><th>Category</th><th>Avg score</th></tr></thead><tbody>${catRows}</tbody></table>` : ''}
+${recentRows ? `<h2>Recent sessions (last 10)</h2><table><thead><tr><th>Category</th><th>Date</th><th>Score</th></tr></thead><tbody>${recentRows}</tbody></table>` : ''}
+<h2>Resources</h2><p style="font-size:0.88rem"><a href="https://www.key2md.com/practice.html?mode=mmi">Continue practising</a> | <a href="https://www.key2md.com/mmi-circuit.html">Mock Circuit</a></p>
+</body></html>`;
+ const blob = new Blob([html], { type: 'text/html' });
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url; a.download = 'mmi-prep-summary.html'; a.click();
+ setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 </script>
 

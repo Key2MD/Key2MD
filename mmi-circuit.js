@@ -10,11 +10,13 @@ const MMICircuit = (() => {
 
  // -- Constants -------------------------------------------------
  const REST_SECONDS = 120; // 2-min rest between stations
- const CIRCUIT_SIZES = [4, 6, 8];
- const CREDIT_DISCOUNT = 1; // 1 credit off vs buying individually
+ const CIRCUIT_SIZES = [4, 5, 6, 8];
+ const BUNDLE_SIZES = { transcript: 5, premium: 6 };
+ const BUNDLE_PRICES = { transcript: 30, premium: 60 };
+ const BUNDLE_PACK_IDS = { transcript: 'mmi_transcript_5', premium: 'mmi_premium_6' };
 
  // Pricing display (mirrors CREDIT_PACKS in worker)
- const CREDIT_PRICE = { transcript: 5, premium: 12 };
+ const CREDIT_PRICE = { transcript: 7, premium: 12 };
 
  // -- State -----------------------------------------------------
  let circuitActive = false;
@@ -142,6 +144,9 @@ const MMICircuit = (() => {
  const sidebar = document.querySelector('aside.sidebar');
  if (!sidebar) return;
 
+ const defaultTier = 'transcript';
+ const defaultSize = BUNDLE_SIZES[defaultTier];
+
  const panel = document.createElement('div');
  panel.id = 'circuitConfigPanel';
  panel.style.display = 'none';
@@ -151,19 +156,19 @@ const MMICircuit = (() => {
 
  <div style="margin-bottom:14px;">
  <div style="font-size:0.72rem;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Stations</div>
- <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
- ${CIRCUIT_SIZES.map((n,i) => `
- <button class="circuit-size-btn${i===0?' active':''}" data-size="${n}" onclick="MMICircuit.setSize(${n})" style="padding:8px 4px;border-radius:8px;border:1px solid ${i===0?'rgba(124,58,237,0.5)':'var(--gray200)'};background:${i===0?'rgba(124,58,237,0.1)':'var(--gray50)'};color:${i===0?'#7c3aed':'var(--gray600)'};font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;">
- ${n}
- </button>`).join('')}
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+ ${CIRCUIT_SIZES.map(n => {
+ const isDefault = n === defaultSize;
+ return `<button class="circuit-size-btn${isDefault?' active':''}" data-size="${n}" data-active="${isDefault?'1':''}" onclick="MMICircuit.setSize(${n})" style="padding:8px 4px;border-radius:8px;border:1px solid ${isDefault?'rgba(124,58,237,0.5)':'var(--gray200)'};background:${isDefault?'rgba(124,58,237,0.1)':'var(--gray50)'};color:${isDefault?'#7c3aed':'var(--gray600)'};font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;">${n}</button>`;
+ }).join('')}
  </div>
  </div>
 
  <div style="margin-bottom:14px;">
  <div style="font-size:0.72rem;font-weight:700;color:var(--gray500);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Tier</div>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
- <button class="circuit-tier-btn active" data-tier="transcript" onclick="MMICircuit.setTier('transcript')" style="padding:8px 6px;border-radius:8px;border:1px solid rgba(124,58,237,0.5);background:rgba(124,58,237,0.1);color:#7c3aed;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;"> Transcript</button>
- <button class="circuit-tier-btn" data-tier="premium" onclick="MMICircuit.setTier('premium')" style="padding:8px 6px;border-radius:8px;border:1px solid var(--gray200);background:var(--gray50);color:var(--gray600);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;">Premium</button>
+ <button class="circuit-tier-btn active" data-tier="transcript" data-active="1" onclick="MMICircuit.setTier('transcript')" style="padding:8px 6px;border-radius:8px;border:1px solid rgba(124,58,237,0.5);background:rgba(124,58,237,0.1);color:#7c3aed;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;"> Transcript</button>
+ <button class="circuit-tier-btn" data-tier="premium" data-active="" onclick="MMICircuit.setTier('premium')" style="padding:8px 6px;border-radius:8px;border:1px solid var(--gray200);background:var(--gray50);color:var(--gray600);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;">Premium</button>
  </div>
  </div>
 
@@ -186,22 +191,24 @@ const MMICircuit = (() => {
  </label>
  </div>
 
- <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:8px;padding:10px 12px;margin-bottom:14px;">
- <div style="font-size:0.72rem;color:var(--gray500);margin-bottom:4px;">Credit cost</div>
- <div id="circuitCreditDisplay" style="font-size:1.1rem;font-weight:800;color:#7c3aed;">4 credits <span style="font-size:0.72rem;font-weight:500;color:var(--gray400);">(save 1 vs individual)</span></div>
+ <div id="circuitPricingBox" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:8px;padding:10px 12px;margin-bottom:14px;">
+ <div id="circuitCreditDisplay" style="font-size:1rem;font-weight:800;color:#7c3aed;"></div>
+ <div id="circuitBundleNote" style="font-size:0.72rem;color:var(--gray500);margin-top:4px;"></div>
  </div>
 
  <button id="circuitStartBtn" onclick="MMICircuit.startCircuit()" style="width:100%;padding:12px;border-radius:50px;border:none;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;box-shadow:0 4px 16px rgba(124,58,237,0.3);">
- > Start Circuit
+ Start Circuit ->
  </button>
  </div>
  `;
  sidebar.appendChild(panel);
+ updateCreditDisplay();
  }
 
  function setSize(n) {
  document.querySelectorAll('.circuit-size-btn').forEach(btn => {
  const active = parseInt(btn.dataset.size) === n;
+ btn.dataset.active = active ? '1' : '';
  btn.style.border = active ? '1px solid rgba(124,58,237,0.5)' : '1px solid var(--gray200)';
  btn.style.background = active ? 'rgba(124,58,237,0.1)' : 'var(--gray50)';
  btn.style.color = active ? '#7c3aed' : 'var(--gray600)';
@@ -212,26 +219,36 @@ const MMICircuit = (() => {
  function setTier(tier) {
  document.querySelectorAll('.circuit-tier-btn').forEach(btn => {
  const active = btn.dataset.tier === tier;
+ btn.dataset.active = active ? '1' : '';
  btn.style.border = active ? '1px solid rgba(124,58,237,0.5)' : '1px solid var(--gray200)';
  btn.style.background = active ? 'rgba(124,58,237,0.1)' : 'var(--gray50)';
  btn.style.color = active ? '#7c3aed' : 'var(--gray600)';
  });
- updateCreditDisplay();
+ // snap size to the bundle size for the new tier
+ setSize(BUNDLE_SIZES[tier]);
  }
 
  function updateCreditDisplay() {
- const size = parseInt(document.querySelector('.circuit-size-btn.active')?.dataset.size ||
- document.querySelector('[data-size]')?.dataset.size || '4');
- const tier = document.querySelector('.circuit-tier-btn.active')?.dataset.tier || 'transcript';
- // Find active via colour (simpler than maintaining separate state)
  const activeSize = parseInt([...document.querySelectorAll('.circuit-size-btn')]
- .find(b => b.style.color === 'rgb(124, 58, 237)')?.dataset.size || '4');
- const activeTier = [...document.querySelectorAll('.circuit-tier-btn')]
- .find(b => b.style.color === 'rgb(124, 58, 237)')?.dataset.tier || 'transcript';
- const credits = activeSize - CREDIT_DISCOUNT;
- const price = credits * CREDIT_PRICE[activeTier];
+ .find(b => b.dataset.active === '1')?.dataset.size || BUNDLE_SIZES.transcript);
+ const activeTier = ([...document.querySelectorAll('.circuit-tier-btn')]
+ .find(b => b.dataset.active === '1')?.dataset.tier) || 'transcript';
+
+ const bundleSize = BUNDLE_SIZES[activeTier];
+ const bundlePrice = BUNDLE_PRICES[activeTier];
+ const individualTotal = activeSize * CREDIT_PRICE[activeTier];
+
  const el = document.getElementById('circuitCreditDisplay');
- if (el) el.innerHTML = `${credits} credits <span style="font-size:0.72rem;font-weight:500;color:var(--gray400);">(save ${CREDIT_DISCOUNT} vs individual | $${price} AUD)</span>`;
+ const noteEl = document.getElementById('circuitBundleNote');
+ if (!el) return;
+
+ if (activeSize === bundleSize) {
+ el.innerHTML = `${activeSize} stations &bull; <span style="color:#16a34a;">$${bundlePrice}</span> with bundle`;
+ if (noteEl) noteEl.innerHTML = `Save $${individualTotal - bundlePrice} vs individual &bull; <a href="plans.html#mmi-section" style="color:#7c3aed;font-weight:600;text-decoration:none;">Buy ${activeTier} bundle -></a>`;
+ } else {
+ el.innerHTML = `${activeSize} stations &bull; $${individualTotal} in credits`;
+ if (noteEl) noteEl.innerHTML = `$${CREDIT_PRICE[activeTier]}/credit &bull; <a href="plans.html#mmi-section" style="color:#7c3aed;font-weight:600;text-decoration:none;">Buy credits -></a>`;
+ }
  }
 
  function bindEvents() {
@@ -355,12 +372,45 @@ const MMICircuit = (() => {
 
  function getConfig() {
  const activeSize = parseInt([...document.querySelectorAll('.circuit-size-btn')]
- .find(b => b.style.color === 'rgb(124, 58, 237)')?.dataset.size || '4');
+ .find(b => b.dataset.active === '1')?.dataset.size || '4');
  const activeTier = ([...document.querySelectorAll('.circuit-tier-btn')]
- .find(b => b.style.color === 'rgb(124, 58, 237)')?.dataset.tier) || 'transcript';
+ .find(b => b.dataset.active === '1')?.dataset.tier) || 'transcript';
  const preset = document.getElementById('circuitPreset')?.value || 'standard';
  const specialist = document.getElementById('circuitSpecialist')?.checked || false;
  return { size: activeSize || 4, tier: activeTier, preset, specialistMode: specialist };
+ }
+
+ function renderCreditPaywall(cfg, balance) {
+ const area = getMainArea();
+ if (!area) return;
+ const need = cfg.size;
+ const tier = cfg.tier;
+ const bundleSize = BUNDLE_SIZES[tier];
+ const bundlePrice = BUNDLE_PRICES[tier];
+ const isBundleSize = need === bundleSize;
+ const plansUrl = 'plans.html#mmi-section';
+ area.innerHTML = `
+ <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;text-align:center;padding:40px 24px;">
+ <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:36px 32px;max-width:460px;width:100%;">
+ <div style="font-size:2rem;margin-bottom:12px;"></div>
+ <h3 style="font-size:1.2rem;font-weight:800;color:var(--navy);margin:0 0 8px;">Credits needed to start</h3>
+ <p style="font-size:0.88rem;color:var(--gray500);line-height:1.6;margin:0 0 20px;">
+ You have <strong>${balance}</strong> ${tier} credit${balance===1?'':'s'}. A ${need}-station circuit needs <strong>${need}</strong>.
+ </p>
+ ${isBundleSize ? `
+ <a href="${plansUrl}" style="display:block;padding:13px 20px;border-radius:50px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:0.92rem;font-weight:700;text-decoration:none;margin-bottom:10px;box-shadow:0 4px 16px rgba(124,58,237,0.3);">
+ Buy ${need}-station bundle &bull; $${bundlePrice} ->
+ </a>
+ <div style="font-size:0.72rem;color:var(--gray400);margin-bottom:16px;">Save $${need * CREDIT_PRICE[tier] - bundlePrice} vs individual credits</div>
+ ` : `
+ <a href="${plansUrl}" style="display:block;padding:13px 20px;border-radius:50px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:0.92rem;font-weight:700;text-decoration:none;margin-bottom:16px;box-shadow:0 4px 16px rgba(124,58,237,0.3);">
+ Buy credits ->
+ </a>
+ `}
+ <button onclick="MMICircuit.abortCircuit()" style="background:none;border:none;color:var(--gray400);font-size:0.82rem;cursor:pointer;font-family:inherit;text-decoration:underline;">Back to setup</button>
+ </div>
+ </div>
+ `;
  }
 
  function startCircuit() {
@@ -369,7 +419,18 @@ const MMICircuit = (() => {
  return;
  }
 
- circuitConfig = getConfig();
+ const cfg = getConfig();
+ const limits = window.Key2MDAuth?.getLimits();
+ const creditKey = cfg.tier === 'premium' ? 'mmi_premium_credits' : 'mmi_transcript_credits';
+ const balance = limits ? (limits[creditKey] || 0) : null;
+ const hasPro = limits && (limits.mmi_pro_tier || limits.mmi_pro_expires_at > Date.now());
+
+ if (balance !== null && !hasPro && balance < cfg.size) {
+ renderCreditPaywall(cfg, balance);
+ return;
+ }
+
+ circuitConfig = cfg;
  circuitResults = [];
  circuitIdx = 0;
  circuitActive = true;
@@ -453,13 +514,10 @@ const MMICircuit = (() => {
  // listening for the result to appear in the DOM, OR by re-reading from
  // the global after the original completes.
 
- // Simple approach: call original, then after it completes read the rendered feedback
  await window._originalSubmitMMI.apply(this, arguments);
 
- // After feedback renders, extract JSON from the rendered output
- // MMIFeedbackRender stores the last feedback on window for exactly this purpose
  if (window._lastMMIFeedback) {
- onStationComplete(window._lastMMIFeedback, circuitStations[circuitIdx]);
+ onStationComplete(window._lastMMIFeedback, circuitStations[circuitIdx], window._lastMMIReviewId || null);
  }
  };
  }
@@ -474,8 +532,7 @@ const MMICircuit = (() => {
  return p;
  }
 
- function onStationComplete(feedbackData, station) {
- // Restore original submit
+ function onStationComplete(feedbackData, station, reviewId) {
  if (window._originalSubmitMMI) {
  window.submitMMIForFeedback = window._originalSubmitMMI;
  delete window._originalSubmitMMI;
@@ -486,6 +543,7 @@ const MMICircuit = (() => {
  feedback: feedbackData,
  stationIdx: circuitIdx,
  tier: circuitConfig.tier,
+ reviewId: reviewId || null,
  });
 
  const isLast = circuitIdx >= circuitConfig.size - 1;
@@ -584,80 +642,34 @@ const MMICircuit = (() => {
 
  async function generateDebrief() {
  renderDebriefLoading();
-
  if (window._circuitDebriefInterval) clearInterval(window._circuitDebriefInterval);
 
  const debriefPrompt = buildDebriefPrompt();
+ const token = window.Key2MDAuth?.getToken();
+ const reviewIds = circuitResults.map(r => r.reviewId).filter(Boolean);
+ const base = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
 
  try {
- const token = window.Key2MDAuth?.getToken();
- const res = await fetch('https://api.anthropic.com/v1/messages', {
+ const res = await fetch(`${base}/api/mmi/circuit-debrief`, {
  method: 'POST',
  headers: {
  'Content-Type': 'application/json',
- 'anthropic-version': '2023-06-01',
+ 'Authorization': `Bearer ${token}`,
  },
- body: JSON.stringify({
- model: 'claude-sonnet-4-20250514',
- max_tokens: 1000,
- system: DEBRIEF_SYSTEM_PROMPT,
- messages: [{ role: 'user', content: debriefPrompt }],
- }),
+ body: JSON.stringify({ prompt: debriefPrompt, review_ids: reviewIds }),
  });
-
  const data = await res.json();
- const raw = data.content?.map(c => c.text || '').join('').trim() || '';
- const debrief = JSON.parse(raw.replace(/```json|```/g, '').trim());
- renderDebrief(debrief);
+ if (!res.ok || !data.debrief) {
+ console.error('Circuit debrief failed:', data);
+ renderDebriefError();
+ return;
+ }
+ renderDebrief(data.debrief);
  } catch (err) {
  console.error('Circuit debrief failed:', err);
  renderDebriefError();
  }
  }
-
- const DEBRIEF_SYSTEM_PROMPT = `You are generating a circuit debrief report for a Key2MD MMI practice session. The student has just completed a multi-station MMI circuit.
-
-Your job is to synthesise patterns across all stations into a structured, honest, actionable debrief. You are not a praise coach. You are an examiner who has watched every station and noticed things the student can't see from the inside.
-
-Return ONLY valid JSON matching this schema exactly - no markdown, no preamble:
-
-{
- "overall_band": "Poor|Unsatisfactory|Satisfactory|Good|Excellent",
- "real_day_estimate": "<2 sentences: if this were a real MMI day, where would this performance sit and why>",
- "criterion_averages": {
- "empathy": {"avg": 1.0, "label": "...", "trend": "consistent|improving|declining|variable"},
- "communication": {"avg": 1.0, "label": "...", "trend": "..."},
- "reasoning": {"avg": 1.0, "label": "...", "trend": "..."},
- "reflection": {"avg": 1.0, "label": "...", "trend": "..."},
- "real_world_awareness": {"avg": 1.0, "label": "...", "trend": "..."}
- },
- "stamina_pattern": {
- "detected": true,
- "description": "<2 sentences about whether quality held across the circuit or declined. Be specific about which stations>",
- "first_half_avg": 3.0,
- "second_half_avg": 3.0
- },
- "cross_station_patterns": [
- "<specific pattern observed across multiple stations - quote the stations>",
- "<second pattern if present>"
- ],
- "category_performance": [
- {"category": "Ethics", "avg_score": 3.0, "note": "<one line>"},
- {"category": "Role-Play", "avg_score": 2.5, "note": "<one line>"}
- ],
- "strongest_station": {
- "station_idx": 0,
- "category": "...",
- "reason": "<one sentence with specific quote from transcript or feedback>"
- },
- "weakest_station": {
- "station_idx": 0,
- "category": "...",
- "reason": "<one sentence>"
- },
- "the_one_thing": "<The single most important thing to fix before the real interview. One specific, actionable change. Not a list. Not encouragement. The thing.>",
- "polished_auditor_circuit": "<if the Polished Auditor trap appeared in 2+ stations, describe the pattern. Otherwise empty string>"
-}`;
 
  function buildDebriefPrompt() {
  const stationSummaries = circuitResults.map((r, i) => {
@@ -823,7 +835,7 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  ${polishedBlock}
 
  <!-- Per-station quick view -->
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;margin-bottom:24px;">
+ <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
  <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);margin-bottom:14px;">Station Results</div>
  ${circuitResults.map((r, i) => {
  const fb = r.feedback;
@@ -845,10 +857,37 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  }).join('')}
  </div>
 
+ <!-- Human review upsell -->
+ ${circuitResults.some(r => r.reviewId) ? `
+ <div id="circuitReviewUpsell" style="background:linear-gradient(135deg,rgba(124,58,237,0.06),rgba(14,165,233,0.04));border:1.5px solid rgba(124,58,237,0.2);border-radius:16px;padding:24px 22px;margin-bottom:24px;">
+ <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#7c3aed;margin-bottom:6px;">Personal coaching</div>
+ <div style="font-size:1rem;font-weight:800;color:var(--navy);margin-bottom:6px;">Have Dan watch your recording</div>
+ <p style="font-size:0.84rem;color:var(--gray600);line-height:1.6;margin:0 0 16px;">Pick one station below. Dan will watch the full recording and send you personalised feedback within 48 hours - $50.</p>
+ <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+ ${circuitResults.map((r, i) => {
+ if (!r.reviewId) return '';
+ const score = r.feedback?.overall?.score || '-';
+ const safeCategory = (r.station.category || '').replace(/'/g, "\\'");
+ const safeName = (r.station.scenario || '').substring(0, 60).replace(/'/g, "\\'");
+ return `<button onclick="MMICircuit.selectReviewStation(this,'${r.reviewId}','${safeCategory}','${safeName}')"
+ data-review-id="${r.reviewId}"
+ style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--gray200);background:#fff;cursor:pointer;font-family:inherit;transition:all 0.15s;text-align:left;">
+ <div style="width:24px;height:24px;border-radius:50%;background:rgba(124,58,237,0.1);color:#7c3aed;font-size:0.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i + 1}</div>
+ <div style="flex:1;font-size:0.83rem;font-weight:600;color:var(--navy);">${r.station.category}</div>
+ <div style="font-size:0.88rem;font-weight:700;color:var(--gray500);">${score}/5</div>
+ </button>`;
+ }).join('')}
+ </div>
+ <button id="circuitReviewBuyBtn" onclick="MMICircuit.buyCircuitReview()" disabled
+ style="width:100%;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.4;transition:all 0.2s;">
+ Select a station above
+ </button>
+ </div>` : ''}
+
  <!-- Actions -->
  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
  <button onclick="MMICircuit.runAgain()" style="padding:12px 28px;border-radius:50px;border:none;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(124,58,237,0.3);transition:all 0.2s;">
- Refresh Run Another Circuit
+ Run Another Circuit
  </button>
  <button onclick="MMICircuit.reviewStations()" style="padding:12px 28px;border-radius:50px;border:1px solid var(--gray200);background:#fff;color:var(--navy);font-size:0.92rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">
  Review Individual Stations
@@ -871,13 +910,66 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  `;
  }
 
+ let _selectedReviewId = null;
+ let _selectedStationName = null;
+ let _selectedStationCategory = null;
+
+ function selectReviewStation(btn, reviewId, category, name) {
+ _selectedReviewId = reviewId;
+ _selectedStationName = name;
+ _selectedStationCategory = category;
+ document.querySelectorAll('[data-review-id]').forEach(b => {
+ b.style.border = '1.5px solid var(--gray200)';
+ b.style.background = '#fff';
+ });
+ btn.style.border = '1.5px solid #7c3aed';
+ btn.style.background = 'rgba(124,58,237,0.06)';
+ const buyBtn = document.getElementById('circuitReviewBuyBtn');
+ if (buyBtn) {
+ buyBtn.disabled = false;
+ buyBtn.style.opacity = '1';
+ buyBtn.textContent = `Have Dan review: ${category} - $50`;
+ }
+ }
+
+ async function buyCircuitReview() {
+ if (!_selectedReviewId) return;
+ const buyBtn = document.getElementById('circuitReviewBuyBtn');
+ if (buyBtn) { buyBtn.disabled = true; buyBtn.textContent = 'Opening checkout...'; }
+ try {
+ const token = window.Key2MDAuth?.getToken();
+ const apiBase = (typeof window !== 'undefined' && window.location.hostname !== 'www.key2md.com')
+ ? 'https://key2md.workers.dev' : '';
+ const resp = await fetch(`${apiBase}/api/mmi/circuit-review-checkout`, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+ body: JSON.stringify({
+ review_id: _selectedReviewId,
+ station_name: _selectedStationName || _selectedStationCategory,
+ station_category: _selectedStationCategory,
+ success_url: window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'circuit_review=success',
+ cancel_url: window.location.href,
+ }),
+ });
+ const data = await resp.json();
+ if (data.checkout_url) {
+ window.location.href = data.checkout_url;
+ } else {
+ if (buyBtn) { buyBtn.disabled = false; buyBtn.style.opacity = '1'; buyBtn.textContent = `Have Dan review: ${_selectedStationCategory} - $50`; }
+ alert(data.message || 'Could not open checkout. Please try again.');
+ }
+ } catch {
+ if (buyBtn) { buyBtn.disabled = false; buyBtn.style.opacity = '1'; buyBtn.textContent = `Have Dan review: ${_selectedStationCategory} - $50`; }
+ alert('Connection error. Please try again.');
+ }
+ }
+
  function runAgain() {
  abortCircuit();
  renderCircuitIdle();
  }
 
  function reviewStations() {
- // Scroll back to show per-station feedback which was rendered inline during the circuit
  alert('Per-station feedback was shown after each station. Use "Run Another Circuit" to do a new circuit, or switch to MMI mode to review individual stations.');
  }
 
@@ -894,6 +986,8 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  generateDebrief,
  runAgain,
  reviewStations,
+ selectReviewStation,
+ buyCircuitReview,
  };
 
 })();

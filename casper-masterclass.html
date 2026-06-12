@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CASPer Masterclass Thursday 11 June | Key2MD</title>
-  <meta name="description" content="Register for the Key2MD CASPer Masterclass on Thursday, 11 June at 1pm AEST. Marking walkthrough, AI analysis of 5000+ responses, high-yield station speed run, and live Q&A.">
+  <title>CASPer Masterclass Recording | Key2MD</title>
+  <meta name="description" content="Buy $300 protected recording access to the Key2MD CASPer Masterclass. Dan covers marking logic, AI analysis of 5000+ responses, high-yield station patterns, and Q&A themes.">
   <link rel="canonical" href="https://www.key2md.com/casper-masterclass.html">
   <meta name="robots" content="index, follow">
-  <meta property="og:title" content="Key2MD CASPer Masterclass - Thursday 11 June">
-  <meta property="og:description" content="The most high-yield CASPer session of the year. Marking walkthrough, AI data from 5000+ responses, live Q&A.">
+  <meta property="og:title" content="Key2MD CASPer Masterclass Recording">
+  <meta property="og:description" content="$300 protected recording access to Dan's CASPer masterclass. Marking walkthrough, AI data from 5000+ responses, and high-yield CASPer patterns.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Key2MD">
   <meta property="og:url" content="https://www.key2md.com/casper-masterclass.html">
@@ -17,15 +17,16 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:type" content="image/png">
-  <meta property="og:image:alt" content="Key2MD CASPer Masterclass on Thursday, 11 June at 1pm AEST with Dan.">
+  <meta property="og:image:alt" content="Key2MD CASPer Masterclass recording with Dan.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Key2MD CASPer Masterclass - Thursday 11 June">
-  <meta name="twitter:description" content="A 2 to 2.5 hour live CASPer masterclass with Dan: framework revision, high-yield stations, marking walkthrough, AI response analysis and live Q&A.">
+  <meta name="twitter:title" content="Key2MD CASPer Masterclass Recording">
+  <meta name="twitter:description" content="$300 protected recording access to Dan's CASPer masterclass: framework revision, high-yield stations, marking walkthrough, AI response analysis and Q&A themes.">
   <meta name="twitter:image" content="https://www.key2md.com/casper-masterclass-og-v2.png">
-  <meta name="twitter:image:alt" content="Key2MD CASPer Masterclass on Thursday, 11 June at 1pm AEST with Dan.">
+  <meta name="twitter:image:alt" content="Key2MD CASPer Masterclass recording with Dan.">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script src="auth.js" defer></script>
+  <script src="masterclass-player.js" defer></script>
   <script src="/key2md-tracking.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,6 +113,17 @@
     .mc-linkbox{display:none;border:1px solid rgba(14,165,233,0.28);background:rgba(14,165,233,0.08);border-radius:10px;padding:13px;margin-bottom:14px;}
     .mc-linkbox p{margin:0 0 7px;color:var(--teal2);font-weight:800;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;}
     .mc-linkbox a{color:#7dd3fc;font-weight:700;}
+    .mc-recording-section{display:none;padding:0 0 10px;}
+    .mc-recording-card{background:rgba(255,255,255,0.045);border:1px solid rgba(56,189,248,0.22);border-radius:18px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.28);}
+    .mc-recording-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:16px;}
+    .mc-recording-title{font-family:'DM Sans',system-ui,sans-serif;font-size:1.12rem;font-weight:900;color:#fff;margin:0 0 4px;}
+    .mc-recording-meta{font-size:0.82rem;color:rgba(255,255,255,0.55);line-height:1.55;}
+    .mc-recording-load{border:0;border-radius:999px;background:linear-gradient(135deg,var(--teal),var(--teal3));color:#fff;font:inherit;font-size:0.86rem;font-weight:900;padding:11px 18px;cursor:pointer;white-space:nowrap;}
+    .mc-recording-load:disabled{opacity:0.55;cursor:not-allowed;}
+    .mc-recording-stage{display:none;position:relative;background:#000;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);}
+    .mc-recording-stage video{display:block;width:100%;max-height:68vh;background:#000;}
+    .mc-recording-watermark{display:none;position:absolute;z-index:3;max-width:min(72%,520px);padding:7px 10px;border-radius:8px;background:rgba(6,14,28,0.58);border:1px solid rgba(255,255,255,0.22);color:rgba(255,255,255,0.78);font-size:0.76rem;font-weight:800;line-height:1.35;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,0.7);transition:left 0.8s ease,top 0.8s ease;}
+    .mc-recording-session{margin-top:9px;color:rgba(255,255,255,0.42);font-size:0.74rem;}
     .mc-action-stack{display:grid;gap:9px;}
     .mc-btn-primary{display:flex;align-items:center;justify-content:center;border-radius:999px;border:0;padding:14px 20px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;background:linear-gradient(135deg,var(--teal),var(--teal3));color:#fff;transition:all 0.2s;text-decoration:none;}
     .mc-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(14,165,233,0.35);}
@@ -235,6 +247,8 @@
       .mc-stats-section{grid-template-columns:1fr;gap:20px;}
       .mc-stats-item+.mc-stats-item{border-left:none;border-top:1px solid rgba(14,165,233,0.15);padding-top:20px;}
       .mc-testimonials-purple{grid-template-columns:1fr;}
+      .mc-recording-head{flex-direction:column;}
+      .mc-recording-load{width:100%;}
     }
     @media(max-width:700px){
       .agenda-grid{grid-template-columns:1fr;}
@@ -287,14 +301,14 @@
 
       <!-- Left: copy -->
       <div class="fade-up">
-        <div class="mc-eyebrow">CASPer Masterclass &bull; Thursday, 11 June</div>
-        <h1>Get into the zone<br>right before <span class="teal">CASPer.</span></h1>
-        <p class="mc-hero-sub">One focused session with Dan so the key points are fresh, your judgement is calm, and you walk in clear on exactly what a great answer looks like.</p>
+        <div class="mc-eyebrow">CASPer Masterclass Recording</div>
+        <h1>Buy the full<br>CASPer <span class="teal">calibration.</span></h1>
+        <p class="mc-hero-sub">$300 protected access to Dan's focused masterclass recording, so the key points are fresh, your judgement is calm, and you can see exactly what a great answer is trying to do.</p>
         <div class="mc-pill-row">
-          <span class="mc-pill">Thursday, 11 June</span>
-          <span class="mc-pill">1pm AEST</span>
+          <span class="mc-pill">Replay available now</span>
           <span class="mc-pill">2&ndash;2.5 hours</span>
-          <span class="mc-pill">Live via Zoom</span>
+          <span class="mc-pill">Protected stream</span>
+          <span class="mc-pill">Account watermark</span>
           <span class="mc-pill gold">$300 AUD</span>
         </div>
         <div class="mc-stats">
@@ -314,24 +328,24 @@
 
         <!-- Hero prep talk - fills height on desktop, sets the tone -->
         <div class="mc-hero-agenda">
-          <div class="mc-hero-agenda-label">Before you walk in</div>
-          <p class="mc-hero-talk">At this point in your prep, more practice isn't the answer. The issue is never that students don't know enough. It's that the right things aren't sharp enough at the front of their mind when the clock starts.</p>
-          <p class="mc-hero-talk">The Masterclass is built to fix exactly that. Two hours with Dan to get your judgement calibrated, your instincts clear, and your confidence grounded in something real, not just hope.</p>
-          <p class="mc-hero-talk" style="color:rgba(255,255,255,0.75);">Every student who's attended has said the same thing afterwards: they walked into CASPer feeling like a different version of themselves.</p>
+          <div class="mc-hero-agenda-label">Before your sitting</div>
+          <p class="mc-hero-talk">At this point in your prep, more practice is not always the answer. The issue is often that the right things are not sharp enough at the front of your mind when the clock starts.</p>
+          <p class="mc-hero-talk">The Masterclass is built to fix exactly that. Two hours with Dan to get your judgement calibrated, your instincts clearer, and your confidence grounded in something real, not just hope.</p>
+          <p class="mc-hero-talk" style="color:rgba(255,255,255,0.75);">The recording is streamed through your Key2MD account and visibly watermarked to your playback session.</p>
         </div>
 
         <!-- Mobile only: inline register CTA (desktop sees the card on the right) -->
         <div class="mc-hero-mobile-cta">
-          <a href="#mc-register-mobile">Register for $300 &rarr;</a>
+          <a href="#mc-register-mobile">Buy recording access - $300 &rarr;</a>
         </div>
       </div>
 
       <!-- Right: register card -->
       <div class="mc-reg-card fade-up delay-1" id="registration">
         <div class="mc-reg-head">
-          <div class="mc-reg-head-label">Register</div>
-          <h3 id="mcTitle">Key2MD CASPer Masterclass</h3>
-          <div class="mc-reg-head-time" id="mcTime">Thursday, 11 June 2026 &bull; 1pm AEST</div>
+          <div class="mc-reg-head-label">Recording access</div>
+          <h3 id="mcTitle">Key2MD CASPer Masterclass Recording</h3>
+          <div class="mc-reg-head-time" id="mcTime">Replay available now</div>
         </div>
         <div class="mc-reg-body">
           <div id="k2mdAuthBar"></div>
@@ -342,11 +356,11 @@
           <div class="mc-price-note">One-time &bull; Secure payment via Stripe</div>
           <div class="mc-status" id="mcStatus">Checking your access...</div>
           <div class="mc-linkbox" id="mcLinkBox">
-            <p>Your masterclass link</p>
-            <a id="mcJoinLink" href="#" target="_blank" rel="noopener">Open Zoom link &rarr;</a>
+            <p>Your recording access</p>
+            <a id="mcJoinLink" href="#" target="_blank" rel="noopener">Open private access &rarr;</a>
           </div>
           <div class="mc-action-stack">
-            <button class="mc-btn-primary" id="mcPayBtn" onclick="startMasterclassCheckout()">Pay $300 and register &rarr;</button>
+            <button class="mc-btn-primary" id="mcPayBtn" onclick="startMasterclassCheckout()">Pay $300 for recording access &rarr;</button>
             <button class="mc-btn-secondary" id="mcLoginBtn" onclick="openMasterclassAuth('login')">Log in</button>
             <button class="mc-btn-secondary" id="mcSignupBtn" onclick="openMasterclassAuth('signup')">Create free account</button>
             <button class="mc-btn-secondary" onclick="refreshMasterclassStatus()">Refresh access</button>
@@ -358,9 +372,10 @@
             <div class="mc-include-item"><div class="mc-check"></div><span><strong>Framework and first 15 seconds</strong> &mdash; start human, not robotic</span></div>
             <div class="mc-include-item"><div class="mc-check"></div><span><strong>Marking scheme and red flags</strong> &mdash; what markers can actually reward</span></div>
             <div class="mc-include-item"><div class="mc-check"></div><span><strong>Policy and safety nets</strong> &mdash; judgement calls, not reflex escalation</span></div>
-            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Live Q&amp;A</strong> &mdash; clear up edge cases before the exam</span></div>
+            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Q&amp;A themes</strong> &mdash; edge cases, timing, phrasing and exam nerves</span></div>
+            <div class="mc-include-item"><div class="mc-check"></div><span><strong>Watermarked playback</strong> &mdash; private recording stream licensed to your account</span></div>
           </div>
-          <p class="mc-reg-fine">After payment, you will receive a confirmation email from dan@key2md.net. The protected access page, where the Zoom link appears, will also be emailed again shortly before the session; if it lands in junk, log in here and refresh. Add dan@key2md.net and brittainmbbs@gmail.com to safe senders.</p>
+          <p class="mc-reg-fine">After payment, log in here and load the recording. Your private stream is watermarked to your account each time you watch. Add dan@key2md.net and brittainmbbs@gmail.com to safe senders for confirmation emails.</p>
         </div>
       </div>
 
@@ -371,24 +386,44 @@
 <!-- BODY -->
 <main class="mc-body">
 
+  <section class="mc-section mc-recording-section" id="mcRecordingSection">
+    <div class="container">
+      <div class="mc-recording-card">
+        <div class="mc-recording-head">
+          <div>
+            <div class="section-eyebrow">Recording access</div>
+            <h2 class="mc-recording-title" id="mcRecordingTitle">Masterclass recording</h2>
+            <div class="mc-recording-meta" id="mcRecordingMeta">Your private stream is watermarked to your account each time you watch.</div>
+          </div>
+          <button class="mc-recording-load" id="mcRecordingLoadBtn" type="button">Load recording</button>
+        </div>
+        <div class="mc-recording-stage" id="mcRecordingStage">
+          <video id="mcRecordingVideo" controls playsinline preload="metadata" controlsList="nodownload noremoteplayback nofullscreen"></video>
+          <div class="mc-recording-watermark" id="mcRecordingWatermark"></div>
+        </div>
+        <div class="mc-recording-session" id="mcRecordingSession"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- WHO IT'S FOR -->
   <section class="mc-section">
     <div class="container">
       <div class="fade-up">
         <div class="section-eyebrow">Who this is for</div>
-        <h2>Works for both sitting dates.</h2>
-        <p class="lead">The Masterclass is on Thursday, 11 June at 1pm AEST, which makes it useful in two different ways depending on when you sit.</p>
+        <h2>Use it as a final calibration pass.</h2>
+        <p class="lead">The replay is for students who want the full masterclass logic without waiting for the next live session.</p>
       </div>
       <div class="mc-who-grid fade-up delay-1">
         <div class="mc-who-card navy">
-          <div class="mc-who-card-kicker">Sitting Thursday 11 June</div>
-          <h3>Use it as your exam-day reset</h3>
-          <p>The session runs at 1pm AEST. It's designed to get the right ideas, structure, and emotional tone active in your head right before you walk in. Less a revision session, more a focused calibration hit.</p>
+          <div class="mc-who-card-kicker">Test soon</div>
+          <h3>Use it as your final reset</h3>
+          <p>It is designed to get the right ideas, structure, and emotional tone active in your head before you sit. Less a generic revision session, more a focused calibration hit.</p>
         </div>
         <div class="mc-who-card purple">
-          <div class="mc-who-card-kicker">Sitting June 21</div>
-          <h3>Use it as a massive seminar 10 days out</h3>
-          <p>With just under two weeks to go, this is exactly when everything should click. The Masterclass gives you a structured peak to build your final week of prep around.</p>
+          <div class="mc-who-card-kicker">Still building</div>
+          <h3>Use it to organise your practice</h3>
+          <p>The Masterclass gives you a structured peak to build your final week of prep around: what to practise, what to stop overthinking, and what a strong answer is trying to show.</p>
         </div>
       </div>
     </div>
@@ -400,7 +435,7 @@
       <div class="fade-up">
         <div class="section-eyebrow">What we cover</div>
         <h2>A proper crash course through the points that matter.</h2>
-        <p class="lead">Around 2+ hours live, depending on Q&amp;A. The agenda is built around the audit findings, the marking logic, and the last high-yield skills students need before CASPer.</p>
+        <p class="lead">Around 2+ hours of structured teaching. The agenda is built around the audit findings, the marking logic, and the last high-yield skills students need before CASPer.</p>
       </div>
       <div class="agenda-list fade-up delay-1">
         <div class="agenda-row">
@@ -441,7 +476,7 @@
         </div>
         <div class="agenda-row">
           <div class="agenda-num">10</div>
-          <div class="agenda-copy"><h3>Live Q&amp;A</h3><p>Bring the stations, fears and edge cases still bothering you.</p></div>
+          <div class="agenda-copy"><h3>Q&amp;A themes</h3><p>Timing, phrasing, policy stations, empathy, conflict stations, and the answers that sound good but quietly lose marks.</p></div>
         </div>
       </div>
 
@@ -508,9 +543,9 @@
       <div id="mc-register-mobile" style="margin-top:40px;padding-bottom:72px;">
         <div class="mc-reg-card" id="registrationMobile" style="display:none;max-width:480px;">
           <div class="mc-reg-head">
-            <div class="mc-reg-head-label">Register</div>
-            <h3>Key2MD CASPer Masterclass</h3>
-            <div class="mc-reg-head-time">Thursday, 11 June 2026 &bull; 1pm AEST</div>
+            <div class="mc-reg-head-label">Recording access</div>
+            <h3>Key2MD CASPer Masterclass Recording</h3>
+            <div class="mc-reg-head-time">Replay available now</div>
           </div>
           <div class="mc-reg-body">
             <div class="mc-price-row">
@@ -520,15 +555,15 @@
             <div class="mc-price-note">One-time &bull; Secure payment via Stripe</div>
             <div class="mc-status" id="mcStatusMobile">Checking your access...</div>
             <div class="mc-linkbox" id="mcLinkBoxMobile">
-              <p>Your masterclass link</p>
-              <a id="mcJoinLinkMobile" href="#" target="_blank" rel="noopener">Open Zoom link &rarr;</a>
+              <p>Your recording access</p>
+              <a id="mcJoinLinkMobile" href="#" target="_blank" rel="noopener">Open private access &rarr;</a>
             </div>
             <div class="mc-action-stack">
-              <button class="mc-btn-primary" id="mcPayBtnMobile" onclick="startMasterclassCheckout()">Pay $300 and register &rarr;</button>
+              <button class="mc-btn-primary" id="mcPayBtnMobile" onclick="startMasterclassCheckout()">Pay $300 for recording access &rarr;</button>
               <button class="mc-btn-secondary" id="mcLoginBtnMobile" onclick="openMasterclassAuth('login')">Log in</button>
               <button class="mc-btn-secondary" id="mcSignupBtnMobile" onclick="openMasterclassAuth('signup')">Create free account</button>
             </div>
-            <p class="mc-reg-fine">After payment, check your confirmation email from dan@key2md.net. The protected access page, where the Zoom link appears, is emailed again shortly before the session.</p>
+            <p class="mc-reg-fine">After payment, log in here and load the protected recording. Your private stream is watermarked to your account each time you watch.</p>
           </div>
         </div>
       </div>
@@ -541,11 +576,11 @@
 <section class="mc-cta">
   <div class="container">
     <div class="mc-cta-inner fade-up">
-      <div class="mc-eyebrow" style="justify-content:center;margin-bottom:20px;">Register now</div>
-      <h2>One session. Right before the exam.</h2>
-      <p>Thursday, 11 June &bull; 1pm AEST &bull; 2&ndash;2.5 hours &bull; Live via Zoom &bull; Spots are capped.</p>
-      <a href="#registration" class="mc-cta-btn">Register for $300 &rarr;</a>
-      <div class="mc-cta-sub">Secure payment via Stripe &bull; Confirmation by email &bull; Protected Zoom link via your Key2MD account</div>
+      <div class="mc-eyebrow" style="justify-content:center;margin-bottom:20px;">Recording access</div>
+      <h2>The full CASPer calibration session.</h2>
+      <p>2&ndash;2.5 hours &bull; Protected stream &bull; Account-specific watermark &bull; Secure checkout</p>
+      <a href="#registration" class="mc-cta-btn">Buy recording access - $300 &rarr;</a>
+      <div class="mc-cta-sub">Secure payment via Stripe &bull; Confirmation by email &bull; Protected recording through your Key2MD account</div>
     </div>
   </div>
 </section>
@@ -595,9 +630,9 @@
 
   function casperMasterclassTimeLabel(value){
     var raw = String(value || '').trim();
-    if(!raw) return 'Thursday, 11 June 2026 \u2022 1pm AEST';
+    if(!raw) return 'Replay available now';
     if(/11/.test(raw) && /june/i.test(raw)){
-      return 'Thursday, 11 June 2026 \u2022 1pm AEST';
+      return 'Replay available now';
     }
     return raw.replace(/1:00pm/gi, '1pm');
   }
@@ -607,8 +642,9 @@
     try{
       const res = await fetch(`${API_BASE}/api/masterclass/status?kind=${encodeURIComponent(MASTERCLASS_KIND)}`, { headers });
       const data = await res.json();
+      if(window.Key2MDMasterclassPlayer) window.Key2MDMasterclassPlayer.updateFromStatus(data);
       const mc = data.masterclass || {};
-      document.getElementById('mcTitle').textContent = mc.title || 'Key2MD CASPer Masterclass';
+      document.getElementById('mcTitle').textContent = mc.title || 'Key2MD CASPer Masterclass Recording';
       document.getElementById('mcTime').textContent = casperMasterclassTimeLabel(mc.starts_at);
       const pay=document.getElementById('mcPayBtn'), login=document.getElementById('mcLoginBtn'), signup=document.getElementById('mcSignupBtn'), linkBox=document.getElementById('mcLinkBox');
       const payM=document.getElementById('mcPayBtnMobile'), loginM=document.getElementById('mcLoginBtnMobile'), signupM=document.getElementById('mcSignupBtnMobile');
@@ -617,7 +653,7 @@
       if(linkBox) linkBox.style.display='none';
       if(linkBoxM) linkBoxM.style.display='none';
       if(!data.authenticated){
-        setStatus('Log in or create a free Key2MD account before paying. This keeps the Zoom link protected.');
+        setStatus('Log in or create a free Key2MD account before paying. This keeps the replay protected.');
         show(pay,'none'); show(login,'flex'); show(signup,'flex');
         show(payM,'none'); show(loginM,'flex'); show(signupM,'flex');
         return;
@@ -631,16 +667,16 @@
           if(linkBoxM) linkBoxM.style.display='block';
           document.getElementById('mcJoinLink').href=data.join_url;
           if(joinM) joinM.href=data.join_url;
-          setStatus('You are registered. The Zoom link is ready below. A reminder email is also sent before the session.','ok');
+          setStatus('You have access. Your private access is ready below, and the protected recording appears on this page when available.','ok');
         }
-        else setStatus('You are registered. A confirmation email has been sent; the protected access page where the Zoom link appears will also be emailed again shortly before the session. The Zoom link appears here at the release time.','ok');
+        else setStatus('You have access. Load the protected recording below once it is available for this masterclass.','ok');
       } else {
         const isOpen = mc.status === 'open';
-        if(pay){ pay.disabled = !isOpen; pay.textContent = isOpen ? `Pay $${MASTERCLASS_PRICE} and register \u2192` : 'Registration closed'; }
-        if(payM){ payM.disabled = !isOpen; payM.textContent = isOpen ? `Pay $${MASTERCLASS_PRICE} and register \u2192` : 'Registration closed'; }
-        setStatus(isOpen ? 'Registration is open. Payment is handled securely by Stripe. After payment, you will receive a confirmation email and the protected access page where the Zoom link appears is emailed again before the session.' : 'Registration is currently closed.', isOpen ? '' : 'warn');
+        if(pay){ pay.disabled = !isOpen; pay.textContent = isOpen ? `Pay $${MASTERCLASS_PRICE} for recording access \u2192` : 'Recording access closed'; }
+        if(payM){ payM.disabled = !isOpen; payM.textContent = isOpen ? `Pay $${MASTERCLASS_PRICE} for recording access \u2192` : 'Recording access closed'; }
+        setStatus(isOpen ? 'Recording access is open. Payment is handled securely by Stripe. After payment, log in here and load the protected watermarked recording.' : 'Recording access is currently closed.', isOpen ? '' : 'warn');
       }
-    } catch(e){ setStatus('Could not check your access. Try refreshing.','err'); }
+    } catch(e){ if(window.Key2MDMasterclassPlayer) window.Key2MDMasterclassPlayer.updateFromStatus(null); setStatus('Could not check your access. Try refreshing.','err'); }
   }
 
   async function startMasterclassCheckout(){
@@ -653,7 +689,7 @@
       if(data.already_paid){ await refreshMasterclassStatus(); return; }
       if(data.checkout_url){ window.location.href=data.checkout_url; return; }
       throw new Error(data.message || data.error || 'No checkout URL returned.');
-    } catch(e){ setStatus(e.message || 'Something went wrong. Try again.','err'); btn.disabled=false; btn.textContent=`Pay $${MASTERCLASS_PRICE} and register \u2192`; }
+    } catch(e){ setStatus(e.message || 'Something went wrong. Try again.','err'); btn.disabled=false; btn.textContent=`Pay $${MASTERCLASS_PRICE} for recording access \u2192`; }
   }
 
   async function trackPaymentReturn(){
@@ -663,7 +699,7 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded',()=>{ initAuth(); trackPaymentReturn().then(refreshMasterclassStatus); });
+  document.addEventListener('DOMContentLoaded',()=>{ initAuth(); if(window.Key2MDMasterclassPlayer) window.Key2MDMasterclassPlayer.init({ apiBase:API_BASE, kind:MASTERCLASS_KIND, tokenProvider:token, setStatus:setStatus }); trackPaymentReturn().then(refreshMasterclassStatus); });
 
   // Show mobile register card on small screens
   function isMobile(){ return window.innerWidth <= 900; }

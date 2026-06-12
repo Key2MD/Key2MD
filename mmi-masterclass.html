@@ -13,6 +13,7 @@
  <meta property="og:url" content="https://www.key2md.com/mmi-masterclass.html">
  <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
  <script src="auth.js" defer></script>
+ <script src="masterclass-player.js" defer></script>
  <script src="/key2md-tracking.js" defer></script>
  <link rel="stylesheet" href="admissions-pages.css">
  <style>
@@ -41,11 +42,22 @@
  .linkbox{display:none;border:1px solid #ddd6fe;background:#f5f3ff;border-radius:12px;padding:14px;margin:14px 0;}
  .linkbox p{margin:0 0 8px;color:#5b21b6;font-weight:900;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;}
  .linkbox a{color:#6d28d9;font-weight:900;text-decoration:none;}
+ .recording-section{display:none;padding:0 0 74px;}
+ .recording-card{border:1px solid #ddd6fe;border-radius:16px;background:#fff;padding:22px;box-shadow:0 14px 36px rgba(15,23,42,.08);}
+ .recording-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:16px;}
+ .recording-title{font-size:1.18rem;font-weight:950;color:var(--navy);margin:0 0 4px;}
+ .recording-meta{font-size:.84rem;color:var(--muted);line-height:1.55;}
+ .recording-load{border:0;border-radius:999px;background:#7c3aed;color:#fff;font:inherit;font-size:.88rem;font-weight:950;padding:12px 18px;cursor:pointer;white-space:nowrap;}
+ .recording-load:disabled{opacity:.55;cursor:not-allowed;}
+ .recording-stage{display:none;position:relative;background:#000;border-radius:12px;overflow:hidden;border:1px solid #111827;}
+ .recording-stage video{display:block;width:100%;max-height:68vh;background:#000;}
+ .recording-watermark{display:none;position:absolute;z-index:3;max-width:min(72%,520px);padding:7px 10px;border-radius:8px;background:rgba(15,23,42,.62);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.78);font-size:.76rem;font-weight:850;line-height:1.35;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,.7);transition:left .8s ease,top .8s ease;}
+ .recording-session{margin-top:9px;color:var(--muted);font-size:.74rem;}
  .action-stack{display:grid;gap:10px;margin-top:14px;}
  .action-stack button,.action-stack a{display:flex;align-items:center;justify-content:center;border-radius:999px;border:0;padding:13px 16px;font-family:inherit;font-size:.9rem;font-weight:900;text-decoration:none;cursor:pointer;}
  .primary-action{background:#7c3aed;color:#fff;}
  .secondary-action{background:#f1f5f9;color:#0f172a;}
- @media(max-width:900px){.master-grid{grid-template-columns:1fr}.master-card.sticky{position:static}.master-hero{padding:56px 0 42px;}}
+ @media(max-width:900px){.master-grid{grid-template-columns:1fr}.master-card.sticky{position:static}.master-hero{padding:56px 0 42px;}.recording-head{flex-direction:column}.recording-load{width:100%;}}
  </style>
 </head>
 <body>
@@ -124,6 +136,26 @@
  </div>
  </aside>
  </div>
+
+ <section class="recording-section" id="mcRecordingSection">
+ <div class="wrap">
+ <div class="recording-card">
+ <div class="recording-head">
+ <div>
+ <div class="section-label">Recording access</div>
+ <h2 class="recording-title" id="mcRecordingTitle">Masterclass recording</h2>
+ <div class="recording-meta" id="mcRecordingMeta">Your private stream is watermarked to your account each time you watch.</div>
+ </div>
+ <button class="recording-load" id="mcRecordingLoadBtn" type="button">Load recording</button>
+ </div>
+ <div class="recording-stage" id="mcRecordingStage">
+ <video id="mcRecordingVideo" controls playsinline preload="metadata" controlsList="nodownload noremoteplayback nofullscreen"></video>
+ <div class="recording-watermark" id="mcRecordingWatermark"></div>
+ </div>
+ <div class="recording-session" id="mcRecordingSession"></div>
+ </div>
+ </div>
+ </section>
  </main>
 
  <footer><div class="wrap footer-row"><span>(c) 2026 Key2MD</span><div class="footer-links"><a href="privacy.html">Privacy</a><a href="practice.html">Practice</a><a href="plans.html">Plans</a></div></div></footer>
@@ -155,6 +187,7 @@
  try{
  const res = await fetch(`${API_BASE}/api/masterclass/status?kind=${encodeURIComponent(MASTERCLASS_KIND)}`, { headers });
  const data = await res.json();
+ if(window.Key2MDMasterclassPlayer) window.Key2MDMasterclassPlayer.updateFromStatus(data);
  const mc = data.masterclass || {};
  document.getElementById('mcTitle').textContent = mc.title || 'Key2MD MMI Masterclass';
  document.getElementById('mcTime').textContent = mc.starts_at || 'TBD - very early September 2026, likely 1-5 September depending on interview release dates';
@@ -171,7 +204,7 @@
  pay.textContent = mc.status === 'open' ? `Pay $${MASTERCLASS_PRICE} and register` : 'Registration closed';
  setStatus(mc.status === 'open' ? 'Registration is open. Payment is handled securely by Stripe. After payment, you will receive a confirmation email and the protected access page where the Zoom link appears is emailed again before the session.' : 'Registration is currently closed.', mc.status === 'open' ? '' : 'warn');
  }
- }catch(e){ setStatus('Could not check your access. Try refreshing.','err'); }
+ }catch(e){ if(window.Key2MDMasterclassPlayer) window.Key2MDMasterclassPlayer.updateFromStatus(null); setStatus('Could not check your access. Try refreshing.','err'); }
  }
  async function startMasterclassCheckout(){
  if(!token()){ setStatus('Log in or create a free Key2MD account before paying.','warn'); openMasterclassAuth('signup'); return; }
@@ -191,7 +224,7 @@
  await fetch(`${API_BASE}/api/masterclass/checkout-session?kind=${encodeURIComponent(MASTERCLASS_KIND)}&session_id=${encodeURIComponent(params.get('session_id'))}`,{headers:{Authorization:`Bearer ${token()}`}}).catch(()=>{});
  }
  }
- document.addEventListener('DOMContentLoaded',()=>{ initAuth(); trackPaymentReturn().then(refreshMasterclassStatus); });
+ document.addEventListener('DOMContentLoaded',()=>{ initAuth(); if(window.Key2MDMasterclassPlayer) window.Key2MDMasterclassPlayer.init({ apiBase:API_BASE, kind:MASTERCLASS_KIND, tokenProvider:token, setStatus:setStatus }); trackPaymentReturn().then(refreshMasterclassStatus); });
  </script>
 </body>
 </html>

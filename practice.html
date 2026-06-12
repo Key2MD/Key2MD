@@ -454,15 +454,15 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
 
  <div class="sidebar-card casper-masterclass-card" id="casperMasterclassCard">
- <div class="casper-masterclass-kicker">CASPer Masterclass</div>
- <div class="casper-masterclass-title">Live final calibration before the June CASPer.</div>
- <p class="casper-masterclass-copy">Thursday, 11 June at 1pm AEST. Dan breaks down what strong answers actually do, where students lose marks, and how to answer with clearer judgement under time.</p>
+ <div class="casper-masterclass-kicker">CASPer Masterclass Recording</div>
+ <div class="casper-masterclass-title">Buy Dan's full CASPer calibration recording.</div>
+ <p class="casper-masterclass-copy">Protected $300 recording access with account-specific watermarking. Dan breaks down what strong answers actually do, where students lose marks, and how to answer with clearer judgement under time.</p>
  <div class="casper-masterclass-tags">
- <span>2-2.5 hr Zoom</span>
- <span>Live Q&A</span>
+ <span>2-2.5 hr replay</span>
+ <span>Watermarked</span>
  <span>$300 AUD</span>
  </div>
- <button type="button" class="casper-masterclass-btn" data-track="casper_masterclass_practice_card" onclick="location.href='casper-masterclass.html?from=practice_sidebar'">View the Masterclass -></button>
+ <button type="button" class="casper-masterclass-btn" data-track="casper_masterclass_practice_card" onclick="location.href='casper-masterclass.html?from=practice_sidebar#registration'">Buy recording - $300 -></button>
  </div>
 
 
@@ -524,6 +524,12 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <button type="button" class="casper-class-btn" data-track="class_checkout_intent" data-track-detail="practice_sidebar" onclick="location.href='casper-class.html?from=practice_sidebar'">Save my spot</button>
  <button type="button" class="casper-class-link" onclick="openEnquiry('CASPer Class Question')">Questions before committing?</button>
+ </div>
+
+ <div class="sidebar-card" id="qotwCard" style="display:none;">
+ <div style="font-size:0.68rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--teal3);margin-bottom:4px;">Question of the week</div>
+ <div id="qotwText" style="font-size:0.82rem;color:var(--text-main,#0a1628);line-height:1.55;white-space:pre-line;"></div>
+ <a href="how-the-ai-marks.html" style="display:block;margin-top:8px;font-size:0.72rem;color:var(--gray400);text-decoration:none;">How the AI marks your answers -></a>
  </div>
 
  <div class="sidebar-card question-submit-card" id="questionSubmitCard">
@@ -603,6 +609,27 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <div id="premiumDisclaimer" style="display:none;font-size:0.72rem;color:var(--gray400);line-height:1.5;padding:8px 12px;background:rgba(124,58,237,0.04);border-radius:8px;margin-top:4px;">
  Premium analysis samples a small number of video frames locally before upload to assess presentation signals. This can take 5-10 seconds on some devices. Your full video is not stored permanently.
+ </div>
+
+ <div class="mmi-specialist-row" id="typedModeRow" style="background:rgba(14,165,233,0.04);border:1px solid rgba(14,165,233,0.18);border-radius:10px;margin-top:8px;display:none;">
+  <div>
+   <div class="mmi-specialist-label" style="color:var(--teal3);">Type instead of speaking</div>
+   <div class="mmi-specialist-sub">Practise MMI responses by typing. Same AI feedback, no camera needed. Uses 1 Transcript credit.</div>
+  </div>
+  <label class="toggle-switch">
+   <input type="checkbox" id="typedModeToggle" onchange="toggleMMITypedMode()">
+   <span class="toggle-slider"></span>
+  </label>
+ </div>
+ <div class="mmi-specialist-row" id="roleplayModeRow" style="background:rgba(139,92,246,0.04);border:1px solid rgba(139,92,246,0.18);border-radius:10px;margin-top:8px;display:none;">
+  <div>
+   <div class="mmi-specialist-label" style="color:#8b5cf6;">Role-play mode</div>
+   <div class="mmi-specialist-sub">Chat back-and-forth with an AI character. Get scored feedback after 2+ exchanges. Uses 1 Transcript credit.</div>
+  </div>
+  <label class="toggle-switch">
+   <input type="checkbox" id="roleplayModeToggle" onchange="toggleMMIRoleplayMode()">
+   <span class="toggle-slider"></span>
+  </label>
  </div>
  </div>
 
@@ -786,6 +813,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
 
  <div id="mmiAiNote" style="display:none;margin-top:10px;">
+ <div id="mmiFreeReviewBanner" style="font-size:0.75rem;color:var(--gray700);line-height:1.55;padding:10px 12px;background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(14,165,233,0.07));border:1px solid rgba(124,58,237,0.3);border-radius:8px;margin-bottom:8px;">
+ <strong style="color:#6d28d9;display:block;margin-bottom:3px;">Your first AI-marked station is free</strong>
+ Record a response and submit for feedback to claim it. One free Transcript review per account, no credit needed.
+ <div style="margin-top:6px;"><a href="plans.html#mmi-section" style="color:#7c3aed;font-weight:700;text-decoration:none;font-size:0.72rem;">See plans for ongoing access -></a></div>
+ </div>
  <div style="font-size:0.75rem;color:var(--gray600);line-height:1.6;padding:10px 12px;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.18);border-radius:8px;margin-bottom:8px;">
  <strong style="color:#7c3aed;display:block;margin-bottom:4px;">MMI AI Feedback - Credits Required</strong>
  MMI AI feedback uses paid credits or MMI Pro access because spoken-response review includes transcription, criterion marking and optional presentation analysis. The timed MMI station bank remains free to practise with.
@@ -1069,6 +1101,19 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="speaking-instruction" id="speakingInstruction">
  <strong> Speak your answer aloud</strong> - this is a spoken station. Use the camera above to record and review your response. Focus on structure, empathy, and authentic delivery.
  </div>
+ <div id="mmiTypedAnswerWrap" style="display:none;padding:6px 0 0;">
+ <textarea id="mmiTypedAnswer" rows="5" placeholder="Type your answer here. Structure: acknowledge the situation, reason through the dilemma, then explain your action." style="width:100%;min-height:110px;border:1.5px solid var(--gray200);border-radius:10px;padding:10px 13px;font-size:0.86rem;color:var(--gray800);resize:vertical;outline:none;font-family:inherit;line-height:1.6;background:#fff;box-sizing:border-box;" oninput="this.closest('#mmiSpeakingArea').querySelector('#btnMMITypedSubmit')&&null"></textarea>
+ </div>
+ <div id="mmiRoleplayWrap" style="display:none;padding:6px 0 0;">
+  <div id="roleplayChatLog" style="min-height:120px;max-height:300px;overflow-y:auto;border:1.5px solid var(--gray200);border-radius:10px;padding:12px;font-size:0.86rem;line-height:1.6;background:#f8fafc;margin-bottom:10px;">
+   <div style="color:var(--gray400);text-align:center;padding:16px 0;font-size:0.86rem;">Start the station to begin the conversation.</div>
+  </div>
+  <textarea id="roleplayChatInput" rows="2" maxlength="2000" placeholder="Type your response to the character..." style="width:100%;border:1.5px solid var(--gray200);border-radius:10px;padding:10px 13px;font-size:0.86rem;color:var(--gray800);resize:none;outline:none;font-family:inherit;line-height:1.6;background:#fff;box-sizing:border-box;" disabled onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRoleplayTurn();}"></textarea>
+  <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+   <button class="btn-mmi-submit" id="btnRoleplaySend" style="flex:0 0 auto;padding:9px 20px;font-size:0.85rem;" onclick="sendRoleplayTurn()" disabled>Send</button>
+   <div id="roleplayTurnCount" style="font-size:0.75rem;color:var(--gray400);">0 exchanges</div>
+  </div>
+ </div>
  <div class="mmi-recording-status" id="mmiRecordingStatus" style="display:none;">
  <div class="mmi-rec-dot"></div>
  <span class="mmi-recording-timer" id="mmiRecordingTimer">0:00</span>
@@ -1079,6 +1124,14 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  Get AI Feedback
  </button>
  <div style="font-size:0.7rem;color:var(--gray400);text-align:center;margin-top:6px;">Transcribes and analyses your spoken response (15-30 seconds)</div>
+ </div>
+ <div id="mmiTypedSubmitWrap" style="display:none;">
+ <button class="btn-mmi-submit" id="btnMMITypedSubmit" onclick="submitMMITypedAnswer()">Get AI Feedback</button>
+ <div style="font-size:0.7rem;color:var(--gray400);text-align:center;margin-top:6px;">Analyses your typed response (10-15 seconds)</div>
+ </div>
+ <div id="mmiRoleplayFeedbackWrap" style="display:none;">
+  <button class="btn-mmi-submit" id="btnRoleplayFeedback" onclick="submitMMIRoleplayFeedback()">End Conversation &amp; Get Feedback</button>
+  <div style="font-size:0.7rem;color:var(--gray400);text-align:center;margin-top:6px;">Analyses the full conversation (10-15 seconds). Uses 1 Transcript credit.</div>
  </div>
  <div id="aiFeedbackWrapMMI"></div>
  </div>
@@ -1535,6 +1588,9 @@ let mmiActivePreset = 'quickfire';
 let mmiSelectedPromptCount = MMI_PRESETS.quickfire.promptCount;
 let mmiSpecialistMode = false;
 let mmiPremiumMode = false;
+let mmiTypedMode = false;
+let mmiRoleplayMode = false;
+let roleplayHistory = [];
 let ffmpegLoaded = false;
 let ffmpegLoading = false;
 let mmiPromptRevealTimestamps = [];
@@ -1931,6 +1987,7 @@ function mmiOnRecordingStop() {
  if(sb) sb.style.display = 'none';
  const sw = document.getElementById('mmiSubmitWrap');
  if(sw) sw.style.display = window.K2_ACTIVE_CASPER_MOCK ? 'none' : 'block';
+ try { window.Key2MDTrack?.funnel?.('recording_completed', { product: 'mmi', duration_sec: Math.round(mmiRecordingDurationSec || 0) }); } catch(e) {}
  resetMMISubmitState();
 }
 
@@ -2105,7 +2162,9 @@ async function submitMMIForFeedback() {
 
  setMMISubmitBusy(isPremium ? 'Preparing Premium analysis...' : 'Uploading...');
  if(sw) sw.style.display = 'none';
- MMIFeedbackRender.renderLoading(feedbackWrap, tier);
+ try { window.Key2MDTrack?.funnel?.('feedback_requested', { product: 'mmi', tier }); } catch(e) {}
+ const supportsSSE = 'ReadableStream' in window && 'TextDecoder' in window;
+ MMIFeedbackRender.renderLoading(feedbackWrap, tier, { useSSE: supportsSSE });
 
  const auth = getK2Auth();
  if(!auth) {
@@ -2184,80 +2243,200 @@ async function submitMMIForFeedback() {
 
 
  const token = auth.getToken();
- const MAX_RETRIES = 3;
- let lastError = null;
+ const reqHeaders = { ...(token ? { 'Authorization': `Bearer ${token}` } : {}), ...(supportsSSE ? { 'Accept': 'text/event-stream' } : {}) };
 
  setMMISubmitBusy(isPremium ? 'Uploading for analysis...' : 'Uploading...');
 
- for(let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+ let res;
  try {
- if(attempt > 1) {
-  setMMISubmitBusy(`Retrying... (${attempt}/${MAX_RETRIES})`);
- await new Promise(r => setTimeout(r, 1500 * attempt));
+ res = await fetchMMIReviewWithTimeout(API_BASE + '/api/mmi-review', {
+  method: 'POST',
+  headers: reqHeaders,
+  body: buildFormData(),
+ });
+ } catch(err) {
+ MMIFeedbackRender.renderError(feedbackWrap, { code: err.code || 'network_error', message: mmiUploadErrorMessage(err) });
+ if(sw) sw.style.display = 'block';
+ resetMMISubmitState();
+ return;
  }
 
-  const res = await fetchMMIReviewWithTimeout(API_BASE + '/api/mmi-review', {
-  method: 'POST',
-  headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-  body: buildFormData(),
-  });
-
-
  if(res.status === 401) {
-  Key2MDAuth.showAuthModal('signup');
-  MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_required', message: 'Sign in to get AI feedback on your MMI response.' });
-  if(sw) sw.style.display = 'block';
-  resetMMISubmitState();
-  return;
-  }
+ Key2MDAuth.showAuthModal('signup');
+ MMIFeedbackRender.renderError(feedbackWrap, { code: 'auth_required', message: 'Sign in to get AI feedback on your MMI response.' });
+ if(sw) sw.style.display = 'block';
+ resetMMISubmitState();
+ return;
+ }
  if(res.status === 402) {
-  const data = await res.json().catch(() => ({}));
-  MMIFeedbackRender.renderError(feedbackWrap, { code: 'no_credits', message: data.message || `You need MMI ${tier} credits to get AI feedback.` });
-  if(sw) sw.style.display = 'block';
-  resetMMISubmitState();
-  return;
-  }
-  if(res.status === 413) {
-  MMIFeedbackRender.renderError(feedbackWrap, { code: 'file_too_large', message: 'Recording is too large to upload. Try a shorter recording.' });
-  if(sw) sw.style.display = 'block';
-  resetMMISubmitState();
-  return;
-  }
-
+ const errData = await res.json().catch(() => ({}));
+ try { window.Key2MDTrack?.funnel?.('paywall_viewed', { product: 'mmi', tier }); } catch(e) {}
+ MMIFeedbackRender.renderError(feedbackWrap, { code: 'no_credits', message: errData.message || `You need MMI ${tier} credits to get AI feedback.` });
+ if(sw) sw.style.display = 'block';
+ resetMMISubmitState();
+ return;
+ }
+ if(res.status === 413) {
+ MMIFeedbackRender.renderError(feedbackWrap, { code: 'file_too_large', message: 'Recording is too large to upload. Try a shorter recording.' });
+ if(sw) sw.style.display = 'block';
+ resetMMISubmitState();
+ return;
+ }
  if(!res.ok) {
+ const errData = await res.json().catch(() => ({}));
+ MMIFeedbackRender.renderError(feedbackWrap, { code: errData.error, message: errData.message || 'Something went wrong. Please try again.' });
+ if(sw) sw.style.display = 'block';
+ resetMMISubmitState();
+ return;
+ }
+
+ if(supportsSSE && (res.headers.get('Content-Type') || '').includes('text/event-stream')) {
+ const reader = res.body.getReader();
+ const dec = new TextDecoder();
+ let sseBuf = '';
+ let stillWorkingTimer = null;
+ const parseSSEEvents = (chunk) => {
+  sseBuf += chunk;
+  const events = [];
+  const parts = sseBuf.split('\n\n');
+  sseBuf = parts.pop();
+  for(const part of parts) {
+  let data = '';
+  for(const line of part.split('\n')) { if(line.startsWith('data: ')) data += line.slice(6); }
+  if(data) { try { events.push(JSON.parse(data)); } catch {} }
+  }
+  return events;
+ };
+ try {
+  while(true) {
+  const { done, value } = await reader.read();
+  if(done) break;
+  const events = parseSSEEvents(dec.decode(value, { stream: true }));
+  for(const evt of events) {
+   if(evt.stage === 'uploaded') {
+   MMIFeedbackRender.updateLoadingStage(feedbackWrap, 'uploaded');
+   setMMISubmitBusy('Transcribing your response...');
+   } else if(evt.stage === 'marking') {
+   clearTimeout(stillWorkingTimer);
+   MMIFeedbackRender.updateLoadingStage(feedbackWrap, 'marking');
+   setMMISubmitBusy('Writing your feedback...');
+   stillWorkingTimer = setTimeout(() => MMIFeedbackRender.updateLoadingStage(feedbackWrap, 'still_working'), 42000);
+   } else if(evt.stage === 'done') {
+   clearTimeout(stillWorkingTimer);
+   const data = evt.result || {};
+   if(data.used_free_review) { try { window.Key2MDTrack?.funnel?.('free_review_used', { product: 'mmi', tier }); } catch(e) {} }
+   recordStationSeen(s, MODE_MMI, data?.score ?? data?.feedback?.score ?? null);
+   showMMIPrediction(feedbackWrap, data, { tier, specialistMode: mmiSpecialistMode, stationCategory: s.category || '', durationSec: mmiRecordingDurationSec, visualDegraded });
+   return;
+   } else if(evt.stage === 'error') {
+   clearTimeout(stillWorkingTimer);
+   MMIFeedbackRender.renderError(feedbackWrap, { code: evt.error, message: evt.message || 'Something went wrong. Please try again.' });
+   if(sw) sw.style.display = 'block';
+   resetMMISubmitState();
+   return;
+   }
+  }
+  }
+  clearTimeout(stillWorkingTimer);
+  MMIFeedbackRender.renderError(feedbackWrap, { code: 'stream_closed', message: 'Connection closed before feedback arrived. Please try again.' });
+ } catch(err) {
+  clearTimeout(stillWorkingTimer);
+  MMIFeedbackRender.renderError(feedbackWrap, { code: err.code || 'network_error', message: mmiUploadErrorMessage(err) });
+ } finally {
+  try { reader.releaseLock(); } catch {}
+ }
+ if(sw) sw.style.display = 'block';
+ resetMMISubmitState();
+ return;
+ }
+
  const data = await res.json().catch(() => ({}));
+ if(data.used_free_review) { try { window.Key2MDTrack?.funnel?.('free_review_used', { product: 'mmi', tier }); } catch(e) {} }
+ recordStationSeen(s, MODE_MMI, data?.score ?? data?.feedback?.score ?? null);
+ showMMIPrediction(feedbackWrap, data, { tier, specialistMode: mmiSpecialistMode, stationCategory: s.category || '', durationSec: mmiRecordingDurationSec, visualDegraded });
+}
 
- if(res.status >= 500 && attempt < MAX_RETRIES) {
- lastError = data.message || 'Server error';
- continue;
-  }
-  MMIFeedbackRender.renderError(feedbackWrap, { code: data.error, message: data.message || 'Something went wrong. Please try again.' });
-  if(sw) sw.style.display = 'block';
-  resetMMISubmitState();
-  return;
-  }
+function showMMIPrediction(container, data, context) {
+ const criteria = [
+  { key: 'empathy', label: 'Empathy' },
+  { key: 'communication', label: 'Communication' },
+  { key: 'reasoning', label: 'Reasoning' },
+  { key: 'reflection', label: 'Reflection' },
+  { key: 'real_world_awareness', label: 'Real-world Awareness' },
+ ];
+ const predictions = {};
 
-  const data = await res.json();
-  recordStationSeen(s, MODE_MMI, data?.score ?? data?.feedback?.score ?? null);
-  MMIFeedbackRender.render(feedbackWrap, data, {
- tier,
- specialistMode: mmiSpecialistMode,
- stationCategory: s.category || '',
- durationSec: mmiRecordingDurationSec,
- visualDegraded,
+ function scoreButtons(key) {
+  return [1,2,3,4,5].map(n => `<button type="button" class="pred-score-btn" data-key="${key}" data-score="${n}">${n}</button>`).join('');
+ }
+
+ container.innerHTML = `<div class="mmi-prediction-wrap" id="mmiPredictionWrap">
+  <div class="mmi-prediction-title">How did you go?</div>
+  <div class="mmi-prediction-sub">Predict your score on each criterion before seeing the AI feedback. This is how you build the self-awareness examiners look for.</div>
+  <div class="mmi-prediction-grid">
+   ${criteria.map(c => `<div class="mmi-prediction-row"><div class="mmi-prediction-label">${c.label}</div><div class="mmi-prediction-scores" data-criterion="${c.key}">${scoreButtons(c.key)}</div></div>`).join('')}
+  </div>
+  <button class="btn-show-feedback" id="btnRevealFeedback" disabled>Reveal feedback -></button>
+  <div class="mmi-prediction-skip"><button type="button" id="btnSkipPrediction">Skip - show feedback now</button></div>
+ </div>`;
+
+ container.querySelectorAll('.pred-score-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+   const key = btn.dataset.key;
+   predictions[key] = parseInt(btn.dataset.score, 10);
+   container.querySelectorAll(`.pred-score-btn[data-key="${key}"]`).forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.score, 10) === predictions[key]);
+   });
+   if (Object.keys(predictions).length === 5) container.querySelector('#btnRevealFeedback').disabled = false;
+  });
+ });
+
+ function reveal(usePredictions) {
+  if (usePredictions && Object.keys(predictions).length === 5) saveMMIPrediction(predictions, data);
+  const streak = getMMICalibrationStreak();
+  MMIFeedbackRender.render(container, data, {
+   ...context,
+   predictedScores: usePredictions && Object.keys(predictions).length === 5 ? predictions : null,
+   calibrationStreak: streak,
   });
   updateMMILimitsUI();
   mmiFeedbackUploadInFlight = false;
-  return;
-
- } catch(err) {
- lastError = err.message;
-  MMIFeedbackRender.renderError(feedbackWrap, { code: err.code || 'network_error', message: mmiUploadErrorMessage(err) });
-  if(sw) sw.style.display = 'block';
-  resetMMISubmitState();
-  return;
-  }
  }
+
+ container.querySelector('#btnRevealFeedback').addEventListener('click', () => reveal(true));
+ container.querySelector('#btnSkipPrediction').addEventListener('click', () => reveal(false));
+}
+
+function saveMMIPrediction(predictions, data) {
+ try {
+  const feedback = data.feedback || data;
+  const criteria = ['empathy','communication','reasoning','reflection','real_world_awareness'];
+  const actual = {};
+  for (const key of criteria) {
+   const scores = (feedback.per_prompt || []).map(pp => pp?.criteria?.[key]?.score).filter(s => typeof s === 'number');
+   if (scores.length) actual[key] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
+  }
+  const saved = JSON.parse(localStorage.getItem('mmi_predictions') || '[]');
+  saved.unshift({ predictions, actual, created_at: new Date().toISOString() });
+  localStorage.setItem('mmi_predictions', JSON.stringify(saved.slice(0, 50)));
+ } catch {}
+}
+
+function getMMICalibrationStreak() {
+ try {
+  const saved = JSON.parse(localStorage.getItem('mmi_predictions') || '[]');
+  let streak = 0;
+  for (const item of saved) {
+   const keys = ['empathy','communication','reasoning','reflection','real_world_awareness'];
+   if (!item.predictions || !item.actual) break;
+   const allClose = keys.every(key => {
+    const pred = item.predictions[key], act = item.actual[key];
+    return typeof pred === 'number' && typeof act === 'number' && Math.abs(pred - act) <= 1;
+   });
+   if (allClose) streak++; else break;
+  }
+  return streak;
+ } catch { return 0; }
 }
 
 function createMMIMockReviewSnapshot() {
@@ -2557,7 +2736,11 @@ function submitWrittenMockReviewSilently(idx) {
 
 async function updateMMILimitsUI() {
  const token = Key2MDAuth.getToken();
- if(!token) return;
+ const freeBanner = document.getElementById('mmiFreeReviewBanner');
+ if(!token) {
+ if(freeBanner) freeBanner.style.display = '';
+ return;
+ }
  try {
  const res = await fetch(API_BASE + '/api/mmi/limits', { headers: { 'Authorization': `Bearer ${token}` } });
  if(!res.ok) return;
@@ -2577,6 +2760,10 @@ async function updateMMILimitsUI() {
  subEl.textContent = access.unlimited
  ? `MMI ${tierLabel} Pro active.`
  : `${rawCredits ?? access.remaining ?? 0} ${tierLabel.toLowerCase()} credit${Number(rawCredits ?? access.remaining ?? 0) === 1 ? '' : 's'} available.`;
+ }
+ if(freeBanner) {
+ const hasOtherAccess = access.unlimited || (rawCredits || 0) > 0;
+ freeBanner.style.display = (!hasOtherAccess && data.mmi_free_review_available) ? '' : 'none';
  }
  } catch {}
 }
@@ -3368,8 +3555,27 @@ function bootPracticePage() {
  try { fn(); } catch(e) { console.warn('Practice boot step failed:', e); }
  });
  try {
- const requestedMode = new URLSearchParams(window.location.search).get('mode');
+ const _params = new URLSearchParams(window.location.search);
+ const requestedMode = _params.get('mode') || _params.get('lock_mode');
  if(requestedMode === 'mmi') setMode(MODE_MMI);
+ const lockedMode = _params.get('lock_mode');
+ if(lockedMode) {
+  const mpRow = document.querySelector('.mode-toggle-wrap');
+  if(mpRow) mpRow.style.display='none';
+  const mockHelper = document.querySelector('.mock-pill-helper');
+  if(mockHelper) mockHelper.style.display='none';
+ }
+ } catch {}
+ try {
+ const retryStation = PRACTICE_URL_PARAMS.get('retry_station');
+ if (retryStation && /^mmi_\d+$/.test(retryStation) && typeof MMI_STATIONS !== 'undefined') {
+  const idx = parseInt(retryStation.slice(4), 10);
+  if (idx >= 0 && idx < MMI_STATIONS.length) {
+   setMode(MODE_MMI);
+   pool = [MMI_STATIONS[idx]]; sessionPool = [MMI_STATIONS[idx]]; currentIdx = 0; completed = 0;
+   loadStation();
+  }
+ }
  } catch {}
 }
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootPracticePage);
@@ -3666,20 +3872,27 @@ function applyModeUI(mode) {
  const sq = $('starredQueueCard');
  const classCard = $('casperClassCard');
  const masterclassCard = $('casperMasterclassCard');
+ const qotwCard = $('qotwCard');
  if (cc) cc.style.display = isCasper ? '' : 'none';
  if (mc) mc.style.display = isMMI ? '' : 'none';
  if (mo) mo.style.display = isMMI ? '' : 'none';
  if (sq) sq.style.display = isCasper ? '' : 'none';
  if (classCard) classCard.style.display = isCasper ? '' : 'none';
  if (masterclassCard) masterclassCard.style.display = isCasper ? '' : 'none';
+ if (qotwCard) qotwCard.style.display = (isCasper && qotwCard.dataset.loaded === '1') ? '' : 'none';
  if (ccard) ccard.style.display = isMock ? 'none' : '';
  if (chdr) chdr.textContent = isCasper ? 'Category' : isMMI ? 'MMI Station Type' : 'Full Mock';
 
  const wp = $('webcamPanel');
  if (wp) {
- wp.className = 'webcam-panel' + (isMMI ? ' show' : '');
- wp.style.display = isMMI ? '' : 'none';
+ const showWebcam = isMMI && !mmiTypedMode && !mmiRoleplayMode;
+ wp.className = 'webcam-panel' + (showWebcam ? ' show' : '');
+ wp.style.display = showWebcam ? '' : 'none';
  }
+ const tmr = $('typedModeRow');
+ if (tmr) tmr.style.display = isMMI ? '' : 'none';
+ const rlr = $('roleplayModeRow');
+ if (rlr) rlr.style.display = isMMI ? '' : 'none';
 
  syncIdleTimerPickers();
  updateCasperReflectionUI();
@@ -4037,7 +4250,7 @@ function startSession(){
  sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
  setPracticeSessionRunning(true);
  statAvg.textContent='-';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
- if(currentMode===MODE_MMI&&!webcamReady)initWebcam();
+ if(currentMode===MODE_MMI&&!webcamReady&&!mmiTypedMode&&!mmiRoleplayMode)initWebcam();
  loadStation();
  scrollActiveStationIntoView();
 }
@@ -4057,6 +4270,7 @@ function loadStation(){
  try {
  window.Key2MDTrack?.toolEvent?.('station_started', {
  mode: currentMode,
+ product: currentMode === MODE_MMI ? 'mmi' : (currentMode === MODE_MOCK ? 'casper_mock' : 'casper'),
  category: s?.category || '',
  station_index: currentIdx + 1
  });
@@ -4087,6 +4301,11 @@ function loadStation(){
 
  hideMMIPromptWraps();
  const sw=$('mmiSubmitWrap');if(sw)sw.style.display='none';
+ const tsw=$('mmiTypedSubmitWrap');if(tsw)tsw.style.display='none';
+ const ta=$('mmiTypedAnswer');if(ta)ta.value='';
+ const rlw=$('mmiRoleplayWrap');if(rlw)rlw.style.display='none';
+ const rfbw=$('mmiRoleplayFeedbackWrap');if(rfbw)rfbw.style.display='none';
+ if(typeof resetRoleplayState==='function')resetRoleplayState();
  const rs=$('mmiRecordingStatus');if(rs)rs.style.display='none';
  const bnr=$('btnRevealNext');if(bnr)bnr.style.display='none';
  if(typeof mmiEngineReset==='function') mmiEngineReset();
@@ -4187,7 +4406,14 @@ async function finishStation(){
  const isMmi=currentMode===MODE_MMI;
  const isStrict=document.getElementById('strictModeToggle')?.checked;
  if(isMmi){
- stopRecording();
+ if(mmiRoleplayMode){
+  const rlw=$('mmiRoleplayWrap');if(rlw)rlw.style.display='';
+  const s=pool[currentIdx];if(s&&typeof initRoleplayConversation==='function')initRoleplayConversation(s);
+ } else if(mmiTypedMode){
+  const tsw=$('mmiTypedSubmitWrap');if(tsw)tsw.style.display='';
+ } else {
+  stopRecording();
+ }
  } else {
  const banner=$('timeUpBanner');
  answerTextarea.classList.remove('flash-expired');
@@ -4439,7 +4665,7 @@ function closeCasperMasterclassNudge(action = 'snooze') {
 function goToCasperMasterclass() {
  if (window.Key2MDTrack?.funnel) window.Key2MDTrack.funnel('casper_masterclass_popup_click', { source: 'practice_ai' });
  saveCasperMasterclassNudgeAction('casper', 'clicked');
- window.location.href = 'https://www.key2md.com/casper-masterclass.html';
+ window.location.href = 'https://www.key2md.com/casper-masterclass.html?from=practice_popup#registration';
 }
 
 document.addEventListener('click', event => {
@@ -6274,6 +6500,310 @@ function updateStreakUI(streak){
 }
 
 setTimeout(()=>{loadStreak();loadLeaderboardSettings();refreshLeaderboardData({silent:true});if(typeof updateLeaderboardCollapsedLabel === 'function') updateLeaderboardCollapsedLabel();},200);
+loadQOTW();
+
+function toggleMMITypedMode() {
+ mmiTypedMode = document.getElementById('typedModeToggle')?.checked || false;
+ if (mmiTypedMode && mmiRoleplayMode) {
+  mmiRoleplayMode = false;
+  const rlt = document.getElementById('roleplayModeToggle');
+  if (rlt) rlt.checked = false;
+  const rlw = $('mmiRoleplayWrap');
+  if (rlw) rlw.style.display = 'none';
+ }
+ const si = $('speakingInstruction');
+ const tiw = $('mmiTypedAnswerWrap');
+ if (si) si.style.display = (!mmiTypedMode && !mmiRoleplayMode) ? '' : 'none';
+ if (tiw) tiw.style.display = mmiTypedMode ? '' : 'none';
+ applyModeUI(currentMode);
+}
+
+async function submitMMITypedAnswer() {
+ const auth = getK2Auth();
+ if (!auth || !auth.isLoggedIn()) { showPracticeNotice('Log in to get AI feedback.', 'error'); return; }
+ const s = pool[currentIdx];
+ if (!s) return;
+ const typedText = ($('mmiTypedAnswer')?.value || '').trim();
+ if (typedText.length < 20) { showPracticeNotice('Please type at least a few sentences before submitting.', 'error'); return; }
+ const cfg = getMMIConfig();
+ const prompts = getPrompts(s).slice(0, cfg.promptCount);
+ const btn = $('btnMMITypedSubmit');
+ if (btn) { btn.disabled = true; btn.textContent = 'Analysing...'; }
+ const feedbackWrap = $('aiFeedbackWrapMMI');
+ if (feedbackWrap) MMIFeedbackRender.renderLoading(feedbackWrap, 'transcript', { useSSE: false });
+ try {
+  const res = await fetch('https://key2md-api.brittainmbbs.workers.dev/api/mmi/typed-review', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${auth.getToken()}` },
+   body: JSON.stringify({
+    station_id: getStationHistoryId(s),
+    station_category: s.category || '',
+    station_scenario: s.scenario || '',
+    prompts,
+    typed_response: typedText,
+    specialist_mode: mmiSpecialistMode || false,
+   })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.error) {
+   const msg = data.message || 'Something went wrong. Please try again.';
+   if (feedbackWrap) MMIFeedbackRender.renderError(feedbackWrap, { code: data.error, message: msg });
+   if (btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
+   return;
+  }
+  const feedback = data.feedback;
+  if (!feedback) {
+   if (feedbackWrap) MMIFeedbackRender.renderError(feedbackWrap, { code: 'no_feedback', message: 'No feedback returned. Please try again.' });
+   if (btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
+   return;
+  }
+  const overallScore = feedback?.overall?.score ?? null;
+  sessionHistory[currentIdx].score = overallScore;
+  sessionHistory[currentIdx].feedback = feedback;
+  sessionHistory[currentIdx].reviewId = data.review_id;
+  recordStationSeen(s, MODE_MMI, overallScore);
+  updateAvgStat();
+  if (btn) btn.style.display = 'none';
+  showMMIPrediction(feedbackWrap, data, {
+   tier: 'transcript',
+   specialistMode: mmiSpecialistMode,
+   stationCategory: s.category || '',
+   durationSec: 0,
+  });
+  updateMMILimitsUI();
+ } catch (err) {
+  if (feedbackWrap) MMIFeedbackRender.renderError(feedbackWrap, { code: 'network_error', message: 'Connection error. Please try again.' });
+  if (btn) { btn.disabled = false; btn.textContent = 'Get AI Feedback'; }
+ }
+}
+
+function toggleMMIRoleplayMode() {
+ mmiRoleplayMode = document.getElementById('roleplayModeToggle')?.checked || false;
+ if (mmiRoleplayMode && mmiTypedMode) {
+  mmiTypedMode = false;
+  const tmt = document.getElementById('typedModeToggle');
+  if (tmt) tmt.checked = false;
+  const tiw = $('mmiTypedAnswerWrap');
+  if (tiw) tiw.style.display = 'none';
+ }
+ const si = $('speakingInstruction');
+ if (si) si.style.display = (!mmiTypedMode && !mmiRoleplayMode) ? '' : 'none';
+ if (!mmiRoleplayMode) {
+  const rlw = $('mmiRoleplayWrap');
+  if (rlw) rlw.style.display = 'none';
+  const rfbw = $('mmiRoleplayFeedbackWrap');
+  if (rfbw) rfbw.style.display = 'none';
+ }
+ applyModeUI(currentMode);
+}
+
+function resetRoleplayState() {
+ roleplayHistory = [];
+ const log = $('roleplayChatLog');
+ if (log) log.innerHTML = '<div style="color:var(--gray400);text-align:center;padding:16px 0;font-size:0.86rem;">Start the station to begin the conversation.</div>';
+ const inp = $('roleplayChatInput');
+ if (inp) { inp.value = ''; inp.disabled = true; inp.placeholder = 'Type your response to the character...'; }
+ const sendBtn = $('btnRoleplaySend');
+ if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Send'; }
+ const tc = $('roleplayTurnCount');
+ if (tc) tc.textContent = '0 exchanges';
+ const rfbw = $('mmiRoleplayFeedbackWrap');
+ if (rfbw) rfbw.style.display = 'none';
+}
+
+function appendRoleplayMessage(role, text) {
+ const log = $('roleplayChatLog');
+ if (!log) return;
+ const isActor = role === 'actor';
+ const wrap = document.createElement('div');
+ wrap.style.cssText = 'margin-bottom:12px;';
+ const label = document.createElement('div');
+ label.style.cssText = 'font-size:0.7rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:' + (isActor ? '#8b5cf6' : '#0a1628') + ';margin-bottom:3px;';
+ label.textContent = isActor ? 'Character' : 'You';
+ const bubble = document.createElement('div');
+ bubble.style.cssText = 'padding:9px 13px;border-radius:10px;font-size:0.87rem;line-height:1.6;background:' + (isActor ? '#f3f0ff' : '#eff6ff') + ';border:1px solid ' + (isActor ? 'rgba(139,92,246,0.2)' : 'rgba(14,165,233,0.2)') + ';';
+ bubble.textContent = text;
+ wrap.appendChild(label);
+ wrap.appendChild(bubble);
+ log.appendChild(wrap);
+ log.scrollTop = log.scrollHeight;
+}
+
+function updateRoleplayTurnCount() {
+ const userTurns = roleplayHistory.filter(m => m.role === 'user').length;
+ const tc = $('roleplayTurnCount');
+ if (tc) tc.textContent = userTurns + ' exchange' + (userTurns === 1 ? '' : 's');
+ const rfbw = $('mmiRoleplayFeedbackWrap');
+ if (rfbw) rfbw.style.display = userTurns >= 2 ? '' : 'none';
+}
+
+async function initRoleplayConversation(station) {
+ if (roleplayHistory.length) return;
+ const log = $('roleplayChatLog');
+ if (log) {
+  log.innerHTML = '';
+  const loading = document.createElement('div');
+  loading.id = 'roleplayOpeningLoading';
+  loading.style.cssText = 'color:var(--gray400);font-size:0.82rem;padding:8px 0;text-align:center;';
+  loading.textContent = 'Character is entering...';
+  log.appendChild(loading);
+ }
+ const auth = getK2Auth();
+ if (!auth || !auth.isLoggedIn()) {
+  const loadEl = document.getElementById('roleplayOpeningLoading');
+  if (loadEl) loadEl.remove();
+  appendRoleplayMessage('actor', '[Log in to start the role-play conversation.]');
+  return;
+ }
+ try {
+  const res = await fetch('https://key2md-api.brittainmbbs.workers.dev/api/mmi/roleplay-turn', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + auth.getToken() },
+   body: JSON.stringify({ station_scenario: station.scenario || '', station_category: station.category || '', conversation_history: [] }),
+  });
+  const data = await res.json().catch(() => ({}));
+  const loadEl = document.getElementById('roleplayOpeningLoading');
+  if (loadEl) loadEl.remove();
+  if (!res.ok || !data.actor_response) {
+   appendRoleplayMessage('actor', '[Character could not be reached. Please try again or switch mode.]');
+   return;
+  }
+  roleplayHistory.push({ role: 'actor', text: data.actor_response });
+  appendRoleplayMessage('actor', data.actor_response);
+  const inp = $('roleplayChatInput');
+  if (inp) { inp.disabled = false; inp.focus(); }
+  const sendBtn = $('btnRoleplaySend');
+  if (sendBtn) sendBtn.disabled = false;
+  updateRoleplayTurnCount();
+ } catch (err) {
+  const loadEl = document.getElementById('roleplayOpeningLoading');
+  if (loadEl) loadEl.remove();
+  appendRoleplayMessage('actor', '[Connection error. Please try again.]');
+ }
+}
+
+async function sendRoleplayTurn() {
+ const inp = $('roleplayChatInput');
+ const sendBtn = $('btnRoleplaySend');
+ const auth = getK2Auth();
+ if (!auth || !auth.isLoggedIn()) { showPracticeNotice('Log in to use role-play mode.', 'error'); return; }
+ const text = (inp?.value || '').trim();
+ if (!text || text.length < 2) return;
+ const s = pool[currentIdx];
+ if (!s) return;
+ const priorHistory = [...roleplayHistory];
+ roleplayHistory.push({ role: 'user', text });
+ appendRoleplayMessage('user', text);
+ if (inp) inp.value = '';
+ updateRoleplayTurnCount();
+ if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = '...'; }
+ if (inp) inp.disabled = true;
+ try {
+  const res = await fetch('https://key2md-api.brittainmbbs.workers.dev/api/mmi/roleplay-turn', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + auth.getToken() },
+   body: JSON.stringify({ station_scenario: s.scenario || '', station_category: s.category || '', conversation_history: priorHistory, user_message: text }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.actor_response) {
+   roleplayHistory = priorHistory;
+   updateRoleplayTurnCount();
+   if (inp) inp.value = text;
+   appendRoleplayMessage('actor', '[' + (data.message || 'Character could not respond. Press Send to try again.') + ']');
+  } else {
+   roleplayHistory.push({ role: 'actor', text: data.actor_response });
+   appendRoleplayMessage('actor', data.actor_response);
+   updateRoleplayTurnCount();
+  }
+ } catch (err) {
+  roleplayHistory = priorHistory;
+  updateRoleplayTurnCount();
+  if (inp) inp.value = text;
+  appendRoleplayMessage('actor', '[Connection error. Press Send to try again.]');
+ }
+ const atCap = roleplayHistory.filter(m => m.role === 'user').length >= 15;
+ if (sendBtn) { sendBtn.disabled = atCap; sendBtn.textContent = 'Send'; }
+ if (inp) {
+  inp.disabled = atCap;
+  if (atCap) inp.placeholder = 'Exchange limit reached. Get your feedback below.';
+  else inp.focus();
+ }
+}
+
+async function submitMMIRoleplayFeedback() {
+ const auth = getK2Auth();
+ if (!auth || !auth.isLoggedIn()) { showPracticeNotice('Log in to get AI feedback.', 'error'); return; }
+ const s = pool[currentIdx];
+ if (!s) return;
+ const userTurns = roleplayHistory.filter(m => m.role === 'user').length;
+ if (userTurns < 1) { showPracticeNotice('Please complete at least one exchange first.', 'error'); return; }
+ const cfg = getMMIConfig();
+ const prompts = getPrompts(s).slice(0, cfg.promptCount);
+ const btn = $('btnRoleplayFeedback');
+ if (btn) { btn.disabled = true; btn.textContent = 'Analysing...'; }
+ const feedbackWrap = $('aiFeedbackWrapMMI');
+ if (feedbackWrap) MMIFeedbackRender.renderLoading(feedbackWrap, 'transcript', { useSSE: false });
+ try {
+  const res = await fetch('https://key2md-api.brittainmbbs.workers.dev/api/mmi/roleplay-feedback', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + auth.getToken() },
+   body: JSON.stringify({
+    station_id: getStationHistoryId(s),
+    station_category: s.category || '',
+    station_scenario: s.scenario || '',
+    prompts,
+    conversation_history: roleplayHistory,
+    specialist_mode: mmiSpecialistMode || false,
+   }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.error) {
+   MMIFeedbackRender.renderError(feedbackWrap, { code: data.error, message: data.message || 'Something went wrong.' });
+   if (btn) { btn.disabled = false; btn.textContent = 'End Conversation & Get Feedback'; }
+   return;
+  }
+  const feedback = data.feedback;
+  if (!feedback) {
+   MMIFeedbackRender.renderError(feedbackWrap, { code: 'no_feedback', message: 'No feedback returned. Please try again.' });
+   if (btn) { btn.disabled = false; btn.textContent = 'End Conversation & Get Feedback'; }
+   return;
+  }
+  const overallScore = feedback?.overall?.score ?? null;
+  sessionHistory[currentIdx].score = overallScore;
+  sessionHistory[currentIdx].feedback = feedback;
+  sessionHistory[currentIdx].reviewId = data.review_id;
+  recordStationSeen(s, MODE_MMI, overallScore);
+  updateAvgStat();
+  if (btn) btn.style.display = 'none';
+  showMMIPrediction(feedbackWrap, data, {
+   tier: 'transcript',
+   specialistMode: mmiSpecialistMode,
+   stationCategory: s.category || '',
+   durationSec: 0,
+  });
+  updateMMILimitsUI();
+ } catch (err) {
+  MMIFeedbackRender.renderError(feedbackWrap, { code: 'network_error', message: 'Connection error. Please try again.' });
+  if (btn) { btn.disabled = false; btn.textContent = 'End Conversation & Get Feedback'; }
+ }
+}
+
+async function loadQOTW(){
+ try{
+  const res=await fetch('https://key2md-api.brittainmbbs.workers.dev/api/qotw');
+  if(!res.ok) return;
+  const data=await res.json().catch(()=>({}));
+  const q=data?.qotw;
+  if(!q||!q.question) return;
+  const card=document.getElementById('qotwCard');
+  const textEl=document.getElementById('qotwText');
+  if(!card||!textEl) return;
+  textEl.textContent=q.question;
+  card.dataset.loaded='1';
+  const isCasper=typeof currentMode!=='undefined'&&currentMode!==MODE_MMI;
+  if(isCasper) card.style.display='';
+ }catch{}
+}
 
 function drawChart(canvas,scores,h){
  const W=canvas.parentElement.offsetWidth||220;canvas.width=W;canvas.height=h;
@@ -7241,25 +7771,25 @@ document.addEventListener('DOMContentLoaded', function(){
  <div class="masterclass-nudge-card">
  <div class="masterclass-nudge-head">
  <button type="button" class="masterclass-nudge-close" onclick="closeCasperMasterclassNudge()" aria-label="Close">x</button>
- <div class="masterclass-nudge-kicker">Live CASPer Masterclass - Thursday, 11 June</div>
+ <div class="masterclass-nudge-kicker">CASPer Masterclass Recording</div>
  <h2 class="masterclass-nudge-title" id="casperMasterclassNudgeTitle">Turn solo practice into exam-ready judgement.</h2>
- <p class="masterclass-nudge-sub" id="casperMasterclassNudgeDesc">A 2-2.5 hour live Zoom session with Dan on Thursday, 11 June at 1pm AEST. Built for students who want a final calibration pass before CASPer, not another generic framework lecture.</p>
+ <p class="masterclass-nudge-sub" id="casperMasterclassNudgeDesc">Buy protected access to Dan's full CASPer masterclass recording, built for students who want a final calibration pass before CASPer, not another generic framework lecture.</p>
  </div>
  <div class="masterclass-nudge-body">
  <div class="masterclass-nudge-facts">
- <div class="masterclass-nudge-fact"><strong>$300 AUD</strong><span>One-time registration</span></div>
- <div class="masterclass-nudge-fact"><strong>Live Q&A</strong><span>Ask your edge cases</span></div>
+ <div class="masterclass-nudge-fact"><strong>$300 AUD</strong><span>One-time recording access</span></div>
+ <div class="masterclass-nudge-fact"><strong>Watermarked</strong><span>Licensed to your account</span></div>
  <div class="masterclass-nudge-fact"><strong>5,000+</strong><span>Response patterns analysed</span></div>
  </div>
  <div class="masterclass-nudge-panel"><strong>Why this is useful after AI practice:</strong> the tool can tell you what went wrong in one answer. The masterclass shows the repeated patterns Dan sees across thousands of responses, and how top-quartile answers handle the same pressure without sounding rehearsed.</div>
  <div class="masterclass-nudge-list">
  <div class="masterclass-nudge-item"><span class="masterclass-nudge-dot"></span><span>Dan walks through what strong CASPer answers consistently do differently: judgement, tone, trade-offs, structure, and when to be decisive.</span></div>
  <div class="masterclass-nudge-item"><span class="masterclass-nudge-dot"></span><span>High-yield station speed run: common traps, common answer types, and the phrases students use when they understand the dilemma.</span></div>
- <div class="masterclass-nudge-item"><span class="masterclass-nudge-dot"></span><span>Designed as a final reset for the Thursday 11 June sitting, and still useful as final-week calibration if your CASPer is later in June.</span></div>
- <div class="masterclass-nudge-item"><span class="masterclass-nudge-dot"></span><span>You can ask Dan questions live about timing, phrasing, empathy, policy stations, conflict stations, and the answers that look good but quietly lose marks.</span></div>
+ <div class="masterclass-nudge-item"><span class="masterclass-nudge-dot"></span><span>Useful as a final-week calibration pass if your CASPer is coming up soon.</span></div>
+ <div class="masterclass-nudge-item"><span class="masterclass-nudge-dot"></span><span>Includes Q&amp;A themes around timing, phrasing, empathy, policy stations, conflict stations, and the answers that look good but quietly lose marks.</span></div>
  </div>
  <div class="masterclass-nudge-actions">
- <button type="button" class="masterclass-nudge-primary" onclick="goToCasperMasterclass()">View details / register -></button>
+ <button type="button" class="masterclass-nudge-primary" onclick="goToCasperMasterclass()">Buy recording access - $300 -></button>
  <button type="button" class="masterclass-nudge-secondary" onclick="closeCasperMasterclassNudge('snooze')">Remind me later</button>
  <button type="button" class="masterclass-nudge-secondary danger" onclick="closeCasperMasterclassNudge('dismissed')">Don't show again</button>
  </div>
@@ -7303,5 +7833,21 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=do
 <div id="autoSaveToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.8rem;font-weight:600;padding:8px 18px;border-radius:50px;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:9999;pointer-events:none;transition:opacity 0.3s;">Response saved to your account</div>
 
 <script src="/key2md-tracking.js" defer></script>
+<script>
+(function(){
+ if (typeof startWriting !== 'function') return;
+ var _origStartWriting = startWriting;
+ startWriting = function() {
+  var result = _origStartWriting.apply(this, arguments);
+  if (typeof mmiRoleplayMode !== 'undefined' && mmiRoleplayMode && typeof currentMode !== 'undefined' && currentMode === MODE_MMI) {
+   var rlw = document.getElementById('mmiRoleplayWrap');
+   if (rlw) rlw.style.display = '';
+   var s = (typeof pool !== 'undefined' && typeof currentIdx !== 'undefined') ? pool[currentIdx] : null;
+   if (s && typeof initRoleplayConversation === 'function') initRoleplayConversation(s);
+  }
+  return result;
+ };
+})();
+</script>
 </body>
 </html>

@@ -3,22 +3,22 @@
  {
  id: 'casper_class',
  area: 'CASPer',
- title: 'Final Friday CASPer class',
+ title: 'Live CASPer class',
  price: '$120',
  href: 'casper-class.html',
- cta: 'Register for the final class',
- bestFor: 'Students aiming for the June 11 CASPer who want one last live pass through Dan\'s realistic tutoring stations.',
- tags: ['casper', 'uow', 'notre dame', 'class', 'june']
+ cta: 'View live classes',
+ bestFor: 'Students who want a live coached pass through realistic CASPer stations before their next sitting.',
+ tags: ['casper', 'uow', 'notre dame', 'class', 'live']
  },
  {
  id: 'casper_masterclass',
  area: 'CASPer',
- title: 'CASPer Masterclass',
+ title: 'CASPer Masterclass Recording',
  price: '$300',
- href: 'casper-masterclass.html',
- cta: 'Register for Thu 11 June',
- bestFor: 'Students sitting the Thursday, 11 June CASPer who want a final 1pm AEST exam-day reset with key points fresh and clear.',
- tags: ['casper', 'masterclass', 'june', 'exam day']
+ href: 'casper-masterclass.html#registration',
+ cta: 'Buy recording access',
+ bestFor: 'Students who want Dan\'s full CASPer masterclass recording with protected, account-watermarked access for $300.',
+ tags: ['casper', 'masterclass', 'replay', 'recording']
  },
  {
  id: 'racgp_casper_subscription',
@@ -74,7 +74,7 @@
  id: 'mmi_pro',
  area: 'MMI',
  title: 'MMI feedback',
- price: 'from $5/review',
+ price: 'from $5.60/review',
  href: 'plans.html#mmi-section',
  cta: 'Compare MMI options',
  bestFor: 'Applicants whose written profile is competitive and now need interview conversion.',
