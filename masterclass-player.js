@@ -71,7 +71,7 @@
     show(watermark, text ? 'block' : 'none');
     moveWatermark();
     if (state.watermarkTimer) clearInterval(state.watermarkTimer);
-    state.watermarkTimer = setInterval(moveWatermark, 28000);
+    state.watermarkTimer = setInterval(moveWatermark, 75000);
   }
 
   async function loadRecording() {
@@ -139,6 +139,17 @@
     if (btn) btn.addEventListener('click', loadRecording);
     var stage = $('mcRecordingStage');
     if (stage) stage.addEventListener('contextmenu', function (event) { event.preventDefault(); });
+    var fsBtn = $('mcFullscreenBtn');
+    if (fsBtn && stage) {
+      fsBtn.addEventListener('click', function () {
+        var active = document.fullscreenElement || document.webkitFullscreenElement;
+        if (active) {
+          (document.exitFullscreen || document.webkitExitFullscreen || function () {}).call(document);
+        } else {
+          (stage.requestFullscreen || stage.webkitRequestFullscreen || function () {}).call(stage);
+        }
+      });
+    }
     var video = $('mcRecordingVideo');
     if (video) {
       video.addEventListener('error', function () {

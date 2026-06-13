@@ -122,7 +122,11 @@
     .mc-recording-load:disabled{opacity:0.55;cursor:not-allowed;}
     .mc-recording-stage{display:none;position:relative;background:#000;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.12);}
     .mc-recording-stage video{display:block;width:100%;max-height:68vh;background:#000;}
-    .mc-recording-watermark{display:none;position:absolute;z-index:3;max-width:min(72%,520px);padding:7px 10px;border-radius:8px;background:rgba(6,14,28,0.58);border:1px solid rgba(255,255,255,0.22);color:rgba(255,255,255,0.78);font-size:0.76rem;font-weight:800;line-height:1.35;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,0.7);transition:left 0.8s ease,top 0.8s ease;}
+    .mc-recording-watermark{display:none;position:absolute;z-index:3;max-width:min(56%,330px);padding:2px 7px;border-radius:6px;background:rgba(6,14,28,0.22);color:rgba(255,255,255,0.46);font-size:0.58rem;font-weight:600;letter-spacing:0.01em;line-height:1.3;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,0.55);transition:left 1.6s ease,top 1.6s ease;}
+    .mc-recording-stage:fullscreen{width:100vw;height:100vh;border-radius:0;border:0;display:flex;align-items:center;justify-content:center;}
+    .mc-recording-stage:fullscreen video,.mc-recording-stage:-webkit-full-screen video{width:100%;height:100%;max-height:100vh;object-fit:contain;}
+    .mc-fs-btn{position:absolute;z-index:4;top:10px;right:10px;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:none;border-radius:8px;background:rgba(6,14,28,0.55);color:#fff;cursor:pointer;font-size:1rem;line-height:1;opacity:0.75;transition:opacity 0.2s,background 0.2s;}
+    .mc-fs-btn:hover{opacity:1;background:rgba(14,165,233,0.85);}
     .mc-recording-session{margin-top:9px;color:rgba(255,255,255,0.42);font-size:0.74rem;}
     .mc-action-stack{display:grid;gap:9px;}
     .mc-btn-primary{display:flex;align-items:center;justify-content:center;border-radius:999px;border:0;padding:14px 20px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;background:linear-gradient(135deg,var(--teal),var(--teal3));color:#fff;transition:all 0.2s;text-decoration:none;}
@@ -396,6 +400,21 @@
 <!-- BODY -->
 <main class="mc-body">
 
+  <section class="mc-section" id="mcPreview">
+    <div class="container">
+      <div class="section-eyebrow">A look inside</div>
+      <h2 style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:2rem;color:#fff;margin:0 0 10px;">Watch a short preview</h2>
+      <p style="color:rgba(255,255,255,0.7);max-width:640px;margin:0 0 24px;font-size:1rem;line-height:1.6;">A few moments pulled straight from the seminar, so you can see the teaching style and the level of detail before you buy. The full marking schemes stay locked.</p>
+      <div style="max-width:880px;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.4);background:#000;border:1px solid rgba(255,255,255,0.1);">
+        <video controls preload="metadata" playsinline controlsList="nodownload" poster="casper-seminar-preview.jpg" style="display:block;width:100%;height:auto;background:#000;" onplay="if(window.gtag){gtag('event','masterclass_preview_play',{'event_category':'engagement','event_label':'masterclass_page_preview'});}">
+          <source src="casper-seminar-preview.mp4" type="video/mp4">
+          Your browser does not support video playback.
+        </video>
+      </div>
+      <p style="color:rgba(255,255,255,0.55);font-size:0.86rem;margin-top:16px;">This is a brief sample. The full recording runs over two hours, with every marking scheme shown in full.</p>
+    </div>
+  </section>
+
   <section class="mc-section mc-recording-section" id="mcRecordingSection">
     <div class="container">
       <div class="mc-recording-card">
@@ -410,6 +429,7 @@
         <div class="mc-recording-stage" id="mcRecordingStage">
           <video id="mcRecordingVideo" controls playsinline preload="metadata" controlsList="nodownload noremoteplayback nofullscreen"></video>
           <div class="mc-recording-watermark" id="mcRecordingWatermark"></div>
+          <button type="button" class="mc-fs-btn" id="mcFullscreenBtn" aria-label="Toggle fullscreen" title="Fullscreen">&#x26F6;</button>
         </div>
         <div class="mc-recording-session" id="mcRecordingSession"></div>
       </div>
