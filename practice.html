@@ -233,7 +233,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <li><a href="medical-school-chances.html" class="k2-green" data-nav="chances">Chances</a></li>
  <li class="k2-dropdown"><a href="practice.html" class="k2-gold" data-nav="practice" aria-haspopup="true">Practice</a>
  <ul class="k2-dropdown-menu" aria-label="Practice tools">
- <li><a href="practice.html" class="k2-gold">CASPer/MMI Practice</a></li>
+ <li><a href="mmi-practice.html" class="k2-gold">MMI Practice</a></li>
+ <li><a href="casper-practice.html" class="k2-gold">CASPer Practice</a></li>
  <li><a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Essay Practice</a></li>
  <li><a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a></li>
  </ul>
@@ -262,7 +263,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <a href="plans.html">Plans &amp; Pricing</a>
  <a href="medical-school-chances.html" class="k2-green">Chances Calculator</a>
  <span class="k2-mobile-label">Practice</span>
- <a href="practice.html" class="k2-gold">CASPer/MMI Practice</a>
+ <a href="mmi-practice.html" class="k2-gold">MMI Practice</a>
+ <a href="casper-practice.html" class="k2-gold">CASPer Practice</a>
  <a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Essay Practice</a>
  <a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a>
  <span class="k2-mobile-label">Resources</span>
@@ -509,6 +511,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button class="cat-btn" data-cat="Policy">Policy <span class="cat-count" id="mmi-cnt-policy">-</span></button>
  <button class="cat-btn" data-cat="Personal">Personal <span class="cat-count" id="mmi-cnt-personal">-</span></button>
  <button class="cat-btn" data-cat="Cultural Competence">Cultural Competence <span class="cat-count" id="mmi-cnt-cultural-competence">-</span></button>
+ <button class="cat-btn" data-cat="Topical Health">Topical Health <span class="cat-count" id="mmi-cnt-topical-health">-</span></button>
  </div>
  </div>
  </div>
@@ -3520,6 +3523,7 @@ function updateMMICounts(){
  $('mmi-cnt-policy').textContent=c.Policy;
  $('mmi-cnt-personal').textContent=c.Personal;
  $('mmi-cnt-cultural-competence').textContent=c['Cultural Competence'];
+ const tcEl=$('mmi-cnt-topical-health');if(tcEl)tcEl.textContent=c['Topical Health']||0;
 }
 updateCounts();
 updateMMICounts();
@@ -3864,6 +3868,11 @@ function applyModeUI(mode) {
  if (ccard) ccard.style.display = isMock ? 'none' : '';
  if (chdr) chdr.textContent = isCasper ? 'Category' : isMMI ? 'MMI Station Type' : 'Full Mock';
 
+ const qsc = $('questionSubmitCard');
+ if (qsc) qsc.style.display = isCasper ? '' : 'none';
+ const aiExpToggle = $('aiExplainerToggle');
+ if (aiExpToggle && aiExpToggle.parentElement) aiExpToggle.parentElement.style.display = isMMI ? 'none' : '';
+
  const wp = $('webcamPanel');
  if (wp) {
  const showWebcam = isMMI && !mmiTypedMode && !mmiRoleplayMode;
@@ -3934,6 +3943,7 @@ function setMode(mode) {
  setPracticeSessionRunning(false);
  reviewPanel.classList.remove('show');scenarioCard.style.display='';
  updateLimitUI();
+ if (typeof refreshLeaderboardData === 'function') refreshLeaderboardData({silent:true});
  if (currentMode === MODE_MMI) {
  updateMMILimitsUI();
  maybeShowMMIFounderNudge();
@@ -5605,7 +5615,7 @@ function getQuartileFromDist(score) {
 
 function getQuartile(score){ return getQuartileFromDist(score); }
 
-const LB_TOOL='casper';
+function currentLbTool(){ return (typeof currentMode!=='undefined' && typeof MODE_MMI!=='undefined' && currentMode===MODE_MMI) ? 'mmi' : 'casper'; }
 const LB_NAME_MAX=24;
 const LB_NAME_MIN=2;
 const LB_BAD_WORDS=[
@@ -5732,7 +5742,7 @@ async function loadLeaderboardSettings(){
 async function refreshLeaderboardData(opts){
  const silent=opts&&opts.silent;
  try{
- const data=await leaderboardFetch('/api/leaderboard?tool='+encodeURIComponent(LB_TOOL));
+ const data=await leaderboardFetch('/api/leaderboard?tool='+encodeURIComponent(currentLbTool()));
  leaderboardRows=Array.isArray(data.rows)?data.rows:[];
  leaderboardSummary={yesterdayCount:readYesterdayPracticeCount(data)};
  leaderboardLoaded=true;
@@ -5763,7 +5773,7 @@ async function saveLeaderboardSettings(optIn, displayName){
  try{
  const data=await leaderboardFetch('/api/leaderboard/settings',{
  method:'POST',
- body:JSON.stringify({tool:LB_TOOL,opt_in:!!optIn,display_name:clean})
+ body:JSON.stringify({tool:currentLbTool(),opt_in:!!optIn,display_name:clean})
  });
  leaderboardSettings={
  opt_in:!!(data.settings&&data.settings.opt_in),
