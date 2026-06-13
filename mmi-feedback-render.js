@@ -625,7 +625,7 @@ const MMIFeedbackRender = (() => {
  <div class="mmi-summary-text">${esc(overall.biggest_improvement || '')}</div>
  </div>
  <div class="mmi-summary-section mmi-summary-q5">
- <div class="mmi-summary-label">* What an "Excellent" response would have included</div>
+ <div class="mmi-summary-label">The one change that would lift this most</div>
  <div class="mmi-summary-text">${esc(overall.excellent_version || '')}</div>
  </div>
  </div>
