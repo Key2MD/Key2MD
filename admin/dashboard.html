@@ -2441,6 +2441,7 @@
  <button class="btn" onclick="insertEmailTemplate('retention')">Retention</button>
  <button class="btn" onclick="insertEmailTemplate('mock')">Mock review</button>
  <button class="btn" onclick="insertEmailTemplate('support')">Support reply</button>
+ <button class="btn blue" onclick="insertSeminarAdEmail()">Seminar advert</button>
  </div>
  <div class="modal-alert" id="ncAlert"></div>
  <div class="modal-footer">
@@ -7599,6 +7600,58 @@ function insertMasterclassFinalEmail() {
  `;
  if (al) { al.className = 'alert ok'; al.textContent = 'Masterclass final message drafted. Choose the newest 90 audience, preview it, send a test, then send.'; }
  updateBcPreview();
+}
+
+function insertSeminarAdEmail() {
+ const link = 'https://www.key2md.com/casper-seminar.html';
+ const subj = document.getElementById('ncSubject');
+ if (subj && !subj.value.trim()) subj.value = 'The CASPer seminar recording (2.5 hrs, high yield)';
+ const html = `
+ <div style="margin:-6px 0 22px;padding:24px 26px;border-radius:18px;background:linear-gradient(135deg,#091525 0%,#0d2a52 62%,#07384d 100%);color:#ffffff;">
+ <div style="display:inline-block;margin:0 0 12px;padding:6px 11px;border-radius:999px;background:rgba(56,189,248,0.14);border:1px solid rgba(125,211,252,0.35);color:#bae6fd;font-size:11px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;">CASPer Masterclass Recording</div>
+ <h1 style="margin:0 0 12px;color:#ffffff;font-size:26px;line-height:1.2;font-weight:900;">Over 2.5 hours of the highest-yield CASPer teaching I can offer.</h1>
+ <p style="margin:0;color:#cbd5e1;font-size:15px;line-height:1.7;">The full recording of my CASPer calibration seminar: exactly how CASPer is marked, the high-yield station patterns, and live worked answers.</p>
+ </div>
+
+ <p style="margin:0 0 15px;color:#334155;font-size:15px;line-height:1.75;">Hi there,</p>
+ <p style="margin:0 0 15px;color:#334155;font-size:15px;line-height:1.75;">If CASPer is on your radar this cycle, the recording of my full calibration seminar is now available for $300, with one-time protected access.</p>
+ <p style="margin:0 0 18px;color:#334155;font-size:15px;line-height:1.75;">It is built around the things I repeatedly see cost students marks: answers that are sensible, but do not show enough empathy, rationale, judgement or human intent for a marker to reward them.</p>
+
+ <div style="margin:22px 0;padding:18px 20px;border-radius:14px;background:#f0f9ff;border:1px solid #bae6fd;">
+ <div style="margin:0 0 9px;color:#0369a1;font-size:12px;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;">Why it is high yield</div>
+ <ul style="margin:0;padding:0 0 0 18px;color:#0f172a;font-size:15px;line-height:1.75;">
+ <li>Exactly how CASPer is marked, drawn from AI analysis of thousands of marked responses</li>
+ <li>The high-yield station patterns that come up again and again</li>
+ <li>The framework I use to approach any station under time pressure</li>
+ <li>Live worked answers, plus the red flags that quietly cost marks</li>
+ </ul>
+ </div>
+
+ <div style="margin:24px 0;">
+ <div style="margin:0 0 12px;color:#0f172a;font-size:13px;font-weight:900;letter-spacing:0.06em;text-transform:uppercase;">What attendees said</div>
+ <div style="margin:0 0 12px;padding:16px 18px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;">
+ <div style="color:#f59e0b;letter-spacing:2px;font-size:13px;margin-bottom:8px;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+ <p style="margin:0 0 8px;color:#334155;font-size:14px;line-height:1.65;font-style:italic;">"The seminar was very informative. Dan covered basically all the basics you need to know for CASPer, and the guides on how to frame your answers were particularly helpful. I really liked that Dan doesn't just tell you what to write, he teaches you the skills you need to approach a question and give a solid answer."</p>
+ <div style="color:#64748b;font-size:11px;font-weight:900;">2026 CASPer seminar attendee</div>
+ </div>
+ <div style="padding:16px 18px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;">
+ <div style="color:#f59e0b;letter-spacing:2px;font-size:13px;margin-bottom:8px;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+ <p style="margin:0 0 8px;color:#334155;font-size:14px;line-height:1.65;font-style:italic;">"I'd sat CASPer before, but I still felt incredibly nervous as the date approached. Joining Dan's seminar turned out to be one of the best decisions I could have made. The session was packed with valuable insights I hadn't even considered before. I walked in overwhelmed with stress, but after 2.5 hours I left feeling prepared and ready for the exam. I can't thank you enough, Dan!"</p>
+ <div style="color:#64748b;font-size:11px;font-weight:900;">2026 CASPer seminar attendee</div>
+ </div>
+ </div>
+
+ <div style="text-align:center;margin:26px 0 22px;">
+ <a href="${esc(link)}" style="display:inline-block;background:#0ea5e9;color:#ffffff;font-weight:900;padding:15px 30px;border-radius:999px;text-decoration:none;font-size:15px;">Watch the CASPer seminar - $300</a>
+ </div>
+
+ <p style="margin:0 0 14px;color:#334155;font-size:15px;line-height:1.75;">If you are not sure whether it is right for where you are at, reply with your test date and how prepared you feel, and I will be honest about whether it will help.</p>
+ <p style="margin:0;color:#334155;font-size:15px;line-height:1.75;">- Dan</p>
+ `;
+ setComposeHtml(html);
+ document.getElementById('ncBody').value = `Hi there,\n\nIf CASPer is on your radar this cycle, the recording of my full calibration seminar is now available for $300 with one-time protected access. It runs over 2.5 hours.\n\nWhy it is high yield:\n- Exactly how CASPer is marked, from AI analysis of thousands of marked responses\n- The high-yield station patterns that come up again and again\n- The framework I use to approach any station under time pressure\n- Live worked answers, plus the red flags that quietly cost marks\n\nWhat attendees said:\n"The seminar was very informative. Dan covered basically all the basics you need to know for CASPer, and the guides on how to frame your answers were particularly helpful. I really liked that Dan doesn't just tell you what to write, he teaches you the skills you need to approach a question and give a solid answer." - 2026 CASPer seminar attendee\n\n"I'd sat CASPer before, but I still felt incredibly nervous as the date approached. Joining Dan's seminar turned out to be one of the best decisions I could have made. I walked in overwhelmed with stress, but after 2.5 hours I left feeling prepared and ready for the exam. I can't thank you enough, Dan!" - 2026 CASPer seminar attendee\n\nWatch it here: ${link}\n\n- Dan`;
+ const al = document.getElementById('ncAlert');
+ if (al) { al.className = 'modal-alert ok'; al.textContent = 'Seminar advert drafted (HTML email attached). Review the preview, then send.'; }
 }
 
 function setBcMode(mode) {
