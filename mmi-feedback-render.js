@@ -532,6 +532,25 @@ const MMIFeedbackRender = (() => {
  return `<div class="mmi-prediction-section"><div class="mmi-pred-title">Your predictions vs AI scores ${streakHtml}</div><div class="mmi-pred-rows">${rows.join('')}</div><div class="mmi-pred-note">${overallMsg}</div></div>`;
  }
 
+ function renderHighlights(feedback) {
+ const hs = Array.isArray(feedback && feedback.transcript_highlights) ? feedback.transcript_highlights.filter(h => h && h.quote) : [];
+ if (!hs.length) return '';
+ const items = hs.slice(0, 8).map(h => {
+ const gap = h.valence === 'gap';
+ const col = gap ? '#d97706' : '#16a34a';
+ const bg = gap ? 'rgba(245,158,11,0.08)' : 'rgba(22,163,74,0.08)';
+ const critLbl = CRITERIA_LABELS[h.criterion] || (h.criterion ? String(h.criterion).replace(/_/g, ' ') : '');
+ return '<div style="border-left:3px solid ' + col + ';background:' + bg + ';padding:8px 10px;border-radius:6px;margin-bottom:8px;">'
+ + '<div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:' + col + ';">' + (gap ? 'Slipped' : 'Landed') + (critLbl ? ' &middot; ' + esc(critLbl) : '') + '</div>'
+ + '<div style="font-style:italic;margin:3px 0;color:#33414f;">&ldquo;' + esc(h.quote) + '&rdquo;</div>'
+ + (h.note ? '<div style="font-size:0.85rem;color:#5b6b82;">' + esc(h.note) + '</div>' : '')
+ + '</div>';
+ }).join('');
+ return '<div style="margin:14px 0;padding:14px 16px;border:1px solid #e6ebf2;border-radius:12px;background:#fff;">'
+ + '<div style="font-weight:800;font-size:0.95rem;margin-bottom:8px;">Your words, mapped to the criteria</div>'
+ + items + '</div>';
+ }
+
  function render(container, data, context) {
  clearLoadingTimers();
  // context: { tier, specialistMode, stationCategory, durationSec, previousFeedback, predictedScores, calibrationStreak }
@@ -571,6 +590,7 @@ const MMIFeedbackRender = (() => {
 
  const deltaSection = context?.previousFeedback ? renderDeltaSection(feedback, context.previousFeedback) : '';
  const predictionSection = context?.predictedScores ? renderPredictionSection(feedback, context.predictedScores, context.calibrationStreak || 0) : '';
+ const highlightsSection = renderHighlights(feedback);
 
  const html = `
  <div class="mmi-feedback" id="mmiFeedbackBlock">
@@ -609,6 +629,8 @@ const MMIFeedbackRender = (() => {
  <div class="mmi-summary-text">${esc(overall.excellent_version || '')}</div>
  </div>
  </div>
+
+ ${highlightsSection}
 
  <div class="mmi-limitations">
  <strong>About this feedback</strong><br>
