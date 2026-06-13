@@ -554,6 +554,16 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 
 
+ <div class="sidebar-card" id="mmiCircuitCard" style="display:none;background:linear-gradient(135deg,#1e1b4b,#4c1d95);border:1px solid rgba(124,58,237,0.4);color:#fff;">
+ <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+ <span style="font-size:0.6rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;background:rgba(124,58,237,0.3);border:1px solid rgba(167,139,250,0.4);color:#c4b5fd;padding:3px 8px;border-radius:50px;">Mock Circuit</span>
+ </div>
+ <h3 style="margin:0 0 6px;color:#fff;font-size:0.98rem;">Run a full interview-day circuit</h3>
+ <p style="font-size:0.76rem;color:rgba(255,255,255,0.72);line-height:1.55;margin:0 0 12px;">4 to 8 stations back-to-back under real timing, then one combined report on your weakest criteria. The closest thing to interview day.</p>
+ <button type="button" onclick="if(typeof MMICircuit!=='undefined'&&MMICircuit.activateCircuitMode){MMICircuit.activateCircuitMode();}" style="width:100%;padding:10px;border:none;border-radius:50px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:0.84rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(124,58,237,0.35);">Start a mock circuit -></button>
+ <a href="mmi-mock-circuit.html" style="display:block;text-align:center;margin-top:8px;font-size:0.72rem;color:#c4b5fd;text-decoration:none;">How the circuit works -></a>
+ </div>
+
  <div class="sidebar-card" id="mmiOptionsCard" style="display:none;">
  <h3>MMI Setup</h3>
  <div class="mmi-sidebar-note">
@@ -3864,6 +3874,8 @@ function applyModeUI(mode) {
  if (cc) cc.style.display = isCasper ? '' : 'none';
  if (mc) mc.style.display = isMMI ? '' : 'none';
  if (mo) mo.style.display = isMMI ? '' : 'none';
+ const mcc = $('mmiCircuitCard');
+ if (mcc) mcc.style.display = isMMI ? '' : 'none';
  if (sq) sq.style.display = isCasper ? '' : 'none';
  if (classCard) classCard.style.display = isCasper ? '' : 'none';
  if (masterclassCard) masterclassCard.style.display = isCasper ? '' : 'none';
