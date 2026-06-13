@@ -7129,7 +7129,15 @@ window.addEventListener('DOMContentLoaded',function(){
  var overlay=document.getElementById('markingModalOverlay');
  if(overlay)overlay.addEventListener('click',function(e){if(e.target===this)closeMarkingModal();});
 
- setMode(MODE_CASPER);
+ // Respect the requested practice mode from the URL (?lock_mode=mmi / ?mode=mmi /
+ // retry_station=mmi_*). This handler runs on DOMContentLoaded, after bootPracticePage,
+ // so forcing CASPer here was overriding MMI and making the MMI link load the CASPer tool.
+ try {
+ const _mp = new URLSearchParams(window.location.search);
+ const _reqMode = _mp.get('mode') || _mp.get('lock_mode');
+ const _retry = _mp.get('retry_station');
+ setMode((_reqMode === 'mmi' || (_retry && /^mmi_/.test(_retry))) ? MODE_MMI : MODE_CASPER);
+ } catch(e) { setMode(MODE_CASPER); }
 
  const auth = getK2Auth();
  if(!auth?.init) return;
