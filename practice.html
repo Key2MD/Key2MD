@@ -470,7 +470,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="casper-masterclass-title">Buy Dan's full CASPer calibration recording.</div>
  <p class="casper-masterclass-copy">Protected $300 recording access with account-specific watermarking. Dan breaks down what strong answers actually do, where students lose marks, and how to answer with clearer judgement under time.</p>
  <div class="casper-masterclass-tags">
- <span>2-2.5 hr replay</span>
+ <span>2.5 hr+ replay</span>
  <span>Watermarked</span>
  <span>$300 AUD</span>
  </div>
@@ -1189,6 +1189,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button class="btn-ctrl" id="prevBtn" disabled hidden><- Previous</button>
  </div>
  <button class="btn-ctrl btn-ctrl-skip" id="skipReadingBtn" disabled title="Skip the reading timer and start answering now">Skip Timer</button>
+ <button class="btn-ctrl" id="pauseBtn" disabled title="Pause the timer so you can stop and review">Pause</button>
  <span id="btnGetAIWrap" class="ai-action-wrap" style="display:none;align-items:center;gap:8px;">
  <button class="btn-ctrl btn-ai-mark" id="btnGetAI" onclick="manualRunAI()" title="Get AI feedback on your response">Mark by AI</button>
  <span id="btnAIRemaining" class="ai-action-remaining"></span>
@@ -3000,7 +3001,7 @@ Object.defineProperty(window,'webcamReady',{get:()=>webcamReady,set:(v)=>{webcam
 Object.defineProperty(window,'webcamActive',{get:()=>webcamActive,set:(v)=>{webcamActive=v;},configurable:true});
 Object.defineProperty(window,'mmiPromptRevealTimestamps',{get:()=>mmiPromptRevealTimestamps,set:(v)=>{mmiPromptRevealTimestamps=v;},configurable:true});
 Object.defineProperty(window,'mmiRecordingStartedAt',{get:()=>mmiRecordingStartedAt,set:(v)=>{mmiRecordingStartedAt=v;},configurable:true});
-let timerInterval=null,phase='idle',sessionActive=false;
+let timerInterval=null,phase='idle',sessionActive=false,timerPaused=false;
 let selectedCategory='All',readingTime=60,writingTime=210;
 let mmiReadingTime=120,mmiAnswerTime=300;
 window.K2PracticeBridge = {
@@ -3507,7 +3508,7 @@ function hideMMIPromptWraps() {
  if(w) w.style.display = 'none';
  });
 }
-const startBtn=$('startBtn'),prevBtn=$('prevBtn'),nextBtn=$('nextBtn'),skipBtn=$('skipReadingBtn');
+const startBtn=$('startBtn'),prevBtn=$('prevBtn'),nextBtn=$('nextBtn'),skipBtn=$('skipReadingBtn'),pauseBtn=$('pauseBtn');
 const timerNum=$('timerNum'),phaseBadge=$('phaseBadge'),progressFill=$('progressFill');
 const scenarioIdle=$('scenarioIdle'),scenarioText=$('scenarioText');
 const prompt1Wrap=$('prompt1Wrap'),prompt2Wrap=$('prompt2Wrap');
@@ -3704,9 +3705,10 @@ function escInline(v){
 }
 
 function runTimer(secs,done){
- clearTimer();let left=secs;
+ clearTimer();timerPaused=false;let left=secs;
  timerNum.textContent=fmt(left);timerNum.classList.remove('urgent');progressFill.style.width='100%';
  timerInterval=setInterval(()=>{
+ if(timerPaused)return;
  left--;
  if(left<0){clearTimer();done&&done();return;}
  timerNum.textContent=fmt(left);
@@ -3764,8 +3766,9 @@ else if(p==='done'){phaseBadge.classList.add('phase-done');phaseBadge.textConten
 function updateBtns(){
  prevBtn.disabled=!sessionActive||currentIdx===0;
  nextBtn.disabled=!sessionActive;
- skipBtn.disabled=!sessionActive||!(phase==='reading'||phase==='reflection');
- skipBtn.title=phase==='reflection'?'Skip reflection time and start answering now':'Skip the reading timer and start answering now';
+ skipBtn.disabled=!sessionActive||!(phase==='reading'||phase==='reflection'||phase==='writing');
+ skipBtn.title=phase==='writing'?'Finish answering now and move on':(phase==='reflection'?'Skip reflection time and start answering now':'Skip the reading timer and start answering now');
+ if(pauseBtn){const _canPause=sessionActive&&(phase==='reading'||phase==='reflection'||phase==='writing');pauseBtn.disabled=!_canPause;if(!_canPause){timerPaused=false;pauseBtn.textContent='Pause';pauseBtn.classList.remove('is-paused');if(timerNum)timerNum.classList.remove('paused');}}
  const inlineRestart=$('restartSessionBtn');
  if(inlineRestart) inlineRestart.disabled=!sessionActive;
  if(phase==='done')nextBtn.textContent='Next Station ->';
@@ -6913,8 +6916,23 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
 });
 
 skipBtn.addEventListener('click',()=>{
- if(!sessionActive||!(phase==='reading'||phase==='reflection'))return;
- clearTimer();startWriting();
+ if(!sessionActive)return;
+ if(phase==='reading'||phase==='reflection'){clearTimer();startWriting();return;}
+ if(phase==='writing'){timerPaused=false;nextBtn.click();}
+});
+pauseBtn?.addEventListener('click',()=>{
+ if(pauseBtn.disabled||!sessionActive)return;
+ timerPaused=!timerPaused;
+ pauseBtn.textContent=timerPaused?'Resume':'Pause';
+ pauseBtn.classList.toggle('is-paused',timerPaused);
+ if(timerNum)timerNum.classList.toggle('paused',timerPaused);
+ if(currentMode===MODE_MMI&&phase==='writing'&&webcamActive){
+ try{
+ if(timerPaused){if(mediaRecorder&&mediaRecorder.state==='recording')mediaRecorder.pause();if(audioRecorder&&audioRecorder.state==='recording')audioRecorder.pause();}
+ else{if(mediaRecorder&&mediaRecorder.state==='paused')mediaRecorder.resume();if(audioRecorder&&audioRecorder.state==='paused')audioRecorder.resume();}
+ }catch(e){}
+ }
+ if(typeof showPracticeNotice==='function')showPracticeNotice(timerPaused?'Paused. Take your time, then press Resume.':'Resumed.','info');
 });
 
 document.addEventListener('keydown',e=>{
@@ -7146,7 +7164,11 @@ window.addEventListener('DOMContentLoaded',function(){
  const _mp = new URLSearchParams(window.location.search);
  const _reqMode = _mp.get('mode') || _mp.get('lock_mode');
  const _retry = _mp.get('retry_station');
- setMode((_reqMode === 'mmi' || (_retry && /^mmi_/.test(_retry))) ? MODE_MMI : MODE_CASPER);
+ // When retry_station=mmi_N is present, bootPracticePage already set MMI mode and loaded that
+ // exact station. Re-calling setMode here would reset the tool to idle and lose it, so skip.
+ if(!(_retry && /^mmi_\d+$/.test(_retry))){
+ setMode((_reqMode === 'mmi') ? MODE_MMI : MODE_CASPER);
+ }
  } catch(e) { setMode(MODE_CASPER); }
 
  const auth = getK2Auth();

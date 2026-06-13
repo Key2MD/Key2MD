@@ -45,22 +45,29 @@ const MMIPlayer = (function () {
    return Number.isFinite(fb) && fb > 0 && fb < 86400 ? fb : 0;
   }
 
+  let durationRecovered = false;
+  function recoverDuration() {
+   if (audioOnly || durationRecovered) return;
+   if (media.duration === Infinity || Number.isNaN(media.duration) || media.duration <= 0) {
+    const restore = () => {
+     if (Number.isFinite(media.duration) && media.duration > 0) {
+      durationRecovered = true;
+      durationOverride = media.duration;
+      try { media.currentTime = 0; } catch (e) {}
+      media.removeEventListener('durationchange', restore);
+      sync();
+     }
+    };
+    media.addEventListener('durationchange', restore);
+    cleanups.push(() => media.removeEventListener('durationchange', restore));
+    try { media.currentTime = 1e101; } catch (e) {}
+   } else {
+    durationRecovered = true;
+   }
+  }
   if (!audioOnly) {
-   on(media, 'loadedmetadata', () => {
-    if (media.duration === Infinity || Number.isNaN(media.duration)) {
-     const restore = () => {
-      if (Number.isFinite(media.duration) && media.duration > 0) {
-       durationOverride = media.duration;
-       media.currentTime = 0;
-       media.removeEventListener('durationchange', restore);
-       sync();
-      }
-     };
-     media.addEventListener('durationchange', restore);
-     cleanups.push(() => media.removeEventListener('durationchange', restore));
-     try { media.currentTime = 1e101; } catch (e) {}
-    }
-   });
+   on(media, 'loadedmetadata', recoverDuration);
+   if (media.readyState >= 1) recoverDuration();
   }
 
   const bar = document.createElement('div');

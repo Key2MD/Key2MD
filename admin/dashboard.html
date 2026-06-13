@@ -1884,6 +1884,12 @@
  <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">Manual access grants the protected page. It does not send the raw Zoom link by itself.</div>
  </div>
  <button class="btn green" onclick="authoriseMasterclass('casper')">Authorise CASPer emails</button>
+ <div class="form-row" style="margin-top:16px;">
+ <label class="form-lbl">Reset one-time viewing window</label>
+ <input class="form-in" id="mc_casper_reset_email" type="email" placeholder="student@email.com">
+ <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">For genuine technical failures only. Clears the student's used 4-hour window so they can watch from scratch again.</div>
+ </div>
+ <button class="btn" onclick="resetMasterclassWindow('casper')">Reset viewing window</button>
  <div style="height:1px;background:var(--border);margin:16px 0;"></div>
  <div class="tbl-toolbar"><span class="tbl-status" id="mc_casper_access_status">No students loaded.</span></div>
  <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:420px;"><table><thead><tr><th>Email</th><th>Source</th><th>Amount</th><th>Expires</th><th>Added</th><th style="width:80px;">Action</th></tr></thead><tbody id="mc_casper_access_body"></tbody></table></div></div>
@@ -1921,6 +1927,12 @@
  <div class="bc-sub">Paid students are added automatically by Stripe. Use manual access for comp places, backup fixes, or direct-payment students.</div>
  <div class="form-row"><label class="form-lbl">Add emails manually</label><textarea class="form-ta" id="mc_mmi_manual_emails" rows="4" placeholder="student@email.com, another@email.com"></textarea></div>
  <button class="btn green" onclick="authoriseMasterclass('mmi')">Authorise MMI emails</button>
+ <div class="form-row" style="margin-top:16px;">
+ <label class="form-lbl">Reset one-time viewing window</label>
+ <input class="form-in" id="mc_mmi_reset_email" type="email" placeholder="student@email.com">
+ <div style="margin-top:5px;font-size:0.7rem;color:var(--muted);">For genuine technical failures only. Clears the student's used 4-hour window so they can watch from scratch again.</div>
+ </div>
+ <button class="btn" onclick="resetMasterclassWindow('mmi')">Reset viewing window</button>
  <div style="height:1px;background:var(--border);margin:16px 0;"></div>
  <div class="tbl-toolbar"><span class="tbl-status" id="mc_mmi_access_status">No students loaded.</span></div>
  <div class="tbl-wrap" style="border-radius:10px;"><div class="tbl-scroller" style="max-height:420px;"><table><thead><tr><th>Email</th><th>Source</th><th>Amount</th><th>Expires</th><th>Added</th><th style="width:80px;">Action</th></tr></thead><tbody id="mc_mmi_access_body"></tbody></table></div></div>
@@ -7066,9 +7078,16 @@ function renderMasterclassPlaybackLogs(kind, rows) {
  const dt = fmtDate(row.created_at);
  const session = String(row.session_id || '').replace(/^mc_/, '').slice(0, 10);
  const agent = String(row.user_agent || '').slice(0, 90);
+ const dur = Number(row.duration_seconds || 0);
+ const furthest = Number(row.furthest_position || 0);
+ const pct = Number(row.percent_watched || 0);
+ const fmtClock = s => { s = Math.max(0, Math.round(s)); const h = Math.floor(s/3600); const m = Math.floor((s%3600)/60); return h ? (h+'h '+m+'m') : (m+'m'); };
+ const watchedHtml = (dur || furthest)
+ ? `<div class="cell-sub" style="font-weight:700;color:${pct>=80?'#16a34a':(pct>=25?'#d97706':'var(--muted)')};">Watched ${pct}%${dur ? ' (' + fmtClock(furthest) + ' / ' + fmtClock(dur) + ')' : ''}</div>`
+ : '<div class="cell-sub" style="color:var(--muted);">No playback progress yet</div>';
  return `<tr class="data-row">
  <td><div class="cell-main">${emailWithDuplicateFlag(row.email || row.user_id || '?',row)}</div><div class="cell-sub">${esc(row.name || agent || '')}</div></td>
- <td><div class="cell-main">${esc(session || '-')}</div><div class="cell-sub">${esc(row.watermark_code || '')}</div></td>
+ <td><div class="cell-main">${esc(session || '-')}</div><div class="cell-sub">${esc(row.watermark_code || '')}</div>${watchedHtml}</td>
  <td><div class="cell-main">${dt?.date || '-'}</div><div class="cell-sub">${dt?.time || ''}</div></td>
  <td><div class="cell-main">${esc(row.ip_key || '-')}</div></td>
  </tr>`;
@@ -7259,6 +7278,27 @@ async function removeMasterclassAccess(kind, email, userId) {
  mergeMasterclassPayload(data);
  renderMasterclasses();
  if (status) status.textContent = `${label} access removed`;
+ } catch(e) {
+ if (status) status.textContent = e.message;
+ alert(e.message);
+ }
+}
+
+async function resetMasterclassWindow(kind) {
+ const label = kind === 'casper' ? 'CASPer' : 'MMI';
+ const input = document.getElementById(`mc_${kind}_reset_email`);
+ const email = (input?.value || '').trim();
+ if (!email) { alert('Enter the student email to reset.'); return; }
+ if (!confirm(`Reset the one-time viewing window for ${email}?\n\nThey will be able to watch the ${label} recording again from scratch (a fresh 4-hour window). Use this only for genuine technical failures.`)) return;
+ const status = document.getElementById('mcStatus');
+ if (status) status.textContent = `Resetting ${label} viewing window...`;
+ try {
+ const { res, data } = await masterclassApi('/admin/masterclasses/reset-window', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ kind, email }) });
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Could not reset viewing window');
+ mergeMasterclassPayload(data);
+ if (input) input.value = '';
+ renderMasterclasses();
+ if (status) status.textContent = `Viewing window reset for ${email}`;
  } catch(e) {
  if (status) status.textContent = e.message;
  alert(e.message);

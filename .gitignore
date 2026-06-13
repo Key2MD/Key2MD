@@ -20,8 +20,15 @@ node_modules/
 **/node_modules/
 
 # Generated class decks, previews, and presentation build workspaces.
+# outputs/ is the private, never-deployed folder for drafts, internal docs, and anything not for the public site.
 outputs/
 outputs/**
+
+# Internal station-design working docs (live in outputs/, never public).
+MMI-New-Stations-*.md
+MMI-New-Stations-*.docx
+*-STATION-DESIGN*.md
+*.draft.html
 
 # Sensitive Cloudflare Worker exports must never be committed.
 worker*.js
