@@ -771,6 +771,11 @@ const MMIFeedbackRender = (() => {
  The AI is less good at: subtle interpersonal nuance, the kind of judgement only experienced examiners bring, and the emotional weight of how something landed in the room.
  </div>
 
+ ${data.review_id ? `<div class="mmi-lift-wrap" id="mmiLiftWrap">
+  <button class="btn-lift-trigger" id="mmiLiftTrigger">Lift my answer - see a stronger version of what you said -></button>
+  <div class="mmi-lift-panel" id="mmiLiftPanel" style="display:none"></div>
+ </div>` : ''}
+
  ${data.review_id ? `<div class="mmi-probe-wrap" id="mmiProbeWrap">
   <button class="btn-probe-trigger" id="mmiProbeTrigger">Get a follow-up question an examiner would actually ask -></button>
   <div class="mmi-probe-panel" id="mmiProbePanel" style="display:none"></div>
@@ -796,6 +801,7 @@ const MMIFeedbackRender = (() => {
  hydrateAnalytics(container, data, context);
  hydratePercentile(container, feedback);
  if (data.review_id) hydrateProbe(container, data.review_id);
+ if (data.review_id) hydrateLift(container, data.review_id);
  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
  }
 
@@ -883,6 +889,44 @@ const MMIFeedbackRender = (() => {
  function clear(container) {
  clearLoadingTimers();
  if (container) container.innerHTML = '';
+ }
+
+ function hydrateLift(container, reviewId) {
+  const trigger = container.querySelector('#mmiLiftTrigger');
+  const panel = container.querySelector('#mmiLiftPanel');
+  if (!trigger || !panel) return;
+  let state = 'idle';
+  trigger.addEventListener('click', async () => {
+   if (state !== 'idle') return;
+   state = 'loading';
+   trigger.disabled = true;
+   panel.style.display = '';
+   panel.innerHTML = '<div class="mmi-lift-loading">Rewriting your answer into a stronger version of what you said...</div>';
+   try {
+    const res = await fetch(`${apiBase()}/api/mmi/lift`, {
+     method: 'POST',
+     headers: { Authorization: `Bearer ${authToken()}`, 'Content-Type': 'application/json' },
+     body: JSON.stringify({ review_id: reviewId }),
+    });
+    const payload = await res.json().catch(() => ({}));
+    if (!res.ok || !payload || !payload.lifted_answer) throw new Error(payload.message || payload.error || 'Could not lift this answer');
+    state = 'done';
+    trigger.style.display = 'none';
+    const changes = Array.isArray(payload.changes) ? payload.changes : [];
+    panel.innerHTML = `
+     ${payload.one_line ? `<div class="mmi-lift-oneline">${esc(payload.one_line)}</div>` : ''}
+     <div class="mmi-lift-section-label">Your answer, lifted</div>
+     <div class="mmi-lift-answer">${esc(payload.lifted_answer)}</div>
+     ${changes.length ? `<div class="mmi-lift-section-label">What changed and why</div><div class="mmi-lift-changes">${changes.map(c => `<div class="mmi-lift-change"><div class="mmi-lift-change-label">${esc(c.label || '')}</div><div class="mmi-lift-change-detail">${esc(c.detail || '')}</div></div>`).join('')}</div>` : ''}
+     <div class="mmi-lift-caveat">This is your own answer, strengthened - not a script to memorise. Hear how your reasoning could land, then say it your way.</div>`;
+   } catch (err) {
+    state = 'idle';
+    trigger.disabled = false;
+    panel.innerHTML = `<div class="mmi-lift-error">${esc(err.message || 'Something went wrong.')} <button class="btn-lift-retry" id="mmiLiftRetry">Dismiss</button></div>`;
+    const rb = container.querySelector('#mmiLiftRetry');
+    if (rb) rb.addEventListener('click', () => { panel.style.display = 'none'; panel.innerHTML = ''; });
+   }
+  });
  }
 
  function hydrateProbe(container, reviewId) {

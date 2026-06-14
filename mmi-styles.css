@@ -1536,6 +1536,22 @@ details[open] .mmi-premium-chevron { transform: rotate(180deg); }
 .mmi-prompt-timing span { white-space: nowrap; }
 .mmi-prompt-timing-flag { color: #b45309; font-weight: 700; }
 .mmi-prompt-timing.mmi-prompt-timing-warn { color: #b45309; font-style: italic; }
+.mmi-lift-wrap { margin: 14px 0; }
+.btn-lift-trigger { width: 100%; padding: 13px 16px; border-radius: 12px; border: 1px solid rgba(14,165,233,0.35); background: linear-gradient(135deg, rgba(14,165,233,0.1), rgba(14,165,233,0.03)); color: var(--navy); font-family: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.18s; }
+.btn-lift-trigger:hover:not(:disabled) { border-color: var(--teal); transform: translateY(-1px); }
+.btn-lift-trigger:disabled { opacity: 0.6; cursor: default; }
+.mmi-lift-panel { margin-top: 10px; }
+.mmi-lift-loading { font-size: 0.85rem; color: var(--gray400); padding: 14px; text-align: center; }
+.mmi-lift-error { font-size: 0.85rem; color: #b91c1c; padding: 12px 14px; background: rgba(220,38,38,0.06); border-radius: 10px; }
+.btn-lift-retry { margin-left: 8px; border: none; background: none; color: var(--teal3); font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: underline; }
+.mmi-lift-oneline { font-weight: 800; color: var(--navy); font-size: 0.95rem; line-height: 1.5; padding: 12px 14px; background: rgba(14,165,233,0.08); border-radius: 10px; margin-bottom: 12px; }
+.mmi-lift-section-label { font-size: 0.66rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--teal3); margin: 12px 0 6px; }
+.mmi-lift-answer { font-size: 0.9rem; color: var(--gray800); line-height: 1.7; white-space: pre-wrap; background: #fff; border: 1px solid var(--gray200); border-radius: 12px; padding: 14px 16px; }
+.mmi-lift-changes { display: flex; flex-direction: column; gap: 8px; }
+.mmi-lift-change { border-left: 3px solid var(--teal); background: var(--gray50); border-radius: 6px; padding: 8px 12px; }
+.mmi-lift-change-label { font-weight: 700; font-size: 0.82rem; color: var(--navy); }
+.mmi-lift-change-detail { font-size: 0.82rem; color: var(--gray800); line-height: 1.5; margin-top: 2px; }
+.mmi-lift-caveat { font-size: 0.74rem; color: var(--gray400); line-height: 1.5; font-style: italic; margin-top: 12px; }
 @media (max-width: 520px) {
  .mmi-presence-teaser-cta { width: 100%; text-align: center; }
 }
