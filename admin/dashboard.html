@@ -594,6 +594,8 @@
 
  /* == BROADCAST / SUBS == */
  .bc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:680px;}
+ #bcRichEditor:empty:before{content:attr(data-placeholder);color:#94a3b8;pointer-events:none;}
+ #bcRichEditor a{color:#0ea5e9;}
  .bc-title{font-size:1rem;font-weight:800;margin-bottom:4px;}
  .bc-sub{font-size:0.82rem;color:var(--muted);margin-bottom:20px;}
  .form-row{margin-bottom:14px;}
@@ -1621,7 +1623,7 @@
  </div>
 
  <!-- Rich editor (contenteditable) -->
- <div id="bcRichEditor" contenteditable="true" oninput="updateBcPreview()" onpaste="handleBcRichPaste(event)" style="min-height:220px;padding:14px;background:var(--surface);border:1px solid var(--border2);border-radius:0 0 8px 8px;color:var(--text);font-size:0.88rem;line-height:1.75;outline:none;white-space:pre-wrap;" placeholder="Write your message here. Use the toolbar above for formatting."></div>
+ <div id="bcRichEditor" contenteditable="true" oninput="updateBcPreview()" onpaste="handleBcRichPaste(event)" data-placeholder="Write your message here. Use the toolbar above for formatting." style="min-height:220px;padding:18px;background:#ffffff;border:1px solid var(--border2);border-radius:0 0 8px 8px;color:#334155;font-size:0.9rem;line-height:1.75;outline:none;white-space:pre-wrap;"></div>
 
  <!-- Plain text fallback -->
  <textarea id="bcPlainBody" oninput="updateBcPreview()" style="display:none;" class="form-ta" placeholder="Write your email here. Plain text - no formatting."></textarea>
@@ -7841,8 +7843,12 @@ function getLocalAudienceEstimate(list, customEmail = '') {
  if (list === 'mmi_pro') S.users.filter(isMmiProActive).forEach(u=>u.email&&set.add(u.email.toLowerCase()));
  if (list === 'no_reviews') S.users.filter(u=>Number(u.review_count||0)===0).forEach(u=>u.email&&set.add(u.email.toLowerCase()));
  if (list === 'mmi_users') S.mmiReviews.forEach(r=>r.email&&set.add(r.email.toLowerCase()));
- if (list === 'active') [...S.reviews, ...S.s2Reviews].filter(r=>withinDays(r.created_at,14)).forEach(r=>r.email&&set.add(r.email.toLowerCase()));
- if (list === 'inactive') S.users.filter(u=>Number(u.review_count||0)===0).forEach(u=>u.email&&set.add(u.email.toLowerCase()));
+ if (list === 'active') S.reviews.filter(r=>withinDays(r.created_at,14)).forEach(r=>r.email&&set.add(r.email.toLowerCase()));
+ if (list === 'inactive') {
+ const recent = new Set();
+ S.reviews.filter(r=>withinDays(r.created_at,30)).forEach(r=>r.email&&recent.add(r.email.toLowerCase()));
+ S.users.filter(u=>u.email && !withinDays(u.created_at,30) && !recent.has(String(u.email).toLowerCase())).forEach(u=>set.add(String(u.email).toLowerCase()));
+ }
  return { count: set.size, sample: Array.from(set).slice(0,5), exact: false };
 }
 
