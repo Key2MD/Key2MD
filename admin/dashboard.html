@@ -2192,6 +2192,12 @@
   <span id="mmiFunnelStatus" style="font-size:0.72rem;color:var(--muted);">Not loaded</span>
  </div>
  <div class="mmi-overview" id="mmiFunnelKpi" style="margin-bottom:18px;"></div>
+ <div style="display:flex;align-items:center;gap:8px;margin:4px 0 8px;flex-wrap:wrap;">
+  <span style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted2);">Interview Outcomes</span>
+  <button class="btn" onclick="loadMmiOutcomes()" style="padding:3px 10px;font-size:0.75rem;">Refresh</button>
+  <span id="mmiOutcomesStatus" style="font-size:0.72rem;color:var(--muted);">Not loaded</span>
+ </div>
+ <div id="mmiOutcomesBody" style="margin-bottom:18px;"></div>
  <div class="mmi-workbench">
  <section class="mmi-list-panel">
  <div class="tbl-toolbar"><span class="tbl-status" id="mmiStatus">-</span></div>
@@ -2773,7 +2779,7 @@ function nav(page, opts={}) {
  if (target==='broadcast') { updateBcStats(); if (!S.broadcastHistory.length) loadBroadcastHistory(); loadQOTWAdmin(); }
  if (target==='class') loadCasperClass();
  if (target==='masterclasses' && !S.masterclasses) loadMasterclasses();
- if (target==='mmi') { if (!S.mmiReviews.length) loadMMI(); loadMmiFunnel(); }
+ if (target==='mmi') { if (!S.mmiReviews.length) loadMMI(); loadMmiFunnel(); loadMmiOutcomes(); }
  if (target==='s2' && !S.s2Reviews.length) loadS2Reviews();
  if (target==='revenue' && !S.revenue.length) loadRevenue();
  if (target==='monitoring') loadMonitoring();
@@ -8926,6 +8932,38 @@ function renderMmiFunnel(data) {
   <div class="mmi-kpi good"><div class="mmi-kpi-label">Purchases</div><div class="mmi-kpi-value">${fmt(p.total)}</div><div class="mmi-kpi-sub">${fmt(p.credit)} credit | ${fmt(p.subscription)} sub</div></div>`;
 }
 
+async function loadMmiOutcomes() {
+ const status = document.getElementById('mmiOutcomesStatus');
+ if (status) status.textContent = 'Loading...';
+ try {
+  const res = await api('/api/admin/mmi/outcomes');
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error || 'Failed');
+  renderMmiOutcomes(data);
+  if (status) status.textContent = `${data.total || 0} captured`;
+ } catch (e) { if (status) status.textContent = e.message || 'Load failed'; }
+}
+function renderMmiOutcomes(data) {
+ const el = document.getElementById('mmiOutcomesBody');
+ if (!el) return;
+ const o = data.by_outcome || {};
+ const fmt = n => (n == null ? '-' : Number(n).toLocaleString());
+ const pct = n => (n == null ? '-' : `${Math.round(n)}%`);
+ if (!data.total) { el.innerHTML = '<div class="mmi-kpi-sub" style="color:var(--muted);">No interview outcomes captured yet. Students report these from the history page once their interview date has passed.</div>'; return; }
+ const kpis = `<div class="mmi-overview">
+  <div class="mmi-kpi good"><div class="mmi-kpi-label">Offer rate</div><div class="mmi-kpi-value">${pct(data.offer_rate)}</div><div class="mmi-kpi-sub">of ${fmt(data.decided)} decided</div></div>
+  <div class="mmi-kpi"><div class="mmi-kpi-label">Offers</div><div class="mmi-kpi-value">${fmt(o.offer)}</div></div>
+  <div class="mmi-kpi"><div class="mmi-kpi-label">Waitlist</div><div class="mmi-kpi-value">${fmt(o.waitlist)}</div></div>
+  <div class="mmi-kpi"><div class="mmi-kpi-label">Unsuccessful</div><div class="mmi-kpi-value">${fmt(o.unsuccessful)}</div></div>
+  <div class="mmi-kpi"><div class="mmi-kpi-label">Pending</div><div class="mmi-kpi-value">${fmt(o.pending)}</div></div>
+  <div class="mmi-kpi"><div class="mmi-kpi-label">Total reported</div><div class="mmi-kpi-value">${fmt(data.total)}</div></div>
+ </div>`;
+ const rows = (data.by_reviews || []).map(b => `<tr><td style="padding:4px 8px;">${b.bucket} reviews</td><td style="padding:4px 8px;">${fmt(b.total)}</td><td style="padding:4px 8px;">${fmt(b.offers)}</td><td style="padding:4px 8px;">${pct(b.offer_rate)}</td></tr>`).join('');
+ const table = `<div style="margin-top:12px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted2);">Offer rate by reviews completed (the flywheel signal)</div>
+  <table style="width:100%;border-collapse:collapse;font-size:0.8rem;margin-top:6px;"><thead><tr style="text-align:left;color:var(--muted2);font-size:0.7rem;"><th style="padding:4px 8px;">Practice volume</th><th style="padding:4px 8px;">Students</th><th style="padding:4px 8px;">Offers</th><th style="padding:4px 8px;">Offer rate</th></tr></thead><tbody>${rows}</tbody></table>
+  <div style="font-size:0.7rem;color:var(--muted);margin-top:8px;font-style:italic;">Self-reported by students; small samples are noisy. Use as directional signal until volume builds.</div>`;
+ el.innerHTML = kpis + table;
+}
 async function loadQOTWAdmin() {
  const el = document.getElementById('qotwCurrent');
  if (!el) return;

@@ -928,6 +928,7 @@ const MMIFeedbackRender = (() => {
   let state = 'idle';
   trigger.addEventListener('click', async () => {
    if (state !== 'idle') return;
+   try { window.Key2MDTrack && window.Key2MDTrack.funnel && window.Key2MDTrack.funnel('mmi_lift_used', {}); } catch (e) {}
    state = 'loading';
    trigger.disabled = true;
    panel.style.display = '';

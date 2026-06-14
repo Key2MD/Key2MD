@@ -1741,8 +1741,10 @@ function mmiShowMethodPrimer(category) {
  const openAttr = attempts < 8 ? ' open' : '';
  el.innerHTML = `<details class="mmi-method-details"${openAttr}><summary class="mmi-method-summary">How to approach this station</summary><div class="mmi-method-body"><div class="mmi-method-title">${primer.title}</div><ol>${primer.steps.map(s => `<li>${s}</li>`).join('')}</ol><div class="mmi-method-note">A guide, not a script - the best answers sound like you, not a template.</div></div></details>`;
  el.style.display = '';
+ try{window.Key2MDTrack?.funnel?.('mmi_primer_shown',{type:mmiMethodType(category)});}catch(e){}
 }
 function selectMMIEntry(mode) {
+ try{window.Key2MDTrack?.funnel?.('mmi_entry_'+(mode==='custom'?'custom':'quick'),{});}catch(e){}
  const details = document.getElementById('mmiFormatDetails');
  const bq = document.getElementById('mmiEntryQuick');
  const bc = document.getElementById('mmiEntryCustom');
@@ -4001,6 +4003,31 @@ function syncIdleTimerPickers() {
  if(showMMI && typeof syncMMIPresetUI === 'function') syncMMIPresetUI();
 }
 
+function maybeShowMmiOnboarding() {
+ try {
+  if (localStorage.getItem('k2_mmi_onboarded') === '1') return;
+  if ((parseInt(localStorage.getItem('k2_mmi_attempts') || '0', 10) || 0) > 0) { localStorage.setItem('k2_mmi_onboarded', '1'); return; }
+ } catch (e) { return; }
+ const m = document.getElementById('mmiOnboardModal');
+ if (!m) return;
+ m.style.display = 'flex';
+ try { window.Key2MDTrack?.funnel?.('mmi_onboarding_shown', {}); } catch (e) {}
+}
+function dismissMmiOnboarding(start) {
+ const m = document.getElementById('mmiOnboardModal');
+ if (m) m.style.display = 'none';
+ try { localStorage.setItem('k2_mmi_onboarded', '1'); } catch (e) {}
+ try { window.Key2MDTrack?.funnel?.(start ? 'mmi_onboarding_start' : 'mmi_onboarding_skip', {}); } catch (e) {}
+ if (start) {
+  try { if (typeof selectMMIEntry === 'function') selectMMIEntry('quick'); } catch (e) {}
+  try {
+   const target = document.getElementById('mmiOptionsCard') || document.getElementById('mmiCategoryCard');
+   if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (e) {}
+ }
+}
+document.addEventListener('click', function (e) { const m = document.getElementById('mmiOnboardModal'); if (m && e.target === m) dismissMmiOnboarding(false); });
+
 function applyModeUI(mode) {
  const isCasper = mode === MODE_CASPER;
  const isMMI = mode === MODE_MMI;
@@ -4021,6 +4048,7 @@ function applyModeUI(mode) {
  if (mc) mc.style.display = isMMI ? '' : 'none';
  const mrc = $('mmiReadinessCard');
  if (mrc) { mrc.style.display = isMMI ? '' : 'none'; if (isMMI && typeof hydrateMmiReadiness === 'function') hydrateMmiReadiness(); }
+ if (isMMI) maybeShowMmiOnboarding();
  if (mo) mo.style.display = isMMI ? '' : 'none';
  const mcc = $('mmiCircuitCard');
  if (mcc) mcc.style.display = isMMI ? '' : 'none';
@@ -4275,6 +4303,7 @@ function stopRecording(){
 
 window.mmiRedoStation = function() {
  if(currentMode!==MODE_MMI || !sessionActive) return;
+ try{window.Key2MDTrack?.funnel?.('mmi_redo',{});}catch(e){}
  if(typeof mmiResetForRestart==='function') mmiResetForRestart();
  if(typeof hardStopRecording==='function') hardStopRecording();
  const pv=$('webcamPlayback'); if(pv&&pv._mmiPlayer)pv._mmiPlayer.destroy();
@@ -4429,9 +4458,11 @@ async function hydrateMmiReadiness() {
    </div>
    ${weakest ? `<div style="font-size:0.78rem;color:var(--gray600);line-height:1.5;">Weakest area: <strong style="color:var(--navy);">${weakest}</strong>. <button onclick="weaknessDrill()" style="border:none;background:none;color:var(--teal3);font-weight:700;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline;">Drill it</button></div>` : ''}
    <div style="font-size:0.68rem;color:var(--gray400);font-style:italic;margin-top:8px;">An estimate from your Key2MD practice, not a prediction of your interview result.</div>`;
+  try{window.Key2MDTrack?.funnel?.('mmi_readiness_viewed',{readiness:readiness});}catch(e){}
  } catch (e) { body.innerHTML = '<div style="font-size:0.8rem;color:var(--gray400);">Could not load readiness right now.</div>'; }
 }
 async function weaknessDrill() {
+ try{window.Key2MDTrack?.funnel?.('mmi_weakness_drill',{});}catch(e){}
  const auth = getK2Auth();
  const token = (auth && auth.getToken) ? auth.getToken() : '';
  let weakest = null;
@@ -6749,6 +6780,7 @@ function toggleVerbalInfo() {
 function toggleMMIVerbalPrompts() {
  mmiVerbalPrompts = document.getElementById('verbalPromptsToggle')?.checked || false;
  if (mmiVerbalPrompts) {
+  try{window.Key2MDTrack?.funnel?.('mmi_verbal_enabled',{});}catch(e){}
   if (window.MMITTS && MMITTS.prime) MMITTS.prime(); // unlock audio on this user gesture
   if (mmiTypedMode) { mmiTypedMode = false; const t = document.getElementById('typedModeToggle'); if (t) t.checked = false; const tiw = $('mmiTypedAnswerWrap'); if (tiw) tiw.style.display = 'none'; }
   if (mmiRoleplayMode) { mmiRoleplayMode = false; const r = document.getElementById('roleplayModeToggle'); if (r) r.checked = false; const rlw = $('mmiRoleplayWrap'); if (rlw) rlw.style.display = 'none'; }
@@ -8117,6 +8149,25 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=do
 </div>
 
 <div id="autoSaveToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:0.8rem;font-weight:600;padding:8px 18px;border-radius:50px;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:9999;pointer-events:none;transition:opacity 0.3s;">Response saved to your account</div>
+
+<div id="mmiOnboardModal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+ <div style="background:#0d1f3c;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:36px 34px;max-width:520px;width:100%;position:relative;font-family:'DM Sans',system-ui,sans-serif;max-height:90vh;overflow:auto;">
+ <button onclick="dismissMmiOnboarding(false)" aria-label="Close" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">x</button>
+ <div style="font-size:0.72rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#0ea5e9;margin-bottom:8px;">New to MMI practice?</div>
+ <h3 style="color:#fff;font-size:1.35rem;font-weight:800;margin:0 0 10px;line-height:1.25;">A quick 60-second orientation</h3>
+ <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;margin:0 0 20px;line-height:1.6;">An MMI is a circuit of short stations. At each one you read a scenario, then talk through your answer out loud while we record it. Here is how a station runs:</p>
+ <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px;">
+  <div style="display:flex;gap:12px;align-items:flex-start;"><span style="flex:none;width:24px;height:24px;border-radius:50%;background:rgba(14,165,233,0.15);color:#0ea5e9;font-weight:800;font-size:0.8rem;display:flex;align-items:center;justify-content:center;">1</span><div style="color:rgba(255,255,255,0.78);font-size:0.86rem;line-height:1.5;"><strong style="color:#fff;">Read</strong> the scenario during a short reading window. Jot notes in the scratchpad.</div></div>
+  <div style="display:flex;gap:12px;align-items:flex-start;"><span style="flex:none;width:24px;height:24px;border-radius:50%;background:rgba(14,165,233,0.15);color:#0ea5e9;font-weight:800;font-size:0.8rem;display:flex;align-items:center;justify-content:center;">2</span><div style="color:rgba(255,255,255,0.78);font-size:0.86rem;line-height:1.5;"><strong style="color:#fff;">Answer out loud</strong> to the camera as you would to an examiner. The timer keeps you to interview pace.</div></div>
+  <div style="display:flex;gap:12px;align-items:flex-start;"><span style="flex:none;width:24px;height:24px;border-radius:50%;background:rgba(14,165,233,0.15);color:#0ea5e9;font-weight:800;font-size:0.8rem;display:flex;align-items:center;justify-content:center;">3</span><div style="color:rgba(255,255,255,0.78);font-size:0.86rem;line-height:1.5;"><strong style="color:#fff;">Get feedback</strong> on your content and your delivery, with a stronger rewrite of what you actually said.</div></div>
+ </div>
+ <p style="color:rgba(255,255,255,0.45);font-size:0.8rem;margin:0 0 22px;line-height:1.55;">Not sure of your university's exact format? Start with our standard setup. You can switch to a custom timer any time.</p>
+ <div style="display:flex;flex-direction:column;gap:12px;">
+  <button onclick="dismissMmiOnboarding(true)" style="width:100%;background:#0ea5e9;border:none;color:#0a1628;font-weight:800;font-size:0.95rem;padding:14px;border-radius:12px;cursor:pointer;font-family:inherit;">Start my first station</button>
+  <button onclick="dismissMmiOnboarding(false)" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-weight:600;font-size:0.88rem;padding:12px;border-radius:12px;cursor:pointer;font-family:inherit;">I'll explore on my own</button>
+ </div>
+ </div>
+</div>
 
 <script src="/key2md-tracking.js" defer></script>
 <script>
