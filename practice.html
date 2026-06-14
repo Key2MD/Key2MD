@@ -662,6 +662,19 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
    <span class="toggle-slider"></span>
   </label>
  </div>
+ <div class="mmi-specialist-row" id="verbalModeRow" style="background:rgba(14,165,233,0.05);border:1px solid rgba(14,165,233,0.2);border-radius:10px;margin-top:8px;display:none;">
+  <div>
+   <div class="mmi-specialist-label" style="color:var(--teal3);">Read prompts aloud <span id="verbalInfoBtn" onclick="toggleVerbalInfo()" title="How verbal prompts work" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gray200);color:var(--gray600);font-size:0.6rem;font-weight:700;cursor:pointer;margin-left:4px;vertical-align:middle;">?</span></div>
+   <div class="mmi-specialist-sub">A spoken examiner reads each question to you, including follow-ups, the way some interviews are run.</div>
+  </div>
+  <label class="toggle-switch">
+   <input type="checkbox" id="verbalPromptsToggle" onchange="toggleMMIVerbalPrompts()">
+   <span class="toggle-slider" style="--toggle-active:#0ea5e9;"></span>
+  </label>
+ </div>
+ <div id="verbalInfo" style="display:none;font-size:0.72rem;color:var(--gray600);line-height:1.55;padding:10px 12px;background:rgba(14,165,233,0.05);border-radius:8px;margin-top:4px;">
+  <strong>How it works:</strong> you read the scenario yourself during reading time. When you begin, the examiner reads the first question aloud. Answer for as long as you like, then <strong>press Continue (or the spacebar)</strong> and the next question is read to you. Nothing advances on its own - taking time to think will never skip you ahead. Logged in uses a natural cloud voice; otherwise your browser's built-in voice is used.
+ </div>
  </div>
 
 
@@ -1564,9 +1577,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 </script>
 
 <script src="practice-stations.js"></script>
+<script src="mmi-download.js"></script>
 <script src="mmi-recording.js"></script>
 <script src="mmi-player.js"></script>
 <script src="mmi-engine.js"></script>
+<script src="mmi-tts.js"></script>
 <script src="mmi-feedback-render.js"></script>
 <script src="casper-mock-exam.js"></script>
 <script>
@@ -1610,6 +1625,8 @@ let mmiPromptRevealTimestamps = [];
 let mmiPromptsRevealedCount = 0;
 let mmiRecordingInterval = null;
 let mmiRecordingStartedAt = null;
+let mmiPausedAccumMs = 0;
+let mmiPauseStartedAt = null;
 let mmiCurrentPrompts = [];
 let mmiRecordingDurationSec = 0;
 let mmiFeedbackUploadInFlight = false;
@@ -1925,18 +1942,23 @@ function stopPremiumLiveFrameCapture() {
 }
 
 function getMMIConfig() {
+ let cfg;
  if(mmiActivePreset === 'custom') {
  const promptCount = getSelectedMMIPromptCount(MMI_PRESETS.custom.promptCount || MMI_DEFAULT_PROMPT_COUNT);
- return {
+ cfg = {
  preset: 'custom',
  readingTime: Math.min(300, Math.max(0, parseInt(document.getElementById('customReadingTime')?.value||'120',10))),
  recordingTime: Math.min(600, Math.max(60, parseInt(document.getElementById('customRecordingTime')?.value||'300',10))),
  promptCount,
  revealMode: 'all_at_once',
  };
- }
+ } else {
  const preset = MMI_PRESETS[mmiActivePreset] || MMI_PRESETS.quickfire;
- return { preset: mmiActivePreset, ...preset, promptCount: preset.promptCount || MMI_DEFAULT_PROMPT_COUNT };
+ cfg = { preset: mmiActivePreset, ...preset, promptCount: preset.promptCount || MMI_DEFAULT_PROMPT_COUNT };
+ }
+ // Verbal prompts force a one-question-at-a-time manual reveal so the examiner can read each one.
+ if (mmiVerbalPrompts) { cfg.revealMode = 'extended_sequential'; cfg.verbalPrompts = true; }
+ return cfg;
 }
 
 function getPrompts(station) {
@@ -1964,6 +1986,8 @@ function mmiOnRecordingStart() {
  mmiPromptRevealTimestamps = [];
  mmiPromptsRevealedCount = 0;
  mmiRecordingStartedAt = Date.now();
+ mmiPausedAccumMs = 0;
+ mmiPauseStartedAt = null;
  mmiRecordingDurationSec = 0;
 
 
@@ -1977,7 +2001,8 @@ function mmiOnRecordingStart() {
 
  clearInterval(mmiRecordingInterval);
  mmiRecordingInterval = setInterval(() => {
- mmiRecordingDurationSec = (Date.now() - mmiRecordingStartedAt) / 1000;
+ const pausedSoFar = mmiPausedAccumMs + (mmiPauseStartedAt ? (Date.now() - mmiPauseStartedAt) : 0);
+ mmiRecordingDurationSec = Math.max(0, (Date.now() - mmiRecordingStartedAt - pausedSoFar) / 1000);
  const el = document.getElementById('mmiRecordingTimer');
  if(el) {
  const m = Math.floor(mmiRecordingDurationSec / 60);
@@ -2407,10 +2432,13 @@ function showMMIPrediction(container, data, context) {
  function reveal(usePredictions) {
   if (usePredictions && Object.keys(predictions).length === 5) saveMMIPrediction(predictions, data);
   const streak = getMMICalibrationStreak();
+  let revealSecs = null;
+  try { const arr = []; (window.mmiPromptRevealTimestamps || []).forEach(x => { const t = Number(x && x.revealed_at_recording_seconds); const idx = Number(x && x.prompt_index) || 0; if (Number.isFinite(t)) arr[idx] = t; }); revealSecs = arr.length ? arr : null; } catch (e) {}
   MMIFeedbackRender.render(container, data, {
    ...context,
    predictedScores: usePredictions && Object.keys(predictions).length === 5 ? predictions : null,
    calibrationStreak: streak,
+   promptRevealSeconds: (context && context.promptRevealSeconds) ? context.promptRevealSeconds : revealSecs,
   });
   updateMMILimitsUI();
   mmiFeedbackUploadInFlight = false;
@@ -3368,6 +3396,7 @@ function updateAccountCardState(user){
 }
 let sessionHistory=[];
 let mmiHidePrompts=false;
+let mmiVerbalPrompts=false;
 
 
 let webcamStream=null,mediaRecorder=null,recordedChunks=[],recordingBlob=null;
@@ -3710,7 +3739,7 @@ function escInline(v){
 }
 
 function runTimer(secs,done){
- clearTimer();timerPaused=false;let left=secs;
+ clearTimer();timerPaused=false;window.mmiTimerPaused=false;let left=secs;
  timerNum.textContent=fmt(left);timerNum.classList.remove('urgent');progressFill.style.width='100%';
  timerInterval=setInterval(()=>{
  if(timerPaused)return;
@@ -3773,7 +3802,7 @@ function updateBtns(){
  nextBtn.disabled=!sessionActive;
  skipBtn.disabled=!sessionActive||!(phase==='reading'||phase==='reflection'||phase==='writing');
  skipBtn.title=phase==='writing'?'Finish answering now and move on':(phase==='reflection'?'Skip reflection time and start answering now':'Skip the reading timer and start answering now');
- if(pauseBtn){const _canPause=sessionActive&&(phase==='reading'||phase==='reflection'||phase==='writing');pauseBtn.disabled=!_canPause;if(!_canPause){timerPaused=false;pauseBtn.textContent='Pause';pauseBtn.classList.remove('is-paused');if(timerNum)timerNum.classList.remove('paused');}}
+ if(pauseBtn){const _canPause=sessionActive&&(phase==='reading'||phase==='reflection'||phase==='writing');pauseBtn.disabled=!_canPause;if(!_canPause){timerPaused=false;window.mmiTimerPaused=false;pauseBtn.textContent='Pause';pauseBtn.classList.remove('is-paused');if(timerNum)timerNum.classList.remove('paused');}}
  const inlineRestart=$('restartSessionBtn');
  if(inlineRestart) inlineRestart.disabled=!sessionActive;
  if(phase==='done')nextBtn.textContent='Next Station ->';
@@ -3916,6 +3945,8 @@ function applyModeUI(mode) {
  if (tmr) tmr.style.display = isMMI ? '' : 'none';
  const rlr = $('roleplayModeRow');
  if (rlr) rlr.style.display = isMMI ? '' : 'none';
+ const vmr = $('verbalModeRow');
+ if (vmr) vmr.style.display = isMMI ? '' : 'none';
 
  syncIdleTimerPickers();
  updateCasperReflectionUI();
@@ -4001,9 +4032,28 @@ async function initWebcam(){
  return false;
  }
 }
+function hardStopRecording(){
+ // Fully tear down any in-flight recording so it can never run across a restart.
+ // Detaches handlers first so the old recorder's async onstop cannot mutate new state.
+ if(window._elapsedInterval){clearInterval(window._elapsedInterval);window._elapsedInterval=null;}
+ if(window._mmiHardStopTimer){clearTimeout(window._mmiHardStopTimer);window._mmiHardStopTimer=null;}
+ try{clearInterval(mmiRecordingInterval);}catch(e){}
+ try{stopPremiumLiveFrameCapture();}catch(e){}
+ try{stopMMIAudioMonitor();}catch(e){}
+ [mediaRecorder,audioRecorder].forEach(r=>{
+ if(!r)return;
+ try{r.ondataavailable=null;r.onstop=null;}catch(e){}
+ try{if(r.state!=='inactive')r.stop();}catch(e){}
+ });
+ mediaRecorder=null;audioRecorder=null;
+ recordedChunks=[];recordingBlob=null;
+ audioChunks=[];audioBlob=null;
+ mmiLiveFrameBlobs=[];mmiLiveFrameSamples=[];
+ webcamActive=false;
+}
 function startRecording(){
  if(!webcamReady||!webcamStream)return;
- if(webcamActive)return;
+ if(webcamActive||mediaRecorder||audioRecorder)hardStopRecording();
  resetMMIAudioMonitor();
  mediaRecorder=null;
  audioRecorder=null;
@@ -4025,7 +4075,12 @@ function startRecording(){
  $('webcamLive').style.display='block';
 
 
- const opts=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
+ // Prefer MP4 (fragmented, seekable, plays in VLC/QuickTime). WebM is the streaming-only
+ // fallback (Firefox) - it has no seek index so downloaded webm is play-once.
+ const opts=MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.640028,mp4a.40.2')?{mimeType:'video/mp4;codecs=avc1.640028,mp4a.40.2'}:
+ MediaRecorder.isTypeSupported('video/mp4;codecs=avc1,mp4a')?{mimeType:'video/mp4;codecs=avc1,mp4a'}:
+ MediaRecorder.isTypeSupported('video/mp4')?{mimeType:'video/mp4'}:
+ MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?{mimeType:'video/webm;codecs=vp9'}:
  MediaRecorder.isTypeSupported('video/webm')?{mimeType:'video/webm'}:{};
  const recorderOpts = { ...opts };
  recorderOpts.videoBitsPerSecond = 850000;
@@ -4070,6 +4125,8 @@ function startRecording(){
  if(currentMode===MODE_MMI) mmiOnRecordingStop();
  };
  videoRecorder.start(1000);
+ if(window._mmiHardStopTimer)clearTimeout(window._mmiHardStopTimer);
+ window._mmiHardStopTimer=setTimeout(()=>{ if(webcamActive){ if(typeof showPracticeNotice==='function')showPracticeNotice('Recording reached the 10 minute limit and was stopped.','info'); stopRecording(); } },11*60*1000);
 
  if(currentMode===MODE_MMI){
  try{
@@ -4101,6 +4158,7 @@ function startRecording(){
 }
 function stopRecording(){
  if(window._elapsedInterval){clearInterval(window._elapsedInterval);window._elapsedInterval=null;}
+ if(window._mmiHardStopTimer){clearTimeout(window._mmiHardStopTimer);window._mmiHardStopTimer=null;}
  stopPremiumLiveFrameCapture();
  if(mediaRecorder&&mediaRecorder.state!=='inactive'){
  try{ if(mediaRecorder.state==='recording') mediaRecorder.requestData(); }catch(e){}
@@ -4120,7 +4178,7 @@ function confirmRestartRecording() {
  }
  if(!sessionActive||currentMode!==MODE_MMI)return;
  if(typeof mmiResetForRestart==='function') mmiResetForRestart();
- stopRecording();
+ hardStopRecording();
  const pv=$('webcamPlayback');
  if(pv&&pv._mmiPlayer)pv._mmiPlayer.destroy();
  if(window._pbObjectUrl){URL.revokeObjectURL(window._pbObjectUrl);window._pbObjectUrl=null;}
@@ -4155,17 +4213,18 @@ function downloadRecording() {
  const cat = s ? String(s.category||'MMI').replace(/[^a-zA-Z0-9]/g,'-') : 'MMI';
  const dateStr = new Date().toISOString().slice(0,10);
  const baseName = `Key2MD-MMI-${cat}-${dateStr}`;
+ const save = (blob) => (window.MMIDownload && typeof MMIDownload.download === 'function') ? MMIDownload.download(blob, baseName) : saveBlobToDevice(blob, baseName);
 
  if(mediaRecorder&&mediaRecorder.state==='recording'){
  const snapChunks=[...recordedChunks];
  mediaRecorder.requestData();
  setTimeout(()=>{
  const allChunks=[...snapChunks,...recordedChunks.slice(snapChunks.length)];
- saveBlobToDevice(new Blob(allChunks,{type:mediaRecorder.mimeType||'video/webm'}),baseName);
+ save(new Blob(allChunks,{type:mediaRecorder.mimeType||'video/webm'}));
  },300);
  return;
  }
- saveBlobToDevice(recordingBlob,baseName);
+ save(recordingBlob);
 }
 
 $('btnDownloadVideo').addEventListener('click', downloadRecording);
@@ -4223,6 +4282,7 @@ function startSession(){
  sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
  setPracticeSessionRunning(true);
  statAvg.textContent='-';statAvg.style.color='var(--gray400)';aiFeedbackWrap.innerHTML='';clearTrend();
+ if(currentMode===MODE_MMI&&(webcamActive||mediaRecorder||audioRecorder)){ hardStopRecording(); if(typeof mmiResetForRestart==='function') mmiResetForRestart(); }
  if(currentMode===MODE_MMI&&!webcamReady&&!mmiTypedMode&&!mmiRoleplayMode)initWebcam();
  loadStation();
  scrollActiveStationIntoView();
@@ -4296,7 +4356,14 @@ function loadStation(){
  allPrompts.forEach((p,i)=>{ const t=$(`prompt${i+1}Text`); if(t)t.textContent=p; });
  hideMMIPromptWraps();
 
- if(mmiHidePrompts){
+ if(cfg.verbalPrompts){
+ promptsLocked.style.display='none';
+ const vh=document.createElement('div');
+ vh.id='qfReadingHint';
+ vh.style.cssText='background:rgba(14,165,233,0.06);border:1px dashed rgba(14,165,233,0.25);border-radius:10px;padding:10px 16px;font-size:0.78rem;color:var(--teal3);font-weight:600;text-align:center;margin-top:8px;';
+ vh.textContent='Read the scenario now. When you begin, the examiner reads each question aloud - press Continue (or spacebar) when you are ready for the next one.';
+ const vpa=$('promptsArea'); if(vpa && !$('qfReadingHint')) vpa.appendChild(vh);
+ } else if(mmiHidePrompts){
  promptsLocked.style.display='flex';
  } else {
  promptsLocked.style.display='none';
@@ -4334,9 +4401,24 @@ function loadStation(){
  } else {
  setPhaseUI('reading');
  if(isMmi && typeof mmiShowCentralTimer==='function') mmiShowCentralTimer(rt,'Reading','purple');
- runTimer(rt,()=>startCasperReflectionOrWriting());
+ runTimer(rt,()=>{ if(isMmi && mmiVerbalPrompts){ showVerbalBeginGate(); } else { startCasperReflectionOrWriting(); } });
  }
  syncAutoSaveHeartbeat();
+}
+
+function showVerbalBeginGate(){
+ try { if(typeof mmiHideCentralTimer==='function') mmiHideCentralTimer(); } catch(e){}
+ const hint=$('qfReadingHint'); if(hint) hint.remove();
+ const pa=$('promptsArea');
+ if(!pa){ startCasperReflectionOrWriting(); return; }
+ if($('verbalBeginGate')) return;
+ const wrap=document.createElement('div');
+ wrap.id='verbalBeginGate';
+ wrap.style.cssText='text-align:center;margin-top:10px;';
+ wrap.innerHTML='<button type="button" id="verbalBeginBtn" class="btn-reveal-next" style="display:inline-flex;">Begin - read me the first question</button><div style="font-size:0.72rem;color:var(--gray400);margin-top:6px;">Press when you are ready. The examiner will read the first question aloud.</div>';
+ pa.appendChild(wrap);
+ const btn=$('verbalBeginBtn');
+ if(btn) btn.addEventListener('click', ()=>{ wrap.remove(); if(window.MMITTS&&MMITTS.prime)MMITTS.prime(); startCasperReflectionOrWriting(); });
 }
 
 function startCasperReflectionOrWriting(){
@@ -4353,6 +4435,7 @@ function startWriting(){
  const s=pool[currentIdx];
  const isMmi=currentMode===MODE_MMI;
  promptsLocked.style.display='none';
+ const _vbg=document.getElementById('verbalBeginGate'); if(_vbg)_vbg.remove();
 
  if(isMmi){
  if(typeof mmiDispatchStartWriting==='function') mmiDispatchStartWriting();
@@ -6475,8 +6558,23 @@ function updateStreakUI(streak){
 setTimeout(()=>{loadStreak();loadLeaderboardSettings();refreshLeaderboardData({silent:true});if(typeof updateLeaderboardCollapsedLabel === 'function') updateLeaderboardCollapsedLabel();},200);
 loadQOTW();
 
+function toggleVerbalInfo() {
+ const e = document.getElementById('verbalInfo');
+ if (e) e.style.display = (!e.style.display || e.style.display === 'none') ? 'block' : 'none';
+}
+function toggleMMIVerbalPrompts() {
+ mmiVerbalPrompts = document.getElementById('verbalPromptsToggle')?.checked || false;
+ if (mmiVerbalPrompts) {
+  if (window.MMITTS && MMITTS.prime) MMITTS.prime(); // unlock audio on this user gesture
+  if (mmiTypedMode) { mmiTypedMode = false; const t = document.getElementById('typedModeToggle'); if (t) t.checked = false; const tiw = $('mmiTypedAnswerWrap'); if (tiw) tiw.style.display = 'none'; }
+  if (mmiRoleplayMode) { mmiRoleplayMode = false; const r = document.getElementById('roleplayModeToggle'); if (r) r.checked = false; const rlw = $('mmiRoleplayWrap'); if (rlw) rlw.style.display = 'none'; }
+  const si = $('speakingInstruction'); if (si) si.style.display = '';
+ }
+ applyModeUI(currentMode);
+}
 function toggleMMITypedMode() {
  mmiTypedMode = document.getElementById('typedModeToggle')?.checked || false;
+ if (mmiTypedMode && mmiVerbalPrompts) { mmiVerbalPrompts = false; const v = document.getElementById('verbalPromptsToggle'); if (v) v.checked = false; }
  if (mmiTypedMode && mmiRoleplayMode) {
   mmiRoleplayMode = false;
   const rlt = document.getElementById('roleplayModeToggle');
@@ -6552,6 +6650,7 @@ async function submitMMITypedAnswer() {
 
 function toggleMMIRoleplayMode() {
  mmiRoleplayMode = document.getElementById('roleplayModeToggle')?.checked || false;
+ if (mmiRoleplayMode && mmiVerbalPrompts) { mmiVerbalPrompts = false; const v = document.getElementById('verbalPromptsToggle'); if (v) v.checked = false; }
  if (mmiRoleplayMode && mmiTypedMode) {
   mmiTypedMode = false;
   const tmt = document.getElementById('typedModeToggle');
@@ -6923,14 +7022,17 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
 skipBtn.addEventListener('click',()=>{
  if(!sessionActive)return;
  if(phase==='reading'||phase==='reflection'){clearTimer();startWriting();return;}
- if(phase==='writing'){timerPaused=false;nextBtn.click();}
+ if(phase==='writing'){timerPaused=false;window.mmiTimerPaused=false;nextBtn.click();}
 });
 pauseBtn?.addEventListener('click',()=>{
  if(pauseBtn.disabled||!sessionActive)return;
  timerPaused=!timerPaused;
+ window.mmiTimerPaused=timerPaused;
  pauseBtn.textContent=timerPaused?'Resume':'Pause';
  pauseBtn.classList.toggle('is-paused',timerPaused);
  if(timerNum)timerNum.classList.toggle('paused',timerPaused);
+ if(timerPaused){if(mmiPauseStartedAt==null)mmiPauseStartedAt=Date.now();}
+ else{if(mmiPauseStartedAt!=null){mmiPausedAccumMs+=(Date.now()-mmiPauseStartedAt);mmiPauseStartedAt=null;}}
  if(currentMode===MODE_MMI&&phase==='writing'&&webcamActive){
  try{
  if(timerPaused){if(mediaRecorder&&mediaRecorder.state==='recording')mediaRecorder.pause();if(audioRecorder&&audioRecorder.state==='recording')audioRecorder.pause();}

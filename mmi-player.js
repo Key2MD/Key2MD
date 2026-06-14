@@ -308,17 +308,21 @@ const MMIPlayer = (function () {
       blob = await res.blob();
      }
      if (!blob) return;
-     const name = (opts.downloadName || 'Key2MD-recording') + extFromMime(blob.type);
-     if (lastObjectUrl) { URL.revokeObjectURL(lastObjectUrl); lastObjectUrl = null; }
-     const url = URL.createObjectURL(blob);
-     lastObjectUrl = url;
-     const a = document.createElement('a');
-     a.href = url;
-     a.download = name;
-     document.body.appendChild(a);
-     a.click();
-     a.remove();
-     setTimeout(() => { if (lastObjectUrl === url) { URL.revokeObjectURL(url); lastObjectUrl = null; } }, 10000);
+     if (window.MMIDownload && typeof window.MMIDownload.download === 'function') {
+      await window.MMIDownload.download(blob, opts.downloadName || 'Key2MD-recording');
+     } else {
+      const name = (opts.downloadName || 'Key2MD-recording') + extFromMime(blob.type);
+      if (lastObjectUrl) { URL.revokeObjectURL(lastObjectUrl); lastObjectUrl = null; }
+      const url = URL.createObjectURL(blob);
+      lastObjectUrl = url;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => { if (lastObjectUrl === url) { URL.revokeObjectURL(url); lastObjectUrl = null; } }, 10000);
+     }
     } catch (e) {
      alert('Could not save the recording. Please try again.');
     }

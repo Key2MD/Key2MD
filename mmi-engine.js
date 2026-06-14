@@ -46,6 +46,7 @@ window.mmiShowCentralTimer = function(totalSec, label, colorClass) {
  if (numEl) numEl.classList.toggle('urgent', sLeft <= 30);
 
  _ctInterval = setInterval(() => {
+ if (window.mmiTimerPaused) return;
  sLeft = Math.max(0, sLeft - 1);
  if (numEl) {
  numEl.textContent = fmt(sLeft);
@@ -196,6 +197,7 @@ window.mmiStartExtended = function(allPrompts, cfg) {
  _extCfg = cfg;
 
  _showWrap(1, allPrompts[0]);
+ if (cfg.verbalPrompts && window.MMITTS) { window.MMITTS.speak(allPrompts[0]); if (allPrompts[1]) window.MMITTS.prefetch(allPrompts[1]); }
  _$('mmiSpeakingArea').classList.add('show');
  document.getElementById('answerSection').style.display = 'none';
  if (window.webcamReady) startRecording();
@@ -219,6 +221,7 @@ function _updateExtBtn() {
 window.mmiExtendedReveal = function() {
  if (_extShown >= _extPrompts.length) return;
  _showWrap(_extShown + 1, _extPrompts[_extShown]);
+ if (_extCfg && _extCfg.verbalPrompts && window.MMITTS) { window.MMITTS.speak(_extPrompts[_extShown]); if (_extPrompts[_extShown + 1]) window.MMITTS.prefetch(_extPrompts[_extShown + 1]); }
  // log timestamp
  if (window.mmiRecordingStartedAt) {
  const elapsed = (Date.now() - window.mmiRecordingStartedAt) / 1000;
@@ -244,6 +247,7 @@ window.mmiStartRandom = function(allPrompts, cfg) {
  _randPrompts = allPrompts;
  _randGiven = 0;
  _randWarnShown = false;
+ window.mmiTimerPaused = false;
  if (_randTimer) clearInterval(_randTimer);
 
  // The user-selected question count controls how many follow-ups can appear.
@@ -284,6 +288,7 @@ window.mmiStartRandom = function(allPrompts, cfg) {
  // Hidden countdown
  let elapsed = 0;
  _randTimer = setInterval(() => {
+ if (window.mmiTimerPaused) return;
  elapsed++;
  const remaining = total - elapsed;
 
@@ -446,6 +451,7 @@ window.mmiDispatchStartWriting = function() {
 
 // -- Cleanup: call mmiEngineReset() from loadStation() and mmiResetForRestart() 
 window.mmiEngineReset = function() {
+ if (window.MMITTS) window.MMITTS.stop();
  // Quickfire
  _qfRunning = false;
  _qfIdx = 0;
@@ -470,8 +476,9 @@ window.mmiEngineReset = function() {
  }
  const pf = _$('progressFill');
  if (pf) pf.style.display = '';
- // Remove any leftover hint
+ // Remove any leftover hint / verbal begin gate
  const qfh = _$('qfReadingHint'); if (qfh) qfh.remove();
+ const vbg = _$('verbalBeginGate'); if (vbg) vbg.remove();
  // Remove highlights
  _removeAllHighlights();
 };

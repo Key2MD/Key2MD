@@ -491,7 +491,47 @@ const MMIFeedbackRender = (() => {
  }
 
 
- function renderPromptCard(pp, index) {
+ const TIMING_FILLERS = new Set(['um','uh','er','ah','like','you','know','sort','kind','basically','literally','actually','right','okay','so']);
+ // Per-prompt timing from phrase segments + reveal times. Only meaningful when
+ // prompts were revealed one at a time (staggered); returns null otherwise.
+ function computePromptTimings(segments, reveals, totalDur) {
+ if (!Array.isArray(segments) || !segments.length) return null;
+ if (!Array.isArray(reveals) || reveals.length < 2) return null;
+ const finite = reveals.filter(n => Number.isFinite(Number(n)));
+ if (finite.length < 2) return null;
+ const staggered = finite.some(t => Number(t) > 2);
+ if (!staggered) return null;
+ const out = [];
+ for (let i = 0; i < reveals.length; i++) {
+ const startWin = Number(reveals[i]);
+ if (!Number.isFinite(startWin)) { out.push(null); continue; }
+ const endWin = Number.isFinite(Number(reveals[i + 1])) ? Number(reveals[i + 1]) : (totalDur > 0 ? totalDur : Infinity);
+ const segs = segments.filter(s => Number(s.start) >= startWin - 0.05 && Number(s.start) < endWin);
+ if (!segs.length) { out.push({ empty: true }); continue; }
+ let words = 0, fillers = 0;
+ segs.forEach(s => {
+ const toks = String(s.text || '').toLowerCase().split(/\s+/).filter(Boolean);
+ words += toks.length;
+ toks.forEach(t => { if (TIMING_FILLERS.has(t.replace(/[^a-z]/g, ''))) fillers++; });
+ });
+ const firstStart = Number(segs[0].start);
+ const lastEnd = Number(segs[segs.length - 1].end);
+ const durationSec = Math.max(0.5, lastEnd - firstStart);
+ out.push({ words, fillers, durationSec: Math.round(durationSec), pace: Math.round((words / durationSec) * 60), timeToFirstWord: Math.max(0, Math.round((firstStart - startWin) * 10) / 10) });
+ }
+ return out;
+ }
+
+ function renderPromptTiming(timing) {
+ if (!timing) return '';
+ if (timing.empty) return '<div class="mmi-prompt-timing mmi-prompt-timing-warn"><span>No clear spoken answer landed in this question\'s window</span></div>';
+ const parts = [`<span>${timing.durationSec}s</span>`, `<span>${timing.pace} wpm</span>`, `<span>${timing.words} words</span>`];
+ if (timing.fillers) parts.push(`<span>${timing.fillers} filler${timing.fillers === 1 ? '' : 's'}</span>`);
+ if (timing.timeToFirstWord >= 2) parts.push(`<span class="mmi-prompt-timing-flag">${timing.timeToFirstWord}s before you spoke</span>`);
+ return `<div class="mmi-prompt-timing">${parts.join('')}</div>`;
+ }
+
+ function renderPromptCard(pp, index, timing) {
  const criteria = ['empathy','communication','reasoning','reflection','real_world_awareness'];
  const criteriaRows = criteria.map(k => {
  const crit = pp.scores?.[k];
@@ -509,6 +549,7 @@ const MMIFeedbackRender = (() => {
  <span class="mmi-score-badge ${avgCls}">${SCORE_LABELS[Math.round(avgScore)] || ''}</span>
  </div>
  <div class="mmi-prompt-text">"${esc(pp.prompt_text || '')}"</div>
+ ${renderPromptTiming(timing)}
  <div class="mmi-criteria-grid">
  ${criteriaRows}
  </div>
@@ -662,7 +703,8 @@ const MMIFeedbackRender = (() => {
  ? `${Math.floor(duration / 60)}m ${Math.round(duration % 60)}s`
  : '';
 
- const promptCards = (feedback.per_prompt || []).map((pp, i) => renderPromptCard(pp, i)).join('');
+ const promptTimings = computePromptTimings(data.transcript_segments, context?.promptRevealSeconds, duration);
+ const promptCards = (feedback.per_prompt || []).map((pp, i) => renderPromptCard(pp, i, promptTimings && promptTimings[i])).join('');
 
  // Premium sections
  const voiceSection = data.voice_metrics ? renderVoiceMetrics(data.voice_metrics) : '';

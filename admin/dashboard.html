@@ -409,6 +409,18 @@
  .mmi-prompt{border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.14);padding:10px 11px;}
  .mmi-prompt-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);font-weight:900;margin-bottom:5px;display:flex;justify-content:space-between;gap:8px;}
  .mmi-prompt-text{font-size:0.82rem;color:var(--text);line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;}
+ .mmi-prompt{transition:border-color 0.15s,background 0.15s,box-shadow 0.15s;}
+ .mmi-prompt.mmi-prompt-active{border-color:rgba(56,189,248,0.6);background:rgba(56,189,248,0.12);box-shadow:0 0 0 1px rgba(56,189,248,0.3);}
+ .mmi-timeline-wrap{margin:0 0 12px;border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,0.16);padding:11px 12px;}
+ .mmi-timeline-head{display:flex;align-items:center;justify-content:space-between;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:900;margin-bottom:6px;}
+ .mmi-tl-clock{color:var(--blue);font-variant-numeric:tabular-nums;}
+ .mmi-timeline-bar{position:relative;height:10px;border-radius:99px;background:rgba(255,255,255,0.09);margin:20px 0 8px;}
+ .mmi-tl-playhead{position:absolute;top:-4px;width:3px;height:18px;border-radius:2px;background:var(--blue);box-shadow:0 0 6px rgba(56,189,248,0.6);transform:translateX(-50%);transition:left 0.1s linear;z-index:3;}
+ .mmi-tl-marker{position:absolute;top:-3px;width:2px;height:16px;background:var(--muted2);transform:translateX(-50%);z-index:2;}
+ .mmi-tl-marker.active{background:var(--green);}
+ .mmi-tl-flag{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:0.58rem;font-weight:900;color:var(--muted);white-space:nowrap;background:rgba(15,23,42,0.92);border:1px solid var(--border);border-radius:5px;padding:1px 5px;}
+ .mmi-tl-marker.active .mmi-tl-flag{color:var(--green);border-color:var(--green-border);}
+ .mmi-tl-note{font-size:0.66rem;color:var(--muted);line-height:1.5;}
  .mmi-transcript{max-height:360px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--text);line-height:1.75;}
 .mmi-media-stage{border:1px dashed var(--border2);border-radius:12px;background:rgba(0,0,0,0.18);min-height:210px;display:grid;place-items:center;padding:14px;text-align:center;color:var(--muted);}
 .mmi-media-stage video,.mmi-media-stage audio{width:100%;max-height:380px;border-radius:10px;outline:none;}
@@ -9128,7 +9140,7 @@ function renderMMIRecordingElement(data) {
 	 const mode = data?.blob_url ? 'Loaded by fallback' : 'Playback link expires soon';
 	 const media = type.startsWith('audio/')
 	 ? `<audio controls preload="metadata" src="${src}"${fallbackAttr}></audio>`
-	 : `<video id="${esc(mediaId)}" playsinline preload="metadata" src="${src}" data-duration="${esc(duration || '')}" data-loaded="1" onloadedmetadata='updateMMIRecordingPlayer(${jsArg(mediaId)})' onloadeddata='applyPendingMMIRecordingSeek(${jsArg(mediaId)});updateMMIRecordingPlayer(${jsArg(mediaId)})' ondurationchange='applyPendingMMIRecordingSeek(${jsArg(mediaId)});updateMMIRecordingPlayer(${jsArg(mediaId)})' ontimeupdate='updateMMIRecordingPlayer(${jsArg(mediaId)})' onplay='updateMMIRecordingPlayer(${jsArg(mediaId)})' onpause='updateMMIRecordingPlayer(${jsArg(mediaId)})' onended='updateMMIRecordingPlayer(${jsArg(mediaId)})' onseeked='updateMMIRecordingPlayer(${jsArg(mediaId)})'${fallbackAttr}></video>`;
+	 : `<video id="${esc(mediaId)}" playsinline preload="metadata" src="${src}" data-duration="${esc(duration || '')}" data-loaded="1" onloadedmetadata='recoverMMIRecordingDuration(${jsArg(mediaId)});updateMMIRecordingPlayer(${jsArg(mediaId)})' onloadeddata='applyPendingMMIRecordingSeek(${jsArg(mediaId)});updateMMIRecordingPlayer(${jsArg(mediaId)})' ondurationchange='applyPendingMMIRecordingSeek(${jsArg(mediaId)});updateMMIRecordingPlayer(${jsArg(mediaId)})' ontimeupdate='updateMMIRecordingPlayer(${jsArg(mediaId)})' onplay='updateMMIRecordingPlayer(${jsArg(mediaId)})' onpause='updateMMIRecordingPlayer(${jsArg(mediaId)})' onended='updateMMIRecordingPlayer(${jsArg(mediaId)})' onseeked='updateMMIRecordingPlayer(${jsArg(mediaId)})'${fallbackAttr}></video>`;
 	 const controls = type.startsWith('audio/') ? '' : `<div class="mmi-playback-controls">
 	 <div class="mmi-playback-row">
 	 <button type="button" class="mmi-playback-btn" onclick='skipMMIRecordingPlayer(${jsArg(mediaId)}, -15)'>-15s</button>
@@ -9163,6 +9175,26 @@ function mmiMediaDuration(video) {
 	 return 0;
 }
 
+function recoverMMIRecordingDuration(id) {
+ // MediaRecorder WebM files report duration=Infinity, which leaves the admin
+ // <video> black and unseekable. Force the browser to compute the real duration
+ // (same trick the student player uses), which also renders the first frame.
+ const video = document.getElementById(id);
+ if (!video || video.tagName !== 'VIDEO' || video.dataset.durRecovered === '1') return;
+ const d = Number(video.duration);
+ if (Number.isFinite(d) && d > 0 && d < 86400) { video.dataset.durRecovered = '1'; return; }
+ const restore = () => {
+  const nd = Number(video.duration);
+  if (Number.isFinite(nd) && nd > 0 && nd < 86400) {
+   video.dataset.durRecovered = '1';
+   video.removeEventListener('durationchange', restore);
+   try { video.currentTime = 0; } catch (e) {}
+   updateMMIRecordingPlayer(id);
+  }
+ };
+ video.addEventListener('durationchange', restore);
+ try { video.currentTime = 1e101; } catch (e) {}
+}
 function updateMMIRecordingPlayer(id) {
 	 const video = document.getElementById(id);
 	 if (!video) return;
@@ -9177,6 +9209,7 @@ function updateMMIRecordingPlayer(id) {
 	 if (range) range.value = String(Math.round(pct * 1000));
 	 if (time) time.textContent = `${mmiMediaTime(current)} / ${duration ? mmiMediaTime(duration) : '--:--'}`;
 	 if (btn) btn.textContent = video.paused || video.ended ? 'Play' : 'Pause';
+	 updateMMITimeline(current, duration);
 }
 
 function applyMMIRecordingSeek(video, target) {
@@ -9281,9 +9314,16 @@ async function loadMMIRecordingBlobFallback(id, key) {
 }
 
 function renderMMIStationPanel(row, prompts) {
+ const domId = mmiDomId(row.id);
+ const durRaw = Number(row.recording_duration_seconds || 0);
+ const duration = (Number.isFinite(durRaw) && durRaw > 0) ? durRaw : 0;
+ const reveals = prompts.map((p, i) => ({ index: i, t: Number.isFinite(p.revealed) ? p.revealed : null, label: `Q${i+1}` }));
+ const staggered = reveals.some(r => Number.isFinite(r.t) && r.t > 2);
+ S.mmiTimeline = { domId, duration, reveals, staggered, hasRecording: !!row.recording_url };
+ const timelineHtml = renderMMITimeline(row, domId, duration, reveals, staggered);
  const promptHtml = prompts.length ? prompts.map((p, i) => `
- <div class="mmi-prompt">
- <div class="mmi-prompt-label"><span>Prompt ${i+1}</span>${Number.isFinite(p.revealed) ? `<span>${p.revealed}s</span>` : ''}</div>
+ <div class="mmi-prompt" id="mmiAdminPrompt-${domId}-${i}"${Number.isFinite(p.revealed) ? ` data-reveal="${p.revealed}"` : ''}>
+ <div class="mmi-prompt-label"><span>Prompt ${i+1}</span>${Number.isFinite(p.revealed) ? `<span>appears at ${mmiMediaTime(p.revealed)}</span>` : ''}</div>
  <div class="mmi-prompt-text">${esc(p.text || '-')}</div>
  </div>`).join('') : '<div class="mmi-media-note">No prompt rows were returned for this review.</div>';
  return `
@@ -9291,9 +9331,49 @@ function renderMMIStationPanel(row, prompts) {
  <div class="mmi-section-head"><div class="mmi-section-title">Station and prompts</div><span class="badge badge-default">${esc(row.reveal_mode || 'all_at_once')}</span></div>
  <div class="mmi-section-body">
  <div class="mmi-scenario">${esc(row.station_scenario || 'No scenario saved for this row.')}</div>
+ ${timelineHtml}
  <div class="mmi-prompt-list">${promptHtml}</div>
  </div>
  </div>`;
+}
+
+function renderMMITimeline(row, domId, duration, reveals, staggered) {
+ if (!row.recording_url) return '';
+ const markers = (duration && staggered) ? reveals.filter(r => Number.isFinite(r.t)).map(r => {
+ const pct = Math.max(0, Math.min(100, (r.t / duration) * 100));
+ return `<div class="mmi-tl-marker" id="mmiTlMarker-${domId}-${r.index}" style="left:${pct}%"><span class="mmi-tl-flag">${esc(r.label)}</span></div>`;
+ }).join('') : '';
+ const note = !duration
+ ? 'No recording duration was saved, so the playhead cannot be scaled for this row.'
+ : staggered
+ ? 'Markers show when each question appeared to the candidate. A long flat gap after a marker before they speak is reading or thinking time - the difference between hesitation and freezing.'
+ : 'All questions were shown at once for this station, so there are no per-question markers. The bar tracks playback position only.';
+ return `<div class="mmi-timeline-wrap">
+ <div class="mmi-timeline-head"><span>Answer timeline</span><span id="mmiTlClock-${domId}" class="mmi-tl-clock">0:00 / ${duration ? mmiMediaTime(duration) : '--:--'}</span></div>
+ <div class="mmi-timeline-bar" id="mmiTlBar-${domId}"><div class="mmi-tl-playhead" id="mmiTlPlayhead-${domId}" style="left:0%"></div>${markers}</div>
+ <div class="mmi-tl-note">${note}</div>
+ </div>`;
+}
+
+function updateMMITimeline(current, duration) {
+ const tl = S.mmiTimeline;
+ if (!tl || !tl.domId || !tl.hasRecording) return;
+ const domId = tl.domId;
+ const dur = duration || tl.duration || 0;
+ const playhead = document.getElementById(`mmiTlPlayhead-${domId}`);
+ const clock = document.getElementById(`mmiTlClock-${domId}`);
+ if (playhead && dur > 0) playhead.style.left = `${Math.max(0, Math.min(100, (current / dur) * 100))}%`;
+ if (clock) clock.textContent = `${mmiMediaTime(current)} / ${dur ? mmiMediaTime(dur) : '--:--'}`;
+ if (!tl.staggered) return;
+ let activeIdx = -1;
+ (tl.reveals || []).forEach(r => { if (Number.isFinite(r.t) && r.t <= current + 0.25) activeIdx = r.index; });
+ (tl.reveals || []).forEach(r => {
+ const el = document.getElementById(`mmiAdminPrompt-${domId}-${r.index}`);
+ const mk = document.getElementById(`mmiTlMarker-${domId}-${r.index}`);
+ const on = r.index === activeIdx;
+ if (el) el.classList.toggle('mmi-prompt-active', on);
+ if (mk) mk.classList.toggle('active', on);
+ });
 }
 
 function renderMMITranscriptPanel(row) {
