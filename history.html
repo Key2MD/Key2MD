@@ -2355,11 +2355,18 @@ async function loadInterviewDateAndReferral(token) {
  ]);
  const dateData = dateRes?.ok ? await dateRes.json().catch(() => ({})) : {};
  const refData = refRes?.ok ? await refRes.json().catch(() => ({})) : {};
- renderPrepPlan(dateData.interview_date || null);
+ renderPrepPlan(dateData.interview_date || null, dateData.interview_outcome || null);
  renderReferralSection(refData);
 }
+function outcomeLabel(o) { return ({ offer: 'Got an offer', waitlist: 'Waitlisted', unsuccessful: 'Not this time', withdrew: 'Withdrew', pending: 'Still waiting' })[o] || o; }
+async function submitInterviewOutcome(outcome) {
+ const token = localStorage.getItem(TOKEN_KEY) || '';
+ if (!token) return;
+ try { await fetch(`${API_BASE}/api/user/interview-outcome`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ outcome }) }); } catch (e) {}
+ loadInterviewDateAndReferral(token);
+}
 
-function renderPrepPlan(interviewDate) {
+function renderPrepPlan(interviewDate, interviewOutcome) {
  const el = document.getElementById('mmiPrepPlan');
  if (!el) return;
  const token = localStorage.getItem(TOKEN_KEY) || '';
@@ -2405,7 +2412,15 @@ function renderPrepPlan(interviewDate) {
   const daysLeft = Math.round((ivDay - today) / 86400000);
   const weeksLeft = Math.floor(daysLeft / 7);
   if (daysLeft <= 0) {
-   planHtml = `<div class="mmi-prep-notice">Your interview was on ${escapeHtml(interviewDate)}. Well done on the preparation work.</div>`;
+   if (interviewOutcome) {
+    planHtml = `<div class="mmi-prep-notice">Your interview was on ${escapeHtml(interviewDate)}. Outcome recorded: <strong>${escapeHtml(outcomeLabel(interviewOutcome))}</strong>. Thank you - this helps us improve the tool.</div>`;
+   } else {
+    planHtml = `<div class="mmi-prep-notice">Your interview was on ${escapeHtml(interviewDate)}. Well done on the preparation work.</div>
+    <div style="margin-top:10px;padding:12px 14px;border:1px solid rgba(14,165,233,0.25);border-radius:10px;background:rgba(14,165,233,0.04);">
+     <div style="font-size:0.82rem;font-weight:700;color:#0a1628;margin-bottom:8px;">How did it go? <span style="font-weight:500;color:var(--gray400);">(optional, private)</span></div>
+     <div style="display:flex;flex-wrap:wrap;gap:6px;">${['offer', 'waitlist', 'unsuccessful', 'withdrew', 'pending'].map(o => `<button type="button" onclick="submitInterviewOutcome('${o}')" style="border:1px solid var(--gray200);background:#fff;border-radius:50px;padding:6px 12px;font-size:0.76rem;font-weight:700;cursor:pointer;font-family:inherit;color:#0a1628;">${escapeHtml(outcomeLabel(o))}</button>`).join('')}</div>
+    </div>`;
+   }
   } else if (daysLeft < 14) {
    planHtml = `<div class="mmi-prep-weeks"><div class="mmi-prep-week"><span class="mmi-prep-wlabel">Now</span><span class="mmi-prep-wfocus">Focus on Mock Circuit and full-length timed practice until your interview.</span></div></div><div class="mmi-prep-notice">${daysLeft} day${daysLeft === 1 ? '' : 's'} remaining.</div>`;
   } else {

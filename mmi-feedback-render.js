@@ -395,6 +395,8 @@ const MMIFeedbackRender = (() => {
  if (pace < 95) tips.push('Lift your pace slightly so every prompt gets a complete answer within the time.');
  if (fillerPct > 10) tips.push('Swap fillers for a brief silent pause - it reads as considered, not hesitant.');
  if (longest > 4) tips.push(`Your longest pause was ${longest}s - fine for thinking, but narrate it ("let me think about that for a second") so it does not read as freezing.`);
+ let esl = false; try { esl = localStorage.getItem('k2_esl') === '1'; } catch (e) {}
+ if (esl) tips.push('Clarity over speed: shorter sentences with clear endings help a listener follow you. Your accent and phrasing are never marked down.');
  if (!tips.length) tips.push('Your delivery sits in a strong range. Hold this pace and clarity under interview pressure.');
 
  return `
@@ -563,7 +565,7 @@ const MMIFeedbackRender = (() => {
  const sums = {}, counts = {};
  for (const pp of (feedback?.per_prompt || [])) {
   for (const key of criteria) {
-   const s = pp?.criteria?.[key]?.score;
+   const s = pp?.scores?.[key]?.score;
    if (typeof s === 'number') { sums[key] = (sums[key]||0)+s; counts[key]=(counts[key]||0)+1; }
   }
  }
@@ -723,6 +725,24 @@ const MMIFeedbackRender = (() => {
  const predictionSection = context?.predictedScores ? renderPredictionSection(feedback, context.predictedScores, context.calibrationStreak || 0) : '';
  const highlightsSection = renderHighlights(feedback);
 
+ const critAvgs = computeCriterionAverages(feedback);
+ const critStrip = CRITERIA_KEYS.map(k => {
+ const v = critAvgs[k];
+ if (!Number.isFinite(v)) return '';
+ const pct = Math.max(0, Math.min(100, (v / 5) * 100));
+ const cls = v >= 4 ? 'good' : v >= 3 ? 'mid' : 'low';
+ return `<div class="mmi-crit-chip"><div class="mmi-crit-chip-top"><span>${esc(CRITERIA_LABELS[k])}</span><strong>${v.toFixed(1)}</strong></div><div class="mmi-crit-bar"><span class="rate-${cls}" style="width:${pct}%"></span></div></div>`;
+ }).filter(Boolean).join('');
+ const leadHtml = `
+ <div class="mmi-lead">
+ <div class="mmi-lead-focus">
+ <div class="mmi-lead-label">Your one focus next time</div>
+ <div class="mmi-lead-text">${esc(overall.biggest_improvement || 'Name the real tension and land a clear, reasoned decision.')}</div>
+ </div>
+ ${overall.biggest_strength ? `<div class="mmi-lead-strength"><strong>What landed:</strong> ${esc(overall.biggest_strength)}</div>` : ''}
+ ${critStrip ? `<div class="mmi-crit-strip">${critStrip}</div>` : ''}
+ </div>`;
+
  const html = `
  <div class="mmi-feedback" id="mmiFeedbackBlock">
 
@@ -733,16 +753,24 @@ const MMIFeedbackRender = (() => {
  </div>
  </div>
 
+ ${leadHtml}
+
  ${auditorFlag}
  <div id="mmiPercentileMount"></div>
  ${deltaSection}
  ${predictionSection}
 
+ <details class="mmi-collapse">
+ <summary class="mmi-collapse-summary">Your progress over time</summary>
  <div id="mmiAnalyticsMount"></div>
+ </details>
 
+ <details class="mmi-collapse">
+ <summary class="mmi-collapse-summary">Per-question marking</summary>
  <div class="mmi-prompts-block">
  ${promptCards}
  </div>
+ </details>
 
  ${voiceSection}
  ${visualSection}
@@ -780,6 +808,8 @@ const MMIFeedbackRender = (() => {
   <button class="btn-probe-trigger" id="mmiProbeTrigger">Get a follow-up question an examiner would actually ask -></button>
   <div class="mmi-probe-panel" id="mmiProbePanel" style="display:none"></div>
  </div>` : ''}
+
+ ${context?.canRedo ? `<div class="mmi-redo-wrap"><button class="btn-mmi-redo" onclick="window.mmiRedoStation && window.mmiRedoStation()">Practise this station again -></button></div>` : ''}
 
  <div class="dan-marking-card">
  <div class="dan-marking-left">

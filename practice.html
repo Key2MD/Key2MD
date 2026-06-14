@@ -507,6 +507,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
 
 
+ <div id="mmiReadinessCard" class="sidebar-card" style="display:none;margin-bottom:14px;padding:16px 18px;">
+ <h3 style="margin:0 0 10px;font-size:0.95rem;">Your MMI readiness</h3>
+ <div id="mmiReadinessBody"><div style="font-size:0.8rem;color:var(--gray400);">Practise a few stations to see your readiness.</div></div>
+ </div>
  <div id="mmiCategoryCard" style="display:none;">
  <div id="mmiCoverageWrap" style="margin-bottom:10px;">
  <div style="height:4px;background:var(--gray100);border-radius:2px;overflow:hidden;margin-bottom:4px;">
@@ -514,6 +518,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div id="mmiCoverageLabel" style="font-size:0.68rem;color:var(--gray400);"></div>
  </div>
+ <button type="button" id="mmiWeaknessDrillBtn" onclick="weaknessDrill()" style="width:100%;margin-bottom:10px;padding:10px 12px;border-radius:10px;border:1px solid rgba(124,58,237,0.3);background:rgba(124,58,237,0.06);color:#7c3aed;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Drill my weak areas -></button>
  <div class="category-filters" id="mmiCategoryFilters">
  <button class="cat-btn active" data-cat="All">All Stations <span class="cat-count" id="mmi-cnt-all">-</span></button>
  <button class="cat-btn" data-cat="Motivation">Motivation <span class="cat-count" id="mmi-cnt-motivation">-</span></button>
@@ -674,6 +679,14 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div id="verbalInfo" style="display:none;font-size:0.72rem;color:var(--gray600);line-height:1.55;padding:10px 12px;background:rgba(14,165,233,0.05);border-radius:8px;margin-top:4px;">
   <strong>How it works:</strong> you read the scenario yourself during reading time. When you begin, the examiner reads the first question aloud. Answer for as long as you like, then <strong>press Continue (or the spacebar)</strong> and the next question is read to you. Nothing advances on its own - taking time to think will never skip you ahead. Logged in uses a natural cloud voice; otherwise your browser's built-in voice is used.
+ </div>
+ <div class="mmi-specialist-row" id="dyslexiaRow" style="margin-top:8px;">
+ <div><div class="mmi-specialist-label">Dyslexia-friendly font</div><div class="mmi-specialist-sub">Easier-to-read spacing and typeface across the page.</div></div>
+ <label class="toggle-switch"><input type="checkbox" id="dyslexiaToggle" onchange="toggleDyslexiaFont()"><span class="toggle-slider"></span></label>
+ </div>
+ <div class="mmi-specialist-row" id="eslRow" style="margin-top:8px;">
+ <div><div class="mmi-specialist-label">English is an additional language</div><div class="mmi-specialist-sub">Adds clarity-focused delivery tips; your accent and phrasing are never marked down.</div></div>
+ <label class="toggle-switch"><input type="checkbox" id="eslToggle" onchange="toggleEsl()"><span class="toggle-slider"></span></label>
  </div>
  </div>
 
@@ -1001,14 +1014,25 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="mmi-timer-kicker">MMI Timing</div>
  <div class="mmi-timer-title">Choose the station format</div>
  </div>
- <div class="mmi-timer-selected" id="mmiTimerSelected">Quickfire | 4 questions</div>
+ <div class="mmi-timer-selected" id="mmiTimerSelected">Standard | 3 questions</div>
  </div>
+ <div class="mmi-entry-choice" id="mmiEntryChoice">
+ <button type="button" class="mmi-entry-card active" id="mmiEntryQuick" onclick="selectMMIEntry('quick')">
+ <span class="mmi-entry-name">Let me test it out</span>
+ <span class="mmi-entry-detail">3 questions, 2 min reading, 5 min answering. Just start.</span>
+ </button>
+ <button type="button" class="mmi-entry-card" id="mmiEntryCustom" onclick="selectMMIEntry('custom')">
+ <span class="mmi-entry-name">I know my format</span>
+ <span class="mmi-entry-detail">Set your own timing, question count and style.</span>
+ </button>
+ </div>
+ <div id="mmiFormatDetails" style="display:none;">
  <div class="mmi-timer-grid" id="mmiTimerPresetGrid">
- <button type="button" class="preset-card mmi-timer-choice active" data-preset="quickfire" onclick="selectMMIPreset('quickfire')">
+ <button type="button" class="preset-card mmi-timer-choice" data-preset="quickfire" onclick="selectMMIPreset('quickfire')">
  <span class="preset-name">Quickfire</span>
  <span class="preset-detail">45s read | 4 Qs | 15s read + 60s each</span>
  </button>
- <button type="button" class="preset-card mmi-timer-choice" data-preset="standard" onclick="selectMMIPreset('standard')">
+ <button type="button" class="preset-card mmi-timer-choice active" data-preset="standard" onclick="selectMMIPreset('standard')">
  <span class="preset-name">Standard</span>
  <span class="preset-detail">2 min read all | 3 Qs | 5 min speaking</span>
  </button>
@@ -1050,7 +1074,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
  </div>
+ </div>
  <p class="scenario-text" id="scenarioText" style="display:none;"></p>
+ <div id="mmiMethodPrimer" class="mmi-method-primer" style="display:none;"></div>
  </div>
  <div class="prompts-area" id="promptsArea">
  <div id="mmiCentralTimer" class="mmi-central-timer" style="display:none;">
@@ -1060,6 +1086,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <span id="mmiCtNum" class="mmi-central-number">--:--</span>
  <span class="mmi-central-remaining">remaining</span>
+ </div>
+ <div id="mmiScratchpadWrap" style="display:none;margin-bottom:10px;">
+ <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gray400);margin-bottom:4px;">Your notes <span style="font-weight:500;text-transform:none;letter-spacing:0;">(scratchpad - private, never marked)</span></div>
+ <textarea id="mmiScratchpad" rows="3" placeholder="Jot quick notes while you read - the tension, both sides, your decision..." style="width:100%;border:1px solid var(--gray200);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:0.85rem;line-height:1.5;resize:vertical;color:var(--gray800);box-sizing:border-box;"></textarea>
  </div>
  <div class="prompts-locked" id="promptsLocked">
  <div class="lock-icon"></div>Prompts revealed after reading time
@@ -1612,7 +1642,7 @@ const MMI_PRESETS = {
  custom: { readingTime:120, recordingTime:300, promptCount:3, revealMode:'all_at_once' },
 };
 const PREMIUM_VISUAL_FRAME_LIMIT = 48;
-let mmiActivePreset = 'quickfire';
+let mmiActivePreset = 'standard';
 let mmiSelectedPromptCount = MMI_PRESETS.quickfire.promptCount;
 let mmiSpecialistMode = false;
 let mmiPremiumMode = false;
@@ -1662,6 +1692,72 @@ function syncMMIPresetUI() {
  if(qfRow) qfRow.style.display = mmiActivePreset === 'quickfire' ? 'flex' : 'none';
 }
 
+const MMI_METHOD_PRIMERS = {
+ ethics: { title: 'Working through an ethical dilemma', steps: [
+  'Name the real tension in plain words (e.g. loyalty to a friend vs honesty).',
+  'Give each side its strongest version before you judge anyone.',
+  'Make a clear decision - fence-sitting scores poorly.',
+  'Say what would change your mind, so it reads as reasoning, not stubbornness.',
+  'Keep everyone affected in view, especially the most vulnerable person.'
+ ] },
+ personal: { title: 'Answering a personal or behavioural question', steps: [
+  'Use one specific, real example - not a general claim.',
+  'Describe your own role honestly, including what was hard.',
+  'Say what you actually did and felt in the moment.',
+  'Reflect: what did it genuinely teach you?',
+  'Link it to the kind of doctor you are becoming.'
+ ] },
+ policy: { title: 'Discussing a health or policy issue', steps: [
+  'State the issue and the strongest argument on each side.',
+  'Prioritise - and give your reason for the priority.',
+  'Propose a realistic action, not a slogan.',
+  'Say how you would know whether it worked.',
+  'Acknowledge the trade-off: who bears the cost.'
+ ] },
+ communication: { title: 'A conversation or role-play station', steps: [
+  'Listen first - let them feel heard before you respond.',
+  'Acknowledge the emotion; do not rush to fix or lecture.',
+  'Ask, do not assume, what they need.',
+  'Help them weigh options together rather than directing them.',
+  'Leave them in a better place than you found them.'
+ ] }
+};
+function mmiMethodType(category) {
+ const c = String(category || '');
+ if (['Ethics', 'Conflict Resolution', 'Professionalism', 'Cultural Competence'].includes(c)) return 'ethics';
+ if (['Personal', 'Motivation', 'Teamwork'].includes(c)) return 'personal';
+ if (['Policy', 'Public Health', 'Indigenous Health', 'Rural Health', 'Topical Health'].includes(c)) return 'policy';
+ if (c === 'Communication') return 'communication';
+ return 'ethics';
+}
+function mmiShowMethodPrimer(category) {
+ const el = document.getElementById('mmiMethodPrimer');
+ if (!el) return;
+ if (currentMode !== MODE_MMI) { el.style.display = 'none'; return; }
+ const primer = MMI_METHOD_PRIMERS[mmiMethodType(category)];
+ if (!primer) { el.style.display = 'none'; return; }
+ let attempts = 0;
+ try { attempts = parseInt(localStorage.getItem('k2_mmi_attempts') || '0', 10) || 0; } catch (e) {}
+ const openAttr = attempts < 8 ? ' open' : '';
+ el.innerHTML = `<details class="mmi-method-details"${openAttr}><summary class="mmi-method-summary">How to approach this station</summary><div class="mmi-method-body"><div class="mmi-method-title">${primer.title}</div><ol>${primer.steps.map(s => `<li>${s}</li>`).join('')}</ol><div class="mmi-method-note">A guide, not a script - the best answers sound like you, not a template.</div></div></details>`;
+ el.style.display = '';
+}
+function selectMMIEntry(mode) {
+ const details = document.getElementById('mmiFormatDetails');
+ const bq = document.getElementById('mmiEntryQuick');
+ const bc = document.getElementById('mmiEntryCustom');
+ if (mode === 'custom') {
+ if (details) details.style.display = '';
+ if (bq) bq.classList.remove('active');
+ if (bc) bc.classList.add('active');
+ selectMMIPreset('custom');
+ } else {
+ if (details) details.style.display = 'none';
+ if (bq) bq.classList.add('active');
+ if (bc) bc.classList.remove('active');
+ selectMMIPreset('standard');
+ }
+}
 function selectMMIPreset(preset) {
  if(currentMode !== MODE_MMI) return;
  mmiActivePreset = preset;
@@ -2439,6 +2535,7 @@ function showMMIPrediction(container, data, context) {
    predictedScores: usePredictions && Object.keys(predictions).length === 5 ? predictions : null,
    calibrationStreak: streak,
    promptRevealSeconds: (context && context.promptRevealSeconds) ? context.promptRevealSeconds : revealSecs,
+   canRedo: true,
   });
   updateMMILimitsUI();
   mmiFeedbackUploadInFlight = false;
@@ -3793,6 +3890,8 @@ function setPhaseUI(p){
  else if(p==='writing'){phaseBadge.classList.add('phase-writing');phaseBadge.textContent='✍️ Writing';progressFill.classList.add('writing');}
 else if(p==='done'){phaseBadge.classList.add('phase-done');phaseBadge.textContent='Done';}
  else{phaseBadge.classList.add('phase-idle');phaseBadge.textContent='Idle';}
+ const _spw=document.getElementById('mmiScratchpadWrap');
+ if(_spw) _spw.style.display=(currentMode===MODE_MMI && (p==='reading'||p==='writing') && !mmiTypedMode && !mmiRoleplayMode) ? '' : 'none';
  syncIdleTimerPickers();
  updateReflectionUI();
  updateBtns();
@@ -3920,6 +4019,8 @@ function applyModeUI(mode) {
  const qotwCard = $('qotwCard');
  if (cc) cc.style.display = isCasper ? '' : 'none';
  if (mc) mc.style.display = isMMI ? '' : 'none';
+ const mrc = $('mmiReadinessCard');
+ if (mrc) { mrc.style.display = isMMI ? '' : 'none'; if (isMMI && typeof hydrateMmiReadiness === 'function') hydrateMmiReadiness(); }
  if (mo) mo.style.display = isMMI ? '' : 'none';
  const mcc = $('mmiCircuitCard');
  if (mcc) mcc.style.display = isMMI ? '' : 'none';
@@ -4172,6 +4273,20 @@ function stopRecording(){
  webcamActive=false;
 }
 
+window.mmiRedoStation = function() {
+ if(currentMode!==MODE_MMI || !sessionActive) return;
+ if(typeof mmiResetForRestart==='function') mmiResetForRestart();
+ if(typeof hardStopRecording==='function') hardStopRecording();
+ const pv=$('webcamPlayback'); if(pv&&pv._mmiPlayer)pv._mmiPlayer.destroy();
+ if(window._pbObjectUrl){URL.revokeObjectURL(window._pbObjectUrl);window._pbObjectUrl=null;}
+ if(pv){pv.src='';pv.style.display='none';}
+ const wl=$('webcamLive'); if(wl)wl.style.display='block';
+ const rc=$('recordingControls'),pc=$('playbackControls'); if(rc)rc.style.display='flex'; if(pc){pc.style.display='none';pc.innerHTML='';}
+ const fb=$('aiFeedbackWrapMMI'); if(fb)fb.innerHTML='';
+ clearTimer();
+ loadStation();
+ if(typeof showPracticeNotice==='function') showPracticeNotice('Same station - give it another go.','info');
+};
 function confirmRestartRecording() {
  if(recordingBlob){
  if(!confirm('Re-record this station? Your current recording will be erased.'))return;
@@ -4288,6 +4403,57 @@ function startSession(){
  scrollActiveStationIntoView();
 }
 
+async function hydrateMmiReadiness() {
+ const card = document.getElementById('mmiReadinessCard');
+ const body = document.getElementById('mmiReadinessBody');
+ if (!card || !body) return;
+ const auth = getK2Auth();
+ const token = (auth && auth.getToken) ? auth.getToken() : '';
+ if (!token) { body.innerHTML = '<div style="font-size:0.8rem;color:var(--gray400);">Log in and practise a few stations to track your readiness.</div>'; return; }
+ try {
+  const res = await fetch('https://key2md-api.brittainmbbs.workers.dev/api/mmi/reviews?limit=50&source=mmi', { headers: { Authorization: `Bearer ${token}` } });
+  const data = await res.json().catch(() => ({}));
+  const rows = (data.reviews || []);
+  const scores = []; const cat = {};
+  rows.forEach(r => { let sc = null; try { sc = JSON.parse(r.ai_feedback_json || '{}')?.overall?.score; } catch (e) {} if (typeof sc === 'number') { scores.push(sc); const c = r.station_category; if (c) (cat[c] = cat[c] || []).push(sc); } });
+  if (!scores.length) { body.innerHTML = '<div style="font-size:0.8rem;color:var(--gray400);">Practise a few stations to see your readiness.</div>'; return; }
+  const recent = scores.slice(0, 8); const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+  const volume = Math.min(scores.length / 15, 1);
+  const readiness = Math.round(((recentAvg / 5) * 0.7 + volume * 0.3) * 100);
+  let weakest = null, lo = 99; for (const c in cat) { const a = cat[c].reduce((x, y) => x + y, 0) / cat[c].length; if (a < lo) { lo = a; weakest = c; } }
+  const col = readiness >= 70 ? '#16a34a' : readiness >= 45 ? '#d97706' : '#dc2626';
+  body.innerHTML = `
+   <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+    <div style="font-size:1.8rem;font-weight:900;color:${col};line-height:1;">${readiness}%</div>
+    <div style="flex:1;"><div style="height:8px;background:var(--gray100);border-radius:999px;overflow:hidden;"><div style="height:100%;width:${readiness}%;background:${col};border-radius:999px;"></div></div><div style="font-size:0.66rem;color:var(--gray400);margin-top:4px;">${scores.length} review${scores.length === 1 ? '' : 's'} | recent avg ${recentAvg.toFixed(1)}/5</div></div>
+   </div>
+   ${weakest ? `<div style="font-size:0.78rem;color:var(--gray600);line-height:1.5;">Weakest area: <strong style="color:var(--navy);">${weakest}</strong>. <button onclick="weaknessDrill()" style="border:none;background:none;color:var(--teal3);font-weight:700;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline;">Drill it</button></div>` : ''}
+   <div style="font-size:0.68rem;color:var(--gray400);font-style:italic;margin-top:8px;">An estimate from your Key2MD practice, not a prediction of your interview result.</div>`;
+ } catch (e) { body.innerHTML = '<div style="font-size:0.8rem;color:var(--gray400);">Could not load readiness right now.</div>'; }
+}
+async function weaknessDrill() {
+ const auth = getK2Auth();
+ const token = (auth && auth.getToken) ? auth.getToken() : '';
+ let weakest = null;
+ if (token) {
+  try {
+   const res = await fetch('https://key2md-api.brittainmbbs.workers.dev/api/mmi/reviews?limit=50&source=mmi', { headers: { Authorization: `Bearer ${token}` } });
+   const data = await res.json().catch(() => ({}));
+   const agg = {};
+   (data.reviews || []).forEach(r => {
+    const cat = r.station_category; let sc = null;
+    try { sc = JSON.parse(r.ai_feedback_json || '{}')?.overall?.score; } catch (e) {}
+    if (cat && typeof sc === 'number') { (agg[cat] = agg[cat] || []).push(sc); }
+   });
+   let lo = 99;
+   for (const cat in agg) { const avg = agg[cat].reduce((a, b) => a + b, 0) / agg[cat].length; if (avg < lo) { lo = avg; weakest = cat; } }
+  } catch (e) {}
+ }
+ if (weakest) { selectedCategory = weakest; if (typeof showPracticeNotice === 'function') showPracticeNotice(`Drilling your weakest area: ${weakest}.`, 'info'); }
+ else { selectedCategory = 'All'; if (typeof showPracticeNotice === 'function') showPracticeNotice('Practise a few stations first and this will target your weakest area. Starting a mixed set for now.', 'info'); }
+ document.querySelectorAll('#mmiCategoryFilters .cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === selectedCategory));
+ startSession();
+}
 function scrollActiveStationIntoView(){
  if(!window.matchMedia || !window.matchMedia('(max-width: 1024px)').matches) return;
  const main=document.querySelector('.main-content');
@@ -4316,6 +4482,7 @@ function loadStation(){
  updateStarBtn(s);
  updateLibraryCoverage();
  scenarioIdle.style.display='none';scenarioText.style.display='';scenarioText.textContent=s.scenario;
+ if(typeof mmiShowMethodPrimer==='function') mmiShowMethodPrimer(s.category);
 
  answerSection.style.display='none';
  $('mmiSpeakingArea').classList.remove('show');
@@ -4351,6 +4518,7 @@ function loadStation(){
  mmiLiveFrameBlobs=[];mmiLiveFrameSamples=[];
  mmiRecordingStartedAt=null;
  mmiRecordingDurationSec=0;
+ const _sp=document.getElementById('mmiScratchpad'); if(_sp)_sp.value='';
  const cfg=getMMIConfig();
  const allPrompts=getPrompts(s).slice(0,cfg.promptCount);
  allPrompts.forEach((p,i)=>{ const t=$(`prompt${i+1}Text`); if(t)t.textContent=p; });
@@ -4460,6 +4628,7 @@ function startWriting(){
 
 async function finishStation(){
  const isMmi=currentMode===MODE_MMI;
+ if(isMmi){ try{ localStorage.setItem('k2_mmi_attempts', String((parseInt(localStorage.getItem('k2_mmi_attempts')||'0',10)||0)+1)); }catch(e){} }
  const isStrict=document.getElementById('strictModeToggle')?.checked;
  if(isMmi){
  if(mmiRoleplayMode){
@@ -6558,6 +6727,21 @@ function updateStreakUI(streak){
 setTimeout(()=>{loadStreak();loadLeaderboardSettings();refreshLeaderboardData({silent:true});if(typeof updateLeaderboardCollapsedLabel === 'function') updateLeaderboardCollapsedLabel();},200);
 loadQOTW();
 
+function toggleDyslexiaFont() {
+ const on = document.getElementById('dyslexiaToggle')?.checked || false;
+ document.body.classList.toggle('k2-dyslexia', on);
+ try { localStorage.setItem('k2_dyslexia', on ? '1' : '0'); } catch (e) {}
+}
+function toggleEsl() {
+ const on = document.getElementById('eslToggle')?.checked || false;
+ try { localStorage.setItem('k2_esl', on ? '1' : '0'); } catch (e) {}
+}
+document.addEventListener('DOMContentLoaded', function () {
+ try {
+ if (localStorage.getItem('k2_dyslexia') === '1') { document.body.classList.add('k2-dyslexia'); const t = document.getElementById('dyslexiaToggle'); if (t) t.checked = true; }
+ if (localStorage.getItem('k2_esl') === '1') { const e = document.getElementById('eslToggle'); if (e) e.checked = true; }
+ } catch (err) {}
+});
 function toggleVerbalInfo() {
  const e = document.getElementById('verbalInfo');
  if (e) e.style.display = (!e.style.display || e.style.display === 'none') ? 'block' : 'none';
