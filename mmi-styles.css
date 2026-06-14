@@ -1309,6 +1309,233 @@ details[open] .mmi-premium-chevron { transform: rotate(180deg); }
  text-underline-offset: 2px;
 }
 
+/* Delivery scorecard, on-camera presence, and percentile estimate */
+.mmi-delivery-card,
+.mmi-presence-card {
+ background: #fff;
+ border: 1px solid var(--gray200);
+ border-radius: 14px;
+ padding: 18px 18px 16px;
+ margin: 16px 0;
+}
+.mmi-delivery-head {
+ display: flex;
+ align-items: flex-start;
+ justify-content: space-between;
+ gap: 12px;
+}
+.mmi-delivery-kicker {
+ font-size: 0.68rem;
+ font-weight: 800;
+ text-transform: uppercase;
+ letter-spacing: 0.08em;
+ color: var(--teal3);
+}
+.mmi-delivery-title {
+ margin: 2px 0 0;
+ font-size: 1.05rem;
+ color: var(--navy);
+}
+.mmi-delivery-tag {
+ flex: none;
+ font-size: 0.62rem;
+ font-weight: 800;
+ text-transform: uppercase;
+ letter-spacing: 0.05em;
+ color: var(--gray400);
+ border: 1px solid var(--gray200);
+ border-radius: 999px;
+ padding: 3px 9px;
+}
+.mmi-delivery-sub {
+ margin: 8px 0 14px;
+ font-size: 0.85rem;
+ color: var(--gray400);
+ line-height: 1.5;
+}
+.mmi-delivery-metric { margin-bottom: 14px; }
+.mmi-delivery-metric-top {
+ display: flex;
+ justify-content: space-between;
+ align-items: baseline;
+ font-size: 0.85rem;
+ font-weight: 600;
+ color: var(--gray800);
+ margin-bottom: 6px;
+}
+.mmi-delivery-metric-top strong { font-size: 1.05rem; }
+.rate-good { color: #16a34a; }
+.rate-mid { color: #d97706; }
+.rate-low { color: #dc2626; }
+.mmi-gauge { margin: 2px 0 4px; }
+.mmi-gauge-track {
+ position: relative;
+ height: 8px;
+ border-radius: 999px;
+ background: linear-gradient(90deg, #fde2e2, #fdebd0, #d8f0e0, #fdebd0, #fde2e2);
+}
+.mmi-gauge-zone {
+ position: absolute;
+ top: 0;
+ height: 8px;
+ border-radius: 999px;
+ background: rgba(22, 163, 74, 0.35);
+}
+.mmi-gauge-marker {
+ position: absolute;
+ top: -3px;
+ width: 3px;
+ height: 14px;
+ border-radius: 2px;
+ background: var(--navy);
+ transform: translateX(-50%);
+}
+.mmi-delivery-note {
+ font-size: 0.8rem;
+ color: var(--gray400);
+ line-height: 1.5;
+}
+.mmi-delivery-target {
+ display: inline-block;
+ margin-left: 4px;
+ font-weight: 700;
+ color: var(--gray800);
+ opacity: 0.7;
+}
+.mmi-delivery-grid {
+ display: grid;
+ grid-template-columns: repeat(3, 1fr);
+ gap: 10px;
+ margin: 14px 0;
+}
+.mmi-delivery-stat {
+ text-align: center;
+ background: var(--gray50);
+ border-radius: 10px;
+ padding: 10px 6px;
+}
+.mmi-delivery-val { font-size: 1.2rem; font-weight: 800; color: var(--navy); }
+.mmi-delivery-lbl { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gray400); margin-top: 2px; }
+.mmi-delivery-trend {
+ font-size: 0.82rem;
+ color: var(--gray800);
+ background: var(--gray50);
+ border-left: 3px solid var(--teal);
+ border-radius: 6px;
+ padding: 8px 10px;
+ margin-bottom: 12px;
+}
+.mmi-delivery-tips {
+ background: rgba(14, 165, 233, 0.06);
+ border-radius: 10px;
+ padding: 12px 14px;
+ margin-bottom: 12px;
+}
+.mmi-delivery-tips-title { font-weight: 800; font-size: 0.85rem; color: var(--navy); margin-bottom: 6px; }
+.mmi-delivery-tips ul { margin: 0; padding-left: 18px; }
+.mmi-delivery-tips li { font-size: 0.83rem; color: var(--gray800); line-height: 1.5; margin-bottom: 4px; }
+.mmi-delivery-caveat {
+ font-size: 0.75rem;
+ color: var(--gray400);
+ line-height: 1.5;
+ font-style: italic;
+}
+.mmi-presence-badges { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.mmi-presence-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mmi-presence-key { font-size: 0.85rem; font-weight: 600; color: var(--gray800); }
+.mmi-presence-val { font-size: 0.82rem; color: var(--gray400); text-align: right; }
+.mmi-presence-badge {
+ font-size: 0.72rem;
+ font-weight: 700;
+ border-radius: 999px;
+ padding: 3px 10px;
+}
+.mmi-presence-badge.rate-good { background: rgba(22, 163, 74, 0.12); color: #15803d; }
+.mmi-presence-badge.rate-mid { background: rgba(217, 119, 6, 0.12); color: #b45309; }
+.mmi-presence-badge.rate-low { background: rgba(220, 38, 38, 0.10); color: #b91c1c; }
+.mmi-presence-text { font-size: 0.85rem; color: var(--gray800); line-height: 1.55; margin: 8px 0; }
+.mmi-presence-text strong { color: var(--navy); }
+.mmi-presence-muted { color: var(--gray400); font-size: 0.8rem; }
+.mmi-presence-summary {
+ font-size: 0.85rem;
+ color: var(--gray800);
+ background: var(--gray50);
+ border-radius: 8px;
+ padding: 10px 12px;
+ margin: 10px 0;
+ line-height: 1.55;
+}
+.mmi-presence-teaser {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 16px;
+ flex-wrap: wrap;
+ background: linear-gradient(135deg, rgba(10, 22, 40, 0.03), rgba(14, 165, 233, 0.07));
+ border: 1px dashed var(--gray200);
+ border-radius: 14px;
+ padding: 16px 18px;
+ margin: 16px 0;
+}
+.mmi-presence-teaser-title { font-weight: 800; color: var(--navy); margin: 2px 0 4px; font-size: 1rem; }
+.mmi-presence-teaser-text { font-size: 0.83rem; color: var(--gray400); line-height: 1.5; max-width: 60ch; }
+.mmi-presence-teaser-cta {
+ flex: none;
+ background: var(--navy);
+ color: #fff;
+ font-weight: 700;
+ font-size: 0.85rem;
+ text-decoration: none;
+ border-radius: 10px;
+ padding: 10px 16px;
+ white-space: nowrap;
+}
+.mmi-presence-teaser-cta:hover { background: var(--teal); }
+.mmi-percentile-card {
+ background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(14, 165, 233, 0.02));
+ border: 1px solid rgba(14, 165, 233, 0.25);
+ border-radius: 14px;
+ padding: 16px 18px;
+ margin: 16px 0;
+}
+.mmi-percentile-headline { font-weight: 800; color: var(--navy); font-size: 0.98rem; margin-bottom: 10px; }
+.mmi-percentile-bar {
+ position: relative;
+ height: 10px;
+ border-radius: 999px;
+ background: var(--gray200);
+}
+.mmi-percentile-fill {
+ position: absolute;
+ left: 0; top: 0;
+ height: 10px;
+ border-radius: 999px;
+ background: linear-gradient(90deg, var(--teal3), var(--teal));
+}
+.mmi-percentile-marker {
+ position: absolute;
+ top: -3px;
+ width: 4px;
+ height: 16px;
+ border-radius: 2px;
+ background: var(--navy);
+ transform: translateX(-50%);
+}
+.mmi-percentile-scale {
+ display: flex;
+ justify-content: space-between;
+ font-size: 0.68rem;
+ text-transform: uppercase;
+ letter-spacing: 0.04em;
+ color: var(--gray400);
+ margin: 6px 0 10px;
+}
+.mmi-percentile-caveat { font-size: 0.74rem; color: var(--gray400); line-height: 1.5; font-style: italic; }
+.mmi-percentile-caveat strong { color: var(--gray800); font-style: normal; }
+@media (max-width: 520px) {
+ .mmi-presence-teaser-cta { width: 100%; text-align: center; }
+}
+
 .mmi-pred-streak {
  background: rgba(245,158,11,0.15);
  color: #92400e;

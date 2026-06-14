@@ -367,87 +367,127 @@ const MMIFeedbackRender = (() => {
  </div>`;
  }
 
+ function deliveryGauge(value, min, max, zoneLo, zoneHi) {
+ const clamp = v => Math.max(min, Math.min(max, v));
+ const pct = v => ((clamp(v) - min) / (max - min)) * 100;
+ const zoneLeft = pct(zoneLo);
+ const zoneWidth = Math.max(0, pct(zoneHi) - pct(zoneLo));
+ const markLeft = pct(value);
+ return `<div class="mmi-gauge"><div class="mmi-gauge-track"><span class="mmi-gauge-zone" style="left:${zoneLeft.toFixed(1)}%;width:${zoneWidth.toFixed(1)}%"></span><span class="mmi-gauge-marker" style="left:${markLeft.toFixed(1)}%"></span></div></div>`;
+ }
+
  function renderVoiceMetrics(voice) {
  if (!voice) return '';
  const pace = voice.pace_wpm || 0;
- const paceNote = pace > 200 ? 'Faster than average - may signal nerves'
- : pace < 100 ? 'Slower than average - thoughtful or hesitant'
- : 'Natural conversational pace';
+ const paceRating = (pace >= 120 && pace <= 165) ? 'good' : (pace > 185 || pace < 95) ? 'low' : 'mid';
+ const paceNote = pace > 185 ? 'Faster than the comfortable range - ease off so the examiner can absorb each point.'
+ : pace < 95 ? 'On the slower side - a little thinking time is good, but keep momentum so you finish your point.'
+ : (pace >= 120 && pace <= 165) ? 'Right in the natural conversational range. This reads as composed.'
+ : 'Close to the natural range - only small adjustments needed.';
  const fillerPct = voice.filler_density_pct || 0;
- const fillerNote = fillerPct > 8
- ? `${fillerPct}% - slightly above average, but examiners do not mark fillers`
- : `${fillerPct}% - well within normal range`;
- const pauseAvg = voice.avg_pause_seconds || 0;
- const pauseNote = pauseAvg > 2
- ? 'Longer pauses - often a sign of genuine thought'
- : 'Short, natural pauses';
+ const fillerRating = fillerPct <= 6 ? 'good' : fillerPct <= 10 ? 'mid' : 'low';
+ const fillerNote = fillerPct <= 6 ? 'Clean delivery with very few fillers.'
+ : fillerPct <= 10 ? 'A few fillers crept in. Examiners do not mark them, but trimming them adds polish.'
+ : 'Fillers were frequent - usually a sign of speaking a little ahead of your thinking. A short silent pause beats an "um".';
+ const longest = voice.longest_pause_seconds || 0;
+ const tips = [];
+ if (pace > 185) tips.push('Slow down: aim for roughly 130-160 words per minute so each point lands.');
+ if (pace < 95) tips.push('Lift your pace slightly so every prompt gets a complete answer within the time.');
+ if (fillerPct > 10) tips.push('Swap fillers for a brief silent pause - it reads as considered, not hesitant.');
+ if (longest > 4) tips.push(`Your longest pause was ${longest}s - fine for thinking, but narrate it ("let me think about that for a second") so it does not read as freezing.`);
+ if (!tips.length) tips.push('Your delivery sits in a strong range. Hold this pace and clarity under interview pressure.');
 
  return `
- <details class="mmi-premium-section">
- <summary class="mmi-premium-summary">
- <span class="mmi-premium-summary-icon"></span>
- <span>Voice &amp; Pacing</span>
- <span class="mmi-premium-badge">Premium</span>
- <span class="mmi-premium-chevron">v</span>
- </summary>
- <div class="mmi-premium-body">
- <div class="mmi-voice-grid">
- <div class="mmi-voice-stat">
- <div class="mmi-voice-val">${pace}</div>
- <div class="mmi-voice-lbl">Words/min</div>
- <div class="mmi-voice-note">${esc(paceNote)}</div>
+ <div class="mmi-delivery-card">
+ <div class="mmi-delivery-head">
+ <div>
+ <div class="mmi-delivery-kicker">Delivery</div>
+ <h3 class="mmi-delivery-title">How you came across</h3>
  </div>
- <div class="mmi-voice-stat">
- <div class="mmi-voice-val">${voice.word_count || 0}</div>
- <div class="mmi-voice-lbl">Total words</div>
- <div class="mmi-voice-note">${voice.filler_count || 0} filler words</div>
+ <span class="mmi-delivery-tag">Coaching only</span>
  </div>
- <div class="mmi-voice-stat">
- <div class="mmi-voice-val">${voice.pause_count || 0}</div>
- <div class="mmi-voice-lbl">Meaningful pauses</div>
- <div class="mmi-voice-note">${esc(pauseNote)}</div>
+ <p class="mmi-delivery-sub">Measured from your recording. Examiners score substance, not polish - this panel is here to help you sound like your most composed self.</p>
+ <div class="mmi-delivery-metric">
+ <div class="mmi-delivery-metric-top"><span>Speaking pace</span><strong class="rate-${paceRating}">${pace} wpm</strong></div>
+ ${deliveryGauge(pace, 60, 220, 120, 160)}
+ <div class="mmi-delivery-note">${esc(paceNote)} <span class="mmi-delivery-target">Target 120-160 wpm</span></div>
  </div>
- <div class="mmi-voice-stat">
- <div class="mmi-voice-val">${fillerPct}%</div>
- <div class="mmi-voice-lbl">Filler density</div>
- <div class="mmi-voice-note">${esc(fillerNote)}</div>
+ <div class="mmi-delivery-metric">
+ <div class="mmi-delivery-metric-top"><span>Filler density</span><strong class="rate-${fillerRating}">${fillerPct}%</strong></div>
+ ${deliveryGauge(fillerPct, 0, 18, 0, 6)}
+ <div class="mmi-delivery-note">${esc(fillerNote)} <span class="mmi-delivery-target">${voice.filler_count || 0} filler word${(voice.filler_count || 0) === 1 ? '' : 's'} of ${voice.word_count || 0}</span></div>
  </div>
+ <div class="mmi-delivery-grid">
+ <div class="mmi-delivery-stat"><div class="mmi-delivery-val">${voice.word_count || 0}</div><div class="mmi-delivery-lbl">Words spoken</div></div>
+ <div class="mmi-delivery-stat"><div class="mmi-delivery-val">${voice.pause_count || 0}</div><div class="mmi-delivery-lbl">Thinking pauses</div></div>
+ <div class="mmi-delivery-stat"><div class="mmi-delivery-val">${longest ? longest + 's' : '-'}</div><div class="mmi-delivery-lbl">Longest pause</div></div>
  </div>
- ${voice.pace_trend ? `<div class="mmi-voice-trend">${esc(voice.pace_trend)}</div>` : ''}
- <div class="mmi-premium-caveat">Filler words (um, uh, like) are tracked for your awareness only - MMI examiners do not mark them down. Pauses are often positive signals of genuine thought.</div>
- </div>
- </details>`;
+ ${voice.pace_trend ? `<div class="mmi-delivery-trend">${esc(voice.pace_trend)}</div>` : ''}
+ <div class="mmi-delivery-tips"><div class="mmi-delivery-tips-title">What to work on</div><ul>${tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
+ <div class="mmi-delivery-caveat"><strong>Natural beats fluent.</strong> A slower, genuine answer reads far better than a fast, polished one that sounds forced or rehearsed. Examiners never mark down fillers or pauses, and chasing these numbers until you no longer sound like yourself will cost you far more than a few stray fillers ever could. This is here to help you notice habits, never a target to perform to.</div>
+ </div>`;
+ }
+
+ function presenceBadge(value, map) {
+ const m = map[value];
+ return m ? `<span class="mmi-presence-badge rate-${m.r}">${esc(m.t)}</span>` : `<span class="mmi-presence-badge rate-mid">${esc(value || '-')}</span>`;
  }
 
  function renderPresentationMetrics(visual) {
  if (!visual) return '';
- const eyeMap = { consistent: 'OK Consistent', mostly: ' Mostly consistent', inconsistent: 'Warning Inconsistent', rare: 'x Rare' };
- const postureMap = { engaged: 'OK Engaged', neutral: '- Neutral', withdrawn: 'Warning Withdrawn' };
- const composureMap = { engaged: 'OK Engaged', neutral: '- Neutral', performative: 'Warning Performative', disengaged: 'x Disengaged' };
+ const eyeMap = { consistent: { t: 'Consistent', r: 'good' }, mostly: { t: 'Mostly steady', r: 'good' }, inconsistent: { t: 'Inconsistent', r: 'mid' }, rare: { t: 'Rarely held', r: 'low' } };
+ const postureMap = { engaged: { t: 'Open and engaged', r: 'good' }, neutral: { t: 'Neutral', r: 'mid' }, withdrawn: { t: 'Withdrawn', r: 'low' } };
+ const composureMap = { engaged: { t: 'Engaged', r: 'good' }, neutral: { t: 'Steady', r: 'mid' }, anxious: { t: 'Looked anxious', r: 'low' }, performative: { t: 'Performative', r: 'mid' }, disengaged: { t: 'Disengaged', r: 'low' } };
+ const authMap = { genuine: { t: 'Genuine', r: 'good' }, mostly_genuine: { t: 'Mostly genuine', r: 'good' }, somewhat_forced: { t: 'A little forced', r: 'mid' }, performative: { t: 'Looked rehearsed', r: 'low' } };
+ const energyMap = { flat: { t: 'Flat', r: 'mid' }, measured: { t: 'Measured', r: 'good' }, animated: { t: 'Naturally animated', r: 'good' }, over_animated: { t: 'Restless', r: 'mid' } };
 
- const distractions = Array.isArray(visual.distractions) && visual.distractions.length
- ? `<div class="mmi-visual-row"><span class="mmi-visual-label">Distractions</span><span class="mmi-visual-val">${visual.distractions.map(d => esc(d)).join(', ')}</span></div>`
+ const authRow = visual.authenticity ? `<div class="mmi-presence-line"><span class="mmi-presence-key">Authenticity</span>${presenceBadge(visual.authenticity, authMap)}</div>` : '';
+ const energyRow = visual.energy ? `<div class="mmi-presence-line"><span class="mmi-presence-key">Energy</span>${presenceBadge(visual.energy, energyMap)}</div>` : '';
+ const tells = Array.isArray(visual.nervous_tells) && visual.nervous_tells.length
+ ? `<div class="mmi-presence-line"><span class="mmi-presence-key">Nervous tells</span><span class="mmi-presence-val">${visual.nervous_tells.map(d => esc(d)).join(', ')}</span></div>`
  : '';
+ const distractions = Array.isArray(visual.distractions) && visual.distractions.length
+ ? `<div class="mmi-presence-line"><span class="mmi-presence-key">Distracting habits</span><span class="mmi-presence-val">${visual.distractions.map(d => esc(d)).join(', ')}</span></div>`
+ : '';
+ const expr = visual.facial_expression ? `<div class="mmi-presence-text"><strong>Expression.</strong> ${esc(visual.facial_expression)}</div>` : '';
+ const evidence = visual.expression_evidence ? `<div class="mmi-presence-text mmi-presence-muted">${esc(visual.expression_evidence)}</div>` : '';
+ const engagement = visual.engagement ? `<div class="mmi-presence-text"><strong>Engagement.</strong> ${esc(visual.engagement)}</div>` : '';
+ const consistency = visual.consistency ? `<div class="mmi-presence-text"><strong>Across the station.</strong> ${esc(visual.consistency)}</div>` : '';
 
  return `
- <details class="mmi-premium-section">
- <summary class="mmi-premium-summary">
- <span class="mmi-premium-summary-icon"></span>
- <span>Presentation Analysis</span>
- <span class="mmi-premium-badge">Premium</span>
- <span class="mmi-premium-chevron">v</span>
- </summary>
- <div class="mmi-premium-body">
- <div class="mmi-visual-grid">
- <div class="mmi-visual-row"><span class="mmi-visual-label">Eye contact</span><span class="mmi-visual-val">${eyeMap[visual.eye_contact] || esc(visual.eye_contact || '-')}</span></div>
- <div class="mmi-visual-row"><span class="mmi-visual-label">Posture</span><span class="mmi-visual-val">${postureMap[visual.posture] || esc(visual.posture || '-')}</span></div>
- <div class="mmi-visual-row"><span class="mmi-visual-label">Composure</span><span class="mmi-visual-val">${composureMap[visual.composure] || esc(visual.composure || '-')}</span></div>
+ <div class="mmi-presence-card">
+ <div class="mmi-delivery-head">
+ <div>
+ <div class="mmi-delivery-kicker">On-camera presence</div>
+ <h3 class="mmi-delivery-title">How you looked to the examiner</h3>
+ </div>
+ <span class="mmi-delivery-tag">Premium</span>
+ </div>
+ <div class="mmi-presence-badges">
+ <div class="mmi-presence-line"><span class="mmi-presence-key">Eye contact</span>${presenceBadge(visual.eye_contact, eyeMap)}</div>
+ <div class="mmi-presence-line"><span class="mmi-presence-key">Posture</span>${presenceBadge(visual.posture, postureMap)}</div>
+ <div class="mmi-presence-line"><span class="mmi-presence-key">Composure</span>${presenceBadge(visual.composure, composureMap)}</div>
+ ${authRow}
+ ${energyRow}
+ ${tells}
  ${distractions}
  </div>
- ${visual.summary ? `<div class="mmi-visual-summary">${esc(visual.summary)}</div>` : ''}
- <div class="mmi-premium-caveat">Examiners weight substance over polish. Strong content with imperfect eye contact still scores well. This section is informational - it does not change your criterion scores.</div>
+ ${expr}${evidence}${engagement}${consistency}
+ ${visual.summary ? `<div class="mmi-presence-summary">${esc(visual.summary)}</div>` : ''}
+ <div class="mmi-delivery-caveat"><strong>Genuine beats polished.</strong> A natural presence with imperfect eye contact reads far better than a rehearsed, performed one - strong content always outweighs delivery. Cultural and neurodivergent differences in eye contact and expression are not penalised, and some frames may catch you reading or thinking rather than speaking.</div>
+ </div>`;
+ }
+
+ function renderPresenceTeaser() {
+ return `
+ <div class="mmi-presence-teaser">
+ <div class="mmi-presence-teaser-body">
+ <div class="mmi-delivery-kicker">On-camera presence</div>
+ <div class="mmi-presence-teaser-title">See how you looked to the examiner</div>
+ <div class="mmi-presence-teaser-text">Premium reviews add frame-by-frame analysis of your eye contact, posture, composure and facial expression - the presence signals a panel reacts to before you finish your first sentence.</div>
  </div>
- </details>`;
+ <a class="mmi-presence-teaser-cta" href="plans.html#mmi-section">Unlock presence analysis -&gt;</a>
+ </div>`;
  }
 
 
@@ -551,6 +591,54 @@ const MMIFeedbackRender = (() => {
  + items + '</div>';
  }
 
+ function computeMmiPerfScore(feedback) {
+ const pp = Array.isArray(feedback?.per_prompt) ? feedback.per_prompt : [];
+ const means = [];
+ for (const p of pp) {
+ const vals = [];
+ for (const k of CRITERIA_KEYS) { const v = Number(p?.scores?.[k]?.score); if (Number.isFinite(v)) vals.push(v); }
+ if (vals.length) means.push(vals.reduce((a, b) => a + b, 0) / vals.length);
+ }
+ let perf = means.length ? means.reduce((a, b) => a + b, 0) / means.length : Number(feedback?.overall?.score);
+ if (!Number.isFinite(perf)) return null;
+ return Math.max(1, Math.min(5, Math.round(perf * 10) / 10));
+ }
+
+ function ordinal(n) {
+ const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+ return n + (s[(v - 20) % 10] || s[v] || s[0]);
+ }
+
+ function renderPercentileCard(pct, sample) {
+ const headline = pct >= 50
+ ? `Stronger than about ${pct}% of Key2MD practice attempts`
+ : `Around the ${ordinal(pct)} percentile of Key2MD practice attempts`;
+ const sampleText = Number(sample) ? Number(sample).toLocaleString() : 'recent';
+ return `
+ <div class="mmi-percentile-card">
+ <div class="mmi-percentile-headline">${esc(headline)}</div>
+ <div class="mmi-percentile-bar"><span class="mmi-percentile-fill" style="width:${pct}%"></span><span class="mmi-percentile-marker" style="left:${pct}%"></span></div>
+ <div class="mmi-percentile-scale"><span>Lower</span><span>Higher</span></div>
+ <div class="mmi-percentile-caveat">Estimate only. This compares this response to ${esc(sampleText)} practice attempts by Key2MD users - it is <strong>not</strong> a prediction of your real interview result, and not a benchmark against the actual applicant pool. Treat it as a rough motivational signal, nothing more.</div>
+ </div>`;
+ }
+
+ async function hydratePercentile(container, feedback) {
+ const mount = container?.querySelector?.('#mmiPercentileMount');
+ if (!mount || !feedback) return;
+ const perf = computeMmiPerfScore(feedback);
+ const token = authToken();
+ if (!Number.isFinite(perf) || !token) return;
+ try {
+ const res = await fetch(`${apiBase()}/api/mmi/percentile?score=${perf}`, { headers: { Authorization: `Bearer ${token}` } });
+ const payload = await res.json().catch(() => ({}));
+ if (!res.ok || !payload || payload.available !== true) return;
+ const pct = Math.max(1, Math.min(99, Math.round(Number(payload.percentile))));
+ if (!Number.isFinite(pct)) return;
+ mount.innerHTML = renderPercentileCard(pct, payload.sample);
+ } catch { /* estimate is optional - never block feedback */ }
+ }
+
  function render(container, data, context) {
  clearLoadingTimers();
  // context: { tier, specialistMode, stationCategory, durationSec, previousFeedback, predictedScores, calibrationStreak }
@@ -577,10 +665,11 @@ const MMIFeedbackRender = (() => {
  const promptCards = (feedback.per_prompt || []).map((pp, i) => renderPromptCard(pp, i)).join('');
 
  // Premium sections
- const voiceSection = (tier === 'premium' && data.voice_metrics)
- ? renderVoiceMetrics(data.voice_metrics) : '';
- const visualSection = (tier === 'premium' && data.visual_metrics)
- ? renderPresentationMetrics(data.visual_metrics) : '';
+ const voiceSection = data.voice_metrics ? renderVoiceMetrics(data.voice_metrics) : '';
+ const isSpoken = !!data.voice_metrics;
+ const visualSection = data.visual_metrics
+ ? renderPresentationMetrics(data.visual_metrics)
+ : (isSpoken && tier !== 'premium' ? renderPresenceTeaser() : '');
 
  const auditorFlag = feedback.polished_auditor_detected ? `
  <div class="mmi-flag mmi-flag-auditor">
@@ -603,6 +692,7 @@ const MMIFeedbackRender = (() => {
  </div>
 
  ${auditorFlag}
+ <div id="mmiPercentileMount"></div>
  ${deltaSection}
  ${predictionSection}
 
@@ -662,6 +752,7 @@ const MMIFeedbackRender = (() => {
  window._lastMMIFeedback = feedback;
  window._lastMMIReviewId = data.review_id || null;
  hydrateAnalytics(container, data, context);
+ hydratePercentile(container, feedback);
  if (data.review_id) hydrateProbe(container, data.review_id);
  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
  }
