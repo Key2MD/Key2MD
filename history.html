@@ -32,6 +32,7 @@
  <script src="mmi-feedback-render.js" defer></script>
  <script src="mmi-download.js" defer></script>
  <script src="mmi-player.js" defer></script>
+ <script src="mmi-share-card.js" defer></script>
  <style>
  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  :root {
@@ -1084,9 +1085,11 @@ function renderMMICategoryMastery() {
  .map(([cat, { total, count }]) => ({ cat, avg: count ? total/count : null, count }))
  .sort((a, b) => (a.avg || 99) - (b.avg || 99));
  const weakest = entries.find(e => e.avg !== null);
+ const strongest = entries.filter(e => e.avg !== null).sort((a, b) => b.avg - a.avg)[0];
  el.innerHTML = `<div class="mmi-mastery-title">Category breakdown</div>
  <div class="mmi-mastery-grid">${entries.map(e => `<div class="mmi-mastery-tile"><div class="mmi-mastery-cat">${escapeHtml(e.cat)}</div><div class="mmi-mastery-score${e.avg===null?' mmi-mastery-na':''}">${e.avg!==null?e.avg.toFixed(1)+'/5':'-'}</div><div class="mmi-mastery-count">${e.count} station${e.count===1?'':'s'}</div></div>`).join('')}</div>
- ${weakest?`<div class="mmi-mastery-cta">Focus area: <strong>${escapeHtml(weakest.cat)}</strong> (avg ${weakest.avg.toFixed(1)}/5) - <a href="practice.html?mode=mmi">Practise stations in this category -></a></div>`:''}`;
+ ${weakest?`<div class="mmi-mastery-cta">Focus area: <strong>${escapeHtml(weakest.cat)}</strong> (avg ${weakest.avg.toFixed(1)}/5) - <a href="practice.html?mode=mmi">Practise stations in this category -></a></div>`:''}
+ ${strongest?`<div style="margin-top:12px"><button type="button" onclick='if(window.MMIShareCard)MMIShareCard.generate({mode:"score",product:"MMI",score:${strongest.avg.toFixed(1)},outOf:5,subtitle:"my strongest MMI area",takeaway:"My strongest MMI area: ${strongest.cat} (${strongest.avg.toFixed(1)}/5) on Key2MD"})' style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:9px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit">Share my progress -></button></div>`:''}`;
  el.style.display = '';
 }
 
