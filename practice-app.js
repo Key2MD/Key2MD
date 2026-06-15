@@ -2248,6 +2248,7 @@ function k2BoltIcon(){
 }
 function showFeedback(score,fb,options){
  if(!fb)return;
+ ensureCasperFbStyles();
  const forceScoreDisclaimer = !!(options && options.forceScoreDisclaimer);
  if(score>=10) triggerPerfectTenCelebration();
  else if(score>=8) triggerConfetti();
