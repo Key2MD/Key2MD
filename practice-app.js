@@ -2232,9 +2232,9 @@ function ensureCasperFbStyles(){
  +'.va-crow{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--gray100);}'
  +'.va-crow:first-of-type{border-top:0;}'
  +'.va-cn{flex:none;width:108px;font-size:0.8rem;font-weight:600;color:var(--gray800);}'
- +'.va-ct{flex:1;height:6px;border-radius:4px;background:var(--gray100);overflow:hidden;}'
- +'.va-cf{height:100%;border-radius:4px;}'
- +'.va-cs{flex:none;font-size:0.72rem;font-weight:800;min-width:30px;text-align:right;}'
+ +'.va-ct{flex:1;height:8px;border-radius:5px;background:var(--gray100);}'
+ +'.va-cf{display:block;height:100%;border-radius:5px;}'
+ +'.va-cs{flex:none;font-size:0.95rem;font-weight:800;min-width:44px;text-align:right;}'
  +'.va-cnote{font-size:0.74rem;color:var(--gray400);line-height:1.45;padding:0 0 9px 120px;margin-top:-3px;}'
  +'.va-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:13px;border-top:1px solid var(--gray100);font-size:0.72rem;color:var(--gray400);}'
  +'.va-foot b{color:var(--gray600);font-weight:700;}'
@@ -2262,8 +2262,9 @@ function showFeedback(score,fb,options){
  const markerLeft=Math.max(0,Math.min(100,score*10));
  const compRows=comps.map(c=>{
  const ci=getQuartile(c.score);
+ const grad=ci.q==='Q4'?'linear-gradient(90deg,#34d399,#22c55e)':ci.q==='Q3'?'linear-gradient(90deg,#38bdf8,#0ea5e9)':ci.q==='Q2'?'linear-gradient(90deg,#fbbf24,#f59e0b)':'linear-gradient(90deg,#fb7185,#ef4444)';
  const note=c.score>=7?(c.evidence||c.improve):(c.improve||c.evidence);
- return `<div class="va-crow"><span class="va-cn">${escInline(c.name)}</span><span class="va-ct"><span class="va-cf" style="width:${Math.round(c.score*10)}%;background:${ci.color};"></span></span><span class="va-cs" style="color:${ci.color};">${c.score.toFixed(1)}</span></div>${note?`<div class="va-cnote">${escInline(note)}</div>`:''}`;
+ return `<div class="va-crow"><span class="va-cn">${escInline(c.name)}</span><span class="va-ct"><span class="va-cf" style="width:${Math.round(c.score*10)}%;background:${grad};box-shadow:0 0 7px ${ci.color}55;"></span></span><span class="va-cs" style="color:${ci.color};">${c.score.toFixed(1)}</span></div>${note?`<div class="va-cnote">${escInline(note)}</div>`:''}`;
  }).join('');
  const winsHtml=wins.length?`<div class="va-sec"><div class="va-label">${wins.length} quick win${wins.length>1?'s':''} for next time</div>${wins.map((w,i)=>`<div class="va-win"><span class="va-wn">${i+1}</span><span class="va-wt">${w}</span></div>`).join('')}</div>`:'';
  const changeHtml=change?`<div class="va-div"></div><div class="va-change-eye">${k2BoltIcon()} Single biggest impact change</div><div class="va-change">${change}</div>`:'';

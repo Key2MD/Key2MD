@@ -1933,8 +1933,9 @@ function casperBodyHTML(r, fb) {
  const comps = normalizeCompetencies(fb.competencies).sort((a, b) => a.score - b.score);
  const compRows = comps.map(c => {
  const cq = qOf(c.score);
+ const cgrad = cq === 'Q4' ? 'linear-gradient(90deg,#34d399,#22c55e)' : cq === 'Q3' ? 'linear-gradient(90deg,#38bdf8,#0ea5e9)' : cq === 'Q2' ? 'linear-gradient(90deg,#fbbf24,#f59e0b)' : 'linear-gradient(90deg,#fb7185,#ef4444)';
  const note = c.score >= 7 ? (c.evidence || c.improve) : (c.improve || c.evidence);
- return `<div class="va-crow"><span class="va-cn">${escapeHtml(c.name)}</span><span class="va-ct"><span class="va-cf" style="width:${Math.round(c.score * 10)}%;background:${qColor(cq)};"></span></span><span class="va-cs" style="color:${qColor(cq)};">${c.score.toFixed(1)}</span></div>${note ? `<div class="va-cnote">${escapeHtml(note)}</div>` : ''}`;
+ return `<div class="va-crow"><span class="va-cn">${escapeHtml(c.name)}</span><span class="va-ct"><span class="va-cf" style="width:${Math.round(c.score * 10)}%;background:${cgrad};box-shadow:0 0 7px ${qColor(cq)}55;"></span></span><span class="va-cs" style="color:${qColor(cq)};">${c.score.toFixed(1)}</span></div>${note ? `<div class="va-cnote">${escapeHtml(note)}</div>` : ''}`;
  }).join('');
  const winsHtml = wins.length ? `<div class="va-sec"><div class="va-label">${wins.length} quick win${wins.length > 1 ? 's' : ''} for next time</div>${wins.map((w, i) => `<div class="va-win"><span class="va-wn">${i + 1}</span><span class="va-wt">${escapeHtml(w)}</span></div>`).join('')}</div>` : '';
  const changeHtml = change ? `<div class="va-div"></div><div class="va-change-eye"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Single biggest impact change</div><div class="va-change">${escapeHtml(change)}</div>` : '';
@@ -1988,9 +1989,9 @@ function ensureCasperFbStyles() {
  + '.va-crow{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--gray100);}'
  + '.va-crow:first-of-type{border-top:0;}'
  + '.va-cn{flex:none;width:108px;font-size:0.8rem;font-weight:600;color:var(--gray800);}'
- + '.va-ct{flex:1;height:6px;border-radius:4px;background:var(--gray100);overflow:hidden;}'
- + '.va-cf{height:100%;border-radius:4px;}'
- + '.va-cs{flex:none;font-size:0.72rem;font-weight:800;min-width:30px;text-align:right;}'
+ + '.va-ct{flex:1;height:8px;border-radius:5px;background:var(--gray100);}'
+ + '.va-cf{display:block;height:100%;border-radius:5px;}'
+ + '.va-cs{flex:none;font-size:0.95rem;font-weight:800;min-width:44px;text-align:right;}'
  + '.va-cnote{font-size:0.74rem;color:var(--gray400);line-height:1.45;padding:0 0 9px 120px;margin-top:-3px;}'
  + '.va-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:13px;border-top:1px solid var(--gray100);font-size:0.72rem;color:var(--gray400);}'
  + '@media(max-width:520px){.va-cn{width:84px;font-size:0.76rem;}.va-cnote{padding-left:0;}.va-top{flex-wrap:wrap;}.va-foot{flex-direction:column;align-items:flex-start;gap:3px;}}';
