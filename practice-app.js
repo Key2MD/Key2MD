@@ -805,7 +805,8 @@ function competencyRowsHtml(comps,compact){
  const rows=normalized.map(c=>{
  const qi=getQuartile(c.score);
  const pct=Math.round(c.score*10);
- const detail=compact?'':`<div style="font-size:0.74rem;color:var(--gray500,#64748b);line-height:1.45;margin-top:4px;">${c.evidence?`<strong style="color:var(--gray600);">Evidence:</strong> ${escInline(c.evidence)} `:''}${c.improve?`<strong style="color:var(--gray600);">Next:</strong> ${escInline(c.improve)}`:''}</div>`;
+ const note=c.score>=7?(c.evidence||c.improve):(c.improve||c.evidence);
+ const detail=(compact||!note)?'':`<div style="font-size:0.74rem;color:var(--gray500,#64748b);line-height:1.45;margin-top:4px;">${escInline(note)}</div>`;
  return`<div style="padding:8px 0;border-top:1px solid var(--gray100);">
  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
  <span style="font-size:0.8rem;font-weight:700;color:var(--navy);">${escInline(c.name)}</span>
@@ -2200,6 +2201,51 @@ function getCalibrationQuartile(){
  return {avg:Math.round(avg*10)/10, n:scores.length, ...qi};
 }
 
+function ensureCasperFbStyles(){
+ if(typeof document==='undefined'||document.getElementById('k2vaStyles'))return;
+ const s=document.createElement('style');
+ s.id='k2vaStyles';
+ s.textContent='.va-sheet{background:var(--white);border-radius:18px;padding:18px;box-shadow:0 1px 2px rgba(10,22,40,0.04),0 8px 30px rgba(10,22,40,0.06);margin-bottom:12px;}'
+ +'.va-hero{background:radial-gradient(120% 140% at 0% 0%,#13294f 0%,#0a1628 55%);border-radius:16px;padding:17px 19px;color:#fff;}'
+ +'.va-top{display:flex;align-items:center;gap:14px;}'
+ +'.va-score{font-size:2.5rem;font-weight:800;line-height:0.85;letter-spacing:-0.02em;}'
+ +'.va-score span{font-size:0.9rem;font-weight:500;color:rgba(255,255,255,0.4);}'
+ +'.va-qwrap{flex:1;min-width:0;}'
+ +'.va-ql{font-size:0.8rem;font-weight:700;margin-bottom:6px;}'
+ +'.va-scale{position:relative;display:flex;height:7px;border-radius:5px;overflow:hidden;}'
+ +'.va-scale i{display:block;height:100%;}'
+ +'.va-mark{position:absolute;top:-3px;width:3px;height:13px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px rgba(10,22,40,0.5),0 0 8px rgba(255,255,255,0.6);transform:translateX(-50%);}'
+ +'.va-avg{flex:none;text-align:right;font-size:0.6rem;color:rgba(255,255,255,0.45);line-height:1.3;}'
+ +'.va-avg b{display:block;color:#fff;font-size:0.78rem;font-weight:800;}'
+ +'.va-div{height:1px;background:rgba(255,255,255,0.1);margin:14px 0;}'
+ +'.va-change-eye{color:#7dd3fc;display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:0.6rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;}'
+ +'.va-change{font-size:0.96rem;font-weight:600;line-height:1.5;color:#fff;}'
+ +'.va-sec{margin-top:18px;}'
+ +'.va-label{font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:9px;}'
+ +'.va-win{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px;}'
+ +'.va-win:last-child{margin-bottom:0;}'
+ +'.va-wn{flex:none;width:20px;height:20px;border-radius:7px;background:rgba(14,165,233,0.12);color:var(--teal3);font-size:0.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px;}'
+ +'.va-wt{font-size:0.86rem;color:#334155;line-height:1.5;}'
+ +'.va-hair{height:1px;background:var(--gray100);margin:16px 0;border:0;}'
+ +'.va-pt{font-size:0.62rem;font-weight:900;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray400);margin-bottom:3px;}'
+ +'.va-pp{font-size:0.86rem;color:var(--gray600);line-height:1.6;}'
+ +'.va-crow{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--gray100);}'
+ +'.va-crow:first-of-type{border-top:0;}'
+ +'.va-cn{flex:none;width:108px;font-size:0.8rem;font-weight:600;color:var(--gray800);}'
+ +'.va-ct{flex:1;height:6px;border-radius:4px;background:var(--gray100);overflow:hidden;}'
+ +'.va-cf{height:100%;border-radius:4px;}'
+ +'.va-cs{flex:none;font-size:0.72rem;font-weight:800;min-width:30px;text-align:right;}'
+ +'.va-cnote{font-size:0.74rem;color:var(--gray400);line-height:1.45;padding:0 0 9px 120px;margin-top:-3px;}'
+ +'.va-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:13px;border-top:1px solid var(--gray100);font-size:0.72rem;color:var(--gray400);}'
+ +'.va-foot b{color:var(--gray600);font-weight:700;}'
+ +'.va-foot button{background:none;border:none;color:var(--teal3);font-weight:600;cursor:pointer;font-family:inherit;font-size:0.72rem;padding:0;}'
+ +'.va-disc{margin-top:10px;padding:12px 15px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.22);border-radius:9px;font-size:0.8rem;color:var(--gray600);line-height:1.7;}'
+ +'@media(max-width:520px){.va-cn{width:84px;font-size:0.76rem;}.va-cnote{padding-left:0;}.va-top{flex-wrap:wrap;}.va-avg{order:3;text-align:left;}}';
+ document.head.appendChild(s);
+}
+function k2BoltIcon(){
+ return '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+}
 function showFeedback(score,fb,options){
  if(!fb)return;
  const forceScoreDisclaimer = !!(options && options.forceScoreDisclaimer);
@@ -2207,106 +2253,47 @@ function showFeedback(score,fb,options){
  else if(score>=8) triggerConfetti();
  const qi=getQuartile(score);
  const cal=getCalibrationQuartile();
- const calHtml=cal?`
- <div style="background:linear-gradient(135deg,#0a1628,#0d2a52);border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid rgba(14,165,233,0.15);">
- <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
- <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);">Your Calibration Score</div>
- <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);">Based on ${cal.n} station${cal.n===1?'':'s'}</div>
- </div>
- <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
- <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1;">${cal.avg}</div>
- <div style="flex:1;">
- <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;">
- <div style="height:100%;width:${(cal.avg/10)*100}%;background:${cal.color};border-radius:3px;transition:width 0.6s ease;"></div>
- </div>
- </div>
- </div>
- <div style="display:flex;gap:8px;flex-wrap:wrap;">
- ${['Q1','Q2','Q3','Q4'].map(q=>`
- <div style="display:flex;align-items:center;gap:4px;">
- <span style="font-size:0.72rem;font-weight:${qi.q===q?'800':'500'};color:${qi.q===q?qi.color:'rgba(255,255,255,0.25)'};">${q}</span>
- </div>`).join('')}
- </div>
-<div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:4px;">${
-qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus on repeating it.':
- qi.q==='Q3'?'Above median. Strong foundation - some refinement needed.':
- qi.q==='Q2'?'Below median. The feedback below shows exactly where to focus.':
- 'Needs significant work. Read the improvement notes carefully.'
- }</div>
- </div>
- `:'';
- const disclaimerDismissed = forceScoreDisclaimer ? false : (() => { try { return localStorage.getItem('k2_score_disclaimer_dismissed') === '1'; } catch { return false; } })();
- const scoreReminderHtml = forceScoreDisclaimer ? `<div style="display:inline-block;margin-bottom:8px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.22);border-radius:50px;padding:4px 9px;color:var(--teal3);font-size:0.68rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;">Calibration reminder - shown every 5 AI markings</div>` : '';
- const disclaimerHtml = `
- <div id="k2ScoreDisclaimerWrap" style="margin-bottom:10px;">
- <button onclick="(function(btn){
- var d=document.getElementById('k2ScoreDisclaimer');
- if(!d)return;
- var open=d.style.display==='block';
- d.style.display=open?'none':'block';
- btn.innerHTML=open?'About this score &#9658;':'About this score &#9660;';
- })(this)" style="background:none;border:none;color:var(--gray400);font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;padding:0;line-height:1;display:inline-flex;align-items:center;gap:4px;" id="k2ScoreDisclaimerBtn">About this score &#9658;</button>
- <div id="k2ScoreDisclaimer" style="display:${disclaimerDismissed?'none':'block'};margin-top:8px;padding:12px 16px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.22);border-radius:8px;font-size:0.8rem;color:var(--gray600);line-height:1.7;">
- <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
- <strong style="color:var(--gray700);font-size:0.82rem;">A note on how this score works - from Dan</strong>
- <button onclick="(function(){
- try{localStorage.setItem('k2_score_disclaimer_dismissed','1');}catch(e){}
- var d=document.getElementById('k2ScoreDisclaimer');
- if(d)d.style.display='none';
- var btn=document.getElementById('k2ScoreDisclaimerBtn');
- if(btn)btn.innerHTML='About this score &#9658;';
- })()" style="background:none;border:none;color:var(--gray400);font-size:0.78rem;cursor:pointer;font-family:inherit;padding:0;flex-shrink:0;line-height:1;" title="Dismiss">x</button>
- </div>
- ${scoreReminderHtml}
-The AI score is a practice calibration, not an official Acuity result. The scale has recently been recalibrated: it is no longer artificially capped at the top end, so genuinely exceptional responses can now receive 10s. That means 7s and 8s are more achievable than they were under the older, compressed scale.<br><br>
-<strong style="color:var(--gray700);">How to read the new scale:</strong> confident students who expect Q4 should be reaching 8/10 consistently. Consistent 7s still mean you are doing well, but 8s are the clearer sign that your response quality is reliably in strong territory. High-Q4 students will often produce 9s, but you do not need every response to be a 9 for the score to be useful.<br><br>
-<strong style="color:var(--gray700);">A recent marking change:</strong> the AI now treats the two CASPer prompts as equal-value halves of the station. Earlier versions could over-reward a student who answered only one prompt very well, because the AI sometimes interpreted that as the whole task. Now, if you neglect one question, you are giving up roughly half the available marks. There is a diminishing return on investment once one answer is strong; spending another minute polishing it usually helps less than giving the second question a solid, complete answer.<br><br>
-<strong style="color:var(--gray700);">School context matters.</strong> If you are aiming for Notre Dame, consistent 7s or 8s should be reassuring. For UoW, assume you need regular 8s and 9s because CASPer carries more weight. Use the written feedback to find the repeatable habits behind the number.
- </div>
- </div>`;
+ const comps=normalizeCompetencies(fb.competencies).sort((a,b)=>a.score-b.score);
+ const change=(fb.biggest_change&&String(fb.biggest_change).trim())||(fb.missed&&fb.missed!=='None'&&String(fb.missed).trim())||(fb.improvements&&String(fb.improvements).trim())||'';
+ const wins=Array.isArray(fb.quick_wins)?fb.quick_wins.map(w=>String(w||'').trim()).filter(Boolean).slice(0,2):[];
+ const zones=[['Q1','#ef4444',30],['Q2','#f59e0b',20],['Q3','#0ea5e9',20],['Q4','#22c55e',30]];
+ const scaleBars=zones.map(z=>`<i style="flex-basis:${z[2]}%;background:${z[1]};opacity:${qi.q===z[0]?'0.95':'0.28'};"></i>`).join('');
+ const markerLeft=Math.max(0,Math.min(100,score*10));
+ const compRows=comps.map(c=>{
+ const ci=getQuartile(c.score);
+ const note=c.score>=7?(c.evidence||c.improve):(c.improve||c.evidence);
+ return `<div class="va-crow"><span class="va-cn">${escInline(c.name)}</span><span class="va-ct"><span class="va-cf" style="width:${Math.round(c.score*10)}%;background:${ci.color};"></span></span><span class="va-cs" style="color:${ci.color};">${c.score.toFixed(1)}</span></div>${note?`<div class="va-cnote">${escInline(note)}</div>`:''}`;
+ }).join('');
+ const winsHtml=wins.length?`<div class="va-sec"><div class="va-label">${wins.length} quick win${wins.length>1?'s':''} for next time</div>${wins.map((w,i)=>`<div class="va-win"><span class="va-wn">${i+1}</span><span class="va-wt">${w}</span></div>`).join('')}</div>`:'';
+ const changeHtml=change?`<div class="va-div"></div><div class="va-change-eye">${k2BoltIcon()} Single biggest impact change</div><div class="va-change">${change}</div>`:'';
+ const calFoot=cal?`Calibration <b>${cal.avg} &middot; ${cal.q}</b> across ${cal.n}`:'Practice calibration, not an official result';
+ const reminderChip=forceScoreDisclaimer?`<div style="display:inline-block;margin-bottom:8px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.22);border-radius:50px;padding:4px 9px;color:var(--teal3);font-size:0.66rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;">Calibration reminder - shown every 5 AI markings</div><br>`:'';
+ const discInner=`${reminderChip}<strong style="color:var(--gray800);">A note on how this score works - from Dan</strong><br><br>The AI score is a practice calibration, not an official Acuity result. The scale has recently been recalibrated: it is no longer artificially capped at the top end, so genuinely exceptional responses can now receive 10s. That means 7s and 8s are more achievable than they were under the older, compressed scale.<br><br><strong style="color:var(--gray800);">How to read the new scale:</strong> confident students who expect Q4 should be reaching 8/10 consistently. Consistent 7s still mean you are doing well, but 8s are the clearer sign that your response quality is reliably in strong territory. High-Q4 students will often produce 9s, but you do not need every response to be a 9 for the score to be useful.<br><br><strong style="color:var(--gray800);">A recent marking change:</strong> the AI now treats the two CASPer prompts as equal-value halves of the station. Earlier versions could over-reward a student who answered only one prompt very well, because the AI sometimes interpreted that as the whole task. Now, if you neglect one question, you are giving up roughly half the available marks. There is a diminishing return on investment once one answer is strong; spending another minute polishing it usually helps less than giving the second question a solid, complete answer.<br><br><strong style="color:var(--gray800);">School context matters.</strong> If you are aiming for Notre Dame, consistent 7s or 8s should be reassuring. For UoW, assume you need regular 8s and 9s because CASPer carries more weight. Use the written feedback to find the repeatable habits behind the number.`;
+ const discOpen=forceScoreDisclaimer;
  getAiFbEl().innerHTML=`
  ${getSelfRatingComparisonHtml(sessionHistory[currentIdx]?.selfRating, score)}
- <div style="background:linear-gradient(135deg,#0a1628,#112240);border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.08);">
- <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
- <div style="font-size:2.4rem;font-weight:800;color:#fff;line-height:1;">${score}<span style="font-size:1rem;color:rgba(255,255,255,0.4);font-weight:400;">/10</span></div>
- <div style="flex:1;">
- <div style="font-size:0.82rem;font-weight:700;color:${qi.color};">${qi.label}</div>
- <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);margin-top:1px;">${qi.q}</div>
+ <div class="va-sheet">
+ <div class="va-hero">
+ <div class="va-top">
+ <div class="va-score">${score}<span>/10</span></div>
+ <div class="va-qwrap"><div class="va-ql" style="color:${qi.color};">${qi.label}</div><div class="va-scale">${scaleBars}<span class="va-mark" style="left:${markerLeft}%;"></span></div></div>
+ ${cal?`<div class="va-avg">avg<b>${cal.avg}</b>${cal.n} done</div>`:''}
  </div>
- <span style="font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:50px;background:${qi.color}22;color:${qi.color};border:1px solid ${qi.color}44;">${qi.q}</span>
+ ${changeHtml}
  </div>
- <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;">
- <div style="height:100%;width:${score*10}%;background:${qi.color};border-radius:2px;transition:width 0.6s ease;"></div>
- </div>
-<div style="font-size:0.78rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-top:8px;">${
-qi.q==='Q4'?'Likely Q4 territory on the new calibration. Strong sign; now focus on repeating it.':
- qi.q==='Q3'?'Above median. Strong foundation - some refinement needed.':
- qi.q==='Q2'?'Below median. The feedback below shows exactly where to focus.':
- 'Needs significant work. Read the improvement notes carefully.'
- }</div>
- </div>
- ${calHtml}
- ${disclaimerHtml}
- <div class="ai-feedback">
- <div class="ai-feedback-header">
- <span class="ai-feedback-title">* AI Feedback</span>
- <span class="ai-score-badge ${scoreCls(score)}">${score}/10</span>
- <span style="margin-left:4px;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:50px;background:${qi.color}22;color:${qi.color};border:1px solid ${qi.color}44;">${qi.q}</span>
- </div>
- <div class="ai-feedback-body">
- <strong>Strengths:</strong> ${fb.strengths}<br><br>
- <strong>Improve:</strong> ${fb.improvements}<br><br>
- <strong>Empathy:</strong> ${fb.empathy}
- ${fb.missed&&fb.missed!=='None'?`<br><br><strong>Missed:</strong> ${fb.missed}`:''}
- ${competencyRowsHtml(fb.competencies,false)}
- </div>
+ ${winsHtml}
+ <hr class="va-hair">
+ <div><div class="va-pt">Strengths</div><div class="va-pp">${fb.strengths||''}</div></div>
+ <div style="margin-top:11px;"><div class="va-pt">Empathy</div><div class="va-pp">${fb.empathy||''}</div></div>
+ ${compRows?`<div class="va-sec"><div class="va-label">Competencies</div>${compRows}</div>`:''}
+ <div class="va-foot"><span>${calFoot}</span><button id="k2ScoreDisclaimerBtn" onclick="(function(btn){var d=document.getElementById('k2ScoreDisclaimer');if(!d)return;var open=d.style.display==='block';d.style.display=open?'none':'block';btn.innerHTML=open?'About this score &#9658;':'About this score &#9660;';})(this)">About this score &#9658;</button></div>
+ <div id="k2ScoreDisclaimer" class="va-disc" style="display:${discOpen?'block':'none'};">${discInner}</div>
  </div>
  ${recommendedStationCardHtml()}
  <div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;">
- <button id="retryStationBtn" onclick="retryStation()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:50px;border:1.5px solid var(--gray200);background:var(--white);color:var(--gray600);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--navy)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">Refresh Retry this station</button>
- <a href="https:
+ <button id="retryStationBtn" onclick="retryStation()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:50px;border:1.5px solid var(--gray200);background:var(--white);color:var(--gray600);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--navy)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">Retry this station</button>
  </div>`;
- if(!disclaimerDismissed){
+ if(discOpen){
  const btn=document.getElementById('k2ScoreDisclaimerBtn');
  if(btn) btn.innerHTML='About this score &#9660;';
  }

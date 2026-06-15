@@ -1919,46 +1919,83 @@ function reviewCardHTML(r, i) {
 }
 
 function casperBodyHTML(r, fb) {
- const missedSection = fb.missed && fb.missed !== 'None'
- ? `<div class="feedback-item feedback-missed"><div class="feedback-item-label">Missed</div><p>${escapeHtml(fb.missed)}</p></div>`
- : '';
- const competencySection = competencyBreakdownHTML(fb.competencies);
-
+ ensureCasperFbStyles();
+ const score = Number(fb.score) || 0;
+ const qOf = s => s >= 7 ? 'Q4' : s >= 5 ? 'Q3' : s >= 3 ? 'Q2' : 'Q1';
+ const qColor = q => q === 'Q4' ? '#22c55e' : q === 'Q3' ? '#0ea5e9' : q === 'Q2' ? '#f59e0b' : '#ef4444';
+ const qLabel = q => q === 'Q4' ? 'Q4 - Likely' : q === 'Q3' ? 'Q3 - Building' : q === 'Q2' ? 'Q2 - Developing' : 'Q1 - Needs work';
+ const curQ = qOf(score);
+ const change = (fb.biggest_change && String(fb.biggest_change).trim()) || (fb.missed && fb.missed !== 'None' && String(fb.missed).trim()) || (fb.improvements && String(fb.improvements).trim()) || '';
+ const wins = Array.isArray(fb.quick_wins) ? fb.quick_wins.map(w => String(w || '').trim()).filter(Boolean).slice(0, 2) : [];
+ const zones = [['Q1', '#ef4444', 30], ['Q2', '#f59e0b', 20], ['Q3', '#0ea5e9', 20], ['Q4', '#22c55e', 30]];
+ const scaleBars = zones.map(z => `<i style="flex-basis:${z[2]}%;background:${z[1]};opacity:${curQ === z[0] ? '0.95' : '0.28'};"></i>`).join('');
+ const markerLeft = Math.max(0, Math.min(100, score * 10));
+ const comps = normalizeCompetencies(fb.competencies).sort((a, b) => a.score - b.score);
+ const compRows = comps.map(c => {
+ const cq = qOf(c.score);
+ const note = c.score >= 7 ? (c.evidence || c.improve) : (c.improve || c.evidence);
+ return `<div class="va-crow"><span class="va-cn">${escapeHtml(c.name)}</span><span class="va-ct"><span class="va-cf" style="width:${Math.round(c.score * 10)}%;background:${qColor(cq)};"></span></span><span class="va-cs" style="color:${qColor(cq)};">${c.score.toFixed(1)}</span></div>${note ? `<div class="va-cnote">${escapeHtml(note)}</div>` : ''}`;
+ }).join('');
+ const winsHtml = wins.length ? `<div class="va-sec"><div class="va-label">${wins.length} quick win${wins.length > 1 ? 's' : ''} for next time</div>${wins.map((w, i) => `<div class="va-win"><span class="va-wn">${i + 1}</span><span class="va-wt">${escapeHtml(w)}</span></div>`).join('')}</div>` : '';
+ const changeHtml = change ? `<div class="va-div"></div><div class="va-change-eye"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Single biggest impact change</div><div class="va-change">${escapeHtml(change)}</div>` : '';
  return `
- ${r.question_text ? `
- <div class="review-section">
- <div class="review-section-label">Scenario / Prompts</div>
- <div class="review-section-text">${escapeHtml(r.question_text)}</div>
- </div>` : ''}
-
- ${r.response_text ? `
- <div class="review-section">
- <div class="review-section-label">Your Response</div>
- <div class="response-box">${escapeHtml(r.response_text)}</div>
- </div>` : ''}
-
- <div class="review-section">
- <div class="review-section-label">AI Feedback - ${fb.score}/10</div>
- <div class="feedback-grid">
- <div class="feedback-item feedback-strengths">
- <div class="feedback-item-label">Strengths</div>
- <p>${escapeHtml(fb.strengths || '-')}</p>
+ ${r.question_text ? `<div class="review-section"><div class="review-section-label">Scenario / Prompts</div><div class="review-section-text">${escapeHtml(r.question_text)}</div></div>` : ''}
+ ${r.response_text ? `<div class="review-section"><div class="review-section-label">Your Response</div><div class="response-box">${escapeHtml(r.response_text)}</div></div>` : ''}
+ <div class="va-sheet">
+ <div class="va-hero">
+ <div class="va-top">
+ <div class="va-score">${score}<span>/10</span></div>
+ <div class="va-qwrap"><div class="va-ql" style="color:${qColor(curQ)};">${qLabel(curQ)}</div><div class="va-scale">${scaleBars}<span class="va-mark" style="left:${markerLeft}%;"></span></div></div>
  </div>
- <div class="feedback-item feedback-improvements">
- <div class="feedback-item-label">Improvements</div>
- <p>${escapeHtml(fb.improvements || '-')}</p>
+ ${changeHtml}
  </div>
- <div class="feedback-item feedback-empathy">
- <div class="feedback-item-label">Empathy</div>
- <p>${escapeHtml(fb.empathy || '-')}</p>
+ ${winsHtml}
+ <hr class="va-hair">
+ <div><div class="va-pt">Strengths</div><div class="va-pp">${escapeHtml(fb.strengths || '-')}</div></div>
+ <div style="margin-top:11px;"><div class="va-pt">Empathy</div><div class="va-pp">${escapeHtml(fb.empathy || '-')}</div></div>
+ ${compRows ? `<div class="va-sec"><div class="va-label">Competencies</div>${compRows}</div>` : ''}
+ <div class="va-foot"><span>Saved AI review &middot; ${score}/10</span><span>Rough estimates, not official sub-scores</span></div>
  </div>
- ${missedSection}
- </div>
- </div>
- ${competencySection}
  `;
 }
 
+function ensureCasperFbStyles() {
+ if (document.getElementById('k2vaStyles')) return;
+ const s = document.createElement('style');
+ s.id = 'k2vaStyles';
+ s.textContent = '.va-sheet{background:var(--white);border-radius:18px;padding:18px;box-shadow:0 1px 2px rgba(10,22,40,0.04),0 8px 30px rgba(10,22,40,0.06);margin-top:8px;}'
+ + '.va-hero{background:radial-gradient(120% 140% at 0% 0%,#13294f 0%,#0a1628 55%);border-radius:16px;padding:17px 19px;color:#fff;}'
+ + '.va-top{display:flex;align-items:center;gap:14px;}'
+ + '.va-score{font-size:2.5rem;font-weight:800;line-height:0.85;letter-spacing:-0.02em;}'
+ + '.va-score span{font-size:0.9rem;font-weight:500;color:rgba(255,255,255,0.4);}'
+ + '.va-qwrap{flex:1;min-width:0;}'
+ + '.va-ql{font-size:0.8rem;font-weight:700;margin-bottom:6px;}'
+ + '.va-scale{position:relative;display:flex;height:7px;border-radius:5px;overflow:hidden;}'
+ + '.va-scale i{display:block;height:100%;}'
+ + '.va-mark{position:absolute;top:-3px;width:3px;height:13px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px rgba(10,22,40,0.5),0 0 8px rgba(255,255,255,0.6);transform:translateX(-50%);}'
+ + '.va-div{height:1px;background:rgba(255,255,255,0.1);margin:14px 0;}'
+ + '.va-change-eye{color:#7dd3fc;display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:0.6rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;}'
+ + '.va-change{font-size:0.96rem;font-weight:600;line-height:1.5;color:#fff;}'
+ + '.va-sec{margin-top:18px;}'
+ + '.va-label{font-size:0.62rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;color:var(--teal3);margin-bottom:9px;}'
+ + '.va-win{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px;}'
+ + '.va-win:last-child{margin-bottom:0;}'
+ + '.va-wn{flex:none;width:20px;height:20px;border-radius:7px;background:rgba(14,165,233,0.12);color:var(--teal3);font-size:0.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px;}'
+ + '.va-wt{font-size:0.86rem;color:#334155;line-height:1.5;}'
+ + '.va-hair{height:1px;background:var(--gray100);margin:16px 0;border:0;}'
+ + '.va-pt{font-size:0.62rem;font-weight:900;letter-spacing:0.06em;text-transform:uppercase;color:var(--gray400);margin-bottom:3px;}'
+ + '.va-pp{font-size:0.86rem;color:var(--gray600);line-height:1.6;}'
+ + '.va-crow{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--gray100);}'
+ + '.va-crow:first-of-type{border-top:0;}'
+ + '.va-cn{flex:none;width:108px;font-size:0.8rem;font-weight:600;color:var(--gray800);}'
+ + '.va-ct{flex:1;height:6px;border-radius:4px;background:var(--gray100);overflow:hidden;}'
+ + '.va-cf{height:100%;border-radius:4px;}'
+ + '.va-cs{flex:none;font-size:0.72rem;font-weight:800;min-width:30px;text-align:right;}'
+ + '.va-cnote{font-size:0.74rem;color:var(--gray400);line-height:1.45;padding:0 0 9px 120px;margin-top:-3px;}'
+ + '.va-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:13px;border-top:1px solid var(--gray100);font-size:0.72rem;color:var(--gray400);}'
+ + '@media(max-width:520px){.va-cn{width:84px;font-size:0.76rem;}.va-cnote{padding-left:0;}.va-top{flex-wrap:wrap;}.va-foot{flex-direction:column;align-items:flex-start;gap:3px;}}';
+ document.head.appendChild(s);
+}
 function competencyBreakdownHTML(rawCompetencies) {
  const competencies = normalizeCompetencies(rawCompetencies).sort((a, b) => a.score - b.score);
  if (!competencies.length) return '';
@@ -1966,6 +2003,7 @@ function competencyBreakdownHTML(rawCompetencies) {
  const rows = competencies.map(comp => {
  const color = scoreColor(comp.score);
  const pct = Math.round(comp.score * 10);
+ const note = comp.score >= 7 ? (comp.evidence || comp.improve) : (comp.improve || comp.evidence);
  return `
  <div class="competency-row">
  <div class="competency-row-head">
@@ -1973,12 +2011,7 @@ function competencyBreakdownHTML(rawCompetencies) {
  <span class="competency-row-score" style="color:${color};">${comp.score.toFixed(1)}/10</span>
  </div>
  <div class="competency-track" style="margin-top:5px;"><div class="competency-fill" style="width:${pct}%;background:${color};"></div></div>
- ${(comp.evidence || comp.improve) ? `
- <div class="competency-row-detail">
- ${comp.evidence ? `<strong>Evidence:</strong> ${escapeHtml(comp.evidence)} ` : ''}
- ${comp.improve ? `<strong>Next:</strong> ${escapeHtml(comp.improve)}` : ''}
- </div>
- ` : ''}
+ ${note ? `<div class="competency-row-detail">${escapeHtml(note)}</div>` : ''}
  </div>
  `;
  }).join('');
