@@ -610,6 +610,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 	 </div>
 	 <div id="mmiPrepPlan" class="mmi-prep-plan-wrap" style="display:none"></div>
 	 <div id="mmiCategoryMastery" class="mmi-mastery-section" style="display:none"></div>
+	 <div id="mmiCircuitsSection" class="mmi-circuits-section" style="display:none"></div>
 	 <div class="mmi-history-list" id="mmiHistoryList"></div>
 	 </section>
 
@@ -743,6 +744,7 @@ async function loadReviews() {
 	 updateStats();
 	 renderMockHistory();
 	 renderMMIHistory();
+	 loadAndRenderCircuits(token);
 	 renderCompetencyProgress();
 	 renderReviews();
 	 loadInterviewDateAndReferral(token);
@@ -763,6 +765,117 @@ async function loadMMIReviews(token) {
  } catch {
  return [];
  }
+}
+
+let mmiCircuits = [];
+const CIRCUIT_BAND_COLORS = { Excellent:'#16a34a', Good:'#0ea5e9', Satisfactory:'#d97706', Unsatisfactory:'#ea580c', Poor:'#dc2626' };
+
+async function loadAndRenderCircuits(token) {
+ if (!token) return;
+ try {
+ const res = await fetch(`${API_BASE}/api/mmi/circuits`, { headers: { Authorization: `Bearer ${token}` } });
+ if (!res.ok) return;
+ const data = await res.json().catch(() => ({}));
+ mmiCircuits = data.circuits || [];
+ } catch { return; }
+ renderCircuits();
+}
+
+function shortCircuitDate(v) {
+ const d = new Date(v);
+ if (isNaN(d.getTime())) return '';
+ return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function renderCircuits() {
+ const el = document.getElementById('mmiCircuitsSection');
+ if (!el) return;
+ if (!mmiCircuits.length) { el.style.display = 'none'; return; }
+ el.style.display = '';
+ const chron = mmiCircuits.slice().reverse();
+ const trend = renderCircuitTrend(chron);
+ const cards = mmiCircuits.map((c, i) => renderCircuitCard(c, i)).join('');
+ el.innerHTML = `
+ <div style="margin:8px 0 14px;">
+ <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#7c3aed;margin-bottom:4px;">Mock circuits</div>
+ <div style="font-size:1.05rem;font-weight:800;color:#0a1628;">Your circuit history</div>
+ <div style="font-size:0.82rem;color:#64748b;">Full back-to-back mocks, newest first. The real test of interview-day stamina.</div>
+ </div>
+ ${trend}
+ <div>${cards}</div>`;
+}
+
+function renderCircuitTrend(chron) {
+ if (chron.length < 2) return '';
+ const scores = chron.map(c => Number(c.overall_score)).filter(Number.isFinite);
+ let overallBlock = '';
+ if (scores.length >= 2) {
+ const first = scores[0], last = scores[scores.length - 1];
+ const delta = Math.round((last - first) * 10) / 10;
+ const dCol = delta > 0 ? '#16a34a' : delta < 0 ? '#dc2626' : '#64748b';
+ const bars = chron.map(c => {
+ const s = Number(c.overall_score);
+ const pct = Number.isFinite(s) ? Math.max(8, Math.min(100, (s / 5) * 100)) : 0;
+ const col = s >= 4 ? '#16a34a' : s >= 3 ? '#0ea5e9' : s >= 2 ? '#d97706' : '#dc2626';
+ return `<div title="${escapeAttr(shortCircuitDate(c.created_at))}: ${Number.isFinite(s) ? s : '-'}/5" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;"><div style="width:100%;max-width:26px;height:${pct}%;background:${col};border-radius:4px 4px 0 0;min-height:4px;"></div></div>`;
+ }).join('');
+ overallBlock = `<div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:14px 16px;flex:1;min-width:220px;">
+ <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;"><span style="font-size:0.74rem;font-weight:700;color:#64748b;">Overall across ${chron.length} circuits</span><strong style="font-size:0.82rem;color:${dCol};">${delta > 0 ? '+' : ''}${delta}</strong></div>
+ <div style="display:flex;align-items:flex-end;gap:4px;height:70px;">${bars}</div>
+ </div>`;
+ }
+ const staminaPts = chron.map(c => {
+ const f = Number(c.stamina_first), s = Number(c.stamina_second);
+ return (Number.isFinite(f) && Number.isFinite(s)) ? Math.round((s - f) * 10) / 10 : null;
+ }).filter(v => v !== null);
+ let staminaBlock = '';
+ if (staminaPts.length >= 2) {
+ const firstDrop = staminaPts[0], lastDrop = staminaPts[staminaPts.length - 1];
+ const improving = lastDrop > firstDrop;
+ const col = lastDrop >= -0.2 ? '#16a34a' : improving ? '#0ea5e9' : '#dc2626';
+ const msg = lastDrop >= -0.2 ? 'You are holding up across the circuit - no real second-half drop now.'
+ : improving ? 'Your second-half drop is shrinking. Stamina is improving.'
+ : 'Your second-half drop is getting bigger. Watch fatigue late in the circuit.';
+ staminaBlock = `<div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:14px 16px;flex:1;min-width:220px;">
+ <div style="font-size:0.74rem;font-weight:700;color:#64748b;margin-bottom:6px;">Stamina (second half vs first)</div>
+ <div style="font-size:1.4rem;font-weight:800;color:${col};">${lastDrop > 0 ? '+' : ''}${lastDrop}</div>
+ <div style="font-size:0.78rem;color:#64748b;line-height:1.5;margin-top:4px;">${msg}</div>
+ </div>`;
+ }
+ if (!overallBlock && !staminaBlock) return '';
+ return `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">${overallBlock}${staminaBlock}</div>`;
+}
+
+function renderCircuitCard(c, i) {
+ const band = c.overall_band || '-';
+ const col = CIRCUIT_BAND_COLORS[band] || '#64748b';
+ const d = c.debrief || {};
+ const crit = d.criterion_averages || {};
+ const CRIT = { empathy: 'Empathy', communication: 'Communication', reasoning: 'Reasoning', reflection: 'Reflection', real_world_awareness: 'Real-world' };
+ const critRows = Object.keys(CRIT).map(k => {
+ const v = crit[k] && Number(crit[k].avg);
+ if (!Number.isFinite(v)) return '';
+ const bc = v >= 4 ? '#16a34a' : v >= 3 ? '#0ea5e9' : v >= 2 ? '#d97706' : '#dc2626';
+ const pct = Math.max(0, Math.min(100, (v / 5) * 100));
+ return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;"><span style="font-size:0.72rem;color:#64748b;width:110px;flex-shrink:0;">${CRIT[k]}</span><div style="flex:1;height:6px;background:#eef2f7;border-radius:99px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${bc};"></div></div><strong style="font-size:0.74rem;color:${bc};width:26px;text-align:right;">${v}</strong></div>`;
+ }).join('');
+ return `<div style="background:#fff;border:1px solid #e6ebf2;border-radius:12px;padding:14px 16px;margin-bottom:10px;">
+ <div style="display:flex;align-items:center;gap:12px;">
+ <div style="display:inline-block;font-size:0.7rem;font-weight:800;color:${col};background:${col}1a;border:1px solid ${col}40;padding:3px 10px;border-radius:50px;white-space:nowrap;">${escapeHtml(band)}</div>
+ <div style="flex:1;min-width:0;">
+ <div style="font-size:0.82rem;font-weight:700;color:#0a1628;">${c.station_count || '-'} stations &middot; ${c.tier === 'premium' ? 'Premium' : 'Transcript'}</div>
+ <div style="font-size:0.72rem;color:#94a3b8;">${escapeHtml(shortCircuitDate(c.created_at))}</div>
+ </div>
+ ${Number.isFinite(Number(c.overall_score)) ? `<div style="text-align:right;"><div style="font-size:1rem;font-weight:800;color:${col};">${c.overall_score}/5</div></div>` : ''}
+ </div>
+ ${c.the_one_thing ? `<div style="margin-top:10px;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.15);border-radius:8px;padding:10px 12px;"><span style="font-size:0.64rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#7c3aed;">The one thing</span><div style="font-size:0.84rem;color:#334155;line-height:1.55;margin-top:3px;">${escapeHtml(c.the_one_thing)}</div></div>` : ''}
+ ${critRows ? `<button onclick="toggleCircuitHistDetail(${i})" style="margin-top:10px;background:none;border:none;color:#7c3aed;font-size:0.76rem;font-weight:700;cursor:pointer;font-family:inherit;padding:0;">Show breakdown</button><div id="circuitHistDetail${i}" style="display:none;margin-top:10px;">${critRows}${d.real_day_estimate ? `<div style="font-size:0.8rem;color:#64748b;line-height:1.55;margin-top:8px;border-top:1px solid #eef2f7;padding-top:8px;">${escapeHtml(d.real_day_estimate)}</div>` : ''}</div>` : ''}
+ </div>`;
+}
+
+function toggleCircuitHistDetail(i) {
+ const el = document.getElementById('circuitHistDetail' + i);
+ if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
 async function loadMockAttempts(token) {
@@ -2508,15 +2621,28 @@ function renderReferralSection(data) {
  const code = data.referral_code;
  const link = data.referral_link || '';
  const count = Number(data.referred_count || 0);
- content.innerHTML = `<div class="mmi-referral-title">Refer a friend</div>
-<div class="mmi-referral-sub">Share your referral link. When your friend makes their first $50 of purchases you get 1 free MMI transcript credit.</div>
+ const earned = Number(data.rewards_earned || 0);
+ const cap = Number(data.reward_cap || 10);
+ const tokens = Number(data.pending_reward_tokens || 0);
+ const friendPct = Number(data.friend_discount_percent || 15);
+ const rewardPct = Number(data.reward_percent || 15);
+ const rewardMax = Number(data.reward_max_dollars || 40);
+ const qualify = Number(data.qualifying_spend_dollars || 50);
+ const isSub = !!data.is_subscriber;
+ const rewardWhere = isSub ? 'your next renewal' : 'your next purchase';
+ const tokenLine = (tokens > 0 && !isSub)
+  ? `<div class="mmi-referral-count" style="color:#16a34a;font-weight:700;">You have ${tokens} reward${tokens === 1 ? '' : 's'} ready: ${rewardPct}% off your next purchase (up to $${rewardMax}).</div>`
+  : '';
+ content.innerHTML = `<div class="mmi-referral-title">Refer a friend, you both win</div>
+<div class="mmi-referral-sub">Your friend gets <strong>${friendPct}% off their first purchase</strong>. When they spend $${qualify} or more, you get <strong>${rewardPct}% off (up to $${rewardMax})</strong>, applied automatically to ${rewardWhere}.</div>
 <div class="mmi-referral-code-row">
  <span class="mmi-referral-code">${escapeHtml(code)}</span>
  <button class="mmi-referral-copy" onclick="copyReferralLink('${escapeAttr(link)}', this)">Copy link</button>
 </div>
 <div class="mmi-referral-link">${escapeHtml(link)}</div>
-<div class="mmi-referral-count">${count} friend${count === 1 ? '' : 's'} referred so far</div>
-<div class="mmi-referral-reward">Credit is granted automatically once qualifying spend is reached.</div>`;
+<div class="mmi-referral-count">${count} friend${count === 1 ? '' : 's'} joined &bull; ${earned} of ${cap} rewards earned</div>
+${tokenLine}
+<div class="mmi-referral-reward">One reward per friend, on their first purchase of $${qualify}+. Rewards apply automatically, nothing to enter. Capped at ${cap} friends.</div>`;
  section.style.display = '';
 }
 

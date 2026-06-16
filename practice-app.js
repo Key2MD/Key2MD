@@ -4722,6 +4722,12 @@ async function buyRacgpPass(btn){
 }
 window.buyRacgpPass = buyRacgpPass;
 
+function referralPostPurchaseNudge(){
+ try {
+ if (typeof showPracticeNotice === 'function') showPracticeNotice('Enjoying Key2MD? Refer a friend and you both get 15% off. Your invite link is on your History page.', 'success');
+ } catch(e){}
+}
+
 (function handlePaymentReturn(){
  const params = new URLSearchParams(window.location.search);
  function clearPaymentParams(names){
@@ -4741,6 +4747,7 @@ window.buyRacgpPass = buyRacgpPass;
  document.getElementById('creditSuccessMsg').textContent = 'Payment successful! Your credits have been added.';
  }
  }, 1500);
+ setTimeout(referralPostPurchaseNudge, 6000);
  } else if(params.get('payment') === 'cancelled'){
  clearPaymentParams(['payment']);
  } else if(params.get('racgp') === 'success'){
@@ -4771,6 +4778,7 @@ window.buyRacgpPass = buyRacgpPass;
  Key2MDAuth.checkSession();
  showPracticeNotice('MMI payment confirmed. Your MMI credits or Pro access are now attached to this account.', 'success');
  }, 1200);
+ setTimeout(referralPostPurchaseNudge, 6000);
  }
 })();
 

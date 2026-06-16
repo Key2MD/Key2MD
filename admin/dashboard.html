@@ -1689,6 +1689,13 @@
  </div>
  </div>
 
+ <div class="bc-card" style="max-width:680px;margin-top:20px;" id="referralCouponCard">
+  <div class="bc-title">Referral program</div>
+  <div class="bc-sub">One-time setup: create the REFERRAL15 Stripe coupon (15% off, once) used when a referred friend buys their first subscription. Safe to click again - it will not duplicate.</div>
+  <button class="btn primary" onclick="createReferralCoupon()">Create / verify REFERRAL15 coupon</button>
+  <div id="referralCouponStatus" style="margin-top:8px;font-size:0.8rem;color:var(--muted);"></div>
+ </div>
+
  <div class="bc-card" style="max-width:680px;margin-top:20px;" id="qotwCard">
   <div class="bc-title">Question of the Week</div>
   <div class="bc-sub">Set the weekly featured question shown on the practice page.</div>
@@ -2932,6 +2939,17 @@ async function runCalibrationReplay() {
    }).join('');
   }
  } catch (e) { if (alertEl) alertEl.textContent = 'Replay failed: ' + (e && e.message || e); }
+}
+
+async function createReferralCoupon(){
+ const s=document.getElementById('referralCouponStatus');
+ if(s)s.textContent='Creating...';
+ try{
+  const r=await api('/admin/create-referral-coupon',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  const d=await r.json();
+  if(!r.ok||!d.ok)throw new Error(d.error||'failed');
+  if(s)s.textContent=d.note==='already_exists'?('Coupon already exists ('+d.coupon+'). Ready.'):('Coupon created: '+d.coupon+'. Ready.');
+ }catch(e){ if(s)s.textContent='Failed: '+(e&&e.message||e); }
 }
 
 // ======================================================
@@ -10769,9 +10787,9 @@ function mmiTierLabel(t) {
 function mmiTierMonthlyValue(t) {
  const monthly = {
  transcript_weekly: 80 * 4.33,
- transcript_monthly: 240,
+ transcript_monthly: 288,
  premium_weekly: 140 * 4.33,
- premium_monthly: 420,
+ premium_monthly: 504,
  };
  return monthly[String(t||'')] || 0;
 }

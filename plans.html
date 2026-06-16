@@ -815,6 +815,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
 <section class="mmi-section" id="mmi-section">
  <div class="container">
+ <div id="referralFriendBanner" style="display:none;margin:0 0 18px;padding:12px 18px;border-radius:12px;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.35);color:#fff;font-size:0.9rem;line-height:1.5;"></div>
  <div class="pro-inner">
  <div class="fade-up">
  <div class="pro-eyebrow" style="color:#a78bfa;"> MMI AI Feedback</div>
@@ -898,7 +899,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div id="mmiProPanel">
  <div style="display:flex;gap:10px;margin-bottom:14px;">
  <button id="mmiFreqWeekly" onclick="switchMMIFreq('weekly')" style="flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;text-align:center;background:rgba(139,92,246,0.2);color:#c4b5fd;">Weekly<br><strong id="mmiProPriceWeekly" style="font-size:1.1rem;color:#fff;">$80</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/wk</span></button>
- <button id="mmiFreqMonthly" onclick="switchMMIFreq('monthly')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;font-family:inherit;transition:all 0.2s;text-align:center;background:transparent;color:rgba(255,255,255,0.5);">Monthly<br><strong id="mmiProPriceMonthly" style="font-size:1.1rem;color:rgba(255,255,255,0.7);">$240</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/mo</span></button>
+ <button id="mmiFreqMonthly" onclick="switchMMIFreq('monthly')" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;font-family:inherit;transition:all 0.2s;text-align:center;background:transparent;color:rgba(255,255,255,0.5);">Monthly<br><strong id="mmiProPriceMonthly" style="font-size:1.1rem;color:rgba(255,255,255,0.7);">$288</strong><span style="font-size:0.72rem;color:rgba(255,255,255,0.5);">/mo</span></button>
  </div>
  <div style="font-size:0.78rem;color:rgba(255,255,255,0.58);margin-bottom:16px;text-align:center;" id="mmiProNote">Cancel anytime | Auto-renews weekly</div>
  <button class="btn-mmi-pro" id="mmiProBtn" onclick="handleMMIPro()">Start MMI Transcript Pro -></button>
@@ -1469,12 +1470,40 @@ let plansMMIFounderState = null;
 
 document.addEventListener('DOMContentLoaded', () => {
  Key2MDAuth.init({ tool:'casper', apiBase:API_BASE, onAuthChange:updateUI, onLimitsLoaded:updateUI });
+ maybeShowReferralBanner();
  initFadeObserver();
  renderMMICreditPacks('transcript');
  updateMMIValueAnchor();
  updateMMIFounderCard();
  updateRacgpPassState();
 });
+
+let _referralBannerFetched = false;
+async function maybeShowReferralBanner() {
+ const el = document.getElementById('referralFriendBanner');
+ if (!el) return;
+ if (Key2MDAuth.isLoggedIn && Key2MDAuth.isLoggedIn()) {
+  if (_referralBannerFetched) return;
+  _referralBannerFetched = true;
+  try {
+   const res = await fetch(`${API_BASE}/api/user/referral-info`, { headers: { Authorization: `Bearer ${Key2MDAuth.getToken()}` } });
+   const d = await res.json().catch(() => ({}));
+   if (d && d.has_first_purchase_discount) {
+    el.innerHTML = `<strong>A friend invited you.</strong> You have ${d.friend_discount_percent || 15}% off your first purchase, applied automatically at checkout.`;
+    el.style.display = '';
+   } else {
+    el.style.display = 'none';
+   }
+  } catch (e) {}
+  return;
+ }
+ try {
+  if (localStorage.getItem('k2md_ref')) {
+   el.innerHTML = `<strong>Invited by a friend?</strong> Create a free account and get 15% off your first purchase.`;
+   el.style.display = '';
+  }
+ } catch (e) {}
+}
 
 function updateUI() {
  const isPro = Key2MDAuth.isPro();
@@ -1487,6 +1516,7 @@ function updateUI() {
  const endLabel = formatProPeriodEnd(user.pro_period_end);
  updateBillingPanel(user, isPro, cancelRequested, endLabel);
  refreshPlansBillingSummary();
+ maybeShowReferralBanner();
  banner.style.display = isPro ? 'flex' : 'none';
  banner.classList.toggle('cancelling', cancelRequested);
  if (isPro) {
@@ -2156,8 +2186,8 @@ const MMI_PACKS = {
 };
 
 const MMI_PRO_PRICES = {
- transcript: { weekly: '$80', monthly: '$240' },
- premium: { weekly: '$140', monthly: '$420' },
+ transcript: { weekly: '$80', monthly: '$288' },
+ premium: { weekly: '$140', monthly: '$504' },
 };
 
 const MMI_CREDIT_LABELS = {
@@ -2289,7 +2319,7 @@ function switchMMIFreq(freq) {
  } else {
  mBtn.style.background = 'rgba(139,92,246,0.2)'; mBtn.style.color = '#c4b5fd'; mBtn.style.border = 'none';
  wBtn.style.background = 'transparent'; wBtn.style.color = 'rgba(255,255,255,0.5)'; wBtn.style.border = '1px solid rgba(255,255,255,0.1)';
- note.textContent = 'Save ~25% vs weekly | Cancel anytime';
+ note.textContent = 'Save ~10% vs weekly | Cancel anytime';
  }
  updateMMIValueAnchor();
 }

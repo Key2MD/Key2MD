@@ -181,12 +181,22 @@ const MMICircuit = (() => {
  </select>
  </div>
 
- <div style="margin-bottom:16px;" id="circuitSpecialistRow">
+ <div style="margin-bottom:12px;" id="circuitSpecialistRow">
  <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid var(--gray200);background:var(--gray50);">
  <input type="checkbox" id="circuitSpecialist" style="accent-color:#7c3aed;width:15px;height:15px;">
  <div>
  <div style="font-size:0.82rem;font-weight:600;color:var(--gray800);">Specialist Mode</div>
  <div style="font-size:0.68rem;color:var(--gray400);line-height:1.4;">Higher bar - RACS/RANZCO/ACRRM</div>
+ </div>
+ </label>
+ </div>
+
+ <div style="margin-bottom:16px;" id="circuitWeaknessRow">
+ <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid var(--gray200);background:var(--gray50);">
+ <input type="checkbox" id="circuitWeakness" style="accent-color:#7c3aed;width:15px;height:15px;">
+ <div>
+ <div style="font-size:0.82rem;font-weight:600;color:var(--gray800);">Target my weak areas</div>
+ <div style="font-size:0.68rem;color:var(--gray400);line-height:1.4;">Weights stations toward your lowest-scoring categories</div>
  </div>
  </label>
  </div>
@@ -276,9 +286,23 @@ const MMICircuit = (() => {
  return document.getElementById('circuitMainArea');
  }
 
+ const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+ // The circuit reuses the normal MMI recording UI for each station, then hides
+ // it during rests and the debrief so only the circuit screen shows. launchStation
+ // re-shows it (via showNativePracticeUI + setMode('mmi')) before the next station.
+ const NATIVE_PRACTICE_IDS = ['scenarioCard','webcamPanel','mmiSpeakingArea','aiFeedbackWrapMMI','mmiSubmitWrap','answerSection','btnGetAIWrap','btnGetAITopWrap'];
+ function hideNativePracticeUI() {
+ NATIVE_PRACTICE_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+ }
+ function showNativePracticeUI() {
+ NATIVE_PRACTICE_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ''; });
+ }
+
  function renderCircuitIdle() {
  const area = getMainArea();
  if (!area) return;
+ hideNativePracticeUI();
  area.innerHTML = `
  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:500px;text-align:center;padding:40px 24px;">
  <div style="font-size:4rem;margin-bottom:20px;"></div>
@@ -377,12 +401,14 @@ const MMICircuit = (() => {
  .find(b => b.dataset.active === '1')?.dataset.tier) || 'transcript';
  const preset = document.getElementById('circuitPreset')?.value || 'standard';
  const specialist = document.getElementById('circuitSpecialist')?.checked || false;
- return { size: activeSize || 4, tier: activeTier, preset, specialistMode: specialist };
+ const weakness = document.getElementById('circuitWeakness')?.checked || false;
+ return { size: activeSize || 4, tier: activeTier, preset, specialistMode: specialist, weaknessMode: weakness };
  }
 
  function renderCreditPaywall(cfg, balance) {
  const area = getMainArea();
  if (!area) return;
+ hideNativePracticeUI();
  const need = cfg.size;
  const tier = cfg.tier;
  const bundleSize = BUNDLE_SIZES[tier];
@@ -413,7 +439,63 @@ const MMICircuit = (() => {
  `;
  }
 
- function startCircuit() {
+ // Ranks the student's MMI categories from weakest to strongest using their saved
+ // marks (same source as weaknessDrill). Returns [] when there is not enough data.
+ async function fetchWeakCategoryRanking() {
+ try {
+ const auth = window.Key2MDAuth;
+ const token = (auth && auth.getToken) ? auth.getToken() : '';
+ if (!token) return [];
+ const base = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+ const res = await fetch(`${base}/api/mmi/reviews?limit=50&source=mmi`, { headers: { Authorization: `Bearer ${token}` } });
+ const data = await res.json().catch(() => ({}));
+ const agg = {};
+ (data.reviews || []).forEach(r => {
+ const cat = r.station_category; let sc = null;
+ try { sc = JSON.parse(r.ai_feedback_json || '{}')?.overall?.score; } catch (e) {}
+ if (cat && typeof sc === 'number') { (agg[cat] = agg[cat] || []).push(sc); }
+ });
+ return Object.keys(agg)
+ .map(cat => ({ cat, avg: agg[cat].reduce((a, b) => a + b, 0) / agg[cat].length, n: agg[cat].length }))
+ .sort((a, b) => a.avg - b.avg);
+ } catch (e) { return []; }
+ }
+
+ // Weights selection toward the weakest categories (~70% of the circuit), keeping
+ // variety and avoiding two of the same category back-to-back. Falls back cleanly.
+ function weaknessShuffle(stations, count, ranking) {
+ if (!ranking || !ranking.length) return balancedShuffle(stations, count);
+ const weakCats = ranking.map(r => r.cat);
+ const weakTarget = Math.max(1, Math.round(count * 0.7));
+ const byCat = {};
+ stations.forEach(s => { const c = s.category || 'General'; (byCat[c] = byCat[c] || []).push(s); });
+ Object.values(byCat).forEach(arr => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } });
+ const picked = [];
+ const used = new Set();
+ let added = true;
+ while (picked.length < weakTarget && added) {
+ added = false;
+ for (const cat of weakCats) {
+ if (picked.length >= weakTarget) break;
+ const arr = byCat[cat];
+ if (!arr || !arr.length) continue;
+ const next = arr.find(s => !used.has(s));
+ if (next && (picked.length === 0 || picked[picked.length - 1].category !== cat)) {
+ picked.push(next); used.add(next); added = true;
+ }
+ }
+ }
+ if (picked.length < count) {
+ const rest = balancedShuffle(stations.filter(s => !used.has(s)), count - picked.length);
+ rest.forEach(s => { if (!used.has(s) && picked.length < count) { picked.push(s); used.add(s); } });
+ }
+ if (picked.length < count) {
+ for (const s of stations) { if (picked.length >= count) break; if (!used.has(s)) { picked.push(s); used.add(s); } }
+ }
+ return picked.slice(0, count);
+ }
+
+ async function startCircuit() {
  if (!window.Key2MDAuth?.isLoggedIn()) {
  window.Key2MDAuth?.showAuthModal('signup');
  return;
@@ -435,13 +517,25 @@ const MMICircuit = (() => {
  circuitIdx = 0;
  circuitActive = true;
 
- // Build balanced station pool from MMI_STATIONS
+ // Build the station pool from MMI_STATIONS
  const allStations = window.MMI_STATIONS || [];
  if (allStations.length < circuitConfig.size) {
  alert('Not enough MMI stations available. Please check practice-stations.js.');
  return;
  }
+
+ if (cfg.weaknessMode) {
+ const ranking = await fetchWeakCategoryRanking();
+ if (ranking.length) {
+ circuitStations = weaknessShuffle(allStations, circuitConfig.size, ranking);
+ } else {
  circuitStations = balancedShuffle(allStations, circuitConfig.size);
+ circuitConfig.weaknessMode = false;
+ if (window.showPracticeNotice) window.showPracticeNotice('Not enough marked MMI stations yet to target weak areas - running a balanced circuit. This will use your weak areas once you have a few marks.', 'info');
+ }
+ } else {
+ circuitStations = balancedShuffle(allStations, circuitConfig.size);
+ }
 
  renderProgressBar();
  launchStation(0);
@@ -464,12 +558,15 @@ const MMICircuit = (() => {
  Station ${idx + 1} / ${circuitConfig.size}
  </div>
  <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">${station.category}</div>
- <div style="margin-left:auto;font-size:0.72rem;color:var(--gray400);">${circuitConfig.tier === 'premium' ? 'Premium' : 'Transcript'} | ${circuitConfig.specialistMode ? 'Specialist Mode' : 'Med School'}</div>
+ <div style="margin-left:auto;font-size:0.72rem;color:var(--gray400);">${circuitConfig.tier === 'premium' ? 'Premium' : 'Transcript'} | ${circuitConfig.specialistMode ? 'Specialist Mode' : 'Med School'}${circuitConfig.weaknessMode ? ' | Weakness focus' : ''}</div>
  </div>
 
  <div id="circuitFeedbackWrap" style="margin-top:16px;"></div>
  </div>
  `;
+
+ // Make sure the native MMI recording UI (hidden during rest/debrief) is back.
+ showNativePracticeUI();
 
  // Override the global MMI state so the existing recording machinery runs
  // We inject the station into the global pool at index 0 so loadStation() picks it up
@@ -489,37 +586,12 @@ const MMICircuit = (() => {
  window.currentIdx = 0;
  window.sessionActive = true;
 
- // Override the normal mmi submit callback to capture result
- window._circuitFeedbackCapture = (feedbackData) => {
- onStationComplete(feedbackData, station);
- };
+ // Route the marked result straight to the circuit. submitMMIForFeedback checks
+ // for this hook on its 'done' stage and skips the prediction/feedback UI, so no
+ // per-station feedback is shown during the run (the circuit is a true mock).
+ window._circuitCapture = (data) => onStationComplete(data, station);
 
  if (window.loadStation) window.loadStation();
-
- // Patch submit button to route through circuit capture
- patchSubmitButton();
- }
-
- function patchSubmitButton() {
- // Replace submitMMIForFeedback with a circuit-aware version
- window._originalSubmitMMI = window.submitMMIForFeedback;
- window.submitMMIForFeedback = async function() {
- // Run the original submit but capture the result
- const btn = document.getElementById('btnMMISubmit');
- const wrap = document.getElementById('aiFeedbackWrapMMI');
-
- // We run the original (which calls the API and renders to aiFeedbackWrapMMI),
- // but also capture the result for the debrief.
- // We do this by wrapping the fetch call via the existing machinery and
- // listening for the result to appear in the DOM, OR by re-reading from
- // the global after the original completes.
-
- await window._originalSubmitMMI.apply(this, arguments);
-
- if (window._lastMMIFeedback) {
- onStationComplete(window._lastMMIFeedback, circuitStations[circuitIdx], window._lastMMIReviewId || null);
- }
- };
  }
 
  function getPrompts(station) {
@@ -532,19 +604,21 @@ const MMICircuit = (() => {
  return p;
  }
 
- function onStationComplete(feedbackData, station, reviewId) {
- if (window._originalSubmitMMI) {
- window.submitMMIForFeedback = window._originalSubmitMMI;
- delete window._originalSubmitMMI;
- }
+ function onStationComplete(data, station) {
+ window._circuitCapture = null;
+ const feedback = (data && (data.feedback || data)) || null;
+ const reviewId = (data && data.review_id) || null;
 
  circuitResults.push({
  station,
- feedback: feedbackData,
+ feedback,
  stationIdx: circuitIdx,
  tier: circuitConfig.tier,
- reviewId: reviewId || null,
+ reviewId,
  });
+
+ // Hide the native recording UI so only the rest/debrief screen shows.
+ hideNativePracticeUI();
 
  const isLast = circuitIdx >= circuitConfig.size - 1;
 
@@ -585,10 +659,8 @@ const MMICircuit = (() => {
  function abortCircuit() {
  circuitActive = false;
  clearInterval(restTimerInterval);
- if (window._originalSubmitMMI) {
- window.submitMMIForFeedback = window._originalSubmitMMI;
- delete window._originalSubmitMMI;
- }
+ window._circuitCapture = null;
+ showNativePracticeUI();
  circuitResults = [];
  circuitStations = [];
  circuitIdx = 0;
@@ -656,7 +728,7 @@ const MMICircuit = (() => {
  'Content-Type': 'application/json',
  'Authorization': `Bearer ${token}`,
  },
- body: JSON.stringify({ prompt: debriefPrompt, review_ids: reviewIds }),
+ body: JSON.stringify({ prompt: debriefPrompt, review_ids: reviewIds, circuit_meta: { station_count: circuitConfig.size, tier: circuitConfig.tier } }),
  });
  const data = await res.json();
  if (!res.ok || !data.debrief) {
@@ -834,25 +906,33 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
 
  ${polishedBlock}
 
- <!-- Per-station quick view -->
+ <!-- Per-station results (expandable) -->
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
- <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);margin-bottom:14px;">Station Results</div>
+ <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+ <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);">Station Results</div>
+ <button onclick="MMICircuit.expandAllStations()" style="background:none;border:none;color:#7c3aed;font-size:0.74rem;font-weight:700;cursor:pointer;font-family:inherit;">Expand all</button>
+ </div>
+ <div style="font-size:0.74rem;color:var(--gray400);margin-bottom:6px;">Tap a station to see its full marking - withheld during the circuit, like the real day.</div>
  ${circuitResults.map((r, i) => {
  const fb = r.feedback;
  const score = fb?.overall?.score || '-';
  const label = fb?.overall?.label || '-';
  const scoreColor = BAND_COLORS[label] || '#6b7280';
  return `
- <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--gray100);">
+ <div class="circuit-station-item" style="border-bottom:1px solid var(--gray100);">
+ <button onclick="MMICircuit.toggleStationDetail(${i})" style="width:100%;display:flex;align-items:center;gap:14px;padding:10px 0;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;">
  <div style="width:28px;height:28px;border-radius:50%;background:rgba(124,58,237,0.1);color:#7c3aed;font-size:0.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i + 1}</div>
  <div style="flex:1;min-width:0;">
- <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">${r.station.category}</div>
- <div style="font-size:0.72rem;color:var(--gray400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.station.scenario.substring(0, 80)}...</div>
+ <div style="font-size:0.82rem;font-weight:600;color:var(--navy);">${esc(r.station.category)}</div>
+ <div style="font-size:0.72rem;color:var(--gray400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.station.scenario.substring(0, 80))}...</div>
  </div>
  <div style="text-align:right;flex-shrink:0;">
  <div style="font-size:1rem;font-weight:800;color:${scoreColor};">${score}/5</div>
- <div style="font-size:0.68rem;color:${scoreColor};font-weight:600;">${label}</div>
+ <div style="font-size:0.68rem;color:${scoreColor};font-weight:600;">${esc(label)}</div>
  </div>
+ <span class="circuit-station-caret" id="circuitCaret${i}" style="color:var(--gray300);font-size:1.1rem;font-weight:700;flex-shrink:0;width:14px;text-align:center;">+</span>
+ </button>
+ <div id="circuitStationDetail${i}" style="display:none;padding-bottom:12px;"></div>
  </div>`;
  }).join('')}
  </div>
@@ -889,8 +969,8 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  <button onclick="MMICircuit.runAgain()" style="padding:12px 28px;border-radius:50px;border:none;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(124,58,237,0.3);transition:all 0.2s;">
  Run Another Circuit
  </button>
- <button onclick="MMICircuit.reviewStations()" style="padding:12px 28px;border-radius:50px;border:1px solid var(--gray200);background:#fff;color:var(--navy);font-size:0.92rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">
- Review Individual Stations
+ <button onclick="MMICircuit.expandAllStations()" style="padding:12px 28px;border-radius:50px;border:1px solid var(--gray200);background:#fff;color:var(--navy);font-size:0.92rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">
+ Review Each Station
  </button>
  </div>
  </div>
@@ -969,8 +1049,62 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  renderCircuitIdle();
  }
 
- function reviewStations() {
- alert('Per-station feedback was shown after each station. Use "Run Another Circuit" to do a new circuit, or switch to MMI mode to review individual stations.');
+ function renderStationDetail(r) {
+ const fb = r && r.feedback;
+ if (!fb) return '<div style="padding:12px;color:var(--gray400);font-size:0.82rem;">No feedback was captured for this station.</div>';
+ const CRIT = { empathy: 'Empathy', communication: 'Communication', reasoning: 'Reasoning', reflection: 'Reflection', real_world_awareness: 'Real-world Awareness' };
+ const sums = {}, counts = {};
+ (fb.per_prompt || []).forEach(pp => {
+ Object.keys(CRIT).forEach(k => {
+ const v = pp && pp.scores && pp.scores[k] && pp.scores[k].score;
+ if (typeof v === 'number') { sums[k] = (sums[k] || 0) + v; counts[k] = (counts[k] || 0) + 1; }
+ });
+ });
+ const critRows = Object.keys(CRIT).map(k => {
+ if (!counts[k]) return '';
+ const a = Math.round((sums[k] / counts[k]) * 10) / 10;
+ const col = a >= 4 ? '#16a34a' : a >= 3 ? '#0ea5e9' : a >= 2 ? '#d97706' : '#dc2626';
+ const pct = Math.max(0, Math.min(100, (a / 5) * 100));
+ return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><span style="font-size:0.74rem;color:var(--gray600);width:140px;flex-shrink:0;">${CRIT[k]}</span><div style="flex:1;height:6px;background:var(--gray100);border-radius:99px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${col};"></div></div><strong style="font-size:0.76rem;color:${col};width:26px;text-align:right;">${a}</strong></div>`;
+ }).join('');
+ const promptSummaries = (fb.per_prompt || []).map((pp, i) =>
+ `<div style="margin-bottom:6px;"><span style="font-size:0.68rem;font-weight:800;color:var(--gray400);">Q${i + 1}</span> <span style="font-size:0.8rem;color:var(--gray600);line-height:1.55;">${esc(pp.summary || '')}</span></div>`
+ ).join('');
+ const o = fb.overall || {};
+ const auditor = fb.polished_auditor_detected
+ ? `<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:0.78rem;color:var(--gray700);"><strong style="color:#d97706;">Polished Auditor:</strong> ${esc(fb.polished_auditor_explanation || '')}</div>`
+ : '';
+ return `<div style="padding:14px 16px;background:var(--gray50);border-radius:10px;margin-top:4px;">
+ ${critRows ? `<div style="margin-bottom:12px;">${critRows}</div>` : ''}
+ ${auditor}
+ ${o.biggest_strength ? `<div style="font-size:0.82rem;margin-bottom:6px;"><strong style="color:#16a34a;">Landed:</strong> <span style="color:var(--gray700);">${esc(o.biggest_strength)}</span></div>` : ''}
+ ${(o.biggest_change || o.biggest_improvement) ? `<div style="font-size:0.82rem;margin-bottom:6px;"><strong style="color:#d97706;">Work on:</strong> <span style="color:var(--gray700);">${esc(o.biggest_change || o.biggest_improvement)}</span></div>` : ''}
+ ${promptSummaries ? `<div style="margin-top:8px;border-top:1px solid var(--gray100);padding-top:8px;">${promptSummaries}</div>` : ''}
+ ${r.reviewId ? `<div style="margin-top:10px;"><a href="history.html" style="font-size:0.78rem;color:#7c3aed;font-weight:700;text-decoration:none;">Open full feedback in history -></a></div>` : ''}
+ </div>`;
+ }
+
+ function toggleStationDetail(i) {
+ const panel = document.getElementById('circuitStationDetail' + i);
+ const caret = document.getElementById('circuitCaret' + i);
+ if (!panel) return;
+ if (panel.style.display === 'none') {
+ if (!panel.dataset.rendered) { panel.innerHTML = renderStationDetail(circuitResults[i]); panel.dataset.rendered = '1'; }
+ panel.style.display = 'block';
+ if (caret) caret.textContent = '-';
+ } else {
+ panel.style.display = 'none';
+ if (caret) caret.textContent = '+';
+ }
+ }
+
+ function expandAllStations() {
+ circuitResults.forEach((r, i) => {
+ const panel = document.getElementById('circuitStationDetail' + i);
+ if (panel && panel.style.display === 'none') toggleStationDetail(i);
+ });
+ const first = document.querySelector('.circuit-station-item');
+ if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
  }
 
  return {
@@ -985,7 +1119,8 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  abortCircuit,
  generateDebrief,
  runAgain,
- reviewStations,
+ toggleStationDetail,
+ expandAllStations,
  selectReviewStation,
  buyCircuitReview,
  };

@@ -846,6 +846,7 @@ async function submitMMIForFeedback() {
    const data = evt.result || {};
    if(data.used_free_review) { try { window.Key2MDTrack?.funnel?.('free_review_used', { product: 'mmi', tier }); } catch(e) {} }
    recordStationSeen(s, MODE_MMI, data?.score ?? data?.feedback?.score ?? null);
+   if(window._circuitCapture) { mmiFeedbackUploadInFlight = false; try { updateMMILimitsUI(); } catch(e) {} try { resetMMISubmitState(); } catch(e) {} window._circuitCapture(data); return; }
    showMMIPrediction(feedbackWrap, data, { tier, specialistMode: mmiSpecialistMode, stationCategory: s.category || '', durationSec: mmiRecordingDurationSec, visualDegraded });
    return;
    } else if(evt.stage === 'error') {
@@ -873,6 +874,7 @@ async function submitMMIForFeedback() {
  const data = await res.json().catch(() => ({}));
  if(data.used_free_review) { try { window.Key2MDTrack?.funnel?.('free_review_used', { product: 'mmi', tier }); } catch(e) {} }
  recordStationSeen(s, MODE_MMI, data?.score ?? data?.feedback?.score ?? null);
+ if(window._circuitCapture) { mmiFeedbackUploadInFlight = false; try { updateMMILimitsUI(); } catch(e) {} try { resetMMISubmitState(); } catch(e) {} window._circuitCapture(data); return; }
  showMMIPrediction(feedbackWrap, data, { tier, specialistMode: mmiSpecialistMode, stationCategory: s.category || '', durationSec: mmiRecordingDurationSec, visualDegraded });
 }
 

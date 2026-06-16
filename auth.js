@@ -99,6 +99,7 @@ const Key2MDAuth = (() => {
  };
 
  installFetchActivityHeaders();
+ captureReferralCode();
  injectAuthModal();
  injectAuthBar();
  consumeImpersonationHandoff().finally(() => checkSession());
@@ -111,6 +112,18 @@ const Key2MDAuth = (() => {
  function isProCancelling() { return _user?.tier === 'pro' && !!_user.cancel_requested; }
  function getProPeriodEnd() { return _user?.pro_period_end || null; }
  function getToken() { return localStorage.getItem(TOKEN_KEY); }
+
+ // Referral attribution: stash ?ref= on landing so it survives browsing before signup.
+ const REF_KEY = 'k2md_ref';
+ function captureReferralCode() {
+ try {
+ const ref = new URL(window.location.href).searchParams.get('ref');
+ if (ref) localStorage.setItem(REF_KEY, String(ref).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16));
+ } catch (e) {}
+ }
+ function getStoredReferralCode() {
+ try { return localStorage.getItem(REF_KEY) || ''; } catch (e) { return ''; }
+ }
 
  async function consumeImpersonationHandoff() {
  try {
@@ -275,11 +288,12 @@ const Key2MDAuth = (() => {
  const res = await fetch(`${_config.apiBase}/api/auth/signup`, {
  method: 'POST',
  headers: getTrackingHeaders({ 'Content-Type': 'application/json' }),
- body: JSON.stringify({ email, password, name }),
+ body: JSON.stringify({ email, password, name, ref: getStoredReferralCode() }),
  });
  const data = await res.json();
  if (!res.ok) throw new Error(data.error || 'Signup failed');
 
+ try { localStorage.removeItem(REF_KEY); } catch (e) {}
  localStorage.setItem(TOKEN_KEY, data.token);
  setUser(data.user);
  await loadLimits();

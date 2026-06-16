@@ -630,7 +630,6 @@ const MMIFeedbackRender = (() => {
  + '</div>';
  }).join('');
  return '<div style="margin:14px 0;padding:14px 16px;border:1px solid #e6ebf2;border-radius:12px;background:#fff;">'
- + '<div style="font-weight:800;font-size:0.95rem;margin-bottom:8px;">Your words, mapped to the criteria</div>'
  + items + '</div>';
  }
 
@@ -743,6 +742,15 @@ const MMIFeedbackRender = (() => {
  ${critStrip ? `<div class="mmi-crit-strip">${critStrip}</div>` : ''}
  </div>`;
 
+ const moveItems = [];
+ if (overall.biggest_improvement) moveItems.push(overall.biggest_improvement);
+ if (overall.excellent_version) moveItems.push(overall.excellent_version);
+ const twoMovesHtml = moveItems.length ? `
+ <div class="mmi-moves">
+ <div class="mmi-moves-label">Your next ${moveItems.length === 1 ? 'move' : 'two moves'}</div>
+ <ol class="mmi-moves-list">${moveItems.map(m => `<li>${esc(m)}</li>`).join('')}</ol>
+ </div>` : '';
+
  const html = `
  <div class="mmi-feedback" id="mmiFeedbackBlock">
 
@@ -754,6 +762,8 @@ const MMIFeedbackRender = (() => {
  </div>
 
  ${leadHtml}
+
+ ${twoMovesHtml}
 
  ${auditorFlag}
  <div id="mmiPercentileMount"></div>
@@ -775,29 +785,16 @@ const MMIFeedbackRender = (() => {
  ${voiceSection}
  ${visualSection}
 
- <div class="mmi-overall-summary">
- <div class="mmi-summary-section">
- <div class="mmi-summary-label"> Biggest Strength</div>
- <div class="mmi-summary-text">${esc(overall.biggest_strength || '')}</div>
- </div>
- <div class="mmi-summary-section">
- <div class="mmi-summary-label"> Biggest Improvement</div>
- <div class="mmi-summary-text">${esc(overall.biggest_improvement || '')}</div>
- </div>
- <div class="mmi-summary-section mmi-summary-q5">
- <div class="mmi-summary-label">The one change that would lift this most</div>
- <div class="mmi-summary-text">${esc(overall.excellent_version || '')}</div>
- </div>
- </div>
+ ${highlightsSection ? `<details class="mmi-collapse"><summary class="mmi-collapse-summary">Your words, mapped to the criteria</summary>${highlightsSection}</details>` : ''}
 
- ${highlightsSection}
-
+ <details class="mmi-collapse">
+ <summary class="mmi-collapse-summary">About this feedback</summary>
  <div class="mmi-limitations">
- <strong>About this feedback</strong><br>
  This AI feedback is calibrated to the rubric Dan uses with his coaching students - empathy, communication, reasoning, reflection, and real-world awareness. It is designed to complement, not replace, human review.<br><br>
  The AI is good at: structural feedback, identifying the Polished Auditor trap, spotting reflection without consequence, flagging textbook answers, and benchmarking your response against Dan's rubric.<br><br>
  The AI is less good at: subtle interpersonal nuance, the kind of judgement only experienced examiners bring, and the emotional weight of how something landed in the room.
  </div>
+ </details>
 
  ${data.review_id ? `<div class="mmi-lift-wrap" id="mmiLiftWrap">
   <button class="btn-lift-trigger" id="mmiLiftTrigger">Lift my answer - see a stronger version of what you said -></button>
@@ -810,6 +807,12 @@ const MMIFeedbackRender = (() => {
  </div>` : ''}
 
  ${context?.canRedo ? `<div class="mmi-redo-wrap"><button class="btn-mmi-redo" onclick="window.mmiRedoStation && window.mmiRedoStation()">Practise this station again -></button></div>` : ''}
+
+ ${overallScore >= 4 ? `<div class="mmi-refer-nudge">
+ <div class="mmi-refer-nudge-title">Strong station. Know someone else prepping?</div>
+ <div class="mmi-refer-nudge-sub">Give a friend 15% off their first purchase. When they spend $50 or more, you get 15% off too.</div>
+ <div class="mmi-refer-nudge-row"><button class="mmi-refer-nudge-btn" id="mmiReferNudgeBtn" type="button">Copy your invite link</button><span class="mmi-refer-nudge-status" id="mmiReferNudgeStatus"></span></div>
+ </div>` : ''}
 
  <div class="dan-marking-card">
  <div class="dan-marking-left">
@@ -832,6 +835,7 @@ const MMIFeedbackRender = (() => {
  hydratePercentile(container, feedback);
  if (data.review_id) hydrateProbe(container, data.review_id);
  if (data.review_id) hydrateLift(container, data.review_id);
+ hydrateReferNudge(container);
  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
  }
 
@@ -919,6 +923,25 @@ const MMIFeedbackRender = (() => {
  function clear(container) {
  clearLoadingTimers();
  if (container) container.innerHTML = '';
+ }
+
+ function hydrateReferNudge(container) {
+  const btn = container.querySelector('#mmiReferNudgeBtn');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+   const status = container.querySelector('#mmiReferNudgeStatus');
+   btn.disabled = true;
+   try {
+    const res = await fetch(`${apiBase()}/api/user/referral-info`, { headers: { Authorization: `Bearer ${authToken()}` } });
+    const d = await res.json().catch(() => ({}));
+    if (!d || !d.referral_link) throw new Error('no link');
+    await navigator.clipboard.writeText(d.referral_link);
+    if (status) status.textContent = 'Link copied. Paste it to a friend.';
+   } catch (e) {
+    if (status) status.textContent = 'Find your invite link on the history page.';
+   }
+   btn.disabled = false;
+  });
  }
 
  function hydrateLift(container, reviewId) {
