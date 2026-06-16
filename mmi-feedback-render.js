@@ -242,7 +242,7 @@ const MMIFeedbackRender = (() => {
  ? 'Your broad MMI performance signal across saved spoken reviews.'
  : CRITERIA_HELP[selectedKey];
  const latestComment = selectedKey === 'overall'
- ? selectedLatest?.point?.feedback?.overall?.biggest_improvement || selectedLatest?.point?.feedback?.overall?.biggest_strength || ''
+ ? selectedLatest?.point?.feedback?.overall?.biggest_change || selectedLatest?.point?.feedback?.overall?.biggest_improvement || selectedLatest?.point?.feedback?.overall?.biggest_strength || ''
  : selectedLatest?.point?.criteria?.[selectedKey]?.comment || '';
 
  const overallActive = selectedKey === 'overall' ? ' active' : '';
@@ -736,8 +736,8 @@ const MMIFeedbackRender = (() => {
  const leadHtml = `
  <div class="mmi-lead">
  <div class="mmi-lead-focus">
- <div class="mmi-lead-label">Your one focus next time</div>
- <div class="mmi-lead-text">${esc(overall.biggest_improvement || 'Name the real tension and land a clear, reasoned decision.')}</div>
+ <div class="mmi-lead-label">Your biggest win next time</div>
+ <div class="mmi-lead-text">${esc(overall.biggest_change || overall.biggest_improvement || 'Name the real tension and land a clear, reasoned decision.')}</div>
  </div>
  ${overall.biggest_strength ? `<div class="mmi-lead-strength"><strong>What landed:</strong> ${esc(overall.biggest_strength)}</div>` : ''}
  ${critStrip ? `<div class="mmi-crit-strip">${critStrip}</div>` : ''}

@@ -1374,6 +1374,7 @@ function mockStationHTML(attempt, row, index) {
  <div class="mock-section-label">Scenario</div>
  ${mockScenarioHTML(row.station?.scenario || '')}
  ${row.station?.prompt1 || row.station?.prompt2 ? `<div class="mock-section-label">Prompts</div><div class="mock-text">${row.station?.prompt1 ? `1. ${escapeHtml(row.station.prompt1)}` : ''}${row.station?.prompt2 ? `\n2. ${escapeHtml(row.station.prompt2)}` : ''}</div>` : ''}
+ ${feedback.change ? `<div class="mock-feedback-item" style="margin-bottom:10px;"><strong>Biggest change</strong><p>${escapeHtml(feedback.change)}</p></div>` : ''}
  <div class="mock-feedback-grid">
  <div class="mock-feedback-item"><strong>Strength</strong><p>${escapeHtml(feedback.strength)}</p></div>
  <div class="mock-feedback-item"><strong>Improve</strong><p>${escapeHtml(feedback.improve)}</p></div>
@@ -1444,6 +1445,7 @@ function mockFeedback(row) {
  };
  }
  return {
+ change: overall.biggest_change || '',
  strength: overall.biggest_strength || fb.strengths || fb.strength || 'No specific strength returned.',
  improve: overall.biggest_improvement || fb.improvements || fb.improve || 'No specific improvement returned.',
  };
@@ -1934,8 +1936,10 @@ function casperBodyHTML(r, fb) {
  const compRows = comps.map(c => {
  const cq = qOf(c.score);
  const cgrad = cq === 'Q4' ? 'linear-gradient(90deg,#34d399,#22c55e)' : cq === 'Q3' ? 'linear-gradient(90deg,#38bdf8,#0ea5e9)' : cq === 'Q2' ? 'linear-gradient(90deg,#fbbf24,#f59e0b)' : 'linear-gradient(90deg,#fb7185,#ef4444)';
- const note = c.score >= 7 ? (c.evidence || c.improve) : (c.improve || c.evidence);
- return `<div class="va-crow"><span class="va-cn">${escapeHtml(c.name)}</span><span class="va-ct"><span class="va-cf" style="width:${Math.round(c.score * 10)}%;background:${cgrad};box-shadow:0 0 7px ${qColor(cq)}55;"></span></span><span class="va-cs" style="color:${qColor(cq)};">${c.score.toFixed(1)}</span></div>${note ? `<div class="va-cnote">${escapeHtml(note)}</div>` : ''}`;
+ const good = c.evidence ? `<div class="va-cline"><b class="va-cgood">Going well</b>${escapeHtml(c.evidence)}</div>` : '';
+ const lift = c.improve ? `<div class="va-cline"><b class="va-clift">To score higher</b>${escapeHtml(c.improve)}</div>` : '';
+ const detail = (good || lift) ? `<div class="va-cnote">${good}${lift}</div>` : '';
+ return `<div class="va-crow"><span class="va-cn">${escapeHtml(c.name)}</span><span class="va-ct"><span class="va-cf" style="width:${Math.round(c.score * 10)}%;background:${cgrad};box-shadow:0 0 7px ${qColor(cq)}55;"></span></span><span class="va-cs" style="color:${qColor(cq)};">${c.score.toFixed(1)}</span></div>${detail}`;
  }).join('');
  const winsHtml = wins.length ? `<div class="va-sec"><div class="va-label">${wins.length} quick win${wins.length > 1 ? 's' : ''} for next time</div>${wins.map((w, i) => `<div class="va-win"><span class="va-wn">${i + 1}</span><span class="va-wt">${escapeHtml(w)}</span></div>`).join('')}</div>` : '';
  const changeHtml = change ? `<div class="va-div"></div><div class="va-change-eye"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Single biggest impact change</div><div class="va-change">${escapeHtml(change)}</div>` : '';
@@ -1992,7 +1996,12 @@ function ensureCasperFbStyles() {
  + '.va-ct{flex:1;height:8px;border-radius:5px;background:var(--gray100);}'
  + '.va-cf{display:block;height:100%;border-radius:5px;}'
  + '.va-cs{flex:none;font-size:0.95rem;font-weight:800;min-width:44px;text-align:right;}'
- + '.va-cnote{font-size:0.74rem;color:var(--gray400);line-height:1.45;padding:0 0 9px 120px;margin-top:-3px;}'
+ + '.va-cnote{padding:3px 0 10px 120px;}'
+ + '.va-cline{font-size:0.75rem;color:var(--gray600);line-height:1.5;}'
+ + '.va-cline+.va-cline{margin-top:4px;}'
+ + '.va-cline b{font-size:0.57rem;font-weight:900;letter-spacing:0.06em;text-transform:uppercase;margin-right:5px;}'
+ + '.va-cgood{color:#15803d;}'
+ + '.va-clift{color:#b45309;}'
  + '.va-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:13px;border-top:1px solid var(--gray100);font-size:0.72rem;color:var(--gray400);}'
  + '@media(max-width:520px){.va-cn{width:84px;font-size:0.76rem;}.va-cnote{padding-left:0;}.va-top{flex-wrap:wrap;}.va-foot{flex-direction:column;align-items:flex-start;gap:3px;}}';
  document.head.appendChild(s);

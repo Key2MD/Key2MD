@@ -806,6 +806,7 @@
  <summary><span class="nav-summary-text"><span>Review Queues</span><small>AI feedback work</small></span></summary>
  <button class="nav-item compact" data-page="reviews" onclick="nav('reviews')" title="Typed CASPer AI reviews"><span class="icon">CA</span><span class="nav-text"><span class="nav-title">CASPer AI Reviews</span></span></button>
  <button class="nav-item compact" data-page="mmi" onclick="nav('mmi')" title="MMI AI reviews and recording history"><span class="icon">MM</span><span class="nav-text"><span class="nav-title">MMI Reviews</span></span><span class="nav-badge" id="mmiBadge">0</span></button>
+ <button class="nav-item compact" data-page="calibration" onclick="nav('calibration')" title="Mark recordings blind to calibrate the MMI AI marker"><span class="icon">CB</span><span class="nav-text"><span class="nav-title">Calibration</span></span></button>
  <button class="nav-item compact" data-page="s2" onclick="nav('s2')" title="GAMSAT Section 2 essay reviews"><span class="icon">S2</span><span class="nav-text"><span class="nav-title">S2 Essays</span></span><span class="nav-badge" id="s2Badge">0</span></button>
  </details>
 
@@ -2214,6 +2215,16 @@
  </div>
  </div>
 
+ <!-- -- CALIBRATION -- -->
+ <div id="pageCalibration" class="page">
+ <div class="page-header">
+ <h1>Marking Calibration</h1>
+ <p style="color:var(--muted);max-width:640px;">Mark each recording blind on the five MMI criteria, then reveal how the AI scored it. This builds the ground-truth set used to measure and tune the marker. MMI recordings are prioritised; CASPer mock videos fill the queue and are tagged as a proxy.</p>
+ </div>
+ <div id="calibrationStatus" style="color:var(--muted);font-size:0.84rem;margin-bottom:14px;"></div>
+ <div id="calibrationCard"></div>
+ </div>
+
  <!-- -- REVENUE -- -->
  <div id="pageRevenue" class="page private-only">
  <div class="page-header">
@@ -2679,10 +2690,147 @@ async function api(path, opts={}) {
  return fetch(`${API}${path}`, {...opts, headers:h});
 }
 
+// ===== Marking calibration =====
+let calQueue = [];
+let calIdx = 0;
+let calLoaded = false;
+const CAL_CRITERIA = [['empathy','Empathy'],['communication','Communication'],['reasoning','Reasoning'],['reflection','Reflection'],['real_world_awareness','Real-world awareness']];
+const CAL_BTN_PRIMARY = 'background:var(--blue);color:#03111f;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;';
+const CAL_BTN_SECONDARY = 'background:var(--surface2);color:var(--text);border:1px solid var(--border2);padding:9px 16px;border-radius:8px;cursor:pointer;';
+
+function calEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+async function loadCalibration() {
+ calLoaded = true;
+ const card = document.getElementById('calibrationCard');
+ const status = document.getElementById('calibrationStatus');
+ if (card) card.innerHTML = '<div style="color:var(--muted);padding:24px;">Loading recordings...</div>';
+ try {
+  const r = await api('/admin/calibration/queue?limit=25');
+  const data = await r.json();
+  if (!r.ok || !data.ok) throw new Error(data.error || 'Could not load the calibration queue.');
+  calQueue = data.items || [];
+  calIdx = 0;
+  if (status) status.textContent = `${data.labelled_total} recording(s) marked so far. ${calQueue.length} in this queue.`;
+  renderCalibration();
+ } catch (e) {
+  if (card) card.innerHTML = `<div style="color:var(--muted);padding:24px;">${calEsc(e.message||'Failed to load.')}</div>`;
+ }
+}
+
+function calSliderRow(key, label) {
+ return `<div style="margin-bottom:12px;">
+  <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:4px;"><span>${label}</span><strong id="calVal_${key}" style="color:var(--blue);">3</strong></div>
+  <input type="range" min="1" max="5" step="1" value="3" id="calIn_${key}" oninput="document.getElementById('calVal_${key}').textContent=this.value" style="width:100%;">
+ </div>`;
+}
+
+function renderCalibration() {
+ const card = document.getElementById('calibrationCard');
+ if (!card) return;
+ if (calIdx >= calQueue.length) {
+  card.innerHTML = `<div style="padding:28px;text-align:center;"><p style="margin-bottom:14px;">Queue complete. Nice work.</p><button style="${CAL_BTN_PRIMARY}" onclick="loadCalibration()">Load more recordings</button></div>`;
+  return;
+ }
+ const item = calQueue[calIdx];
+ const promptsHtml = (item.prompts||[]).map((p,i)=>`<div style="margin-bottom:6px;"><strong>Prompt ${i+1}:</strong> ${calEsc(p)}</div>`).join('');
+ const sourceTag = item.source==='mmi'
+  ? '<span style="background:var(--blue-dim);color:var(--blue);padding:2px 8px;border-radius:6px;font-size:0.72rem;font-weight:700;">MMI</span>'
+  : '<span style="background:rgba(255,255,255,0.08);color:var(--muted);padding:2px 8px;border-radius:6px;font-size:0.72rem;font-weight:700;">CASPer mock (proxy)</span>';
+ card.innerHTML = `
+  <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:14px;padding:18px;max-width:760px;">
+   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <div>${sourceTag} <span style="color:var(--muted);font-size:0.8rem;">${calEsc(item.station_category||'')}</span></div>
+    <div style="color:var(--muted);font-size:0.78rem;">${calIdx+1} of ${calQueue.length}</div>
+   </div>
+   <video id="calVideo" controls playsinline style="width:100%;max-height:360px;background:#000;border-radius:10px;margin-bottom:12px;"></video>
+   <div style="font-size:0.85rem;margin-bottom:10px;">${item.station_scenario?`<div style="margin-bottom:8px;"><strong>Scenario:</strong> ${calEsc(item.station_scenario)}</div>`:''}${promptsHtml}</div>
+   <details style="margin-bottom:14px;"><summary style="color:var(--muted);cursor:pointer;font-size:0.8rem;">Transcript excerpt</summary><div style="font-size:0.82rem;white-space:pre-wrap;margin-top:6px;color:var(--muted);">${calEsc(item.transcript_excerpt||'')}</div></details>
+   <div style="border-top:1px solid var(--border2);padding-top:14px;">
+    <div style="font-weight:700;margin-bottom:10px;">Your scores (1-5)</div>
+    ${CAL_CRITERIA.map(([k,l])=>calSliderRow(k,l)).join('')}
+    ${calSliderRow('overall','Overall (holistic)')}
+    <div style="display:flex;gap:18px;margin:10px 0;font-size:0.84rem;flex-wrap:wrap;">
+     <label><input type="checkbox" id="calBoundary"> Hard boundary call</label>
+     <label><input type="checkbox" id="calTrap"> Polished auditor / fence-sitter</label>
+    </div>
+    <textarea id="calComment" placeholder="Why these scores? (the most valuable part for tuning the marker)" style="width:100%;min-height:84px;background:rgba(0,0,0,0.25);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:10px;font-family:inherit;"></textarea>
+    <div style="display:flex;gap:10px;margin-top:12px;">
+     <button style="${CAL_BTN_PRIMARY}" id="calSaveBtn" onclick="saveCalibration()">Save and reveal AI scores</button>
+     <button style="${CAL_BTN_SECONDARY}" onclick="skipCalibration()">Skip</button>
+    </div>
+    <div id="calReveal" style="margin-top:14px;"></div>
+   </div>
+  </div>`;
+ loadCalVideo(item.review_id);
+}
+
+async function loadCalVideo(id) {
+ const v = document.getElementById('calVideo');
+ if (!v) return;
+ try {
+  const r = await api('/admin/calibration/recording?id='+encodeURIComponent(id));
+  if (!r.ok) throw new Error('recording');
+  const blob = await r.blob();
+  v.src = URL.createObjectURL(blob);
+ } catch (e) {
+  v.outerHTML = '<div style="color:var(--muted);padding:14px;">Recording could not be loaded.</div>';
+ }
+}
+
+async function saveCalibration() {
+ const item = calQueue[calIdx];
+ if (!item) return;
+ const btn = document.getElementById('calSaveBtn');
+ if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+ const val = k => parseInt(document.getElementById('calIn_'+k).value, 10);
+ const scores = { overall: val('overall') };
+ CAL_CRITERIA.forEach(([k]) => scores[k] = val(k));
+ try {
+  const r = await api('/admin/calibration/save', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+   review_id: item.review_id,
+   scores,
+   commentary: document.getElementById('calComment').value || '',
+   boundary_flag: document.getElementById('calBoundary').checked,
+   trap_flag: document.getElementById('calTrap').checked,
+  })});
+  const data = await r.json();
+  if (!r.ok || !data.ok) throw new Error(data.error||'save_failed');
+  showCalReveal(data, scores);
+ } catch (e) {
+  if (btn) { btn.disabled=false; btn.textContent='Save and reveal AI scores'; }
+  alert('Could not save: '+(e.message||'error'));
+ }
+}
+
+function calDeltaTag(d) {
+ if (d===null || d===undefined) return '<span style="color:var(--muted);">-</span>';
+ if (d===0) return '<span style="color:#4ade80;">match</span>';
+ const sign = d>0?'+':'';
+ const color = Math.abs(d)>=1.5 ? '#f87171' : '#fbbf24';
+ return `<span style="color:${color};">${sign}${d} vs AI</span>`;
+}
+
+function showCalReveal(data, scores) {
+ const ai = data.ai||{}; const aic = ai.criteria||{}; const dl = data.deltas||{};
+ const rows = [['overall','Overall',scores.overall,ai.overall]].concat(CAL_CRITERIA.map(([k,l])=>[k,l,scores[k],aic[k]]));
+ const tbl = rows.map(([k,label,you,aiv])=>`<div style="display:grid;grid-template-columns:1.3fr 0.6fr 0.6fr 1fr;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2);font-size:0.84rem;"><span>${label}</span><strong>${you==null?'-':you}</strong><span style="color:var(--muted);">${aiv==null?'-':aiv}</span>${calDeltaTag(dl[k])}</div>`).join('');
+ document.getElementById('calReveal').innerHTML = `
+  <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border2);border-radius:10px;padding:14px;">
+   <div style="display:grid;grid-template-columns:1.3fr 0.6fr 0.6fr 1fr;gap:8px;font-size:0.74rem;color:var(--muted);font-weight:700;padding-bottom:4px;"><span>Criterion</span><span>You</span><span>AI</span><span>Delta</span></div>
+   ${tbl}
+   ${ai.biggest_change?`<div style="margin-top:10px;font-size:0.82rem;"><strong>AI's biggest-change call:</strong> ${calEsc(ai.biggest_change)}</div>`:''}
+   <button style="${CAL_BTN_PRIMARY}margin-top:12px;" onclick="nextCalibration()">Next recording</button>
+  </div>`;
+}
+
+function nextCalibration() { calIdx++; renderCalibration(); }
+function skipCalibration() { calIdx++; renderCalibration(); }
+
 // ======================================================
 // NAVIGATION
 // ======================================================
-const ADMIN_PAGES = new Set(['dashboard','growth','reviews','s2','mmi','mocks','users','warmleads','pipeline','timeline','actions','outreach','funnel','abandoned','retention','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','masterclasses','subscribers']);
+const ADMIN_PAGES = new Set(['dashboard','growth','reviews','s2','mmi','calibration','mocks','users','warmleads','pipeline','timeline','actions','outreach','funnel','abandoned','retention','sharing','enquiries','revenue','monitoring','inbox','broadcast','class','masterclasses','subscribers']);
 const PRIVATE_ADMIN_PAGES = new Set(['revenue','monitoring']);
 
 function isPrivacyMode() {
@@ -2780,6 +2928,7 @@ function nav(page, opts={}) {
  if (target==='class') loadCasperClass();
  if (target==='masterclasses' && !S.masterclasses) loadMasterclasses();
  if (target==='mmi') { if (!S.mmiReviews.length) loadMMI(); loadMmiFunnel(); loadMmiOutcomes(); }
+ if (target==='calibration' && !calLoaded) loadCalibration();
  if (target==='s2' && !S.s2Reviews.length) loadS2Reviews();
  if (target==='revenue' && !S.revenue.length) loadRevenue();
  if (target==='monitoring') loadMonitoring();
