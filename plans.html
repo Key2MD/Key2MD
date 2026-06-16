@@ -1443,6 +1443,11 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 <div class="modal-title" id="modalTitle">Complete your purchase</div>
 <div class="modal-sub" id="modalSub">You'll be redirected to Stripe's secure checkout.</div>
 <div class="modal-policy-note" id="modalPolicyNote"><strong>Subscription note:</strong> recurring plans renew until cancelled. Elapsed subscription days and forgotten renewals are not refunded; accidental purchases may be considered for a pro-rata refund of unused future days after cancellation.</div>
+<div id="modalReferralRow" style="display:none;text-align:left;margin-bottom:16px;">
+ <label style="display:block;font-size:0.78rem;color:rgba(255,255,255,0.7);margin-bottom:6px;">Referral code (optional)</label>
+ <input id="modalReferralCode" type="text" placeholder="Friend's code" autocomplete="off" oninput="onReferralCodeInput()" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.9rem;font-family:inherit;text-transform:uppercase;box-sizing:border-box;">
+ <div id="modalReferralStatus" style="font-size:0.75rem;margin-top:6px;color:rgba(255,255,255,0.5);min-height:1em;"></div>
+</div>
 <div class="modal-alert" id="modalAlert"></div>
 <button class="modal-btn" id="modalConfirmBtn" onclick="confirmCheckout()">Continue to Payment -></button>
  <span class="modal-cancel-link" onclick="closeModal()">Cancel</span>
@@ -1996,11 +2001,51 @@ async function handleMockCheckout(tier) {
  );
 }
 
+let _refValidateTimer = null;
+function getReferralCodeForCheckout(){
+ const el = document.getElementById('modalReferralCode');
+ return el ? (el.value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16) : '';
+}
+function onReferralCodeInput(){
+ const status = document.getElementById('modalReferralStatus');
+ const code = getReferralCodeForCheckout();
+ if (_refValidateTimer) clearTimeout(_refValidateTimer);
+ if (!code) { if (status) status.textContent = ''; return; }
+ if (status) { status.textContent = 'Checking...'; status.style.color = 'rgba(255,255,255,0.5)'; }
+ _refValidateTimer = setTimeout(async () => {
+  try {
+   const token = Key2MDAuth.getToken();
+   if (!token) { if (status) { status.textContent = 'Sign in to use a referral code.'; status.style.color = 'rgba(255,255,255,0.5)'; } return; }
+   const res = await fetch(`${API_BASE}/api/referral/validate?code=${encodeURIComponent(code)}`, { headers: { Authorization: `Bearer ${token}` } });
+   const d = await res.json().catch(() => ({}));
+   if (!status) return;
+   if (d && d.valid) {
+    status.textContent = `${d.percent || 15}% off will be applied at checkout.`;
+    status.style.color = '#4ade80';
+   } else {
+    const msg = { already_used: 'You have already used a referral discount.', not_first_purchase: 'Referral codes apply to your first purchase only.', unknown_code: 'That code was not recognised.', own_code: 'You cannot use your own code.' }[d && d.reason] || 'That code cannot be applied.';
+    status.textContent = msg;
+    status.style.color = 'rgba(248,113,113,0.95)';
+   }
+  } catch (e) { if (status) status.textContent = ''; }
+ }, 450);
+}
+
 function openModal(title, sub, action) {
  document.getElementById('modalTitle').textContent = title;
  document.getElementById('modalSub').textContent = sub;
  const policy = document.getElementById('modalPolicyNote');
  if (policy) policy.style.display = ['mmi_pro', 'gamsat_s2_pro_weekly', 'gamsat_s2_pro_monthly', 'pro'].includes(action) ? 'block' : 'none';
+ const refRow = document.getElementById('modalReferralRow');
+ if (refRow) {
+  const showRef = (action === 'mmi_pro' || action === 'mmi_credits');
+  refRow.style.display = showRef ? 'block' : 'none';
+  if (showRef) {
+   const input = document.getElementById('modalReferralCode');
+   if (input && !input.value) { try { input.value = localStorage.getItem('k2md_ref') || ''; } catch (e) {} }
+   onReferralCodeInput();
+  }
+ }
  document.getElementById('modalAlert').className = 'modal-alert';
  document.getElementById('modalConfirmBtn').disabled = false;
  document.getElementById('modalConfirmBtn').textContent = 'Continue to Payment ->';
@@ -2032,10 +2077,10 @@ async function confirmCheckout() {
  body:JSON.stringify(mockBody)
  });
  } else if (pendingAction === 'mmi_pro') {
- const body = { pro_tier: `${mmiTier}_${mmiProFreq}`, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
+ const body = { pro_tier: `${mmiTier}_${mmiProFreq}`, referral_code: getReferralCodeForCheckout(), success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
  res = await fetch(`${API_BASE}/api/mmi/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(body)});
  } else if (pendingAction === 'mmi_credits') {
- const body = { pack_id: selectedMMIPackId, success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
+ const body = { pack_id: selectedMMIPackId, referral_code: getReferralCodeForCheckout(), success_url:`${location.origin}/practice.html?mmi_payment=success`, cancel_url:`${location.origin}/plans.html#mmi-section` };
  res = await fetch(`${API_BASE}/api/mmi/checkout`, {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(body)});
  } else if (pendingAction === 'gamsat_s2_pro_weekly' || pendingAction === 'gamsat_s2_pro_monthly') {
  const tier = pendingAction === 'gamsat_s2_pro_weekly' ? 'weekly' : 'monthly';
