@@ -1716,31 +1716,9 @@
   <div class="alert" id="qotwAlert" style="margin-top:8px;"></div>
  </div>
 
- <div class="bc-card" style="max-width:680px;margin-top:20px;" id="calibrationCard">
+ <div class="bc-card" style="max-width:680px;margin-top:20px;">
   <div class="bc-title">Marking calibration</div>
-  <div class="bc-sub">Store gold-standard fixtures (a real response + the score you would give it). Run a replay to re-mark them with the live AI marker and see the drift, so you can confirm scores are not shifting over time.</div>
-  <div id="calStatus" style="margin:8px 0;font-size:0.78rem;color:var(--muted);">Not loaded.</div>
-  <div class="form-row"><label class="form-lbl">Tool</label>
-   <select class="form-sel" id="calTool" style="width:auto;">
-    <option value="casper">CASPer</option>
-    <option value="mmi">MMI</option>
-    <option value="gamsat">GAMSAT S2</option>
-   </select>
-  </div>
-  <div class="form-row" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
-   <div><label class="form-lbl">Your score (1-10)</label><input class="form-in" id="calGold" type="number" min="1" max="10" step="0.5" style="width:120px;"></div>
-   <div style="flex:1;min-width:220px;"><label class="form-lbl">Label</label><input class="form-in" id="calLabel" type="text" placeholder="e.g. Ethics - friend cheating (strong)"></div>
-  </div>
-  <div class="form-row"><label class="form-lbl">Scenario + prompt</label><textarea id="calQuestion" class="form-ta" style="min-height:70px;" placeholder="Paste the station scenario and prompt text."></textarea></div>
-  <div class="form-row"><label class="form-lbl">Response / transcript</label><textarea id="calResponse" class="form-ta" style="min-height:90px;" placeholder="Paste the candidate response you scored."></textarea></div>
-  <div class="form-row"><label class="form-lbl">Note (optional)</label><input class="form-in" id="calNote" type="text" placeholder="Why this score / what it tests."></div>
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-   <button class="btn" onclick="loadCalibration()">Load fixtures</button>
-   <button class="btn primary" onclick="addCalibrationFixture()">Add fixture</button>
-   <button class="btn" onclick="runCalibrationReplay()" style="background:#0ea5e9;color:#fff;border-color:#0ea5e9;">Run replay</button>
-  </div>
-  <div class="alert" id="calAlert" style="margin-top:8px;"></div>
-  <div id="calResults" style="margin-top:12px;font-size:0.8rem;"></div>
+  <div class="bc-sub">This has moved to the Calibration tab (left nav), now combined with blind recording marking.</div>
  </div>
 
  <div class="bc-card" style="max-width:680px;margin-top:20px;">
@@ -2218,11 +2196,29 @@
  <!-- -- CALIBRATION -- -->
  <div id="pageCalibration" class="page">
  <div class="page-header">
- <h1>Marking Calibration</h1>
- <p style="color:var(--muted);max-width:640px;">Mark each recording blind on the five MMI criteria, then reveal how the AI scored it. This builds the ground-truth set used to measure and tune the marker. MMI recordings are prioritised; CASPer mock videos fill the queue and are tagged as a proxy.</p>
+ <div>
+ <div class="page-title">Calibration</div>
+ <div class="page-sub">Calibrate the AI marker to your judgement. Mark recordings blind below, then run a drift replay to confirm the marker still agrees with your scores. Your blind marks also feed the live MMI marker as worked examples.</div>
  </div>
- <div id="calibrationStatus" style="color:var(--muted);font-size:0.84rem;margin-bottom:14px;"></div>
- <div id="calibrationCard"></div>
+ </div>
+
+ <div style="font-weight:700;font-size:0.95rem;margin:4px 0 6px;">1. Blind recording marking</div>
+ <div class="page-sub" style="margin-bottom:10px;">Watch a recording, score it on the five MMI criteria, then reveal how the AI scored it. MMI recordings are prioritised; CASPer mock videos fill the queue, tagged as a proxy.</div>
+ <div id="recCalStatus" style="color:var(--muted);font-size:0.84rem;margin-bottom:10px;"></div>
+ <div id="calBias" style="margin-bottom:14px;"></div>
+ <div id="recCalCard"></div>
+
+ <div class="bc-card" style="max-width:680px;margin-top:28px;">
+  <div class="bc-title">2. Drift replay</div>
+  <div class="bc-sub">Re-mark your already-labelled recordings with the live AI marker and compare its overall against the score you gave (same 1-5 scale). Use this to confirm the marker is not drifting over time. Needs at least one blind-marked recording above.</div>
+  <div id="calStatus" style="margin:8px 0;font-size:0.78rem;color:var(--muted);">Not run yet.</div>
+  <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+   <div><label class="form-lbl">Recordings to replay</label><input class="form-in" id="calReplayLimit" type="number" min="1" max="40" step="1" value="20" style="width:120px;"></div>
+   <button class="btn" onclick="runCalibrationReplay()" style="background:#0ea5e9;color:#fff;border-color:#0ea5e9;">Run drift replay</button>
+  </div>
+  <div class="alert" id="calAlert" style="margin-top:8px;"></div>
+  <div id="calResults" style="margin-top:12px;font-size:0.8rem;"></div>
+ </div>
  </div>
 
  <!-- -- REVENUE -- -->
@@ -2700,10 +2696,10 @@ const CAL_BTN_SECONDARY = 'background:var(--surface2);color:var(--text);border:1
 
 function calEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
-async function loadCalibration() {
+async function loadRecCalQueue() {
  calLoaded = true;
- const card = document.getElementById('calibrationCard');
- const status = document.getElementById('calibrationStatus');
+ const card = document.getElementById('recCalCard');
+ const status = document.getElementById('recCalStatus');
  if (card) card.innerHTML = '<div style="color:var(--muted);padding:24px;">Loading recordings...</div>';
  try {
   const r = await api('/admin/calibration/queue?limit=25');
@@ -2712,6 +2708,8 @@ async function loadCalibration() {
   calQueue = data.items || [];
   calIdx = 0;
   if (status) status.textContent = `${data.labelled_total} recording(s) marked so far. ${calQueue.length} in this queue.`;
+  renderCalReplayStatus(data.last_replay);
+  renderCalBias(data.bias_summary);
   renderCalibration();
  } catch (e) {
   if (card) card.innerHTML = `<div style="color:var(--muted);padding:24px;">${calEsc(e.message||'Failed to load.')}</div>`;
@@ -2726,10 +2724,10 @@ function calSliderRow(key, label) {
 }
 
 function renderCalibration() {
- const card = document.getElementById('calibrationCard');
+ const card = document.getElementById('recCalCard');
  if (!card) return;
  if (calIdx >= calQueue.length) {
-  card.innerHTML = `<div style="padding:28px;text-align:center;"><p style="margin-bottom:14px;">Queue complete. Nice work.</p><button style="${CAL_BTN_PRIMARY}" onclick="loadCalibration()">Load more recordings</button></div>`;
+  card.innerHTML = `<div style="padding:28px;text-align:center;"><p style="margin-bottom:14px;">Queue complete. Nice work.</p><button style="${CAL_BTN_PRIMARY}" onclick="loadRecCalQueue()">Load more recordings</button></div>`;
   return;
  }
  const item = calQueue[calIdx];
@@ -2743,17 +2741,28 @@ function renderCalibration() {
     <div>${sourceTag} <span style="color:var(--muted);font-size:0.8rem;">${calEsc(item.station_category||'')}</span></div>
     <div style="color:var(--muted);font-size:0.78rem;">${calIdx+1} of ${calQueue.length}</div>
    </div>
-   <video id="calVideo" controls playsinline style="width:100%;max-height:360px;background:#000;border-radius:10px;margin-bottom:12px;"></video>
+   <video id="calVideo" controls playsinline style="width:100%;max-height:360px;background:#000;border-radius:10px;margin-bottom:8px;"></video>
+   <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:12px;font-size:0.78rem;color:var(--muted);">
+    <span>Speed</span>
+    <button type="button" style="${CAL_BTN_SECONDARY}padding:3px 9px;" onclick="calSetSpeed(1)">1x</button>
+    <button type="button" style="${CAL_BTN_SECONDARY}padding:3px 9px;" onclick="calSetSpeed(1.5)">1.5x</button>
+    <button type="button" style="${CAL_BTN_SECONDARY}padding:3px 9px;" onclick="calSetSpeed(2)">2x</button>
+    <button type="button" style="${CAL_BTN_SECONDARY}padding:3px 9px;" onclick="calSkip(-10)">-10s</button>
+    <button type="button" style="${CAL_BTN_SECONDARY}padding:3px 9px;" onclick="calSkip(10)">+10s</button>
+    <span style="margin-left:6px;">keys: space, j/l skip, [ ] speed, Enter save/next</span>
+   </div>
    <div style="font-size:0.85rem;margin-bottom:10px;">${item.station_scenario?`<div style="margin-bottom:8px;"><strong>Scenario:</strong> ${calEsc(item.station_scenario)}</div>`:''}${promptsHtml}</div>
    <details style="margin-bottom:14px;"><summary style="color:var(--muted);cursor:pointer;font-size:0.8rem;">Transcript excerpt</summary><div style="font-size:0.82rem;white-space:pre-wrap;margin-top:6px;color:var(--muted);">${calEsc(item.transcript_excerpt||'')}</div></details>
    <div style="border-top:1px solid var(--border2);padding-top:14px;">
     <div style="font-weight:700;margin-bottom:10px;">Your scores (1-5)</div>
     ${CAL_CRITERIA.map(([k,l])=>calSliderRow(k,l)).join('')}
     ${calSliderRow('overall','Overall (holistic)')}
-    <div style="display:flex;gap:18px;margin:10px 0;font-size:0.84rem;flex-wrap:wrap;">
-     <label><input type="checkbox" id="calBoundary"> Hard boundary call</label>
-     <label><input type="checkbox" id="calTrap"> Polished auditor / fence-sitter</label>
+    <div style="display:flex;gap:18px;margin:10px 0 6px;font-size:0.84rem;flex-wrap:wrap;">
+     <label><input type="checkbox" id="calBoundary" onchange="document.getElementById('calBoundaryNote').style.display=this.checked?'block':'none'"> Hard boundary call</label>
+     <label><input type="checkbox" id="calTrap" onchange="document.getElementById('calTrapNote').style.display=this.checked?'block':'none'"> Polished auditor / fence-sitter</label>
     </div>
+    <input id="calBoundaryNote" placeholder="Why is this a boundary call? (fed to the marker)" style="display:none;width:100%;margin-bottom:6px;background:rgba(0,0,0,0.25);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:8px;font-family:inherit;font-size:0.82rem;">
+    <input id="calTrapNote" placeholder="What made it look better than it was? (fed to the marker)" style="display:none;width:100%;margin-bottom:6px;background:rgba(0,0,0,0.25);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:8px;font-family:inherit;font-size:0.82rem;">
     <textarea id="calComment" placeholder="Why these scores? (the most valuable part for tuning the marker)" style="width:100%;min-height:84px;background:rgba(0,0,0,0.25);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:10px;font-family:inherit;"></textarea>
     <div style="display:flex;gap:10px;margin-top:12px;">
      <button style="${CAL_BTN_PRIMARY}" id="calSaveBtn" onclick="saveCalibration()">Save and reveal AI scores</button>
@@ -2793,6 +2802,8 @@ async function saveCalibration() {
    commentary: document.getElementById('calComment').value || '',
    boundary_flag: document.getElementById('calBoundary').checked,
    trap_flag: document.getElementById('calTrap').checked,
+   boundary_note: document.getElementById('calBoundaryNote').value || '',
+   trap_note: document.getElementById('calTrapNote').value || '',
   })});
   const data = await r.json();
   if (!r.ok || !data.ok) throw new Error(data.error||'save_failed');
@@ -2820,12 +2831,108 @@ function showCalReveal(data, scores) {
    <div style="display:grid;grid-template-columns:1.3fr 0.6fr 0.6fr 1fr;gap:8px;font-size:0.74rem;color:var(--muted);font-weight:700;padding-bottom:4px;"><span>Criterion</span><span>You</span><span>AI</span><span>Delta</span></div>
    ${tbl}
    ${ai.biggest_change?`<div style="margin-top:10px;font-size:0.82rem;"><strong>AI's biggest-change call:</strong> ${calEsc(ai.biggest_change)}</div>`:''}
-   <button style="${CAL_BTN_PRIMARY}margin-top:12px;" onclick="nextCalibration()">Next recording</button>
+   <div style="margin-top:14px;border-top:1px solid var(--border2);padding-top:12px;">
+    <div style="font-size:0.82rem;font-weight:700;margin-bottom:6px;">What did the AI get wrong here? (optional, fed to the marker as a mistake to avoid)</div>
+    <textarea id="calAiError" placeholder="e.g. AI gave Empathy 4 but they were performing empathy, not feeling it." style="width:100%;min-height:64px;background:rgba(0,0,0,0.25);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:10px;font-family:inherit;font-size:0.84rem;"></textarea>
+    <div id="calAiErrorStatus" style="font-size:0.76rem;color:var(--muted);margin-top:4px;"></div>
+   </div>
+   <div style="display:flex;gap:10px;margin-top:12px;">
+    <button style="${CAL_BTN_SECONDARY}" onclick="saveCalAiError()">Save correction</button>
+    <button style="${CAL_BTN_PRIMARY}" onclick="nextCalibration()">Next recording</button>
+   </div>
   </div>`;
+}
+
+async function saveCalAiError() {
+ const item = calQueue[calIdx];
+ if (!item) return;
+ const statusEl = document.getElementById('calAiErrorStatus');
+ const val = (document.getElementById('calAiError').value || '').trim();
+ if (!val) { if (statusEl) statusEl.textContent = 'Nothing to save.'; return; }
+ if (statusEl) statusEl.textContent = 'Saving...';
+ try {
+  const r = await api('/admin/calibration/note', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ review_id: item.review_id, ai_error: val }) });
+  const data = await r.json();
+  if (!r.ok || !data.ok) throw new Error(data.message || data.error || 'failed');
+  if (statusEl) statusEl.textContent = 'Saved. The marker will use this on similar stations.';
+ } catch (e) { if (statusEl) statusEl.textContent = 'Could not save: ' + (e && e.message || e); }
 }
 
 function nextCalibration() { calIdx++; renderCalibration(); }
 function skipCalibration() { calIdx++; renderCalibration(); }
+
+function renderCalBias(bs) {
+ const el = document.getElementById('calBias');
+ if (!el) return;
+ if (!bs || !bs.n || !bs.bias) { el.innerHTML = ''; return; }
+ const labels = [['empathy','Empathy'],['communication','Communication'],['reasoning','Reasoning'],['reflection','Reflection'],['real_world_awareness','Real-world'],['overall','Overall']];
+ const cells = labels.map(([k,l]) => {
+  const v = bs.bias[k];
+  if (v == null) return `<span style="color:var(--muted);">${l} -</span>`;
+  const col = Math.abs(v) < 0.3 ? '#16a34a' : (Math.abs(v) <= 0.7 ? '#d97706' : '#dc2626');
+  const dir = v > 0 ? '+' : '';
+  return `<span><span style="color:var(--muted);">${l}</span> <strong style="color:${col};">${dir}${v}</strong></span>`;
+ }).join('');
+ el.innerHTML = `<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;font-size:0.82rem;">
+  <div style="color:var(--muted);font-size:0.74rem;margin-bottom:6px;">Systematic bias across ${bs.n} label(s) - positive means you score higher than the AI (AI runs harsh); negative means the AI runs generous.</div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;">${cells}</div>
+ </div>`;
+}
+
+function calSetSpeed(rate) { const v = document.getElementById('calVideo'); if (v) v.playbackRate = rate; }
+function calSkip(sec) { const v = document.getElementById('calVideo'); if (v && Number.isFinite(v.currentTime)) v.currentTime = Math.max(0, v.currentTime + sec); }
+function calIsRevealed() { const el = document.getElementById('calReveal'); return !!(el && el.innerHTML.trim()); }
+function calKeyHandler(e) {
+ const pg = document.getElementById('pageCalibration');
+ if (!pg || !pg.classList.contains('active')) return;
+ const tag = (e.target && e.target.tagName) || '';
+ if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+ const v = document.getElementById('calVideo');
+ if (e.key === ' ') { if (v) { e.preventDefault(); v.paused ? v.play() : v.pause(); } }
+ else if (e.key === 'j') { calSkip(-10); }
+ else if (e.key === 'l') { calSkip(10); }
+ else if (e.key === '[') { if (v) v.playbackRate = Math.max(0.5, v.playbackRate - 0.25); }
+ else if (e.key === ']') { if (v) v.playbackRate = Math.min(3, v.playbackRate + 0.25); }
+ else if (e.key === 'Enter') {
+  if (calIsRevealed()) { nextCalibration(); }
+  else { const b = document.getElementById('calSaveBtn'); if (b && !b.disabled) saveCalibration(); }
+ }
+}
+document.addEventListener('keydown', calKeyHandler);
+
+function renderCalReplayStatus(last) {
+ const status = document.getElementById('calStatus');
+ if (!status) return;
+ if (last && last.summary) {
+  const su = last.summary;
+  status.textContent = 'Last replay ' + calFmtWhen(su.ran_at) + ': mean abs error ' + su.mean_abs_error + ', bias ' + (su.bias > 0 ? '+' : '') + su.bias + ', max ' + su.max_abs_error + ' (n=' + su.scored + ').';
+ } else {
+  status.textContent = 'Not run yet.';
+ }
+}
+
+async function runCalibrationReplay() {
+ const alertEl = document.getElementById('calAlert');
+ const limit = parseInt(document.getElementById('calReplayLimit').value, 10) || 20;
+ if (alertEl) alertEl.textContent = 'Running replay (re-marking each labelled recording with the live AI marker, this can take a moment)...';
+ try {
+  const res = await api('/admin/calibration/replay', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ limit }) });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.message || data.error || 'failed');
+  const su = data.summary || {};
+  if (!su.scored) { if (alertEl) alertEl.textContent = 'No labelled recordings to replay yet. Blind-mark a recording above first.'; return; }
+  if (alertEl) alertEl.textContent = 'Done. Mean abs error ' + su.mean_abs_error + ', bias ' + (su.bias > 0 ? '+' : '') + su.bias + ', max ' + su.max_abs_error + ' across ' + su.scored + ' recording(s).';
+  renderCalReplayStatus({ summary: su });
+  const list = document.getElementById('calResults');
+  if (list) {
+   list.innerHTML = '<div style="font-weight:700;margin:8px 0 6px;">Replay results (AI overall vs your score)</div>' + (data.results || []).map(function(r){
+    const col = r.delta == null ? 'var(--muted)' : (Math.abs(r.delta) <= 0.5 ? '#16a34a' : (Math.abs(r.delta) <= 1 ? '#d97706' : '#dc2626'));
+    const val = r.ai == null ? 'no score' : ('AI ' + r.ai + ' vs ' + r.gold + ' (' + (r.delta > 0 ? '+' : '') + r.delta + ')');
+    return '<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border2);"><span>' + calEsc(r.label || r.review_id) + '</span><span style="color:' + col + ';font-weight:700;">' + val + '</span></div>';
+   }).join('');
+  }
+ } catch (e) { if (alertEl) alertEl.textContent = 'Replay failed: ' + (e && e.message || e); }
+}
 
 // ======================================================
 // NAVIGATION
@@ -2928,7 +3035,7 @@ function nav(page, opts={}) {
  if (target==='class') loadCasperClass();
  if (target==='masterclasses' && !S.masterclasses) loadMasterclasses();
  if (target==='mmi') { if (!S.mmiReviews.length) loadMMI(); loadMmiFunnel(); loadMmiOutcomes(); }
- if (target==='calibration' && !calLoaded) loadCalibration();
+ if (target==='calibration' && !calLoaded) { loadRecCalQueue(); }
  if (target==='s2' && !S.s2Reviews.length) loadS2Reviews();
  if (target==='revenue' && !S.revenue.length) loadRevenue();
  if (target==='monitoring') loadMonitoring();
@@ -10906,65 +11013,6 @@ function renderFbBox(raw) {
 </script>
 <script>
 function calFmtWhen(iso){ try{ return new Date(iso).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}); }catch(e){ return iso||''; } }
-async function loadCalibration(){
- var status=document.getElementById('calStatus');
- if(status)status.textContent='Loading...';
- try{
-  var res=await api('/admin/marking/fixtures');
-  var data=await res.json();
-  calRender(data);
- }catch(e){ if(status)status.textContent='Could not load: '+(e&&e.message||e); }
-}
-function calRender(data){
- var status=document.getElementById('calStatus');
- var fixtures=(data&&data.fixtures)||[];
- var last=data&&data.last_replay;
- var s=fixtures.length+' fixture'+(fixtures.length===1?'':'s')+' stored.';
- if(last&&last.summary){ var su=last.summary; s+=' Last replay '+calFmtWhen(su.ran_at)+': mean abs error '+su.mean_abs_error+', bias '+(su.bias>0?'+':'')+su.bias+', max '+su.max_abs_error+' (n='+su.scored+').'; }
- if(status)status.textContent=s;
- var list=document.getElementById('calResults');
- if(list){
-  list.innerHTML = fixtures.length ? '<div style="font-weight:700;margin-bottom:6px;">Fixtures</div>'+fixtures.map(function(f){ return '<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border,#eee);"><span>'+esc(f.label||f.id)+' <span style="color:var(--muted);">('+f.tool+', gold '+f.gold_score+')</span></span><button class="btn" style="font-size:0.7rem;padding:2px 8px;" onclick="deleteCalibrationFixture(\''+f.id+'\')">Remove</button></div>'; }).join('') : '<div style="color:var(--muted);">No fixtures yet. Add real responses with the score you would give them.</div>';
- }
-}
-async function addCalibrationFixture(){
- var alertEl=document.getElementById('calAlert');
- var gold=parseFloat(document.getElementById('calGold').value);
- if(!Number.isFinite(gold)){ if(alertEl)alertEl.textContent='Enter a numeric score (1-10).'; return; }
- var payload={ tool:document.getElementById('calTool').value, gold_score:gold, label:document.getElementById('calLabel').value, question_text:document.getElementById('calQuestion').value, response_text:document.getElementById('calResponse').value, note:document.getElementById('calNote').value };
- if(alertEl)alertEl.textContent='Saving...';
- try{
-  var res=await api('/admin/marking/fixtures',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  var data=await res.json();
-  if(!res.ok)throw new Error(data.message||data.error||'failed');
-  if(alertEl)alertEl.textContent='Fixture added.';
-  ['calLabel','calQuestion','calResponse','calNote','calGold'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-  loadCalibration();
- }catch(e){ if(alertEl)alertEl.textContent='Could not add: '+(e&&e.message||e); }
-}
-async function deleteCalibrationFixture(id){
- if(!confirm('Remove this fixture?'))return;
- try{ await api('/admin/marking/fixtures/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}); loadCalibration(); }catch(e){}
-}
-async function runCalibrationReplay(){
- var alertEl=document.getElementById('calAlert');
- if(alertEl)alertEl.textContent='Running replay (re-marking each fixture with the live AI marker, this can take a moment)...';
- try{
-  var res=await api('/admin/marking/replay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
-  var data=await res.json();
-  if(!res.ok)throw new Error(data.message||data.error||'failed');
-  var su=data.summary||{};
-  if(alertEl)alertEl.textContent='Done. Mean abs error '+su.mean_abs_error+', bias '+(su.bias>0?'+':'')+su.bias+', max '+su.max_abs_error+' across '+su.scored+' fixtures.';
-  var list=document.getElementById('calResults');
-  if(list){
-   list.innerHTML='<div style="font-weight:700;margin:8px 0 6px;">Replay results (AI vs your score)</div>'+(data.results||[]).map(function(r){
-    var col = r.delta==null?'var(--muted)':(Math.abs(r.delta)<=1?'#16a34a':(Math.abs(r.delta)<=2?'#d97706':'#dc2626'));
-    var val = r.ai==null?(r.error||'no score'):('AI '+r.ai+' vs '+r.gold+' ('+(r.delta>0?'+':'')+r.delta+')');
-    return '<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--border,#eee);"><span>'+esc(r.label||r.id)+' <span style="color:var(--muted);">('+r.tool+')</span></span><span style="color:'+col+';font-weight:700;">'+val+'</span></div>';
-   }).join('');
-  }
- }catch(e){ if(alertEl)alertEl.textContent='Replay failed: '+(e&&e.message||e); }
-}
 </script>
 </body>
 </html>
