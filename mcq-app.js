@@ -49,6 +49,7 @@
       setText("mcqSubHeading", cfg.subtypeHeading);
       pickRow("mcqCats", cfg.categories, categoryField, cfg.allCategoryLabel || "All");
       if (cfg.subtypes) pickRow("mcqSubs", cfg.subtypes, subtypeField, cfg.allSubtypeLabel || "All");
+      if (cfg.difficulties && $("mcqDiff")) pickRow("mcqDiff", cfg.difficulties, "difficulty", cfg.allDifficultyLabel || "Mixed");
     }
 
     function startPractice() {
@@ -61,6 +62,7 @@
       var filter = {};
       var c = activeKey("mcqCats"); if (c) filter.category = c;
       var s = cfg.subtypes ? activeKey("mcqSubs") : ""; if (s) filter.subtype = s;
+      var d = $("mcqDiff") ? activeKey("mcqDiff") : ""; if (d) filter.difficulty = d;
       var count = parseInt($("mcqCount").value, 10) || 0;
       if (!session.build({ filter: filter, limit: count, shuffle: true })) {
         alert("No questions match that filter yet."); return;

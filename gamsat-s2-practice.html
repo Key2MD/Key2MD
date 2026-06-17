@@ -1617,7 +1617,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <ul class="k2-dropdown-menu" aria-label="Practice tools">
  <li><a href="mmi-practice.html" class="k2-gold">MMI Practice</a></li>
  <li><a href="casper-practice.html" class="k2-gold">CASPer Practice</a></li>
+ <li><a href="gamsat-s1-practice.html" class="k2-purple">GAMSAT S1 Practice (beta)</a></li>
  <li><a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Essay Practice</a></li>
+ <li><a href="gamsat-s3-practice.html" class="k2-purple">GAMSAT S3 Practice (beta)</a></li>
  <li><a href="ucat-practice.html" class="k2-green">UCAT Practice (beta)</a></li>
  <li><a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a></li>
  </ul>
@@ -1649,7 +1651,9 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <span class="k2-mobile-label">Practice</span>
  <a href="mmi-practice.html" class="k2-gold">MMI Practice</a>
  <a href="casper-practice.html" class="k2-gold">CASPer Practice</a>
+ <a href="gamsat-s1-practice.html" class="k2-purple">GAMSAT S1 Practice (beta)</a>
  <a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Essay Practice</a>
+ <a href="gamsat-s3-practice.html" class="k2-purple">GAMSAT S3 Practice (beta)</a>
  <a href="ucat-practice.html" class="k2-green">UCAT Practice (beta)</a>
  <a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a>
  <span class="k2-mobile-label">Resources</span>
@@ -2313,6 +2317,256 @@ const stations = {
  { text: "Inside every cynical person, there is a disappointed idealist.", attr: "George Carlin" },
  { text: "We are not human beings having a spiritual experience. We are spiritual beings having a human experience.", attr: "Pierre Teilhard de Chardin" }
  ]
+ },
+ {
+ theme: "Free Speech and Censorship",
+ quotes: [
+ { text: "I disapprove of what you say, but I will defend to the death your right to say it.", attr: "Evelyn Beatrice Hall" },
+ { text: "If liberty means anything at all, it means the right to tell people what they do not want to hear.", attr: "George Orwell" },
+ { text: "Censorship reflects a society's lack of confidence in itself.", attr: "Potter Stewart" },
+ { text: "Whoever would overthrow the liberty of a nation must begin by subduing the freeness of speech.", attr: "Benjamin Franklin" },
+ { text: "Sunlight is said to be the best of disinfectants.", attr: "Louis Brandeis" }
+ ]
+ },
+ {
+ theme: "Privacy and Surveillance",
+ quotes: [
+ { text: "Big Brother is watching you.", attr: "George Orwell" },
+ { text: "Arguing that you don't care about privacy because you have nothing to hide is like saying you don't care about free speech because you have nothing to say.", attr: "Edward Snowden" },
+ { text: "Who controls the past controls the future; who controls the present controls the past.", attr: "George Orwell" },
+ { text: "Privacy is not something that I'm merely entitled to, it's an absolute prerequisite.", attr: "Marlon Brando" },
+ { text: "Civilization is the progress toward a society of privacy.", attr: "Ayn Rand" }
+ ]
+ },
+ {
+ theme: "Equality of Opportunity",
+ quotes: [
+ { text: "We hold these truths to be self-evident, that all men are created equal.", attr: "Thomas Jefferson" },
+ { text: "It is not our differences that divide us. It is our inability to recognize, accept, and celebrate those differences.", attr: "Audre Lorde" },
+ { text: "No one is born hating another person because of the colour of his skin.", attr: "Nelson Mandela" },
+ { text: "The opposite of poverty is not wealth; the opposite of poverty is justice.", attr: "Bryan Stevenson" },
+ { text: "A right delayed is a right denied.", attr: "Martin Luther King Jr." }
+ ]
+ },
+ {
+ theme: "Capitalism and the Market",
+ quotes: [
+ { text: "It is not from the benevolence of the butcher, the brewer, or the baker that we expect our dinner, but from their regard to their own interest.", attr: "Adam Smith" },
+ { text: "The social responsibility of business is to increase its profits.", attr: "Milton Friedman" },
+ { text: "Capital is dead labour that, vampire-like, lives only by sucking living labour.", attr: "Karl Marx" },
+ { text: "Capitalism is the astonishing belief that the most wickedest of men will do the most wickedest of things for the greatest good of everyone.", attr: "John Maynard Keynes" },
+ { text: "The market is a good servant but a bad master.", attr: "Proverb" }
+ ]
+ },
+ {
+ theme: "Patriotism and the Nation",
+ quotes: [
+ { text: "Patriotism is the last refuge of a scoundrel.", attr: "Samuel Johnson" },
+ { text: "A man's feet must be planted in his country, but his eyes should survey the world.", attr: "George Santayana" },
+ { text: "Patriotism is when love of your own people comes first; nationalism, when hate for people other than your own comes first.", attr: "Charles de Gaulle" },
+ { text: "My country, right or wrong; if right, to be kept right; and if wrong, to be set right.", attr: "Carl Schurz" },
+ { text: "You'll never have a quiet world till you knock the patriotism out of the human race.", attr: "George Bernard Shaw" }
+ ]
+ },
+ {
+ theme: "Crime and Its Causes",
+ quotes: [
+ { text: "Poverty is the parent of revolution and crime.", attr: "Aristotle" },
+ { text: "The degree of civilization in a society can be judged by entering its prisons.", attr: "Fyodor Dostoevsky" },
+ { text: "Society prepares the crime; the criminal commits it.", attr: "Henry Thomas Buckle" },
+ { text: "Fear follows crime, and is its punishment.", attr: "Voltaire" },
+ { text: "The prevention of crime is better than the punishment of it.", attr: "Proverb" }
+ ]
+ },
+ {
+ theme: "Reason and Emotion",
+ quotes: [
+ { text: "Reason is, and ought only to be the slave of the passions.", attr: "David Hume" },
+ { text: "The heart has its reasons of which reason knows nothing.", attr: "Blaise Pascal" },
+ { text: "I think, therefore I am.", attr: "Rene Descartes" },
+ { text: "Man is not a rational animal; he is a rationalizing animal.", attr: "Robert A. Heinlein" },
+ { text: "We are not thinking machines that feel, we are feeling machines that think.", attr: "Antonio Damasio" }
+ ]
+ },
+ {
+ theme: "Free Will and Fate",
+ quotes: [
+ { text: "Man is condemned to be free.", attr: "Jean-Paul Sartre" },
+ { text: "We must believe in free will, we have no choice.", attr: "Isaac Bashevis Singer" },
+ { text: "The fault, dear Brutus, is not in our stars, but in ourselves.", attr: "William Shakespeare" },
+ { text: "A man can do what he wants, but not want what he wants.", attr: "Arthur Schopenhauer" },
+ { text: "Character is destiny.", attr: "Heraclitus" }
+ ]
+ },
+ {
+ theme: "Knowledge and Ignorance",
+ quotes: [
+ { text: "I know that I know nothing.", attr: "Socrates" },
+ { text: "The greater our knowledge increases, the more our ignorance unfolds.", attr: "John F. Kennedy" },
+ { text: "Real knowledge is to know the extent of one's ignorance.", attr: "Confucius" },
+ { text: "Where ignorance is bliss, 'tis folly to be wise.", attr: "Thomas Gray" },
+ { text: "Knowledge is power.", attr: "Francis Bacon" }
+ ]
+ },
+ {
+ theme: "Language and Thought",
+ quotes: [
+ { text: "The limits of my language mean the limits of my world.", attr: "Ludwig Wittgenstein" },
+ { text: "Language is the dress of thought.", attr: "Samuel Johnson" },
+ { text: "But words are things, and a small drop of ink, falling like dew, upon a thought, produces that which makes thousands, perhaps millions, think.", attr: "Lord Byron" },
+ { text: "A different language is a different vision of life.", attr: "Federico Fellini" },
+ { text: "He who knows no foreign languages knows nothing of his own.", attr: "Johann Wolfgang von Goethe" }
+ ]
+ },
+ {
+ theme: "Beauty and Taste",
+ quotes: [
+ { text: "Beauty is in the eye of the beholder.", attr: "Margaret Wolfe Hungerford" },
+ { text: "Beauty is truth, truth beauty - that is all ye know on earth, and all ye need to know.", attr: "John Keats" },
+ { text: "Everything has beauty, but not everyone sees it.", attr: "Confucius" },
+ { text: "Beauty will save the world.", attr: "Fyodor Dostoevsky" },
+ { text: "Tell me what you like, and I'll tell you what you are.", attr: "John Ruskin" }
+ ]
+ },
+ {
+ theme: "Heroes and Celebrity",
+ quotes: [
+ { text: "Show me a hero and I'll write you a tragedy.", attr: "F. Scott Fitzgerald" },
+ { text: "A hero is no braver than an ordinary man, but he is braver five minutes longer.", attr: "Ralph Waldo Emerson" },
+ { text: "In the future, everyone will be world-famous for 15 minutes.", attr: "Andy Warhol" },
+ { text: "Unhappy the land that is in need of heroes.", attr: "Bertolt Brecht" },
+ { text: "The hero is commonly the simplest and obscurest of men.", attr: "Henry David Thoreau" }
+ ]
+ },
+ {
+ theme: "Sport and Society",
+ quotes: [
+ { text: "Sport has the power to change the world.", attr: "Nelson Mandela" },
+ { text: "You miss 100% of the shots you don't take.", attr: "Wayne Gretzky" },
+ { text: "Winning isn't everything; it's the only thing.", attr: "Vince Lombardi" },
+ { text: "Sport does not build character. It reveals it.", attr: "Heywood Hale Broun" },
+ { text: "It's not whether you get knocked down; it's whether you get up.", attr: "Vince Lombardi" }
+ ]
+ },
+ {
+ theme: "History and Forgetting",
+ quotes: [
+ { text: "History is a set of lies agreed upon.", attr: "Napoleon Bonaparte" },
+ { text: "The very ink with which all history is written is merely fluid prejudice.", attr: "Mark Twain" },
+ { text: "History is written by the victors.", attr: "Winston Churchill" },
+ { text: "A generation which ignores history has no past and no future.", attr: "Robert A. Heinlein" },
+ { text: "We are not makers of history. We are made by history.", attr: "Martin Luther King Jr." }
+ ]
+ },
+ {
+ theme: "Charity and Justice",
+ quotes: [
+ { text: "Charity is no substitute for justice withheld.", attr: "Saint Augustine" },
+ { text: "We make a living by what we get, but we make a life by what we give.", attr: "Winston Churchill" },
+ { text: "No one has ever become poor by giving.", attr: "Anne Frank" },
+ { text: "Justice is what love looks like in public.", attr: "Cornel West" },
+ { text: "If you can't feed a hundred people, then feed just one.", attr: "Mother Teresa" }
+ ]
+ },
+ {
+ theme: "Cities and Civilisation",
+ quotes: [
+ { text: "What is the city but the people?", attr: "William Shakespeare" },
+ { text: "A great city is not to be confounded with a populous one.", attr: "Aristotle" },
+ { text: "Cities have the capability of providing something for everybody, only because, and only when, they are created by everybody.", attr: "Jane Jacobs" },
+ { text: "The city is not a concrete jungle, it is a human zoo.", attr: "Desmond Morris" },
+ { text: "Civilization is a movement and not a condition, a voyage and not a harbour.", attr: "Arnold J. Toynbee" }
+ ]
+ },
+ {
+ theme: "Rights and Duties",
+ quotes: [
+ { text: "Rights that do not flow from duty well performed are not worth having.", attr: "Mahatma Gandhi" },
+ { text: "Liberty means responsibility. That is why most men dread it.", attr: "George Bernard Shaw" },
+ { text: "No man is good enough to govern another man without that other's consent.", attr: "Abraham Lincoln" },
+ { text: "Duty is ours; consequences are God's.", attr: "Stonewall Jackson" },
+ { text: "Man is free at the moment he wishes to be.", attr: "Voltaire" }
+ ]
+ },
+ {
+ theme: "Revolution and Reform",
+ quotes: [
+ { text: "Those who make peaceful revolution impossible will make violent revolution inevitable.", attr: "John F. Kennedy" },
+ { text: "Revolutions are not made; they come.", attr: "Wendell Phillips" },
+ { text: "The tree of liberty must be refreshed from time to time with the blood of patriots and tyrants.", attr: "Thomas Jefferson" },
+ { text: "It is easier to build strong children than to repair broken men.", attr: "Frederick Douglass" },
+ { text: "Be the change that you wish to see in the world.", attr: "Mahatma Gandhi" }
+ ]
+ },
+ {
+ theme: "Work and Automation",
+ quotes: [
+ { text: "The real problem is not whether machines think but whether men do.", attr: "B.F. Skinner" },
+ { text: "Automation is good, so long as you know exactly where to put the machine.", attr: "Eliyahu Goldratt" },
+ { text: "We are being afflicted with a new disease of which some readers may not yet have heard the name, technological unemployment.", attr: "John Maynard Keynes" },
+ { text: "The factory of the future will have only two employees, a man and a dog.", attr: "Warren Bennis" },
+ { text: "Nothing is really work unless you would rather be doing something else.", attr: "J.M. Barrie" }
+ ]
+ },
+ {
+ theme: "Borders and Hospitality",
+ quotes: [
+ { text: "Good fences make good neighbours.", attr: "Robert Frost" },
+ { text: "A nation that cannot control its borders is not a nation.", attr: "Ronald Reagan" },
+ { text: "No one leaves home unless home is the mouth of a shark.", attr: "Warsan Shire" },
+ { text: "The stranger who resides with you shall be to you as the native among you.", attr: "Leviticus 19:34" },
+ { text: "Remember always that all of us are descended from immigrants.", attr: "Franklin D. Roosevelt" }
+ ]
+ },
+ {
+ theme: "Risk and Security",
+ quotes: [
+ { text: "Only those who will risk going too far can possibly find out how far one can go.", attr: "T.S. Eliot" },
+ { text: "A ship in harbor is safe, but that is not what ships are built for.", attr: "John A. Shedd" },
+ { text: "They who can give up essential liberty to obtain a little temporary safety deserve neither liberty nor safety.", attr: "Benjamin Franklin" },
+ { text: "The biggest risk is not taking any risk.", attr: "Mark Zuckerberg" },
+ { text: "To be alive at all involves some risk.", attr: "Harold Macmillan" }
+ ]
+ },
+ {
+ theme: "Tolerance and Its Limits",
+ quotes: [
+ { text: "The highest result of education is tolerance.", attr: "Helen Keller" },
+ { text: "Tolerance implies no lack of commitment to one's own beliefs. Rather it condemns the oppression or persecution of others.", attr: "John F. Kennedy" },
+ { text: "In the practice of tolerance, one's enemy is the best teacher.", attr: "Dalai Lama" },
+ { text: "We must learn to live together as brothers or perish together as fools.", attr: "Martin Luther King Jr." },
+ { text: "Laws alone cannot secure freedom of expression.", attr: "Albert Einstein" }
+ ]
+ },
+ {
+ theme: "The Common Good",
+ quotes: [
+ { text: "The welfare of the people is the ultimate law.", attr: "Cicero" },
+ { text: "We can't help everyone, but everyone can help someone.", attr: "Ronald Reagan" },
+ { text: "What is good for the hive is good for the bee.", attr: "Marcus Aurelius" },
+ { text: "Individually, we are one drop. Together, we are an ocean.", attr: "Ryunosuke Satoro" },
+ { text: "The strength of the team is each individual member. The strength of each member is the team.", attr: "Phil Jackson" }
+ ]
+ },
+ {
+ theme: "Innovation and Disruption",
+ quotes: [
+ { text: "If I had asked people what they wanted, they would have said faster horses.", attr: "Henry Ford" },
+ { text: "Innovation distinguishes between a leader and a follower.", attr: "Steve Jobs" },
+ { text: "The best way to predict the future is to invent it.", attr: "Alan Kay" },
+ { text: "Creative destruction is the essential fact about capitalism.", attr: "Joseph Schumpeter" },
+ { text: "There is nothing more difficult to take in hand than to take the lead in the introduction of a new order of things.", attr: "Niccolo Machiavelli" }
+ ]
+ },
+ {
+ theme: "Fairness and Merit",
+ quotes: [
+ { text: "Justice is the constant and perpetual will to render to each his due.", attr: "Justinian" },
+ { text: "The arc of the moral universe is long, but it bends toward justice.", attr: "Martin Luther King Jr." },
+ { text: "From each according to his ability, to each according to his needs.", attr: "Karl Marx" },
+ { text: "Life is not fair; get used to it.", attr: "Bill Gates" },
+ { text: "Fairness is not an attitude. It's a professional skill that must be developed and exercised.", attr: "Brit Hume" }
+ ]
  }
  ],
  B: [
@@ -2564,6 +2818,256 @@ const stations = {
  { text: "The smallest act of kindness is worth more than the grandest intention.", attr: "Oscar Wilde" },
  { text: "Do things for people not because of who they are or what they do in return, but because of who you are.", attr: "Harold S. Kushner" },
  { text: "A single act of kindness throws out roots in all directions, and the roots spring up and make new trees.", attr: "Amelia Earhart" }
+ ]
+ },
+ {
+ theme: "Patience and Waiting",
+ quotes: [
+ { text: "Patience is bitter, but its fruit is sweet.", attr: "Aristotle" },
+ { text: "All things come to those who wait.", attr: "Proverb" },
+ { text: "Have patience with all things, but chiefly have patience with yourself.", attr: "Saint Francis de Sales" },
+ { text: "Adopt the pace of nature: her secret is patience.", attr: "Ralph Waldo Emerson" },
+ { text: "Our patience will achieve more than our force.", attr: "Edmund Burke" }
+ ]
+ },
+ {
+ theme: "Honesty with Oneself",
+ quotes: [
+ { text: "The first principle is that you must not fool yourself - and you are the easiest person to fool.", attr: "Richard Feynman" },
+ { text: "Knowing yourself is the beginning of all wisdom.", attr: "Aristotle" },
+ { text: "We lie loudest when we lie to ourselves.", attr: "Eric Hoffer" },
+ { text: "There is no greater agony than bearing an untold story inside you.", attr: "Maya Angelou" },
+ { text: "The unexamined life is not worth living.", attr: "Socrates" }
+ ]
+ },
+ {
+ theme: "Change and Letting Go",
+ quotes: [
+ { text: "Everything changes and nothing stands still.", attr: "Heraclitus" },
+ { text: "Some changes look negative on the surface, but you will soon realize that space is being created in your life for something new to emerge.", attr: "Eckhart Tolle" },
+ { text: "Letting go means to come to the realization that some people are a part of your history, but not a part of your destiny.", attr: "Steve Maraboli" },
+ { text: "The only way to make sense out of change is to plunge into it, move with it, and join the dance.", attr: "Alan Watts" },
+ { text: "In the process of letting go you will lose many things from the past, but you will find yourself.", attr: "Deepak Chopra" }
+ ]
+ },
+ {
+ theme: "Hope and Despair",
+ quotes: [
+ { text: "Hope is the thing with feathers that perches in the soul.", attr: "Emily Dickinson" },
+ { text: "Once you choose hope, anything's possible.", attr: "Christopher Reeve" },
+ { text: "Everything that is done in the world is done by hope.", attr: "Martin Luther" },
+ { text: "We must accept finite disappointment, but never lose infinite hope.", attr: "Martin Luther King Jr." },
+ { text: "Hope is being able to see that there is light despite all of the darkness.", attr: "Desmond Tutu" }
+ ]
+ },
+ {
+ theme: "Ambition and Burnout",
+ quotes: [
+ { text: "Almost everything will work again if you unplug it for a few minutes, including you.", attr: "Anne Lamott" },
+ { text: "Rest when you're weary. Refresh and renew yourself.", attr: "Ralph Marston" },
+ { text: "Burnout is what happens when you try to avoid being human for too long.", attr: "Michael Gungor" },
+ { text: "It's not the load that breaks you down, it's the way you carry it.", attr: "Lou Holtz" },
+ { text: "Take rest; a field that has rested gives a bountiful crop.", attr: "Ovid" }
+ ]
+ },
+ {
+ theme: "Boredom and Stillness",
+ quotes: [
+ { text: "Boredom is the root of all evil - the despairing refusal to be oneself.", attr: "Soren Kierkegaard" },
+ { text: "The cure for boredom is curiosity. There is no cure for curiosity.", attr: "Dorothy Parker" },
+ { text: "In all chaos there is a cosmos, in all disorder a secret order.", attr: "Carl Jung" },
+ { text: "Within you, there is a stillness and a sanctuary to which you can retreat at any time.", attr: "Hermann Hesse" },
+ { text: "Tension is who you think you should be. Relaxation is who you are.", attr: "Chinese Proverb" }
+ ]
+ },
+ {
+ theme: "Envy and Comparison",
+ quotes: [
+ { text: "Comparison is the thief of joy.", attr: "Theodore Roosevelt" },
+ { text: "Envy is the art of counting the other fellow's blessings instead of your own.", attr: "Harold Coffin" },
+ { text: "It is not enough to succeed. Others must fail.", attr: "Gore Vidal" },
+ { text: "Envy is the ulcer of the soul.", attr: "Socrates" },
+ { text: "A heart at peace gives life to the body, but envy rots the bones.", attr: "Proverbs 14:30" }
+ ]
+ },
+ {
+ theme: "Self-Doubt and Confidence",
+ quotes: [
+ { text: "Our doubts are traitors, and make us lose the good we oft might win, by fearing to attempt.", attr: "William Shakespeare" },
+ { text: "Believe you can and you're halfway there.", attr: "Theodore Roosevelt" },
+ { text: "No one can make you feel inferior without your consent.", attr: "Eleanor Roosevelt" },
+ { text: "Doubt kills more dreams than failure ever will.", attr: "Suzy Kassem" },
+ { text: "Whether you think you can, or you think you can't - you're right.", attr: "Henry Ford" }
+ ]
+ },
+ {
+ theme: "Discipline and Freedom",
+ quotes: [
+ { text: "Discipline is the bridge between goals and accomplishment.", attr: "Jim Rohn" },
+ { text: "In reading the lives of great men, I found that the first victory they won was over themselves; self-discipline with all of them came first.", attr: "Harry S. Truman" },
+ { text: "Freedom is not procured by a full enjoyment of what is desired, but by controlling the desire.", attr: "Epictetus" },
+ { text: "The first and best victory is to conquer self.", attr: "Plato" },
+ { text: "Discipline is choosing between what you want now and what you want most.", attr: "Abraham Lincoln" }
+ ]
+ },
+ {
+ theme: "Travel and Self-Discovery",
+ quotes: [
+ { text: "Travel makes one modest. You see what a tiny place you occupy in the world.", attr: "Gustave Flaubert" },
+ { text: "A journey of a thousand miles begins with a single step.", attr: "Lao Tzu" },
+ { text: "We travel not to escape life, but for life not to escape us.", attr: "Unknown" },
+ { text: "Travel far enough, you meet yourself.", attr: "David Mitchell" },
+ { text: "To travel is to live.", attr: "Hans Christian Andersen" }
+ ]
+ },
+ {
+ theme: "Reading and Imagination",
+ quotes: [
+ { text: "A reader lives a thousand lives before he dies. The man who never reads lives only one.", attr: "George R.R. Martin" },
+ { text: "Imagination is more important than knowledge.", attr: "Albert Einstein" },
+ { text: "There is no friend as loyal as a book.", attr: "Ernest Hemingway" },
+ { text: "Once you learn to read, you will be forever free.", attr: "Frederick Douglass" },
+ { text: "A room without books is like a body without a soul.", attr: "Marcus Tullius Cicero" }
+ ]
+ },
+ {
+ theme: "Enough and Excess",
+ quotes: [
+ { text: "He who is not contented with what he has, would not be contented with what he would like to have.", attr: "Socrates" },
+ { text: "Enough is as good as a feast.", attr: "Proverb" },
+ { text: "Too much of a good thing can be wonderful.", attr: "Mae West" },
+ { text: "Riches consist not in the possession of treasures, but in the use made of them.", attr: "Napoleon Bonaparte" },
+ { text: "It is not the man who has too little, but the man who craves more, that is poor.", attr: "Seneca" }
+ ]
+ },
+ {
+ theme: "Routine and Spontaneity",
+ quotes: [
+ { text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", attr: "Will Durant" },
+ { text: "Routine, in an intelligent man, is a sign of ambition.", attr: "W.H. Auden" },
+ { text: "Life is what happens to us while we are making other plans.", attr: "Allen Saunders" },
+ { text: "A little nonsense now and then is relished by the wisest men.", attr: "Roald Dahl" },
+ { text: "Spontaneity is a meticulously prepared art.", attr: "Oscar Wilde" }
+ ]
+ },
+ {
+ theme: "Apology and Pride",
+ quotes: [
+ { text: "Pride is concerned with who is right. Humility is concerned with what is right.", attr: "Ezra Taft Benson" },
+ { text: "An apology is the superglue of life. It can repair just about anything.", attr: "Lynn Johnston" },
+ { text: "Pride must die in you, or nothing of heaven can live in you.", attr: "Andrew Murray" },
+ { text: "Never ruin an apology with an excuse.", attr: "Benjamin Franklin" },
+ { text: "The proud man counts his newspaper clippings, the humble man his blessings.", attr: "Fulton J. Sheen" }
+ ]
+ },
+ {
+ theme: "Listening and Understanding",
+ quotes: [
+ { text: "Most people do not listen with the intent to understand; they listen with the intent to reply.", attr: "Stephen R. Covey" },
+ { text: "Courage is what it takes to stand up and speak; courage is also what it takes to sit down and listen.", attr: "Winston Churchill" },
+ { text: "We have two ears and one mouth so that we can listen twice as much as we speak.", attr: "Epictetus" },
+ { text: "When people talk, listen completely. Most people never listen.", attr: "Ernest Hemingway" },
+ { text: "The most basic of all human needs is the need to understand and be understood.", attr: "Ralph Nichols" }
+ ]
+ },
+ {
+ theme: "Beginnings and Endings",
+ quotes: [
+ { text: "Every new beginning comes from some other beginning's end.", attr: "Seneca" },
+ { text: "What we call the beginning is often the end. And to make an end is to make a beginning.", attr: "T.S. Eliot" },
+ { text: "The secret of getting ahead is getting started.", attr: "Mark Twain" },
+ { text: "Every exit is an entry somewhere else.", attr: "Tom Stoppard" },
+ { text: "There are far better things ahead than any we leave behind.", attr: "C.S. Lewis" }
+ ]
+ },
+ {
+ theme: "Mentors and Teachers",
+ quotes: [
+ { text: "A teacher affects eternity; he can never tell where his influence stops.", attr: "Henry Adams" },
+ { text: "The mediocre teacher tells. The good teacher explains. The superior teacher demonstrates. The great teacher inspires.", attr: "William Arthur Ward" },
+ { text: "Tell me and I forget. Teach me and I remember. Involve me and I learn.", attr: "Benjamin Franklin" },
+ { text: "The best teachers are those who show you where to look but don't tell you what to see.", attr: "Alexandra K. Trenfor" },
+ { text: "What sculpture is to a block of marble, education is to the soul.", attr: "Joseph Addison" }
+ ]
+ },
+ {
+ theme: "Rest and Restlessness",
+ quotes: [
+ { text: "There is virtue in work and there is virtue in rest. Use both and overlook neither.", attr: "Alan Cohen" },
+ { text: "Rest is not idleness, and to lie sometimes on the grass under trees on a summer's day is by no means a waste of time.", attr: "John Lubbock" },
+ { text: "Our restlessness in this world seems to indicate that we are intended for a better.", attr: "Joseph Addison" },
+ { text: "For fast-acting relief, try slowing down.", attr: "Lily Tomlin" },
+ { text: "Sometimes the most productive thing you can do is rest.", attr: "Mark Black" }
+ ]
+ },
+ {
+ theme: "Identity and Masks",
+ quotes: [
+ { text: "Man is least himself when he talks in his own person. Give him a mask, and he will tell you the truth.", attr: "Oscar Wilde" },
+ { text: "We are all serving a life sentence in the dungeon of self.", attr: "Cyril Connolly" },
+ { text: "It is the ability to choose which makes us human.", attr: "Madeleine L'Engle" },
+ { text: "I had been my whole life a bell, and never knew it until at that moment I was lifted and struck.", attr: "Annie Dillard" },
+ { text: "Knowing others is intelligence; knowing yourself is true wisdom.", attr: "Lao Tzu" }
+ ]
+ },
+ {
+ theme: "Finding Light in Darkness",
+ quotes: [
+ { text: "Even the darkest night will end and the sun will rise.", attr: "Victor Hugo" },
+ { text: "In the depth of winter, I finally learned that within me there lay an invincible summer.", attr: "Albert Camus" },
+ { text: "Stars can't shine without darkness.", attr: "Unknown" },
+ { text: "There is a crack in everything. That's how the light gets in.", attr: "Leonard Cohen" },
+ { text: "When it is dark enough, you can see the stars.", attr: "Ralph Waldo Emerson" }
+ ]
+ },
+ {
+ theme: "Faith and Doubt",
+ quotes: [
+ { text: "Doubt is not the opposite of faith; it is one element of faith.", attr: "Paul Tillich" },
+ { text: "Faith is the bird that feels the light when the dawn is still dark.", attr: "Rabindranath Tagore" },
+ { text: "The opposite of faith is not doubt, but certainty.", attr: "Anne Lamott" },
+ { text: "I respect faith, but doubt is what gets you an education.", attr: "Wilson Mizner" },
+ { text: "To believe with certainty we must begin with doubting.", attr: "Stanislaw Leszczynski" }
+ ]
+ },
+ {
+ theme: "How We Spend Our Time",
+ quotes: [
+ { text: "It is not that we have a short time to live, but that we waste a lot of it.", attr: "Seneca" },
+ { text: "Time you enjoy wasting is not wasted time.", attr: "Marthe Troly-Curtin" },
+ { text: "Lost time is never found again.", attr: "Benjamin Franklin" },
+ { text: "The bad news is time flies. The good news is you're the pilot.", attr: "Michael Altshuler" },
+ { text: "How we spend our days is, of course, how we spend our lives.", attr: "Annie Dillard" }
+ ]
+ },
+ {
+ theme: "Choices and Consequences",
+ quotes: [
+ { text: "Two roads diverged in a wood, and I took the one less traveled by, and that has made all the difference.", attr: "Robert Frost" },
+ { text: "We are our choices.", attr: "Jean-Paul Sartre" },
+ { text: "It is our choices that show what we truly are, far more than our abilities.", attr: "J.K. Rowling" },
+ { text: "Every choice you make has an end result.", attr: "Zig Ziglar" },
+ { text: "The strongest principle of growth lies in the human choice.", attr: "George Eliot" }
+ ]
+ },
+ {
+ theme: "Compassion for the Self",
+ quotes: [
+ { text: "Talk to yourself like you would to someone you love.", attr: "Brene Brown" },
+ { text: "You yourself, as much as anybody in the entire universe, deserve your love and affection.", attr: "The Buddha" },
+ { text: "Be gentle with yourself. You are a child of the universe, no less than the trees and the stars.", attr: "Max Ehrmann" },
+ { text: "Self-compassion is simply giving the same kindness to ourselves that we would give to others.", attr: "Christopher Germer" },
+ { text: "Lighten up on yourself. No one is perfect. Gently accept your humanness.", attr: "Deborah Day" }
+ ]
+ },
+ {
+ theme: "Joy in Small Things",
+ quotes: [
+ { text: "Enjoy the little things, for one day you may look back and realize they were the big things.", attr: "Robert Brault" },
+ { text: "The little things? The little moments? They aren't little.", attr: "Jon Kabat-Zinn" },
+ { text: "Happiness consists in realizing that the long-awaited big moments are often the small ones.", attr: "Unknown" },
+ { text: "It is the sweet, simple things of life which are the real ones after all.", attr: "Laura Ingalls Wilder" },
+ { text: "Find joy in the ordinary.", attr: "Max Lucado" }
  ]
  }
  ]

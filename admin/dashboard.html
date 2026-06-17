@@ -1687,14 +1687,6 @@
  </div>
 
  </div>
- </div>
-
- <div class="bc-card" style="max-width:680px;margin-top:20px;" id="referralCouponCard">
-  <div class="bc-title">Referral program</div>
-  <div class="bc-sub">One-time setup: create the REFERRAL15 Stripe coupon (15% off, once) used when a referred friend buys their first subscription. Safe to click again - it will not duplicate.</div>
-  <button class="btn primary" onclick="createReferralCoupon()">Create / verify REFERRAL15 coupon</button>
-  <div id="referralCouponStatus" style="margin-top:8px;font-size:0.8rem;color:var(--muted);"></div>
- </div>
 
  <div class="bc-card" style="max-width:680px;margin-top:20px;" id="qotwCard">
   <div class="bc-title">Question of the Week</div>
@@ -1738,6 +1730,7 @@
    <button class="btn primary" id="crosssellLiveBtn" onclick="runCasperToMmiCrossSell(false)" disabled>Enqueue live</button>
   </div>
   <div class="alert" id="crosssellAlert" style="margin-top:6px;"></div>
+ </div>
  </div>
 
  <!-- -- CASPER CLASS -- -->
@@ -2787,8 +2780,24 @@ async function loadCalVideo(id) {
  try {
   const r = await api('/admin/calibration/recording?id='+encodeURIComponent(id));
   if (!r.ok) throw new Error('recording');
-  const blob = await r.blob();
-  v.src = URL.createObjectURL(blob);
+  let blob = await r.blob();
+  if (!blob || !blob.size) throw new Error('empty');
+  const url = URL.createObjectURL(blob);
+  v.dataset.durationFixed = '';
+  v.src = url;
+  v.load();
+  v.addEventListener('emptied', function revoke(){ v.removeEventListener('emptied', revoke); try { URL.revokeObjectURL(url); } catch(e){} });
+  // Header-less WebM recordings report Infinity/NaN duration, which breaks the scrubber and makes
+  // seeking jump wildly. Force the browser to compute the real duration by seeking to a huge time,
+  // then snap back to the start.
+  v.addEventListener('loadedmetadata', function fix(){
+   v.removeEventListener('loadedmetadata', fix);
+   if (v.duration === Infinity || isNaN(v.duration) || v.duration <= 0) {
+    const onSeek = function(){ v.removeEventListener('timeupdate', onSeek); v.dataset.durationFixed = '1'; try { v.currentTime = 0; } catch(e){} };
+    v.addEventListener('timeupdate', onSeek);
+    try { v.currentTime = 1e101; } catch (e) {}
+   }
+  });
  } catch (e) {
   v.outerHTML = '<div style="color:var(--muted);padding:14px;">Recording could not be loaded.</div>';
  }
