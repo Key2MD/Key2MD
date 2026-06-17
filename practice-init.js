@@ -758,6 +758,7 @@ async function submitMMIForFeedback() {
  if (isPremium && isCasperMockReview) fd.append('visual_frame_source', 'answer_windows');
 
  frames.forEach((frame, i) => fd.append(`frame_${i}`, frame, `frame_${i}.jpg`));
+ if (isPremium && window.MMIIntonation) { try { const _inton = window.MMIIntonation.getMetrics(); if (_inton) fd.append('intonation_json', JSON.stringify(_inton)); } catch (e) {} }
  return fd;
  };
 

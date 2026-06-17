@@ -390,15 +390,25 @@ const MMIFeedbackRender = (() => {
  : fillerPct <= 10 ? 'A few fillers crept in. Examiners do not mark them, but trimming them adds polish.'
  : 'Fillers were frequent - usually a sign of speaking a little ahead of your thinking. A short silent pause beats an "um".';
  const longest = voice.longest_pause_seconds || 0;
+ const pitchLabel = voice.pitch_label || '';
+ const pitchVar = typeof voice.pitch_variation_st === 'number' ? voice.pitch_variation_st : null;
+ const pitchRating = pitchLabel === 'flat' ? 'low' : pitchLabel ? 'good' : 'mid';
+ const pitchWord = pitchLabel === 'flat' ? 'On the flat side' : pitchLabel === 'expressive' ? 'Expressive' : pitchLabel === 'natural' ? 'Natural range' : '';
+ const pitchNote = pitchLabel === 'flat' ? 'Your pitch stayed fairly level, which can read as flat or a little nervous. Letting it rise and fall - especially on the parts you genuinely care about - sounds warmer and more present.'
+  : pitchLabel === 'expressive' ? 'Lots of natural pitch movement - this reads as animated and engaged. Keep it real so it never tips into performed.'
+  : pitchLabel === 'natural' ? 'Your pitch moved naturally as you spoke, which reads as warm and genuine.'
+  : '';
  const tips = [];
  if (pace > 185) tips.push('Slow down: aim for roughly 130-160 words per minute so each point lands.');
  if (pace < 95) tips.push('Lift your pace slightly so every prompt gets a complete answer within the time.');
  if (fillerPct > 10) tips.push('Swap fillers for a brief silent pause - it reads as considered, not hesitant.');
  if (longest > 4) tips.push(`Your longest pause was ${longest}s - fine for thinking, but narrate it ("let me think about that for a second") so it does not read as freezing.`);
+ if (pitchLabel === 'flat') tips.push('Let your pitch rise and fall a little more - flat, level delivery can read as nervous or disengaged even when the content is strong. Lean into the moments you actually care about.');
  let esl = false; try { esl = localStorage.getItem('k2_esl') === '1'; } catch (e) {}
  if (esl) tips.push('Clarity over speed: shorter sentences with clear endings help a listener follow you. Your accent and phrasing are never marked down.');
  if (!tips.length) tips.push('Your delivery sits in a strong range. Hold this pace and clarity under interview pressure.');
 
+ const full = !voice.basic;
  return `
  <div class="mmi-delivery-card">
  <div class="mmi-delivery-head">
@@ -414,11 +424,18 @@ const MMIFeedbackRender = (() => {
  ${deliveryGauge(pace, 60, 220, 120, 160)}
  <div class="mmi-delivery-note">${esc(paceNote)} <span class="mmi-delivery-target">Target 120-160 wpm</span></div>
  </div>
+ ${full ? `
  <div class="mmi-delivery-metric">
  <div class="mmi-delivery-metric-top"><span>Filler density</span><strong class="rate-${fillerRating}">${fillerPct}%</strong></div>
  ${deliveryGauge(fillerPct, 0, 18, 0, 6)}
  <div class="mmi-delivery-note">${esc(fillerNote)} <span class="mmi-delivery-target">${voice.filler_count || 0} filler word${(voice.filler_count || 0) === 1 ? '' : 's'} of ${voice.word_count || 0}</span></div>
  </div>
+ ${pitchLabel ? `
+ <div class="mmi-delivery-metric">
+ <div class="mmi-delivery-metric-top"><span>Vocal variation</span><strong class="rate-${pitchRating}">${esc(pitchWord)}</strong></div>
+ ${deliveryGauge(pitchVar || 0, 0, 8, 2, 6)}
+ <div class="mmi-delivery-note">${esc(pitchNote)}${pitchVar != null ? ` <span class="mmi-delivery-target">${pitchVar} semitones of pitch movement</span>` : ''}</div>
+ </div>` : ''}
  <div class="mmi-delivery-grid">
  <div class="mmi-delivery-stat"><div class="mmi-delivery-val">${voice.word_count || 0}</div><div class="mmi-delivery-lbl">Words spoken</div></div>
  <div class="mmi-delivery-stat"><div class="mmi-delivery-val">${voice.pause_count || 0}</div><div class="mmi-delivery-lbl">Thinking pauses</div></div>
@@ -426,6 +443,9 @@ const MMIFeedbackRender = (() => {
  </div>
  ${voice.pace_trend ? `<div class="mmi-delivery-trend">${esc(voice.pace_trend)}</div>` : ''}
  <div class="mmi-delivery-tips"><div class="mmi-delivery-tips-title">What to work on</div><ul>${tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
+ ` : `
+ <div class="mmi-delivery-upsell" style="margin-top:6px;padding:12px 14px;border:1px solid rgba(14,165,233,0.28);border-radius:10px;background:rgba(14,165,233,0.05);font-size:0.82rem;color:#0a1628;line-height:1.5;">Filler words, thinking pauses and <strong>vocal intonation</strong> - how genuine and varied your delivery sounds - come with a <strong>Premium</strong> review. <a href="plans.html#mmi-pro" style="color:#0ea5e9;font-weight:700;text-decoration:none;">See Premium -></a></div>
+ `}
  <div class="mmi-delivery-caveat"><strong>Natural beats fluent.</strong> A slower, genuine answer reads far better than a fast, polished one that sounds forced or rehearsed. Examiners never mark down fillers or pauses, and chasing these numbers until you no longer sound like yourself will cost you far more than a few stray fillers ever could. This is here to help you notice habits, never a target to perform to.</div>
  </div>`;
  }
@@ -761,6 +781,8 @@ const MMIFeedbackRender = (() => {
  </div>
  </div>
 
+ <div class="mmi-calib-note" style="margin:0 0 14px;padding:11px 14px;border:1px solid rgba(245,158,11,0.3);border-radius:10px;background:rgba(245,158,11,0.07);font-size:0.8rem;color:#7c4a03;line-height:1.5;"><strong>About the score:</strong> the number is being calibrated daily and will swing around over the next couple of weeks. The written feedback is the consistent part - it is built on Dan's tutoring - so let the feedback, and your own sense of how it went, guide you rather than the score for now.</div>
+
  ${leadHtml}
 
  ${twoMovesHtml}
@@ -963,16 +985,24 @@ const MMIFeedbackRender = (() => {
      body: JSON.stringify({ review_id: reviewId }),
     });
     const payload = await res.json().catch(() => ({}));
-    if (!res.ok || !payload || !payload.lifted_answer) throw new Error(payload.message || payload.error || 'Could not lift this answer');
+    if (res.status === 402 || (payload && payload.error === 'premium_only')) {
+     state = 'idle';
+     trigger.style.display = 'none';
+     panel.innerHTML = `<div class="mmi-lift-oneline">Lift my answer is a Premium feature</div><div class="mmi-lift-answer">On a Premium review, the AI rewrites your own answer into a stronger version - your voice and your decision, with the weakness the marker flagged fixed. <a href="plans.html#mmi-pro" style="color:#0ea5e9;font-weight:700;text-decoration:none;">See Premium -></a></div>`;
+     return;
+    }
+    const liftedPrompts = Array.isArray(payload.prompts) ? payload.prompts : null;
+    if (!res.ok || (!liftedPrompts && !(payload && payload.lifted_answer))) throw new Error((payload && (payload.message || payload.error)) || 'Could not lift this answer');
     state = 'done';
     trigger.style.display = 'none';
-    const changes = Array.isArray(payload.changes) ? payload.changes : [];
-    panel.innerHTML = `
-     ${payload.one_line ? `<div class="mmi-lift-oneline">${esc(payload.one_line)}</div>` : ''}
-     <div class="mmi-lift-section-label">Your answer, lifted</div>
-     <div class="mmi-lift-answer">${esc(payload.lifted_answer)}</div>
-     ${changes.length ? `<div class="mmi-lift-section-label">What changed and why</div><div class="mmi-lift-changes">${changes.map(c => `<div class="mmi-lift-change"><div class="mmi-lift-change-label">${esc(c.label || '')}</div><div class="mmi-lift-change-detail">${esc(c.detail || '')}</div></div>`).join('')}</div>` : ''}
-     <div class="mmi-lift-caveat">This is your own answer, strengthened - not a script to memorise. Hear how your reasoning could land, then say it your way.</div>`;
+    let liftBody;
+    if (liftedPrompts) {
+     liftBody = '<div class="mmi-lift-section-label">Your answer, lifted prompt by prompt</div>' + liftedPrompts.map((p, i) => `<div class="mmi-lift-prompt-block" style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(15,23,42,0.08);"><div class="mmi-lift-prompt-q" style="font-weight:800;color:#0a1628;font-size:0.86rem;margin-bottom:6px;">Prompt ${i + 1}${p.prompt ? ': ' + esc(p.prompt) : ''}</div><div class="mmi-lift-answer">${esc(p.lifted_answer || '')}</div>${p.change ? `<div class="mmi-lift-change-detail" style="margin-top:6px;">${esc(p.change)}</div>` : ''}</div>`).join('');
+    } else {
+     const changes = Array.isArray(payload.changes) ? payload.changes : [];
+     liftBody = `<div class="mmi-lift-section-label">Your answer, lifted</div><div class="mmi-lift-answer">${esc(payload.lifted_answer)}</div>${changes.length ? `<div class="mmi-lift-section-label">What changed and why</div><div class="mmi-lift-changes">${changes.map(c => `<div class="mmi-lift-change"><div class="mmi-lift-change-label">${esc(c.label || '')}</div><div class="mmi-lift-change-detail">${esc(c.detail || '')}</div></div>`).join('')}</div>` : ''}`;
+    }
+    panel.innerHTML = `${payload.one_line ? `<div class="mmi-lift-oneline">${esc(payload.one_line)}</div>` : ''}${liftBody}<div class="mmi-lift-caveat">This is your own answer, strengthened - not a script to memorise. Hear how your reasoning could land, then say it your way.</div>`;
    } catch (err) {
     state = 'idle';
     trigger.disabled = false;

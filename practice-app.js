@@ -1043,6 +1043,8 @@ function applyModeUI(mode) {
  if (mo) mo.style.display = isMMI ? '' : 'none';
  const mcc = $('mmiCircuitCard');
  if (mcc) mcc.style.display = isMMI ? '' : 'none';
+ const cmk = $('casperMockCard');
+ if (cmk) cmk.style.display = isCasper ? '' : 'none';
  if (sq) sq.style.display = isCasper ? '' : 'none';
  if (classCard) classCard.style.display = isCasper ? '' : 'none';
  if (masterclassCard) masterclassCard.style.display = isCasper ? '' : 'none';
@@ -1269,6 +1271,7 @@ function startRecording(){
  }
 
  startMMIAudioMonitor(webcamStream);
+ try{ if(window.MMIIntonation && typeof shouldCapturePremiumLiveFrames==='function' && shouldCapturePremiumLiveFrames()) window.MMIIntonation.start(webcamStream); }catch(e){}
  webcamActive=true;
  startPremiumLiveFrameCapture();
  $('btnRestartRecording').disabled=false;
@@ -1289,6 +1292,7 @@ function stopRecording(){
  audioRecorder.stop();
  }
  stopMMIAudioMonitor();
+ try{ if(window.MMIIntonation) window.MMIIntonation.stop(); }catch(e){}
  webcamActive=false;
 }
 

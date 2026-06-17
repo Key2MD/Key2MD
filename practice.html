@@ -250,6 +250,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <li><a href="mmi-practice.html" class="k2-gold">MMI Practice</a></li>
  <li><a href="casper-practice.html" class="k2-gold">CASPer Practice</a></li>
  <li><a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Essay Practice</a></li>
+ <li><a href="ucat-practice.html" class="k2-green">UCAT Practice (beta)</a></li>
  <li><a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a></li>
  </ul>
  </li>
@@ -281,6 +282,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <a href="mmi-practice.html" class="k2-gold">MMI Practice</a>
  <a href="casper-practice.html" class="k2-gold">CASPer Practice</a>
  <a href="gamsat-s2-practice.html" class="k2-purple">GAMSAT S2 Essay Practice</a>
+ <a href="ucat-practice.html" class="k2-green">UCAT Practice (beta)</a>
  <a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a>
  <span class="k2-mobile-label">Resources</span>
  <a href="guide.html">Full Guide</a>
@@ -459,12 +461,10 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <div class="mode-toggle-wrap">
  <div class="mode-toggle-label">Practice Mode</div>
- <div class="mode-pill-row practice-mode-grid">
+ <div class="mode-pill-row">
  <button class="mode-pill active-casper" id="modeCasper" onclick="setMode('casper');" aria-label="CASPer practice">CASPer</button>
  <button class="mode-pill" id="modeMMI" onclick="setMode('mmi');" aria-label="MMI practice">MMI</button>
-<button class="mode-pill mode-pill-mock" id="modeMock" onclick="setMode('mock');window.FullCasperMock?.activateMockMode?.();" aria-label="Full CASPer mock exam"><span class="mock-pill-kicker">New</span><span>Full Mock</span></button>
 </div>
- <div class="mock-pill-helper">5 all-new full mocks. Every question hand-written by Dan. | <a href="full-casper-mock-exam.html">details</a></div>
 </div>
 
  <button class="btn-start" id="startBtn"><span id="startBtnIcon">></span><span id="startBtnText">Start Session</span></button>
@@ -573,6 +573,16 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <button id="startStarredQueueBtn" onclick="startStarredRevisionQueue()" style="width:100%;border:none;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid rgba(245,158,11,0.25);border-radius:9px;padding:9px 10px;font-size:0.78rem;font-weight:800;cursor:pointer;font-family:inherit;">Revise starred stations -></button>
  </div>
 
+
+ <div class="sidebar-card" id="casperMockCard" style="display:none;background:linear-gradient(135deg,#0c4a6e,#0a1628);border:1px solid rgba(14,165,233,0.4);color:#fff;">
+ <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+ <span style="font-size:0.6rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;background:rgba(14,165,233,0.3);border:1px solid rgba(125,211,252,0.4);color:#7dd3fc;padding:3px 8px;border-radius:50px;">Full Mock</span>
+ </div>
+ <h3 style="margin:0 0 6px;color:#fff;font-size:0.98rem;">Run a full CASPer mock exam</h3>
+ <p style="font-size:0.76rem;color:rgba(255,255,255,0.72);line-height:1.55;margin:0 0 12px;">5 all-new full mocks, every question hand-written by Dan: 4 video scenarios then 7 typed stations, under real timing with AI marking.</p>
+ <button type="button" onclick="setMode('mock');if(window.FullCasperMock&&window.FullCasperMock.activateMockMode)window.FullCasperMock.activateMockMode();" style="width:100%;padding:10px;border:none;border-radius:50px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;font-size:0.84rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(14,165,233,0.35);">Start a full CASPer mock -></button>
+ <a href="full-casper-mock-exam.html" style="display:block;text-align:center;margin-top:8px;font-size:0.72rem;color:#7dd3fc;text-decoration:none;">How the mock works -></a>
+ </div>
 
  <div class="sidebar-card" id="mmiCircuitCard" style="display:none;background:linear-gradient(135deg,#1e1b4b,#4c1d95);border:1px solid rgba(124,58,237,0.4);color:#fff;">
  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
@@ -908,7 +918,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <span class="category-pill phase-idle" id="categoryPill">Select a category &amp; press Start</span>
  <span id="seenBeforePill" style="display:none;"></span>
  <button id="starBtn" class="station-star-btn" onclick="toggleStarStation()" title="Save this station" aria-label="Save this station">&#9734;</button>
- <span id="starHint" class="station-star-hint">&larr; click to save tricky stations</span>
+ <span id="starHint" class="station-star-hint">&larr; Star to save this station to your Revision Queue</span>
  <div class="header-spacer"></div>
 <div id="lbRankBadge" style="display:none;align-items:center;gap:6px;padding:5px 12px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:50px;font-size:0.78rem;font-weight:700;color:var(--teal3);"> <span id="lbRankBadgeText">-</span></div>
  <div class="timer-display">
@@ -1609,10 +1619,12 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 <script src="practice-stations.js" defer></script>
 <script src="mmi-download.js" defer></script>
 <script src="mmi-recording.js" defer></script>
+<script src="mmi-intonation.js" defer></script>
 <script src="mmi-player.js" defer></script>
 <script src="mmi-engine.js" defer></script>
 <script src="mmi-tts.js" defer></script>
 <script src="mmi-feedback-render.js" defer></script>
+<script src="mmi-circuit.js" defer></script>
 <script src="casper-mock-exam.js" defer></script>
 <script src="practice-init.js" defer></script>
 <script src="practice-app.js" defer></script>

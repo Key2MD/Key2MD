@@ -107,6 +107,7 @@ const MMICircuit = (() => {
  // Show circuit config panel
  const cp = document.getElementById('circuitConfigPanel');
  if (cp) cp.style.display = 'block';
+ try { setTier(circuitTierAccess().premium ? 'premium' : 'transcript'); } catch (e) {}
 
  const mainContent = document.getElementById('mainContent') || document.querySelector('.main-content');
  if (mainContent) {
@@ -226,7 +227,20 @@ const MMICircuit = (() => {
  updateCreditDisplay();
  }
 
+ function circuitTierAccess() {
+ const limits = window.Key2MDAuth?.getLimits() || {};
+ const activePro = !!(limits.mmi_pro_tier && Number(limits.mmi_pro_expires_at || 0) > Date.now());
+ const proPremium = activePro && /premium/i.test(String(limits.mmi_pro_tier));
+ const tCred = Number(limits.mmi_transcript_credits || 0);
+ const pCred = Number(limits.mmi_premium_credits || 0);
+ return { transcript: activePro || tCred > 0 || pCred > 0, premium: proPremium || pCred > 0 };
+ }
+
  function setTier(tier) {
+ if (tier === 'premium' && !circuitTierAccess().premium) {
+ if (window.showPracticeNotice) window.showPracticeNotice('A Premium mock circuit needs Premium credits or MMI Pro Premium. Running in Transcript mode - get Premium on the plans page to unlock voice, presence and intonation analysis.', 'info');
+ tier = 'transcript';
+ }
  document.querySelectorAll('.circuit-tier-btn').forEach(btn => {
  const active = btn.dataset.tier === tier;
  btn.dataset.active = active ? '1' : '';
@@ -505,9 +519,10 @@ const MMICircuit = (() => {
  const limits = window.Key2MDAuth?.getLimits();
  const creditKey = cfg.tier === 'premium' ? 'mmi_premium_credits' : 'mmi_transcript_credits';
  const balance = limits ? (limits[creditKey] || 0) : null;
- const hasPro = limits && (limits.mmi_pro_tier || limits.mmi_pro_expires_at > Date.now());
+ const activePro = !!(limits && limits.mmi_pro_tier && Number(limits.mmi_pro_expires_at || 0) > Date.now());
+ const proCoversTier = activePro && (cfg.tier !== 'premium' || /premium/i.test(String(limits.mmi_pro_tier)));
 
- if (balance !== null && !hasPro && balance < cfg.size) {
+ if (balance !== null && !proCoversTier && balance < cfg.size) {
  renderCreditPaywall(cfg, balance);
  return;
  }
@@ -1126,6 +1141,8 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  };
 
 })();
+
+window.MMICircuit = MMICircuit;
 
 // Auto-init
 document.addEventListener('DOMContentLoaded', () => MMICircuit.init());
