@@ -290,6 +290,26 @@
  .btn-mmi-pro{width:100%;padding:14px 20px;border-radius:50px;border:none;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;transition:all 0.25s;margin-bottom:10px;}
  .btn-mmi-pro:hover{background:linear-gradient(135deg,#a78bfa,#8b5cf6);transform:translateY(-2px);}
  .btn-mmi-pro:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.mmi-cmp{margin:36px auto 0;max-width:780px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.09);border-radius:20px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.35);}
+.mmi-cmp-top{padding:24px 24px 2px;text-align:center;}
+.mmi-cmp-eyebrow{font-size:0.7rem;font-weight:900;letter-spacing:0.14em;text-transform:uppercase;color:#a78bfa;margin-bottom:7px;}
+.mmi-cmp-h{font-family:'DM Serif Display',Georgia,serif;font-size:clamp(1.2rem,3vw,1.5rem);color:#fff;line-height:1.22;}
+.mmi-cmp-grid{display:grid;grid-template-columns:1.7fr 1fr 1.15fr;margin-top:16px;}
+.mmi-cmp-grid>div{padding:13px 18px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;min-height:52px;}
+.mmi-cmp-feat{color:rgba(255,255,255,0.82);font-size:0.85rem;line-height:1.4;}
+.mmi-cmp-val{justify-content:center;font-size:1.05rem;}
+.mmi-cmp-prem{background:linear-gradient(180deg,rgba(124,58,237,0.2),rgba(124,58,237,0.06));}
+.mmi-cmp-yes{color:#34d399;font-weight:900;}
+.mmi-cmp-yes-p{color:#c4b5fd;font-weight:900;}
+.mmi-cmp-no{color:rgba(255,255,255,0.26);font-weight:700;}
+.mmi-cmp-head{border-top:none!important;padding-top:6px!important;padding-bottom:15px!important;flex-direction:column;justify-content:flex-end;gap:2px;}
+.mmi-cmp-head .t{font-size:0.98rem;font-weight:800;color:#fff;}
+.mmi-cmp-head .s{font-size:0.7rem;color:rgba(255,255,255,0.45);text-align:center;}
+.mmi-cmp-pill{font-size:0.57rem;font-weight:900;letter-spacing:0.07em;text-transform:uppercase;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;padding:3px 10px;border-radius:50px;margin-bottom:5px;}
+.mmi-cmp-foot{padding:16px 22px 20px;text-align:center;font-size:0.8rem;color:rgba(255,255,255,0.55);line-height:1.6;}
+.mmi-cmp-foot a{color:#c4b5fd;font-weight:700;text-decoration:none;}
+.mmi-cmp-foot a:hover{text-decoration:underline;}
+@media(max-width:560px){.mmi-cmp-grid{grid-template-columns:1.5fr 0.72fr 0.9fr;}.mmi-cmp-grid>div{padding:11px 9px;min-height:46px;}.mmi-cmp-feat{font-size:0.76rem;}.mmi-cmp-head .t{font-size:0.8rem;}.mmi-cmp-head .s{display:none;}}
  .mmi-credit-packs{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
  .mmi-credit-pack{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:10px;border:1.5px solid rgba(167,139,250,0.18);background:rgba(167,139,250,0.05);cursor:pointer;transition:all 0.18s;}
  .mmi-credit-pack:hover{border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.1);}
@@ -954,6 +974,56 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
  </div>
+
+ <div class="mmi-cmp">
+ <div class="mmi-cmp-top">
+ <div class="mmi-cmp-eyebrow">Transcript vs Premium</div>
+ <div class="mmi-cmp-h">Both mark your answer. Premium also marks how you said it.</div>
+ </div>
+ <div class="mmi-cmp-grid">
+ <div class="mmi-cmp-head"></div>
+ <div class="mmi-cmp-head mmi-cmp-val"><span class="t">Transcript</span><span class="s">What you said</span></div>
+ <div class="mmi-cmp-head mmi-cmp-val mmi-cmp-prem"><span class="mmi-cmp-pill">Recommended</span><span class="t">Premium</span><span class="s">Plus how you said it</span></div>
+
+ <div class="mmi-cmp-feat">AI feedback on all 5 MMI criteria, scored per prompt</div>
+ <div class="mmi-cmp-val"><span class="mmi-cmp-yes">&#10003;</span></div>
+ <div class="mmi-cmp-val mmi-cmp-prem"><span class="mmi-cmp-yes-p">&#10003;</span></div>
+
+ <div class="mmi-cmp-feat">Full transcript of your spoken answer</div>
+ <div class="mmi-cmp-val"><span class="mmi-cmp-yes">&#10003;</span></div>
+ <div class="mmi-cmp-val mmi-cmp-prem"><span class="mmi-cmp-yes-p">&#10003;</span></div>
+
+ <div class="mmi-cmp-feat">Polished Auditor Trap detection</div>
+ <div class="mmi-cmp-val"><span class="mmi-cmp-yes">&#10003;</span></div>
+ <div class="mmi-cmp-val mmi-cmp-prem"><span class="mmi-cmp-yes-p">&#10003;</span></div>
+
+ <div class="mmi-cmp-feat">All 150 stations and Specialist mode</div>
+ <div class="mmi-cmp-val"><span class="mmi-cmp-yes">&#10003;</span></div>
+ <div class="mmi-cmp-val mmi-cmp-prem"><span class="mmi-cmp-yes-p">&#10003;</span></div>
+
+ <div class="mmi-cmp-feat">Speaking pace (words per minute)</div>
+ <div class="mmi-cmp-val"><span class="mmi-cmp-yes">&#10003;</span></div>
+ <div class="mmi-cmp-val mmi-cmp-prem"><span class="mmi-cmp-yes-p">&#10003;</span></div>
+
+ <div class="mmi-cmp-feat">Filler words, thinking pauses and pace trend</div>
+ <div class="mmi-cmp-val"><span class="mmi-cmp-no">&#8211;</span></div>
+ <div class="mmi-cmp-val mmi-cmp-prem"><span class="mmi-cmp-yes-p">&#10003;</span></div>
+
+ <div class="mmi-cmp-feat">Vocal intonation - how genuine you sound</div>
+ <div class="mmi-cmp-val"><span class="mmi-cmp-no">&#8211;</span></div>
+ <div class="mmi-cmp-val mmi-cmp-prem"><span class="mmi-cmp-yes-p">&#10003;</span></div>
+
+ <div class="mmi-cmp-feat">Visual presence and composure on camera</div>
+ <div class="mmi-cmp-val"><span class="mmi-cmp-no">&#8211;</span></div>
+ <div class="mmi-cmp-val mmi-cmp-prem"><span class="mmi-cmp-yes-p">&#10003;</span></div>
+
+ <div class="mmi-cmp-feat"><span><strong style="color:#fff;">Lift my answer</strong> - your answer rewritten stronger, per prompt</span></div>
+ <div class="mmi-cmp-val"><span class="mmi-cmp-no">&#8211;</span></div>
+ <div class="mmi-cmp-val mmi-cmp-prem"><span class="mmi-cmp-yes-p">&#10003;</span></div>
+ </div>
+ <div class="mmi-cmp-foot">Both run on credits or unlimited <strong style="color:#fff;">MMI Pro</strong>, and your first Transcript review is free. <a href="#mmi-section" onclick="try{switchMMITier('premium')}catch(e){}">See Premium pricing above &#8593;</a></div>
+ </div>
+
  </div>
 </section>
 
