@@ -985,24 +985,21 @@ const MMIFeedbackRender = (() => {
      body: JSON.stringify({ review_id: reviewId }),
     });
     const payload = await res.json().catch(() => ({}));
-    if (res.status === 402 || (payload && payload.error === 'premium_only')) {
-     state = 'idle';
-     trigger.style.display = 'none';
-     panel.innerHTML = `<div class="mmi-lift-oneline">Lift my answer is a Premium feature</div><div class="mmi-lift-answer">On a Premium review, the AI rewrites your own answer into a stronger version - your voice and your decision, with the weakness the marker flagged fixed. <a href="plans.html#mmi-pro" style="color:#0ea5e9;font-weight:700;text-decoration:none;">See Premium -></a></div>`;
-     return;
-    }
     const liftedPrompts = Array.isArray(payload.prompts) ? payload.prompts : null;
-    if (!res.ok || (!liftedPrompts && !(payload && payload.lifted_answer))) throw new Error((payload && (payload.message || payload.error)) || 'Could not lift this answer');
+    const mildRec = (!liftedPrompts && payload && payload.recommendation) ? String(payload.recommendation) : null;
+    if (!res.ok || (!liftedPrompts && !mildRec && !(payload && payload.lifted_answer))) throw new Error((payload && (payload.message || payload.error)) || 'Could not lift this answer');
     state = 'done';
     trigger.style.display = 'none';
     let liftBody;
     if (liftedPrompts) {
      liftBody = '<div class="mmi-lift-section-label">Your answer, lifted prompt by prompt</div>' + liftedPrompts.map((p, i) => `<div class="mmi-lift-prompt-block" style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(15,23,42,0.08);"><div class="mmi-lift-prompt-q" style="font-weight:800;color:#0a1628;font-size:0.86rem;margin-bottom:6px;">Prompt ${i + 1}${p.prompt ? ': ' + esc(p.prompt) : ''}</div><div class="mmi-lift-answer">${esc(p.lifted_answer || '')}</div>${p.change ? `<div class="mmi-lift-change-detail" style="margin-top:6px;">${esc(p.change)}</div>` : ''}</div>`).join('');
+    } else if (mildRec) {
+     liftBody = `<div class="mmi-lift-section-label">How to lift this answer</div><div class="mmi-lift-answer">${esc(mildRec)}</div><div class="mmi-lift-upsell" style="margin-top:12px;padding:11px 14px;border:1px solid rgba(14,165,233,0.28);border-radius:10px;background:rgba(14,165,233,0.06);font-size:0.82rem;line-height:1.5;color:#0a1628;">That is the quick Transcript tip. <strong>Premium</strong> rewrites your full answer, prompt by prompt, in your own voice. <a href="plans.html#mmi-section" style="color:#0ea5e9;font-weight:700;text-decoration:none;">See Premium -></a></div>`;
     } else {
      const changes = Array.isArray(payload.changes) ? payload.changes : [];
      liftBody = `<div class="mmi-lift-section-label">Your answer, lifted</div><div class="mmi-lift-answer">${esc(payload.lifted_answer)}</div>${changes.length ? `<div class="mmi-lift-section-label">What changed and why</div><div class="mmi-lift-changes">${changes.map(c => `<div class="mmi-lift-change"><div class="mmi-lift-change-label">${esc(c.label || '')}</div><div class="mmi-lift-change-detail">${esc(c.detail || '')}</div></div>`).join('')}</div>` : ''}`;
     }
-    panel.innerHTML = `${payload.one_line ? `<div class="mmi-lift-oneline">${esc(payload.one_line)}</div>` : ''}${liftBody}<div class="mmi-lift-caveat">This is your own answer, strengthened - not a script to memorise. Hear how your reasoning could land, then say it your way.</div>`;
+    panel.innerHTML = `${payload.one_line ? `<div class="mmi-lift-oneline">${esc(payload.one_line)}</div>` : ''}${liftBody}${(liftedPrompts || (payload && payload.lifted_answer)) ? `<div class="mmi-lift-caveat">This is your own answer, strengthened - not a script to memorise. Hear how your reasoning could land, then say it your way.</div>` : ''}`;
    } catch (err) {
     state = 'idle';
     trigger.disabled = false;
