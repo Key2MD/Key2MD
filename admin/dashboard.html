@@ -2424,8 +2424,9 @@
  <p style="color:var(--muted);font-size:0.82rem;margin-bottom:16px;line-height:1.6;">Creates a free mock pass with 7 written stations and 4 video stations. Reset Premium expires unfinished live attempts so the next start uses a fresh pass, but does not delete previous attempts.</p>
  <div class="form-row"><label class="form-lbl">Mock type</label><select class="form-sel" id="mpTier"><option value="transcript">Transcript mock</option><option value="premium">Premium mock</option></select></div>
  <div class="form-row"><label class="form-lbl">Expires after</label><select class="form-sel" id="mpDays"><option value="14">14 days</option><option value="30">30 days</option><option value="60">60 days</option></select></div>
+ <div class="form-row"><label class="form-lbl" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;line-height:1.45;"><input type="checkbox" id="mpResetInProgress" style="width:auto;margin:3px 0 0;"> <span>Reset to station 1 <span style="display:block;color:var(--muted);font-weight:400;font-size:0.76rem;">Expire the current unfinished attempt so the next start is fresh at station 1, using the Mock type above. Keeps past attempt records. Use this to re-trial a mock.</span></span></label></div>
  <div class="modal-alert" id="mpAlert"></div>
- <div class="modal-footer"><button class="btn" onclick="closeMockPassModal()">Cancel</button><button class="btn amber" id="mpReset" onclick="resetPremiumMockPassFromModal()">Reset to 1 Premium</button><button class="btn green" id="mpSave" onclick="grantMockPass()">Grant Mock</button></div>
+ <div class="modal-footer"><button class="btn" onclick="closeMockPassModal()">Cancel</button><button class="btn" id="mpRevoke" style="border-color:#ef4444;color:#ef4444;" onclick="revokeMockPass()">Revoke (set to 0)</button><button class="btn amber" id="mpReset" onclick="resetPremiumMockPassFromModal()">Reset to 1 Premium</button><button class="btn green" id="mpSave" onclick="grantMockPass()">Grant Mock</button></div>
  </div>
 </div>
 
@@ -10534,6 +10535,7 @@ function openMockPassModal(id,email) {
  document.getElementById('mpEmail').textContent = email;
  document.getElementById('mpTier').value = 'premium';
  document.getElementById('mpDays').value = '14';
+ document.getElementById('mpResetInProgress').checked = false;
  document.getElementById('mpAlert').className = 'modal-alert';
  document.getElementById('mpAlert').textContent = '';
  document.getElementById('mockPassModal').classList.add('open');
@@ -10543,10 +10545,45 @@ function closeMockPassModal() {
  document.getElementById('mockPassModal').classList.remove('open');
 }
 
+async function revokeMockPass() {
+ const id = S.mockPassModalUserId;
+ const email = document.getElementById('mpEmail')?.textContent || 'this student';
+ if (!confirm(`Revoke ${email}'s Full CASPer Mock pass and set it to 0?\n\nThis clears the pass entirely and expires any unfinished attempt, leaving no mock entitlement. Use this, then Grant Mock to issue a fresh one. Past attempt records are kept.`)) return;
+ const al = document.getElementById('mpAlert');
+ al.className = 'modal-alert';
+ al.textContent = '';
+ const revokeBtn = document.getElementById('mpRevoke');
+ const saveBtn = document.getElementById('mpSave');
+ if (revokeBtn) revokeBtn.disabled = true;
+ if (saveBtn) saveBtn.disabled = true;
+ try {
+ const res = await api('/admin/users/mock-pass', {
+ method:'POST',
+ headers:{'Content-Type':'application/json'},
+ body: JSON.stringify({ user_id:id, revoke:true })
+ });
+ const data = await res.json().catch(()=>({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Revoke failed');
+ const expired = Number(data.expired_in_progress_count || 0);
+ al.className = 'modal-alert ok';
+ al.textContent = `Mock pass revoked (set to 0).${expired ? ` Expired ${expired} unfinished live attempt${expired === 1 ? '' : 's'}.` : ''} Grant a new one when ready.`;
+ S.detailCache.clear();
+ await loadUsers();
+ } catch(e) {
+ al.className = 'modal-alert err';
+ al.textContent = e.message;
+ } finally {
+ if (revokeBtn) revokeBtn.disabled = false;
+ if (saveBtn) saveBtn.disabled = false;
+ }
+}
+
 async function grantMockPass(replace = false, resetInProgress = false) {
  const id = S.mockPassModalUserId;
  const tier = document.getElementById('mpTier').value;
  const days = parseInt(document.getElementById('mpDays').value, 10) || 14;
+ const resetInProg = resetInProgress || !!document.getElementById('mpResetInProgress')?.checked;
+ const replaceExisting = replace || resetInProg;
  const al = document.getElementById('mpAlert');
  al.className = 'modal-alert';
  al.textContent = '';
@@ -10557,12 +10594,12 @@ async function grantMockPass(replace = false, resetInProgress = false) {
  const res = await api('/admin/users/mock-pass', {
  method:'POST',
  headers:{'Content-Type':'application/json'},
- body: JSON.stringify({ user_id:id, tier, days, replace, reset_in_progress: resetInProgress })
+ body: JSON.stringify({ user_id:id, tier, days, replace: replaceExisting, reset_in_progress: resetInProg })
  });
  const data = await res.json().catch(()=>({}));
- if (res.status === 409 && data?.error === 'active_mock_exists' && !replace) {
+ if (res.status === 409 && data?.error === 'active_mock_exists' && !replaceExisting) {
  const ok = confirm(`${data.message || 'This student already has an active mock pass.'}\n\nReplace it with this new free mock pass?`);
- if (ok) return await grantMockPass(true, resetInProgress);
+ if (ok) return await grantMockPass(true, resetInProg);
  al.className = 'modal-alert err';
  al.textContent = 'Existing mock pass kept.';
  return;
@@ -10571,7 +10608,7 @@ async function grantMockPass(replace = false, resetInProgress = false) {
  const expiry = data.expires_at ? new Date(data.expires_at).toLocaleDateString('en-AU') : 'soon';
  al.className = 'modal-alert ok';
  const expired = Number(data.expired_in_progress_count || 0);
- al.textContent = `Granted ${tier} mock. Expires ${expiry}.${resetInProgress ? ` Expired ${expired} unfinished live attempt${expired === 1 ? '' : 's'}.` : ''}`;
+ al.textContent = `Granted ${tier} mock. Expires ${expiry}.${resetInProg ? ` Expired ${expired} unfinished live attempt${expired === 1 ? '' : 's'}.` : ''}`;
  S.detailCache.clear();
  await loadUsers();
  } catch(e) {
