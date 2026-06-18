@@ -59,3 +59,70 @@ select{font-family:inherit;font-size:0.92rem;padding:9px 12px;border:1px solid v
 .mcq-brk-val{flex:0 0 auto;font-size:0.84rem;color:var(--muted);font-variant-numeric:tabular-nums}
 #mcqTimeStat{color:var(--muted);font-size:0.88rem;margin-top:18px;text-align:center}
 .mcq-empty{color:var(--muted);text-align:center;padding:30px}
+
+/* Station mode (GAMSAT S1/S3) */
+.mcqs-setup-row{align-items:flex-start;gap:12px}
+.mcqs-setup-note{font-size:0.82rem;color:var(--muted);line-height:1.5;flex:1;min-width:220px}
+.mcqs-switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;white-space:nowrap}
+.mcqs-switch input{position:absolute;opacity:0;width:0;height:0}
+.mcqs-slider{width:40px;height:22px;border-radius:999px;background:#cbd5e1;position:relative;transition:.18s;flex:0 0 auto}
+.mcqs-slider::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.18s}
+.mcqs-switch input:checked+.mcqs-slider{background:var(--teal)}
+.mcqs-switch input:checked+.mcqs-slider::after{transform:translateX(18px)}
+.mcqs-switch input:focus-visible+.mcqs-slider{outline:2px solid var(--teal);outline-offset:2px}
+.mcqs-switch-lbl{font-weight:700;color:var(--navy);font-size:0.9rem}
+.mcqs-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.mcqs-progress{font-weight:700;color:var(--navy);font-size:0.92rem}
+.mcqs-clock{display:flex;align-items:center;gap:10px}
+.mcqs-time{font-variant-numeric:tabular-nums;font-weight:700;color:var(--navy);font-size:1.02rem;min-width:48px;text-align:right}
+.mcqs-pace{font-family:inherit;font-weight:700;font-size:0.78rem;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;background:#fff;color:var(--muted)}
+.mcqs-pace.green{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
+.mcqs-pace.amber{background:#fffbeb;border-color:#fde68a;color:#b45309}
+.mcqs-pace.red{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+.mcqs-pace.off{opacity:0.6}
+.mcqs-strip{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.mcqs-chip{font-family:inherit;width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--muted);font-weight:700;font-size:0.84rem;cursor:pointer;position:relative;transition:.12s}
+.mcqs-chip:hover{border-color:var(--teal)}
+.mcqs-chip.cur{background:var(--navy);color:#fff;border-color:var(--navy)}
+.mcqs-chip.done{border-color:var(--ok);color:var(--ok)}
+.mcqs-chip.cur.done{background:var(--ok);color:#fff;border-color:var(--ok)}
+.mcqs-chip.flag::after{content:"";position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#f59e0b;border:1.5px solid #fff}
+.mcqs-added{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:12px 15px;margin:0 0 16px}
+.mcqs-added-tag{display:block;font-size:0.7rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:#b45309;margin-bottom:6px}
+.mcqs-q{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
+.mcqs-q.flagged{border-left:3px solid #f59e0b;padding-left:12px;margin-left:-12px}
+.mcqs-qhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
+.mcqs-qnum{font-weight:800;color:var(--teal);font-size:0.8rem;letter-spacing:0.03em}
+.mcqs-flag{font-family:inherit;font-size:0.76rem;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:3px 12px;cursor:pointer}
+.mcqs-flag:hover{border-color:#f59e0b;color:#b45309}
+.mcqs-flag.on{background:#fffbeb;border-color:#fbbf24;color:#b45309}
+.mcqs-pill{font-size:0.76rem;font-weight:700;border-radius:999px;padding:3px 11px}
+.mcqs-pill.ok{background:#f0fdf4;color:var(--ok)}
+.mcqs-pill.no{background:#fef2f2;color:var(--no)}
+.mcqs-pill.blank{background:var(--bg);color:var(--muted)}
+.mcqs-stem{font-size:1.02rem;color:var(--navy);font-weight:500;margin-bottom:12px}
+.mcqs-opts{display:flex;flex-direction:column;gap:9px}
+.mcqs-opt{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:11px;padding:10px 12px;cursor:pointer;background:#fff;transition:.12s}
+.mcqs-opt:hover{border-color:var(--teal)}
+.mcqs-opt.selected{border-color:var(--teal);background:#f0f9ff}
+.mcqs-opt.struck{opacity:0.5}
+.mcqs-opt.struck .mcqs-opt-text{text-decoration:line-through}
+.mcqs-opt.correct{border-color:var(--ok);background:#f0fdf4}
+.mcqs-opt.wrong{border-color:var(--no);background:#fef2f2}
+.mcqs-key{flex:0 0 25px;height:25px;border-radius:7px;background:var(--bg);color:var(--navy);font-weight:700;font-size:0.8rem;display:flex;align-items:center;justify-content:center}
+.mcqs-opt.selected .mcqs-key{background:var(--teal);color:#fff}
+.mcqs-opt.correct .mcqs-key{background:var(--ok);color:#fff}
+.mcqs-opt.wrong .mcqs-key{background:var(--no);color:#fff}
+.mcqs-opt-text{flex:1}
+.mcqs-strike{flex:0 0 auto;width:24px;height:24px;border-radius:6px;border:1px solid transparent;background:transparent;color:#94a3b8;font-size:1rem;line-height:1;cursor:pointer;font-family:inherit}
+.mcqs-strike:hover{background:#fef2f2;color:var(--no)}
+.mcqs-note-wrap{margin-top:9px}
+.mcqs-note-toggle{font-family:inherit;font-size:0.76rem;font-weight:700;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 0}
+.mcqs-note-toggle:hover{color:var(--teal)}
+.mcqs-note-area{width:100%;margin-top:6px;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:0.9rem;resize:vertical;min-height:60px;color:var(--ink)}
+.mcqs-ex{margin-top:11px;background:var(--bg);border-radius:10px;padding:11px 13px;font-size:0.93rem;color:var(--ink)}
+.mcqs-stscore{margin-top:18px;font-weight:800;color:var(--navy);font-size:1rem}
+.mcqs-submit-wrap{margin-top:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.mcqs-submit-note{font-size:0.8rem;color:var(--muted);flex:1;min-width:180px}
+.mcqs-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;flex-wrap:wrap}
+@media(max-width:560px){.mcqs-nav .btn{flex:1 1 auto}}

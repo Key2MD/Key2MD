@@ -102,7 +102,7 @@ const Key2MDAuth = (() => {
  captureReferralCode();
  injectAuthModal();
  injectAuthBar();
- consumeImpersonationHandoff().finally(() => checkSession());
+ consumeImpersonationHandoff().finally(() => checkSession().finally(() => maybeShowReferralWelcome()));
  }
 
  function getUser() { return _user; }
@@ -123,6 +123,31 @@ const Key2MDAuth = (() => {
  }
  function getStoredReferralCode() {
  try { return localStorage.getItem(REF_KEY) || ''; } catch (e) { return ''; }
+ }
+
+ // Foolproof referral: wherever the invite link lands, make the offer and the signup obvious.
+ function maybeShowReferralWelcome() {
+ try {
+ if (isLoggedIn()) return;
+ if (!getStoredReferralCode()) return;
+ if (sessionStorage.getItem('k2md_ref_welcome_dismissed')) return;
+ if (document.getElementById('referralFriendBanner')) return; // plans.html shows its own
+ if (document.getElementById('k2mdReferralWelcome')) return;
+ const el = document.createElement('div');
+ el.id = 'k2mdReferralWelcome';
+ document.body.appendChild(el);
+ const dismiss = "try{sessionStorage.setItem('k2md_ref_welcome_dismissed','1')}catch(e){};var n=document.getElementById('k2mdReferralWelcome');if(n)n.remove();";
+ el.innerHTML = `
+ <div style="position:fixed;left:12px;right:12px;bottom:12px;z-index:99997;max-width:540px;margin:0 auto;background:linear-gradient(135deg,#0a1628,#0c2236);color:#fff;border:1px solid rgba(14,165,233,0.42);box-shadow:0 18px 48px rgba(8,15,30,0.42);border-radius:14px;padding:15px 16px 14px;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+ <button onclick="${dismiss}" aria-label="Dismiss" style="position:absolute;top:7px;right:11px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.25rem;line-height:1;cursor:pointer;">&times;</button>
+ <div style="font-size:0.95rem;font-weight:800;margin:0 20px 5px 0;">A friend invited you to Key2MD</div>
+ <div style="font-size:0.84rem;color:rgba(255,255,255,0.78);line-height:1.55;margin-bottom:12px;">Create a free account now and your <strong style="color:#7dd3fc;">15% off your first purchase</strong> locks in automatically - nothing to type at checkout. Your free practice starts straight away.</div>
+ <div style="display:flex;gap:9px;flex-wrap:wrap;">
+ <button onclick="Key2MDAuth.showAuthModal('signup')" style="background:#0ea5e9;color:#fff;border:none;border-radius:999px;padding:10px 20px;font:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;">Create free account &rarr;</button>
+ <button onclick="${dismiss}" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.2);border-radius:999px;padding:10px 16px;font:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;">Maybe later</button>
+ </div>
+ </div>`;
+ } catch (e) {}
  }
 
  async function consumeImpersonationHandoff() {

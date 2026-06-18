@@ -220,11 +220,11 @@ footer p{font-size:0.8rem;color:rgba(255,255,255,0.5);margin:0;}
     <p class="label" id="mcqCatPrompt">Choose a subject</p>
     <div id="mcqCats" class="pickrow"></div>
     <div class="row">
-      <label for="mcqCount" class="label" style="margin:0">Questions</label>
+      <label for="mcqCount" class="label" style="margin:0">Stations</label>
       <select id="mcqCount">
-        <option value="5">5</option>
-        <option value="10" selected>10</option>
-        <option value="20">20</option>
+        <option value="3">3</option>
+        <option value="5" selected>5</option>
+        <option value="8">8</option>
         <option value="0">All</option>
       </select>
       <button id="mcqStart" class="btn btn-primary">Start practice</button>
@@ -365,9 +365,11 @@ footer p{font-size:0.8rem;color:rgba(255,255,255,0.5);margin:0;}
 
 <script src="mcq-engine.js"></script>
 <script src="gamsat-s3-questions.js"></script>
-<script src="mcq-app.js"></script>
+<script src="mcq-station.js"></script>
 <script>
-MCQApp.init({
+MCQStation.init({
+  perQuestionSeconds: 120,
+  stationNoun: "station",
   categoryField: "subject",
   subtypeField: "topic",
   taxonomy: GS3_TAXONOMY,

@@ -30,6 +30,7 @@ let mmiActivePreset = 'standard';
 let mmiSelectedPromptCount = MMI_PRESETS.quickfire.promptCount;
 let mmiSpecialistMode = false;
 let mmiPremiumMode = false;
+let mmiFreeReviewPremiumApplied = false;
 let mmiTypedMode = false;
 let mmiRoleplayMode = false;
 let roleplayHistory = [];
@@ -1290,7 +1291,18 @@ async function updateMMILimitsUI() {
  }
  if(freeBanner) {
  const hasOtherAccess = access.unlimited || (rawCredits || 0) > 0;
- freeBanner.style.display = (!hasOtherAccess && data.mmi_free_review_available) ? '' : 'none';
+ const showFree = !hasOtherAccess && data.mmi_free_review_available;
+ freeBanner.style.display = showFree ? '' : 'none';
+ // First review on the house is a Premium showcase: default to Premium once so the full delivery + presence read is captured (user can still switch it off).
+ if (showFree && !mmiFreeReviewPremiumApplied && !mmiPremiumMode) {
+ mmiFreeReviewPremiumApplied = true;
+ const pToggle = document.getElementById('premiumModeToggle');
+ if (pToggle) pToggle.checked = true;
+ mmiPremiumMode = true;
+ const pDisc = document.getElementById('premiumDisclaimer');
+ if (pDisc) pDisc.style.display = 'block';
+ if (!ffmpegLoaded && !ffmpegLoading) loadFFmpeg();
+ }
  }
  } catch {}
 }

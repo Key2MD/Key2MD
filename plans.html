@@ -898,11 +898,16 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div style="margin:18px 0 0;padding:16px 18px;background:linear-gradient(135deg,rgba(124,58,237,0.16),rgba(14,165,233,0.08));border:1px solid rgba(196,181,253,0.3);border-radius:14px;">
  <div style="font-size:0.72rem;font-weight:800;color:#ddd6fe;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:7px;">It is not only what you say</div>
  <p style="font-size:0.9rem;color:rgba(255,255,255,0.82);line-height:1.65;margin:0 0 8px;">The MMI is a spoken, face-to-face station, so examiners mark a single holistic impression - and how you deliver an answer is a large part of it.</p>
- <p style="font-size:0.84rem;color:rgba(255,255,255,0.62);line-height:1.7;margin:0;">Your <strong style="color:#fff;">tone</strong>, your <strong style="color:#fff;">prosody</strong> (the rise, fall and stress in your voice), your <strong style="color:#fff;">rhythm and pace</strong>, and the <strong style="color:#fff;">presence and composure</strong> you carry decide whether the same words land as warm and convincing or flat and rehearsed. Strong content delivered poorly rarely scores well. Premium reads these delivery signals directly; every tier sharpens the structure and substance they sit on.</p>
+ <p style="font-size:0.84rem;color:rgba(255,255,255,0.62);line-height:1.7;margin:0 0 8px;">Your <strong style="color:#fff;">tone</strong> and <strong style="color:#fff;">prosody</strong> (the rise, fall and stress in your voice), your <strong style="color:#fff;">pace and rhythm</strong>, the <strong style="color:#fff;">hesitations, fillers and stumbles</strong> that surface under pressure, and the <strong style="color:#fff;">presence</strong> you hold on camera all decide whether the same words land as warm and convincing or flat and rehearsed. A <strong style="color:#fff;">Premium</strong> review reads these signals directly:</p>
+ <ul style="font-size:0.82rem;color:rgba(255,255,255,0.6);line-height:1.6;margin:0 0 8px;padding-left:18px;">
+ <li style="margin-bottom:5px;"><strong style="color:rgba(255,255,255,0.85);">From your voice:</strong> speaking pace, filler and stutter density, your thinking pauses, and vocal variation - how genuine and varied you sound.</li>
+ <li><strong style="color:rgba(255,255,255,0.85);">From your video:</strong> eye contact and camera gaze, posture (open and engaged vs withdrawn or slumped), facial expression, visible engagement, and any distracting habits.</li>
+ </ul>
+ <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);line-height:1.65;margin:0;">It surfaces these gently, to help you notice habits under pressure - never a target to chase, and never a way to penalise a natural, cultural or neurodivergent style. Strong content delivered poorly rarely scores well, so every tier sharpens your structure and substance, and Premium layers this delivery and presence read on top.</p>
  </div>
  <div style="margin-bottom:20px;padding:14px 18px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:12px;">
- <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Your first review is free</div>
- <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.65;margin:0 0 10px;">Record a station response and submit it - your first AI-marked Transcript review is free, no credit needed. One per account, no expiry.</p>
+ <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Your first review is a free Premium review</div>
+ <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.65;margin:0 0 10px;">Record a station response and submit it - your first AI-marked review is a full <strong style="color:rgba(255,255,255,0.85);">Premium</strong> review, on me, with the complete delivery and presence read. No credit needed, one per account, no expiry.</p>
  <p style="font-size:0.82rem;color:rgba(255,255,255,0.45);line-height:1.6;margin:0;">After that, MMI feedback uses credits or an MMI Pro subscription. Spoken-response marking includes real-time transcription and per-prompt criterion analysis, so it costs more to run than a CASPer text review.</p>
  </div>
  <div style="margin-bottom:22px;padding:15px 18px;background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(14,165,233,0.1));border:1px solid rgba(196,181,253,0.34);border-radius:14px;">
@@ -1634,7 +1639,7 @@ async function maybeShowReferralBanner() {
    const res = await fetch(`${API_BASE}/api/user/referral-info`, { headers: { Authorization: `Bearer ${Key2MDAuth.getToken()}` } });
    const d = await res.json().catch(() => ({}));
    if (d && d.has_first_purchase_discount) {
-    el.innerHTML = `<strong>A friend invited you.</strong> You have ${d.friend_discount_percent || 15}% off your first purchase, applied automatically at checkout.`;
+    el.innerHTML = `<strong>A friend invited you.</strong> Your <strong>${d.friend_discount_percent || 15}% off your first purchase</strong> is ready and applies automatically at checkout - nothing to enter.`;
     el.style.display = '';
    } else {
     el.style.display = 'none';
@@ -1644,7 +1649,7 @@ async function maybeShowReferralBanner() {
  }
  try {
   if (localStorage.getItem('k2md_ref')) {
-   el.innerHTML = `<strong>Invited by a friend?</strong> Create a free account and get 15% off your first purchase.`;
+   el.innerHTML = `<strong>A friend invited you to Key2MD.</strong> Create a free account now and your <strong>15% off your first purchase</strong> locks in automatically - nothing to type at checkout. <button type="button" onclick="Key2MDAuth.showAuthModal('signup')" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:#0ea5e9;color:#fff;border:none;border-radius:999px;padding:9px 18px;font-weight:700;font-size:0.84rem;cursor:pointer;font-family:inherit;">Create free account &rarr;</button>`;
    el.style.display = '';
   }
  } catch (e) {}
@@ -2403,15 +2408,15 @@ let mmiTier = 'transcript';
 
 const MMI_PACKS = {
  transcript: [
- { id: 'mmi_transcript_1', label: '1 Transcript review', price: '$7.00', save: null },
- { id: 'mmi_transcript_5', label: '5 Transcript reviews', price: '$30.00', save: 'Save $5' },
- { id: 'mmi_transcript_10', label: '10 Transcript reviews', price: '$56.00', save: 'Save $14' },
+ { id: 'mmi_transcript_1', label: '1 Transcript review', price: '$14.00', save: null },
+ { id: 'mmi_transcript_5', label: '5 Transcript reviews', price: '$60.00', save: 'Save $10' },
+ { id: 'mmi_transcript_10', label: '10 Transcript reviews', price: '$112.00', save: 'Save $28' },
  ],
  premium: [
- { id: 'mmi_premium_1', label: '1 Premium review', price: '$12.00', save: null },
- { id: 'mmi_premium_5', label: '5 Premium reviews', price: '$54.00', save: 'Save 10%' },
- { id: 'mmi_premium_6', label: '6 Premium reviews', price: '$60.00', save: 'Save $12' },
- { id: 'mmi_premium_10', label: '10 Premium reviews', price: '$96.00', save: 'Save 20%' },
+ { id: 'mmi_premium_1', label: '1 Premium review', price: '$24.00', save: null },
+ { id: 'mmi_premium_5', label: '5 Premium reviews', price: '$108.00', save: 'Save 10%' },
+ { id: 'mmi_premium_6', label: '6 Premium reviews', price: '$120.00', save: 'Save $24' },
+ { id: 'mmi_premium_10', label: '10 Premium reviews', price: '$192.00', save: 'Save 20%' },
  ],
 };
 
@@ -2421,18 +2426,18 @@ const MMI_PRO_PRICES = {
 };
 
 const MMI_CREDIT_LABELS = {
- mmi_transcript_1: '1 Transcript Review - $7.00',
- mmi_transcript_5: '5 Transcript Reviews - $30.00',
- mmi_transcript_10: '10 Transcript Reviews - $56.00',
- mmi_premium_1: '1 Premium Review - $12.00',
- mmi_premium_5: '5 Premium Reviews - $54.00',
- mmi_premium_6: '6 Premium Reviews - $60.00',
- mmi_premium_10: '10 Premium Reviews - $96.00',
+ mmi_transcript_1: '1 Transcript Review - $14.00',
+ mmi_transcript_5: '5 Transcript Reviews - $60.00',
+ mmi_transcript_10: '10 Transcript Reviews - $112.00',
+ mmi_premium_1: '1 Premium Review - $24.00',
+ mmi_premium_5: '5 Premium Reviews - $108.00',
+ mmi_premium_6: '6 Premium Reviews - $120.00',
+ mmi_premium_10: '10 Premium Reviews - $192.00',
 };
 
 const MMI_CREDIT_PRICES = {
- mmi_transcript_1: '$7.00', mmi_transcript_5: '$30.00', mmi_transcript_10: '$56.00',
- mmi_premium_1: '$12.00', mmi_premium_5: '$54.00', mmi_premium_6: '$60.00', mmi_premium_10: '$96.00',
+ mmi_transcript_1: '$14.00', mmi_transcript_5: '$60.00', mmi_transcript_10: '$112.00',
+ mmi_premium_1: '$24.00', mmi_premium_5: '$108.00', mmi_premium_6: '$120.00', mmi_premium_10: '$192.00',
 };
 
 function switchMMITier(tier) {
