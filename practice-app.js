@@ -140,6 +140,7 @@ window.K2PracticeBridge = {
  getCurrentHistory: () => sessionHistory[currentIdx] || null,
  getSessionHistory: () => sessionHistory,
  getMediaDiagnostics: () => getMMIMediaDiagnostics(),
+ waitForRecordingReady: (opts) => waitForMMIRecordingReady(opts),
  setupSingleStation(station, mode, options = {}) {
  setMode(mode);
  if (mode === MODE_MMI) {

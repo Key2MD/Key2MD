@@ -1384,6 +1384,8 @@ function returnedFromCheckout(tier = config.tier) {
  byId('modeCasper')?.classList.remove('active-casper');
  byId('modeMMI')?.classList.remove('active-mmi');
  byId('modeMock')?.classList.add('active-mock');
+ const onboard = byId('mmiOnboardModal');
+ if (onboard) onboard.style.display = 'none';
  }
 
  function hideNormalPanels() {
@@ -2642,7 +2644,11 @@ function returnedFromCheckout(tier = config.tier) {
  let submission = null;
  if (item.type === 'video') {
  bridge.stopRecording?.();
+ if (typeof bridge.waitForRecordingReady === 'function') {
+ await bridge.waitForRecordingReady({ requireVideo: true });
+ } else {
  await sleep(650);
+ }
  submission = bridge.submitMockVideoReview?.() || null;
  } else {
  bridge.saveAnswer?.();
