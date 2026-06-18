@@ -353,10 +353,26 @@
       pace.textContent = label;
     }
 
+    function scrollToTopOf(id) {
+      var host = $(id);
+      if (!host) return;
+      // Defer so the swapped-in content has laid out (and the browser has clamped any
+      // scroll left over from a taller previous view) before we compute the target.
+      setTimeout(function () {
+        var header = document.querySelector(".k2-header");
+        var offset = (header && header.offsetHeight ? header.offsetHeight : 0) + 12;
+        var pageY = window.pageYOffset || document.documentElement.scrollTop || 0;
+        var y = host.getBoundingClientRect().top + pageY - offset;
+        if (y < 0) y = 0;
+        try { window.scrollTo({ top: y, behavior: "smooth" }); }
+        catch (e) { window.scrollTo(0, y); }
+      }, 60);
+    }
+
     function gotoStation(n) {
       if (n < 0 || n >= S.stations.length) return;
       S.idx = n; renderStation();
-      var host = $("mcqPractice"); if (host && host.scrollIntoView) host.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollToTopOf("mcqPractice");
     }
 
     function bindKeys() {
@@ -419,7 +435,7 @@
       saveLastResult(r);
       renderReview(r);
       hide("mcqPractice"); show("mcqReview");
-      var host = $("mcqReview"); if (host && host.scrollIntoView) host.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollToTopOf("mcqReview");
     }
 
     function renderReview(r) {

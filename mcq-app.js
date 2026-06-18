@@ -11,6 +11,19 @@
   function hide(id) { var el = $(id); if (el) el.style.display = "none"; }
   function setText(id, t) { var el = $(id); if (el) el.textContent = (t == null ? "" : t); }
   function fmt(s) { var m = Math.floor(s / 60), r = s % 60; return m + ":" + (r < 10 ? "0" : "") + r; }
+  function scrollToTopOf(id) {
+    var host = $(id);
+    if (!host) return;
+    setTimeout(function () {
+      var header = document.querySelector(".k2-header");
+      var offset = (header && header.offsetHeight ? header.offsetHeight : 0) + 12;
+      var pageY = window.pageYOffset || document.documentElement.scrollTop || 0;
+      var y = host.getBoundingClientRect().top + pageY - offset;
+      if (y < 0) y = 0;
+      try { window.scrollTo({ top: y, behavior: "smooth" }); }
+      catch (e) { window.scrollTo(0, y); }
+    }, 60);
+  }
 
   function init(cfg) {
     var session = null, selectedValue = null, revealed = false, totalTimer = null, startMs = 0;
@@ -121,9 +134,10 @@
       if (!revealed) { if (selectedValue === null) return; reveal(); return; }
       if (!session.next()) { finish(); return; }
       renderCurrent();
+      scrollToTopOf("mcqPractice");
     }
 
-    function finish() { stopTimer(); renderReview(session.finish()); hide("mcqPractice"); show("mcqReview"); }
+    function finish() { stopTimer(); renderReview(session.finish()); hide("mcqPractice"); show("mcqReview"); scrollToTopOf("mcqReview"); }
 
     function pctOf(b) { return b.answered ? Math.round((b.correct / b.answered) * 100) : 0; }
     function brkRow(label, b) {
