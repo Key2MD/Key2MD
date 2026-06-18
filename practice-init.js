@@ -1012,20 +1012,24 @@ function createMMIMockReviewSnapshot() {
  };
 }
 
-function buildMMIMockFormData(snapshot, frames, visualDegraded) {
+function buildMMIMockFormData(snapshot, frames, visualDegraded, skipVideo) {
  const transcriptBlob = snapshot.audioBlob || snapshot.uploadBlob;
  const audioFile = new File([transcriptBlob], 'recording-audio.webm', {
  type: transcriptBlob.type || 'audio/webm'
  });
  const fd = new FormData();
  fd.append('audio', audioFile);
- if (snapshot.requireVideoUpload && snapshot.recordingBlob) {
+ // skipVideo drops the large raw video so only the small audio (plus premium frames) is sent.
+ // Scoring needs audio + frames, not the raw video (which is only for playback), so on a weak
+ // connection the station still saves with full transcript and premium visual feedback.
+ const includeVideo = snapshot.requireVideoUpload && snapshot.recordingBlob && !skipVideo;
+ if (includeVideo) {
  const videoFile = new File([snapshot.recordingBlob], 'recording-video.webm', {
  type: snapshot.recordingBlob.type || 'video/webm'
  });
  fd.append('recording_video', videoFile);
  }
- fd.append('media_kind', snapshot.recordingBlob ? 'video' : 'audio');
+ fd.append('media_kind', includeVideo ? 'video' : 'audio');
  fd.append('station_id', snapshot.stationId);
  fd.append('station_category', snapshot.station.category || '');
  fd.append('station_scenario', snapshot.station.scenario || '');
@@ -1084,7 +1088,7 @@ function submitMMIMockReviewSilently() {
   const res = await fetchMMIReviewWithTimeout(API_BASE + '/api/mmi-review', {
   method: 'POST',
   headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-  body: buildMMIMockFormData(snapshot, frames, visualDegraded),
+  body: buildMMIMockFormData(snapshot, frames, visualDegraded, attempt > 1),
  });
  const data = await res.json().catch(() => ({}));
  if(!res.ok) {
@@ -1095,6 +1099,7 @@ function submitMMIMockReviewSilently() {
  }
  return {
  ...data,
+ audio_fallback: attempt > 1,
  feedback: data.feedback,
  visual_degraded: visualDegraded || !!data.visual_degraded,
  durationSec: snapshot.durationSec,

@@ -1787,6 +1787,8 @@ function returnedFromCheckout(tier = config.tier) {
  row.visualDegraded = !!data?.visual_degraded;
  row.processingError = data?.processing_error || data?.message || null;
  row.autoRepairError = null;
+ row.audioFallback = !!data?.audio_fallback;
+ if (row.audioFallback) showMockWarningToast('Your connection could not upload the video, so this station was saved as audio only. Your transcript feedback is unaffected.');
  } else {
  row.score = scoreValue(data?.score);
  row.feedback = data?.feedback || null;
@@ -2746,6 +2748,15 @@ function returnedFromCheckout(tier = config.tier) {
  advancing = false;
  transitionActive = false;
  renderStationSaveError(submittedRow, err, 'save_failed');
+ return;
+ }
+
+ // Block advancing past a video station whose recording did not save (belt-and-suspenders over
+ // the upload-failure handling above): a student must never move on with a lost station.
+ if (submittedRow.type === 'video' && !submittedRow.recordingKey) {
+ advancing = false;
+ transitionActive = false;
+ renderStationSaveError(submittedRow, new Error('This video station has not saved yet, so it cannot be skipped. Refresh to re-record it; on a weak connection it will now save as audio automatically.'), 'local_rescue');
  return;
  }
 
