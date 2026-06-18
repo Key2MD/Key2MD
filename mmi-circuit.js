@@ -80,6 +80,7 @@ const MMICircuit = (() => {
  function init() {
  renderConfigPanel();
  bindEvents();
+ loadMmiLimits();
  // Check URL param
  if (window.location.search.includes('tab=circuit')) {
  setTimeout(() => activateCircuitMode(), 100);
@@ -107,6 +108,7 @@ const MMICircuit = (() => {
  // Show circuit config panel
  const cp = document.getElementById('circuitConfigPanel');
  if (cp) cp.style.display = 'block';
+ loadMmiLimits();
  try { setTier(circuitTierAccess().premium ? 'premium' : 'transcript'); } catch (e) {}
 
  const mainContent = document.getElementById('mainContent') || document.querySelector('.main-content');
@@ -227,8 +229,23 @@ const MMICircuit = (() => {
  updateCreditDisplay();
  }
 
+ // MMI credits + Pro tier live at /api/mmi/limits, NOT /api/limits (which Key2MDAuth.getLimits()
+ // returns and which carries no MMI fields). Fetch the MMI limits directly and cache them so the
+ // tier UI and the start gate both read real balances and a real mmi_pro_tier.
+ let mmiLimitsCache = null;
+ async function loadMmiLimits() {
+ try {
+ const token = window.Key2MDAuth?.getToken?.();
+ if (!token) { mmiLimitsCache = null; return null; }
+ const base = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+ const res = await fetch(`${base}/api/mmi/limits`, { headers: { 'Authorization': `Bearer ${token}` } });
+ if (res.ok) mmiLimitsCache = await res.json();
+ } catch (e) { /* keep last known cache on a transient failure */ }
+ return mmiLimitsCache;
+ }
+
  function circuitTierAccess() {
- const limits = window.Key2MDAuth?.getLimits() || {};
+ const limits = mmiLimitsCache || {};
  // A non-null mmi_pro_tier from the limits API already means Pro is active (the worker gates it on
  // expiry server-side and the limits endpoint does not send mmi_pro_expires_at), so treat a truthy
  // tier as active and only apply the expiry guard when the field is actually present.
@@ -521,7 +538,7 @@ const MMICircuit = (() => {
  }
 
  const cfg = getConfig();
- const limits = window.Key2MDAuth?.getLimits();
+ const limits = await loadMmiLimits();
  const creditKey = cfg.tier === 'premium' ? 'mmi_premium_credits' : 'mmi_transcript_credits';
  const balance = limits ? (limits[creditKey] || 0) : null;
  const activePro = !!(limits && limits.mmi_pro_tier && (!limits.mmi_pro_expires_at || Number(limits.mmi_pro_expires_at) > Date.now()));

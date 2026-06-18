@@ -2653,6 +2653,15 @@ function returnedFromCheckout(tier = config.tier) {
  }
  }
 
+ function mockVideoRecordingSafe(row) {
+ if (!row) return false;
+ // Safe to advance if the server stored the recording (recordingKey) OR the review actually
+ // succeeded (feedback / transcript means the upload reached the server and was processed) OR it
+ // saved as an audio fallback. Only a total failure (no key, no feedback, no transcript) drops to
+ // the SOS rescue, so a genuinely lost recording is still caught.
+ return !!(row.recordingKey || row.feedback || (row.transcript && String(row.transcript).trim()) || row.audioFallback);
+ }
+
  async function completeAndAdvance(payload, token = stationToken) {
  if (token !== stationToken || advancing) return;
  advancing = true;
@@ -2716,7 +2725,7 @@ function returnedFromCheckout(tier = config.tier) {
  renderStationSaving(item.type);
  try {
  await feedbackTask;
- if (!submittedRow.recordingKey) {
+ if (!mockVideoRecordingSafe(submittedRow)) {
  submittedRow.localRescuePending = true;
  submittedRow.processingError = `${submittedRow.processingError || 'Video upload did not return a saved recording key.'} Ping SOS to Dan.`;
  saveMockDraft({ phase: 'analysis_missing_recording' });
@@ -2727,7 +2736,7 @@ function returnedFromCheckout(tier = config.tier) {
  return;
  }
  } catch (err) {
- if (submittedRow.type === 'video' && !submittedRow.recordingKey) {
+ if (submittedRow.type === 'video' && !mockVideoRecordingSafe(submittedRow)) {
  submittedRow.localRescuePending = true;
  submittedRow.processingError = `${submittedRow.processingError || 'Video upload did not complete.'} Ping SOS to Dan.`;
  saveMockDraft({ phase: 'analysis_failed' });
@@ -2753,7 +2762,7 @@ function returnedFromCheckout(tier = config.tier) {
 
  // Block advancing past a video station whose recording did not save (belt-and-suspenders over
  // the upload-failure handling above): a student must never move on with a lost station.
- if (submittedRow.type === 'video' && !submittedRow.recordingKey) {
+ if (submittedRow.type === 'video' && !mockVideoRecordingSafe(submittedRow)) {
  advancing = false;
  transitionActive = false;
  renderStationSaveError(submittedRow, new Error('This video station has not saved yet, so it cannot be skipped. Refresh to re-record it; on a weak connection it will now save as audio automatically.'), 'local_rescue');
