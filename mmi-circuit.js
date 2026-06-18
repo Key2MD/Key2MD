@@ -513,8 +513,10 @@ const MMICircuit = (() => {
  }
 
  async function startCircuit() {
+ try {
  if (!window.Key2MDAuth?.isLoggedIn()) {
- window.Key2MDAuth?.showAuthModal('signup');
+ if (window.Key2MDAuth?.showAuthModal) window.Key2MDAuth.showAuthModal('signup');
+ else if (window.showPracticeNotice) window.showPracticeNotice('Please sign in to start a mock circuit.', 'info');
  return;
  }
 
@@ -557,6 +559,12 @@ const MMICircuit = (() => {
 
  renderProgressBar();
  launchStation(0);
+ } catch (err) {
+ console.error('[MMICircuit] startCircuit failed:', err);
+ circuitActive = false;
+ if (window.showPracticeNotice) window.showPracticeNotice('Could not start the circuit (' + ((err && err.message) || 'unexpected error') + '). Please refresh and try again.', 'error');
+ else alert('Could not start the circuit. Please refresh and try again.');
+ }
  }
 
  function launchStation(idx) {
