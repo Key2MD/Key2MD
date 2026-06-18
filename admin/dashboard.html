@@ -2686,6 +2686,23 @@ async function api(path, opts={}) {
  return fetch(`${API}${path}`, {...opts, headers:h});
 }
 
+// Force-sync a user's MMI Pro from Stripe into their account row (fixes the case where a paid
+// MMI Pro sub never wrote mmi_pro_tier, so the circuit/limits show "no MMI Pro").
+async function reconcileMmiPro(userId, email) {
+ try {
+  const res = await api('/admin/users/reconcile-mmi-pro', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ user_id: userId, email }) });
+  const d = await res.json().catch(()=>({}));
+  if (res.ok && d.mmi_pro_tier) {
+   const exp = d.mmi_pro_expires_at ? ' until ' + new Date(Number(d.mmi_pro_expires_at)).toLocaleDateString() : '';
+   alert('MMI Pro synced: ' + d.mmi_pro_tier + exp + '. Reopen this user to see it.');
+  } else if (res.ok) {
+   alert(d.message || 'No active MMI Pro subscription found for this account.');
+  } else {
+   alert('Reconcile failed: ' + (d.message || d.error || ('HTTP ' + res.status)));
+  }
+ } catch (e) { alert('Reconcile error: ' + ((e && e.message) || e)); }
+}
+
 // ===== Marking calibration =====
 let calQueue = [];
 let calIdx = 0;
@@ -4504,6 +4521,7 @@ function renderUserDetail(det) {
  <button class="btn blue" onclick="openStudentReportForUser('${esc(u.id)}','student')">Student Report</button>
  <button class="btn blue" onclick='viewAsStudent(${jsArg(u.id)},${jsArg(u.email)})'>View as student</button>
  <button class="btn green" onclick="openMockPassModal('${esc(u.id)}','${esc(u.email)}')">Grant Mock</button>
+ <button class="btn blue" onclick="reconcileMmiPro('${esc(u.id)}','${esc(u.email)}')">Sync MMI Pro</button>
  <button class="btn blue" onclick="openCreditModal('${esc(u.id)}','${esc(u.email)}',${credits.find(c=>c.tool==='casper')?.balance||0},${credits.find(c=>c.tool==='gamsat')?.balance||0},${credits.find(c=>c.tool==='mmi_transcript')?.balance||0},${credits.find(c=>c.tool==='mmi_premium')?.balance||0})"> Credits</button>
  <button class="btn amber" onclick="openTierModal('${esc(u.id)}','${esc(u.email)}','${esc(u.tier||'free')}')">Tier</button>
  <button class="btn red" onclick='openDuplicateFlagModal(${jsArg(u.id)},${jsArg(u.email)})'>Restrict free use</button>
