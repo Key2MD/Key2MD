@@ -995,6 +995,9 @@ function syncIdleTimerPickers() {
 }
 
 function maybeShowMmiOnboarding() {
+ // Never show MMI onboarding ("Start my first station" / "I'll explore on my own") during a full
+ // mock - the mock reuses MMI mode for video stations and must stay a clean exam simulation.
+ if (window.K2_ACTIVE_CASPER_MOCK) return;
  try {
   if (localStorage.getItem('k2_mmi_onboarded') === '1') return;
   if ((parseInt(localStorage.getItem('k2_mmi_attempts') || '0', 10) || 0) > 0) { localStorage.setItem('k2_mmi_onboarded', '1'); return; }

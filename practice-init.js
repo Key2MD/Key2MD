@@ -441,7 +441,9 @@ function getMMIConfig() {
  cfg = { preset: mmiActivePreset, ...preset, promptCount: preset.promptCount || MMI_DEFAULT_PROMPT_COUNT };
  }
  // Verbal prompts force a one-question-at-a-time manual reveal so the examiner can read each one.
- if (mmiVerbalPrompts) { cfg.revealMode = 'extended_sequential'; cfg.verbalPrompts = true; }
+ // Never apply during a full mock: it would override the fixed exam timing and play a spoken
+ // examiner the real CASPer exam does not have.
+ if (mmiVerbalPrompts && !window.K2_ACTIVE_CASPER_MOCK) { cfg.revealMode = 'extended_sequential'; cfg.verbalPrompts = true; }
  return cfg;
 }
 
