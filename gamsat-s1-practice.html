@@ -370,8 +370,10 @@ footer p{font-size:0.8rem;color:rgba(255,255,255,0.5);margin:0;}
 <script src="mcq-engine.js"></script>
 <script src="gamsat-s1-questions.js"></script>
 <script src="mcq-station.js"></script>
+<script src="auth.js"></script>
 <script>
-MCQStation.init({
+var API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+var s1Station = MCQStation.init({
   perQuestionSeconds: 97,
   stationNoun: "station",
   categoryField: "genre",
@@ -384,15 +386,27 @@ MCQStation.init({
   difficulties: [
     { key: "easy", label: "Easy" },
     { key: "medium", label: "Medium" },
-    { key: "hard", label: "Hard" }
+    { key: "hard", label: "Hard" },
+    { key: "very_hard", label: "Very hard" }
   ],
   allDifficultyLabel: "Mixed",
+  gatedDifficulties: ["medium", "hard", "very_hard"],
+  storageKey: "mcqs_last_s1",
+  isAuthed: function () { return !!(window.Key2MDAuth && Key2MDAuth.isLoggedIn()); },
+  onAuthRequired: function () { if (window.Key2MDAuth) Key2MDAuth.showAuthModal('signup'); },
   categoryLabel: function (k) { return GAMSAT_S1_GENRES[k] || k; },
   subtypeLabel: function (cat, k) { return GAMSAT_S1_SKILLS[k] || k; },
   categoryPrompt: "Choose a genre",
   categoryHeading: "By genre",
   subtypeHeading: "By reasoning skill"
 });
+if (window.Key2MDAuth) {
+  Key2MDAuth.init({
+    tool: 'gamsat',
+    apiBase: API_BASE,
+    onAuthChange: function () { if (s1Station && s1Station.refreshGate) s1Station.refreshGate(); }
+  });
+}
 </script>
 </body>
 </html>

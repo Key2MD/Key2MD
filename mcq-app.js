@@ -9,7 +9,7 @@
   function $(id) { return document.getElementById(id); }
   function show(id) { var el = $(id); if (el) el.style.display = ""; }
   function hide(id) { var el = $(id); if (el) el.style.display = "none"; }
-  function setText(id, t) { var el = $(id); if (el && t) el.textContent = t; }
+  function setText(id, t) { var el = $(id); if (el) el.textContent = (t == null ? "" : t); }
   function fmt(s) { var m = Math.floor(s / 60), r = s % 60; return m + ":" + (r < 10 ? "0" : "") + r; }
 
   function init(cfg) {
@@ -137,23 +137,45 @@
       setText("mcqScoreSub", r.correct + " of " + r.answered + " correct");
       var cat = "";
       Object.keys(r.byCategory).forEach(function (k) { cat += brkRow(cfg.categoryLabel(k), r.byCategory[k]); });
-      $("mcqBreakdownCat").innerHTML = cat;
+      var catEl = $("mcqBreakdownCat"); if (catEl) catEl.innerHTML = cat;
       var sub = "";
       Object.keys(r.bySubtype).forEach(function (k) {
         var item = r.items.filter(function (it) { return it.subtype === k; })[0];
         sub += brkRow(cfg.subtypeLabel(item ? item.category : "", k), r.bySubtype[k]);
       });
-      $("mcqBreakdownSub").innerHTML = sub;
+      var subEl = $("mcqBreakdownSub"); if (subEl) subEl.innerHTML = sub;
       var s = Math.floor(r.totalMs / 1000), per = r.answered ? Math.round((r.totalMs / r.answered) / 1000) : 0;
       setText("mcqTimeStat", "Total " + fmt(s) + ", average " + per + "s per question");
     }
 
+    function bindKeys() {
+      document.addEventListener("keydown", function (e) {
+        var practice = $("mcqPractice");
+        if (!practice || practice.style.display === "none") return;
+        var tag = e.target && e.target.tagName;
+        if (tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT") return;
+        if (e.key === "Enter") {
+          var btn = $("mcqAction"); if (btn && !btn.disabled) { e.preventDefault(); btn.click(); }
+          return;
+        }
+        if (revealed) return;
+        var idx = -1;
+        if (/^[1-9]$/.test(e.key)) idx = parseInt(e.key, 10) - 1;
+        else if (/^[a-hA-H]$/.test(e.key)) idx = e.key.toUpperCase().charCodeAt(0) - 65;
+        if (idx < 0) return;
+        var qEl = $("mcqQ");
+        var opts = qEl ? qEl.querySelectorAll(".mcq-option") : [];
+        if (idx < opts.length) { e.preventDefault(); opts[idx].click(); }
+      });
+    }
+
     function boot() {
       buildSetup();
-      $("mcqStart").addEventListener("click", startPractice);
-      $("mcqAction").addEventListener("click", onAction);
-      $("mcqAgain").addEventListener("click", function () { hide("mcqReview"); show("mcqSetup"); });
-      $("mcqBack").addEventListener("click", function () { stopTimer(); hide("mcqPractice"); show("mcqSetup"); });
+      var start = $("mcqStart"); if (start) start.addEventListener("click", startPractice);
+      var action = $("mcqAction"); if (action) action.addEventListener("click", onAction);
+      var again = $("mcqAgain"); if (again) again.addEventListener("click", function () { hide("mcqReview"); show("mcqSetup"); });
+      var back = $("mcqBack"); if (back) back.addEventListener("click", function () { stopTimer(); hide("mcqPractice"); show("mcqSetup"); });
+      bindKeys();
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);

@@ -192,13 +192,23 @@
       if (!q || !q.stimulus) return "";
       var st = q.stimulus;
       var cap = st.caption || st.attribution || "";
-      var body = st.kind === "image"
-        ? '<img class="mcq-stimulus-img" alt="" src="' + escapeHtml(st.content) + '">'
-        : '<div class="mcq-stimulus-text">' + escapeHtml(st.content) + '</div>';
+      var body;
+      if (st.kind === "image") {
+        body = '<img class="mcq-stimulus-img" alt="' + escapeHtml(st.alt || st.caption || "") + '" src="' + escapeHtml(st.content) + '">';
+      } else if (st.kind === "svg" || st.kind === "table" || st.kind === "html") {
+        body = '<div class="mcq-stimulus-fig"' + (st.alt ? ' role="img" aria-label="' + escapeHtml(st.alt) + '"' : '') + '>' + st.content + '</div>';
+      } else {
+        body = '<div class="mcq-stimulus-text">' + escapeHtml(st.content) + '</div>';
+      }
       return '<div class="mcq-stimulus">' + body +
         (cap ? '<div class="mcq-stimulus-cap">' + escapeHtml(cap) + '</div>' : '') + '</div>';
     },
     questionHtml: function (q, scales) {
+      if (q.format === "drag_rank") {
+        return '<div class="mcq-question">' + Renderer.stimulusHtml(q) +
+          '<div class="mcq-stem">' + escapeHtml(q.stem) + '</div>' +
+          '<div class="mcq-empty">This drag-to-rank question type is not supported in this view yet.</div></div>';
+      }
       var opts = Renderer.optionList(q, scales);
       var letters = "ABCDEFGH";
       var optionHtml = opts.map(function (opt, i) {

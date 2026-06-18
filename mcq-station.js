@@ -22,7 +22,13 @@
     var noun = cfg.stationNoun || "station";
     var letters = "ABCDEFGH";
 
-    var S = { stations: [], idx: 0, ans: {}, submitted: {}, startMs: 0, raceOn: true, timer: null };
+    var S = { stations: [], idx: 0, ans: {}, submitted: {}, startMs: 0, raceOn: true, timer: null, keyBound: false };
+
+    var gatedDiffs = cfg.gatedDifficulties || [];
+    var storeKey = cfg.storageKey || ("mcqs_last_" + (categoryField || "x"));
+    function authed() { return cfg.isAuthed ? !!cfg.isAuthed() : true; }
+    function isGatedDiff(k) { return gatedDiffs.indexOf(k) !== -1; }
+    function promptAuth() { if (typeof cfg.onAuthRequired === "function") cfg.onAuthRequired(); }
 
     function getBank() { return cfg.getBank() || []; }
     function ansFor(qid) {
@@ -30,18 +36,21 @@
       return S.ans[qid];
     }
 
-    function pickRow(wrapId, items, field, allLabel) {
+    function pickRow(wrapId, items, field, allLabel, gating) {
       var wrap = $(wrapId);
       if (!wrap || !items) return;
       var counts = {};
       getBank().forEach(function (q) { counts[q[field]] = (counts[q[field]] || 0) + 1; });
       var html = '<button class="mcq-pick active" data-key="">' + esc(allLabel) + ' <span>' + getBank().length + '</span></button>';
       items.forEach(function (it) {
-        html += '<button class="mcq-pick" data-key="' + esc(it.key) + '">' + esc(it.label) + ' <span>' + (counts[it.key] || 0) + '</span></button>';
+        var lock = gating && isGatedDiff(it.key) && !authed();
+        html += '<button class="mcq-pick' + (lock ? " locked" : "") + '" data-key="' + esc(it.key) + '"' + (lock ? ' data-gated="1"' : '') + '>' +
+          esc(it.label) + ' <span>' + (counts[it.key] || 0) + '</span>' + (lock ? '<span class="mcqs-lock" aria-hidden="true">&#128274;</span>' : '') + '</button>';
       });
       wrap.innerHTML = html;
       wrap.querySelectorAll(".mcq-pick").forEach(function (b) {
         b.addEventListener("click", function () {
+          if (b.getAttribute("data-gated") === "1") { promptAuth(); return; }
           wrap.querySelectorAll(".mcq-pick").forEach(function (x) { x.classList.remove("active"); });
           b.classList.add("active");
         });
@@ -56,8 +65,48 @@
       setText("mcqCatPrompt", cfg.categoryPrompt);
       pickRow("mcqCats", cfg.categories, categoryField, cfg.allCategoryLabel || "All");
       if (cfg.subtypes) pickRow("mcqSubs", cfg.subtypes, subtypeField, cfg.allSubtypeLabel || "All");
-      if (cfg.difficulties && $("mcqDiff")) pickRow("mcqDiff", cfg.difficulties, "difficulty", cfg.allDifficultyLabel || "Mixed");
+      if (cfg.difficulties && $("mcqDiff")) pickRow("mcqDiff", cfg.difficulties, "difficulty", cfg.allDifficultyLabel || "Mixed", true);
       injectControls();
+      renderGateNote();
+      renderResumeCard();
+    }
+
+    function gatedCountInBank() {
+      var n = 0; getBank().forEach(function (q) { if (isGatedDiff(q.difficulty)) n++; }); return n;
+    }
+    function renderGateNote() {
+      var diff = $("mcqDiff"), setup = $("mcqSetup");
+      var existing = $("mcqsGateNote");
+      if (authed() || !gatedDiffs.length || !gatedCountInBank()) { if (existing && existing.parentNode) existing.parentNode.removeChild(existing); return; }
+      if (existing) return;
+      var note = document.createElement("p");
+      note.id = "mcqsGateNote";
+      note.className = "mcqs-gate-note";
+      note.innerHTML = 'Easy stations are free for everyone. <button type="button" class="mcqs-gate-link" id="mcqsGateLink">Create a free account</button> to unlock medium, hard and very hard.';
+      if (diff && diff.parentNode) diff.parentNode.insertBefore(note, diff.nextSibling);
+      else if (setup) setup.appendChild(note);
+      var link = $("mcqsGateLink"); if (link) link.addEventListener("click", promptAuth);
+    }
+    function saveLastResult(r) { try { localStorage.setItem(storeKey, JSON.stringify({ t: Date.now(), r: r })); } catch (e) {} }
+    function loadLastResult() {
+      try {
+        var raw = localStorage.getItem(storeKey); if (!raw) return null;
+        var o = JSON.parse(raw); if (!o || !o.r) return null;
+        if (Date.now() - (o.t || 0) > 7 * 864e5) return null;
+        return o.r;
+      } catch (e) { return null; }
+    }
+    function renderResumeCard() {
+      var setup = $("mcqSetup"); if (!setup) return;
+      var existing = $("mcqsResumeCard"); if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+      var r = loadLastResult(); if (!r) return;
+      var card = document.createElement("div");
+      card.id = "mcqsResumeCard"; card.className = "mcqs-resume";
+      card.innerHTML = '<span>Your last session scored <b>' + r.accuracy + '%</b> (' + r.correct + '/' + r.answered + ' answered).</span>' +
+        '<button type="button" class="btn btn-ghost" id="mcqsResumeBtn">View breakdown</button>';
+      setup.appendChild(card);
+      var btn = $("mcqsResumeBtn");
+      if (btn) btn.addEventListener("click", function () { renderReview(r); hide("mcqSetup"); show("mcqReview"); });
     }
 
     function injectControls() {
@@ -75,6 +124,7 @@
     function buildStations(bank, filter) {
       var order = [], map = {};
       bank.forEach(function (q) {
+        if (!authed() && isGatedDiff(q.difficulty)) return;
         if (filter.category && q[categoryField] !== filter.category) return;
         if (filter.subtype && q[subtypeField] !== filter.subtype) return;
         if (filter.difficulty && q.difficulty !== filter.difficulty) return;
@@ -92,6 +142,7 @@
       var c = activeKey("mcqCats"); if (c) filter.category = c;
       var s = cfg.subtypes ? activeKey("mcqSubs") : ""; if (s) filter.subtype = s;
       var d = $("mcqDiff") ? activeKey("mcqDiff") : ""; if (d) filter.difficulty = d;
+      if (!authed() && filter.difficulty && isGatedDiff(filter.difficulty)) { promptAuth(); return; }
       var stations = buildStations(bank, filter);
       if (!stations.length) { alert("No " + noun + "s match that filter yet."); return; }
       stations = shuffle(stations);
@@ -101,7 +152,7 @@
       S.raceOn = $("mcqsRaceToggle") ? !!$("mcqsRaceToggle").checked : true;
       S.startMs = Date.now();
       hide("mcqSetup"); hide("mcqReview"); show("mcqPractice");
-      buildShell(); startTimer(); renderStation();
+      buildShell(); bindKeys(); startTimer(); renderStation();
     }
 
     function buildShell() {
@@ -127,9 +178,14 @@
     function stimulusHtml(st) {
       if (!st) return "";
       var capn = st.caption || st.attribution || "";
-      var body = st.kind === "image"
-        ? '<img class="mcq-stimulus-img" alt="" src="' + esc(st.content) + '">'
-        : '<div class="mcq-stimulus-text">' + esc(st.content) + '</div>';
+      var body;
+      if (st.kind === "image") {
+        body = '<img class="mcq-stimulus-img" alt="' + esc(st.alt || st.caption || "") + '" src="' + esc(st.content) + '">';
+      } else if (st.kind === "svg" || st.kind === "table" || st.kind === "html") {
+        body = '<div class="mcq-stimulus-fig"' + (st.alt ? ' role="img" aria-label="' + esc(st.alt) + '"' : '') + '>' + st.content + '</div>';
+      } else {
+        body = '<div class="mcq-stimulus-text">' + esc(st.content) + '</div>';
+      }
       return '<div class="mcq-stimulus">' + body + (capn ? '<div class="mcq-stimulus-cap">' + esc(capn) + '</div>' : '') + '</div>';
     }
     function addedInfoHtml(text) {
@@ -303,6 +359,21 @@
       var host = $("mcqPractice"); if (host && host.scrollIntoView) host.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
+    function bindKeys() {
+      if (S.keyBound) return;
+      document.addEventListener("keydown", onKey);
+      S.keyBound = true;
+    }
+    function onKey(e) {
+      var practice = $("mcqPractice");
+      if (!practice || practice.style.display === "none") return;
+      var tag = e.target && e.target.tagName;
+      if (tag === "TEXTAREA" || tag === "INPUT" || tag === "SELECT") return;
+      if (e.key === "ArrowRight") { e.preventDefault(); gotoStation(S.idx + 1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); gotoStation(S.idx - 1); }
+      else if (e.key === "Enter") { var sb = $("mcqsSubmit"); if (sb) { e.preventDefault(); sb.click(); } }
+    }
+
     function startTimer() {
       stopTimer();
       S.timer = setInterval(function () { setText("mcqsTime", fmt((Date.now() - S.startMs) / 1000)); updatePace(); }, 500);
@@ -339,12 +410,14 @@
         perStation.push({ category: st.category, total: st.questions.length, correct: sc, answered: sAns });
       });
       return { total: total, answered: answered, correct: correct, accuracy: answered ? Math.round(correct / answered * 100) : 0,
-        byCategory: cats, bySubtype: subs, byDifficulty: diffs, subCat: subCat, perStation: perStation, elapsed: (Date.now() - S.startMs) / 1000 };
+        byCategory: cats, bySubtype: subs, byDifficulty: diffs, subCat: subCat, perStation: perStation, elapsed: (Date.now() - S.startMs) / 1000, raceOn: S.raceOn };
     }
 
     function finish() {
       stopTimer();
-      renderReview(computeResults());
+      var r = computeResults();
+      saveLastResult(r);
+      renderReview(r);
       hide("mcqPractice"); show("mcqReview");
       var host = $("mcqReview"); if (host && host.scrollIntoView) host.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -358,7 +431,8 @@
       if ($("mcqBreakdownSub")) $("mcqBreakdownSub").innerHTML = subH;
       var per = r.answered ? Math.round(r.elapsed / r.answered) : 0;
       var budget = r.total * perQ, delta = budget - r.elapsed;
-      var raceLine = S.raceOn
+      var raceOn = (typeof r.raceOn === "boolean") ? r.raceOn : S.raceOn;
+      var raceLine = raceOn
         ? " Pace budget was " + fmt(budget) + ", so you finished " + fmt(Math.abs(delta)) + (delta >= 0 ? " under." : " over.")
         : "";
       setText("mcqTimeStat", "Total " + fmt(r.elapsed) + ", average " + per + "s per answered question." + raceLine);
@@ -395,6 +469,8 @@
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
     else boot();
+
+    return { refreshGate: function () { buildSetup(); } };
   }
 
   window.MCQStation = { init: init };
