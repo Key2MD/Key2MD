@@ -747,6 +747,14 @@ function returnedFromCheckout(tier = config.tier) {
  clearMockDraft();
  return null;
  }
+ // A draft is only valid while the server still lists its attempt as the live in-progress one. Once an
+ // admin clears the attempt (or it expires / completes), the status no longer reports that attempt id,
+ // so the draft is orphaned and must be purged - this is what makes the admin "Clear mock" guaranteed
+ // to unstick a student after they reload. (Skipped only until status has loaded, to avoid a false drop.)
+ if (mockStatusCache && String(mockStatusCache.active_attempt_id || '') !== String(draft.attempt_id)) {
+ clearMockDraft();
+ return null;
+ }
  return draft;
  } catch {
  return null;

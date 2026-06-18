@@ -4522,6 +4522,7 @@ function renderUserDetail(det) {
  <button class="btn blue" onclick="openStudentReportForUser('${esc(u.id)}','student')">Student Report</button>
  <button class="btn blue" onclick='viewAsStudent(${jsArg(u.id)},${jsArg(u.email)})'>View as student</button>
  <button class="btn green" onclick="openMockPassModal('${esc(u.id)}','${esc(u.email)}')">Grant Mock</button>
+ <button class="btn amber" onclick='clearMockDraftForUser(${jsArg(u.id)},${jsArg(u.email)})'>Clear mock draft</button>
  <button class="btn blue" onclick="reconcileMmiPro('${esc(u.id)}','${esc(u.email)}')">Sync MMI Pro</button>
  <button class="btn blue" onclick="openCreditModal('${esc(u.id)}','${esc(u.email)}',${credits.find(c=>c.tool==='casper')?.balance||0},${credits.find(c=>c.tool==='gamsat')?.balance||0},${credits.find(c=>c.tool==='mmi_transcript')?.balance||0},${credits.find(c=>c.tool==='mmi_premium')?.balance||0})"> Credits</button>
  <button class="btn amber" onclick="openTierModal('${esc(u.id)}','${esc(u.email)}','${esc(u.tier||'free')}')">Tier</button>
@@ -10645,6 +10646,27 @@ async function resetPremiumMockPassForEmail(email, days = 30) {
  return data;
 }
 window.resetPremiumMockPassForEmail = resetPremiumMockPassForEmail;
+
+async function clearMockDraftForUser(userId, email) {
+ const label = email || userId || 'this student';
+ if (!confirm(`Clear ${label}'s in-progress Full CASPer Mock?\n\nThis expires any unfinished attempt on the server and restores their station counts (4 video / 7 typed) so they can restart from station 1. Their pass tier and expiry are kept. After this, the student must reload the mock page once - it will then drop their saved local draft automatically.`)) return;
+ try {
+ const res = await api('/admin/users/mock-pass', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ user_id: userId, clear_draft: true })
+ });
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) throw new Error(data?.message || data?.error || 'Clear failed');
+ const expired = Number(data.expired_in_progress_count || 0);
+ alert(`Cleared ${label}'s mock.\nExpired ${expired} unfinished attempt${expired === 1 ? '' : 's'} on the server.${data.pass_restored ? ' Pass restored to 4 video / 7 typed.' : ' (No pass on file.)'}\n\nNow tell the student to RELOAD the mock page once - their saved draft will clear itself automatically.`);
+ S.detailCache.clear();
+ await loadUsers();
+ } catch (e) {
+ alert('Could not clear mock draft: ' + (e?.message || e));
+ }
+}
+window.clearMockDraftForUser = clearMockDraftForUser;
 
 // ======================================================
 // CSV EXPORT
