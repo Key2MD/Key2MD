@@ -906,6 +906,8 @@ function returnedFromCheckout(tier = config.tier) {
  }
 
  function discardDraft() {
+ resetMockRuntimeState();
+ active = true;
  clearMockDraft();
  renderIdle();
  }
