@@ -525,9 +525,9 @@ const MMICircuit = (() => {
  const creditKey = cfg.tier === 'premium' ? 'mmi_premium_credits' : 'mmi_transcript_credits';
  const balance = limits ? (limits[creditKey] || 0) : null;
  const activePro = !!(limits && limits.mmi_pro_tier && (!limits.mmi_pro_expires_at || Number(limits.mmi_pro_expires_at) > Date.now()));
- const proCoversTier = activePro && (cfg.tier !== 'premium' || /premium/i.test(String(limits.mmi_pro_tier)));
-
- if (balance !== null && !proCoversTier && balance < cfg.size) {
+ // Any active MMI Pro tier (transcript or premium) gets a free pass into the circuit,
+ // whatever circuit tier is selected. Without Pro, it needs enough MMI credits.
+ if (balance !== null && !activePro && balance < cfg.size) {
  renderCreditPaywall(cfg, balance);
  return;
  }

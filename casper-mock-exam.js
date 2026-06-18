@@ -665,8 +665,48 @@ function returnedFromCheckout(tier = config.tier) {
  } catch {}
  }
 
+ // Recording reliability helpers. Phone/tablet browsers frequently capture a video but
+ // fail to upload a playable recording, which silently loses mock stations; warn up front.
+ function isLikelyMobileOrTablet() {
+ try {
+ const ua = navigator.userAgent || '';
+ if (/Mobi|Android|iPhone|iPod|iPad|Windows Phone|IEMobile|Tablet|Silk/i.test(ua)) return true;
+ if (/Macintosh/.test(ua) && Number(navigator.maxTouchPoints || 0) > 1) return true; // iPadOS reports as Mac
+ return false;
+ } catch (e) { return false; }
+ }
+ function deviceWarningHtml() {
+ if (!isLikelyMobileOrTablet()) return '';
+ return '<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:14px 16px;font-size:0.84rem;color:#991b1b;line-height:1.6;margin-bottom:18px;"><strong>Please use a laptop or desktop in Chrome for this mock.</strong> Phone and tablet browsers often fail to save the video recordings (the camera records, but the file will not upload), which can lose your stations. If you only have a phone and a station shows a save error, switch to a computer and ask Dan to reset your pass.</div>';
+ }
+ let _wasHiddenDuringVideo = false;
+ function onVideoStationNow() {
+ return started && sequence[index] && sequence[index].type === 'video';
+ }
+ function showMockWarningToast(msg) {
+ try {
+ let el = document.getElementById('mockWarnToast');
+ if (!el) {
+ el = document.createElement('div');
+ el.id = 'mockWarnToast';
+ el.style.cssText = 'position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:99999;background:#7c2d12;color:#fff;padding:12px 18px;border-radius:10px;font-size:0.86rem;font-weight:700;max-width:92%;box-shadow:0 8px 30px rgba(0,0,0,0.35);text-align:center;line-height:1.5;';
+ document.body.appendChild(el);
+ }
+ el.textContent = msg;
+ el.style.display = 'block';
+ clearTimeout(el._t);
+ el._t = setTimeout(() => { el.style.display = 'none'; }, 7000);
+ } catch (e) {}
+ }
+
  document.addEventListener('visibilitychange', () => {
  if (!started || !mockAttemptId) return;
+ if (document.visibilityState === 'hidden') {
+ if (onVideoStationNow()) _wasHiddenDuringVideo = true;
+ } else if (_wasHiddenDuringVideo && onVideoStationNow()) {
+ _wasHiddenDuringVideo = false;
+ showMockWarningToast('You left this tab during a video station. Switching tabs or apps can stop the recording. Keep this tab open and in front while recording, and re-record this station if you were mid-answer.');
+ }
  updateTelemetryVisibility();
  sendMockTelemetry(document.visibilityState === 'hidden' ? 'tab_hidden' : 'tab_visible', { keepalive: document.visibilityState === 'hidden' }).catch(() => {});
  });
@@ -1675,9 +1715,10 @@ function returnedFromCheckout(tier = config.tier) {
  ${ruleCard('Feedback', config.tier === 'premium' ? 'Premium includes transcript, voice, pacing, and presentation analysis for video stations.' : 'Transcript mock analyses what you said in video stations without voice or presentation scoring.')}
  ${ruleCard('Report', 'The final report compares your performance against the Key2MD cohort of serious, actively preparing applicants. It is a practice estimate, not an official Acuity result.')}
  </div>
+ ${deviceWarningHtml()}
  ${accessTimingSelectorHtml()}
  <div style="background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:14px 16px;font-size:0.82rem;color:var(--gray600);line-height:1.6;margin-bottom:18px;">
- Best setup: quiet room, charger plugged in, browser tab kept open, camera permission allowed, and no page refresh once the exam starts.
+ Best setup: a laptop or desktop in Chrome, quiet room, charger plugged in, browser tab kept open and in front, camera permission allowed, and no page refresh once the exam starts.
  </div>
  <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap;">
  <button type="button" onclick="FullCasperMock.activateMockMode()" style="padding:11px 18px;border-radius:50px;border:1px solid var(--gray200);background:#fff;color:var(--gray600);font-size:0.84rem;font-weight:800;cursor:pointer;font-family:inherit;">Back</button>

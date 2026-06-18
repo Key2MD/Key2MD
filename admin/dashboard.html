@@ -4444,6 +4444,30 @@ function renderUsers() {
  });
 }
 
+function entMockPassLine(mp) {
+ if (!mp) return '<div class="detail-box-row">Full Mock pass: <strong>none on file</strong></div>';
+ const exp = mp.expires_at ? ` | expires ${esc(formatMillisDate(mp.expires_at))}` : '';
+ const att = mp.active_attempt_id ? ` | attempt ${esc(String(mp.active_attempt_id).slice(0,8))}` : '';
+ let state;
+ if (mp.full_unused) state = `<strong style="color:#16a34a;">Full unused (${esc(mp.tier||'?')})</strong>`;
+ else if (mp.in_progress) state = `<strong style="color:#d97706;">In progress (${esc(mp.tier||'?')})</strong> | ${mp.video_remaining} video + ${mp.typed_remaining} typed left`;
+ else state = `<strong>${esc(mp.tier||'?')}</strong> | ${mp.video_remaining} video + ${mp.typed_remaining} typed left`;
+ return `<div class="detail-box-row">Full Mock pass: ${state}${exp}${att}</div>`;
+}
+function entitlementsBoxHtml(det, credits) {
+ const ent = det.entitlements || null;
+ const bal = (tool) => Number((credits.find(c=>c.tool===tool)||{}).balance || 0);
+ const rows = [];
+ rows.push(entMockPassLine(ent ? ent.mock_pass : null));
+ rows.push(`<div class="detail-box-row">Credits: CASPer <strong>${bal('casper')}</strong> | GAMSAT S2 <strong>${bal('gamsat')}</strong> | MMI transcript <strong>${bal('mmi_transcript')}</strong> | MMI premium <strong>${bal('mmi_premium')}</strong></div>`);
+ const g = ent && ent.gamsat_s2_pro, r = ent && ent.racgp_casper, cc = (ent && ent.casper_class) || {};
+ if (g) rows.push(`<div class="detail-box-row">GAMSAT S2 Pro: <strong>${esc(g.tier||'active')}</strong>${g.expires_at?` | until ${esc(formatMillisDate(g.expires_at))}`:''}</div>`);
+ if (r) rows.push(`<div class="detail-box-row">RACGP CASPer: <strong>${esc(r.tier||'active')}</strong>${r.expires_at?` | until ${esc(formatMillisDate(r.expires_at))}`:''}</div>`);
+ if (cc.subscription) rows.push(`<div class="detail-box-row">CASPer class sub: <strong>${esc(cc.subscription.status||'active')}</strong>${cc.subscription.expires_at?` | until ${esc(formatMillisDate(cc.subscription.expires_at))}`:''}</div>`);
+ if (cc.one_off && cc.one_off.remaining) rows.push(`<div class="detail-box-row">CASPer class credits: <strong>${cc.one_off.remaining}</strong></div>`);
+ const note = ent ? '' : '<div class="detail-box-row" style="color:#9ca3af;font-size:0.72rem;">Mock pass &amp; subscription detail appears once the updated worker is deployed.</div>';
+ return `<div class="detail-box"><div class="detail-box-hd">Owned &amp; remaining</div>${rows.join('')}${note}</div>`;
+}
 function renderUserDetail(det) {
  const u = det.user||{};
  const credits = det.credits||[];
@@ -4486,6 +4510,7 @@ function renderUserDetail(det) {
  <button class="btn" onclick="composeToUser('${esc(u.email)}')"> Email</button>
  </div>
  </div>
+ ${entitlementsBoxHtml(det, credits)}
  <div class="detail-box">
  <div class="detail-box-hd">Credits & Payments - ${fmtMoney(totalSpend)}</div>
  <table class="subtbl"><thead><tr><th>Tool</th><th>Balance</th><th>Updated</th></tr></thead><tbody>
