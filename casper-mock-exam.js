@@ -874,7 +874,8 @@ function returnedFromCheckout(tier = config.tier) {
  }));
  }
 
- function restoreDraft() {
+ async function restoreDraft() {
+ await refreshMockPassStatus().catch(() => {});
  const draft = readMockDraft();
  if (!draft) return;
  active = true;
