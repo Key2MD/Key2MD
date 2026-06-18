@@ -1018,7 +1018,13 @@ function returnedFromCheckout(tier = config.tier) {
  });
  if (!res.ok) return null;
  const status = await res.json().catch(() => null);
- if (status) mockStatusCache = status;
+ if (status) {
+ mockStatusCache = status;
+ // Lock the tier to the active pass so the video review never sends a tier the pass does not cover.
+ // A mismatch (e.g. premium selected on a transcript pass) makes the worker reject it as
+ // "pass not active yet", which is what forced the manual tier switch on entry.
+ if (status.tier === 'premium' || status.tier === 'transcript') config.tier = status.tier;
+ }
  return status;
  }
 

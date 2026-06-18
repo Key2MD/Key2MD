@@ -1100,7 +1100,10 @@ function setMode(mode) {
  : 'Configure your full CASPer mock exam below. Key2MD will assign your next unused private mock automatically.';
 
  if (!isCasper) {
- if (isMMI && mmiActivePreset === 'casperVideo') mmiActivePreset = 'quickfire';
+ // During a full mock, keep the casperVideo preset (10s read + 60s answer per question, 2 prompts) -
+ // remapping it to quickfire (15s/4 prompts) is what made the mock timing "mixed up". Only fall back
+ // to quickfire for normal MMI practice, where casperVideo is not a user-selectable option.
+ if (isMMI && !window.K2_ACTIVE_CASPER_MOCK && mmiActivePreset === 'casperVideo') mmiActivePreset = 'quickfire';
  $('readingSlider').min=30;$('readingSlider').max=180;$('readingSlider').value=120;
  $('writingSlider').min=60;$('writingSlider').max=600;$('writingSlider').value=300;
  $('readingVal').textContent='2:00';$('writingVal').textContent='5:00';

@@ -118,7 +118,8 @@ function mmiMethodType(category) {
 function mmiShowMethodPrimer(category) {
  const el = document.getElementById('mmiMethodPrimer');
  if (!el) return;
- if (currentMode !== MODE_MMI) { el.style.display = 'none'; return; }
+ // No coaching during a full mock - it must simulate the real exam (no "how to approach" primer).
+ if (currentMode !== MODE_MMI || window.K2_ACTIVE_CASPER_MOCK) { el.style.display = 'none'; return; }
  const primer = MMI_METHOD_PRIMERS[mmiMethodType(category)];
  if (!primer) { el.style.display = 'none'; return; }
  let attempts = 0;

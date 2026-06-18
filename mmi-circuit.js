@@ -584,6 +584,85 @@ const MMICircuit = (() => {
  }
  }
 
+ // Full MMI Mock: a paid, pass-gated run of the 8 hand-written server stations. Buying is disabled
+ // for now; a pass is granted via /admin/users/mmi-mock-pass while the product is finished. Reuses
+ // the circuit run loop, but stations come from the server and the gate is the mock pass (not credits).
+ async function startMock() {
+ try {
+ if (!window.Key2MDAuth?.isLoggedIn()) {
+ if (window.Key2MDAuth?.showAuthModal) window.Key2MDAuth.showAuthModal('signup');
+ else if (window.showPracticeNotice) window.showPracticeNotice('Please sign in to start your Full Mock.', 'info');
+ return;
+ }
+ const token = window.Key2MDAuth?.getToken?.();
+ const base = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+ const statusRes = await fetch(`${base}/api/mmi/mock/status`, { headers: { 'Authorization': `Bearer ${token}` } });
+ const status = await statusRes.json().catch(() => null);
+ if (!status?.has_pass) {
+ if (window.showPracticeNotice) window.showPracticeNotice('No active Full Mock pass on your account.', 'info');
+ return;
+ }
+ const stationsRes = await fetch(`${base}/api/mmi/mock/stations`, { headers: { 'Authorization': `Bearer ${token}` } });
+ const stationsData = await stationsRes.json().catch(() => null);
+ const rawStations = Array.isArray(stationsData?.stations) ? stationsData.stations : [];
+ if (!stationsRes.ok || !rawStations.length) {
+ if (window.showPracticeNotice) window.showPracticeNotice(stationsData?.message || 'Your Full Mock is not published yet. Please check back shortly.', 'info');
+ return;
+ }
+ // Normalise each station to the shape the engine reads (category + scenario + getPrompts), keeping
+ // both a prompts[] array and prompt1..promptN so it works whichever the loader uses.
+ const stations = rawStations.map((s, i) => {
+ const pr = Array.isArray(s.prompts) ? s.prompts.filter(Boolean) : [s.prompt1, s.prompt2, s.prompt3, s.prompt4, s.prompt5].filter(Boolean);
+ const o = { id: s.id || ('mock' + (i + 1)), category: s.category || 'MMI Station', scenario: s.scenario || '', prompts: pr };
+ pr.forEach((p, j) => { o['prompt' + (j + 1)] = p; });
+ return o;
+ });
+ circuitConfig = {
+ size: stations.length,
+ tier: status.tier === 'premium' ? 'premium' : 'transcript',
+ preset: 'standard',
+ specialistMode: false,
+ weaknessMode: false,
+ fullMock: true,
+ mockExamSlug: status.exam_slug || stationsData.exam_slug || '',
+ };
+ circuitResults = [];
+ circuitIdx = 0;
+ circuitActive = true;
+ circuitStations = stations;
+ renderProgressBar();
+ launchStation(0);
+ } catch (err) {
+ console.error('[MMICircuit] startMock failed:', err);
+ if (window.showPracticeNotice) window.showPracticeNotice('Could not start your Full Mock (' + ((err && err.message) || 'unexpected error') + '). Please refresh and try again.', 'error');
+ }
+ }
+
+ // Best-effort entry card for a pass-holder (no buy button - purchasing is disabled until launch).
+ async function checkMockEntry() {
+ try {
+ const token = window.Key2MDAuth?.getToken?.();
+ if (!token) return;
+ const base = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+ const res = await fetch(`${base}/api/mmi/mock/status`, { headers: { 'Authorization': `Bearer ${token}` } });
+ const status = await res.json().catch(() => null);
+ const host = document.getElementById('circuitConfigPanel');
+ const existing = document.getElementById('mmiMockEntryCard');
+ if (!status?.has_pass) { if (existing) existing.remove(); return; }
+ if (existing || !host) return;
+ const card = document.createElement('div');
+ card.id = 'mmiMockEntryCard';
+ card.style.cssText = 'background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(14,165,233,0.05));border:1.5px solid rgba(124,58,237,0.25);border-radius:16px;padding:20px 22px;margin-bottom:16px;';
+ card.innerHTML = `
+ <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#7c3aed;margin-bottom:6px;">Full MMI Mock - ${status.tier === 'premium' ? 'Premium' : 'Transcript'}</div>
+ <div style="font-size:1rem;font-weight:800;color:var(--navy);margin-bottom:4px;">${status.started ? 'Continue your Full Mock' : 'Start your Full Mock'}</div>
+ <div style="font-size:0.82rem;color:var(--gray600);line-height:1.55;margin-bottom:14px;">${status.stations_total || 8} hand-written stations, marked back-to-back with a full cross-station report at the end.</div>
+ <button onclick="MMICircuit.startMock()" style="padding:12px 26px;border-radius:50px;border:none;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;">Begin Full Mock</button>
+ `;
+ host.insertBefore(card, host.firstChild);
+ } catch (e) { /* entry is best-effort */ }
+ }
+
  function launchStation(idx) {
  circuitIdx = idx;
  const station = circuitStations[idx];
@@ -766,6 +845,7 @@ const MMICircuit = (() => {
 
  async function generateDebrief() {
  if (window._circuitDebriefInterval) clearInterval(window._circuitDebriefInterval);
+ if (circuitConfig && circuitConfig.fullMock) { await generateMockReport(); return; }
  // Lite overview computed locally; the richer cross-station analysis is reserved for the paid full mock.
  const stationScores = circuitResults.map(r => Number(r.feedback?.overall?.score)).filter(n => Number.isFinite(n));
  const avgScore = stationScores.length ? (stationScores.reduce((a, b) => a + b, 0) / stationScores.length) : null;
@@ -779,6 +859,30 @@ const MMICircuit = (() => {
  if (avg >= 2.5) return 'Satisfactory';
  if (avg >= 1.75) return 'Unsatisfactory';
  return 'Poor';
+ }
+
+ // Full Mock report: the full cross-station AI analysis (reserved from the lite circuit). Calls the
+ // worker debrief endpoint, then renderDebrief renders the rich sections because circuitConfig.fullMock.
+ async function generateMockReport() {
+ renderDebriefLoading();
+ if (window._circuitDebriefInterval) clearInterval(window._circuitDebriefInterval);
+ const debriefPrompt = buildDebriefPrompt();
+ const token = window.Key2MDAuth?.getToken?.();
+ const reviewIds = circuitResults.map(r => r.reviewId).filter(Boolean);
+ const base = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+ try {
+ const res = await fetch(`${base}/api/mmi/circuit-debrief`, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+ body: JSON.stringify({ prompt: debriefPrompt, review_ids: reviewIds, circuit_meta: { station_count: circuitConfig.size, tier: circuitConfig.tier, full_mock: true } }),
+ });
+ const data = await res.json();
+ if (!res.ok || !data.debrief) { console.error('Mock report failed:', data); renderDebriefError(); return; }
+ renderDebrief(data.debrief);
+ } catch (err) {
+ console.error('Mock report failed:', err);
+ renderDebriefError();
+ }
  }
 
  function buildDebriefPrompt() {
