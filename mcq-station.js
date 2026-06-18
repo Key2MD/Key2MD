@@ -124,6 +124,7 @@
     function buildStations(bank, filter) {
       var order = [], map = {};
       bank.forEach(function (q) {
+        if (q.aiImagePending) return;
         if (!authed() && isGatedDiff(q.difficulty)) return;
         if (filter.category && q[categoryField] !== filter.category) return;
         if (filter.subtype && q[subtypeField] !== filter.subtype) return;

@@ -12,11 +12,11 @@ const MMICircuit = (() => {
  const REST_SECONDS = 120; // 2-min rest between stations
  const CIRCUIT_SIZES = [4, 5, 6, 8];
  const BUNDLE_SIZES = { transcript: 5, premium: 6 };
- const BUNDLE_PRICES = { transcript: 30, premium: 60 };
+ const BUNDLE_PRICES = { transcript: 60, premium: 120 };
  const BUNDLE_PACK_IDS = { transcript: 'mmi_transcript_5', premium: 'mmi_premium_6' };
 
- // Pricing display (mirrors CREDIT_PACKS in worker)
- const CREDIT_PRICE = { transcript: 7, premium: 12 };
+ // Pricing display only - MUST mirror MMI_CREDIT_PACKS in the worker (the source of truth).
+ const CREDIT_PRICE = { transcript: 14, premium: 24 };
 
  // -- State -----------------------------------------------------
  let circuitActive = false;
@@ -229,7 +229,10 @@ const MMICircuit = (() => {
 
  function circuitTierAccess() {
  const limits = window.Key2MDAuth?.getLimits() || {};
- const activePro = !!(limits.mmi_pro_tier && Number(limits.mmi_pro_expires_at || 0) > Date.now());
+ // A non-null mmi_pro_tier from the limits API already means Pro is active (the worker gates it on
+ // expiry server-side and the limits endpoint does not send mmi_pro_expires_at), so treat a truthy
+ // tier as active and only apply the expiry guard when the field is actually present.
+ const activePro = !!(limits.mmi_pro_tier && (!limits.mmi_pro_expires_at || Number(limits.mmi_pro_expires_at) > Date.now()));
  const proPremium = activePro && /premium/i.test(String(limits.mmi_pro_tier));
  const tCred = Number(limits.mmi_transcript_credits || 0);
  const pCred = Number(limits.mmi_premium_credits || 0);
@@ -519,7 +522,7 @@ const MMICircuit = (() => {
  const limits = window.Key2MDAuth?.getLimits();
  const creditKey = cfg.tier === 'premium' ? 'mmi_premium_credits' : 'mmi_transcript_credits';
  const balance = limits ? (limits[creditKey] || 0) : null;
- const activePro = !!(limits && limits.mmi_pro_tier && Number(limits.mmi_pro_expires_at || 0) > Date.now());
+ const activePro = !!(limits && limits.mmi_pro_tier && (!limits.mmi_pro_expires_at || Number(limits.mmi_pro_expires_at) > Date.now()));
  const proCoversTier = activePro && (cfg.tier !== 'premium' || /premium/i.test(String(limits.mmi_pro_tier)));
 
  if (balance !== null && !proCoversTier && balance < cfg.size) {

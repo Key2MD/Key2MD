@@ -63,6 +63,7 @@
     function applyFilter(filter) {
       var f = normaliseFilter(filter);
       return allQuestions.filter(function (q) {
+        if (q.aiImagePending) return false;
         if (f.category && q[categoryField] !== f.category) return false;
         if (f.subtype && q[subtypeField] !== f.subtype) return false;
         if (f.difficulty && q.difficulty !== f.difficulty) return false;
