@@ -804,3 +804,8 @@ const Key2MDAuth = (() => {
  _doForgot,
  };
 })();
+
+// Key2MDAuth is a top-level const, which is a global lexical binding but NOT a window
+// property. Modules that reference it as window.Key2MDAuth (mmi-circuit.js,
+// casper-mock-exam.js, mmi-tts.js, mmi-feedback-render.js) need it exposed here.
+if (typeof window !== 'undefined') window.Key2MDAuth = Key2MDAuth;
