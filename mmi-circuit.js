@@ -594,30 +594,39 @@ const MMICircuit = (() => {
  // Make sure the native MMI recording UI (hidden during rest/debrief) is back.
  showNativePracticeUI();
 
- // Override the global MMI state so the existing recording machinery runs
- // We inject the station into the global pool at index 0 so loadStation() picks it up
- if (window.setMode) window.setMode('mmi');
-
- // Directly configure the MMI engine state variables used by practice.html
- window.mmiCurrentPrompts = getPrompts(station);
- window.mmiSpecialistMode = circuitConfig.specialistMode;
- window.mmiPremiumMode = circuitConfig.tier === 'premium';
-
- // Set the active preset so the engine uses correct timing
- if (window.selectMMIPreset) window.selectMMIPreset(circuitConfig.preset);
- if (window.mmiActivePreset !== undefined) window.mmiActivePreset = circuitConfig.preset;
-
- // Inject station into the global pool so the existing UI renders it
- window.pool = [station];
- window.currentIdx = 0;
- window.sessionActive = true;
-
  // Route the marked result straight to the circuit. submitMMIForFeedback checks
  // for this hook on its 'done' stage and skips the prediction/feedback UI, so no
  // per-station feedback is shown during the run (the circuit is a true mock).
  window._circuitCapture = (data) => onStationComplete(data, station);
 
+ // Load the station through the practice bridge, exactly like the CASPer mock's video
+ // stations (beginVideoStation in casper-mock-exam.js). setupSingleStation sets the engine's
+ // OWN state (pool, currentIdx, sessionActive, premium/specialist, preset) and initialises the
+ // webcam, then loads the station. The previous manual window.* injection set several values
+ // the engine reads as bare module variables (sessionActive, mmiPremiumMode, mmiSpecialistMode)
+ // and never initialised the webcam, so the station could not actually start.
+ const bridge = window.K2PracticeBridge;
+ if (bridge && typeof bridge.setupSingleStation === 'function') {
+ bridge.setupSingleStation(station, 'mmi', {
+ preset: circuitConfig.preset,
+ premium: circuitConfig.tier === 'premium',
+ specialist: !!circuitConfig.specialistMode,
+ promptCount: getPrompts(station).length,
+ });
+ const webcam = document.getElementById('webcamPanel');
+ if (webcam) { webcam.classList.add('show'); webcam.style.display = ''; }
+ // setMode('mmi') (inside setupSingleStation) re-shows the normal practice chrome; re-hide the
+ // non-recording cards so the circuit keeps its takeover (the recording UI stays visible).
+ ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','mmiCircuitCard','casperClassCard','startBtn','bottomRail'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+ } else {
+ // Legacy fallback if the bridge is unavailable.
+ if (window.setMode) window.setMode('mmi');
+ if (window.selectMMIPreset) window.selectMMIPreset(circuitConfig.preset);
+ window.pool = [station];
+ window.currentIdx = 0;
+ window.sessionActive = true;
  if (window.loadStation) window.loadStation();
+ }
  }
 
  function getPrompts(station) {
