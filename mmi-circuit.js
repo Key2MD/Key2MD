@@ -748,34 +748,20 @@ const MMICircuit = (() => {
  // -- Debrief generation ----------------------------------------
 
  async function generateDebrief() {
- renderDebriefLoading();
  if (window._circuitDebriefInterval) clearInterval(window._circuitDebriefInterval);
-
- const debriefPrompt = buildDebriefPrompt();
- const token = window.Key2MDAuth?.getToken();
- const reviewIds = circuitResults.map(r => r.reviewId).filter(Boolean);
- const base = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
-
- try {
- const res = await fetch(`${base}/api/mmi/circuit-debrief`, {
- method: 'POST',
- headers: {
- 'Content-Type': 'application/json',
- 'Authorization': `Bearer ${token}`,
- },
- body: JSON.stringify({ prompt: debriefPrompt, review_ids: reviewIds, circuit_meta: { station_count: circuitConfig.size, tier: circuitConfig.tier } }),
- });
- const data = await res.json();
- if (!res.ok || !data.debrief) {
- console.error('Circuit debrief failed:', data);
- renderDebriefError();
- return;
+ // Lite overview computed locally; the richer cross-station analysis is reserved for the paid full mock.
+ const stationScores = circuitResults.map(r => Number(r.feedback?.overall?.score)).filter(n => Number.isFinite(n));
+ const avgScore = stationScores.length ? (stationScores.reduce((a, b) => a + b, 0) / stationScores.length) : null;
+ renderDebrief({ overall_band: bandFromAvgScore(avgScore) });
  }
- renderDebrief(data.debrief);
- } catch (err) {
- console.error('Circuit debrief failed:', err);
- renderDebriefError();
- }
+
+ function bandFromAvgScore(avg) {
+ if (avg == null) return 'Complete';
+ if (avg >= 4.25) return 'Excellent';
+ if (avg >= 3.5) return 'Good';
+ if (avg >= 2.5) return 'Satisfactory';
+ if (avg >= 1.75) return 'Unsatisfactory';
+ return 'Poor';
  }
 
  function buildDebriefPrompt() {
@@ -827,6 +813,8 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  Unsatisfactory: '#ea580c', Poor: '#dc2626',
  };
  const bandColor = BAND_COLORS[d.overall_band] || '#6b7280';
+ const summaryScores = circuitResults.map(r => Number(r.feedback?.overall?.score)).filter(n => Number.isFinite(n));
+ const summaryAvg = summaryScores.length ? (summaryScores.reduce((a, b) => a + b, 0) / summaryScores.length) : null;
  const TREND_ICONS = { consistent: '->', improving: '', declining: '', variable: 'up/down' };
  const TREND_COLORS = { consistent: '#6b7280', improving: '#16a34a', declining: '#dc2626', variable: '#d97706' };
 
@@ -895,51 +883,8 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  <div style="display:inline-block;font-size:2rem;font-weight:900;color:${bandColor};background:${bandColor}15;padding:8px 28px;border-radius:50px;border:2px solid ${bandColor}40;margin-bottom:12px;">
  ${d.overall_band}
  </div>
- <p style="color:var(--gray600);font-size:0.92rem;line-height:1.7;max-width:540px;margin:0 auto;">${d.real_day_estimate}</p>
+ ${summaryAvg != null ? ('<p style="color:var(--gray600);font-size:0.95rem;line-height:1.7;max-width:540px;margin:0 auto;">Average <strong style="color:var(--navy);">' + summaryAvg.toFixed(1) + ' / 5</strong> across ' + summaryScores.length + ' marked station' + (summaryScores.length === 1 ? '' : 's') + '. Open each station below for its full marking.</p>') : ''}
  </div>
-
- <!-- The One Thing -->
- <div style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:16px;padding:24px 28px;margin-bottom:24px;">
- <div style="font-size:0.65rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:10px;">The one thing to fix before your real interview</div>
- <div style="font-size:1.05rem;font-weight:700;line-height:1.6;">${d.the_one_thing}</div>
- </div>
-
- <!-- Grid: criterion heatmap + category performance -->
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;">
- <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);margin-bottom:16px;">Criterion Heatmap</div>
- ${criterionRows}
- </div>
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;">
- <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);margin-bottom:14px;">Performance by Category</div>
- ${categoryRows}
- <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--gray100);">
- <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:6px;">
- <span style="color:var(--gray500);">Best station: <strong style="color:var(--navy);">${d.strongest_station?.category || '-'}</strong></span>
- <span style="color:#16a34a;font-weight:600;">S${(d.strongest_station?.station_idx ?? 0) + 1}</span>
- </div>
- <div style="display:flex;justify-content:space-between;font-size:0.78rem;">
- <span style="color:var(--gray500);">Needs work: <strong style="color:var(--navy);">${d.weakest_station?.category || '-'}</strong></span>
- <span style="color:#dc2626;font-weight:600;">S${(d.weakest_station?.station_idx ?? 0) + 1}</span>
- </div>
- </div>
- </div>
- </div>
-
- <!-- Stamina -->
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
- <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);margin-bottom:4px;">Stamina Pattern</div>
- ${staminaBlock}
- </div>
-
- <!-- Cross-station patterns -->
- ${patternsList ? `
- <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
- <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);margin-bottom:12px;">Cross-station Patterns</div>
- <ul style="padding:0 0 0 18px;margin:0;">${patternsList}</ul>
- </div>` : ''}
-
- ${polishedBlock}
 
  <!-- Per-station results (expandable) -->
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
