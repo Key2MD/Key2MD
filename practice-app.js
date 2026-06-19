@@ -371,6 +371,8 @@ function updateLimitUI(){
  if(el){el.textContent='MMI access shown below';el.className='ai-limit-count';}
  if(fill){fill.style.width='100%';fill.className='ai-limit-fill';}
  if(noteEl) noteEl.textContent='MMI uses its own transcript/premium credits. CASPer AI credits are separate and are hidden here.';
+ // The status badge otherwise keeps its stale CASPer "Free - 1/day" value in MMI mode; updateMMILimitsUI sets the real MMI access below.
+ if(statusEl) statusEl.innerHTML='<span class="sdot sdot-green"></span>MMI mode';
  if(creditWrap) creditWrap.style.display='none';
  if(buyBtn) buyBtn.style.display='none';
  updateMMILimitsUI();

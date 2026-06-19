@@ -1297,6 +1297,12 @@ async function updateMMILimitsUI() {
  ? `MMI ${tierLabel} Pro active.`
  : `${rawCredits ?? access.remaining ?? 0} ${tierLabel.toLowerCase()} credit${Number(rawCredits ?? access.remaining ?? 0) === 1 ? '' : 's'} available.`;
  }
+ // Don't show a paying Pro / credit holder the "Credits Required" explainer - it reads as "you have no access".
+ const creditsRequiredNote = document.getElementById('mmiCreditsRequiredNote');
+ if (creditsRequiredNote) {
+ const hasMMIAccess = !!(data.transcript?.unlimited || data.premium?.unlimited || (data.mmi_transcript_credits || 0) > 0 || (data.mmi_premium_credits || 0) > 0);
+ creditsRequiredNote.style.display = hasMMIAccess ? 'none' : '';
+ }
  if(freeBanner) {
  const hasOtherAccess = access.unlimited || (rawCredits || 0) > 0;
  const showFree = !hasOtherAccess && data.mmi_free_review_available;
@@ -1311,6 +1317,17 @@ async function updateMMILimitsUI() {
  if (pDisc) pDisc.style.display = 'block';
  if (!ffmpegLoaded && !ffmpegLoading) loadFFmpeg();
  }
+ }
+ // Reflect MMI access in the "AI Marking" status badge so a Pro/credit holder in MMI mode never reads as "Free - 1/day".
+ const mmiStatusBadge = document.getElementById('aiStatusEl');
+ if (mmiStatusBadge && typeof currentMode !== 'undefined' && currentMode === MODE_MMI) {
+ let badgeText;
+ if (data.premium?.unlimited) badgeText = 'MMI Premium Pro - Unlimited';
+ else if (data.transcript?.unlimited) badgeText = 'MMI Pro - Unlimited';
+ else if ((data.mmi_premium_credits || 0) > 0 || (data.mmi_transcript_credits || 0) > 0) badgeText = 'MMI - Credits available';
+ else if (data.mmi_free_review_available) badgeText = 'MMI - First review free';
+ else badgeText = 'MMI - Credits needed';
+ mmiStatusBadge.innerHTML = '<span class="sdot sdot-green"></span>' + badgeText;
  }
  } catch {}
 }
