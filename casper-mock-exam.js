@@ -1766,6 +1766,39 @@ function returnedFromCheckout(tier = config.tier) {
  `;
  }
 
+ function renderDebriefError(err) {
+ const area = ensureMainArea();
+ if (!area) return;
+ area.style.display = 'block';
+ try {
+ saveMockAttempt(buildRows(), latestReport, 'completed').then(() => clearMockDraft()).catch(() => {});
+ } catch (saveErr) {
+ console.warn('Mock save during report recovery failed', saveErr);
+ }
+ const detail = esc(err?.message || 'The report could not be assembled in this browser.');
+ area.innerHTML = `
+ <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:34px 32px;text-align:center;max-width:660px;margin:0 auto;">
+ <div style="font-size:0.72rem;font-weight:850;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:8px;">Your mock is saved</div>
+ <h2 style="font-size:1.4rem;color:var(--navy);line-height:1.3;margin:0 0 10px;">Every station saved, but the final report could not finish drawing here.</h2>
+ <p style="font-size:0.9rem;color:var(--gray600);line-height:1.65;margin:0 auto 8px;max-width:560px;">Your recordings, typed answers, and AI feedback are stored on your account. This was a display problem at the last step, not lost work. You can reopen the report from your history, and Dan can rebuild it from admin if needed.</p>
+ <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+ <button type="button" onclick="FullCasperMock.showPartialReportNow()" style="padding:11px 20px;border-radius:50px;border:1px solid var(--gray200);background:#fff;color:var(--navy);font-size:0.86rem;font-weight:850;cursor:pointer;font-family:inherit;">Try building the report again</button>
+ <a href="/history.html" style="padding:11px 20px;border-radius:50px;border:none;background:var(--navy);color:#fff;font-size:0.86rem;font-weight:850;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;">Open your mock history</a>
+ </div>
+ <div style="font-family:var(--mono);font-size:0.68rem;color:var(--gray400);line-height:1.5;margin-top:16px;word-break:break-word;">${detail}</div>
+ </div>
+ `;
+ }
+
+ function safeStationReviewHtml(row) {
+ try {
+ return stationReviewHtml(row);
+ } catch (err) {
+ console.error('Mock station render failed:', err, row);
+ return `<div class="k2mr-notice" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.25);"><strong style="color:var(--red);">This station could not render.</strong> The rest of your report is below, and the station is still saved to your account.</div>`;
+ }
+ }
+
  function withAnalysisTimeout(promise, row) {
  const label = `${row.type === 'video' ? 'Video' : 'Typed'} ${stationShort(row)}`;
  return Promise.race([
@@ -2141,7 +2174,8 @@ function returnedFromCheckout(tier = config.tier) {
 
  function showPartialReportNow() {
  renderDebrief({ skipAnalysisWait: true }).catch(err => {
- console.warn('Partial mock report failed', err);
+ console.error('Partial mock report failed', err);
+ renderDebriefError(err);
  });
  }
 
@@ -2304,7 +2338,10 @@ function returnedFromCheckout(tier = config.tier) {
  async function launchCurrent() {
  const item = sequence[index];
  if (!item) {
- renderDebrief();
+ renderDebrief().catch(err => {
+ console.error('Mock debrief failed:', err);
+ renderDebriefError(err);
+ });
  return;
  }
 
@@ -3483,6 +3520,7 @@ const report = { rows, overallAvg, scoredCount, expectedCount, isPartial: scored
  await settleFinalAnalysisTasks({ skipWait: !!options.skipAnalysisWait });
  if (renderToken !== debriefRenderToken) return;
 
+ try {
  const rows = buildRows();
  const typed = rows.filter(r => r.type === 'typed');
  const videos = rows.filter(r => r.type === 'video');
@@ -3612,6 +3650,11 @@ const partialAnalyses = completedAnalyses < rows.length;
  const status = byId('mockManualReviewStatus');
  if (status) status.textContent = `Mock report visible. Manual review checkout will retry saving if needed: ${err.message}`;
  });
+ } catch (err) {
+ if (renderToken !== debriefRenderToken) return;
+ console.error('Mock debrief render failed:', err);
+ renderDebriefError(err);
+ }
  }
 
  function card(title, body, extra = '') {
@@ -3658,7 +3701,7 @@ function renderPartialReportNotice(rows) {
        <div class="k2mr-tabs">${tabs}</div>
       </div>
       <div class="k2mr-explorer-body">
-       <div id="mockStationReviewPanel">${stationReviewHtml(rows[0])}</div>
+       <div id="mockStationReviewPanel">${safeStationReviewHtml(rows[0])}</div>
       </div>
      </section>
     `;
