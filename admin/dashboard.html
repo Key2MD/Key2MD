@@ -7244,10 +7244,30 @@ async function saveCasperClass() {
 }
 
 async function runCasperClassEmailCheck() {
- if (!confirm('Run the CASPer class email check now? If the private link is pasted and students are authorised, this will email them immediately.')) return;
+ if (!confirm('Save the current class details (including the pasted link) and run the CASPer class email check now? If the link is present and students are authorised, this will email them immediately.')) return;
  const status = document.getElementById('ccStatus');
- if (status) status.textContent = 'Running email check...';
+ if (status) status.textContent = 'Saving link, then running email check...';
  try {
+ // The email run reads the Worker's SAVED settings, not the text boxes, so persist the current
+ // fields (including the pasted link) first. This prevents a "Link missing" result when a link
+ // has been pasted but not yet saved.
+ const expiresAt = datetimeLocalToMs(document.getElementById('ccExpiresAt')?.value || '');
+ let autoEmailAt = datetimeLocalToMs(document.getElementById('ccAutoEmailAt')?.value || '');
+ const autoEnabled = (document.getElementById('ccAutoEmailEnabled')?.value || '1') !== '0';
+ if (autoEnabled && !autoEmailAt && expiresAt) autoEmailAt = autoEmailAt530FromMs(expiresAt);
+ const saveBody = {
+ title: document.getElementById('ccTitle')?.value || '',
+ class_id: document.getElementById('ccClassId')?.value || '',
+ starts_at: document.getElementById('ccStartsAt')?.value || '',
+ expires_at: expiresAt,
+ auto_email_enabled: autoEnabled,
+ auto_email_at: autoEmailAt,
+ join_url: document.getElementById('ccJoinUrl')?.value || '',
+ status: document.getElementById('ccOpenStatus')?.value || 'open',
+ };
+ const saveRes = await api('/admin/casper-class', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(saveBody) });
+ const saveData = await saveRes.json().catch(()=>({}));
+ if (!saveRes.ok) throw new Error(saveData?.message || saveData?.error || 'Could not save the class link before running the check');
  const res = await api('/admin/casper-class/email/run', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ force:true }) });
  const data = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(data?.message || data?.error || 'Could not run email check');
