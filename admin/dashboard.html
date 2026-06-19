@@ -7268,7 +7268,7 @@ async function runCasperClassEmailCheck() {
 }
 
 async function reconcileCasperClass() {
- if (!confirm('Check recent Stripe checkout sessions, recover paid CASPer class students, and refresh package pass usage from Friday class dates? This includes one-off, weekly, and package payments. This will not email students.')) return;
+ if (!confirm('Full Stripe reconcile: recover paid CASPer class students from recent checkout sessions AND re-link every active weekly subscription directly from Stripe (this restores subscribers dropped by a missed renewal webhook), then refresh package pass usage. This will not email students.')) return;
  const status = document.getElementById('ccStatus');
  if (status) status.textContent = 'Checking Stripe...';
  try {
@@ -7283,8 +7283,13 @@ async function reconcileCasperClass() {
  email_state: data.email_state || S.casperClass?.email_state || {},
  };
  renderCasperClass();
- const message = `Recovered/confirmed ${data.recovered || 0} class payment${Number(data.recovered || 0)===1?'':'s'} from ${data.checked || 0} matching Stripe session${Number(data.checked || 0)===1?'':'s'}.`;
- if (status) status.textContent = message;
+ const subsRecovered = Number(data.subscriptions_recovered || 0);
+ const unresolved = Array.isArray(data.subscription_unresolved_rows) ? data.subscription_unresolved_rows : [];
+ const rosterOnly = Array.isArray(data.roster_without_stripe) ? data.roster_without_stripe : [];
+ let message = `Sessions: recovered/confirmed ${data.recovered || 0} of ${data.checked || 0} matching Stripe session${Number(data.checked || 0)===1?'':'s'}.\nSubscriptions: checked ${data.subscriptions_checked || 0} active Stripe sub${Number(data.subscriptions_checked || 0)===1?'':'s'}, restored ${subsRecovered} that had lapsed off the roster.`;
+ if (unresolved.length) message += `\n\nUNMATCHED Stripe subscriptions (active payer, no Key2MD account found, likely paid under a different email): ` + unresolved.map(r=>r.customer_email||r.customer_id||r.subscription_id).join(', ');
+ if (rosterOnly.length) message += `\n\nON ROSTER but NOT Stripe-linked (manual/admin adds, verify these are genuinely paid): ` + rosterOnly.map(r=>r.email||r.name).filter(Boolean).join(', ');
+ if (status) status.textContent = `Done. ${subsRecovered} subscriber${subsRecovered===1?'':'s'} restored, ${data.recovered||0} session payment${Number(data.recovered||0)===1?'':'s'} confirmed.`;
  alert(message);
  } catch(e) {
  if (status) status.textContent = e.message;
