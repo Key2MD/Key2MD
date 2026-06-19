@@ -130,13 +130,13 @@ const Key2MDAuth = (() => {
  try {
  if (isLoggedIn()) return;
  if (!getStoredReferralCode()) return;
- if (sessionStorage.getItem('k2md_ref_welcome_dismissed')) return;
+ if (localStorage.getItem('k2md_ref_welcome_dismissed')) return;
  if (document.getElementById('referralFriendBanner')) return; // plans.html shows its own
  if (document.getElementById('k2mdReferralWelcome')) return;
  const el = document.createElement('div');
  el.id = 'k2mdReferralWelcome';
  document.body.appendChild(el);
- const dismiss = "try{sessionStorage.setItem('k2md_ref_welcome_dismissed','1')}catch(e){};var n=document.getElementById('k2mdReferralWelcome');if(n)n.remove();";
+ const dismiss = "try{localStorage.setItem('k2md_ref_welcome_dismissed','1')}catch(e){};var n=document.getElementById('k2mdReferralWelcome');if(n)n.remove();";
  el.innerHTML = `
  <div style="position:fixed;left:12px;right:12px;bottom:12px;z-index:99997;max-width:540px;margin:0 auto;background:linear-gradient(135deg,#0a1628,#0c2236);color:#fff;border:1px solid rgba(14,165,233,0.42);box-shadow:0 18px 48px rgba(8,15,30,0.42);border-radius:14px;padding:15px 16px 14px;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
  <button onclick="${dismiss}" aria-label="Dismiss" style="position:absolute;top:7px;right:11px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.25rem;line-height:1;cursor:pointer;">&times;</button>
