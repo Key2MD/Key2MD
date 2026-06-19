@@ -866,6 +866,7 @@
           <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
           ${reprocessIssueCount?`<button id="reprocessIssuesBtn" class="secondary" onclick="reprocessAttemptIssues()">Check + reprocess ${reprocessIssueCount} flag${reprocessIssueCount===1?'':'s'}</button>`:''}
           <button class="secondary" onclick="saveNotes()">Save notes</button>
+          <button class="secondary" type="button" onclick="deleteCurrentMock()" style="border-color:#dc2626;color:#dc2626;">Delete this mock</button>
           </div>
         </div>
         <div class="monitor-grid" style="margin:14px 0 4px;">
@@ -1745,7 +1746,11 @@
       });
       if(active && wrap.dataset.lastActive!==String(active.dataset.start)){
         wrap.dataset.lastActive=String(active.dataset.start);
-        active.scrollIntoView({block:'nearest'});
+        const wrapRect=wrap.getBoundingClientRect();
+        const actRect=active.getBoundingClientRect();
+        if(actRect.top<wrapRect.top || actRect.bottom>wrapRect.bottom){
+          wrap.scrollTop+=(actRect.top-wrapRect.top)-(wrap.clientHeight-active.offsetHeight)/2;
+        }
       }
     }
 
@@ -1970,6 +1975,25 @@
       const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(currentAttempt.id)+'/notes',{method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({status:reviewStatus.value,manual_review_notes:manualReviewNotes.value,notes:adminNotes.value})});
       const data=await res.json().catch(()=>({}));
       document.getElementById('saveStatus').textContent=res.ok?'Saved.':(data.error||'Save failed');
+    }
+
+    async function deleteCurrentMock(){
+      if(!currentAttempt)return;
+      const a=currentAttempt;
+      const who=a.user_name||a.user_email||'this student';
+      if(!confirm('Permanently delete this mock for '+who+'?\n\nThis removes the attempt, every saved recording, and the per-station reviews, and frees them from being resumed into it. This cannot be undone.\n\nIt does NOT restore their mock pass - use Grant Mock on the dashboard if they should be able to start a fresh one.'))return;
+      const panel=document.getElementById('attemptPanel');
+      panel.innerHTML='<div class="muted">Deleting mock...</div>';
+      try{
+        const res=await fetch(API_BASE+'/api/admin/casper-mock/attempt/'+encodeURIComponent(a.id)+'/delete',{method:'POST',headers:authHeaders()});
+        const data=await res.json().catch(()=>({}));
+        if(!res.ok)throw new Error(data.message||data.error||'Delete failed');
+        currentAttempt=null;
+        panel.innerHTML='<div class="muted">Mock deleted ('+(data.recordings_removed||0)+' recording(s), '+(data.reviews_removed||0)+' review(s) removed). Select another attempt from the list.</div>';
+        loadList();
+      }catch(err){
+        panel.innerHTML='<div class="muted">Delete failed: '+esc(err.message||'unknown error')+'</div>';
+      }
     }
 
     async function buildVideoReprocessBody(row,rowIndex,statusEl){

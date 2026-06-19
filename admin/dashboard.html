@@ -6851,11 +6851,14 @@ async function sendReply() {
  const d = await res.json().catch(()=>({}));
  if (!res.ok) throw new Error(d?.error||'Send failed');
  const conv = S.conversations.find(c=>c.email===to);
- if (conv) { conv.messages=(conv.messages||[]); conv.messages.push({direction:'outbound',subject:subj,body,created_at:new Date().toISOString(),from_email:'dan@key2md.net'}); renderMsgs(conv.messages); }
+ if (conv) { conv.messages=(conv.messages||[]); conv.messages.push({direction:'outbound',subject:subj,body,created_at:new Date().toISOString(),from_email:'dan@key2md.net'}); }
+ if (S.activeConv === to) {
+ if (conv) renderMsgs(conv.messages);
  document.getElementById('composeBody').value='';
  if (status) status.textContent = 'Sent.';
+ }
  } catch(e) {
- if (status) status.textContent = `Send failed: ${e.message}`;
+ if (S.activeConv === to && status) status.textContent = `Send failed: ${e.message}`;
  }
  finally { btn.disabled=false; sp.style.display='none'; }
 }
