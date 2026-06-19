@@ -707,13 +707,19 @@ const MMIFeedbackRender = (() => {
  if (!container || !data) return;
 
  const feedback = data.feedback || data;
- const tier = context?.tier || 'transcript';
+ // The review's tier is decided server-side (always the highest the student holds); trust the
+ // returned data.tier over any client context so the labelling and gating match what was produced.
+ const tier = (data && data.tier) || context?.tier || 'transcript';
  const specialistMode = context?.specialistMode || false;
  const category = context?.stationCategory || '';
  const duration = context?.durationSec || 0;
  const specialistBadge = specialistMode
  ? '<span class="mmi-specialist-badge">Specialist Mode</span>'
  : '<span class="mmi-medschool-badge">Med School</span>';
+ const isPremiumTier = tier === 'premium';
+ const tierBadge = isPremiumTier
+ ? '<span class="mmi-tier-badge" style="display:inline-block;background:linear-gradient(90deg,#0ea5e9,#6366f1);color:#fff;font-weight:800;font-size:0.7rem;letter-spacing:0.05em;text-transform:uppercase;border-radius:999px;padding:3px 11px;">Premium review</span>'
+ : '<span class="mmi-tier-badge" style="display:inline-block;background:#eef2f7;color:#33415c;font-weight:700;font-size:0.7rem;letter-spacing:0.05em;text-transform:uppercase;border-radius:999px;padding:3px 11px;border:1px solid #d9e1ec;">Transcript review</span>';
 
  const overall = feedback.overall || {};
  const overallScore = overall.score || 3;
@@ -772,12 +778,12 @@ const MMIFeedbackRender = (() => {
  </div>` : '';
 
  const html = `
- <div class="mmi-feedback" id="mmiFeedbackBlock">
+ <div class="mmi-feedback${isPremiumTier ? ' mmi-feedback-premium' : ''}" id="mmiFeedbackBlock"${isPremiumTier ? ' style="border-top:3px solid #0ea5e9;"' : ''}>
 
  <div class="mmi-feedback-header">
  <div class="mmi-overall-badge ${overallCls}">${esc(overallLbl)}</div>
  <div class="mmi-overall-meta">
- ${esc(category)}${durationStr ? ' | ' + esc(durationStr) : ''} | ${specialistBadge}
+ ${tierBadge} ${esc(category)}${durationStr ? ' | ' + esc(durationStr) : ''} | ${specialistBadge}
  </div>
  </div>
 
