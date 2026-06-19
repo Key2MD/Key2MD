@@ -411,15 +411,22 @@
 
  <header class="journey-hero">
  <div class="wrap">
- <div class="eyebrow">Student journey</div>
- <h1>One place to see where you are up to.</h1>
- <p class="hero-sub">Your saved calculator plan, practice direction, and next useful Key2MD step. This is the student-facing area; the admin dashboard stays separate.</p>
+ <div class="eyebrow">Your hub</div>
+ <h1>Your plan, your progress, your rewards.</h1>
+ <p class="hero-sub">Everything in one place: your saved calculator plan and next step, a snapshot of how your practice is going, and the referral rewards you have earned. Come back here to pick up where you left off.</p>
  </div>
  </header>
 
  <main class="journey-shell">
  <div class="wrap journey-layout">
  <section>
+ <article class="journey-card" id="journeyReferralCard" style="display:none;border:1px solid rgba(14,165,233,0.3);">
+ <div class="journey-kicker">Refer a friend</div>
+ <h2 style="margin-bottom:6px;">You both win.</h2>
+ <p class="journey-muted" id="journeyReferralHook">Share your link: your friend gets a discount on their first review, and you earn a reward when they buy.</p>
+ <div id="journeyReferralBody"></div>
+ </article>
+
  <article class="journey-card" id="planCard">
  <div class="journey-kicker">Saved plan</div>
  <h2 id="planTitle">No saved plan yet.</h2>
@@ -1122,5 +1129,29 @@ renderMMISkillMap();
 renderAccount();
  </script>
  <script src="/key2md-tracking.js" defer></script>
+<script>
+(function(){
+ var API='https://key2md-api.brittainmbbs.workers.dev';
+ function jesc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+ window.jCopyRef=function(link,btn){try{if(link)navigator.clipboard.writeText(link);if(btn){var t=btn.textContent;btn.textContent='Copied';setTimeout(function(){btn.textContent=t;},1400);}}catch(e){}};
+ async function loadJourneyReferral(){
+  var card=document.getElementById('journeyReferralCard'), body=document.getElementById('journeyReferralBody'), hook=document.getElementById('journeyReferralHook');
+  if(!card||!body) return;
+  var token=(window.Key2MDAuth&&window.Key2MDAuth.getToken&&window.Key2MDAuth.getToken())||localStorage.getItem('key2md_token')||'';
+  if(!token){ card.style.display='block'; body.innerHTML='<p class="journey-muted" style="margin-top:8px;"><a href="plans.html" style="color:#0284c7;font-weight:800;text-decoration:none;">Create a free account</a> to get your referral link.</p>'; return; }
+  try{
+   var res=await fetch(API+'/api/user/referral-info',{headers:{Authorization:'Bearer '+token}});
+   if(!res.ok) return; var d=await res.json(); if(!d||!d.referral_code) return;
+   window.__jRefLink=d.referral_link||'';
+   var code=d.referral_code, fp=Number(d.friend_discount_percent||15), rp=Number(d.reward_percent||15), rmax=Number(d.reward_max_dollars||40), count=Number(d.referred_count||0), earned=Number(d.rewards_earned||0), cap=Number(d.reward_cap||10), tokens=Number(d.pending_reward_tokens||0), qualify=Number(d.qualifying_spend_dollars||50);
+   if(hook) hook.textContent='Your friend gets '+fp+'% off their first purchase. When they spend $'+qualify+' or more, you get '+rp+'% off (up to $'+rmax+'), applied automatically.';
+   var ready=tokens>0?'<div style="color:#16a34a;font-weight:800;margin-top:10px;">'+tokens+' reward'+(tokens===1?'':'s')+' ready: '+rp+'% off your next purchase.</div>':'';
+   body.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0;"><span style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:8px 16px;font-size:1rem;font-weight:850;letter-spacing:0.1em;font-family:monospace;color:#0a1628;">'+jesc(code)+'</span><button type="button" onclick="jCopyRef(window.__jRefLink,this)" style="border-radius:50px;padding:8px 18px;font-size:0.82rem;font-weight:800;border:1px solid rgba(14,165,233,0.35);background:#fff;color:#0284c7;cursor:pointer;font-family:inherit;">Copy link</button></div><div style="font-weight:700;color:#334155;">'+count+' friend'+(count===1?'':'s')+' joined &bull; '+earned+' of '+cap+' rewards earned</div>'+ready;
+   card.style.display='block';
+  }catch(e){}
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',loadJourneyReferral); else loadJourneyReferral();
+})();
+</script>
 </body>
 </html>

@@ -471,6 +471,36 @@ function syncPracticeSidebarOrder(){
  });
 }
 
+function copyReferralLink(link, btn){
+ try { if(link) navigator.clipboard.writeText(link); if(btn){ var t=btn.textContent; btn.textContent='Copied'; setTimeout(function(){ btn.textContent=t; },1400); } } catch(e){}
+}
+async function loadReferralCard(){
+ var card=document.getElementById('referralCard'), body=document.getElementById('referralCardBody'), hook=document.getElementById('referralCardHook');
+ if(!card||!body) return;
+ var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+ var auth=getK2Auth(), loggedIn=!!(auth&&auth.isLoggedIn&&auth.isLoggedIn());
+ if(!loggedIn){
+  if(hook) hook.textContent='You both win.';
+  body.innerHTML='<div style="font-size:0.76rem;color:var(--gray600);line-height:1.5;">Your friend gets a discount on their first review, and you earn one too. <a href="plans.html" style="color:var(--teal3);font-weight:800;text-decoration:none;">Create a free account</a> for your link.</div>';
+  card.style.display='block'; return;
+ }
+ var token=(auth&&auth.getToken)?auth.getToken():'';
+ try{
+  var res=await fetch(API_BASE+'/api/user/referral-info',{headers:{Authorization:'Bearer '+token}});
+  if(!res.ok) return; var d=await res.json();
+  if(!d||!d.referral_code) return;
+  window.__refLink=d.referral_link||'';
+  var code=d.referral_code, friendPct=Number(d.friend_discount_percent||15), rewardPct=Number(d.reward_percent||15), rewardMax=Number(d.reward_max_dollars||40), count=Number(d.referred_count||0), earned=Number(d.rewards_earned||0), cap=Number(d.reward_cap||10), tokens=Number(d.pending_reward_tokens||0);
+  if(hook) hook.textContent='Friend gets '+friendPct+'% off; you earn '+rewardPct+'% (up to $'+rewardMax+').';
+  var dots='', shown=Math.min(cap,5); for(var i=0;i<shown;i++){ dots+='<span style="width:8px;height:8px;border-radius:50%;background:'+(i<Math.min(count,shown)?'#0ea5e9':'var(--gray200)')+';"></span>'; }
+  var ready=tokens>0?'<div style="font-size:0.72rem;color:#16a34a;font-weight:800;margin-top:6px;">'+tokens+' reward'+(tokens===1?'':'s')+' ready &bull; '+rewardPct+'% off your next purchase.</div>':'';
+  body.innerHTML='<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px;"><span style="background:var(--gray50);border:1px solid var(--gray200);border-radius:7px;padding:5px 11px;font-size:0.8rem;font-weight:850;letter-spacing:0.07em;font-family:monospace;color:#0a1628;">'+esc(code)+'</span><button type="button" onclick="copyReferralLink(window.__refLink,this)" style="border-radius:50px;padding:5px 13px;font-size:0.72rem;font-weight:800;border:1px solid rgba(14,165,233,0.35);background:#fff;color:var(--teal3);cursor:pointer;font-family:inherit;">Copy link</button></div><div style="display:flex;gap:4px;margin-bottom:7px;">'+dots+'</div><div style="font-size:0.72rem;color:var(--gray500);">'+count+' friend'+(count===1?'':'s')+' joined &bull; '+earned+' of '+cap+' rewards</div>'+ready+'<a href="student-journey.html" style="display:inline-block;margin-top:8px;font-size:0.74rem;color:var(--teal3);font-weight:800;text-decoration:none;">See your rewards &rarr;</a>';
+  card.style.display='block';
+ }catch(e){}
+}
+window.copyReferralLink=copyReferralLink; window.loadReferralCard=loadReferralCard;
+document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ loadReferralCard(); }catch(e){} }, 500); });
+
 function updateAccountCardState(user){
  const title = document.getElementById('accountCardTitle');
  const badge = document.getElementById('accountCardBadge');
@@ -4501,6 +4531,7 @@ window.addEventListener('DOMContentLoaded',function(){
  onAuthChange: function(user) {
  updateLimitUI();
  updateAccountCardState(user);
+ loadReferralCard();
  window.FullCasperMock?.refreshPricing?.();
  loadLeaderboardSettings();
  refreshLeaderboardData({silent:true});
