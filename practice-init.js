@@ -664,6 +664,7 @@ async function submitMMIForFeedback() {
  const isPremium = mmiPremiumMode;
  const tier = isPremium ? 'premium' : 'transcript';
  const isCasperMockReview = !!window.K2_ACTIVE_CASPER_MOCK;
+ const isBaselineMockReview = !!window.K2_ACTIVE_BASELINE_MOCK;
  const requireVideoUpload = isCasperMockReview && isPremium;
 
  if(mmiFeedbackUploadInFlight) return;
@@ -757,6 +758,10 @@ async function submitMMIForFeedback() {
  fd.append('mock_attempt_id', window.K2_ACTIVE_CASPER_MOCK.attempt_id || '');
  fd.append('mock_station_order', String(window.K2_ACTIVE_CASPER_MOCK.station_order || currentIdx + 1));
  fd.append('mock_station_id', window.K2_ACTIVE_CASPER_MOCK.station_id || stationId);
+ }
+ if (isBaselineMockReview) {
+ fd.append('baseline_mock', '1');
+ fd.append('mock_tier', window.K2_ACTIVE_BASELINE_MOCK.tier || tier);
  }
  fd.append('visual_degraded', visualDegraded ? '1' : '0');
  if (isPremium && isCasperMockReview) fd.append('visual_frame_source', 'answer_windows');

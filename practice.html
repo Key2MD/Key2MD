@@ -589,6 +589,15 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <a href="full-casper-mock-exam.html" style="display:block;text-align:center;margin-top:8px;font-size:0.72rem;color:#7dd3fc;text-decoration:none;">How the mock works -></a>
  </div>
 
+ <div class="sidebar-card" id="mmiBaselineCard" style="display:none;background:linear-gradient(135deg,#0a1628,#4c1d95);border:1px solid rgba(124,58,237,0.45);color:#fff;">
+ <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+ <span style="font-size:0.6rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;background:rgba(14,165,233,0.25);border:1px solid rgba(125,211,252,0.5);color:#7dd3fc;padding:3px 8px;border-radius:50px;">Start Here</span>
+ </div>
+ <h3 style="margin:0 0 6px;color:#fff;font-size:0.98rem;">Baseline Mock</h3>
+ <p style="font-size:0.76rem;color:rgba(255,255,255,0.78);line-height:1.55;margin:0 0 12px;">Eight stations hand-written by Dan, carefully crafted across every theme an interview tests. Sit them once to get your number and your weak themes, then track every future attempt against it.</p>
+ <button type="button" onclick="if(window.MMICircuit&&MMICircuit.openBaseline){MMICircuit.openBaseline();}" style="width:100%;padding:10px;border:none;border-radius:50px;background:linear-gradient(135deg,#0ea5e9,#7c3aed);color:#fff;font-size:0.84rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(124,58,237,0.35);">Start the Baseline Mock -></button>
+ </div>
+
  <div class="sidebar-card" id="mmiCircuitCard" style="display:none;background:linear-gradient(135deg,#1e1b4b,#4c1d95);border:1px solid rgba(124,58,237,0.4);color:#fff;">
  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
  <span style="font-size:0.6rem;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;background:rgba(124,58,237,0.3);border:1px solid rgba(167,139,250,0.4);color:#c4b5fd;padding:3px 8px;border-radius:50px;">Mock Circuit</span>
@@ -969,6 +978,17 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <input type="range" id="writingSlider" min="60" max="600" step="15" value="210" style="display:none;" aria-label="CASPer writing timer">
  <span id="readingVal" style="display:none;">60s</span>
  <span id="writingVal" style="display:none;">3:30</span>
+
+ <div id="mmiBaselineHero" style="display:none;background:linear-gradient(135deg,#0a1628,#4c1d95);border:1px solid rgba(124,58,237,0.45);border-radius:18px;padding:22px 24px;margin-bottom:18px;color:#fff;">
+ <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;justify-content:space-between;">
+ <div style="flex:1;min-width:240px;">
+ <div style="font-size:0.62rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:#7dd3fc;margin-bottom:8px;">Baseline Mock &bull; Start Here</div>
+ <div style="font-size:1.15rem;font-weight:900;margin-bottom:6px;">Track your progress over time. Start with your baseline.</div>
+ <p style="font-size:0.84rem;color:rgba(255,255,255,0.8);line-height:1.6;margin:0;max-width:560px;">Eight stations hand-written by Dan, his best work carefully crafted across every theme an interview tests. Sit them once for detailed AI feedback and a score you can measure every future attempt against.</p>
+ </div>
+ <button type="button" onclick="if(window.MMICircuit&&MMICircuit.openBaseline){MMICircuit.openBaseline();}" style="padding:13px 26px;border:none;border-radius:50px;background:linear-gradient(135deg,#0ea5e9,#7c3aed);color:#fff;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(124,58,237,0.4);white-space:nowrap;">Start the Baseline Mock -></button>
+ </div>
+ </div>
 
  <div class="scenario-card" id="scenarioCard">
  <div class="scenario-top">
@@ -1638,6 +1658,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 <script src="mmi-engine.js" defer></script>
 <script src="mmi-tts.js" defer></script>
 <script src="mmi-feedback-render.js" defer></script>
+<script src="mmi-baseline-mock.js" defer></script>
 <script src="mmi-circuit.js" defer></script>
 <script src="casper-mock-exam.js" defer></script>
 <script src="practice-init.js" defer></script>

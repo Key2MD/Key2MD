@@ -1091,6 +1091,10 @@ function applyModeUI(mode) {
  if (mrc) { mrc.style.display = isMMI ? '' : 'none'; if (isMMI && typeof hydrateMmiReadiness === 'function') hydrateMmiReadiness(); }
  if (isMMI) maybeShowMmiOnboarding();
  if (mo) mo.style.display = isMMI ? '' : 'none';
+ const mbc = $('mmiBaselineCard');
+ if (mbc) mbc.style.display = isMMI ? '' : 'none';
+ const mbh = $('mmiBaselineHero');
+ if (mbh) mbh.style.display = isMMI ? '' : 'none';
  const mcc = $('mmiCircuitCard');
  if (mcc) mcc.style.display = isMMI ? '' : 'none';
  const cmk = $('casperMockCard');

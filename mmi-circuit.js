@@ -27,6 +27,8 @@ const MMICircuit = (() => {
  let restTimerInterval = null;
  let restSecondsLeft = 0;
  let onCircuitEnd = null; // callback when all stations + debrief done
+ let baselineFormat = 3; // prompts revealed per baseline station (student-chosen format)
+ let _baselinePrev = null; // the previous saved baseline snapshot, for the progress comparison
 
  // -- Category balance ------------------------------------------
  function balancedShuffle(stations, count) {
@@ -82,7 +84,9 @@ const MMICircuit = (() => {
  bindEvents();
  loadMmiLimits();
  // Check URL param
- if (window.location.search.includes('tab=circuit')) {
+ if (window.location.search.includes('tab=baseline')) {
+ setTimeout(() => openBaseline(), 150);
+ } else if (window.location.search.includes('tab=circuit')) {
  setTimeout(() => activateCircuitMode(), 100);
  }
  }
@@ -98,7 +102,7 @@ const MMICircuit = (() => {
  // legacy callers continue to work even if the outer ID isn't present.
  // 'bottomRail' is the new under-main-content rail (Stats, Heatmap,
  // Friday Classes, Weekly Tips) - must be hidden during a circuit.
- const panels = ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','mmiCircuitCard','casperClassCard','webcamPanel','startBtn','scenarioCard','bottomRail'];
+ const panels = ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','mmiBaselineCard','mmiBaselineHero','mmiCircuitCard','casperClassCard','webcamPanel','startBtn','scenarioCard','bottomRail'];
  panels.forEach(id => {
  const el = document.getElementById(id);
  if (el) el.style.display = 'none';
@@ -638,6 +642,162 @@ const MMICircuit = (() => {
  }
  }
 
+ // -- Baseline Mock --------------------------------------------
+ // A fixed, curated 8-station mock used as the recommended starting point for new students. Runs
+ // through the same circuit loop, but the stations are the public MMI_BASELINE_STATIONS (in order,
+ // never shuffled) and the student chooses a format that sets how many of the five prompts reveal.
+
+ function setBaselineFormat(n, btn) {
+ baselineFormat = Math.max(1, Math.min(5, Number(n) || 3));
+ document.querySelectorAll('.baseline-format-btn').forEach(b => {
+ const active = Number(b.dataset.count) === baselineFormat;
+ b.dataset.active = active ? '1' : '';
+ b.style.border = active ? '1px solid rgba(124,58,237,0.5)' : '1px solid var(--gray200)';
+ b.style.background = active ? 'rgba(124,58,237,0.1)' : '#fff';
+ b.style.color = active ? '#7c3aed' : 'var(--gray600)';
+ });
+ }
+
+ function openBaseline() {
+ if (!window.Key2MDAuth?.isLoggedIn || !window.Key2MDAuth.isLoggedIn()) {
+ if (window.Key2MDAuth?.showAuthModal) window.Key2MDAuth.showAuthModal('signup');
+ else if (window.showPracticeNotice) window.showPracticeNotice('Please sign in to start the Baseline Mock.', 'info');
+ }
+ activateCircuitMode();
+ const cp = document.getElementById('circuitConfigPanel');
+ if (cp) cp.style.display = 'none';
+ renderBaselineIntro();
+ }
+
+ function renderBaselineIntro() {
+ const area = getMainArea();
+ if (!area) return;
+ hideNativePracticeUI();
+ const stations = window.MMI_BASELINE_STATIONS || [];
+ const chips = stations.map((s, i) => `<span style="display:inline-block;font-size:0.72rem;font-weight:600;color:#6d28d9;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.15);border-radius:50px;padding:5px 12px;">${i + 1}. ${esc(s.category)}</span>`).join(' ');
+ const fmt = (n, label, sub) => `<button class="baseline-format-btn" data-count="${n}" data-active="${n === baselineFormat ? '1' : ''}" onclick="MMICircuit.setBaselineFormat(${n}, this)" style="flex:1;min-width:120px;padding:12px 10px;border-radius:12px;border:1px solid ${n === baselineFormat ? 'rgba(124,58,237,0.5)' : 'var(--gray200)'};background:${n === baselineFormat ? 'rgba(124,58,237,0.1)' : '#fff'};color:${n === baselineFormat ? '#7c3aed' : 'var(--gray600)'};cursor:pointer;font-family:inherit;text-align:center;transition:all 0.15s;"><div style="font-size:0.92rem;font-weight:800;">${label}</div><div style="font-size:0.68rem;color:var(--gray400);margin-top:3px;">${sub}</div></button>`;
+ area.innerHTML = `
+ <div style="max-width:680px;margin:0 auto;padding:8px 0 48px;">
+ <div style="text-align:center;padding:30px 24px;background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(14,165,233,0.05));border:1px solid rgba(124,58,237,0.15);border-radius:20px;margin-bottom:22px;">
+ <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#7c3aed;margin-bottom:10px;">Baseline Mock - Start Here</div>
+ <h2 style="font-size:1.7rem;font-weight:900;color:var(--navy);margin:0 0 10px;">See exactly where you stand</h2>
+ <p style="color:var(--gray600);font-size:0.95rem;line-height:1.7;max-width:520px;margin:0 auto 12px;">Eight stations hand-written by Dan, his best work across every theme an interview tests, each one crafted to find the gaps a real panel would. Run them back to back, get detailed AI feedback on each, and save a baseline you can measure every future attempt against.</p>
+ <p style="color:var(--gray500);font-size:0.82rem;line-height:1.6;max-width:520px;margin:0 auto;">This is the strongest possible place to start. Get your number, see your weak themes, then build from a foundation you can trust.</p>
+ </div>
+ <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;margin-bottom:18px;">
+ <div style="font-size:0.7rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);margin-bottom:12px;">The 8 hand-written stations</div>
+ <div style="display:flex;flex-wrap:wrap;gap:8px;">${chips}</div>
+ </div>
+ <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;margin-bottom:18px;">
+ <div style="font-size:0.7rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);margin-bottom:6px;">Choose your format</div>
+ <div style="font-size:0.78rem;color:var(--gray500);line-height:1.55;margin-bottom:14px;">This sets how many of each station's prompts are revealed, matching the interview style you are preparing for.</div>
+ <div style="display:flex;gap:10px;flex-wrap:wrap;">
+ ${fmt(2, 'Quickfire', '2 prompts / station')}
+ ${fmt(3, 'Standard', '3 prompts / station')}
+ ${fmt(5, 'Full panel', '5 prompts / station')}
+ </div>
+ </div>
+ <button onclick="MMICircuit.startBaseline()" style="width:100%;padding:15px;border-radius:50px;border:none;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 24px rgba(124,58,237,0.35);">Begin Baseline Mock -></button>
+ <div style="text-align:center;margin-top:12px;font-size:0.74rem;color:var(--gray400);">One purchase runs all 8 stations. Transcript $89 or Premium $129. Each station is recorded and marked like the real day.</div>
+ </div>
+ `;
+ }
+
+ async function startBaseline() {
+ try {
+ if (!window.Key2MDAuth?.isLoggedIn || !window.Key2MDAuth.isLoggedIn()) {
+ if (window.Key2MDAuth?.showAuthModal) window.Key2MDAuth.showAuthModal('signup');
+ else if (window.showPracticeNotice) window.showPracticeNotice('Please sign in to start the Baseline Mock.', 'info');
+ return;
+ }
+ const src = window.MMI_BASELINE_STATIONS || [];
+ if (!src.length) {
+ if (window.showPracticeNotice) window.showPracticeNotice('The Baseline Mock is not available right now. Please refresh and try again.', 'info');
+ return;
+ }
+ const token = window.Key2MDAuth?.getToken?.();
+ const base = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+ let status = null;
+ try {
+ const res = await fetch(`${base}/api/baseline/status`, { headers: { Authorization: `Bearer ${token}` } });
+ status = await res.json().catch(() => null);
+ } catch (e) { status = null; }
+ if (!status || !status.has_pass) { renderBaselinePaywall(); return; }
+ const tier = status.tier === 'premium' ? 'premium' : 'transcript';
+ const size = src.length;
+ const stations = src.map((s, i) => {
+ const pr = [s.prompt1, s.prompt2, s.prompt3, s.prompt4, s.prompt5].filter(Boolean);
+ const o = { id: s.id || ('baseline' + (i + 1)), category: s.category || 'MMI Station', scenario: s.scenario || '', prompts: pr };
+ pr.forEach((p, j) => { o['prompt' + (j + 1)] = p; });
+ return o;
+ });
+ circuitConfig = { size, tier, preset: 'standard', specialistMode: false, weaknessMode: false, baseline: true, promptCount: baselineFormat };
+ circuitResults = [];
+ circuitIdx = 0;
+ circuitActive = true;
+ circuitStations = stations;
+ window.K2_ACTIVE_BASELINE_MOCK = { tier };
+ renderProgressBar();
+ launchStation(0);
+ } catch (err) {
+ console.error('[MMICircuit] startBaseline failed:', err);
+ if (window.showPracticeNotice) window.showPracticeNotice('Could not start the Baseline Mock (' + ((err && err.message) || 'unexpected error') + '). Please refresh and try again.', 'error');
+ }
+ }
+
+ function renderBaselinePaywall() {
+ const area = getMainArea();
+ if (!area) return;
+ hideNativePracticeUI();
+ const card = (tier, price, title, blurb, feats, primary) => `
+ <div style="flex:1;min-width:240px;background:#fff;border:1.5px solid ${primary ? 'rgba(124,58,237,0.45)' : 'var(--gray200)'};border-radius:16px;padding:22px 22px;display:flex;flex-direction:column;">
+ <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:${primary ? '#7c3aed' : 'var(--gray400)'};margin-bottom:6px;">${title}</div>
+ <div style="font-size:2rem;font-weight:900;color:var(--navy);line-height:1;margin-bottom:4px;">$${price}</div>
+ <div style="font-size:0.8rem;color:var(--gray500);line-height:1.5;margin-bottom:14px;">${blurb}</div>
+ <ul style="list-style:none;padding:0;margin:0 0 18px;font-size:0.82rem;color:var(--gray700);line-height:1.7;flex:1;">${feats.map(f => `<li style="display:flex;gap:8px;"><span style="color:#16a34a;font-weight:800;">+</span><span>${f}</span></li>`).join('')}</ul>
+ <button onclick="MMICircuit.buyBaseline('${tier}')" style="width:100%;padding:13px;border-radius:50px;border:none;background:${primary ? 'linear-gradient(135deg,#7c3aed,#6d28d9)' : 'var(--navy)'};color:#fff;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;">Get the ${tier === 'premium' ? 'Premium' : 'Transcript'} Baseline -></button>
+ </div>`;
+ area.innerHTML = `
+ <div style="max-width:760px;margin:0 auto;padding:8px 0 48px;">
+ <div style="text-align:center;margin-bottom:22px;">
+ <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#7c3aed;margin-bottom:10px;">Baseline Mock</div>
+ <h2 style="font-size:1.6rem;font-weight:900;color:var(--navy);margin:0 0 8px;">Get your starting point</h2>
+ <p style="color:var(--gray600);font-size:0.92rem;line-height:1.6;max-width:520px;margin:0 auto;">Eight stations hand-written by Dan, carefully crafted across every interview theme. One purchase runs all eight with detailed AI feedback and a score you can track over time.</p>
+ </div>
+ <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:stretch;">
+ ${card('transcript', '89', 'Transcript', 'Substance and structure, marked station by station.', ['All 8 hand-written stations', 'Marking across the 5 interview criteria', 'Per-station strengths and fixes', 'Cross-station summary and progress tracking'], false)}
+ ${card('premium', '129', 'Premium', 'Everything in Transcript, plus how you come across.', ['Everything in Transcript', 'Voice: pace, fillers, vocal variation', 'On-camera presence and delivery', 'The full read examiners form on the day'], true)}
+ </div>
+ <div style="text-align:center;margin-top:16px;font-size:0.76rem;color:var(--gray400);">MMI Pro members get 20% off automatically at checkout. <button onclick="MMICircuit.runAgain()" style="background:none;border:none;color:#7c3aed;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:underline;">Back</button></div>
+ </div>
+ `;
+ }
+
+ async function buyBaseline(tier) {
+ try {
+ if (!window.Key2MDAuth?.isLoggedIn || !window.Key2MDAuth.isLoggedIn()) {
+ if (window.Key2MDAuth?.showAuthModal) window.Key2MDAuth.showAuthModal('signup');
+ return;
+ }
+ const token = window.Key2MDAuth?.getToken?.();
+ const base = window.API_BASE || 'https://key2md-api.brittainmbbs.workers.dev';
+ const res = await fetch(`${base}/api/baseline/checkout`, {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+ body: JSON.stringify({
+ tier: tier === 'premium' ? 'premium' : 'transcript',
+ success_url: window.location.origin + '/practice.html?lock_mode=mmi&tab=baseline&baseline_purchase=success',
+ cancel_url: window.location.origin + '/practice.html?lock_mode=mmi&tab=baseline',
+ }),
+ });
+ const data = await res.json().catch(() => ({}));
+ if (data.checkout_url) { window.location.href = data.checkout_url; return; }
+ if (window.showPracticeNotice) window.showPracticeNotice(data.message || 'Could not open checkout. Please try again.', 'error');
+ } catch (e) {
+ if (window.showPracticeNotice) window.showPracticeNotice('Connection error. Please try again.', 'error');
+ }
+ }
+
  // Best-effort entry card for a pass-holder (no buy button - purchasing is disabled until launch).
  async function checkMockEntry() {
  try {
@@ -668,6 +828,10 @@ const MMICircuit = (() => {
  const station = circuitStations[idx];
  const area = getMainArea();
  if (!area) return;
+
+ // Baseline stations are authorised by the paid baseline pass (no per-station credit charge); the
+ // flag tells submitMMIForFeedback to send baseline_mock=1. Cleared for normal circuits.
+ window.K2_ACTIVE_BASELINE_MOCK = (circuitConfig && circuitConfig.baseline) ? { tier: circuitConfig.tier } : null;
 
  // Show the station number in the progress bar
  updateProgressBar(idx);
@@ -707,13 +871,13 @@ const MMICircuit = (() => {
  preset: circuitConfig.preset,
  premium: circuitConfig.tier === 'premium',
  specialist: !!circuitConfig.specialistMode,
- promptCount: getPrompts(station).length,
+ promptCount: circuitConfig.promptCount || getPrompts(station).length,
  });
  const webcam = document.getElementById('webcamPanel');
  if (webcam) { webcam.classList.add('show'); webcam.style.display = ''; }
  // setMode('mmi') (inside setupSingleStation) re-shows the normal practice chrome; re-hide the
  // non-recording cards so the circuit keeps its takeover (the recording UI stays visible).
- ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','mmiCircuitCard','casperClassCard','startBtn','bottomRail'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+ ['categoryCard','casperCategoryCard','mmiCategoryCard','mmiOptionsCard','mmiBaselineCard','mmiBaselineHero','mmiCircuitCard','casperClassCard','startBtn','bottomRail'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
  } else {
  // Legacy fallback if the bridge is unavailable.
  if (window.setMode) window.setMode('mmi');
@@ -737,6 +901,7 @@ const MMICircuit = (() => {
 
  function onStationComplete(data, station) {
  window._circuitCapture = null;
+ window.K2_ACTIVE_BASELINE_MOCK = null;
  const feedback = (data && (data.feedback || data)) || null;
  const reviewId = (data && data.review_id) || null;
 
@@ -791,6 +956,7 @@ const MMICircuit = (() => {
  circuitActive = false;
  clearInterval(restTimerInterval);
  window._circuitCapture = null;
+ window.K2_ACTIVE_BASELINE_MOCK = null;
  showNativePracticeUI();
  circuitResults = [];
  circuitStations = [];
@@ -849,7 +1015,64 @@ const MMICircuit = (() => {
  // Lite overview computed locally; the richer cross-station analysis is reserved for the paid full mock.
  const stationScores = circuitResults.map(r => Number(r.feedback?.overall?.score)).filter(n => Number.isFinite(n));
  const avgScore = stationScores.length ? (stationScores.reduce((a, b) => a + b, 0) / stationScores.length) : null;
+ if (circuitConfig && circuitConfig.baseline) {
+ saveBaselineSnapshot(avgScore);
+ renderDebrief(computeLocalDebrief(avgScore));
+ return;
+ }
  renderDebrief({ overall_band: bandFromAvgScore(avgScore) });
+ }
+
+ // Builds a reasonable, softer cross-station report for the baseline locally (no AI call): criterion
+ // averages with a gentle trend, per-station performance, and a soft stamina read. The richer AI
+ // cross-station prose (patterns, the-one-thing) stays reserved for the paid full mock.
+ function computeLocalDebrief(avgScore) {
+ const CRIT = ['empathy', 'communication', 'reasoning', 'reflection', 'real_world_awareness'];
+ const half = Math.max(1, Math.floor(circuitResults.length / 2));
+ const mean = arr => (arr && arr.length) ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
+ const agg = {}; CRIT.forEach(k => { agg[k] = { all: [], first: [], second: [] }; });
+ circuitResults.forEach((r, idx) => {
+ const pp = (r.feedback && r.feedback.per_prompt) || [];
+ const sums = {}, counts = {};
+ pp.forEach(p => CRIT.forEach(k => { const v = p && p.scores && p.scores[k] && p.scores[k].score; if (typeof v === 'number') { sums[k] = (sums[k] || 0) + v; counts[k] = (counts[k] || 0) + 1; } }));
+ CRIT.forEach(k => { if (counts[k]) { const a = sums[k] / counts[k]; agg[k].all.push(a); (idx < half ? agg[k].first : agg[k].second).push(a); } });
+ });
+ const criterion_averages = {};
+ CRIT.forEach(k => {
+ const a = mean(agg[k].all); if (a == null) return;
+ const f = mean(agg[k].first), s = mean(agg[k].second);
+ let trend = 'consistent';
+ if (f != null && s != null) { const d = s - f; trend = d >= 0.4 ? 'improving' : d <= -0.4 ? 'declining' : 'consistent'; }
+ criterion_averages[k] = { avg: a, trend };
+ });
+ const category_performance = circuitResults.map(r => {
+ const sc = Number(r.feedback && r.feedback.overall && r.feedback.overall.score);
+ const note = !Number.isFinite(sc) ? 'Not marked' : sc >= 4 ? 'Strong' : sc >= 3 ? 'Solid' : sc >= 2 ? 'Developing' : 'Build this up';
+ return { category: r.station.category, avg_score: Number.isFinite(sc) ? sc : 0, note };
+ });
+ const scores = circuitResults.map(r => Number(r.feedback && r.feedback.overall && r.feedback.overall.score)).filter(Number.isFinite);
+ const fhAvg = mean(scores.slice(0, half)), shAvg = mean(scores.slice(half));
+ let stamina_pattern = { detected: false, description: 'Your level held across the stations, a good sign of interview stamina.' };
+ if (fhAvg != null && shAvg != null) {
+ stamina_pattern = (shAvg <= fhAvg - 0.5)
+ ? { detected: true, description: 'Your scores softened in the back half. Practising stations back to back builds the stamina to finish as strongly as you start.', first_half_avg: fhAvg, second_half_avg: shAvg }
+ : { detected: false, description: 'You held your level from the first stations to the last, a good sign of interview stamina.', first_half_avg: fhAvg, second_half_avg: shAvg };
+ }
+ return { overall_band: bandFromAvgScore(avgScore), criterion_averages, category_performance, stamina_pattern };
+ }
+
+ // Saves a baseline run to localStorage so the student can track progress across attempts, and
+ // stashes the previous run for the comparison shown on the debrief.
+ function saveBaselineSnapshot(avgScore) {
+ try {
+ const key = 'k2_baseline_history';
+ const hist = JSON.parse(localStorage.getItem(key) || '[]');
+ _baselinePrev = hist.length ? hist[hist.length - 1] : null;
+ const categories = circuitResults.map(r => ({ category: r.station.category, score: Number(r.feedback?.overall?.score) }));
+ hist.push({ date: new Date().toISOString(), avg: avgScore, band: bandFromAvgScore(avgScore), format: circuitConfig.promptCount, categories });
+ while (hist.length > 12) hist.shift();
+ localStorage.setItem(key, JSON.stringify(hist));
+ } catch (e) { _baselinePrev = null; }
  }
 
  function bandFromAvgScore(avg) {
@@ -993,6 +1216,41 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  <div style="font-size:0.85rem;color:var(--gray700);line-height:1.65;">${d.polished_auditor_circuit}</div>
  </div>` : '';
 
+ let baselineBanner = '';
+ if (circuitConfig && circuitConfig.baseline) {
+ const scored = circuitResults.map(r => ({ category: r.station.category, score: Number(r.feedback?.overall?.score) })).filter(x => Number.isFinite(x.score));
+ const weakest = scored.slice().sort((a, b) => a.score - b.score).slice(0, 2).map(x => x.category);
+ const curAvg = scored.length ? (scored.reduce((a, b) => a + b.score, 0) / scored.length) : null;
+ let compare;
+ if (_baselinePrev && Number.isFinite(_baselinePrev.avg) && Number.isFinite(curAvg)) {
+ const delta = curAvg - _baselinePrev.avg;
+ const col = delta >= 0.05 ? '#16a34a' : delta <= -0.05 ? '#dc2626' : '#6b7280';
+ const word = delta >= 0.05 ? 'up' : delta <= -0.05 ? 'down' : 'steady';
+ let prevDate = '';
+ try { prevDate = new Date(_baselinePrev.date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }); } catch (e) {}
+ compare = `<div style="margin-top:10px;font-size:0.84rem;color:var(--gray700);">Versus your last baseline (${prevDate}, ${Number(_baselinePrev.avg).toFixed(1)}/5): <strong style="color:${col};">${delta >= 0 ? '+' : ''}${delta.toFixed(1)} (${word})</strong></div>`;
+ } else {
+ compare = `<div style="margin-top:10px;font-size:0.84rem;color:var(--gray600);">This is your first baseline. Re-take it in a few weeks to see how far you have moved.</div>`;
+ }
+ const weakBlock = weakest.length ? `<div style="margin-top:10px;font-size:0.84rem;color:var(--gray700);">Lowest stations this run: <strong style="color:var(--navy);">${weakest.map(esc).join(', ')}</strong>. <a href="practice.html?lock_mode=mmi" style="color:#7c3aed;font-weight:700;text-decoration:none;">Drill these in MMI practice -></a></div>` : '';
+ baselineBanner = `
+ <div style="background:linear-gradient(135deg,rgba(124,58,237,0.07),rgba(14,165,233,0.05));border:1.5px solid rgba(124,58,237,0.2);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
+ <div style="font-size:0.66rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#7c3aed;margin-bottom:6px;">Baseline saved</div>
+ <div style="font-size:0.95rem;font-weight:800;color:var(--navy);">Your starting point is locked in.</div>
+ ${compare}
+ ${weakBlock}
+ </div>`;
+ }
+
+ const hasRich = Object.keys(d.criterion_averages || {}).length > 0;
+ const richSections = hasRich ? `
+ <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
+ <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);margin-bottom:14px;">How you scored across criteria</div>
+ ${criterionRows}
+ ${categoryRows ? `<div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray400);margin:18px 0 10px;">By station</div>${categoryRows}` : ''}
+ ${staminaBlock}
+ </div>` : '';
+
  area.innerHTML = `
  <div style="max-width:780px;margin:0 auto;padding:0 0 48px;">
 
@@ -1006,6 +1264,10 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  </div>
  ${summaryAvg != null ? ('<p style="color:var(--gray600);font-size:0.95rem;line-height:1.7;max-width:540px;margin:0 auto;">Average <strong style="color:var(--navy);">' + summaryAvg.toFixed(1) + ' / 5</strong> across ' + summaryScores.length + ' marked station' + (summaryScores.length === 1 ? '' : 's') + '. Open each station below for its full marking.</p>') : ''}
  </div>
+
+ ${baselineBanner}
+
+ ${richSections}
 
  <!-- Per-station results (expandable) -->
  <div style="background:#fff;border:1px solid var(--gray200);border-radius:16px;padding:20px 22px;margin-bottom:20px;">
@@ -1068,7 +1330,7 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  <!-- Actions -->
  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
  <button onclick="MMICircuit.runAgain()" style="padding:12px 28px;border-radius:50px;border:none;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(124,58,237,0.3);transition:all 0.2s;">
- Run Another Circuit
+ ${circuitConfig && circuitConfig.baseline ? 'Re-take Baseline' : 'Run Another Circuit'}
  </button>
  <button onclick="MMICircuit.expandAllStations()" style="padding:12px 28px;border-radius:50px;border:1px solid var(--gray200);background:#fff;color:var(--navy);font-size:0.92rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">
  Review Each Station
@@ -1146,8 +1408,10 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  }
 
  function runAgain() {
+ const wasBaseline = !!(circuitConfig && circuitConfig.baseline);
  abortCircuit();
- renderCircuitIdle();
+ if (wasBaseline) renderBaselineIntro();
+ else renderCircuitIdle();
  }
 
  function renderStationDetail(r) {
@@ -1216,6 +1480,10 @@ Generate the circuit debrief report. Be specific. Reference station numbers and 
  setTier,
  updateCreditDisplay,
  startCircuit,
+ openBaseline,
+ setBaselineFormat,
+ startBaseline,
+ buyBaseline,
  skipRest,
  abortCircuit,
  generateDebrief,
