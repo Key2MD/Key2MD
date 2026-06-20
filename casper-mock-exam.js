@@ -3429,6 +3429,19 @@ return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : null;
  return row?.voiceMetrics || row?.voice_metrics || row?.rawFeedback?.voice_metrics || null;
  }
 
+ function niceKey(key) {
+ const map = {
+ overall: 'Overall', score: 'Score', label: 'Label', comment: 'Comment', summary: 'Summary',
+ empathy: 'Empathy', communication: 'Communication', reasoning: 'Reasoning', reflection: 'Reflection',
+ real_world_awareness: 'Real-world judgement', thought_content: 'Thought content', organisation: 'Organisation',
+ theme_engagement: 'Theme engagement', evidence_illustration: 'Evidence and illustration',
+ language_style: 'Language and style', biggest_strength: 'Biggest strength', biggest_improvement: 'Biggest improvement',
+ excellent_version: 'Excellent response would add', visual_presence: 'Visual presence', one_improvement: 'One improvement',
+ next_step: 'Next step', nextStep: 'Next step', eye_contact: 'Eye contact', posture: 'Posture', composure: 'Composure',
+ };
+ return map[key] || String(key || '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').replace(/\b\w/g, ch => ch.toUpperCase());
+ }
+
  function countVisualValues(items, key) {
  const counts = {};
  items.forEach(item => {
