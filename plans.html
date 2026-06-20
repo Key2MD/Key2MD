@@ -895,6 +895,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="pro-eyebrow" style="color:#a78bfa;"> MMI AI Feedback</div>
  <h2 style="color:#fff;">Speak. Get marked.<br>Improve fast.</h2>
  <p style="color:rgba(255,255,255,0.72);">Record your MMI response, and get detailed feedback across 5 criteria - Empathy, Communication, Reasoning, Reflection, and Real-world Awareness - using the same examiner rubric Dan applies in live coaching.</p>
+ <button type="button" class="fbprev-trigger" onclick="openFeedbackPreview('mmi')"><span class="fbprev-trigger-ic">&#128065;</span> Preview a sample MMI review</button>
  <div style="margin:18px 0 0;padding:16px 18px;background:linear-gradient(135deg,rgba(124,58,237,0.16),rgba(14,165,233,0.08));border:1px solid rgba(196,181,253,0.3);border-radius:14px;">
  <div style="font-size:0.72rem;font-weight:800;color:#ddd6fe;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:7px;">It is not only what you say</div>
  <p style="font-size:0.9rem;color:rgba(255,255,255,0.82);line-height:1.65;margin:0 0 8px;">The MMI is a spoken, face-to-face station, so examiners mark a single holistic impression - and how you deliver an answer is a large part of it.</p>
@@ -1095,6 +1096,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="pro-eyebrow">* CASPer Pro - Recommended</div>
  <h2>Unlimited AI reviews.<br>No daily cap.</h2>
  <p>Most serious CASPer students need 10-20 practice stations per week. The free tier gives you 1 CASPer review per day. Pro removes the cap entirely so you can practise as hard as your prep demands.</p>
+ <button type="button" class="fbprev-trigger" onclick="openFeedbackPreview('casper')"><span class="fbprev-trigger-ic">&#128065;</span> Preview a sample CASPer review</button>
  <div class="pro-feats">
  <div class="pro-feat">
  <div class="pro-feat-icon">AI</div>
@@ -2673,5 +2675,227 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=do
 </script>
 
 <script src="/key2md-tracking.js" defer></script>
+<!-- Sample feedback preview modal -->
+<div class="fbprev-ov" id="fbPreviewModal" role="dialog" aria-modal="true" aria-label="Sample AI feedback preview">
+ <div class="fbprev-shell">
+  <div class="fbprev-bar">
+   <div class="fbprev-toggle">
+    <button type="button" class="fbprev-tab active" data-fbtab="mmi">MMI feedback</button>
+    <button type="button" class="fbprev-tab" data-fbtab="casper">CASPer feedback</button>
+   </div>
+   <button type="button" class="fbprev-close" onclick="closeFeedbackPreview()" aria-label="Close preview">&times;</button>
+  </div>
+  <div class="fbprev-scroll">
+   <div class="k2sfb" data-fbpanel="mmi">
+    <div class="k2sfb-lead">
+     <div class="eb">See it before you pay</div>
+     <h2>This is the feedback you get on every MMI answer.</h2>
+     <p>A real example of how the AI marks an MMI station - scored on the criteria examiners actually use.</p>
+    </div>
+    <div class="k2fb">
+     <div class="k2fb-head">
+      <span class="k2fb-sample">Illustrative sample</span>
+      <span class="k2fb-tag">&#9679; AI feedback &middot; MMI station</span>
+      <div class="k2fb-station-label">The station</div>
+      <div class="k2fb-station">A close friend calls you in tears the night before your most important exam. They have just found out they failed a subject they need to graduate, and they say they feel like giving up on everything. What do you say, and what do you do?</div>
+      <div class="k2fb-answer"><b>Your answer (excerpt):</b> "First I would tell them failing one subject isn't the end of the world and that lots of people fail and still graduate. I would explain they can probably resit or appeal, and help them email the coordinator to sort out options. I would tell them to focus on next steps rather than dwell on it. I would also make sure I still got enough sleep for my own exam."</div>
+     </div>
+     <div class="k2fb-scorewrap">
+      <div class="ring" style="background:conic-gradient(var(--teal) 60%,#e9eef5 0)"><span><span class="num">6</span><br><span class="den">/ 10</span></span></div>
+      <div>
+       <div class="k2fb-verdict-k">Panel impression</div>
+       <div class="k2fb-verdict">Satisfactory - warm instincts, solved too soon</div>
+       <div class="k2fb-verdict-sub">You reached for the fix before the person felt heard. That one change is the difference between a 6 and an 8 here.</div>
+      </div>
+     </div>
+     <div class="k2fb-body">
+      <div class="k2fb-h"><span class="t">The five criteria</span><span class="rule"></span></div>
+      <div class="crit">
+       <div class="crit-row"><div class="crit-name">Empathy</div><div class="crit-right"><div class="bar lo"><i style="width:40%"></i></div><div class="crit-note">You reassured ("not the end of the world") but never named what they are feeling. Reassurance that skips the emotion reads as dismissal, even when you mean well.</div></div></div>
+       <div class="crit-row"><div class="crit-name">Communication</div><div class="crit-right"><div class="bar"><i style="width:80%"></i></div><div class="crit-note">Clear and easy to follow. It speaks at your friend more than with them - fewer instructions, more presence.</div></div></div>
+       <div class="crit-row"><div class="crit-name">Reasoning</div><div class="crit-right"><div class="bar mid"><i style="width:60%"></i></div><div class="crit-note">Sensible options (resit, appeal) - but offered before you understood the situation. Good judgement at the wrong moment still costs marks.</div></div></div>
+       <div class="crit-row"><div class="crit-name">Reflection</div><div class="crit-right"><div class="bar lo"><i style="width:40%"></i></div><div class="crit-note">No sign you checked whether your help was wanted, or weighed your own exam against being there. The closing line lands as self-focused.</div></div></div>
+       <div class="crit-row"><div class="crit-name">Real-world awareness</div><div class="crit-right"><div class="bar mid"><i style="width:60%"></i></div><div class="crit-note">You know the mechanics. A top answer also notices risk: "give up on everything" is a flag worth gently checking before moving on.</div></div></div>
+      </div>
+      <div class="k2fb-h"><span class="t">Read this first</span><span class="rule"></span></div>
+      <div class="duo">
+       <div class="cardlet good"><div class="lab"><span class="dot"></span>Biggest strength</div><p>Your instinct to be useful is real, and examiners want future doctors who act. The fix is not to care less - it is to time it.</p></div>
+       <div class="cardlet gap"><div class="lab"><span class="dot"></span>What's holding you back</div><p>You moved to fixing before the person felt heard. Candidates who score 8+ sit in the emotion for a beat first, then problem-solve.</p></div>
+      </div>
+      <div class="k2fb-h"><span class="t">Your line, upgraded</span><span class="rule"></span></div>
+      <div class="rewrite">
+       <div class="rw-row rw-said"><div class="rw-k">You said</div><p>"Failing one subject isn't the end of the world, and lots of people fail and still graduate."</p></div>
+       <div class="rw-row rw-better"><div class="rw-k">Stronger</div><p>"That sounds crushing - especially tonight, when you were finally going to breathe. Before we work anything out, I just want to be here with you for a minute."</p></div>
+       <div class="rw-row rw-why"><div class="rw-k">Why it scores</div><p>It names the feeling, signals you are staying, and earns you the right to problem-solve next - so your resit/appeal advice lands instead of bouncing off.</p></div>
+      </div>
+      <div class="nextrep"><div class="ic">&#127909;</div><div><div class="k">Your next rep</div><p>Re-record this station. For the first 20 seconds, say nothing that contains a solution - only what you notice they are feeling. Then watch your Empathy score move.</p></div></div>
+      <div class="k2fb-cta">
+       <h3>Your first MMI review is free.</h3>
+       <p>Record or type a response and get this back, scored on the real criteria - a full Premium review on your first station.</p>
+       <a class="btn" href="practice.html?lock_mode=mmi&amp;from=plans_preview">Try a station free &#8594;</a>
+       <div class="k2fb-fineprint">Illustrative example. Real feedback is generated on your own answer.</div>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="k2sfb" data-fbpanel="casper" style="display:none">
+    <div class="k2sfb-lead">
+     <div class="eb">See it before you pay</div>
+     <h2>This is the feedback you get on every CASPer response.</h2>
+     <p>A real example of how the AI marks a typed CASPer answer - quartile estimate, competency read, and the one change that moves you up.</p>
+    </div>
+    <div class="k2fb">
+     <div class="k2fb-head">
+      <span class="k2fb-sample">Illustrative sample</span>
+      <span class="k2fb-tag">&#9679; AI feedback &middot; CASPer scenario</span>
+      <div class="k2fb-station-label">The scenario</div>
+      <div class="k2fb-station">You are working on a group assignment worth 40% of your grade. One teammate, Sam, has missed every meeting and contributed nothing, but has just messaged the group asking that all four names go on the final submission, which is due tomorrow. What would you do, and what factors would you consider?</div>
+      <div class="k2fb-answer"><b>Your answer (excerpt):</b> "I would message Sam directly and say it is not fair to be credited for work they did not do, when the rest of us put in the hours. I would tell them that if they want their name on it, they need to contribute something tonight. If they refuse, I would email the tutor and explain the situation so the rest of us are not marked down. The people who actually did the work have to come first."</div>
+     </div>
+     <div class="k2fb-scorewrap">
+      <div class="ring" style="background:conic-gradient(var(--teal) 72%,#e9eef5 0)"><span><span class="num">Q3</span><br><span class="den">of Q4</span></span></div>
+      <div>
+       <div class="k2fb-verdict-k">Quartile estimate</div>
+       <div class="k2fb-verdict">Third quartile - fair-minded, but quick to judge</div>
+       <div class="k2fb-verdict-sub">You reached a fair outcome, but you decided why Sam disappeared before you asked. Leading with curiosity instead of a verdict is the gap between Q3 and Q4 here.</div>
+      </div>
+     </div>
+     <div class="k2fb-body">
+      <div class="k2fb-h"><span class="t">How it read across competencies</span><span class="rule"></span></div>
+      <div class="crit">
+       <div class="crit-row"><div class="crit-name">Problem solving</div><div class="crit-right"><div class="bar"><i style="width:80%"></i></div><div class="crit-note">A clear plan with a sensible escalation path. You knew the steps - that part is genuinely strong.</div></div></div>
+       <div class="crit-row"><div class="crit-name">Communication</div><div class="crit-right"><div class="bar mid"><i style="width:58%"></i></div><div class="crit-note">Direct, but "it is not fair" and "work they did not do" land as an accusation. The message corners Sam before they can explain.</div></div></div>
+       <div class="crit-row"><div class="crit-name">Collaboration</div><div class="crit-right"><div class="bar lo"><i style="width:38%"></i></div><div class="crit-note">You moved straight to an ultimatum and reporting. Little attempt to keep the team intact for the last night of a shared task.</div></div></div>
+       <div class="crit-row"><div class="crit-name">Equity</div><div class="crit-right"><div class="bar mid"><i style="width:55%"></i></div><div class="crit-note">Fair to the people who worked - but you assumed Sam's silence was laziness without checking for a hidden barrier (illness, caring load, crisis).</div></div></div>
+       <div class="crit-row"><div class="crit-name">Self-awareness</div><div class="crit-right"><div class="bar lo"><i style="width:40%"></i></div><div class="crit-note">No sign you noticed your own frustration shaping the response, or that your read of Sam could be wrong.</div></div></div>
+      </div>
+      <div class="k2fb-h"><span class="t">Read this first</span><span class="rule"></span></div>
+      <div class="duo">
+       <div class="cardlet good"><div class="lab"><span class="dot"></span>Biggest strength</div><p>You protect the people who did the work and you act - examiners want applicants who will not let unfairness slide. The judgement is sound.</p></div>
+       <div class="cardlet gap"><div class="lab"><span class="dot"></span>What's holding you back</div><p>You concluded Sam was at fault before gathering facts. Top-quartile answers check the cause first, then respond proportionately.</p></div>
+      </div>
+      <div class="k2fb-h"><span class="t">Your line, upgraded</span><span class="rule"></span></div>
+      <div class="rewrite">
+       <div class="rw-row rw-said"><div class="rw-k">You said</div><p>"It is not fair to be credited for work they did not do. Contribute something tonight or I email the tutor."</p></div>
+       <div class="rw-row rw-better"><div class="rw-k">Stronger</div><p>"Hey Sam, we have missed you at the meetings - is everything okay? We are submitting tomorrow and want to be fair to everyone, so can we have a quick call about what you are able to contribute tonight?"</p></div>
+       <div class="rw-row rw-why"><div class="rw-k">Why it scores</div><p>It checks the cause, keeps the door open, and still names the deadline and fairness - so if you do escalate, it reads as proportionate, not punitive.</p></div>
+      </div>
+      <div class="nextrep"><div class="ic">&#9999;&#65039;</div><div><div class="k">Your next rep</div><p>Re-answer this station. Before you propose any action, write one sentence that asks why Sam disengaged - then watch your Collaboration and Equity read move.</p></div></div>
+      <div class="k2fb-cta">
+       <h3>One free CASPer review every day.</h3>
+       <p>Type a response to any station and get this back, scored on the CASPer competencies.</p>
+       <a class="btn" href="practice.html?lock_mode=casper&amp;from=plans_preview">Try a station free &#8594;</a>
+       <div class="k2fb-fineprint">Illustrative example. Not an official Acuity Insights score. Real feedback is generated on your own answer.</div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+<style>
+.fbprev-ov{display:none;position:fixed;inset:0;background:rgba(6,12,24,0.74);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:10000;padding:18px;}
+.fbprev-ov.open{display:flex;align-items:center;justify-content:center;}
+.fbprev-shell{position:relative;width:100%;max-width:840px;max-height:92vh;display:flex;flex-direction:column;background:#eef2f7;border-radius:22px;overflow:hidden;box-shadow:0 40px 110px -28px rgba(0,0,0,0.75);}
+.fbprev-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;background:#0a1628;flex:0 0 auto;}
+.fbprev-toggle{display:inline-flex;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);border-radius:50px;padding:4px;}
+.fbprev-tab{border:0;background:transparent;color:rgba(255,255,255,0.66);font:inherit;font-size:0.84rem;font-weight:800;padding:8px 18px;border-radius:50px;cursor:pointer;transition:all 0.18s;}
+.fbprev-tab.active{background:#0ea5e9;color:#fff;}
+.fbprev-close{flex:0 0 auto;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:#fff;font-size:1.4rem;line-height:1;cursor:pointer;transition:all 0.18s;}
+.fbprev-close:hover{background:rgba(255,255,255,0.16);}
+.fbprev-scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.fbprev-scroll .k2sfb{padding:30px 18px 40px;}
+.fbprev-trigger{display:inline-flex;align-items:center;gap:9px;margin:4px 0 8px;padding:11px 20px;border-radius:50px;border:1px solid rgba(56,189,248,0.45);background:rgba(14,165,233,0.12);color:#bae6fd;font:inherit;font-size:0.9rem;font-weight:800;cursor:pointer;transition:all 0.2s;}
+.fbprev-trigger:hover{background:rgba(14,165,233,0.22);border-color:rgba(56,189,248,0.7);color:#fff;transform:translateY(-1px);}
+.fbprev-trigger-ic{font-size:1rem;}
+.k2sfb{--navy:#0a1628;--navy2:#0d1f3c;--teal:#0ea5e9;--teal2:#38bdf8;--teal3:#0284c7;--gold:#f59e0b;--amber:#fbbf24;--green:#22c55e;--ink:#0f172a;--gray600:#475569;--gray500:#64748b;--gray400:#94a3b8;--line:#e6ebf2;--card:#fff;background:radial-gradient(1100px 560px at 82% -10%,rgba(14,165,233,0.10),transparent 60%),#eef2f7;font-family:'DM Sans',system-ui,sans-serif}
+.k2sfb-lead{max-width:760px;margin:0 auto 26px;text-align:center}
+.k2sfb-lead .eb{font-size:0.72rem;font-weight:800;letter-spacing:0.13em;text-transform:uppercase;color:var(--teal3);margin-bottom:8px}
+.k2sfb-lead h2{font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:clamp(1.5rem,3.4vw,2.1rem);color:var(--navy);line-height:1.15;margin:0 0 8px}
+.k2sfb-lead p{color:var(--gray600);font-size:1rem;margin:0}
+.k2sfb .k2fb{max-width:760px;margin:0 auto;background:var(--card);border-radius:24px;overflow:hidden;box-shadow:0 30px 80px -24px rgba(10,22,40,0.45);border:1px solid rgba(255,255,255,0.7)}
+.k2sfb .k2fb-head{position:relative;background:linear-gradient(150deg,var(--navy) 0%,var(--navy2) 55%,#0a1f3d 100%);color:#fff;padding:30px 34px 78px;overflow:hidden}
+.k2sfb .k2fb-head::after{content:'';position:absolute;right:-120px;top:-120px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(14,165,233,0.28),transparent 68%)}
+.k2sfb .k2fb-tag{display:inline-flex;align-items:center;gap:7px;font-size:0.66rem;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--teal2);background:rgba(14,165,233,0.14);border:1px solid rgba(56,189,248,0.34);padding:6px 13px;border-radius:50px}
+.k2sfb .k2fb-sample{position:absolute;top:22px;right:26px;font-size:0.62rem;font-weight:800;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.62);border:1px dashed rgba(255,255,255,0.32);padding:5px 11px;border-radius:50px;z-index:2}
+.k2sfb .k2fb-station-label{margin:18px 0 7px;font-size:0.7rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.5)}
+.k2sfb .k2fb-station{font-size:1.16rem;line-height:1.5;color:rgba(255,255,255,0.96);max-width:600px;position:relative;z-index:2}
+.k2sfb .k2fb-answer{position:relative;z-index:2;margin-top:18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-left:3px solid var(--teal);border-radius:12px;padding:13px 16px;font-size:0.9rem;color:rgba(255,255,255,0.78);font-style:italic}
+.k2sfb .k2fb-answer b{color:rgba(255,255,255,0.95);font-style:normal;font-weight:700}
+.k2sfb .k2fb-scorewrap{display:flex;align-items:center;gap:20px;margin:-56px 34px 0;position:relative;z-index:3;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;box-shadow:0 16px 40px -18px rgba(10,22,40,0.30)}
+.k2sfb .ring{flex:0 0 auto;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--teal) 60%,#e9eef5 0);position:relative}
+.k2sfb .ring::before{content:'';position:absolute;inset:9px;background:#fff;border-radius:50%}
+.k2sfb .ring span{position:relative;text-align:center;line-height:1}
+.k2sfb .ring .num{font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--navy)}
+.k2sfb .ring .den{font-size:0.66rem;color:var(--gray500);font-weight:700}
+.k2sfb .k2fb-verdict-k{font-size:0.68rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal3);margin-bottom:4px}
+.k2sfb .k2fb-verdict{font-size:1.18rem;font-weight:800;color:var(--navy)}
+.k2sfb .k2fb-verdict-sub{font-size:0.9rem;color:var(--gray600);margin-top:3px}
+.k2sfb .k2fb-body{padding:26px 34px 34px}
+.k2sfb .k2fb-h{display:flex;align-items:baseline;gap:10px;margin:26px 0 14px}
+.k2sfb .k2fb-h:first-child{margin-top:6px}
+.k2sfb .k2fb-h .t{font-size:0.74rem;font-weight:800;letter-spacing:0.13em;text-transform:uppercase;color:var(--gray500)}
+.k2sfb .k2fb-h .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.k2sfb .crit{display:flex;flex-direction:column;gap:14px}
+.k2sfb .crit-row{display:grid;grid-template-columns:170px 1fr;gap:14px;align-items:start}
+.k2sfb .crit-name{font-weight:700;color:var(--navy);font-size:0.95rem}
+.k2sfb .bar{height:9px;border-radius:50px;background:#eef2f7;overflow:hidden}
+.k2sfb .bar>i{display:block;height:100%;border-radius:50px;background:linear-gradient(90deg,var(--teal3),var(--teal2))}
+.k2sfb .bar.lo>i{background:linear-gradient(90deg,#f59e0b,var(--amber))}
+.k2sfb .bar.mid>i{background:linear-gradient(90deg,#0284c7,var(--teal2))}
+.k2sfb .crit-note{font-size:0.86rem;color:var(--gray600);margin-top:8px;line-height:1.55}
+.k2sfb .duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.k2sfb .cardlet{border-radius:14px;padding:16px 18px;border:1px solid var(--line)}
+.k2sfb .cardlet .lab{font-size:0.68rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.k2sfb .cardlet p{font-size:0.9rem;color:var(--gray600);line-height:1.6}
+.k2sfb .cardlet.good{background:linear-gradient(180deg,rgba(34,197,94,0.07),rgba(34,197,94,0.02));border-color:rgba(34,197,94,0.25)}
+.k2sfb .cardlet.good .lab{color:#15803d}
+.k2sfb .cardlet.gap{background:linear-gradient(180deg,rgba(245,158,11,0.08),rgba(245,158,11,0.02));border-color:rgba(245,158,11,0.3)}
+.k2sfb .cardlet.gap .lab{color:#b45309}
+.k2sfb .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.k2sfb .rewrite{border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.k2sfb .rw-row{padding:15px 18px}.k2sfb .rw-row+.rw-row{border-top:1px solid var(--line)}
+.k2sfb .rw-k{font-size:0.66rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
+.k2sfb .rw-said .rw-k{color:var(--gray400)}
+.k2sfb .rw-said p{color:var(--gray500);font-size:0.92rem;text-decoration:line-through;text-decoration-color:rgba(148,163,184,0.5)}
+.k2sfb .rw-better{background:linear-gradient(180deg,rgba(14,165,233,0.07),rgba(14,165,233,0.015))}
+.k2sfb .rw-better .rw-k{color:var(--teal3)}
+.k2sfb .rw-better p{color:var(--navy);font-size:1.02rem;font-weight:600;line-height:1.55}
+.k2sfb .rw-why{background:#fbfdff}.k2sfb .rw-why .rw-k{color:var(--gray400)}.k2sfb .rw-why p{color:var(--gray600);font-size:0.88rem}
+.k2sfb .nextrep{display:flex;gap:14px;align-items:flex-start;margin-top:22px;background:var(--navy);color:#fff;border-radius:16px;padding:18px 20px}
+.k2sfb .nextrep .ic{flex:0 0 auto;width:38px;height:38px;border-radius:11px;background:rgba(14,165,233,0.18);border:1px solid rgba(56,189,248,0.4);display:grid;place-items:center;font-size:1.05rem}
+.k2sfb .nextrep .k{font-size:0.66rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--teal2);margin-bottom:3px}
+.k2sfb .nextrep p{font-size:0.94rem;color:rgba(255,255,255,0.88);line-height:1.55}
+.k2sfb .k2fb-cta{margin-top:24px;text-align:center;padding:24px 18px 6px;border-top:1px solid var(--line)}
+.k2sfb .k2fb-cta h3{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--navy);margin-bottom:6px}
+.k2sfb .k2fb-cta p{color:var(--gray600);font-size:0.95rem;margin-bottom:18px}
+.k2sfb .k2fb-cta .btn{display:inline-flex;align-items:center;gap:9px;background:var(--teal);color:#fff;font-weight:700;font-size:1rem;padding:14px 30px;border-radius:50px;text-decoration:none;box-shadow:0 12px 30px -8px rgba(14,165,233,0.6)}
+.k2sfb .k2fb-fineprint{margin-top:14px;font-size:0.72rem;color:var(--gray400)}
+@media(max-width:640px){.fbprev-scroll .k2sfb{padding:22px 10px 30px}.fbprev-tab{padding:8px 13px;font-size:0.78rem}.k2sfb .k2fb-head{padding:24px 20px 72px}.k2sfb .k2fb-scorewrap{margin:-54px 16px 0;gap:16px;padding:16px}.k2sfb .ring{width:80px;height:80px}.k2sfb .ring .num{font-size:1.6rem}.k2sfb .k2fb-body{padding:22px 18px 26px}.k2sfb .crit-row{grid-template-columns:1fr;gap:6px}.k2sfb .duo{grid-template-columns:1fr}.k2sfb .k2fb-sample{top:16px;right:16px}}
+</style>
+<script>
+function setFeedbackPreviewTab(which){
+ document.querySelectorAll('#fbPreviewModal [data-fbtab]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-fbtab')===which);});
+ document.querySelectorAll('#fbPreviewModal [data-fbpanel]').forEach(function(p){p.style.display=(p.getAttribute('data-fbpanel')===which)?'':'none';});
+ var sc=document.querySelector('#fbPreviewModal .fbprev-scroll'); if(sc) sc.scrollTop=0;
+}
+function openFeedbackPreview(which){
+ var ov=document.getElementById('fbPreviewModal'); if(!ov) return;
+ setFeedbackPreviewTab(which||'mmi');
+ ov.classList.add('open');
+ document.body.style.overflow='hidden';
+}
+function closeFeedbackPreview(){
+ var ov=document.getElementById('fbPreviewModal'); if(!ov) return;
+ ov.classList.remove('open');
+ document.body.style.overflow='';
+}
+(function(){
+ var ov=document.getElementById('fbPreviewModal'); if(!ov) return;
+ ov.addEventListener('click',function(e){ if(e.target===ov) closeFeedbackPreview(); });
+ ov.querySelectorAll('[data-fbtab]').forEach(function(b){ b.addEventListener('click',function(){ setFeedbackPreviewTab(b.getAttribute('data-fbtab')); }); });
+ document.addEventListener('keydown',function(e){ if(e.key==='Escape' && ov.classList.contains('open')) closeFeedbackPreview(); });
+})();
+</script>
 </body>
 </html>
