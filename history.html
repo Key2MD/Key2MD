@@ -2645,28 +2645,32 @@ function renderReferralSection(data) {
  const code = data.referral_code;
  const link = data.referral_link || '';
  const count = Number(data.referred_count || 0);
- const earned = Number(data.rewards_earned || 0);
- const cap = Number(data.reward_cap || 10);
- const tokens = Number(data.pending_reward_tokens || 0);
  const friendPct = Number(data.friend_discount_percent || 15);
- const rewardPct = Number(data.reward_percent || 15);
- const rewardMax = Number(data.reward_max_dollars || 40);
+ const rewardPct = Number(data.reward_percent || 0);
+ const startPct = Number(data.start_percent || 10);
+ const stepPct = Number(data.step_percent || 2.5);
+ const capPct = Number(data.cap_percent || 30);
  const qualify = Number(data.qualifying_spend_dollars || 50);
+ const bigSpend = Number(data.big_spender_dollars || 150);
  const isSub = !!data.is_subscriber;
- const rewardWhere = isSub ? 'your next renewal' : 'your next purchase';
- const tokenLine = (tokens > 0 && !isSub)
-  ? `<div class="mmi-referral-count" style="color:#16a34a;font-weight:700;">You have ${tokens} reward${tokens === 1 ? '' : 's'} ready: ${rewardPct}% off your next purchase (up to $${rewardMax}).</div>`
-  : '';
+ const rewardWhere = isSub ? 'everything you buy, and forever on renewals' : 'everything you buy';
+ const haveReward = rewardPct > 0;
+ const pctOfCap = Math.max(0, Math.min(100, Math.round((rewardPct / (capPct || 30)) * 100)));
+ const statusLine = haveReward
+  ? `<div class="mmi-referral-count" style="color:#0a1628;font-weight:800;font-size:1.05rem;">You are earning ${rewardPct}% off ${rewardWhere}, for life.</div>`
+  : `<div class="mmi-referral-count" style="color:#0a1628;font-weight:800;">Refer your first friend to unlock ${startPct}% off, for life.</div>`;
+ const progress = `<div style="margin:8px 0 4px;max-width:340px;"><div style="height:9px;border-radius:50px;background:#e8edf3;overflow:hidden;"><div style="height:100%;width:${pctOfCap}%;border-radius:50px;background:linear-gradient(90deg,#0ea5e9,#6366f1);transition:width .5s ease;"></div></div><div style="display:flex;justify-content:space-between;font-size:0.68rem;color:#64748b;font-weight:700;margin-top:3px;"><span>${haveReward ? rewardPct + '%' : '0%'}</span><span>${capPct}% max</span></div></div>`;
  content.innerHTML = `<div class="mmi-referral-title">Refer a friend, you both win</div>
-<div class="mmi-referral-sub">Your friend gets <strong>${friendPct}% off their first purchase</strong>. When they spend $${qualify} or more, you get <strong>${rewardPct}% off (up to $${rewardMax})</strong>, applied automatically to ${rewardWhere}.</div>
+<div class="mmi-referral-sub">Your friend gets <strong>${friendPct}% off their first purchase</strong>. You unlock an <strong>enduring discount on ${rewardWhere}</strong>: ${startPct}% with your first referral, then +${stepPct}% for every friend who spends $${qualify} or more, climbing to <strong>${capPct}% off, forever</strong>. Friends who spend $${bigSpend}+ count double, so recruiting heavy users rewards you twice as fast.</div>
+${statusLine}
+${progress}
 <div class="mmi-referral-code-row">
  <span class="mmi-referral-code">${escapeHtml(code)}</span>
  <button class="mmi-referral-copy" onclick="copyReferralLink('${escapeAttr(link)}', this)">Copy link</button>
 </div>
 <div class="mmi-referral-link">${escapeHtml(link)}</div>
-<div class="mmi-referral-count">${count} friend${count === 1 ? '' : 's'} joined &bull; ${earned} of ${cap} rewards earned</div>
-${tokenLine}
-<div class="mmi-referral-reward">One reward per friend, on their first purchase of $${qualify}+. Rewards apply automatically, nothing to enter. Capped at ${cap} friends.</div>`;
+<div class="mmi-referral-count">${count} friend${count === 1 ? '' : 's'} joined</div>
+<div class="mmi-referral-reward">Your discount is permanent, never expires, and only ever grows. It applies automatically to every future purchase, with nothing to enter.</div>`;
  section.style.display = '';
 }
 

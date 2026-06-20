@@ -477,11 +477,12 @@ function copyReferralLink(link, btn){
 async function loadReferralCard(){
  var card=document.getElementById('referralCard'), body=document.getElementById('referralCardBody'), hook=document.getElementById('referralCardHook');
  if(!card||!body) return;
+ try{ if(localStorage.getItem('k2_ref_card_hidden')==='1'){ card.style.display='none'; return; } }catch(e){}
  var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
  var auth=getK2Auth(), loggedIn=!!(auth&&auth.isLoggedIn&&auth.isLoggedIn());
  if(!loggedIn){
-  if(hook) hook.textContent='You both win.';
-  body.innerHTML='<div style="font-size:0.76rem;color:var(--gray600);line-height:1.5;">Your friend gets a discount on their first review, and you earn one too. <a href="plans.html" style="color:var(--teal3);font-weight:800;text-decoration:none;">Create a free account</a> for your link.</div>';
+  if(hook) hook.textContent='Up to 30% off, forever.';
+  body.innerHTML='<div style="font-size:0.76rem;color:var(--gray600);line-height:1.55;">Refer friends and earn an enduring discount on everything you buy, climbing to 30% off. <a href="plans.html" style="color:var(--teal3);font-weight:800;text-decoration:none;">Create a free account</a> for your link.</div>';
   card.style.display='block'; return;
  }
  var token=(auth&&auth.getToken)?auth.getToken():'';
@@ -490,11 +491,24 @@ async function loadReferralCard(){
   if(!res.ok) return; var d=await res.json();
   if(!d||!d.referral_code) return;
   window.__refLink=d.referral_link||'';
-  var code=d.referral_code, friendPct=Number(d.friend_discount_percent||15), rewardPct=Number(d.reward_percent||15), rewardMax=Number(d.reward_max_dollars||40), count=Number(d.referred_count||0), earned=Number(d.rewards_earned||0), cap=Number(d.reward_cap||10), tokens=Number(d.pending_reward_tokens||0);
-  if(hook) hook.textContent='Friend gets '+friendPct+'% off; you earn '+rewardPct+'% (up to $'+rewardMax+').';
-  var dots='', shown=Math.min(cap,5); for(var i=0;i<shown;i++){ dots+='<span style="width:8px;height:8px;border-radius:50%;background:'+(i<Math.min(count,shown)?'#0ea5e9':'var(--gray200)')+';"></span>'; }
-  var ready=tokens>0?'<div style="font-size:0.72rem;color:#16a34a;font-weight:800;margin-top:6px;">'+tokens+' reward'+(tokens===1?'':'s')+' ready &bull; '+rewardPct+'% off your next purchase.</div>':'';
-  body.innerHTML='<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px;"><span style="background:var(--gray50);border:1px solid var(--gray200);border-radius:7px;padding:5px 11px;font-size:0.8rem;font-weight:850;letter-spacing:0.07em;font-family:monospace;color:#0a1628;">'+esc(code)+'</span><button type="button" onclick="copyReferralLink(window.__refLink,this)" style="border-radius:50px;padding:5px 13px;font-size:0.72rem;font-weight:800;border:1px solid rgba(14,165,233,0.35);background:#fff;color:var(--teal3);cursor:pointer;font-family:inherit;">Copy link</button></div><div style="display:flex;gap:4px;margin-bottom:7px;">'+dots+'</div><div style="font-size:0.72rem;color:var(--gray500);">'+count+' friend'+(count===1?'':'s')+' joined &bull; '+earned+' of '+cap+' rewards</div>'+ready+'<a href="student-journey.html" style="display:inline-block;margin-top:8px;font-size:0.74rem;color:var(--teal3);font-weight:800;text-decoration:none;">See your rewards &rarr;</a>';
+  var code=d.referral_code,
+      rewardPct=Number(d.reward_percent||0),
+      capPct=Number(d.cap_percent||30),
+      count=Number(d.referred_count||0),
+      qualify=Number(d.qualifying_spend_dollars||50),
+      bigSpend=Number(d.big_spender_dollars||150);
+  var pctOfCap=Math.max(0,Math.min(100,Math.round((rewardPct/(capPct||30))*100)));
+  if(hook) hook.textContent=rewardPct>0?('You earn '+rewardPct+'% off, forever.'):'Up to 30% off, forever.';
+  var big=rewardPct>0
+   ?'<div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:1.95rem;font-weight:900;line-height:1;color:#0a1628;">'+rewardPct+'%</span><span style="font-size:0.71rem;color:var(--gray500);font-weight:700;">off everything you buy</span></div>'
+   :'<div style="font-size:0.86rem;font-weight:850;color:#0a1628;line-height:1.4;">Earn 10% off with your first referral.</div>';
+  var bar='<div style="margin:9px 0 2px;"><div style="height:8px;border-radius:50px;background:#e8edf3;overflow:hidden;"><div style="height:100%;width:'+pctOfCap+'%;border-radius:50px;background:linear-gradient(90deg,#0ea5e9,#6366f1);transition:width .5s ease;"></div></div><div style="display:flex;justify-content:space-between;font-size:0.63rem;color:var(--gray500);font-weight:700;margin-top:3px;"><span>'+(rewardPct>0?rewardPct+'%':'0%')+'</span><span>'+capPct+'% max</span></div></div>';
+  var note=rewardPct<capPct
+   ?'<div style="font-size:0.7rem;color:var(--gray500);line-height:1.45;margin-top:5px;">+2.5% for every friend who spends over $'+qualify+'. Friends who spend over $'+bigSpend+' count double.</div>'
+   :'<div style="font-size:0.7rem;color:#16a34a;font-weight:800;margin-top:5px;">Maxed out at '+capPct+'%. Nice work.</div>';
+  var codeRow='<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:10px;"><span style="background:var(--gray50);border:1px solid var(--gray200);border-radius:7px;padding:5px 11px;font-size:0.78rem;font-weight:850;letter-spacing:0.06em;font-family:monospace;color:#0a1628;">'+esc(code)+'</span><button type="button" onclick="copyReferralLink(window.__refLink,this)" style="border-radius:50px;padding:5px 13px;font-size:0.72rem;font-weight:800;border:1px solid rgba(14,165,233,0.35);background:#fff;color:var(--teal3);cursor:pointer;font-family:inherit;">Copy link</button></div>';
+  var foot='<div style="font-size:0.68rem;color:var(--gray500);margin-top:8px;">'+count+' friend'+(count===1?'':'s')+' joined &bull; <a href="student-journey.html" style="color:var(--teal3);font-weight:800;text-decoration:none;">Your rewards &rarr;</a></div>';
+  body.innerHTML=big+bar+note+codeRow+foot;
   card.style.display='block';
  }catch(e){}
 }

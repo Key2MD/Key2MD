@@ -868,7 +868,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <span class="referral-chev" aria-hidden="true"></span>
  </button>
  <div class="referral-body" id="referralBody">
- <p class="referral-lede">Share your link. Each friend who makes their first purchase grows your discount: 5% for the first, then +2.5% each, up to 30%. Best part, it is an <strong style="color:#fff;">ongoing discount on everything you buy</strong> from then on, not a one-off, and it never expires. A big first purchase counts double.</p>
+ <p class="referral-lede">Share your link. Each friend who makes their first purchase grows your discount: 10% for the first, then +2.5% for every friend who spends over $50, up to 30%. Best part, it is an <strong style="color:#fff;">ongoing discount on everything you buy</strong> from then on, not a one-off, and it never expires. Friends who spend over $150 count double, so recruiting heavy users rewards you twice as fast.</p>
  <div class="referral-code-row">
  <code id="referralLinkText">your link</code>
  <button class="referral-copy" id="referralCopyBtn" type="button">Copy link</button>
@@ -1662,7 +1662,7 @@ function toggleReferralPanel(btn) {
  if (btn) btn.setAttribute('aria-expanded', String(!collapsed));
 }
 function renderReferralTiers(curPct) {
- const ms = [{ pct: 5, label: '5%' }, { pct: 15, label: '15%' }, { pct: 30, label: '30% for good' }];
+ const ms = [{ pct: 10, label: '10%' }, { pct: 20, label: '20%' }, { pct: 30, label: '30% for good' }];
  return ms.map(function (m) { return '<span class="referral-tier' + (curPct >= m.pct ? ' hit' : '') + '">' + m.label + '</span>'; }).join('');
 }
 let _referralPanelLoaded = false;
@@ -1677,9 +1677,9 @@ async function loadReferralPanel() {
   const d = await res.json().catch(() => ({}));
   if (!d || !d.referral_code) { _referralPanelLoaded = false; return; }
   const cap = Number(d.cap_percent || 30);
-  const capPoints = Math.max(1, Math.round((cap - 5) / 2.5) + 1);
+  const capPoints = Math.max(1, Math.round((cap - 10) / 2.5) + 1);
   const points = Number(d.referral_points != null ? d.referral_points : (d.referred_count || 0));
-  const cur = Number(d.reward_percent != null ? d.reward_percent : (points <= 0 ? 0 : Math.min(cap, 5 + 2.5 * (points - 1))));
+  const cur = Number(d.reward_percent != null ? d.reward_percent : (points <= 0 ? 0 : Math.min(cap, 10 + 2.5 * (points - 1))));
   const link = d.referral_link || ('https://www.key2md.com/practice.html?ref=' + d.referral_code);
   const linkEl = document.getElementById('referralLinkText'); if (linkEl) linkEl.textContent = link;
   const curEl = document.getElementById('referralCurPct'); if (curEl) curEl.textContent = cur > 0 ? (cur + '% off, ongoing') : 'No reward yet';
@@ -1687,7 +1687,7 @@ async function loadReferralPanel() {
   const nextEl = document.getElementById('referralNextHint');
   if (nextEl) {
    if (points >= capPoints) { nextEl.textContent = 'Max 30% ongoing discount unlocked. Legend.'; }
-   else { const need = (d.points_to_next != null ? d.points_to_next : 1); const nextPct = (d.next_reward_percent != null ? d.next_reward_percent : Math.min(cap, 5 + 2.5 * points)); nextEl.textContent = need + ' more to ' + nextPct + '%'; }
+   else { const need = (d.points_to_next != null ? d.points_to_next : 1); const nextPct = (d.next_reward_percent != null ? d.next_reward_percent : Math.min(cap, 10 + 2.5 * points)); nextEl.textContent = need + ' more to ' + nextPct + '%'; }
   }
   const tiersEl = document.getElementById('referralTiers'); if (tiersEl) tiersEl.innerHTML = renderReferralTiers(cur);
   const cnt = Number(d.referred_count || 0);

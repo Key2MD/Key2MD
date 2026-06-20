@@ -913,14 +913,6 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
 
- <div class="sidebar-card" id="referralCard" style="display:none;padding:0;overflow:hidden;border:1px solid rgba(14,165,233,0.3);">
- <div style="background:linear-gradient(135deg,#0ea5e9,#6366f1);padding:11px 15px;color:#fff;">
- <div style="font-size:0.82rem;font-weight:850;display:flex;align-items:center;gap:7px;"><span aria-hidden="true">&#127873;</span> Refer a friend</div>
- <div style="font-size:0.72rem;opacity:0.92;margin-top:2px;line-height:1.4;" id="referralCardHook">You both win.</div>
- </div>
- <div style="padding:12px 15px;" id="referralCardBody"></div>
- </div>
-
  </aside>
 
 
@@ -1594,6 +1586,15 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 </div>
 
 
+<style>@media (max-width:1200px){#referralCard{display:none !important;}}</style>
+<div id="referralCard" style="display:none;position:fixed;right:24px;bottom:80px;width:212px;z-index:1090;border-radius:16px;overflow:hidden;background:var(--white);border:1px solid rgba(14,165,233,0.28);box-shadow:0 10px 34px rgba(10,22,40,0.16);font-family:inherit;">
+ <button type="button" onclick="document.getElementById('referralCard').style.display='none';try{localStorage.setItem('k2_ref_card_hidden','1');}catch(e){}" aria-label="Hide referral card" style="position:absolute;top:7px;right:9px;background:rgba(255,255,255,0.22);border:none;color:#fff;font-size:0.95rem;line-height:1;width:19px;height:19px;border-radius:50%;cursor:pointer;padding:0;z-index:2;">&times;</button>
+ <div style="background:linear-gradient(135deg,#0ea5e9,#6366f1);padding:11px 14px;color:#fff;">
+  <div style="font-size:0.82rem;font-weight:850;display:flex;align-items:center;gap:7px;"><span aria-hidden="true">&#127873;</span> Refer a friend</div>
+  <div style="font-size:0.7rem;opacity:0.93;margin-top:2px;line-height:1.4;" id="referralCardHook">Up to 30% off, forever.</div>
+ </div>
+ <div style="padding:12px 14px;" id="referralCardBody"></div>
+</div>
 <button id="bugBtn" onclick="openBugReport()" style="position:fixed;bottom:24px;right:24px;z-index:1200;background:var(--white);border:1.5px solid var(--gray200);border-radius:50px;padding:10px 18px;font-size:0.82rem;font-weight:600;color:var(--gray600);cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,0.1);display:flex;align-items:center;gap:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal3)'" onmouseout="this.style.borderColor='var(--gray200)';this.style.color='var(--gray600)'">
  Any issues?
 </button>
