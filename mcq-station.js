@@ -23,6 +23,7 @@
     var letters = "ABCDEFGH";
 
     var S = { stations: [], idx: 0, ans: {}, submitted: {}, startMs: 0, raceOn: true, timer: null, keyBound: false };
+    var historyCache = {};
 
     var gatedDiffs = cfg.gatedDifficulties || [];
     var storeKey = cfg.storageKey || ("mcqs_last_" + (categoryField || "x"));
@@ -69,6 +70,7 @@
       injectControls();
       renderGateNote();
       renderResumeCard();
+      renderHistoryCard();
     }
 
     function gatedCountInBank() {
@@ -106,7 +108,79 @@
         '<button type="button" class="btn btn-ghost" id="mcqsResumeBtn">View breakdown</button>';
       setup.appendChild(card);
       var btn = $("mcqsResumeBtn");
-      if (btn) btn.addEventListener("click", function () { renderReview(r); hide("mcqSetup"); show("mcqReview"); });
+      if (btn) btn.addEventListener("click", function () { renderReview(r); hide("mcqSetup"); show("mcqReview"); scrollToTopOf("mcqReview"); });
+    }
+
+    // -- Saved history tied to the student account (server side). Gated on cfg.historyTool. --
+    function historyApiBase() { return (cfg.apiBase || "").replace(/\/+$/, ""); }
+    function historyEnabled() { return !!cfg.historyTool && !!historyApiBase(); }
+    function authToken() {
+      try {
+        if (window.Key2MDAuth && Key2MDAuth.getToken) { var t = Key2MDAuth.getToken(); if (t) return t; }
+        if (window.localStorage) return localStorage.getItem("key2md_token") || "";
+      } catch (e) {}
+      return "";
+    }
+    function saveServerSession(r) {
+      if (!historyEnabled() || !authed()) return;
+      var token = authToken(); if (!token) return;
+      try {
+        fetch(historyApiBase() + "/api/mcq/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+          body: JSON.stringify({ tool: cfg.historyTool, result: r })
+        }).then(function () { if ($("mcqsHistoryBody")) loadServerHistory(); }).catch(function () {});
+      } catch (e) {}
+    }
+    function fmtSessionDate(iso) {
+      try {
+        var d = new Date(iso); if (isNaN(d.getTime())) return "";
+        return d.toLocaleDateString(undefined, { day: "numeric", month: "short" }) + " " +
+          d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+      } catch (e) { return ""; }
+    }
+    function renderHistoryCard() {
+      var setup = $("mcqSetup"); if (!setup) return;
+      var existing = $("mcqsHistoryCard"); if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+      if (!historyEnabled() || !authed() || !authToken()) return;
+      var card = document.createElement("div");
+      card.id = "mcqsHistoryCard"; card.className = "mcqs-history";
+      card.innerHTML = '<div class="mcqs-history-head"><span>Your saved sessions</span>' +
+        '<button type="button" class="mcqs-history-refresh" id="mcqsHistoryRefresh">Refresh</button></div>' +
+        '<div class="mcqs-history-body" id="mcqsHistoryBody"><p class="mcqs-history-empty">Loading your history...</p></div>';
+      setup.appendChild(card);
+      var rb = $("mcqsHistoryRefresh"); if (rb) rb.addEventListener("click", loadServerHistory);
+      loadServerHistory();
+    }
+    function loadServerHistory() {
+      var body = $("mcqsHistoryBody"); if (!body) return;
+      var token = authToken();
+      if (!token) { body.innerHTML = '<p class="mcqs-history-empty">Sign in to see your saved sessions.</p>'; return; }
+      body.innerHTML = '<p class="mcqs-history-empty">Loading your history...</p>';
+      fetch(historyApiBase() + "/api/mcq/sessions?tool=" + encodeURIComponent(cfg.historyTool), {
+        headers: { "Authorization": "Bearer " + token }
+      }).then(function (res) { return res.ok ? res.json() : null; }).then(function (data) {
+        var sessions = (data && data.sessions) ? data.sessions : [];
+        if (!sessions.length) {
+          body.innerHTML = '<p class="mcqs-history-empty">No saved sessions yet. Finish a set and it is saved here automatically.</p>';
+          return;
+        }
+        historyCache = {};
+        body.innerHTML = sessions.map(function (s) {
+          historyCache[s.id] = s.result;
+          var when = fmtSessionDate(s.created_at);
+          var canView = s.result && s.result.items ? "" : " disabled";
+          return '<div class="mcqs-history-row"><span class="mcqs-history-acc">' + (s.accuracy != null ? s.accuracy + "%" : "-") + '</span>' +
+            '<span class="mcqs-history-meta">' + (s.correct || 0) + "/" + (s.answered || 0) + " correct" + (when ? " &middot; " + esc(when) : "") + '</span>' +
+            '<button type="button" class="btn btn-ghost mcqs-history-view" data-id="' + esc(s.id) + '"' + canView + '>View</button></div>';
+        }).join("");
+        body.querySelectorAll(".mcqs-history-view").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var r = historyCache[b.getAttribute("data-id")]; if (!r) return;
+            renderReview(r); hide("mcqSetup"); show("mcqReview"); scrollToTopOf("mcqReview");
+          });
+        });
+      }).catch(function () { body.innerHTML = '<p class="mcqs-history-empty">Could not load your history right now.</p>'; });
     }
 
     function injectControls() {
@@ -410,10 +484,10 @@
     }
 
     function computeResults() {
-      var cats = {}, subs = {}, diffs = {}, subCat = {}, perStation = [], correct = 0, answered = 0, total = 0;
-      S.stations.forEach(function (st) {
+      var cats = {}, subs = {}, diffs = {}, subCat = {}, perStation = [], items = [], correct = 0, answered = 0, total = 0;
+      S.stations.forEach(function (st, si) {
         var sc = 0, sAns = 0;
-        st.questions.forEach(function (q) {
+        st.questions.forEach(function (q, qi) {
           total++;
           var a = S.ans[q.id], sel = a ? a.selected : null, has = sel !== null && sel !== undefined;
           var ok = has && isCorrect(q, sel);
@@ -423,17 +497,25 @@
           bump(subs, sub, ok, has);
           bump(diffs, q.difficulty || "unknown", ok, has);
           if (has) { answered++; sAns++; if (ok) { correct++; sc++; } }
+          items.push({
+            station: si + 1, qnum: qi + 1, category: st.category,
+            stem: q.stem, options: (q.options || []).slice(),
+            selected: has ? sel : null, answer: q.answer,
+            ok: ok, blank: !has, flagged: !!(a && a.flagged),
+            explanation: q.explanation || ""
+          });
         });
         perStation.push({ category: st.category, total: st.questions.length, correct: sc, answered: sAns });
       });
       return { total: total, answered: answered, correct: correct, accuracy: answered ? Math.round(correct / answered * 100) : 0,
-        byCategory: cats, bySubtype: subs, byDifficulty: diffs, subCat: subCat, perStation: perStation, elapsed: (Date.now() - S.startMs) / 1000, raceOn: S.raceOn };
+        byCategory: cats, bySubtype: subs, byDifficulty: diffs, subCat: subCat, perStation: perStation, items: items, elapsed: (Date.now() - S.startMs) / 1000, raceOn: S.raceOn };
     }
 
     function finish() {
       stopTimer();
       var r = computeResults();
       saveLastResult(r);
+      saveServerSession(r);
       renderReview(r);
       hide("mcqPractice"); show("mcqReview");
       scrollToTopOf("mcqReview");
@@ -454,6 +536,58 @@
         : "";
       setText("mcqTimeStat", "Total " + fmt(r.elapsed) + ", average " + per + "s per answered question." + raceLine);
       renderPerStation(r.perStation);
+      renderQuestionReview(r.items || []);
+    }
+
+    function reviewAnswerLine(label, idx, opts, cls) {
+      if (idx === null || idx === undefined) {
+        return '<div class="mcqs-rev-ans ' + cls + '"><span class="mcqs-rev-lbl">' + esc(label) + '</span><span class="mcqs-rev-val">Not answered</span></div>';
+      }
+      var text = opts && opts[idx] != null ? opts[idx] : "";
+      return '<div class="mcqs-rev-ans ' + cls + '"><span class="mcqs-rev-lbl">' + esc(label) + '</span>' +
+        '<span class="mcqs-rev-val"><b>' + letters.charAt(idx) + '.</b> ' + esc(text) + '</span></div>';
+    }
+
+    function renderQuestionReview(items) {
+      var review = $("mcqReview"); if (!review) return;
+      var box = $("mcqsQuestionReview");
+      if (!box) {
+        box = document.createElement("div");
+        box.id = "mcqsQuestionReview";
+        var actions = review.querySelector(".row");
+        if (actions && actions.parentNode) actions.parentNode.insertBefore(box, actions);
+        else review.appendChild(box);
+      }
+      if (!items || !items.length) { box.innerHTML = ""; return; }
+      var nCorrect = 0, nWrong = 0, nBlank = 0;
+      items.forEach(function (it) { if (it.blank) nBlank++; else if (it.ok) nCorrect++; else nWrong++; });
+      var summary = '<div class="mcqs-rev-summary">' +
+        '<span class="mcqs-pill ok">' + nCorrect + ' correct</span>' +
+        '<span class="mcqs-pill no">' + nWrong + ' incorrect</span>' +
+        (nBlank ? '<span class="mcqs-pill blank">' + nBlank + ' skipped</span>' : '') + '</div>';
+      var lastStation = null, html = "";
+      items.forEach(function (it, i) {
+        if (it.station !== lastStation) {
+          html += '<p class="mcqs-rev-station">' + cap(noun) + ' ' + it.station + ' &middot; ' + esc(cfg.categoryLabel(it.category)) + '</p>';
+          lastStation = it.station;
+        }
+        var verdict = it.blank ? '<span class="mcqs-pill blank">Not answered</span>'
+          : (it.ok ? '<span class="mcqs-pill ok">Correct</span>' : '<span class="mcqs-pill no">Incorrect</span>');
+        html += '<div class="mcqs-rev-item ' + (it.blank ? "blank" : (it.ok ? "ok" : "no")) + '">' +
+          '<div class="mcqs-rev-top"><span class="mcqs-rev-q">Q' + (it.qnum || (i + 1)) + '</span>' + verdict + '</div>' +
+          '<div class="mcqs-rev-stem">' + esc(it.stem) + '</div>';
+        if (it.ok) {
+          html += reviewAnswerLine("Your answer", it.selected, it.options, "right");
+        } else {
+          html += reviewAnswerLine("Your answer", it.blank ? null : it.selected, it.options, "you");
+          html += reviewAnswerLine("Correct answer", it.answer, it.options, "right");
+        }
+        if (it.explanation) {
+          html += '<details class="mcqs-rev-ex"><summary>Why this answer</summary><div class="mcqs-ex">' + esc(it.explanation) + '</div></details>';
+        }
+        html += '</div>';
+      });
+      box.innerHTML = '<p class="brk-title">Every question, marked</p>' + summary + html;
     }
 
     function renderPerStation(list) {

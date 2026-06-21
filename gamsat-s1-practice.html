@@ -393,6 +393,8 @@ var s1Station = MCQStation.init({
   allDifficultyLabel: "Mixed",
   gatedDifficulties: ["medium", "hard", "very_hard"],
   storageKey: "mcqs_last_s1",
+  historyTool: "s1",
+  apiBase: API_BASE,
   isAuthed: function () { return !!(window.Key2MDAuth && Key2MDAuth.isLoggedIn()); },
   onAuthRequired: function () { if (window.Key2MDAuth) Key2MDAuth.showAuthModal('signup'); },
   categoryLabel: function (k) { return GAMSAT_S1_GENRES[k] || k; },

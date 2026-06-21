@@ -142,3 +142,36 @@ select{font-family:inherit;font-size:0.92rem;padding:9px 12px;border:1px solid v
 .mcqs-gate-link{font-family:inherit;font-size:0.86rem;font-weight:700;color:var(--teal);background:none;border:none;padding:0;cursor:pointer;text-decoration:underline}
 .mcqs-resume{margin-top:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:11px 14px;font-size:0.9rem;color:var(--ink)}
 .mcqs-resume b{color:var(--navy)}
+
+/* Saved history card on the setup screen */
+.mcqs-history{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:4px 14px 10px}
+.mcqs-history-head{display:flex;justify-content:space-between;align-items:center;padding:10px 0 6px;font-weight:700;color:var(--navy);font-size:0.92rem}
+.mcqs-history-refresh{background:none;border:0;color:var(--teal);font-family:inherit;font-weight:700;font-size:0.82rem;cursor:pointer}
+.mcqs-history-empty{color:var(--muted);font-size:0.86rem;margin:6px 0 8px}
+.mcqs-history-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.mcqs-history-acc{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;flex:0 0 48px}
+.mcqs-history-meta{flex:1;color:var(--muted);font-size:0.85rem}
+.mcqs-history-view{padding:6px 14px;font-size:0.82rem}
+.mcqs-history-view:disabled{opacity:0.5;cursor:default}
+
+/* Every-question marked review on the results screen */
+.mcqs-rev-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.mcqs-rev-station{font-weight:800;color:var(--navy);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;margin:20px 0 8px}
+.mcqs-rev-item{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:10px;background:#fff}
+.mcqs-rev-item.ok{border-left-color:var(--ok)}
+.mcqs-rev-item.no{border-left-color:var(--no)}
+.mcqs-rev-item.blank{border-left-color:#cbd5e1}
+.mcqs-rev-top{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.mcqs-rev-q{font-weight:800;color:var(--navy);font-size:0.86rem}
+.mcqs-rev-stem{font-size:0.96rem;color:var(--ink);margin-bottom:10px;white-space:pre-wrap}
+.mcqs-rev-ans{display:flex;gap:8px;font-size:0.9rem;margin-bottom:5px;align-items:baseline}
+.mcqs-rev-lbl{flex:0 0 104px;color:var(--muted);font-size:0.8rem;font-weight:700}
+.mcqs-rev-val{flex:1;color:var(--ink)}
+.mcqs-rev-ans.right .mcqs-rev-val{color:var(--ok)}
+.mcqs-rev-ans.you .mcqs-rev-val{color:var(--no)}
+.mcqs-rev-ex{margin-top:8px}
+.mcqs-rev-ex summary{cursor:pointer;color:var(--teal);font-weight:700;font-size:0.85rem;list-style:none}
+.mcqs-rev-ex summary::-webkit-details-marker{display:none}
+.mcqs-rev-ex summary::before{content:'+ ';font-weight:800}
+.mcqs-rev-ex[open] summary::before{content:'- '}
+.mcqs-rev-ex .mcqs-ex{margin-top:8px}
