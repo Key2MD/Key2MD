@@ -30,7 +30,7 @@
 
   function isCorrect(question, value) {
     if (question == null || value == null) return false;
-    if (question.format === "drag_rank") return arraysEqual(value, question.answer);
+    if (question.format === "drag_rank" || question.format === "multi_yes_no") return arraysEqual(value, question.answer);
     return value === question.answer;
   }
 
@@ -209,6 +209,20 @@
         return '<div class="mcq-question">' + Renderer.stimulusHtml(q) +
           '<div class="mcq-stem">' + escapeHtml(q.stem) + '</div>' +
           '<div class="mcq-empty">This drag-to-rank question type is not supported in this view yet.</div></div>';
+      }
+      if (q.format === "multi_yes_no") {
+        var stmts = q.statements || [];
+        var rows = stmts.map(function (s, i) {
+          return '<div class="mcq-stmt" data-i="' + i + '">' +
+            '<span class="mcq-stmt-text">' + escapeHtml(s) + '</span>' +
+            '<span class="mcq-stmt-btns">' +
+            '<button type="button" class="mcq-yn" data-i="' + i + '" data-v="1">Yes</button>' +
+            '<button type="button" class="mcq-yn" data-i="' + i + '" data-v="0">No</button>' +
+            '</span></div>';
+        }).join("");
+        return '<div class="mcq-question">' + Renderer.stimulusHtml(q) +
+          '<div class="mcq-stem">' + escapeHtml(q.stem) + '</div>' +
+          '<div class="mcq-stmts">' + rows + '</div></div>';
       }
       var opts = Renderer.optionList(q, scales);
       var letters = "ABCDEFGH";

@@ -100,6 +100,20 @@
       $("mcqQ").innerHTML = E.Renderer.questionHtml(q, scales);
       $("mcqExplain").innerHTML = ""; hide("mcqExplain");
       var btn = $("mcqAction"); btn.textContent = "Submit"; btn.disabled = true;
+      if (q.format === "multi_yes_no") {
+        var stmtCount = (q.statements || []).length;
+        selectedValue = new Array(stmtCount).fill(null);
+        $("mcqQ").querySelectorAll(".mcq-yn").forEach(function (b) {
+          b.addEventListener("click", function () {
+            if (revealed) return;
+            var i = parseInt(b.getAttribute("data-i"), 10);
+            selectedValue[i] = b.getAttribute("data-v") === "1";
+            b.parentNode.querySelectorAll(".mcq-yn").forEach(function (x) { x.classList.toggle("selected", x === b); });
+            if (selectedValue.every(function (s) { return s !== null; })) btn.disabled = false;
+          });
+        });
+        return;
+      }
       var opts = $("mcqQ").querySelectorAll(".mcq-option");
       opts.forEach(function (o) {
         o.addEventListener("click", function () {
@@ -116,13 +130,30 @@
       var q = session.current();
       var rec = session.submit(selectedValue);
       revealed = true;
-      $("mcqQ").querySelectorAll(".mcq-option").forEach(function (o) {
-        var v = parseInt(o.getAttribute("data-value"), 10);
-        if (v === q.answer) o.classList.add("correct");
-        else if (v === selectedValue) o.classList.add("wrong");
-      });
+      var extra = "";
+      if (q.format === "multi_yes_no") {
+        var ans = q.answer || [], k = 0;
+        $("mcqQ").querySelectorAll(".mcq-stmt").forEach(function (row) {
+          var i = parseInt(row.getAttribute("data-i"), 10);
+          var correctVal = !!ans[i], chosen = selectedValue[i];
+          if (chosen === correctVal) k++;
+          row.classList.add(chosen === correctVal ? "row-ok" : "row-no");
+          row.querySelectorAll(".mcq-yn").forEach(function (b) {
+            var bv = b.getAttribute("data-v") === "1";
+            if (bv === correctVal) b.classList.add("correct");
+            else if (bv === chosen) b.classList.add("wrong");
+          });
+        });
+        extra = '<div class="mcq-multi-tally">' + k + ' of ' + ans.length + ' statements correct</div>';
+      } else {
+        $("mcqQ").querySelectorAll(".mcq-option").forEach(function (o) {
+          var v = parseInt(o.getAttribute("data-value"), 10);
+          if (v === q.answer) o.classList.add("correct");
+          else if (v === selectedValue) o.classList.add("wrong");
+        });
+      }
       $("mcqExplain").innerHTML = '<div class="mcq-verdict ' + (rec.correct ? "ok" : "no") + '">' +
-        (rec.correct ? "Correct" : "Not quite") + '</div>' +
+        (rec.correct ? "Correct" : "Not quite") + '</div>' + extra +
         (q.explanation ? '<div class="mcq-ex-text">' + E.util.escapeHtml(q.explanation) + '</div>' : '');
       show("mcqExplain");
       var btn = $("mcqAction");
