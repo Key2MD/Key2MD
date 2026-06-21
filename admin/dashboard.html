@@ -8053,12 +8053,24 @@ function bcFormat(cmd) {
 function bcInsert(type) {
  const ed = document.getElementById('bcRichEditor');
  ed.focus();
+ if (type === 'cta') {
+ const url = (window.prompt('Button link (URL):', 'https://www.key2md.com/mmi-class.html#register') || '').trim();
+ if (!url) return;
+ const al = document.getElementById('bcAlert');
+ if (!isSafeHttpUrl(url)) { if (al) { al.className='alert err'; al.textContent='Enter a valid http(s) link for the button.'; } return; }
+ const labelRaw = (window.prompt('Button text:', 'Register your interest') || '').trim() || 'Register your interest';
+ const label = labelRaw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+ const safeUrl = url.replace(/"/g,'%22');
+ const btn = `<div style="text-align:center;margin:24px 0;"><a href="${safeUrl}" style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;font-weight:800;padding:14px 32px;border-radius:50px;text-decoration:none;font-size:15px;">${label} -></a></div>`;
+ document.execCommand('insertHTML', false, btn);
+ updateBcPreview();
+ return;
+ }
  const templates = {
  h2: '<h2 style="font-size:1.25rem;font-weight:800;color:#0a1628;margin:20px 0 8px;">Your heading here</h2>',
  h3: '<h3 style="font-size:1rem;font-weight:700;color:#0a1628;margin:16px 0 6px;">Your subheading here</h3>',
  bullet: '<ul style="padding-left:20px;line-height:1.9;color:#374151;"><li>First point</li><li>Second point</li><li>Third point</li></ul>',
  divider: '<hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;">',
- cta: '<div style="text-align:center;margin:24px 0;"><a href="https://www.key2md.com/practice.html" style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;font-weight:800;padding:14px 32px;border-radius:50px;text-decoration:none;font-size:15px;">Button text -></a></div>',
  };
  document.execCommand('insertHTML', false, templates[type] || '');
  updateBcPreview();
