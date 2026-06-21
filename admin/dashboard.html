@@ -1603,7 +1603,7 @@
 
  <div style="margin-bottom:14px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid var(--amber-border);border-radius:8px;font-size:0.75rem;color:var(--muted);line-height:1.5;">
  <strong style="color:var(--text);">Fresh-lead shortcut:</strong> choose <strong style="color:var(--amber);">Newest 90 registered accounts</strong>, preview the audience, send yourself a test, then send. This skips unsubscribed accounts where the account flag exists.
- <div style="margin-top:8px;"><button class="btn" type="button" onclick="insertMasterclassFinalEmail()" style="padding:7px 11px;font-size:0.74rem;">Build masterclass final message</button></div>
+ <div style="margin-top:8px;"><button class="btn" type="button" onclick="insertMasterclassFinalEmail()" style="padding:7px 11px;font-size:0.74rem;">Build masterclass final message</button> <button class="btn blue" type="button" onclick="insertMmiClassEmail()" style="padding:7px 11px;font-size:0.74rem;">Build MMI class email</button></div>
  </div>
 
  <div class="form-row">
@@ -7975,6 +7975,45 @@ function insertMasterclassFinalEmail() {
  <p style="margin:0 0 14px;color:#334155;font-size:15px;line-height:1.75;">If you are unsure whether it is worth it for where you are at, reply with your test date and how prepared you feel. I will be honest.</p>
  `;
  if (al) { al.className = 'alert ok'; al.textContent = 'Masterclass final message drafted. Choose the newest 90 audience, preview it, send a test, then send.'; }
+ updateBcPreview();
+}
+
+function insertMmiClassEmail() {
+ const link = 'https://www.key2md.com/mmi-class.html#register';
+ const al = document.getElementById('bcAlert');
+ document.getElementById('bcSubject').value = 'Practise the MMI live, every Friday';
+ setBcMode('rich');
+ document.getElementById('bcRichEditor').innerHTML = `
+ <div style="margin:-6px 0 24px;padding:26px 28px;border-radius:18px;background:linear-gradient(135deg,#0a1628 0%,#0d2244 60%,#0a2e40 100%);color:#ffffff;">
+ <div style="display:inline-block;margin:0 0 14px;padding:6px 11px;border-radius:999px;background:rgba(240,179,74,0.16);border:1px solid rgba(240,179,74,0.4);color:#f0c987;font-size:11px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;">Registrations of interest now open</div>
+ <h1 style="margin:0 0 12px;color:#ffffff;font-size:28px;line-height:1.18;font-weight:900;">Practise the MMI live, every Friday.</h1>
+ <p style="margin:0;color:#cbd5e1;font-size:15px;line-height:1.7;">Small-group MMI practice with Dan, the tutor behind 72 offers and a 93%+ interview success rate. Real stations, marked and discussed out loud, with a room of motivated students working the same scenario.</p>
+ </div>
+
+ <p style="margin:0 0 15px;color:#334155;font-size:15px;line-height:1.75;">Hi there,</p>
+ <p style="margin:0 0 18px;color:#334155;font-size:15px;line-height:1.75;">We are gathering the first cohort for the new Key2MD live MMI classes, and registrations of interest are open now. Classes run every Friday at 6pm AEST once we reach the numbers to begin.</p>
+
+ <div style="margin:24px 0 10px;color:#0f172a;font-size:18px;line-height:1.3;font-weight:900;">What you get every week:</div>
+ <ol style="margin:0 0 22px 22px;padding:0;color:#263447;font-size:15px;line-height:1.8;">
+ <li style="margin:0 0 8px;"><strong>Hear how everyone else answers.</strong> You answer a station, then hear other strong students take the same one. Seeing the gap is the fastest way to learn what a top answer sounds like, and it is something 1:1 cannot give you.</li>
+ <li style="margin:0 0 8px;"><strong>Real feedback on your real answer.</strong> Dan marks what you actually said, not a generic rubric, and names exactly what to change next time.</li>
+ <li style="margin:0 0 8px;"><strong>Regular reps before the real day.</strong> Performing under pressure week after week is what turns a nervous candidate into a calm one by interview season.</li>
+ <li style="margin:0 0 4px;"><strong>Built for every university.</strong> Stations cover the formats used across Australian and international medical schools, and the fundamental skills they build transfer to every interview you sit.</li>
+ </ol>
+
+ <div style="margin:24px 0;padding:20px 22px;border-radius:14px;background:#0a1628;color:#ffffff;">
+ <div style="margin:0 0 8px;color:#f0c987;font-size:12px;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;">Best value, by a distance</div>
+ <p style="margin:0 0 6px;color:#ffffff;font-size:22px;font-weight:900;">$150 per week <span style="font-size:14px;color:#9fb3c9;font-weight:600;">(subscribers $140)</span></p>
+ <p style="margin:0;color:#c4d4e6;font-size:14px;line-height:1.65;">Group feedback plus peer benchmarking at a fraction of the cost of one to one coaching. Multi-week packages to come once we set a start date. There is nothing to pay today.</p>
+ </div>
+
+ <div style="text-align:center;margin:28px 0 22px;">
+ <a href="${esc(link)}" style="display:inline-block;background:#0ea5e9;color:#ffffff;font-weight:900;padding:15px 30px;border-radius:999px;text-decoration:none;font-size:15px;box-shadow:0 10px 24px rgba(14,165,233,0.25);">Register your interest -></a>
+ </div>
+
+ <p style="margin:0 0 14px;color:#334155;font-size:15px;line-height:1.75;">Spots in the first cohort are limited, and registered students hear first. If you have a question before you commit, just reply to this email.</p>
+ `;
+ if (al) { al.className = 'alert ok'; al.textContent = 'MMI class email drafted. Choose the newest 90 audience, preview it, send a test, then send.'; }
  updateBcPreview();
 }
 
