@@ -101,7 +101,7 @@
  "name": "What combo score do I need for a medical school interview in Australia?",
  "acceptedAnswer": {
  "@type": "Answer",
- "text": "Based on self-reported community data from the r/GAMSAT results spreadsheet — not published by universities: Deakin 1.71, ANU 1.69, UQ 1.65, Griffith 1.66, UWA 1.63, UoM 1.66, Macquarie 1.62, UNDS 1.56, UNDF 1.56. Rural applicants typically need 0.10-0.20 lower. These figures change year to year. Treat as planning benchmarks, not hard thresholds."
+ "text": "Based on self-reported community data from the r/GAMSAT results spreadsheet - not published by universities: Deakin 1.71, ANU 1.69, UQ 1.65, Griffith 1.66, UWA 1.63, UoM 1.66, Macquarie 1.62, UNDS 1.56, UNDF 1.56. Rural applicants typically need 0.10-0.20 lower. These figures change year to year. Treat as planning benchmarks, not hard thresholds."
  }
  },
  {
@@ -1276,7 +1276,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
   <!-- Weighted GPA -->
   <div class="gpa-row">
     <label for="gpaInput">Weighted GPA
-      <span class="gpa-tip" tabindex="0"><i class="gpa-tip-icon">?</i><span class="gpa-tip-box">Standard GEMSAS GPA — final year counts triple (1:2:3 weighting). Used by most schools: Deakin, ANU, UWA, UQ, Macquarie, UNDS, UNDF, UoW.</span></span>
+      <span class="gpa-tip" tabindex="0"><i class="gpa-tip-icon">?</i><span class="gpa-tip-box">Standard GEMSAS GPA - final year counts triple (1:2:3 weighting). Used by most schools: Deakin, ANU, UWA, UQ, Macquarie, UNDS, UNDF, UoW.</span></span>
     </label>
     <div class="input-wrap">
       <input type="number" id="gpaInput" step="0.01" min="4" max="7" placeholder="e.g. 6.45" inputmode="decimal" autocomplete="off">
@@ -1286,7 +1286,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
   <!-- Unweighted GPA -->
   <div class="gpa-row">
     <label for="gpaUnweightedInput">Unweighted GPA <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.72rem;">(optional)</span>
-      <span class="gpa-tip" tabindex="0"><i class="gpa-tip-icon">?</i><span class="gpa-tip-box">Plain average of all 3 years equally weighted. Griffith uses this. Leave blank and Griffith falls back to your weighted GPA — slightly less accurate.</span></span>
+      <span class="gpa-tip" tabindex="0"><i class="gpa-tip-icon">?</i><span class="gpa-tip-box">Plain average of all 3 years equally weighted. Griffith uses this. Leave blank and Griffith falls back to your weighted GPA - slightly less accurate.</span></span>
     </label>
     <div class="input-wrap">
       <input type="number" id="gpaUnweightedInput" step="0.01" min="4" max="7" placeholder="e.g. 6.30" inputmode="decimal" autocomplete="off">
@@ -1315,22 +1315,22 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
   </div>
   <div class="gpa-yearly-panel" id="gpaYearlyPanel" aria-hidden="true">
     <div class="gpa-deg-toggle" role="group">
-      <button type="button" id="gpaDegStd" class="active">Standard bachelor<br><span style="font-size:0.60rem;opacity:0.7;font-weight:400">3 or 4 yr — last 3 used</span></button>
+      <button type="button" id="gpaDegStd" class="active">Standard bachelor<br><span style="font-size:0.60rem;opacity:0.7;font-weight:400">3 or 4 yr - last 3 used</span></button>
       <button type="button" id="gpaDegHon">Standalone honours<br><span style="font-size:0.60rem;opacity:0.7;font-weight:400">Honours + 2 bachelor years</span></button>
     </div>
     <div class="gpa-year-rows" id="gpaYearRows"></div>
     <div class="gpa-yearly-results" aria-live="polite">
       <div class="gpa-yr-result-row">
         <span class="gpa-yr-result-lbl">Weighted (1:2:3)<small>Most schools</small></span>
-        <span class="gpa-yr-result-val hi" id="gpaCalcW">—</span>
+        <span class="gpa-yr-result-val hi" id="gpaCalcW"> - </span>
       </div>
       <div class="gpa-yr-result-row">
         <span class="gpa-yr-result-lbl">Unweighted (avg)<small>Griffith</small></span>
-        <span class="gpa-yr-result-val" id="gpaCalcU">—</span>
+        <span class="gpa-yr-result-val" id="gpaCalcU"> - </span>
       </div>
       <div class="gpa-yr-result-row">
         <span class="gpa-yr-result-lbl">Melbourne (1:2:2)<small>UoM only</small></span>
-        <span class="gpa-yr-result-val" id="gpaCalcM">—</span>
+        <span class="gpa-yr-result-val" id="gpaCalcM"> - </span>
       </div>
     </div>
     <button type="button" class="gpa-yearly-apply-btn" id="gpaYearlyApply" disabled>Fill GPA fields above</button>
@@ -1344,7 +1344,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
     <details style="display:inline;font-size:0.68rem;color:var(--gray400);">
       <summary style="display:inline;cursor:pointer;color:var(--gray400);font-size:0.68rem;list-style:none;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dotted;">Flinders only. What GPA to use?</summary>
       <div style="margin-top:8px;padding:10px 12px;background:#f8fafc;border:1px solid var(--gray200);border-radius:8px;font-size:0.72rem;color:var(--gray600);line-height:1.6;max-width:340px;">
-        Flinders calculates its own weighted GPA — it is not the same as your GEMSAS GPA. If you have already run the Flinders wGPA calculation from their Application Guide, use that figure here.<br><br>
+        Flinders calculates its own weighted GPA - it is not the same as your GEMSAS GPA. If you have already run the Flinders wGPA calculation from their Application Guide, use that figure here.<br><br>
         If you haven't, use your <strong>home university GPA</strong> (the raw GPA on your transcript, out of 7). That is a closer approximation than GEMSAS GPA, which applies a different weighting formula. Do <strong>not</strong> use your GEMSAS GPA here.
       </div>
     </details>
@@ -1355,7 +1355,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
     <details style="display:inline;font-size:0.68rem;color:var(--gray400);">
       <summary style="display:inline;cursor:pointer;color:var(--gray400);font-size:0.68rem;list-style:none;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dotted;">Melbourne only. What GPA to use?</summary>
       <div style="margin-top:8px;padding:10px 12px;background:#f8fafc;border:1px solid var(--gray200);border-radius:8px;font-size:0.72rem;color:var(--gray600);line-height:1.6;max-width:340px;">
-        Melbourne uses its own 1:2:2 weighted GPA — final year counts double, not triple like most GEMSAS schools. Enter it here if you know it.<br><br>
+        Melbourne uses its own 1:2:2 weighted GPA - final year counts double, not triple like most GEMSAS schools. Enter it here if you know it.<br><br>
         If unsure, leave blank and the calculator will use your standard weighted GPA as a fallback. Use the yearly breakdown above to calculate it.
       </div>
     </details>
@@ -1435,12 +1435,12 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div class="bonus-panel calc-initial-only" id="bonusPanel">
  <div class="bonus-attention-banner">
  <span class="bonus-attention-icon">✦</span>
- <span><strong>Don't skip this — bonuses can change your shortlist.</strong> Each university has its own adjustments (rural background, HDR, work experience, and more). Use the university tabs below and tick what applies to <em>each one separately</em> — your selections are saved independently per school.</span>
+ <span><strong>Don't skip this - bonuses can change your shortlist.</strong> Each university has its own adjustments (rural background, HDR, work experience, and more). Use the university tabs below and tick what applies to <em>each one separately</em> - your selections are saved independently per school.</span>
  </div>
  <div class="bonus-panel-head">
  <div>
  <div class="bonus-panel-title">University bonuses and GPA rules</div>
- <div class="bonus-panel-sub">Switch between universities using the tabs below — each school has its own bonus rules, and your selections are saved independently for each one. Numeric bonuses only affect that university's result.</div>
+ <div class="bonus-panel-sub">Switch between universities using the tabs below - each school has its own bonus rules, and your selections are saved independently for each one. Numeric bonuses only affect that university's result.</div>
  </div>
  </div>
  <div class="bonus-school-pills" id="bonusSchoolPills" aria-label="Choose university for bonus options"></div>
@@ -1584,7 +1584,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
       <div class="input-wrap">
         <input type="number" id="intlTestScoreInput" step="0.1" min="0" max="100" placeholder="e.g. 65" inputmode="decimal" autocomplete="off">
       </div>
-      <div class="intl-gamsat-note">ACER overall weighted score. UoM and UQ use section averages — enter S1/S2/S3 for more accurate results at those schools.</div>
+      <div class="intl-gamsat-note">ACER overall weighted score. UoM and UQ use section averages - enter S1/S2/S3 for more accurate results at those schools.</div>
     </div>
     <div id="intlGamsatSectionsPanel" style="display:none">
       <div class="intl-section-grid">
@@ -1610,7 +1610,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
     <div class="input-wrap">
       <input type="number" id="intlMcatInput" step="1" min="472" max="528" placeholder="e.g. 512" inputmode="numeric" autocomplete="off">
     </div>
-    <div class="intl-gamsat-note">MCAT total (472–528). Only accepted for international applicants residing <em>outside</em> Australia at time of application. Minimum requirements vary by school — shown on each card below.</div>
+    <div class="intl-gamsat-note">MCAT total (472–528). Only accepted for international applicants residing <em>outside</em> Australia at time of application. Minimum requirements vary by school - shown on each card below.</div>
   </div>
 
   <!-- DAT input (hidden until DAT mode) -->
@@ -1630,7 +1630,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  </div>
  <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.82rem;color:#0c4a6e;line-height:1.55;">
- <strong>International / overseas applicant data</strong> — self-reported 2025 application cycle outcomes. Sample sizes are smaller than domestic data. Treat cutoffs as indicative zones, not hard thresholds. International applicants apply directly to each university — GEMSAS is for domestic applicants only.
+ <strong>International / overseas applicant data</strong> - self-reported 2025 application cycle outcomes. Sample sizes are smaller than domestic data. Treat cutoffs as indicative zones, not hard thresholds. International applicants apply directly to each university - GEMSAS is for domestic applicants only.
  </div>
  <div class="input-error" id="intlErr" style="margin-bottom:12px;">Please enter your scores above.</div>
  </div>
@@ -1667,7 +1667,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div id="intlComboDisplay" style="font-size:1rem;color:rgba(255,255,255,0.85);line-height:1.5;"></div>
  </div>
  <div class="unis-head">
- <h3>International applicant — per-university breakdown</h3>
+ <h3>International applicant - per-university breakdown</h3>
  <div class="unis-head-sub">2025 application cycle · self-reported data · treat as indicative only</div>
  </div>
  <div class="intl-chart-legend" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;font-size:0.78rem;color:var(--gray600);">
@@ -1801,7 +1801,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
 
  <details class="faq-item">
  <summary>How accurate is this calculator?</summary>
- <p>It's built on self-reported student data from the publicly available r/GAMSAT community results spreadsheet — a volunteer-maintained Google Sheet where students submit their own scores and outcomes. The data includes obvious outliers, is self-selecting (only students who choose to share results are included), and cannot fully capture structured applications, unpublished bonus-point conversions, category-specific quotas, interview year-to-year variation, preference order effects, or post-offer rejections. Scores entered into this calculator are not stored or transmitted. Treat results as informational only.</p>
+ <p>It's built on self-reported student data from the publicly available r/GAMSAT community results spreadsheet - a volunteer-maintained Google Sheet where students submit their own scores and outcomes. The data includes obvious outliers, is self-selecting (only students who choose to share results are included), and cannot fully capture structured applications, unpublished bonus-point conversions, category-specific quotas, interview year-to-year variation, preference order effects, or post-offer rejections. Scores entered into this calculator are not stored or transmitted. Treat results as informational only.</p>
  </details>
 
  <details class="faq-item">
@@ -1821,7 +1821,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <p>Results generated by this tool are for your personal reference only. They may not be reproduced, redistributed, published, or used as the basis for advice to third parties without written permission from Key2MD.</p>
 
  <h4>Data source and limitations</h4>
- <p>Official eligibility rules are drawn from publicly available university, UCAT ANZ and tertiary admissions pages. Competitiveness estimates are derived from <strong>publicly available, self-reported outcome data submitted by students to the r/GAMSAT community results spreadsheet</strong> — a volunteer-maintained public resource hosted on Google Sheets and linked from the r/GAMSAT Reddit community. This tool is not affiliated with, endorsed by, or authorised by the r/GAMSAT community or its maintainers. Community data is <strong>self-selecting, unverified, may include errors or outliers, and does not represent the full applicant population</strong> at any university. Rural/category data is particularly sparse.</p>
+ <p>Official eligibility rules are drawn from publicly available university, UCAT ANZ and tertiary admissions pages. Competitiveness estimates are derived from <strong>publicly available, self-reported outcome data submitted by students to the r/GAMSAT community results spreadsheet</strong> - a volunteer-maintained public resource hosted on Google Sheets and linked from the r/GAMSAT Reddit community. This tool is not affiliated with, endorsed by, or authorised by the r/GAMSAT community or its maintainers. Community data is <strong>self-selecting, unverified, may include errors or outliers, and does not represent the full applicant population</strong> at any university. Rural/category data is particularly sparse.</p>
 
  <h4>Factors this tool does NOT account for</h4>
  <p>Actual admission decisions depend on many factors this tool cannot fully model, including but not limited to: structured applications, unpublished bonus conversions, preference order, category-specific quotas, international vs domestic status, GAM (Graduate Academic Marker) adjustments, CASPer scaling at UoW/Notre Dame only, year-to-year cutoff variation, medical school-specific weighting changes, and interview performance itself.</p>
@@ -1830,7 +1830,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <p>No guarantee, warranty, or representation is made as to the accuracy, completeness, or reliability of results. Treat the output as a rough guide only. Users are strongly advised to consult official sources - <a href="https://www.gemsas.edu.au/" target="_blank" rel="noopener">GEMSAS</a>, individual medical school admissions offices, and professional advisors - before making any application, enrolment, or financial decisions.</p>
 
  <h4>No liability</h4>
- <p>To the maximum extent permitted by law, Dan, Key2MD, and any associated persons or entities are not responsible for decisions made, actions taken, or outcomes resulting from use of this tool — including but not limited to application decisions, school preference ordering, and enrolment choices. Users assume responsibility for verifying information and making their own informed decisions. Nothing here excludes rights or remedies that cannot legally be excluded.</p>
+ <p>To the maximum extent permitted by law, Dan, Key2MD, and any associated persons or entities are not responsible for decisions made, actions taken, or outcomes resulting from use of this tool - including but not limited to application decisions, school preference ordering, and enrolment choices. Users assume responsibility for verifying information and making their own informed decisions. Nothing here excludes rights or remedies that cannot legally be excluded.</p>
 
  <h4>Changes</h4>
  <p>Data and cutoffs may be updated without notice as new information becomes available. Competitiveness estimates were last reviewed: May 2026.</p>
@@ -1919,7 +1919,7 @@ const UNIS = [
    gamsat:{ internalMed:64, internalMin:57, internalMax:78, externalMed:75, externalMin:61, externalMax:81, ruralMed:62, ruralMin:58, ruralMax:72 },
    nOffers:52, nRej:2,
    casper:false, uow:false, flinders:true,
-   noteNR:'Flinders is a direct application — not GEMSAS. Interview shortlisting is on GAMSAT overall score only within sub-quota pools. wGPA ≥ 5.0 is an eligibility hurdle only and does not affect interview ranking. Final offer = equal weight of GAMSAT + wGPA + interview. Up to 75% of SA Bedford Park places reserved for Flinders graduates. Dataset: 52 offer records, 2 rejections from 2025 cycle.',
+   noteNR:'Flinders is a direct application - not GEMSAS. Interview shortlisting is on GAMSAT overall score only within sub-quota pools. wGPA ≥ 5.0 is an eligibility hurdle only and does not affect interview ranking. Final offer = equal weight of GAMSAT + wGPA + interview. Up to 75% of SA Bedford Park places reserved for Flinders graduates. Dataset: 52 offer records, 2 rejections from 2025 cycle.',
    noteRural:'SA rural (SARM) and NT (NTMP) sub-quotas with dedicated places. Rural GAMSAT offers observed 58–72 (median ~62) in 2025 cycle data.' },
 
  { id:'uow', name:'The University of Wollongong', short:'UoW', gamsatMode:'hurdle', nInt:40, nRej:59, interview:null, cutoffNR:null, cutoffR:null, casper:true, uow:true,
@@ -2040,7 +2040,7 @@ const BONUS_RULES = {
  ],
  },
  flinders: {
- summary: 'Flinders is not GEMSAS — it requires a direct application to Flinders University. Ranking uses a Flinders-calculated weighted GPA (wGPA) and weighted GAMSAT. Up to 75% of SA Bedford Park places are reserved for Flinders graduates; external applicants face a materially higher effective cutoff.',
+ summary: 'Flinders is not GEMSAS - it requires a direct application to Flinders University. Ranking uses a Flinders-calculated weighted GPA (wGPA) and weighted GAMSAT. Up to 75% of SA Bedford Park places are reserved for Flinders graduates; external applicants face a materially higher effective cutoff.',
  foot: 'SARM (SA rural) and NTMP (NT) sub-quotas have separate priority criteria. No published percentage bonus multiplier like Deakin or ANU. A $160 non-refundable application fee applies.',
  items: [
  { id:'flindersDegree', label:'Flinders University graduate (internal applicant)', type:'qualitative', meta:'sub-quota priority', detail:'Up to 75% of SA Bedford Park places are reserved for Flinders graduates, who compete in a substantially larger internal pool with a lower effective cutoff than external applicants.' },
@@ -3898,7 +3898,7 @@ function renderUni(u, gpa, scores) {
  ${impact.applied ? `<div class="bonus-adjustment-badge">${escapeHtml(impact.badge)} applied to ${escapeHtml(u.short)}</div>` : ''}
  ${renderBonusImpact(impact)}
  ${getScoreForUni(u, scores).estimated ? `<div class="uni-notes">Because you did not enter section scores or an unweighted average, this school's result uses your weighted overall score as a placeholder. Enter S1/S2/S3 for the accurate UoM/UQ/Notre Dame calculation.</div>` : ''}
- ${usingUomProxy ? '<div style="margin-top:8px;font-size:0.75rem;color:#b45309;font-weight:600;">&#9888; Using your standard GEMSAS GPA as a proxy &mdash; Melbourne uses a 1:2:2 weighting which may differ. Enter your Melbourne GPA above or use the yearly breakdown for a more accurate result.</div>' : ''}
+ ${usingUomProxy ? '<div style="margin-top:8px;font-size:0.75rem;color:#b45309;font-weight:600;">&#9888; Using your standard GEMSAS GPA as a proxy - Melbourne uses a 1:2:2 weighting which may differ. Enter your Melbourne GPA above or use the yearly breakdown for a more accurate result.</div>' : ''}
  ${casperBadge}
  ${noteHtml.length ? `<div class="uni-notes">${noteHtml.join(' ')}</div>` : ''}
  `;
@@ -3954,7 +3954,7 @@ function renderFlindersCard(u, gpa, scores) {
  } else if (gam >= poolMed) {
    verdictClass = 'green'; verdictLabel = isRural ? 'Above rural median GAMSAT' : (isInternal ? 'Above internal pool median' : 'Above external pool median');
  } else if (gam >= poolMin + (poolMed - poolMin) * 0.4) {
-   verdictClass = 'amber'; verdictLabel = 'Below pool median — in competitive range';
+   verdictClass = 'amber'; verdictLabel = 'Below pool median - in competitive range';
  } else {
    verdictClass = 'red'; verdictLabel = 'Below most observed offer GAMSATs';
  }
@@ -4118,7 +4118,7 @@ function renderUoWCard(u, gpa, scores) {
 
 
 // ============================================================
-// INTERNATIONAL SCHOOLS DATA — 2025 application cycle, self-reported
+// INTERNATIONAL SCHOOLS DATA - 2025 application cycle, self-reported
 // ============================================================
 const INTL_SCHOOLS = {
  GAMSAT: [
@@ -4133,7 +4133,7 @@ const INTL_SCHOOLS = {
  { id:'flinders', name:'Flinders University', degree:'MD', gamsatMode:'weighted',
  interview:{ offers:[{g:67,gpa:6.5}], rejections:[] },
  finalOffer:{ offers:[{g:62,gpa:6.688},{g:59,gpa:6.7},{g:64,gpa:6.13},{g:60,gpa:6.4},{g:63,gpa:5.94},{g:56,gpa:6.38},{g:66,gpa:5.67},{g:70,gpa:5.3}], rejections:[] },
- note:'Direct application (not GEMSAS). International data limited — cutoffs appear lower than domestic external cutoffs.' },
+ note:'Direct application (not GEMSAS). International data limited - cutoffs appear lower than domestic external cutoffs.' },
  { id:'griffith', name:'Griffith University', degree:'MD', gamsatMode:'weighted',
  interview:{ offers:[{g:77,gpa:7},{g:71,gpa:6.845},{g:61,gpa:6.83},{g:59.67,gpa:6.563},{g:60,gpa:6.4}], rejections:[] },
  finalOffer:{ offers:[], rejections:[] },
@@ -4183,7 +4183,7 @@ const INTL_SCHOOLS = {
  { id:'undf_m', name:'Notre Dame Fremantle', degree:'MD',
  interview:{ offers:[{mcat:0,gpa:6.9}], rejections:[] },
  finalOffer:{ offers:[], rejections:[] },
- note:'MCAT accepted. Very limited data — one observation with exempt/zero score.' },
+ note:'MCAT accepted. Very limited data - one observation with exempt/zero score.' },
  { id:'uq_m', name:'University of Queensland', degree:'MD',
  interview:{ offers:[{mcat:513,gpa:6.9},{mcat:515,gpa:6.9},{mcat:512,gpa:6.9},{mcat:517,gpa:6.86},{mcat:508,gpa:6.8},{mcat:507,gpa:6.5},{mcat:508,gpa:6.2},{mcat:516,gpa:6.1},{mcat:515,gpa:5}], rejections:[] },
  finalOffer:{ offers:[{mcat:513,gpa:6.9},{mcat:516,gpa:6.1}], rejections:[] },
@@ -4191,7 +4191,7 @@ const INTL_SCHOOLS = {
  { id:'uom_m', name:'University of Melbourne', degree:'MD',
  interview:{ offers:[{mcat:513,gpa:6.9},{mcat:508,gpa:6.79},{mcat:516,gpa:6.1}], rejections:[{mcat:508,gpa:6.2}] },
  finalOffer:{ offers:[], rejections:[] },
- note:'UoM accepts MCAT. Rejection at 508/6.2 — both MCAT score and GPA matter.' },
+ note:'UoM accepts MCAT. Rejection at 508/6.2 - both MCAT score and GPA matter.' },
  { id:'uwa_m', name:'University of Western Australia', degree:'MD',
  interview:{ offers:[{mcat:504,gpa:6.5}], rejections:[] },
  finalOffer:{ offers:[], rejections:[] },
@@ -4199,7 +4199,7 @@ const INTL_SCHOOLS = {
  { id:'usyd_m', name:'University of Sydney', degree:'MD',
  interview:{ offers:[{mcat:518,gpa:null},{mcat:524,gpa:null}], rejections:[] },
  finalOffer:{ offers:[{mcat:518,gpa:null}], rejections:[] },
- note:'USyd accepts MCAT. Limited data — offers observed at MCAT 518+.' },
+ note:'USyd accepts MCAT. Limited data - offers observed at MCAT 518+.' },
  ],
  GPA: [
  { id:'monash_g', name:'Monash University', degree:'MD',
@@ -4228,7 +4228,7 @@ const INTL_MCAT_MINS = {
   griffith_m: { total: 500, section: null, note: 'Standard MCAT minimum applies' },
   unds_m:  { total: 500, section: null, note: 'Min 500 total or unweighted GAMSAT 50' },
   undf_m:  { total: 500, section: null, note: 'Min 500 total or unweighted GAMSAT 50' },
-  uq_m:    { total: 500, section: null, note: 'UQ accepts MCAT — apply directly' },
+  uq_m:    { total: 500, section: null, note: 'UQ accepts MCAT - apply directly' },
   uom_m:   { total: 492, section: null, note: 'Min 492 total. Overseas applicants only (not onshore).' },
   uwa_m:   { total: 500, section: 124, note: 'Min 500 total, 124 per section' },
   usyd_m:  { total: null, section: null, note: 'USyd uses MCAT section-based ranking; no published overall min' },
@@ -4465,11 +4465,11 @@ function calculateInternational() {
  if (intlTestMode === 'GPA') {
    if (!wam || isNaN(wam)) { if(errEl){errEl.style.display='block';} return; }
    userVal = wam;
-   comboText = 'WAM <strong>' + wam.toFixed(1) + '</strong> — Monash graduate MD entry';
+   comboText = 'WAM <strong>' + wam.toFixed(1) + '</strong> - Monash graduate MD entry';
  } else if (intlTestMode === 'DAT') {
    if (!datScore || isNaN(datScore)) { if(errEl){errEl.style.display='block';} return; }
    userVal = datScore;
-   comboText = 'DAT <strong>' + datScore + '</strong> — USyd DMD international';
+   comboText = 'DAT <strong>' + datScore + '</strong> - USyd DMD international';
  } else if (intlTestMode === 'MCAT') {
    if (!gpa || isNaN(gpa) || !mcatScore || isNaN(mcatScore)) { if(errEl){errEl.style.display='block';} return; }
    const normMcat = mcatScore * (100/528);
@@ -4541,7 +4541,7 @@ function calculateInternational() {
    '</div>' +
    scoreBadgeHtml +
    '<div class="uni-notes" style="margin-top:8px;">' + escapeHtml(school.note) + '</div>' +
-   '<div class="intl-coaching-note">Interview performance matters significantly — applicants with similar combo scores get different final outcomes depending on how they perform. <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener">Book interview coaching with Dan ($300)</a> to work on this before offers come out.</div>';
+   '<div class="intl-coaching-note">Interview performance matters significantly - applicants with similar combo scores get different final outcomes depending on how they perform. <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener">Book interview coaching with Dan ($300)</a> to work on this before offers come out.</div>';
    list.appendChild(card);
    if (hasData) {
      const chartUserVal = schoolUserVal;

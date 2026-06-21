@@ -12,6 +12,40 @@
  <meta property="og:type" content="website">
  <meta property="og:url" content="https://www.key2md.com/mmi-class.html">
  <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
+ <script type="application/ld+json">
+ {
+  "@context": "https://schema.org",
+  "@graph": [
+   {
+    "@type": "Service",
+    "name": "Key2MD Live MMI Classes",
+    "serviceType": "Medical interview (MMI) coaching",
+    "description": "Weekly small-group live MMI practice with Dan, covering interview stations relevant to every medical school. Answers are marked and discussed live, building the structured thinking, empathy, ethical reasoning and communication the MMI rewards.",
+    "provider": {"@type": "Organization", "name": "Key2MD", "url": "https://www.key2md.com/"},
+    "areaServed": "AU",
+    "audience": {"@type": "EducationalAudience", "educationalRole": "student", "audienceType": "Australian and international medical school interview applicants"},
+    "url": "https://www.key2md.com/mmi-class.html",
+    "offers": {"@type": "Offer", "price": "150", "priceCurrency": "AUD", "availability": "https://schema.org/PreOrder", "url": "https://www.key2md.com/mmi-class.html#register", "description": "Live weekly MMI class. $150 per week, or $140 per week for Key2MD subscribers."}
+   },
+   {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+     {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.key2md.com/"},
+     {"@type": "ListItem", "position": 2, "name": "MMI Classes", "item": "https://www.key2md.com/mmi-class.html"}
+    ]
+   },
+   {
+    "@type": "FAQPage",
+    "mainEntity": [
+     {"@type": "Question", "name": "When do the MMI classes start?", "acceptedAnswer": {"@type": "Answer", "text": "Classes run live every Friday at 6pm AEST. We are taking registrations of interest now and will confirm the start date once we reach the numbers to begin. Registered students are emailed first."}},
+     {"@type": "Question", "name": "How much do the MMI classes cost?", "acceptedAnswer": {"@type": "Answer", "text": "$150 per week, or $140 per week for current Key2MD subscribers. Multi-week packages will follow once a start date is set. There is nothing to pay when you register your interest."}},
+     {"@type": "Question", "name": "Who are the MMI classes for?", "acceptedAnswer": {"@type": "Answer", "text": "Any student preparing for a medical school interview. Stations are drawn to be relevant to every university, and the fundamental skills they build transfer to every MMI, panel and CASPer."}},
+     {"@type": "Question", "name": "Do I have to pay to register my interest?", "acceptedAnswer": {"@type": "Answer", "text": "No. Registering is free and places you under no obligation. It adds you to the first cohort and locks in launch pricing, and you are emailed first when the start date is confirmed."}}
+    ]
+   }
+  ]
+ }
+ </script>
  <script src="auth.js" defer></script>
  <script src="/key2md-tracking.js" defer></script>
  <link rel="stylesheet" href="admissions-pages.css">
@@ -102,7 +136,7 @@
  <p class="hero-sub">Small-group live practice with Dan, working through MMI stations relevant to all universities. The MMI tests fundamental skills used in every interview format and every program: structured thinking, genuine empathy, ethical reasoning and clear communication. Whatever university you are sitting for, these classes sharpen the skills that decide the day.</p>
  <p class="hero-sub"><strong>We are taking registrations of interest now.</strong> As soon as we reach the numbers to begin, classes run live every Friday at 6pm AEST. Register now to be in the first cohort and to lock in launch pricing.</p>
  <div class="hero-actions">
- <a href="#register" class="btn btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'});return false;">Register your interest -></a>
+ <a href="#register" class="btn btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'});return false;">Register your interest</a>
  <a href="blog-mmi-guide-australia.html" class="btn btn-outline">MMI preparation guide</a>
  </div>
  </div>
@@ -177,12 +211,20 @@
  <div class="field"><label for="inEmail">Email</label><input id="inEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
  <div class="field"><label for="inUni">Which universities or interviews are you preparing for?</label><input id="inUni" type="text" placeholder="e.g. Monash, UNSW, or undecided"></div>
  <div class="field"><label for="inNotes">Anything else? (your stage, availability for Friday 6pm AEST, questions)</label><textarea id="inNotes" placeholder="Optional"></textarea></div>
- <button class="btn btn-primary full-btn" id="interestBtn" onclick="submitInterest()">Register my interest -></button>
+ <button class="btn btn-primary full-btn" id="interestBtn" onclick="submitInterest()">Register my interest</button>
  </div>
  <div class="form-ok" id="interestOk">
  <strong>You're on the list.</strong>
  <span>Thanks for registering. We'll email you first as soon as the start date is confirmed, with joining details and launch pricing.</span>
  </div>
+ </section>
+
+ <section style="max-width:760px; margin:8px auto 0;">
+ <h2 style="font-size:1.3rem; color:var(--navy); margin:0 0 14px;">MMI classes: common questions</h2>
+ <details style="border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 10px;"><summary style="font-weight:700; color:var(--navy); cursor:pointer;">When do the MMI classes start?</summary><p style="margin:10px 0 0; color:var(--muted); line-height:1.6; font-size:0.92rem;">Classes run live every Friday at 6pm AEST. We are taking registrations of interest now and will confirm the start date once we reach the numbers to begin. Registered students are emailed first.</p></details>
+ <details style="border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 10px;"><summary style="font-weight:700; color:var(--navy); cursor:pointer;">How much do the MMI classes cost?</summary><p style="margin:10px 0 0; color:var(--muted); line-height:1.6; font-size:0.92rem;">$150 per week, or $140 per week for current Key2MD subscribers. Multi-week packages will follow once a start date is set. There is nothing to pay when you register your interest.</p></details>
+ <details style="border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 10px;"><summary style="font-weight:700; color:var(--navy); cursor:pointer;">Who are the MMI classes for?</summary><p style="margin:10px 0 0; color:var(--muted); line-height:1.6; font-size:0.92rem;">Any student preparing for a medical school interview. Stations are drawn to be relevant to every university, and the fundamental skills they build transfer to every MMI, panel and CASPer.</p></details>
+ <details style="border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 10px;"><summary style="font-weight:700; color:var(--navy); cursor:pointer;">Do I have to pay to register my interest?</summary><p style="margin:10px 0 0; color:var(--muted); line-height:1.6; font-size:0.92rem;">No. Registering is free and places you under no obligation. It adds you to the first cohort and locks in launch pricing, and you are emailed first when the start date is confirmed.</p></details>
  </section>
 
  </main>
