@@ -1,0 +1,2874 @@
+function openBookModal(e){ if(e && e.preventDefault) e.preventDefault(); var m=document.getElementById('bookModal'); if(m){ m.style.display='flex'; document.body.style.overflow='hidden'; } }
+function closeBookModal(){ var m=document.getElementById('bookModal'); if(m){ m.style.display='none'; document.body.style.overflow=''; } }
+document.addEventListener('click', function(e){ var m=document.getElementById('bookModal'); if(m && e.target===m) closeBookModal(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var m=document.getElementById('bookModal'); if(m && m.style.display==='flex') closeBookModal(); } });
+
+
+
+
+
+const UNIS = [
+ { id:'deakin', name:'Deakin University', short:'Deakin', gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 }, nInt:40, nRej:81, interview:{med:1.74311, std:0.03590}, cutoffNR:1.7081, cutoffR:1.411, casper:false, uow:false,
+ noteRural:'Rural cut-off shown is the minimum observed (1.411) - safer target is 1.5+.' },
+ { id:'anu', name:'Australian National University', short:'ANU', gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 }, nInt:19, nRej:54, interview:{med:1.72526, std:0.03263}, cutoffNR:1.6910, cutoffR:1.49, casper:false, uow:false },
+ { id:'uom', name:'The University of Melbourne', short:'UoM', gamsatMode:'unweighted', gamsatHurdle:{ sectionMin:50 }, nInt:87, nRej:120, interview:{med:1.70544, std:0.03160}, cutoffNR:1.66, cutoffR:1.52, casper:false, uow:false,
+ noteNR:'UoM uses the unweighted GAMSAT average. Unclear whether the GAM (Graduate Academic Marker) adjustment was applied to the lowest observed interview combo.' },
+ { id:'uq', name:'The University of Queensland', short:'UQ', gamsatMode:'unweighted', gamsatHurdle:{ sectionMin:50 }, nInt:57, nRej:53, interview:{med:1.67759, std:0.03521}, cutoffNR:1.65, cutoffR:1.58, casper:false, uow:false,
+ noteNR:'UQ uses the unweighted average GAMSAT score rounded to six decimal places.' },
+ { id:'griffith', name:'Griffith University', short:'Griffith', gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 }, nInt:24, nRej:72, interview:{med:1.68007, std:0.02136}, cutoffNR:1.659, cutoffR:1.42, casper:false, uow:false,
+ noteNR:'Cut-off shown is the minimum observed interview combo in the 2026 dataset.' },
+ { id:'uwa', name:'The University of Western Australia', short:'UWA', gamsatMode:'weighted', gamsatHurdle:{ scoreMin:55, sectionMin:50 }, nInt:41, nRej:25, interview:{med:1.65250, std:0.03051}, cutoffNR:1.625, cutoffR:1.48, casper:false, uow:false },
+ { id:'unds', name:'The University of Notre Dame Sydney', short:'UNDS', gamsatMode:'unweighted', gamsatHurdle:{ scoreMin:52, sectionMin:50 }, nInt:84, nRej:60, interview:{med:1.65065, std:0.04852}, cutoffNR:1.56, cutoffR:1.48, casper:true, uow:false,
+ noteNR:'UNDS uses unweighted GAMSAT and CASPer as formal selection components. A Q4 typically required to compete at this combo range.',
+ noteCasperRural:'Rural applicants usually need at least a Q2 CASPer.' },
+ { id:'macquarie', name:'Macquarie University', short:'Macquarie', gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 }, nInt:24, nRej:11, interview:{med:1.64036, std:0.03503}, cutoffNR:1.6150, cutoffR:null, casper:false, uow:false,
+ noteRural:'Rural cut-off not provided in available data.' },
+ { id:'undf', name:'The University of Notre Dame Fremantle', short:'UNDF', gamsatMode:'unweighted', gamsatHurdle:{ scoreMin:52, sectionMin:50 }, nInt:44, nRej:22, interview:{med:1.60658, std:0.03229}, cutoffNR:1.56, cutoffR:1.51, casper:true, uow:false,
+ noteNR:'UNDF uses unweighted GAMSAT and CASPer as formal selection components. A Q4 typically required to compete at this combo range.',
+ noteCasperRural:'Rural applicants usually need at least a Q2 CASPer.' },
+ { id:'flinders', name:'Flinders University Doctor of Medicine', short:'Flinders', gamsatMode:'weighted', gamsatHurdle:{ scoreMin:50, sectionMin:50 },
+   wgpaHurdle:5.0,
+   gamsat:{ internalMed:64, internalMin:57, internalMax:78, externalMed:75, externalMin:61, externalMax:81, ruralMed:62, ruralMin:58, ruralMax:72 },
+   nOffers:52, nRej:2,
+   casper:false, uow:false, flinders:true,
+   noteNR:'Flinders is a direct application - not GEMSAS. Interview shortlisting is on GAMSAT overall score only within sub-quota pools. wGPA ≥ 5.0 is an eligibility hurdle only and does not affect interview ranking. Final offer = equal weight of GAMSAT + wGPA + interview. Up to 75% of SA Bedford Park places reserved for Flinders graduates. Dataset: 52 offer records, 2 rejections from 2025 cycle.',
+   noteRural:'SA rural (SARM) and NT (NTMP) sub-quotas with dedicated places. Rural GAMSAT offers observed 58–72 (median ~62) in 2025 cycle data.' },
+
+ { id:'uow', name:'The University of Wollongong', short:'UoW', gamsatMode:'hurdle', nInt:40, nRej:59, interview:null, cutoffNR:null, cutoffR:null, casper:true, uow:true,
+ hurdles:{ gpaMin:5.5, gamsatMin:50, sectionMin:50, casperReq:'Q4 typically', bonusReq:'UOW bonuses are weighted equally and combined with Casper for interview ranking' } },
+];
+
+
+
+
+const BONUS_ORDER = ['deakin','uow','uq','anu','uwa','macquarie','griffith','uom','unds','undf','flinders'];
+
+const BONUS_RULES = {
+ deakin: {
+ summary: 'Deakin publishes percentage adjustments to the combined GPA/GAMSAT aggregate. This calculator multiplies Deakin only by the selected percentage total.',
+ foot: 'Clinical experience and general work experience are mutually exclusive. Geelong/MM2 and MM3-MM7 rurality are mutually exclusive. Deakin states there is no cap on additional points.',
+ items: [
+ { id:'financial', label:'Financial disadvantage', value:0.02, type:'comboPercent', meta:'+2%', detail:'Eligible income-support or similar financial disadvantage during undergraduate/postgraduate study.' },
+ { id:'clinical', label:'Prior clinical experience in a health discipline', value:0.04, type:'comboPercent', meta:'+4%', group:'work', detail:'At least 12 months full-time equivalent clinical practice as an eligible registered health professional, speech pathologist, or dietitian.' },
+ { id:'work', label:'Work experience', value:0.02, type:'comboPercent', meta:'+2%', group:'work', detail:'At least two years full-time equivalent paid work, either consecutive or cumulative over four years.' },
+ { id:'deakinStudy', label:'Deakin study', value:0.04, type:'comboPercent', meta:'+4%', detail:'Completed or completing an eligible Deakin degree with at least two thirds completed at Deakin.' },
+ { id:'geelongMm1Mm2', label:'Geelong MM1 or MM2 residence', value:0.04, type:'comboPercent', meta:'+4%', group:'deakinRural', detail:'Geelong MM1 or MM2 rural/regional residency meeting Deakin criteria.' },
+ { id:'mm3Mm7', label:'MM3-MM7 rural/regional residence', value:0.08, type:'comboPercent', meta:'+8%', group:'deakinRural', detail:'MM3-MM7 rural/regional residency meeting Deakin criteria.' },
+ ],
+ },
+ uow: {
+ summary: 'UOW uses GPA and GAMSAT as hurdles, then ranks interview offers using 50% Casper and 50% admissions bonuses. With 12 equal bonuses, each selected bonus is worth about 4.17 points on the bonus half.',
+ foot: 'A useful historical calibration: last year, the average MMI offer profile was around Q4 Casper plus about 3.5 bonuses. The exact Casper percentile is not visible from quartiles, so this is a guide, not a prediction.',
+ items: [
+ { id:'firstPreference', label:'UOW first preference applicant', type:'uowBonus', meta:'+1 bonus', detail:'You list UOW MD as your first GEMSAS preference.' },
+ { id:'registeredHealth', label:'Registered health professional', type:'uowBonus', meta:'+1 bonus', detail:'Current practising registration/accreditation in an eligible health profession.' },
+ { id:'service', label:'Service commitment', type:'uowBonus', meta:'+1 bonus', detail:'Two or more consecutive years of eligible volunteer, emergency service, or Defence service.' },
+ { id:'work', label:'Sustained work experience', type:'uowBonus', meta:'+1 bonus', detail:'Two or more consecutive years of sustained paid employment in any industry.' },
+ { id:'ruralWork', label:'Rural work experience', type:'uowBonus', meta:'+1 bonus', detail:'Two or more consecutive years of paid employment while living and working in MM2-MM7.' },
+ { id:'ruralHighSchool', label:'Rural high school education', type:'uowBonus', meta:'+1 bonus', detail:'Four or more years at an Australian rural high school while residing rurally.' },
+ { id:'illawarra', label:'Illawarra local resident MM1', type:'uowBonus', meta:'+1 bonus', detail:'Currently live in the MM1 Wollongong area and lived there for at least five consecutive years immediately before applying.' },
+ { id:'nswRural', label:'NSW rural resident MM2-MM7', type:'uowBonus', meta:'+1 bonus', detail:'Rural NSW residence for at least five consecutive or ten cumulative years.' },
+ { id:'uowGraduate', label:'UOW graduate', type:'uowBonus', meta:'+1 bonus', detail:'Eligible UOW undergraduate or postgraduate graduate.' },
+ { id:'uowGraduateExcellence', label:'UOW graduate plus academic excellence', type:'uowBonus', meta:'+1 bonus', detail:'Eligible UOW graduate with overall weighted GPA of 6.5 or higher.' },
+ { id:'indigenousHealth', label:'Indigenous Health graduate', type:'uowBonus', meta:'+1 bonus', detail:'Completed eligible postgraduate qualification specialising in Indigenous Health.' },
+ { id:'financial', label:'Financial disadvantage', type:'uowBonus', meta:'+1 bonus', detail:'Eligible Centrelink income support for the qualifying period within the past five years.' },
+ ],
+ },
+ uq: {
+ summary: 'UQ uses the key degree GPA and unweighted GAMSAT. Some key degrees override GPA rather than adding a percentage bonus.',
+ foot: 'Only select an override if the relevant qualification is the key degree UQ will assess.',
+ items: [
+ { id:'honoursI', label:'Honours Class I key degree', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'uqGpa', detail:'UQ deems Honours Class I to have GPA 7.00.' },
+ { id:'honoursIIA', label:'Honours Class IIA key degree', value:6, type:'gpaOverride', meta:'GPA 6.0', group:'uqGpa', detail:'UQ deems Honours Class IIA to have GPA 6.00.' },
+ { id:'honoursIIB', label:'Honours Class IIB key degree', value:5, type:'gpaOverride', meta:'GPA 5.0', group:'uqGpa', detail:'UQ deems Honours Class IIB to have GPA 5.00.' },
+ { id:'honoursIII', label:'Honours Class III key degree', value:4, type:'gpaOverride', meta:'GPA 4.0', group:'uqGpa', detail:'UQ deems Honours Class III to have GPA 4.00.' },
+ { id:'aqf10', label:'AQF Level 10 research masters or doctoral key degree', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'uqGpa', detail:'UQ deems AQF Level 10 research masters or doctoral degrees to have GPA 7.00.' },
+ { id:'ruralAdjustments', label:'Rural background GAMSAT adjustments', type:'qualitative', meta:'qualitative', detail:'UQ says rural-background applicants receive two adjustments to the unweighted GAMSAT score, but does not publish a clean combo value here.' },
+ ],
+ },
+ anu: {
+ summary: 'ANU applies the highest eligible higher-degree percentage bonus to the combined GPA/GAMSAT score. These do not stack.',
+ foot: 'The calculator applies only the highest selected ANU percentage, matching the published non-cumulative rule.',
+ items: [
+ { id:'standaloneHonours', label:'Standalone Honours degree', value:0.02, type:'bestComboPercent', meta:'+2%', detail:'Standalone Honours only; embedded/professional honours do not receive this percentage bonus.' },
+ { id:'mastersResearch', label:'Masters by Research complete before application', value:0.02, type:'bestComboPercent', meta:'+2%', detail:'Completed prior to the application date.' },
+ { id:'phd', label:'PhD complete before application', value:0.04, type:'bestComboPercent', meta:'+4%', detail:'Completed prior to the application date.' },
+ ],
+ },
+ uwa: {
+ summary: 'UWA has GPA effects for completed research degrees rather than a broad combo multiplier.',
+ foot: 'The Masters by Research adjustment is capped at GPA 7.0 in this calculator so the displayed combo remains on the normal GPA scale.',
+ items: [
+ { id:'phd', label:'Completed PhD', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'uwaGpa', detail:'Completed PhD from a recognised institution by the time of application.' },
+ { id:'uwaDmd', label:'Completed UWA Doctor of Dental Medicine', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'uwaGpa', detail:'Completed UWA DMD by the time of application.' },
+ { id:'mastersResearch', label:'Completed Masters by Research', value:0.2, type:'gpaAdd', meta:'+0.2 GPA', detail:'Completed Masters by Research by 31 July; UWA adds a small 0.2 GPA bonus.' },
+ ],
+ },
+ macquarie: {
+ summary: 'Macquarie applies a 3% bonus to weighted GPA for each listed cohort, capped at 5% total.',
+ foot: 'Macquarie also reserves interview places for Bachelor of Clinical Science graduates/final-year students; this calculator only models the published GPA bonus.',
+ items: [
+ { id:'atsi', label:'Aboriginal and/or Torres Strait Islander applicant', value:0.03, type:'gpaPercentCapped', meta:'+3%', detail:'Applied to weighted GPA.' },
+ { id:'rural', label:'Rural applicant', value:0.03, type:'gpaPercentCapped', meta:'+3%', detail:'Applied to weighted GPA.' },
+ { id:'clinicalScience', label:'Macquarie Bachelor of Clinical Science applicant', value:0.03, type:'gpaPercentCapped', meta:'+3%', detail:'Applied to weighted GPA.' },
+ ],
+ },
+ griffith: {
+ summary: 'Griffith has several degree-specific GPA treatments. Completed PhDs receive an overall GPA of 7.0.',
+ foot: 'Masters by Research handling depends on FTE and graded/research components, so it is shown as a note rather than an invented exact combo.',
+ items: [
+ { id:'phd', label:'Completed PhD by 31 July', value:7, type:'gpaOverride', meta:'GPA 7.0', group:'griffithGpa', detail:'Griffith states completed PhDs receive an overall GPA of 7.0.' },
+ { id:'mastersResearch', label:'Completed Masters by Research', type:'qualitative', meta:'component GPA 7', detail:'Research components may receive GPA 7.0 for their equivalent full-time study, but the full effect depends on the degree structure.' },
+ { id:'honoursBest', label:'Completed Honours classification may help', type:'qualitative', meta:'GPA rule', detail:'Griffith may use the honours classification or subject results, whichever gives the better final-year GPA.' },
+ ],
+ },
+ uom: {
+ summary: 'Melbourne has important reranking and access schemes, but they are not published as a clean combo percentage.',
+ foot: 'These are shown as strategic flags so students do not miss them, but the calculator keeps Melbourne numeric results on the published GPA/GAMSAT combo scale.',
+ items: [
+ { id:'gam', label:'Graduate Access Melbourne (GAM)', type:'qualitative', meta:'rerank', detail:'Eligible sustained disadvantage may lead to reranking based on level of disadvantage.' },
+ { id:'phdCognate', label:'High-performing cognate PhD', type:'qualitative', meta:'limited rerank', detail:'A small number of applicants with high-level performance in a recent cognate PhD may be reranked in their favour.' },
+ { id:'mdRural', label:'MD Rural Pathway / rural priority', type:'qualitative', meta:'pathway', detail:'Rural applicants may access a dedicated rural pathway or rural-background priority rules.' },
+ ],
+ },
+ unds: {
+ summary: 'Notre Dame Sydney ranks GPA, GAMSAT, Casper, and bonus points in a 30:30:30:10 interview formula. Exact bonus point values are not published on the GEMSAS page.',
+ foot: 'These flags are still worth surfacing because Casper and bonuses can materially change Notre Dame competitiveness.',
+ items: [
+ { id:'rural', label:'Demonstrated rural background', type:'qualitative', meta:'bonus points', detail:'Rural background applicants receive bonus points.' },
+ { id:'hdr', label:'Masters by Research or Doctoral degree complete by 31 July', type:'qualitative', meta:'bonus points', detail:'Notre Dame awards bonus points for completed HDR qualifications.' },
+ { id:'fipUnda', label:'Facilitated interview pathway graduate', type:'qualitative', meta:'pathway', detail:'UNDA undergraduate and Graduate Diploma of Health and Medical Sciences graduates may have a facilitated interview pathway.' },
+ { id:'fipAcu', label:'ACU Bachelor of Biomedical Science graduate', type:'qualitative', meta:'pathway', detail:'Sydney lists ACU Bachelor of Biomedical Science graduates as eligible for a facilitated interview pathway.' },
+ ],
+ },
+ undf: {
+ summary: 'Notre Dame Fremantle ranks GPA, GAMSAT, Casper, and bonus points in a 30:30:30:10 interview formula. Exact bonus point values are not published on the GEMSAS page.',
+ foot: 'Fremantle also considers WA residency and has KCRMT/Broome-related pathways, which are not reducible to a combo multiplier.',
+ items: [
+ { id:'rural', label:'Demonstrated rural background', type:'qualitative', meta:'bonus points', detail:'Rural background applicants receive bonus points.' },
+ { id:'waResidency', label:'Western Australian residency', type:'qualitative', meta:'bonus points', detail:'Cumulative WA residency of 10 years or more may receive bonus points.' },
+ { id:'hdr', label:'Masters by Research or Doctoral degree complete by 31 July', type:'qualitative', meta:'bonus points', detail:'Notre Dame awards bonus points for completed HDR qualifications.' },
+ { id:'fipUnda', label:'Facilitated interview pathway graduate', type:'qualitative', meta:'pathway', detail:'UNDA undergraduate, Graduate Diploma of Health and Medical Sciences, and Pre-Medicine Certificate graduates may have a facilitated interview pathway.' },
+ ],
+ },
+ flinders: {
+ summary: 'Flinders is not GEMSAS - it requires a direct application to Flinders University. Ranking uses a Flinders-calculated weighted GPA (wGPA) and weighted GAMSAT. Up to 75% of SA Bedford Park places are reserved for Flinders graduates; external applicants face a materially higher effective cutoff.',
+ foot: 'SARM (SA rural) and NTMP (NT) sub-quotas have separate priority criteria. No published percentage bonus multiplier like Deakin or ANU. A $160 non-refundable application fee applies.',
+ items: [
+ { id:'flindersDegree', label:'Flinders University graduate (internal applicant)', type:'qualitative', meta:'sub-quota priority', detail:'Up to 75% of SA Bedford Park places are reserved for Flinders graduates, who compete in a substantially larger internal pool with a lower effective cutoff than external applicants.' },
+ { id:'sarm', label:'SA rural background or commitment (SARM program)', type:'qualitative', meta:'rural sub-quota', detail:'SARM program has dedicated SA rural-background sub-quota places. Priority given to applicants meeting SARM criteria including rural residency and/or rural schooling in SA.' },
+ { id:'ntmp', label:'NT residency or NT commitment (NTMP)', type:'qualitative', meta:'NT sub-quota', detail:'NTMP places are set aside for applicants with NT residency or a demonstrable commitment to working in the Northern Territory.' },
+ { id:'atsiFlinders', label:'Aboriginal and/or Torres Strait Islander applicant', type:'qualitative', meta:'IES/sub-quota pathway', detail:'ATSI applicants may apply via the IES (Indigenous Entry Stream) pathway if they do not hold a current GAMSAT result. Sub-quota places also exist within SAMP.' },
+ { id:'hdrFlinders', label:'Completed HDR (Masters by Research or PhD)', type:'qualitative', meta:'wGPA effect', detail:'Completed HDR qualifications may affect the Flinders wGPA calculation. Check the Flinders MD Application Guide for the exact wGPA treatment of your qualification.' },
+ ],
+ },
+};
+
+const UNDERGRAD_SCHOOLS = [
+ {
+ id: 'unsw',
+ name: 'UNSW Bachelor of Medical Studies / Doctor of Medicine',
+ short: 'UNSW',
+ region: 'NSW',
+ type: 'UCAT + ATAR + interview',
+ minAtar: p => p.rural ? 91.0 : 96.0,
+ targetAtar: p => p.rural ? 96.0 : 99.6,
+ targetPercentile: p => p.rural ? 86 : 94,
+ targetLabel: 'community estimate',
+ formula: 'Official: interview selection uses selection rank and UCAT overall score; final offers use academic rank, UCAT and interview. UNSW says minimum scores alone are usually not enough.',
+ official: 'Year 12 applicants need at least 96.00 ATAR for standard eligibility; rural and Gateway pathways have separate rules. UNSW states the 2026 local lowest ATAR was 99.75, with lower observed ATARs in rural/Gateway categories.',
+ community: 'Reddit community estimate: around the 94th percentile for general applicants. Rural estimates are much less certain.',
+ officialSources: [
+ ['UNSW course page', 'https://www.unsw.edu.au/study/undergraduate/bachelor-of-medical-studies-doctor-of-medicine'],
+ ['UNSW local applicants', 'https://www.unsw.edu.au/medicine-health/study-with-us/undergraduate/applying-to-medicine/local-applicants'],
+ ],
+ communitySources: [['Reddit estimate', 'https://www.reddit.com/r/vce/comments/1q0pv7w/2026_ucat_expected_requirements_for_every/']],
+ },
+ {
+ id: 'wsu',
+ name: 'Western Sydney / Charles Sturt Joint Program in Medicine',
+ short: 'WSU/CSU',
+ region: 'NSW',
+ type: 'Academic hurdle + weighted UCAT + MMI',
+ minAtar: p => p.rural ? 91.5 : (p.gws ? 93.5 : 95.5),
+ targetAtar: p => p.rural ? 91.5 : (p.gws ? 93.5 : 95.5),
+ targetPercentile: p => p.rural ? 88 : (p.gws ? 93 : (p.homeState === 'NSW' ? 96 : 99)),
+ targetLabel: 'community estimate',
+ wsuFormulaTarget: p => p.rural ? 730 : (p.gws ? 760 : (p.homeState === 'NSW' ? 797 : 865)),
+ formula: 'Official: ATAR/GPA is a hurdle; interview invitations use UCAT section performance, and final offers are 75% interview + 25% UCAT.',
+ official: 'Academic threshold is 95.5 non-GWS, 93.5 GWS, and 91.5 rural. The university does not publish the annual UCAT threshold.',
+ community: 'Reddit community estimate reports WSU formula targets around 760 for GWS, 797 for NSW, and 865 for interstate. Treat this as unverified.',
+ officialSources: [
+ ['WSU general applicants', 'https://www.westernsydney.edu.au/future/study/how-to-apply/md-applicants/general-applicants'],
+ ['WSU FAQ', 'https://www.westernsydney.edu.au/future/study/how-to-apply/md-applicants/frequently-asked-questions'],
+ ],
+ communitySources: [['Reddit estimate', 'https://www.reddit.com/r/vce/comments/1q0pv7w/2026_ucat_expected_requirements_for_every/']],
+ },
+ {
+ id: 'jmp',
+ name: 'University of Newcastle / UNE Joint Medical Program',
+ short: 'JMP',
+ region: 'NSW',
+ type: 'Academic hurdle + UCAT aggregate + MSA/PQA',
+ minAtar: p => p.rural ? 85.0 : 94.3,
+ targetAtar: p => p.rural ? 85.0 : 94.3,
+ targetPercentile: p => (p.rural || p.jmpLocal) ? 85 : 99,
+ targetLabel: 'community estimate',
+ formula: 'Official: academic eligibility first, then UCAT cognitive aggregate ranks applicants for JMP Assessment. Situational Judgement is not used for 2027 admission.',
+ official: 'Minimum ATAR is 94.3, or 85 for eligible rural/remote high-school applicants. UCAT cutoff is not determined until applications close.',
+ community: 'Reddit community estimate: around 85th percentile for Hunter/New England/Newcastle/Central Coast style local pools, and near 99th percentile for wider NSW/interstate non-rural applicants.',
+ officialSources: [
+ ['JMP academic eligibility', 'https://www.newcastle.edu.au/joint-medical-program/selection-process/academic-eligibility'],
+ ['JMP personal qualities', 'https://www.newcastle.edu.au/joint-medical-program/selection-process/assessment-of-personal-qualities'],
+ ],
+ communitySources: [['Reddit estimate', 'https://www.reddit.com/r/vce/comments/1q0pv7w/2026_ucat_expected_requirements_for_every/']],
+ },
+ {
+ id: 'uq',
+ name: 'University of Queensland MD Provisional Entry',
+ short: 'UQ',
+ region: 'QLD',
+ type: 'ATAR + UCAT + MMI',
+ minAtar: () => 95.0,
+ targetAtar: () => 99.45,
+ targetPercentile: p => p.rural ? 75 : (p.homeState === 'QLD' ? 91 : 98),
+ targetLabel: 'mixed official/community',
+ formula: 'Official: adjusted ATAR 95 minimum, competitive UCAT aggregate, then MMI. UQ says the required UCAT varies by applicant performance and places.',
+ official: 'UQ publishes adjusted ATAR 95 as the minimum and reports provisional-entry ATAR distributions; it does not publish a fixed future UCAT cutoff.',
+ community: 'Reddit community estimate: about 91st percentile for Queensland applicants and about 98th percentile for interstate. Rural targets are materially lower but variable.',
+ officialSources: [
+ ['UQ entry requirements', 'https://study.uq.edu.au/admissions/doctor-medicine/provisional-entry/entry-requirements'],
+ ['UQ minimum entry scores', 'https://study.uq.edu.au/admissions/doctor-medicine/provisional-entry/entry-requirements/minimum-entry-scores-doctor-medicine-provisional-entry'],
+ ],
+ communitySources: [['Reddit estimate', 'https://www.reddit.com/r/vce/comments/1q0pv7w/2026_ucat_expected_requirements_for_every/']],
+ },
+ {
+ id: 'uqRegional',
+ name: 'CQU / UniSQ Regional Pathways to UQ MD',
+ short: 'UQ Regional',
+ region: 'QLD',
+ type: 'Regional provisional pathway',
+ minAtar: () => 95.0,
+ targetAtar: () => 95.0,
+ targetPercentile: p => p.rural || p.homeState === 'QLD' ? 78 : 90,
+ targetLabel: 'limited estimate',
+ formula: 'Official: school-leaver pathway, ATAR 95 minimum, UCAT shortlisting and MMI, then progression to the UQ MD with GPA 5.0 if completed on time.',
+ official: 'CQU and UniSQ list ATAR 95 and direct/provisional progression to UQ MD after the required bachelor degree and GPA. Places are regional-workforce focused.',
+ community: 'There is less public community cutoff data than for Greater Brisbane UQ. Treat the UCAT target here as a broad planning signal only.',
+ officialSources: [
+ ['CQU pathway', 'https://www.cqu.edu.au/courses/cm17/bachelor-of-medical-science-pathway-to-medicine'],
+ ['UniSQ pathway', 'https://www.unisq.edu.au/study/degrees-and-courses/bachelor-of-biomedical-sciences-medicine-pathway'],
+ ],
+ communitySources: [],
+ },
+ {
+ id: 'monash',
+ name: 'Monash Direct Entry Medicine',
+ short: 'Monash',
+ region: 'VIC',
+ type: 'ATAR + UCAT + MMI',
+ minAtar: () => 90.0,
+ targetAtar: p => p.rural ? 95.0 : 99.0,
+ targetPercentile: p => p.rural ? 82 : (p.homeState === 'VIC' ? 94 : 98),
+ targetLabel: 'official weighting + community estimate',
+ formula: 'Official: ATAR aggregate, UCAT ANZ total score and MMI are three equally weighted components.',
+ official: 'Minimum ATAR is 90, but Monash states final ATAR is usually significantly higher. 2026 lowest ATAR offers were published as range-of-criteria values across school-leaver categories.',
+ community: 'Reddit community estimate: high 94th percentile for Victorian applicants and about 98th percentile for interstate.',
+ officialSources: [
+ ['Monash entry requirements', 'https://www.monash.edu/medicine/som/direct-entry/domestic/entry-requirements'],
+ ['Monash applications', 'https://www.monash.edu/medicine/som/direct-entry/domestic/applications-fees'],
+ ],
+ communitySources: [['Reddit estimate', 'https://www.reddit.com/r/vce/comments/1q0pv7w/2026_ucat_expected_requirements_for_every/']],
+ },
+ {
+ id: 'adelaide',
+ name: 'Adelaide University Bachelor of Medical Studies',
+ short: 'Adelaide',
+ region: 'SA',
+ type: 'UCAT shortlisting + interview + academic score',
+ minAtar: () => 90.0,
+ targetAtar: () => 98.5,
+ targetPercentile: p => p.homeState === 'SA' ? 80 : 98,
+ targetLabel: 'community estimate',
+ formula: 'Official: if academic minimums are met, interview selection is based on UCAT; eligible applicants are then ranked using UCAT, interview and academic score.',
+ official: 'Minimum adjusted ATAR is 90.00 and applicants must sit UCAT ANZ and attend interview if invited.',
+ community: 'Reddit community estimate: around 80th percentile for South Australian applicants and 98th+ for interstate.',
+ officialSources: [['Adelaide University degree page', 'https://adelaideuni.edu.au/study/degrees/bachelor-of-medical-studies/dom/']],
+ communitySources: [['Reddit estimate', 'https://www.reddit.com/r/vce/comments/1q0pv7w/2026_ucat_expected_requirements_for_every/']],
+ },
+ {
+ id: 'flinders',
+ name: 'Flinders Bachelor of Clinical Sciences / Doctor of Medicine',
+ short: 'Flinders',
+ region: 'SA',
+ type: 'ATAR + UCAT selection rank',
+ minAtar: () => 90.0,
+ targetAtar: () => 98.5,
+ targetPercentile: p => p.homeState === 'SA' || p.homeState === 'NT' ? 88 : 94,
+ targetLabel: 'community estimate',
+ formula: 'Official: high-school pathway uses ATAR and UCAT scores combined for final selection rank.',
+ official: 'Flinders states ATAR and UCAT are combined for final selection rank for the Clinical Sciences/Medicine pathway.',
+ community: 'Reddit community estimate: UCAT carries relatively low weight and around 90th percentile may be competitive, but this is unverified.',
+ officialSources: [
+ ['Flinders pathway', 'https://www.flinders.edu.au/study/medicine/medical-pathways'],
+ ['Flinders course page', 'https://www.flinders.edu.au/study/courses/bachelor-clinical-sciences-doctor-medicine'],
+ ],
+ communitySources: [['Reddit estimate', 'https://www.reddit.com/r/vce/comments/1q0pv7w/2026_ucat_expected_requirements_for_every/']],
+ },
+ {
+ id: 'curtin',
+ name: 'Curtin Bachelor of Medicine, Bachelor of Surgery',
+ short: 'Curtin',
+ region: 'WA',
+ type: 'ATAR + UCAT + CASPer + MMI',
+ minAtar: p => p.firstNations ? 90.0 : 95.0,
+ targetAtar: p => p.rural ? 97.0 : 99.5,
+ targetPercentile: p => p.rural ? 85 : (p.homeState === 'WA' ? 96 : 98),
+ targetLabel: 'official process + community estimate',
+ formula: 'Official: interview ranking uses ATAR/equivalent, UCAT and CASPer; final selection uses ATAR/equivalent, UCAT and MMI. Aboriginal and Torres Strait Islander applicants are not required to sit UCAT/CASPer.',
+ official: 'Minimum ATAR is 95, and applicants must sit UCAT ANZ and CASPer unless applying via the Aboriginal and Torres Strait Islander pathway.',
+ community: 'Community estimates commonly place metro UCAT competitiveness around the mid-to-high 90s percentile, with lower rural targets and strong CASPer needed.',
+ officialSources: [
+ ['Curtin course page', 'https://www.curtin.edu.au/study/offering/t--B-MBBS/'],
+ ['Curtin UCAT/CASPer FAQ', 'https://www.curtin.edu.au/study/help-support/app/answers/detail/a_id/1942'],
+ ],
+ communitySources: [['Reddit estimate', 'https://www.reddit.com/r/vce/comments/1q0pv7w/2026_ucat_expected_requirements_for_every/']],
+ },
+ {
+ id: 'uwa',
+ name: 'UWA Assured Pathway to Doctor of Medicine',
+ short: 'UWA',
+ region: 'WA',
+ type: 'ATAR + interview + UCAT',
+ minAtar: p => p.firstNations ? 90.0 : 98.0,
+ targetAtar: p => p.rural ? 99.0 : 99.4,
+ targetPercentile: p => p.rural ? 90 : (p.homeState === 'WA' ? 86 : 99),
+ targetLabel: 'official formula + community estimate',
+ formula: 'Official: final ranking is ATAR/equivalent 30%, interview 50%, UCAT ANZ 20%. Rural ranking includes rurality rating.',
+ official: 'UWA lists ATAR 98 for the Medicine assured pathway via Bachelor of Biomedicine (Specialised), with additional entry requirements and no guarantee from ATAR alone.',
+ community: 'Reddit community estimate: around 86th percentile for WA applicants and high 99th percentile for interstate.',
+ officialSources: [
+ ['UWA Assured Pathways', 'https://www.uwa.edu.au/study/explore-courses/assured-pathways'],
+ ['UWA IMSCP', 'https://www.uwa.edu.au/study/courses/integrated-medical-sciences-and-clinical-practice'],
+ ],
+ communitySources: [['Reddit estimate', 'https://www.reddit.com/r/vce/comments/1q0pv7w/2026_ucat_expected_requirements_for_every/']],
+ },
+ {
+ id: 'utas',
+ name: 'University of Tasmania BMedScMD',
+ short: 'UTAS',
+ region: 'TAS',
+ type: 'ATAR-primary + UCAT tiebreak',
+ minAtar: p => p.rural ? 90.0 : 95.0,
+ targetAtar: p => p.homeState === 'TAS' ? 96.5 : 99.0,
+ targetPercentile: p => p.homeState === 'TAS' ? 70 : 85,
+ targetLabel: 'limited estimate',
+ atarPrimary: true,
+ formula: 'Official: ATAR-equivalent score is the primary ranking method. UCAT cognitive total is used as a secondary ranking method for applicants in the same ATAR group. No interview.',
+ official: 'Domestic school-leaver minimum adjusted ATAR is 95; rural applicants can receive up to five ATAR points through RAP. At least 75% of domestic places are offered to Tasmanians.',
+ community: 'Community UCAT cutoffs are less meaningful here because ATAR and Tasmanian/rural quotas dominate.',
+ officialSources: [['UTAS course page', 'https://www.utas.edu.au/courses/chm/courses/h3x-bachelor-of-medical-science-and-doctor-of-medicine']],
+ communitySources: [],
+ },
+ {
+ id: 'griffith',
+ name: 'Griffith Bachelor of Medical Science / Doctor of Medicine',
+ short: 'Griffith',
+ region: 'QLD',
+ type: 'ATAR-primary, UCAT tiebreak',
+ minAtar: () => 99.90,
+ targetAtar: () => 99.90,
+ targetPercentile: () => 0,
+ targetLabel: 'official',
+ atarPrimary: true,
+ ucatOptional: true,
+ formula: 'Official: ATAR/selection rank is primary. UCAT total is optional but used as second-order ranking inside ATAR bands.',
+ official: 'For 2026, Gold Coast minimum adjusted ATAR was 99.90 and UCAT total 2240 was used as a second-order differentiator; Nathan was 99.95 with all in that ATAR band offered.',
+ community: 'Reddit also describes Griffith as 99.85+ ATAR with UCAT as tiebreaker; the official 2026 figure is the safer anchor.',
+ officialSources: [['Griffith pathways', 'https://www.griffith.edu.au/griffith-health/medicine-pathway']],
+ communitySources: [['Reddit estimate', 'https://www.reddit.com/r/vce/comments/1q0pv7w/2026_ucat_expected_requirements_for_every/']],
+ },
+ {
+ id: 'unisc',
+ name: 'UniSC Bachelor of Medical Science to Griffith MD',
+ short: 'UniSC',
+ region: 'QLD',
+ type: 'Local/regional provisional pathway',
+ minAtar: () => 99.10,
+ targetAtar: p => p.homeState === 'QLD' || p.rural ? 99.10 : 99.70,
+ targetPercentile: () => 0,
+ targetLabel: 'limited estimate',
+ atarPrimary: true,
+ ucatOptional: true,
+ formula: 'Official: provisional direct entry to Griffith MD at Sunshine Coast University Hospital; local-area residence is relevant.',
+ official: 'UniSC states the program is highly competitive and gives provisional direct entry to Griffith MD subject to GPA 5.5 progression.',
+ community: 'Public cutoff data is sparse. Treat this as an ATAR-heavy regional pathway rather than a UCAT-driven one.',
+ officialSources: [['UniSC Medical Science', 'https://www.usc.edu.au/study/courses-and-programs/bachelor-degrees-undergraduate-programs/bachelor-of-medical-science']],
+ communitySources: [],
+ },
+ {
+ id: 'jcu',
+ name: 'James Cook University MBBS',
+ short: 'JCU',
+ region: 'QLD',
+ type: 'No UCAT: written application + interview',
+ minAtar: p => p.rural ? 85.0 : 96.0,
+ targetAtar: p => p.rural ? 96.0 : 98.5,
+ targetPercentile: () => 0,
+ targetLabel: 'not UCAT-based',
+ noUcat: true,
+ formula: 'Official: selection uses academic performance, written application and interview. UCAT is not used.',
+ official: 'JCU says an excellent academic history plus strong written application makes a competitive candidate; interviews are based on application and academic results.',
+ community: 'The official page is the anchor here. Community estimates vary because rurality and the written application matter heavily.',
+ officialSources: [
+ ['JCU course page', 'https://www.jcu.edu.au/courses/bachelor-of-medicine-bachelor-of-surgery'],
+ ['JCU ATAR FAQ', 'https://jcu.custhelp.com/app/answers/detail/a_id/942/~/what-op/atar-score-do-i-need-to-get-into-medicine-at-jcu'],
+ ],
+ communitySources: [],
+ },
+ {
+ id: 'bond',
+ name: 'Bond Medical Program',
+ short: 'Bond',
+ region: 'QLD',
+ type: 'No UCAT: psychometric test + interview',
+ minAtar: () => 96.0,
+ targetAtar: () => 96.5,
+ targetPercentile: () => 0,
+ targetLabel: 'not UCAT-based',
+ noUcat: true,
+ formula: 'Official: academic assessment, psychometric testing and interview. UCAT is not used.',
+ official: 'Bond says recent intake competitiveness for undergraduate applicants was around ATAR 96+ or IB 38+ for psychometric-test selection; it is full-fee and strictly limited.',
+ community: 'Not a UCAT play. Include it so students with strong ATAR but weaker UCAT do not miss the pathway.',
+ officialSources: [['Bond entry requirements', 'https://bond.edu.au/medical-program-entry-requirements']],
+ communitySources: [],
+ },
+];
+
+let state = { entryMode: 'graduate', rural: false, casper: '', scoreMode: 'overall', activeBonusUni: 'deakin', bonuses: {} };
+let latestCalculatorPlan = null;
+const K2_LATEST_CALCULATOR_PLAN_KEY = 'key2md_latest_calculator_plan_v1';
+
+const DUPLICATE_RURAL_BONUS_IDS = {
+ deakin: ['geelongMm1Mm2', 'mm3Mm7'],
+ uq: ['ruralAdjustments'],
+ uom: ['mdRural'],
+ unds: ['rural'],
+ undf: ['rural'],
+};
+
+function isDuplicateRuralBonus(schoolId, item) {
+ return !!(state.rural && DUPLICATE_RURAL_BONUS_IDS[schoolId]?.includes(item.id));
+}
+
+function sanitizeBonusesForState() {
+ if (!state.rural) return;
+ Object.entries(DUPLICATE_RURAL_BONUS_IDS).forEach(([schoolId, ids]) => {
+ if (!state.bonuses[schoolId]?.length) return;
+ state.bonuses[schoolId] = state.bonuses[schoolId].filter(id => !ids.includes(id));
+ });
+}
+
+function escapeHtml(value) {
+ return String(value).replace(/[&<>"']/g, ch => ({
+ '&': '&amp;',
+ '<': '&lt;',
+ '>': '&gt;',
+ '"': '&quot;',
+ "'": '&#39;',
+ }[ch]));
+}
+
+function trackCalculatorEvent(name, params = {}) {
+ if (window.Key2MDTrack && typeof window.Key2MDTrack.track === 'function') {
+ window.Key2MDTrack.track(name, Object.assign({ event_category: 'calculator' }, params));
+ } else if (typeof gtag === 'function') {
+ gtag('event', name, Object.assign({ event_category: 'calculator' }, params));
+ }
+}
+
+function setResultStatus(message) {
+ const status = document.getElementById('resultStatus');
+ if (status) status.textContent = message || '';
+}
+
+function setLatestCalculatorPlan(plan) {
+ latestCalculatorPlan = Object.assign({
+ generatedAt: new Date().toISOString(),
+ page: 'medical-school-chances',
+ url: 'https://www.key2md.com/medical-school-chances.html',
+ }, plan);
+ try { localStorage.setItem(K2_LATEST_CALCULATOR_PLAN_KEY, JSON.stringify(latestCalculatorPlan)); } catch (e) {}
+ if (typeof renderResultHeadline === 'function' && Number.isFinite(latestCalculatorPlan.schoolCount)) {
+ renderResultHeadline(latestCalculatorPlan.competitiveCount, latestCalculatorPlan.schoolCount);
+ }
+ if (window.Key2MDTrack && typeof window.Key2MDTrack.funnel === 'function') {
+ window.Key2MDTrack.funnel('calculator_result_saved', { mode: latestCalculatorPlan.mode || 'unknown' });
+ }
+}
+
+function formatLatestCalculatorPlan() {
+ if (!latestCalculatorPlan) return 'Key2MD medical school chances result: run the calculator to generate a plan.';
+ const lines = [
+ 'Key2MD medical school chances result',
+ '',
+ latestCalculatorPlan.summary,
+ '',
+ 'Strongest fits:',
+ ...(latestCalculatorPlan.strongest || []).map(item => `- ${item.name}: ${item.detail}`),
+ '',
+ `Next step: ${latestCalculatorPlan.nextStep}`,
+ ];
+ if (latestCalculatorPlan.watchouts?.length) {
+ lines.push('', 'Watchouts:', ...latestCalculatorPlan.watchouts.map(item => `- ${item}`));
+ }
+ lines.push('', 'Run it again:', latestCalculatorPlan.url);
+ lines.push('', '---', 'This result is informational only. Data is self-reported community data, not published by universities. Results are not professional admissions advice and do not guarantee any outcome. Verify all information with official sources before making application decisions.');
+ return lines.filter(line => line !== undefined && line !== null).join('\n');
+}
+
+async function copyLatestCalculatorPlan() {
+ const text = formatLatestCalculatorPlan();
+ try {
+ await navigator.clipboard.writeText(text);
+ setResultStatus('Copied. Nice and portable.');
+ } catch {
+ setResultStatus('Copy failed in this browser. You can still email the plan to yourself.');
+ }
+ trackCalculatorEvent('calculator_result_copy', { event_label: latestCalculatorPlan?.mode || 'unknown' });
+}
+
+function buildResultHeadlineText(comp, total) {
+ if (!total) return '';
+ if (comp <= 0) return 'On these inputs, no schools are above their observed cutoff yet';
+ return 'Competitive at ' + comp + ' of ' + total + ' schools on these inputs';
+}
+
+function renderResultHeadline(comp, total) {
+ const el = document.getElementById('resultHeadline');
+ if (!el) return;
+ if (!total) { el.classList.remove('show'); el.innerHTML = ''; return; }
+ if (comp > 0) {
+ el.innerHTML = 'Competitive at <span>' + comp + '</span> of <span>' + total + '</span> schools on these inputs.';
+ } else {
+ el.textContent = buildResultHeadlineText(comp, total);
+ }
+ el.classList.add('show');
+}
+
+function _k2RoundRect(ctx, x, y, w, h, r) {
+ r = Math.min(r, w / 2, h / 2);
+ ctx.beginPath();
+ ctx.moveTo(x + r, y);
+ ctx.arcTo(x + w, y, x + w, y + h, r);
+ ctx.arcTo(x + w, y + h, x, y + h, r);
+ ctx.arcTo(x, y + h, x, y, r);
+ ctx.arcTo(x, y, x + w, y, r);
+ ctx.closePath();
+}
+
+function _k2DrawSpaced(ctx, str, x, y, ls) {
+ let cx = x;
+ for (const ch of str) {
+ ctx.fillText(ch, cx, y);
+ cx += ctx.measureText(ch).width + ls;
+ }
+}
+
+async function buildResultShareCardBlob() {
+ const plan = latestCalculatorPlan;
+ if (!plan) return null;
+ try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+ const scale = 2, W = 1200, H = 630;
+ const canvas = document.createElement('canvas');
+ canvas.width = W * scale; canvas.height = H * scale;
+ const ctx = canvas.getContext('2d');
+ ctx.scale(scale, scale);
+ const FS = "'DM Sans', system-ui, -apple-system, sans-serif";
+ const M = 72;
+ const g = ctx.createLinearGradient(0, 0, 0, H);
+ g.addColorStop(0, '#071326'); g.addColorStop(1, '#0c1e3a');
+ ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+ const rg = ctx.createRadialGradient(W * 0.9, H * 0.08, 60, W * 0.9, H * 0.08, 540);
+ rg.addColorStop(0, 'rgba(14,165,233,0.20)'); rg.addColorStop(1, 'rgba(14,165,233,0)');
+ ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+ ctx.textBaseline = 'alphabetic';
+ ctx.fillStyle = '#0ea5e9'; ctx.font = '800 22px ' + FS;
+ _k2DrawSpaced(ctx, 'MEDICAL SCHOOL CHANCES CALCULATOR', M, 92, 3);
+ const comp = plan.competitiveCount, total = plan.schoolCount;
+ ctx.fillStyle = '#ffffff';
+ if (total && comp > 0) {
+ ctx.font = '800 78px ' + FS;
+ ctx.fillText('Competitive at ' + comp + ' of ' + total, M, 196);
+ ctx.fillText('schools on my inputs', M, 280);
+ } else if (total) {
+ ctx.font = '800 70px ' + FS; ctx.fillText('My competitiveness read', M, 200);
+ ctx.font = '500 30px ' + FS; ctx.fillStyle = '#78c4ec';
+ ctx.fillText('Run against real Australian admissions data', M, 250);
+ } else {
+ ctx.font = '800 70px ' + FS; ctx.fillText('My med school chances', M, 200);
+ ctx.font = '500 30px ' + FS; ctx.fillStyle = '#78c4ec';
+ ctx.fillText('Run against real Australian admissions data', M, 250);
+ }
+ const bx = M, bw = W - M * 2, by = 360, bh = 30;
+ const bg = ctx.createLinearGradient(bx, 0, bx + bw, 0);
+ bg.addColorStop(0, '#e24b4a'); bg.addColorStop(0.5, '#f59e0b'); bg.addColorStop(1, '#22c55e');
+ _k2RoundRect(ctx, bx, by, bw, bh, bh / 2); ctx.fillStyle = bg; ctx.fill();
+ ctx.font = '700 18px ' + FS;
+ ctx.textAlign = 'left'; ctx.fillStyle = '#e24b4a'; ctx.fillText('Below', bx, by + bh + 26);
+ ctx.textAlign = 'center'; ctx.fillStyle = '#f59e0b'; ctx.fillText('Borderline', bx + bw / 2, by + bh + 26);
+ ctx.textAlign = 'right'; ctx.fillStyle = '#22c55e'; ctx.fillText('Competitive', bx + bw, by + bh + 26);
+ ctx.textAlign = 'left';
+ const ratio = Math.max(0.05, Math.min(0.95, (typeof plan.ratio === 'number' ? plan.ratio : 0.5)));
+ const yx = bx + bw * ratio;
+ ctx.fillStyle = '#ffffff'; ctx.fillRect(yx - 2, by, 4, bh);
+ ctx.fillStyle = '#fbbf24';
+ ctx.beginPath(); ctx.moveTo(yx, by - 8); ctx.lineTo(yx - 16, by - 32); ctx.lineTo(yx + 16, by - 32); ctx.closePath(); ctx.fill();
+ ctx.font = '800 18px ' + FS;
+ const pw = ctx.measureText('YOU').width + 26;
+ _k2RoundRect(ctx, yx - pw / 2, by - 74, pw, 34, 17); ctx.fillStyle = '#fbbf24'; ctx.fill();
+ ctx.fillStyle = '#071326'; ctx.textAlign = 'center'; ctx.fillText('YOU', yx, by - 51); ctx.textAlign = 'left';
+ const fits = (plan.strongest || []).slice(0, 3).map(s => s.name).filter(Boolean);
+ if (fits.length) {
+ ctx.font = '700 19px ' + FS; ctx.fillStyle = '#9eb2cc'; ctx.fillText('Strongest fits', M, 468);
+ let cx = M; const cy = 484; ctx.font = '800 20px ' + FS;
+ fits.forEach(name => {
+ const tw = ctx.measureText(name).width + 34;
+ _k2RoundRect(ctx, cx, cy, tw, 44, 22);
+ ctx.fillStyle = 'rgba(20,44,78,1)'; ctx.fill();
+ ctx.strokeStyle = 'rgba(40,76,122,1)'; ctx.lineWidth = 1; ctx.stroke();
+ ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle'; ctx.fillText(name, cx + 17, cy + 23);
+ ctx.textBaseline = 'alphabetic'; cx += tw + 14;
+ });
+ }
+ const fy = 566;
+ ctx.font = '800 30px ' + FS; ctx.fillStyle = '#ffffff'; ctx.fillText('Key', M, fy);
+ const kw = ctx.measureText('Key').width;
+ ctx.fillStyle = '#fbbf24'; ctx.fillText('2', M + kw, fy);
+ const k2 = ctx.measureText('2').width;
+ ctx.fillStyle = '#ffffff'; ctx.fillText('MD', M + kw + k2, fy);
+ const mdw = ctx.measureText('MD').width;
+ ctx.font = '600 19px ' + FS; ctx.fillStyle = '#9eb2cc';
+ ctx.fillText('key2md.com/chances  \u00b7  Informational only, not admissions advice', M + kw + k2 + mdw + 20, fy - 1);
+ return await new Promise(res => canvas.toBlob(res, 'image/png'));
+}
+
+async function shareLatestCalculatorPlan() {
+ const text = formatLatestCalculatorPlan();
+ const shareUrl = latestCalculatorPlan?.url || 'https://www.key2md.com/medical-school-chances.html';
+ let blob = null;
+ try { blob = await buildResultShareCardBlob(); } catch (e) { blob = null; }
+ if (blob && navigator.canShare) {
+ const file = new File([blob], 'key2md-chances.png', { type: 'image/png' });
+ if (navigator.canShare({ files: [file] })) {
+ try {
+ await navigator.share({ files: [file], title: 'My Key2MD chances result', text: latestCalculatorPlan?.headline || 'My Australian medical school chances result.', url: shareUrl });
+ trackCalculatorEvent('calculator_result_share', { event_label: latestCalculatorPlan?.mode || 'unknown', method: 'image' });
+ return;
+ } catch (err) { if (err && err.name === 'AbortError') return; }
+ }
+ }
+ if (blob) {
+ try {
+ const a = document.createElement('a');
+ a.href = URL.createObjectURL(blob);
+ a.download = 'key2md-chances.png';
+ document.body.appendChild(a); a.click(); a.remove();
+ setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+ setResultStatus('Share image saved to your device.');
+ trackCalculatorEvent('calculator_result_share', { event_label: latestCalculatorPlan?.mode || 'unknown', method: 'download' });
+ return;
+ } catch (e) {}
+ }
+ if (navigator.share) {
+ try {
+ await navigator.share({ title: 'My Key2MD chances result', text, url: shareUrl });
+ trackCalculatorEvent('calculator_result_share', { event_label: latestCalculatorPlan?.mode || 'unknown', method: 'text' });
+ return;
+ } catch (err) { if (err && err.name === 'AbortError') return; }
+ }
+ await copyLatestCalculatorPlan();
+}
+
+function schoolById(id) {
+ return UNIS.find(u => u.id === id);
+}
+
+function getSelectedBonusIds(schoolId) {
+ return state.bonuses[schoolId] || [];
+}
+
+function getSelectedBonusItems(schoolId) {
+ const rule = BONUS_RULES[schoolId];
+ if (!rule) return [];
+ const selected = new Set(getSelectedBonusIds(schoolId));
+ return rule.items.filter(item => selected.has(item.id));
+}
+
+function initBonusPicker() {
+ const wrap = document.getElementById('bonusSchoolPills');
+ if (!wrap) return;
+ wrap.innerHTML = BONUS_ORDER.map(id => {
+ const school = schoolById(id);
+ return `<button type="button" class="bonus-school-pill" data-school="${id}">${school ? school.short : id}</button>`;
+ }).join('');
+ wrap.addEventListener('click', event => {
+ const btn = event.target.closest('.bonus-school-pill');
+ if (!btn) return;
+ state.activeBonusUni = btn.dataset.school;
+ renderBonusPicker();
+ });
+ document.getElementById('bonusChecklist').addEventListener('change', event => {
+ const input = event.target.closest('input[type="checkbox"][data-bonus-id]');
+ if (!input) return;
+ toggleBonus(state.activeBonusUni, input.dataset.bonusId, input.checked);
+ });
+ renderBonusPicker();
+}
+
+function toggleBonus(schoolId, itemId, checked) {
+ const rule = BONUS_RULES[schoolId];
+ if (!rule) return;
+ const item = rule.items.find(entry => entry.id === itemId);
+ if (!item) return;
+ if (checked && isDuplicateRuralBonus(schoolId, item)) {
+ renderBonusPicker();
+ return;
+ }
+ const selected = new Set(getSelectedBonusIds(schoolId));
+ if (checked && item.group) {
+ rule.items
+ .filter(entry => entry.group === item.group && entry.id !== item.id)
+ .forEach(entry => selected.delete(entry.id));
+ }
+ if (checked) selected.add(itemId);
+ else selected.delete(itemId);
+ state.bonuses[schoolId] = Array.from(selected);
+ renderBonusPicker();
+}
+
+function renderBonusPicker() {
+ sanitizeBonusesForState();
+ const activeId = state.activeBonusUni;
+ const rule = BONUS_RULES[activeId];
+ const note = document.getElementById('bonusSchoolNote');
+ const list = document.getElementById('bonusChecklist');
+ const foot = document.getElementById('bonusPanelFoot');
+ document.querySelectorAll('.bonus-school-pill').forEach(btn => {
+ const sid = btn.dataset.school;
+ btn.classList.toggle('active', sid === activeId);
+ btn.setAttribute('aria-pressed', sid === activeId ? 'true' : 'false');
+ const sc = BONUS_RULES[sid] ? getSelectedBonusIds(sid).length : 0;
+ const schoolObj = schoolById(sid);
+ const lbl = schoolObj ? schoolObj.short : sid;
+ btn.innerHTML = escapeHtml(lbl) + (sc > 0 ? `<span class="bonus-pill-badge">${sc}</span>` : '');
+ });
+ if (!rule) return;
+ const school = schoolById(activeId);
+ const selected = new Set(getSelectedBonusIds(activeId));
+ note.innerHTML = `<strong>${escapeHtml(school ? school.name : activeId)}:</strong> ${escapeHtml(rule.summary)}`;
+ list.innerHTML = rule.items.map(item => {
+ const disabled = isDuplicateRuralBonus(activeId, item);
+ const disabledText = disabled ? 'Already covered by the rural-category benchmark selected above, so this is not stacked again.' : '';
+ return `
+ <label class="bonus-check${disabled ? ' disabled' : ''}">
+ <input type="checkbox" data-bonus-id="${escapeHtml(item.id)}" ${selected.has(item.id) ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
+ <span>
+ <strong>${escapeHtml(item.label)} <span class="bonus-check-meta">${escapeHtml(item.meta || '')}</span></strong>
+ <span class="bonus-check-detail">${escapeHtml(item.detail)}${disabledText ? ` ${escapeHtml(disabledText)}` : ''}</span>
+ </span>
+ </label>
+ `}).join('');
+ const totalSelected = Object.values(state.bonuses).reduce((sum, ids) => sum + ids.length, 0);
+ const sanityText = state.rural && DUPLICATE_RURAL_BONUS_IDS[activeId]
+ ? ' Rural-category benchmarking is already turned on, so matching rural-background options for this school are disabled to avoid double counting the same evidence.'
+ : '';
+ foot.textContent = `${rule.foot || ''} ${totalSelected ? `${totalSelected} adjustment option${totalSelected === 1 ? '' : 's'} selected across all schools.` : 'No adjustments selected yet.'}${sanityText}`.trim();
+}
+
+initBonusPicker();
+
+document.getElementById('toggleNonRural').addEventListener('click', () => {
+ state.rural = false;
+ document.getElementById('toggleNonRural').classList.add('active');
+ document.getElementById('toggleNonRural').setAttribute('aria-selected', 'true');
+ document.getElementById('toggleRural').classList.remove('active');
+ document.getElementById('toggleRural').setAttribute('aria-selected', 'false');
+ renderBonusPicker();
+});
+document.getElementById('toggleRural').addEventListener('click', () => {
+ state.rural = true;
+ sanitizeBonusesForState();
+ document.getElementById('toggleRural').classList.add('active');
+ document.getElementById('toggleRural').setAttribute('aria-selected', 'true');
+ document.getElementById('toggleNonRural').classList.remove('active');
+ document.getElementById('toggleNonRural').setAttribute('aria-selected', 'false');
+ renderBonusPicker();
+});
+
+document.querySelectorAll('.casper-pill').forEach(p => {
+ p.addEventListener('click', () => {
+ document.querySelectorAll('.casper-pill').forEach(x => x.classList.remove('active'));
+ p.classList.add('active');
+ state.casper = p.dataset.c;
+ });
+});
+document.querySelector('.casper-pill[data-c=""]').classList.add('active');
+
+function setScoreMode(mode) {
+ state.scoreMode = mode === 'sections' ? 'sections' : 'overall';
+ const overallBtn = document.getElementById('scoreModeOverall');
+ const sectionsBtn = document.getElementById('scoreModeSections');
+ const overallPanel = document.getElementById('overallScorePanel');
+ const sectionPanel = document.getElementById('sectionScorePanel');
+ overallBtn.classList.toggle('active', state.scoreMode === 'overall');
+ sectionsBtn.classList.toggle('active', state.scoreMode === 'sections');
+ overallBtn.setAttribute('aria-selected', state.scoreMode === 'overall' ? 'true' : 'false');
+ sectionsBtn.setAttribute('aria-selected', state.scoreMode === 'sections' ? 'true' : 'false');
+ overallPanel.hidden = state.scoreMode !== 'overall';
+ sectionPanel.hidden = state.scoreMode !== 'sections';
+ [gamWeightedIn, gamUnweightedIn, gamS1In, gamS2In, gamS3In].forEach(input => markInvalid(input, false));
+ document.getElementById('gamsatErr').classList.remove('show');
+}
+document.getElementById('scoreModeOverall').addEventListener('click', () => setScoreMode('overall'));
+document.getElementById('scoreModeSections').addEventListener('click', () => setScoreMode('sections'));
+
+const calcBtn = document.getElementById('calcBtn');
+const recalcBtn = document.getElementById('recalcBtn');
+const gpaIn = document.getElementById('gpaInput');
+const gpaFlindersIn = document.getElementById('gpaFlindersInput');
+const gpaUomIn = document.getElementById('gpaUomInput');
+const gamWeightedIn = document.getElementById('gamsatWeightedInput');
+const gamUnweightedIn = document.getElementById('gamsatUnweightedInput');
+const gamS1In = document.getElementById('gamsatS1Input');
+const gamS2In = document.getElementById('gamsatS2Input');
+const gamS3In = document.getElementById('gamsatS3Input');
+const modeUndergradBtn = document.getElementById('modeUndergrad');
+const modeGraduateBtn = document.getElementById('modeGraduate');
+const graduatePanel = document.getElementById('graduateCalculatorPanel');
+const undergradPanel = document.getElementById('undergradCalculatorPanel');
+const atarIn = document.getElementById('atarInput');
+const ucatPercentileIn = document.getElementById('ucatPercentileInput');
+const ucatTotalIn = document.getElementById('ucatTotalInput');
+const ucatVrIn = document.getElementById('ucatVrInput');
+const ucatDmIn = document.getElementById('ucatDmInput');
+const ucatQrIn = document.getElementById('ucatQrInput');
+const applicantStateIn = document.getElementById('applicantStateInput');
+const curtinCasperIn = document.getElementById('curtinCasperInput');
+const ugRuralIn = document.getElementById('ugRuralInput');
+const ugFirstNationsIn = document.getElementById('ugFirstNationsInput');
+const ugGwsIn = document.getElementById('ugGwsInput');
+const ugJmpLocalIn = document.getElementById('ugJmpLocalInput');
+
+function setEntryMode(mode) {
+ if (mode === 'international') {
+ state.entryMode = 'international';
+ } else {
+ state.entryMode = mode === 'graduate' ? 'graduate' : 'undergrad';
+ }
+ const isUndergrad = state.entryMode === 'undergrad';
+ const isGrad = state.entryMode === 'graduate';
+ const isIntl = state.entryMode === 'international';
+ modeUndergradBtn.classList.toggle('active', isUndergrad);
+ modeGraduateBtn.classList.toggle('active', isGrad);
+ const modeIntlBtn = document.getElementById('modeInternational');
+ if (modeIntlBtn) modeIntlBtn.classList.toggle('active', isIntl);
+ modeUndergradBtn.setAttribute('aria-selected', isUndergrad ? 'true' : 'false');
+ modeGraduateBtn.setAttribute('aria-selected', isGrad ? 'true' : 'false');
+ if (modeIntlBtn) modeIntlBtn.setAttribute('aria-selected', isIntl ? 'true' : 'false');
+ undergradPanel.hidden = !isUndergrad;
+ graduatePanel.hidden = !isGrad;
+ const intlPanel = document.getElementById('internationalCalculatorPanel');
+ if (intlPanel) intlPanel.hidden = !isIntl;
+ const calcBtnEl = document.getElementById('calcBtn');
+ if (calcBtnEl) {
+ if (isUndergrad) calcBtnEl.textContent = 'Calculate my interview chances ->';
+ else if (isIntl) calcBtnEl.textContent = 'Show my international chances ->';
+ else calcBtnEl.textContent = 'Calculate my interview chances ->';
+ }
+}
+
+modeUndergradBtn.addEventListener('click', () => setEntryMode('undergrad'));
+modeGraduateBtn.addEventListener('click', () => setEntryMode('graduate'));
+const modeIntlBtn = document.getElementById('modeInternational');
+if (modeIntlBtn) modeIntlBtn.addEventListener('click', () => setEntryMode('international'));
+setEntryMode('graduate');
+
+function parseScore(input) {
+ const n = parseFloat(input.value);
+ return Number.isFinite(n) ? n : NaN;
+}
+
+function markInvalid(input, invalid) {
+ if (!input) return;
+ if (invalid) input.setAttribute('aria-invalid', 'true');
+ else input.removeAttribute('aria-invalid');
+}
+
+function validScore(n) {
+ return Number.isFinite(n) && n >= 0 && n <= 100;
+}
+
+function roundScore(n) {
+ return Math.round(n * 1000) / 1000;
+}
+
+function updateSectionScorePreview() {
+ const preview = document.getElementById('sectionScorePreview');
+ const s1 = parseScore(gamS1In);
+ const s2 = parseScore(gamS2In);
+ const s3 = parseScore(gamS3In);
+ if (![s1, s2, s3].every(validScore)) {
+ preview.textContent = 'Enter S1, S2 and S3 to calculate weighted and unweighted GAMSAT automatically.';
+ return;
+ }
+ const weighted = roundScore((s1 + s2 + (2 * s3)) / 4);
+ const unweighted = roundScore((s1 + s2 + s3) / 3);
+ preview.innerHTML = `<strong>Calculated scores:</strong> ACER weighted ${weighted.toFixed(1)} | unweighted average ${unweighted.toFixed(1)}.`;
+}
+[gamS1In, gamS2In, gamS3In].forEach(input => input.addEventListener('input', updateSectionScorePreview));
+
+function getGamsatScores() {
+ if (state.scoreMode === 'sections') {
+ const s1 = parseScore(gamS1In);
+ const s2 = parseScore(gamS2In);
+ const s3 = parseScore(gamS3In);
+ return {
+ mode: 'sections',
+ weighted: roundScore((s1 + s2 + (2 * s3)) / 4),
+ unweighted: roundScore((s1 + s2 + s3) / 3),
+ sections: { s1, s2, s3 },
+ unweightedEstimated: false,
+ };
+ }
+ const weighted = parseScore(gamWeightedIn);
+ const unweightedRaw = parseScore(gamUnweightedIn);
+ const hasUnweighted = validScore(unweightedRaw);
+ return {
+ mode: 'overall',
+ weighted,
+ unweighted: hasUnweighted ? unweightedRaw : weighted,
+ sections: null,
+ unweightedEstimated: !hasUnweighted,
+ };
+}
+
+function validate(){
+ let ok = true;
+ let gamsatOk = true;
+
+ const gpaFromInput    = parseFloat(gpaIn.value);
+ const gpaFromYearly   = (window._gpaYearly && window._gpaYearly.hasData) ? window._gpaYearly.weighted : NaN;
+ const gpaUnweightedRaw = parseFloat((document.getElementById('gpaUnweightedInput') || {}).value);
+ const gpaFromFallback = parseFloat((document.getElementById('gpaFallbackInput') || {}).value);
+
+ const hasWeighted   = Number.isFinite(gpaFromInput)    && gpaFromInput    >= 4 && gpaFromInput    <= 7;
+ const hasUnweighted = Number.isFinite(gpaUnweightedRaw) && gpaUnweightedRaw >= 4 && gpaUnweightedRaw <= 7;
+ const hasFallback   = Number.isFinite(gpaFromFallback) && gpaFromFallback >= 4 && gpaFromFallback <= 7;
+ const hasYearly     = Number.isFinite(gpaFromYearly)   && gpaFromYearly   >= 4 && gpaFromYearly   <= 7;
+
+ const gpa = hasWeighted   ? gpaFromInput    :
+             hasYearly     ? gpaFromYearly   :
+             hasUnweighted ? gpaUnweightedRaw :
+             hasFallback   ? gpaFromFallback  :
+             NaN;
+
+ if (isNaN(gpa)) {
+ gpaIn.setAttribute('aria-invalid', 'true');
+ document.getElementById('gpaErr').classList.add('show');
+ ok = false;
+ } else {
+ gpaIn.removeAttribute('aria-invalid');
+ document.getElementById('gpaErr').classList.remove('show');
+ }
+
+ // Expose resolved values for getGpaForSchool()
+ window._gpaResolved = {
+  weighted:          hasWeighted ? gpaFromInput : hasFallback ? gpaFromFallback : (hasUnweighted ? gpaUnweightedRaw : gpa),
+  unweighted:        hasUnweighted ? gpaUnweightedRaw : hasFallback ? gpaFromFallback : (hasWeighted ? gpaFromInput : gpa),
+  usingFallbackOnly: !hasWeighted && !hasUnweighted && !hasYearly && hasFallback,
+ };
+
+ const scores = getGamsatScores();
+ if (state.scoreMode === 'sections') {
+ const sectionScores = [scores.sections?.s1, scores.sections?.s2, scores.sections?.s3];
+ const bad = sectionScores.map(s => !validScore(s));
+ [gamS1In, gamS2In, gamS3In].forEach((input, i) => markInvalid(input, bad[i]));
+ if (bad.some(Boolean)) {
+ ok = false;
+ gamsatOk = false;
+ }
+ } else {
+ const weightedBad = !validScore(scores.weighted);
+ const unweightedValue = parseScore(gamUnweightedIn);
+ const unweightedBad = gamUnweightedIn.value.trim() !== '' && !validScore(unweightedValue);
+ markInvalid(gamWeightedIn, weightedBad);
+ markInvalid(gamUnweightedIn, unweightedBad);
+ if (weightedBad || unweightedBad) {
+ ok = false;
+ gamsatOk = false;
+ }
+ }
+
+ document.getElementById('gamsatErr').classList.toggle('show', !gamsatOk);
+ return ok ? { gpa, scores } : null;
+}
+
+function validAtar(n) {
+ return Number.isFinite(n) && n >= 0 && n <= 99.95;
+}
+
+function validUcatPercentile(n) {
+ return Number.isFinite(n) && n >= 0 && n <= 100;
+}
+
+function validUcatTotal(n) {
+ return Number.isFinite(n) && n >= 900 && n <= 3600;
+}
+
+function validUcatSection(n) {
+ return Number.isFinite(n) && n >= 300 && n <= 900;
+}
+
+function estimateUcatPercentileFromTotal(total) {
+ if (!validUcatTotal(total)) return null;
+ const currentScaleTotal = total > 2700
+ ? 900 + ((total - 1200) / 2400) * 1800
+ : total;
+ const points = [
+ [1400, 10],
+ [1550, 25],
+ [1700, 40],
+ [1800, 50],
+ [1920, 65],
+ [2050, 80],
+ [2150, 90],
+ [2240, 95],
+ [2320, 98],
+ [2380, 99],
+ [2460, 99.5],
+ ];
+ if (currentScaleTotal <= points[0][0]) return Math.max(1, points[0][1] - ((points[0][0] - currentScaleTotal) / 25));
+ for (let i = 1; i < points.length; i++) {
+ const [score, pct] = points[i];
+ const [prevScore, prevPct] = points[i - 1];
+ if (currentScaleTotal <= score) {
+ const ratio = (currentScaleTotal - prevScore) / (score - prevScore);
+ return prevPct + ratio * (pct - prevPct);
+ }
+ }
+ return 99.8;
+}
+
+function getUndergradProfile() {
+ const atar = parseFloat(atarIn.value);
+ const percentileRaw = parseScore(ucatPercentileIn);
+ const totalRaw = parseScore(ucatTotalIn);
+ const vr = parseScore(ucatVrIn);
+ const dm = parseScore(ucatDmIn);
+ const qr = parseScore(ucatQrIn);
+ const sectionValues = [vr, dm, qr];
+ const sectionInputs = [ucatVrIn, ucatDmIn, ucatQrIn];
+ const anySectionEntered = sectionInputs.some(input => input.value.trim() !== '');
+ const sectionsValid = sectionValues.every(validUcatSection);
+ const sectionTotal = sectionsValid ? vr + dm + qr : null;
+ const total = validUcatTotal(totalRaw) ? totalRaw : sectionTotal;
+ const percentile = validUcatPercentile(percentileRaw)
+ ? percentileRaw
+ : estimateUcatPercentileFromTotal(total);
+ const percentileEstimated = !validUcatPercentile(percentileRaw) && percentile !== null;
+ return {
+ atar,
+ percentile,
+ percentileEstimated,
+ total,
+ totalIsLegacyScale: validUcatTotal(totalRaw) && totalRaw > 2700,
+ sections: sectionsValid ? { vr, dm, qr } : null,
+ anySectionEntered,
+ wsuFormula: sectionsValid ? (0.5 * vr + 0.25 * dm + 0.25 * qr) : null,
+ homeState: applicantStateIn.value,
+ curtinCasper: curtinCasperIn.value,
+ rural: ugRuralIn.checked,
+ firstNations: ugFirstNationsIn.checked,
+ gws: ugGwsIn.checked,
+ jmpLocal: ugJmpLocalIn.checked,
+ };
+}
+
+function validateUndergrad() {
+ const profile = getUndergradProfile();
+ let ok = true;
+ if (!validAtar(profile.atar)) {
+ markInvalid(atarIn, true);
+ document.getElementById('atarErr').classList.add('show');
+ ok = false;
+ } else {
+ markInvalid(atarIn, false);
+ document.getElementById('atarErr').classList.remove('show');
+ }
+
+ const percentileEntered = ucatPercentileIn.value.trim() !== '';
+ const totalEntered = ucatTotalIn.value.trim() !== '';
+ const percentileBad = percentileEntered && !validUcatPercentile(parseScore(ucatPercentileIn));
+ const totalBad = totalEntered && !validUcatTotal(parseScore(ucatTotalIn));
+ const sectionInputs = [ucatVrIn, ucatDmIn, ucatQrIn];
+ const sectionBad = sectionInputs.map(input => input.value.trim() !== '' && !validUcatSection(parseScore(input)));
+ markInvalid(ucatPercentileIn, percentileBad);
+ markInvalid(ucatTotalIn, totalBad);
+ sectionInputs.forEach((input, i) => markInvalid(input, sectionBad[i]));
+
+ if (percentileBad || totalBad || sectionBad.some(Boolean)) {
+ document.getElementById('ucatErr').classList.add('show');
+ ok = false;
+ } else {
+ document.getElementById('ucatErr').classList.remove('show');
+ }
+ return ok ? profile : null;
+}
+
+calcBtn.addEventListener('click', () => {
+ if (state.entryMode === 'undergrad') {
+ const profile = validateUndergrad();
+ if (!profile) return;
+ calculateUndergrad(profile);
+ return;
+ }
+ if (state.entryMode === 'international') {
+ calculateInternational();
+ return;
+ }
+ const v = validate();
+ if (!v) return;
+ calculate(v.gpa, v.scores);
+});
+
+document.getElementById('intlRecalcBtn') && document.getElementById('intlRecalcBtn').addEventListener('click', () => {
+ document.getElementById('intlResultsWrap').style.display = 'none';
+ document.getElementById('calcCard').classList.remove('calc-hide-on-results');
+ document.getElementById('calcCard').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+recalcBtn.addEventListener('click', () => {
+ document.getElementById('calcCard').classList.remove('calc-hide-on-results');
+ document.getElementById('comboDisplay').classList.remove('show');
+ document.getElementById('unisWrap').classList.remove('show');
+ document.getElementById('postResult').classList.remove('show');
+ { const _h = document.getElementById('resultHeadline'); if (_h) { _h.classList.remove('show'); _h.innerHTML = ''; } }
+ document.getElementById('calcCard').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+document.getElementById('copyResultBtn').addEventListener('click', copyLatestCalculatorPlan);
+document.getElementById('shareResultBtn').addEventListener('click', shareLatestCalculatorPlan);
+
+function calculate(gpa, scores) {
+ sanitizeBonusesForState();
+ const weightedCombo = (gpa / 7) + (scores.weighted / 100);
+ const unweightedCombo = (gpa / 7) + (scores.unweighted / 100);
+ const sameCombo = !scores.unweightedEstimated && Math.abs(weightedCombo - unweightedCombo) < 0.00005;
+
+ document.getElementById('comboLabel').textContent = sameCombo ? 'Base Combo' : 'Base Weighted Combo';
+ document.getElementById('comboNum').textContent = weightedCombo.toFixed(4);
+ document.getElementById('comboBreakdown').innerHTML = `
+ <div style="margin-bottom:4px;"><strong>GPA ${gpa.toFixed(2)}</strong> 7 = ${(gpa/7).toFixed(4)}</div>
+ <div style="margin-bottom:4px;"><strong>Weighted GAMSAT ${scores.weighted.toFixed(1)}</strong> 100 = ${(scores.weighted/100).toFixed(4)}</div>
+ <div style="margin-bottom:4px;"><strong>Unweighted GAMSAT ${scores.unweighted.toFixed(1)}</strong> 100 = ${(scores.unweighted/100).toFixed(4)}</div>
+ <div style="padding-top:8px;border-top:1px solid rgba(255,255,255,0.15);margin-top:8px;">
+ Weighted-school combo = <strong>${weightedCombo.toFixed(4)}</strong><br>
+ Unweighted-school combo = <strong>${unweightedCombo.toFixed(4)}</strong>
+ <span style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-left:8px;">${state.rural ? '(rural)' : '(non-rural)'}</span>
+ <div style="margin-top:6px;color:rgba(255,255,255,0.58);font-size:0.8rem;">School-specific bonuses and GPA overrides are applied in the university cards below.</div>
+ </div>
+ ${scores.unweightedEstimated ? `<div class="score-warning" style="margin-top:12px;background:rgba(245,158,11,0.16);border-color:rgba(245,158,11,0.32);color:#fde68a;">Unweighted score is estimated from your weighted overall because no section scores or unweighted average were entered. For UoM, UQ and Notre Dame, enter S1/S2/S3 for a more accurate result.</div>` : ''}
+ ${scores.mode === 'overall' ? `<div class="score-warning" style="margin-top:10px;background:rgba(14,165,233,0.14);border-color:rgba(14,165,233,0.3);color:#bae6fd;">Section minimums are not checked from overall scores alone. Use S1/S2/S3 if any section may be close to 50.</div>` : ''}
+ `;
+ document.getElementById('smartInsights').innerHTML = renderSmartInsights(gpa, scores);
+
+ document.getElementById('calcCard').classList.add('calc-hide-on-results');
+ document.getElementById('comboDisplay').classList.add('show');
+
+ renderUnis(gpa, scores);
+ updatePostResultSummary(gpa, scores);
+ document.getElementById('unisWrap').classList.add('show');
+ document.getElementById('postResult').classList.add('show');
+
+ setTimeout(() => {
+ document.getElementById('comboDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
+ }, 100);
+
+ if (typeof gtag === 'function') {
+ gtag('event', 'calculate_chances', {
+ event_category: 'calculator',
+ event_label: state.rural ? 'rural' : 'non_rural',
+ value: Math.round(weightedCombo * 10000),
+ });
+ }
+}
+
+function calculateUndergrad(profile) {
+ const percentileText = profile.percentile !== null
+ ? `${profile.percentile.toFixed(1)}${profile.percentileEstimated ? '% estimated' : '%'}`
+ : 'not entered';
+ const totalText = profile.total !== null
+ ? `${Math.round(profile.total)}${profile.totalIsLegacyScale ? ' legacy-scale total converted for percentile estimate' : ''}`
+ : 'not entered';
+ const wsuText = profile.wsuFormula !== null
+ ? profile.wsuFormula.toFixed(0)
+ : 'enter VR/DM/QR for WSU formula';
+
+ document.getElementById('comboLabel').textContent = profile.percentile !== null ? 'UCAT percentile' : 'ATAR profile';
+ document.getElementById('comboNum').textContent = profile.percentile !== null ? `${profile.percentile.toFixed(0)}%` : profile.atar.toFixed(2);
+ document.getElementById('comboBreakdown').innerHTML = `
+ <div style="margin-bottom:4px;"><strong>ATAR / selection rank:</strong> ${profile.atar.toFixed(2)}</div>
+ <div style="margin-bottom:4px;"><strong>UCAT percentile:</strong> ${escapeHtml(percentileText)}</div>
+ <div style="margin-bottom:4px;"><strong>UCAT total:</strong> ${escapeHtml(totalText)}</div>
+ <div style="margin-bottom:4px;"><strong>WSU weighted section estimate:</strong> ${escapeHtml(wsuText)}</div>
+ <div style="padding-top:8px;border-top:1px solid rgba(255,255,255,0.15);margin-top:8px;">
+ Flags: ${profile.homeState}${profile.rural ? ' | rural/regional' : ''}${profile.gws ? ' | GWS' : ''}${profile.jmpLocal ? ' | JMP local' : ''}${profile.firstNations ? ' | First Nations pathway' : ''}
+ <div style="margin-top:6px;color:rgba(255,255,255,0.58);font-size:0.8rem;">Official eligibility rules are applied first. Community UCAT targets are used only where universities do not publish cutoffs.</div>
+ </div>
+ ${profile.percentileEstimated ? `<div class="score-warning" style="margin-top:12px;background:rgba(245,158,11,0.16);border-color:rgba(245,158,11,0.32);color:#fde68a;">Percentile is estimated from UCAT total. Use the official percentile table once UCAT ANZ publishes it for your test year.</div>` : ''}
+ `;
+
+ const assessments = renderUndergradSchools(profile);
+ document.getElementById('smartInsights').innerHTML = renderUndergradSmartInsights(profile, assessments);
+ updateUndergradPostResultSummary(assessments, profile);
+
+ document.getElementById('calcCard').classList.add('calc-hide-on-results');
+ document.getElementById('comboDisplay').classList.add('show');
+ document.getElementById('unisWrap').classList.add('show');
+ document.getElementById('postResult').classList.add('show');
+
+ setTimeout(() => {
+ document.getElementById('comboDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
+ }, 100);
+
+ if (typeof gtag === 'function') {
+ gtag('event', 'calculate_undergrad_chances', {
+ event_category: 'calculator',
+ event_label: profile.rural ? 'undergrad_rural' : 'undergrad_non_rural',
+ value: Math.round(profile.percentile || profile.atar),
+ });
+ }
+}
+
+function renderUndergradSchools(profile) {
+ const list = document.getElementById('uniList');
+ const assessments = UNDERGRAD_SCHOOLS.map(school => assessUndergradSchool(school, profile));
+ assessments.sort((a, b) => b.rankScore - a.rankScore);
+ list.innerHTML = assessments.map(assessment => renderUndergradSchoolCard(assessment, profile)).join('');
+
+ document.getElementById('unisHeadTitle').textContent = 'Undergraduate medicine breakdown';
+ document.getElementById('unisHeadSub').textContent = 'Australia-focused | official rules first | community estimates marked';
+ const ruralBox = document.getElementById('ruralDisclaimer');
+ if (profile.rural || profile.firstNations) {
+ ruralBox.innerHTML = `<strong>Pathway note:</strong> Rural/regional and Aboriginal and Torres Strait Islander pathways are not just lower cutoffs. They often use separate quotas, documentation, interviews or application steps. Use this calculator as a shortlist map, then check the official page for each school you plan to preference.`;
+ ruralBox.style.display = 'block';
+ } else {
+ ruralBox.style.display = 'none';
+ }
+ return assessments;
+}
+
+function assessUndergradSchool(school, profile) {
+ const minAtar = school.minAtar(profile);
+ const targetAtar = school.targetAtar(profile);
+ const targetPercentile = school.targetPercentile(profile);
+ const hasUcat = profile.percentile !== null;
+ const atarMargin = profile.atar - minAtar;
+ const targetAtarMargin = profile.atar - targetAtar;
+ const pctMargin = hasUcat ? profile.percentile - targetPercentile : null;
+ let verdict = 'Needs review';
+ let verdictClass = 'gray';
+ let body = '';
+ let rankScore = 40;
+
+ if (profile.firstNations && !school.noUcat) {
+ verdict = 'Dedicated pathway';
+ verdictClass = 'green';
+ body = 'You selected an Aboriginal and/or Torres Strait Islander pathway flag. Many schools use a dedicated process, so normal UCAT community cutoffs are often the wrong benchmark. Check the official pathway page and documentation requirements.';
+ rankScore = 82 + Math.max(-5, atarMargin);
+ } else if (profile.atar < minAtar) {
+ verdict = 'Below official minimum';
+ verdictClass = 'red';
+ body = `Official academic eligibility appears not met: this pathway uses about ${minAtar.toFixed(2)} as the minimum for your selected flags.`;
+ rankScore = 8 + Math.max(-20, atarMargin);
+ } else if (school.noUcat) {
+ if (profile.atar >= targetAtar) {
+ verdict = 'Strong non-UCAT option';
+ verdictClass = 'green';
+ body = `${school.short} does not use UCAT. Your ATAR is around the competitive range, so the next differentiators are the written application, psychometric test or interview depending on the school.`;
+ rankScore = 86 + Math.min(10, targetAtarMargin * 2);
+ } else {
+ verdict = 'Possible non-UCAT option';
+ verdictClass = 'amber';
+ body = `${school.short} does not use UCAT, but your ATAR is below the usual competitive planning target. The rest of the application would need to be very strong.`;
+ rankScore = 58 + Math.max(-12, targetAtarMargin * 2);
+ }
+ } else if (school.atarPrimary) {
+ if (profile.atar >= targetAtar) {
+ verdict = school.ucatOptional ? 'ATAR-competitive' : 'Competitive';
+ verdictClass = 'green';
+ body = school.ucatOptional
+ ? 'This pathway is ATAR-primary. UCAT can help as a tiebreaker inside an ATAR band, but ATAR/selection rank is the main issue.'
+ : 'This pathway is ATAR-primary, with UCAT used mainly as a secondary ranking method. Your ATAR sits in the likely competitive zone.';
+ rankScore = 84 + Math.min(12, targetAtarMargin * 10);
+ } else if (profile.atar >= minAtar) {
+ verdict = 'ATAR reach';
+ verdictClass = 'amber';
+ body = `You meet the official minimum, but this pathway is ATAR-heavy and the planning target is closer to ${targetAtar.toFixed(2)}.`;
+ rankScore = 50 + Math.max(-10, targetAtarMargin * 10);
+ }
+ } else if (!hasUcat) {
+ verdict = 'UCAT needed';
+ verdictClass = 'gray';
+ body = 'You meet the academic screen, but this school is UCAT-sensitive. Enter a UCAT percentile or total score for a real competitiveness read.';
+ rankScore = 45 + Math.min(15, atarMargin);
+ } else if (school.id === 'wsu' && profile.wsuFormula !== null) {
+ const formulaTarget = school.wsuFormulaTarget(profile);
+ const formulaMargin = profile.wsuFormula - formulaTarget;
+ if (formulaMargin >= 25) {
+ verdict = 'Highly competitive';
+ verdictClass = 'green';
+ body = `Your WSU-style weighted section estimate is ${formulaMargin.toFixed(0)} points above the community target. Academic rank is a hurdle here, so MMI conversion becomes the big issue.`;
+ rankScore = 92 + Math.min(8, formulaMargin / 10);
+ } else if (formulaMargin >= 0) {
+ verdict = 'Competitive';
+ verdictClass = 'green';
+ body = `Your WSU-style weighted section estimate meets the community target. Officially, final offers are still 75% interview and 25% UCAT.`;
+ rankScore = 82 + Math.min(9, formulaMargin / 5);
+ } else if (formulaMargin >= -35) {
+ verdict = 'Borderline';
+ verdictClass = 'amber';
+ body = `Your WSU-style weighted section estimate is ${Math.abs(formulaMargin).toFixed(0)} points below the community target. Still plausible if your pool is softer, but not a safe read.`;
+ rankScore = 58 + formulaMargin / 2;
+ } else {
+ verdict = 'Reach';
+ verdictClass = 'red';
+ body = `Your WSU-style weighted section estimate is well below the community target for your selected pool.`;
+ rankScore = 26 + formulaMargin / 4;
+ }
+ } else if (pctMargin >= 4 && profile.atar >= minAtar) {
+ verdict = 'Highly competitive';
+ verdictClass = 'green';
+ body = `Your UCAT percentile is clearly above the ${school.targetLabel} target and you meet the official academic screen. This is one of your stronger UCAT fits.`;
+ rankScore = 92 + Math.min(8, pctMargin / 2) + Math.min(4, targetAtarMargin);
+ } else if (pctMargin >= 0 && profile.atar >= minAtar) {
+ verdict = 'Competitive';
+ verdictClass = 'green';
+ body = `Your UCAT percentile meets the current planning target and your ATAR clears the official minimum. This is competitive, not guaranteed.`;
+ rankScore = 80 + Math.min(10, pctMargin) + Math.min(4, atarMargin / 2);
+ } else if (pctMargin >= -7 && profile.atar >= minAtar) {
+ verdict = 'Possible / borderline';
+ verdictClass = 'amber';
+ body = `You clear the official academic minimum, but your UCAT is about ${Math.abs(pctMargin).toFixed(1)} percentile points below the planning target. Apply if the pathway fit is strong, especially with rural/local flags.`;
+ rankScore = 55 + pctMargin + Math.min(4, atarMargin / 3);
+ } else {
+ verdict = 'Reach';
+ verdictClass = 'red';
+ body = `You clear the official academic minimum, but the UCAT gap to the planning target is large. Treat this as a long shot unless a special pathway applies.`;
+ rankScore = 28 + Math.max(-20, pctMargin || -12);
+ }
+
+ return {
+ school,
+ verdict,
+ verdictClass,
+ body,
+ rankScore,
+ minAtar,
+ targetAtar,
+ targetPercentile,
+ pctMargin,
+ atarMargin,
+ };
+}
+
+function renderUndergradSchoolCard(assessment, profile) {
+ const { school } = assessment;
+ const percentileDisplay = profile.percentile !== null
+ ? `${profile.percentile.toFixed(1)}${profile.percentileEstimated ? '% est.' : '%'}`
+ : 'not entered';
+ const ucatTarget = school.noUcat
+ ? 'Not used'
+ : (school.ucatOptional ? 'Tie-break only' : `${assessment.targetPercentile.toFixed(0)}% ${assessment.school.targetLabel}`);
+ const wsuMetric = school.id === 'wsu' && profile.wsuFormula !== null
+ ? `<div class="undergrad-metric"><strong>${profile.wsuFormula.toFixed(0)} / ${school.wsuFormulaTarget(profile).toFixed(0)}</strong><span>WSU section formula</span></div>`
+ : '';
+ const casperNote = school.id === 'curtin'
+ ? `<div class="uni-notes"><strong>Curtin CASPer:</strong> ${profile.firstNations ? 'You selected First Nations pathway; Curtin says UCAT/CASPer are not required for that pathway.' : (profile.curtinCasper ? `You selected ${escapeHtml(profile.curtinCasper)}. CASPer is part of interview ranking, so a lower quartile can pull down an otherwise strong ATAR/UCAT profile.` : 'CASPer is required for most applicants; select a quartile once known.')}</div>`
+ : '';
+ const communityNote = school.community
+ ? `<div class="uni-notes"><strong>Community estimate:</strong> ${escapeHtml(school.community)}</div>`
+ : '';
+
+ return `
+ <div class="uni-card${school.noUcat ? ' non-ucat' : ''}">
+ <div class="uni-card-top">
+ <div>
+ <div class="uni-name">${escapeHtml(school.name)}</div>
+ <div class="uni-n">${escapeHtml(school.region)} | ${escapeHtml(school.type)}</div>
+ </div>
+ <div class="uni-verdict ${assessment.verdictClass}">${escapeHtml(assessment.verdict)}</div>
+ </div>
+ <div class="uni-body">${escapeHtml(assessment.body)}</div>
+ <div class="undergrad-metrics">
+ <div class="undergrad-metric"><strong>${profile.atar.toFixed(2)} / ${assessment.minAtar.toFixed(2)}</strong><span>Official ATAR minimum</span></div>
+ <div class="undergrad-metric"><strong>${profile.atar.toFixed(2)} / ${assessment.targetAtar.toFixed(2)}</strong><span>Planning ATAR target</span></div>
+ <div class="undergrad-metric"><strong>${escapeHtml(percentileDisplay)}</strong><span>UCAT vs ${escapeHtml(ucatTarget)}</span></div>
+ ${wsuMetric}
+ </div>
+ <div class="uni-notes"><strong>Official rule:</strong> ${escapeHtml(school.official)} <br><strong>Selection lens:</strong> ${escapeHtml(school.formula)}</div>
+ ${communityNote}
+ ${casperNote}
+ ${renderSourcePills(school)}
+ </div>
+ `;
+}
+
+function renderSourcePills(school) {
+ const official = (school.officialSources || []).map(([label, url]) =>
+ `<a class="source-pill" href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`
+ );
+ const community = (school.communitySources || []).map(([label, url]) =>
+ `<a class="source-pill community" href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(label)} | unverified</a>`
+ );
+ if (!official.length && !community.length) return '';
+ return `<div class="source-pill-row">${official.concat(community).join('')}</div>`;
+}
+
+function renderUndergradSmartInsights(profile, assessments) {
+ const insights = [];
+ const top = assessments
+ .filter(item => item.verdictClass !== 'red')
+ .slice(0, 3)
+ .map(item => `${item.school.short}: ${item.verdict}`)
+ .join(' | ');
+ if (top) {
+ insights.push(`<div class="smart-insight"><strong>Best fits:</strong> ${escapeHtml(top)}.</div>`);
+ }
+ if (profile.percentileEstimated) {
+ insights.push('<div class="smart-insight"><strong>Percentile caveat:</strong> your UCAT percentile is estimated from total score. Once official UCAT ANZ percentiles are released, use the percentile directly.</div>');
+ }
+ if (!profile.sections) {
+ insights.push('<div class="smart-insight"><strong>Improve WSU/JMP accuracy:</strong> add VR, DM and QR section scores. WSU in particular appears to weight sections rather than using plain total score.</div>');
+ }
+ if (profile.rural) {
+ insights.push('<div class="smart-insight"><strong>Rural strategy:</strong> rural status changes more than a cutoff. It can affect quotas, campus allocation, documentation and interview pools.</div>');
+ }
+ if (profile.rural && profile.gws) {
+ insights.push('<div class="smart-insight"><strong>WSU sanity check:</strong> you selected both rural and GWS. The calculator uses the rural WSU threshold because it is the more specific pathway flag.</div>');
+ }
+ if (profile.firstNations) {
+ insights.push('<div class="smart-insight"><strong>Dedicated pathway:</strong> many schools have Aboriginal and Torres Strait Islander pathways where normal UCAT cutoffs are not the right comparator.</div>');
+ }
+ if (profile.percentile === null) {
+ insights.push('<div class="smart-insight"><strong>UCAT missing:</strong> non-UCAT and ATAR-primary pathways are still visible, but UCAT-heavy schools need a score for a meaningful read.</div>');
+ }
+ return insights.join('');
+}
+
+function updateUndergradPostResultSummary(assessments, profile) {
+ const box = document.getElementById('resultShortlist');
+ if (!box) return;
+ const strongest = assessments.slice(0, 3);
+ const reaches = assessments.filter(item => item.verdictClass === 'red').slice(0, 2);
+ const nextStep = profile.percentile === null
+ ? 'Main next step: add a UCAT percentile or total score for UCAT-heavy schools. Right now the calculator can only judge ATAR-primary and non-UCAT pathways confidently.'
+ : 'Main next step: preference the schools where your official eligibility and UCAT target both line up, then check each official application deadline and required direct application.';
+ box.innerHTML = `
+ <div class="result-shortlist-title">Your strongest undergraduate fits</div>
+ <div class="result-shortlist-grid">
+ ${strongest.map(item => `
+ <div class="result-shortlist-item">
+ <strong>${escapeHtml(item.school.short)}</strong>
+ <span>${escapeHtml(item.verdict)} | ${escapeHtml(item.school.type)}</span>
+ </div>
+ `).join('')}
+ </div>
+ <div class="result-next-step">${escapeHtml(nextStep)}</div>
+ ${reaches.length ? `<div class="result-next-step" style="color:rgba(255,255,255,0.65);font-weight:600;">Reach schools from these inputs: ${escapeHtml(reaches.map(item => item.school.short).join(', '))}.</div>` : ''}
+ `;
+ box.classList.add('show');
+ setLatestCalculatorPlan({
+ mode: 'undergraduate',
+ competitiveCount: assessments.filter(a => a.verdictClass === 'green').length,
+ schoolCount: assessments.length,
+ ratio: assessments.length ? assessments.filter(a => a.verdictClass === 'green').length / assessments.length : 0,
+ headline: buildResultHeadlineText(assessments.filter(a => a.verdictClass === 'green').length, assessments.length),
+ focus: profile.percentile === null ? 'UCAT data and school shortlist' : 'Undergraduate shortlist and interview conversion',
+ summary: `Undergraduate profile: ATAR ${profile.atar.toFixed(2)}, UCAT ${profile.percentile !== null ? `${profile.percentile.toFixed(1)} percentile${profile.percentileEstimated ? ' estimated' : ''}` : 'not entered'}, ${profile.rural ? 'rural/regional' : 'non-rural'} applicant.`,
+ strongest: strongest.map(item => ({ name: item.school.short, detail: `${item.verdict} - ${item.school.type}` })),
+ watchouts: [
+ profile.percentileEstimated ? 'UCAT percentile was estimated from total score; use the official UCAT ANZ percentile table when available.' : '',
+ reaches.length ? `Reach schools on these inputs: ${reaches.map(item => item.school.short).join(', ')}.` : '',
+ profile.rural || profile.firstNations ? 'Priority pathways can involve separate documentation, quotas and application steps.' : '',
+ ].filter(Boolean),
+ nextStep,
+ primaryHref: profile.percentile === null ? 'medical-school-chances.html' : 'practice.html',
+ primaryText: profile.percentile === null ? 'Add UCAT data' : 'Start interview practice',
+ secondaryHref: 'student-journey.html',
+ secondaryText: 'Open my journey',
+ });
+ setResultStatus('');
+}
+
+function renderUnis(gpa, scores) {
+ const list = document.getElementById('uniList');
+ list.innerHTML = '';
+
+ const sub = state.rural
+ ? `Rural cohort | based on self-reported 2026 data`
+ : `Non-rural cohort | 2026 interview cohorts (self-reported)`;
+ document.getElementById('unisHeadTitle').textContent = 'Per-university breakdown';
+ document.getElementById('unisHeadSub').textContent = sub;
+
+ document.getElementById('ruralDisclaimer').innerHTML = '<strong>Note: rural data is sparse.</strong> Very few students submit rural-category data, sample sizes are small, and many fields are incomplete. Treat these results as a <strong>very loose guide</strong>. With a valid combo, a strong application, and appropriate bonuses, outcomes vary widely and rural applicants regularly receive interviews at scores that would be uncompetitive in the non-rural cohort.';
+ document.getElementById('ruralDisclaimer').style.display = state.rural ? 'block' : 'none';
+
+ UNIS.forEach(u => {
+ list.appendChild(renderUni(u, gpa, scores));
+ });
+}
+
+function getRankedSchoolMargins(gpa, scores) {
+ return UNIS
+ .filter(u => !u.uow)
+ .map(u => {
+ const cutoff = state.rural ? u.cutoffR : u.cutoffNR;
+ const hurdleStatus = getGamsatHurdleStatus(u, scores);
+ if (cutoff === null || cutoff === undefined || hurdleStatus.failed) return null;
+ const schoolGpa = typeof getGpaForSchool === 'function' ? getGpaForSchool(u.id, gpa) : gpa;
+ const impact = getBonusImpact(u, schoolGpa, scores);
+ return {
+ school: u,
+ margin: impact.adjustedCombo - cutoff,
+ combo: impact.adjustedCombo,
+ adjusted: impact.applied,
+ };
+ })
+ .filter(Boolean)
+ .sort((a, b) => b.margin - a.margin);
+}
+
+function getGraduateStrategyAdvice(gpa, scores, ranked) {
+ const weightedCombo = (gpa / 7) + (scores.weighted / 100);
+ const unweightedCombo = (gpa / 7) + (scores.unweighted / 100);
+ const bestDisplayedCombo = Math.max(weightedCombo, unweightedCombo);
+ const normalComboMargins = ranked.filter(item => !item.school.casper);
+ const notreDame = ranked
+ .filter(item => ['unds', 'undf'].includes(item.school.id))
+ .sort((a, b) => b.margin - a.margin);
+ const bestNotreDame = notreDame[0];
+ const normalSchoolsAreTight = normalComboMargins.length
+ ? normalComboMargins.every(item => item.margin < 0.015)
+ : bestDisplayedCombo < 1.7;
+ const belowCasperPivot = bestDisplayedCombo < 1.7 || normalSchoolsAreTight;
+ const uowBonusCount = getSelectedBonusItems('uow').filter(item => item.type === 'uowBonus').length;
+
+ if (gpa < 5.8) {
+ return {
+ focus: 'GPA repair and the three CASPer pathways',
+ nextStep: 'Key area to work on: your GEMSAS GPA is currently the limiting factor. Look seriously at UoW if you clear the GPA/GAMSAT hurdles and can build a strong CASPer plus bonus profile. Separately, consider a new bachelor if GPA repair is realistic, or Honours only if you can reliably aim for First Class and are specifically trying to improve UQ-style GPA treatment.',
+ insight: 'A GEMSAS GPA below about 5.8 makes most normal combo schools very difficult because GAMSAT has to do too much lifting. This does not mean the application is dead, but the strategy changes: UoW, Notre Dame with strong CASPer, a deliberate GPA-repair pathway, or a very carefully chosen Honours year become more important than simply hoping another small GAMSAT lift fixes everything. CASPer only helps for UoW, UNDS and UNDF; the other postgraduate schools do not consider it.',
+ example: 'Example: a modest combo may be nowhere near enough for UoM, where CASPer is not considered, but UoW does not rank applicants on the normal combo after hurdles. UoW is driven by CASPer and bonuses.',
+ primaryHref: 'mmi-class.html?from=calculator_gpa_casper',
+ primaryText: 'Register for live MMI classes',
+ secondaryHref: 'practice.html',
+ secondaryText: 'Practise CASPer free',
+ watchouts: ['GEMSAS GPA below 5.8 is a major constraint for most combo-ranked schools.', 'Honours only helps if the likely outcome is genuinely strong; a weak Honours result can waste time without solving the bottleneck.'],
+ };
+ }
+
+ if (belowCasperPivot) {
+ const ndLine = bestNotreDame
+ ? `${bestNotreDame.school.short} is ${bestNotreDame.margin >= 0 ? '+' : ''}${bestNotreDame.margin.toFixed(3)} versus its observed cutoff.`
+ : 'UoW, UNDS and UNDF are the only postgraduate CASPer pathways; the standard combo schools do not consider CASPer.';
+ return {
+ focus: 'CASPer is the highest-ROI move',
+ nextStep: 'Key area to work on: CASPer, if UoW, UNDS or UNDF are realistic targets. If your combo is below about 1.70, or only barely competitive for the normal GPA/GAMSAT schools, a strong CASPer can change the application much more efficiently than another tiny GPA or GAMSAT movement at those three schools.',
+ insight: 'This is the big strategic asymmetry: students spend years protecting GPA, then one to three years chasing GAMSAT, but many do almost no CASPer preparation. Because the field is underprepared, CASPer is often one of the highest-return parts of the application at the three postgraduate CASPer schools: UoW, UNDS and UNDF. It does not help at the other postgraduate universities because they do not factor it in.',
+ example: `Example: a 1.65 combo is not very comfortable for UoM, but it can be extremely live at UNDS or UNDF with Q4 CASPer. ${ndLine} UoW is even more direct: once hurdles are cleared, CASPer and bonuses drive the ranking.`,
+ primaryHref: 'mmi-class.html?from=calculator_casper_roi',
+ primaryText: 'Register for live MMI classes',
+ secondaryHref: 'practice.html',
+ secondaryText: 'Practise CASPer free',
+ watchouts: [`Displayed combo is around ${bestDisplayedCombo.toFixed(3)}, so UoW/UNDS/UNDF deserve serious attention if you can build a strong CASPer result.`, `UoW: ${state.casper || 'unknown CASPer'} plus ${uowBonusCount} selected bonus${uowBonusCount === 1 ? '' : 'es'}.`],
+ };
+ }
+
+ return {
+ focus: 'MMI and interview conversion',
+ nextStep: 'Key area to work on: MMI/interview prep. Your combo is no longer the obvious bottleneck, so the bigger risk becomes wasting a strong written profile by underperforming at interview.',
+ insight: 'Once your combo is around or above 1.70, the strategy usually shifts. Small GPA/GAMSAT gains still help, but the main upside is converting interviews: ethical judgement, self-reflection, communication under pressure, and avoiding generic answers.',
+ example: 'Example: a strong combo can open the door at multiple schools, but it does not protect you from an average MMI. At that point, repetitions and feedback are usually higher yield than endlessly recalculating cutoffs.',
+ primaryHref: 'practice.html',
+ primaryText: 'Practise MMI',
+ secondaryHref: 'mmi-tutor-australia.html',
+ secondaryText: 'Get MMI help',
+ watchouts: ['A strong combo should trigger interview preparation early, not after interview offers are released.'],
+ };
+}
+
+function updatePostResultSummary(gpa, scores) {
+ const box = document.getElementById('resultShortlist');
+ if (!box) return;
+ const ranked = getRankedSchoolMargins(gpa, scores);
+ if (!ranked.length) {
+ box.classList.remove('show');
+ box.innerHTML = '';
+ return;
+ }
+
+ const strongest = ranked.slice(0, 3);
+ const weakest = ranked[ranked.length - 1];
+ const strategy = getGraduateStrategyAdvice(gpa, scores, ranked);
+ const uowBonusCount = getSelectedBonusItems('uow').filter(item => item.type === 'uowBonus').length;
+ const weakestLine = weakest.margin < 0
+ ? `${weakest.school.short} is ${Math.abs(weakest.margin).toFixed(3)} below the observed cutoff.`
+ : `Your weakest displayed fit is still ${weakest.margin.toFixed(3)} above its observed cutoff.`;
+ const uowLine = state.casper || uowBonusCount
+ ? `<div class="result-next-step">UOW note: ${escapeHtml(state.casper || 'unknown CASPer')} plus ${uowBonusCount} selected UOW bonus${uowBonusCount === 1 ? '' : 'es'}.</div>`
+ : '';
+
+ box.innerHTML = `
+ <div class="result-shortlist-title">Your strongest calculator fits</div>
+ <div class="result-shortlist-grid">
+ ${strongest.map(item => `
+ <div class="result-shortlist-item">
+ <strong>${escapeHtml(item.school.short)}</strong>
+ <span>${item.margin >= 0 ? '+' : ''}${item.margin.toFixed(3)} vs observed cutoff${item.adjusted ? ' after selected adjustment' : ''}</span>
+ </div>
+ `).join('')}
+ </div>
+ <div class="result-next-step"><strong>Key area to work on:</strong> ${escapeHtml(strategy.focus)}.</div>
+ <div class="result-next-step" style="color:rgba(255,255,255,0.72);font-weight:600;">${escapeHtml(strategy.nextStep)}</div>
+ <div class="result-next-step" style="color:rgba(255,255,255,0.62);font-weight:600;">${escapeHtml(strategy.example)} ${escapeHtml(weakestLine)}</div>
+ <div class="result-next-step" style="display:flex;gap:10px;flex-wrap:wrap;">
+ <a href="${escapeHtml(strategy.primaryHref)}" style="color:#0a1628;background:#38bdf8;border-radius:999px;padding:8px 12px;text-decoration:none;font-weight:900;">${escapeHtml(strategy.primaryText)}</a>
+ <a href="${escapeHtml(strategy.secondaryHref)}" style="color:#fde68a;border:1px solid rgba(253,230,138,0.45);border-radius:999px;padding:8px 12px;text-decoration:none;font-weight:900;">${escapeHtml(strategy.secondaryText)}</a>
+ </div>
+ ${uowLine}
+ `;
+ box.classList.add('show');
+ setLatestCalculatorPlan({
+ mode: 'graduate',
+ competitiveCount: ranked.filter(r => r.margin >= 0).length,
+ schoolCount: ranked.length,
+ ratio: ranked.length ? ranked.filter(r => r.margin >= 0).length / ranked.length : 0,
+ headline: buildResultHeadlineText(ranked.filter(r => r.margin >= 0).length, ranked.length),
+ focus: strategy.focus,
+ summary: `Graduate profile: GPA ${gpa.toFixed(2)}, weighted GAMSAT ${scores.weighted.toFixed(1)}, unweighted GAMSAT ${scores.unweighted.toFixed(1)}, ${state.rural ? 'rural' : 'non-rural'} benchmark.`,
+ strongest: strongest.map(item => ({
+ name: item.school.short,
+ detail: `${item.margin >= 0 ? '+' : ''}${item.margin.toFixed(3)} vs observed cutoff${item.adjusted ? ' after selected adjustment' : ''}`,
+ })),
+ watchouts: [
+ weakest.margin < 0 ? `${weakest.school.short} is ${Math.abs(weakest.margin).toFixed(3)} below the observed cutoff.` : '',
+ scores.unweightedEstimated ? 'Unweighted score was estimated; enter S1/S2/S3 for UoM, UQ and Notre Dame accuracy.' : '',
+ (state.casper || uowBonusCount) ? `UOW: ${state.casper || 'unknown CASPer'} plus ${uowBonusCount} selected UOW bonus${uowBonusCount === 1 ? '' : 'es'}.` : '',
+ ...(strategy.watchouts || []),
+ ].filter(Boolean),
+ nextStep: strategy.nextStep,
+ primaryHref: strategy.primaryHref,
+ primaryText: strategy.primaryText,
+ secondaryHref: strategy.secondaryHref,
+ secondaryText: strategy.secondaryText,
+ });
+ setResultStatus('');
+}
+
+function renderSmartInsights(gpa, scores) {
+ const insights = [];
+ const margins = getRankedSchoolMargins(gpa, scores)
+ .map(item => ({
+ short: item.school.short,
+ margin: item.margin,
+ adjusted: item.adjusted,
+ }));
+ const strategy = getGraduateStrategyAdvice(gpa, scores, getRankedSchoolMargins(gpa, scores));
+
+ insights.push(`<div class="smart-insight"><strong>${escapeHtml(strategy.focus)}:</strong> ${escapeHtml(strategy.insight)}</div>`);
+ insights.push(`<div class="smart-insight"><strong>Strategic example:</strong> ${escapeHtml(strategy.example)}</div>`);
+
+ if (margins.length) {
+ const top = margins.slice(0, 3).map(item => {
+ const sign = item.margin >= 0 ? '+' : '';
+ return `${item.short} ${sign}${item.margin.toFixed(3)}${item.adjusted ? ' adjusted' : ''}`;
+ }).join(' | ');
+ insights.push(`<div class="smart-insight"><strong>Closest fits:</strong> ${escapeHtml(top)} versus the observed cutoffs in this dataset.</div>`);
+ }
+
+ const uowBonusCount = getSelectedBonusItems('uow').filter(item => item.type === 'uowBonus').length;
+ if (uowBonusCount || state.casper) {
+ const casperText = state.casper ? state.casper : 'unknown Casper';
+ insights.push(`<div class="smart-insight"><strong>UOW lens:</strong> ${escapeHtml(casperText)} plus ${uowBonusCount} selected bonus${uowBonusCount === 1 ? '' : 'es'}. Last year's MMI-offer average was about Q4 plus 3.5 bonuses.</div>`);
+ }
+
+ if (scores.unweightedEstimated) {
+ insights.push('<div class="smart-insight"><strong>Improve accuracy:</strong> enter S1, S2 and S3 for exact UoM, UQ and Notre Dame scoring.</div>');
+ }
+
+ if (scores.mode === 'overall') {
+ insights.push('<div class="smart-insight"><strong>Check section hurdles:</strong> several schools need every GAMSAT section to clear 50, and UWA generally needs a 55 overall.</div>');
+ }
+
+ const selectedSchools = BONUS_ORDER.filter(id => getSelectedBonusIds(id).length);
+ if (selectedSchools.length) {
+ insights.push(`<div class="smart-insight"><strong>Bonus-aware:</strong> selected adjustments are applied school by school only: ${escapeHtml(selectedSchools.map(id => schoolById(id)?.short || id).join(', '))}.</div>`);
+ }
+
+ return insights.join('');
+}
+
+function getScoreForUni(u, scores) {
+ if (u.gamsatMode === 'unweighted') {
+ return {
+ score: scores.unweighted,
+ label: 'unweighted average',
+ estimated: scores.unweightedEstimated,
+ };
+ }
+ if (u.gamsatMode === 'hurdle') {
+ return {
+ score: scores.weighted,
+ label: 'overall weighted hurdle score',
+ estimated: false,
+ };
+ }
+ return {
+ score: scores.weighted,
+ label: 'ACER overall weighted',
+ estimated: false,
+ };
+}
+
+function comboForUni(gpa, u, scores) {
+ const scoreInfo = getScoreForUni(u, scores);
+ return (gpa / 7) + (scoreInfo.score / 100);
+}
+
+function capGpa(gpa) {
+ return Math.max(0, Math.min(7, gpa));
+}
+
+function comboForGpa(gpa, u, scores) {
+ const scoreInfo = getScoreForUni(u, scores);
+ return (capGpa(gpa) / 7) + (scoreInfo.score / 100);
+}
+
+function getBonusImpact(u, gpa, scores) {
+ const selected = getSelectedBonusItems(u.id);
+ const baseCombo = comboForUni(gpa, u, scores);
+ const qualitative = selected.filter(item => item.type === 'qualitative');
+ const impact = {
+ selected,
+ qualitative,
+ baseCombo,
+ adjustedCombo: baseCombo,
+ adjustedGpa: gpa,
+ applied: false,
+ badge: '',
+ detail: '',
+ };
+
+ if (!selected.length) return impact;
+
+ const comboPct = selected
+ .filter(item => item.type === 'comboPercent')
+ .reduce((sum, item) => sum + (item.value || 0), 0);
+ if (comboPct > 0) {
+ impact.adjustedCombo = baseCombo * (1 + comboPct);
+ impact.applied = true;
+ impact.badge = `+${(comboPct * 100).toFixed(0)}% adjustment`;
+ impact.detail = `Selected percentage adjustments lift this school's displayed score from ${baseCombo.toFixed(4)} to ${impact.adjustedCombo.toFixed(4)}.`;
+ return impact;
+ }
+
+ const bestComboPct = Math.max(0, ...selected
+ .filter(item => item.type === 'bestComboPercent')
+ .map(item => item.value || 0));
+ if (bestComboPct > 0) {
+ impact.adjustedCombo = baseCombo * (1 + bestComboPct);
+ impact.applied = true;
+ impact.badge = `+${(bestComboPct * 100).toFixed(0)}% highest bonus`;
+ impact.detail = `Only the highest selected ANU percentage applies, lifting this school's displayed score from ${baseCombo.toFixed(4)} to ${impact.adjustedCombo.toFixed(4)}.`;
+ return impact;
+ }
+
+ const gpaPctRaw = selected
+ .filter(item => item.type === 'gpaPercentCapped')
+ .reduce((sum, item) => sum + (item.value || 0), 0);
+ if (gpaPctRaw > 0) {
+ const gpaPct = Math.min(gpaPctRaw, 0.05);
+ impact.adjustedGpa = capGpa(gpa * (1 + gpaPct));
+ impact.adjustedCombo = comboForGpa(impact.adjustedGpa, u, scores);
+ impact.applied = true;
+ impact.badge = `GPA +${(gpaPct * 100).toFixed(0)}%`;
+ impact.detail = `Macquarie's selected GPA bonus changes the GPA used here from ${gpa.toFixed(2)} to ${impact.adjustedGpa.toFixed(2)}, lifting the displayed combo from ${baseCombo.toFixed(4)} to ${impact.adjustedCombo.toFixed(4)}.`;
+ return impact;
+ }
+
+ const override = selected.find(item => item.type === 'gpaOverride');
+ const gpaAdd = selected
+ .filter(item => item.type === 'gpaAdd')
+ .reduce((sum, item) => sum + (item.value || 0), 0);
+ if (override || gpaAdd > 0) {
+ const startingGpa = override ? override.value : gpa;
+ impact.adjustedGpa = capGpa(startingGpa + gpaAdd);
+ impact.adjustedCombo = comboForGpa(impact.adjustedGpa, u, scores);
+ impact.applied = true;
+ impact.badge = `GPA ${impact.adjustedGpa.toFixed(2)}`;
+ impact.detail = `The selected GPA rule changes the GPA used for this school from ${gpa.toFixed(2)} to ${impact.adjustedGpa.toFixed(2)}, changing the displayed combo from ${baseCombo.toFixed(4)} to ${impact.adjustedCombo.toFixed(4)}.`;
+ }
+
+ return impact;
+}
+
+function renderBonusImpact(impact) {
+ if (!impact.selected.length) return '';
+ const chips = impact.selected
+ .map(item => `<span class="bonus-chip">${escapeHtml(item.label)}</span>`)
+ .join('');
+ const qualitativeText = impact.qualitative.length
+ ? ' Some selected items are qualitative/pathway flags because the school does not publish an exact combo conversion for them.'
+ : '';
+ const detail = impact.applied
+ ? impact.detail
+ : 'Selected items for this school are important, but they are not published as a clean numeric adjustment. They are shown as strategic flags only.';
+ return `
+ <div class="bonus-result${impact.applied ? '' : ' qualitative'}">
+ <strong>Bonus-aware read:</strong> ${escapeHtml(detail)}${escapeHtml(qualitativeText)}
+ <div class="bonus-chip-row">${chips}</div>
+ </div>
+ `;
+}
+
+function getGamsatHurdleStatus(u, scores) {
+ const h = u.gamsatHurdle;
+ if (!h) return { failed: false, messages: [] };
+
+ const info = getScoreForUni(u, scores);
+ const messages = [];
+
+ if (h.scoreMin !== undefined && h.scoreMin !== null && !info.estimated && info.score < h.scoreMin) {
+ messages.push(`${info.label} must be at least ${h.scoreMin}`);
+ }
+
+ if (h.sectionMin !== undefined && h.sectionMin !== null && scores.sections) {
+ const lowSections = [
+ ['S1', scores.sections.s1],
+ ['S2', scores.sections.s2],
+ ['S3', scores.sections.s3],
+ ].filter(([, score]) => score < h.sectionMin);
+
+ if (lowSections.length) {
+ messages.push(`each section must be at least ${h.sectionMin} (${lowSections.map(([label, score]) => `${label} ${score.toFixed(0)}`).join(', ')})`);
+ }
+ }
+
+ return { failed: messages.length > 0, messages };
+}
+
+function renderScoreMethodBadge(u, scores) {
+ const info = getScoreForUni(u, scores);
+ const warning = info.estimated ? ' | estimated' : '';
+ return `<div class="score-method-badge">GAMSAT used: ${info.label} ${info.score.toFixed(1)}${warning}</div>`;
+}
+
+function renderUni(u, gpa, scores) {
+ const card = document.createElement('div');
+ card.className = 'uni-card';
+
+ // Route per-school GPA: yearly breakdown > manual UoM input > getGpaForSchool > base gpa
+ let schoolGpa = typeof getGpaForSchool === 'function' ? getGpaForSchool(u.id, gpa) : gpa;
+ let usingUomProxy = false;
+ if (u.id === 'uom') {
+  const uomRaw = gpaUomIn ? parseFloat(gpaUomIn.value) : NaN;
+  if (!isNaN(uomRaw) && uomRaw >= 4 && uomRaw <= 7) { schoolGpa = uomRaw; }
+  else { usingUomProxy = !(window._gpaYearly && window._gpaYearly.hasData); }
+ }
+
+ if (u.flinders) {
+ card.innerHTML = renderFlindersCard(u, schoolGpa, scores);
+ return card;
+ }
+
+ if (u.uow) {
+ card.innerHTML = renderUoWCard(u, schoolGpa, scores);
+ return card;
+ }
+
+ const impact = getBonusImpact(u, schoolGpa, scores);
+ const combo = impact.adjustedCombo;
+ const baseCombo = impact.baseCombo;
+ const cutoff = state.rural ? u.cutoffR : u.cutoffNR;
+ const iv = u.interview;
+ const hurdleStatus = getGamsatHurdleStatus(u, scores);
+ let verdict, verdictClass, verdictDetail;
+
+ if (hurdleStatus.failed) {
+ verdict = 'Hurdle not met';
+ verdictClass = 'red';
+ verdictDetail = `Published GAMSAT eligibility hurdle appears not met: ${hurdleStatus.messages.join('; ')}. This would usually make the school ineligible even if the combo looks competitive.`;
+ } else if (cutoff === null || cutoff === undefined) {
+ verdict = 'Data unavailable';
+ verdictClass = 'gray';
+ verdictDetail = 'Not enough data for this category to form a useful benchmark.';
+ } else if (combo >= iv.med + iv.std) {
+ verdict = 'Highly competitive';
+ verdictClass = 'green';
+ verdictDetail = `Your combo places you above ~84% of students who were offered a 2026 interview at this school.`;
+ } else if (combo >= iv.med) {
+ verdict = 'Competitive';
+ verdictClass = 'green';
+ verdictDetail = `You sit above the median 2026 interviewee (${iv.med.toFixed(4)}). A competitive position, but not guaranteed.`;
+ } else if (combo >= cutoff) {
+ verdict = 'Possible';
+ verdictClass = 'amber';
+ verdictDetail = `You're above the observed 2026 cut-off (${cutoff.toFixed(4)}) but below the median interviewee. Outcomes are plausible but dependent on cohort strength and other factors.`;
+ } else if (combo >= cutoff - iv.std) {
+ verdict = 'Borderline';
+ verdictClass = 'amber';
+ verdictDetail = `You're below the observed 2026 cut-off (${cutoff.toFixed(4)}) by ${(cutoff - combo).toFixed(4)}. Combo alone likely insufficient - other factors would need to compensate.`;
+ } else {
+ verdict = 'Unlikely';
+ verdictClass = 'red';
+ verdictDetail = `Combo is substantially below the 2026 cut-off (${cutoff.toFixed(4)}). Your combo suggests this school would be a very long shot based on combo alone.`;
+ }
+
+ let rangeHtml = '';
+ let low = (cutoff === null || cutoff === undefined ? iv.med : cutoff) - 2 * iv.std;
+ let high = iv.med + 2 * iv.std;
+ let pctOf = v => Math.max(0, Math.min(100, ((v - low) / (high - low)) * 100));
+ let youPct = pctOf(combo);
+ let medPct = pctOf(iv.med);
+ let cutoffPct = pctOf(cutoff === null || cutoff === undefined ? low : cutoff);
+ if (cutoff !== null && cutoff !== undefined) {
+ const low = cutoff - 2 * iv.std;
+ const high = iv.med + 2 * iv.std;
+ const pctOf = v => Math.max(0, Math.min(100, ((v - low) / (high - low)) * 100));
+ const youPct = pctOf(combo);
+ const medPct = pctOf(iv.med);
+ const cutoffPct = pctOf(cutoff);
+ const youLabel = impact.applied ? 'You adjusted' : 'You';
+ rangeHtml = `
+ <div class="range-bar-wrap">
+ <div class="range-bar-title">Position vs 2026 interview cohort</div>
+ <div class="range-bar-ticks-top">
+ <span>${low.toFixed(3)}</span>
+ <span>${high.toFixed(3)}</span>
+ </div>
+ <div class="range-bar">
+ <div class="range-bar-cutoff${cutoffPct < 10 ? ' at-left' : (cutoffPct > 90 ? ' at-right' : '')}" style="left:${cutoffPct.toFixed(2)}%;"></div>
+ <div class="range-bar-median" style="left:${medPct.toFixed(2)}%;"></div>
+ <div class="range-bar-you${youPct < 10 ? ' at-left' : (youPct > 90 ? ' at-right' : '')}" style="left:${youPct.toFixed(2)}%;"></div>
+ </div>
+ <div class="range-bar-legend">
+ <span class="l-you">${youLabel} (${combo.toFixed(3)})</span>
+ <span class="l-median">Median interviewee (${iv.med.toFixed(3)})</span>
+ <span class="l-cutoff">Cut-off (${cutoff.toFixed(3)})</span>
+ </div>
+ </div>
+ `;
+ }
+
+ const noteHtml = [];
+ if (state.rural && u.noteRural) noteHtml.push(u.noteRural);
+ if (!state.rural && u.noteNR) noteHtml.push(u.noteNR);
+
+ const casperBadge = u.casper ? renderCasperBadge(u) : '';
+
+ card.innerHTML = `
+ <div class="uni-card-top">
+ <div>
+ <div class="uni-name">${u.name}</div>
+ <div class="uni-n">2026 intake | ${u.nInt} interviewed | ${u.nRej} rejected (self-reported)</div>
+ </div>
+ <div class="uni-verdict ${verdictClass}">${verdict}</div>
+ </div>
+ <div class="uni-body">${verdictDetail}</div>
+
+ <div class="range-bar-wrap">
+ <div class="range-bar-title">Position vs 2026 interview cohort</div>
+ <div class="range-bar-ticks-top">
+ <span>${low.toFixed(3)}</span>
+ <span>${high.toFixed(3)}</span>
+ </div>
+ <div class="range-bar">
+ <div class="range-bar-cutoff${cutoffPct < 10 ? ' at-left' : (cutoffPct > 90 ? ' at-right' : '')}" style="left:${cutoffPct.toFixed(2)}%;"></div>
+ <div class="range-bar-median" style="left:${medPct.toFixed(2)}%;"></div>
+ <div class="range-bar-you${youPct < 10 ? ' at-left' : (youPct > 90 ? ' at-right' : '')}" style="left:${youPct.toFixed(2)}%;"></div>
+ </div>
+ <div class="range-bar-legend">
+ <span class="l-you">You (${combo.toFixed(3)})</span>
+ <span class="l-median">Median interviewee (${iv.med.toFixed(3)})</span>
+ <span class="l-cutoff">Cut-off (${cutoff !== null ? cutoff.toFixed(3) : '-'})</span>
+ </div>
+ </div>
+
+ ${renderScoreMethodBadge(u, scores)}
+ ${impact.applied ? `<div class="bonus-adjustment-badge">${escapeHtml(impact.badge)} applied to ${escapeHtml(u.short)}</div>` : ''}
+ ${renderBonusImpact(impact)}
+ ${getScoreForUni(u, scores).estimated ? `<div class="uni-notes">Because you did not enter section scores or an unweighted average, this school's result uses your weighted overall score as a placeholder. Enter S1/S2/S3 for the accurate UoM/UQ/Notre Dame calculation.</div>` : ''}
+ ${usingUomProxy ? '<div style="margin-top:8px;font-size:0.75rem;color:#b45309;font-weight:600;">&#9888; Using your standard GEMSAS GPA as a proxy - Melbourne uses a 1:2:2 weighting which may differ. Enter your Melbourne GPA above or use the yearly breakdown for a more accurate result.</div>' : ''}
+ ${casperBadge}
+ ${noteHtml.length ? `<div class="uni-notes">${noteHtml.join(' ')}</div>` : ''}
+ `;
+
+ return card;
+}
+
+function renderCasperBadge(u) {
+ let txt = 'Q4 typically required to compete at this combo range.';
+ if (state.rural && u.noteCasperRural) {
+ txt = u.noteCasperRural;
+ }
+ if (state.casper) {
+ if (state.casper === 'Q4') {
+ txt += ' Q4 reported.';
+ } else if (state.casper === 'Q3' && state.rural) {
+ txt += ' Your Q3 meets the rural threshold.';
+ } else if (state.casper === 'Q2' && state.rural) {
+ txt += ' Your Q2 meets the rural minimum but Q3+ is stronger.';
+ } else {
+ txt += ` You reported ${state.casper} - this will likely pull you below most interviewees at this school.`;
+ }
+ }
+ return `<div class="uni-casper-badge">CASPer-critical | ${txt}</div>`;
+}
+
+function renderFlindersCard(u, gpa, scores) {
+ const gam = scores.weighted;
+ const flindersGpaRaw = gpaFlindersIn ? parseFloat(gpaFlindersIn.value) : NaN;
+ const flindersGpa = (!isNaN(flindersGpaRaw) && flindersGpaRaw >= 4 && flindersGpaRaw <= 7) ? flindersGpaRaw : gpa;
+ const usingFlindersGpa = flindersGpa !== gpa;
+ const isInternal = !!(state.bonuses['flinders'] && state.bonuses['flinders'].includes('flindersDegree'));
+ const isRural = !!state.rural;
+ const note = isRural ? (u.noteRural || u.noteNR) : u.noteNR;
+ const bonusImpact = getBonusImpact(u, gpa, scores);
+
+ const wgpaHurdleMet = flindersGpa >= u.wgpaHurdle;
+ const gamsatSectionMet = scores.sections
+   ? [scores.sections.s1, scores.sections.s2, scores.sections.s3].every(s => s >= 50)
+   : null;
+ const gamsatOverallValid = !isNaN(gam) && gam >= 50;
+
+ const g = u.gamsat;
+ const poolMed   = isRural ? g.ruralMed   : (isInternal ? g.internalMed   : g.externalMed);
+ const poolMin   = isRural ? g.ruralMin   : (isInternal ? g.internalMin   : g.externalMin);
+ const poolMax   = isRural ? g.ruralMax   : (isInternal ? g.internalMax   : g.externalMax);
+ const poolLabel = isRural ? 'rural/SARM' : (isInternal ? 'internal (Flinders grad)' : 'external');
+ const poolN     = isRural ? '~10'        : (isInternal ? 'n=35' : 'n=17');
+
+ let verdictClass, verdictLabel;
+ if (!wgpaHurdleMet || !gamsatOverallValid) {
+   verdictClass = 'red'; verdictLabel = 'Eligibility hurdle not met';
+ } else if (gam >= poolMed) {
+   verdictClass = 'green'; verdictLabel = isRural ? 'Above rural median GAMSAT' : (isInternal ? 'Above internal pool median' : 'Above external pool median');
+ } else if (gam >= poolMin + (poolMed - poolMin) * 0.4) {
+   verdictClass = 'amber'; verdictLabel = 'Below pool median - in competitive range';
+ } else {
+   verdictClass = 'red'; verdictLabel = 'Below most observed offer GAMSATs';
+ }
+
+ const barLow  = poolMin - 2;
+ const barHigh = poolMax + 2;
+ const pctOf = v => Math.max(0, Math.min(100, ((v - barLow) / (barHigh - barLow)) * 100));
+ const youPct = pctOf(gam);
+ const medPct = pctOf(poolMed);
+ const minPct = pctOf(poolMin);
+ const maxPct = pctOf(poolMax);
+
+ const rangeHtml = `
+    <div class="range-bar-wrap">
+      <div class="range-bar-title">Your GAMSAT vs ${poolLabel} offer pool (2025 cycle, ${poolN} offers)</div>
+      <div class="range-bar-ticks-top">
+        <span>${barLow}</span>
+        <span>${Math.round((barLow + barHigh) / 2)}</span>
+        <span>${barHigh}</span>
+      </div>
+      <div class="range-bar" style="overflow:visible;">
+        <div style="position:absolute;top:0;bottom:0;left:${minPct.toFixed(1)}%;width:${(maxPct - minPct).toFixed(1)}%;background:rgba(14,165,233,0.18);border-radius:4px;"></div>
+        <div class="range-bar-median" style="left:${medPct.toFixed(1)}%;"></div>
+        <div class="range-bar-you${youPct < 10 ? ' at-left' : (youPct > 90 ? ' at-right' : '')}" style="left:${youPct.toFixed(1)}%;"></div>
+      </div>
+      <div class="range-bar-legend">
+        <span class="l-you">Your GAMSAT (${gam.toFixed(1)})</span>
+        <span class="l-median">Median offer (${poolMed})</span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--gray500);"><span style="display:inline-block;width:20px;height:8px;background:rgba(14,165,233,0.25);border-radius:2px;"></span>Offer range ${poolMin}–${poolMax}</span>
+      </div>
+    </div>`;
+
+ const hurdleRow = (ok, label) =>
+   `<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:700;color:${ok ? '#15803d' : '#dc2626'};">` +
+   `<span style="font-size:0.9rem;">${ok ? '✓' : '✗'}</span>${label}</span>`;
+
+ const hurdlesHtml = `
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
+      ${hurdleRow(wgpaHurdleMet, 'wGPA \u2265 5.0 ' + (wgpaHurdleMet ? '(\u2713 ' + flindersGpa.toFixed(2) + ')' : '(\u2717 ' + flindersGpa.toFixed(2) + ')'))}
+      ${hurdleRow(gamsatOverallValid, 'GAMSAT \u2265 50 overall ' + (gamsatOverallValid ? '(\u2713 ' + gam.toFixed(0) + ')' : '(\u2717 not met)'))}
+      ${gamsatSectionMet !== null ? hurdleRow(gamsatSectionMet, 'All sections \u2265 50') : '<span style="font-size:0.72rem;color:var(--gray400);">Enter sections above to check section minimums</span>'}
+    </div>`;
+
+ return `
+ <div class="uni-card-top">
+   <div>
+     <div class="uni-name">${escapeHtml(u.name)}</div>
+     <div class="uni-n" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+       <span style="display:inline-block;background:#7c3aed;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 8px;border-radius:4px;letter-spacing:0.04em;">DIRECT APPLY \u2014 NOT GEMSAS</span>
+       <span>${isInternal ? 'Internal (Flinders grad)' : isRural ? 'Rural sub-quota' : 'External applicant'} \u00b7 2025 cycle data</span>
+     </div>
+   </div>
+   <div class="uni-verdict ${verdictClass}">${verdictLabel}</div>
+ </div>
+ <div class="uni-body">
+   <div style="font-size:0.82rem;line-height:1.75;color:var(--gray700);">
+     <strong>How Flinders selects:</strong> Interview shortlisting is on <strong>GAMSAT score only</strong> within your sub-quota pool. wGPA \u2265 5.0 is an eligibility hurdle \u2014 it does not affect your interview ranking. Final offer = equal weight of GAMSAT + wGPA + interview.
+   </div>
+   ${hurdlesHtml}
+   ${usingFlindersGpa
+     ? '<div style="margin-top:8px;font-size:0.75rem;color:#7c3aed;font-weight:600;">Using your Flinders wGPA (' + flindersGpa.toFixed(2) + ') for the hurdle check.</div>'
+     : '<div style="margin-top:8px;font-size:0.75rem;color:#b45309;font-weight:600;">\u26a0 Using GEMSAS GPA as a proxy \u2014 enter your Flinders wGPA in the input above if you have it.</div>'}
+   ${!isInternal && !isRural ? '<div style="margin-top:6px;font-size:0.78rem;color:var(--gray500);">Tick \u201cFlinders University graduate\u201d in the bonus panel if applicable \u2014 you\u2019d compete in the internal pool where GAMSAT cutoffs are lower.</div>' : ''}
+ </div>
+ ${rangeHtml}
+ <div class="uni-notes" style="background:#faf5ff;border-left-color:#7c3aed;">
+   <strong>\u26a0 Separate application required \u2014 not covered by your GEMSAS application.</strong><br>${escapeHtml(note)}
+ </div>
+ ${renderBonusImpact(bonusImpact)}
+ <div class="uni-notes" style="margin-top:8px;">
+   Official sources:
+   <a href="https://www.flinders.edu.au/study/courses/postgraduate-doctor-medicine" target="_blank" rel="noopener" style="color:var(--teal3);text-decoration:underline;">Flinders MD page</a> \u00b7
+   <a href="https://www.flinders.edu.au/content/dam/documents/study/domestic/apply/md-admissions-guide.pdf" target="_blank" rel="noopener" style="color:var(--teal3);text-decoration:underline;">Application guide (PDF)</a>
+ </div>
+ `;
+}
+
+
+function renderUoWCard(u, gpa, scores) {
+ const gam = scores.weighted;
+ const hurdles = u.hurdles;
+
+ const gpaMet = gpa >= hurdles.gpaMin;
+ const gamMet = gam >= hurdles.gamsatMin;
+ const sectionKnown = !!scores.sections;
+ const sectionMet = sectionKnown
+ ? [scores.sections.s1, scores.sections.s2, scores.sections.s3].every(score => score >= hurdles.sectionMin)
+ : null;
+ const casperStatus = state.casper
+ ? (state.casper === 'Q4' ? 'met' : 'likely-not')
+ : 'unknown';
+ const uowBonusItems = getSelectedBonusItems('uow').filter(item => item.type === 'uowBonus');
+ const uowBonusCount = uowBonusItems.length;
+ const uowBonusPoints = uowBonusCount * (50 / 12);
+ const casperMidpoints = { Q1: 6.25, Q2: 18.75, Q3: 31.25, Q4: 43.75 };
+ const casperEstimate = state.casper ? casperMidpoints[state.casper] : null;
+ const uowRankEstimate = casperEstimate === null ? null : casperEstimate + uowBonusPoints;
+ const uowBonusBenchmark = 3.5;
+ const uowBonusChips = uowBonusItems
+ .map(item => `<span class="bonus-chip">${escapeHtml(item.label)}</span>`)
+ .join('');
+
+ const allMet = gpaMet && gamMet && sectionMet !== false && (casperStatus === 'met');
+
+ let verdict, verdictClass, verdictDetail;
+ if (!gpaMet || !gamMet || sectionMet === false) {
+ verdict = 'Hurdle not met';
+ verdictClass = 'red';
+ verdictDetail = 'UoW requires minimum GPA and GAMSAT hurdles regardless of combo. Your current inputs do not meet the basic thresholds.';
+ } else if (casperStatus === 'met' && allMet) {
+ if (uowBonusCount >= 4) {
+ verdict = 'Strong UOW profile';
+ verdictClass = 'green';
+ verdictDetail = 'You meet the published hurdles, report Q4 Casper, and have a bonus count above the recent MMI-offer average.';
+ } else if (uowBonusCount >= 3) {
+ verdict = 'Competitive UOW profile';
+ verdictClass = 'green';
+ verdictDetail = 'You meet the published hurdles and sit near the recent UOW MMI-offer benchmark of Q4 Casper plus about 3.5 bonuses.';
+ } else {
+ verdict = 'Bonus-light';
+ verdictClass = 'amber';
+ verdictDetail = 'You meet the published hurdles and report Q4 Casper, but your selected UOW bonus count is below the recent average MMI-offer profile.';
+ }
+ } else if (casperStatus === 'likely-not') {
+ verdict = 'CASPer likely too low';
+ verdictClass = 'amber';
+ verdictDetail = 'Hurdles cleared for GPA/GAMSAT, but Casper is half of UOW interview ranking. Extra bonuses help, but last year still appeared to have a Q4 minimum for MMI offers.';
+ } else {
+ verdict = 'CASPer dependent';
+ verdictClass = 'amber';
+ verdictDetail = 'You meet the GPA and GAMSAT hurdles. UOW ranks interview offers on Casper plus bonuses, so select a Casper quartile and any UOW bonuses above to sharpen this read.';
+ }
+
+ return `
+ <div class="uni-card-top">
+ <div>
+ <div class="uni-name">${u.name}</div>
+ <div class="uni-n">Uses hurdles + CASPer, not combo | 2026: ${u.nInt} interviewed | ${u.nRej} rejected</div>
+ </div>
+ <div class="uni-verdict ${verdictClass}">${verdict}</div>
+ </div>
+ <div class="uni-body">${verdictDetail}</div>
+ <div class="uni-uow-hurdles">
+ <strong>Your hurdle status:</strong>
+ <ul>
+ <li class="${gpaMet ? 'hurdle-met' : 'hurdle-miss'}">GPA ${hurdles.gpaMin}: <strong>${gpaMet ? 'Met' : 'Not met'}</strong> (${gpa.toFixed(2)})</li>
+ <li class="${gamMet ? 'hurdle-met' : 'hurdle-miss'}">GAMSAT overall ${hurdles.gamsatMin}: <strong>${gamMet ? 'Met' : 'Not met'}</strong> (${gam.toFixed(1)})</li>
+ <li class="${sectionMet === true ? 'hurdle-met' : (sectionMet === false ? 'hurdle-miss' : 'hurdle-unknown')}">GAMSAT sections ${hurdles.sectionMin}: <strong>${sectionKnown ? (sectionMet ? 'Met' : 'Not met') : 'Unknown'}</strong>${sectionKnown ? ` (S1 ${scores.sections.s1.toFixed(0)}, S2 ${scores.sections.s2.toFixed(0)}, S3 ${scores.sections.s3.toFixed(0)})` : ' - enter section scores to check exactly'}</li>
+ <li class="${casperStatus === 'met' ? 'hurdle-met' : (casperStatus === 'likely-not' ? 'hurdle-miss' : 'hurdle-unknown')}">CASPer: <strong>${state.casper || 'Not specified'}</strong> - ${hurdles.casperReq} required</li>
+ <li class="hurdle-unknown">Bonus: ${hurdles.bonusReq}</li>
+ </ul>
+ </div>
+ <div class="bonus-result">
+ <strong>UOW bonus rank estimate:</strong> ${uowBonusCount}/12 selected bonuses = ${uowBonusPoints.toFixed(1)} of the 50 bonus-side points. ${uowRankEstimate === null ? 'Select a Casper quartile for an approximate 100-point ranking estimate.' : `Using the midpoint of ${state.casper}, the rough combined ranking estimate is ${uowRankEstimate.toFixed(1)}/100.`} Recent MMI offers averaged about ${uowBonusBenchmark.toFixed(1)} bonuses with Q4 Casper.
+ ${uowBonusChips ? `<div class="bonus-chip-row">${uowBonusChips}</div>` : ''}
+ </div>
+ <div class="uni-notes">UoW uses GAMSAT as a hurdle, not as a combo rank. Current GEMSAS guidance lists minimum overall 50 and minimum 50 in each section.</div>
+ `;
+}
+
+
+
+// ============================================================
+// INTERNATIONAL SCHOOLS DATA - 2025 application cycle, self-reported
+// ============================================================
+const INTL_SCHOOLS = {
+ GAMSAT: [
+ { id:'anu', name:'Australian National University', degree:'MD', gamsatMode:'weighted',
+ interview:{ offers:[{g:77,gpa:7},{g:71,gpa:6.869},{g:66.5,gpa:6.88},{g:66,gpa:6.9},{g:63,gpa:6.708},{g:63,gpa:6.62},{g:60,gpa:6.646},{g:60,gpa:6.4},{g:70,gpa:5.3}], rejections:[{g:61,gpa:7},{g:63,gpa:5.582}] },
+ finalOffer:{ offers:[{g:71,gpa:6.845},{g:66,gpa:6.9},{g:63,gpa:6.62},{g:60,gpa:6.646},{g:64,gpa:6.13},{g:60,gpa:6.4}], rejections:[{g:61,gpa:7}] },
+ note:'Uses overall GAMSAT. International places are limited and highly competitive.' },
+ { id:'deakin', name:'Deakin University', degree:'MD', gamsatMode:'weighted',
+ interview:{ offers:[{g:71,gpa:6.84},{g:66.5,gpa:6.889}], rejections:[{g:61,gpa:6.83},{g:60,gpa:6.646},{g:60,gpa:6.4}] },
+ finalOffer:{ offers:[{g:71,gpa:6.845},{g:67,gpa:6.92}], rejections:[] },
+ note:'Small international cohort. Interview offers observed at combo ~1.65+.' },
+ { id:'flinders', name:'Flinders University', degree:'MD', gamsatMode:'weighted',
+ interview:{ offers:[{g:67,gpa:6.5}], rejections:[] },
+ finalOffer:{ offers:[{g:62,gpa:6.688},{g:59,gpa:6.7},{g:64,gpa:6.13},{g:60,gpa:6.4},{g:63,gpa:5.94},{g:56,gpa:6.38},{g:66,gpa:5.67},{g:70,gpa:5.3}], rejections:[] },
+ note:'Direct application (not GEMSAS). International data limited - cutoffs appear lower than domestic external cutoffs.' },
+ { id:'griffith', name:'Griffith University', degree:'MD', gamsatMode:'weighted',
+ interview:{ offers:[{g:77,gpa:7},{g:71,gpa:6.845},{g:61,gpa:6.83},{g:59.67,gpa:6.563},{g:60,gpa:6.4}], rejections:[] },
+ finalOffer:{ offers:[], rejections:[] },
+ note:'Uses overall GAMSAT. Relatively accessible combo range for international applicants.' },
+ { id:'uom', name:'University of Melbourne', degree:'MD', gamsatMode:'unweighted',
+ interview:{ offers:[{g:77,gpa:7},{g:69,gpa:6.845},{g:64.3,gpa:6.9},{g:63.33,gpa:6.884},{g:64,gpa:6.7},{g:61,gpa:6.83},{g:65,gpa:6.32}], rejections:[{g:59.67,gpa:6.713},{g:63,gpa:5.593},{g:63,gpa:5.582}] },
+ finalOffer:{ offers:[{g:61,gpa:6.83}], rejections:[] },
+ note:'Uses unweighted section average. GAM adjustment may apply. International interviews observed from combo ~1.55+.' },
+ { id:'macq', name:'Macquarie University', degree:'MD', gamsatMode:'weighted',
+ interview:{ offers:[{g:71,gpa:6.845}], rejections:[{g:60,gpa:6.65}] },
+ finalOffer:{ offers:[], rejections:[] },
+ note:'Very limited international data. Single interview offer observed at combo 1.688.' },
+ { id:'unds', name:'Notre Dame Sydney', degree:'MD', gamsatMode:'unweighted',
+ interview:{ offers:[{g:68,gpa:6.677},{g:60,gpa:6.4},{g:63.66,gpa:5.7}], rejections:[] },
+ finalOffer:{ offers:[{g:60,gpa:6.4},{g:70,gpa:5.3}], rejections:[] },
+ note:'Uses unweighted GAMSAT. CASPer is used in selection. More accessible combo than most schools.' },
+ { id:'uq', name:'University of Queensland', degree:'MD', gamsatMode:'unweighted',
+ interview:{ offers:[{g:77,gpa:7},{g:71,gpa:6.845},{g:65,gpa:6.88},{g:64,gpa:6.74},{g:63,gpa:6.708},{g:61,gpa:6.83},{g:65,gpa:6.52},{g:60,gpa:6.5},{g:59,gpa:6.5},{g:60,gpa:6.4},{g:70,gpa:5.3},{g:63.33,gpa:5.657},{g:60,gpa:5.2},{g:54,gpa:5.6}], rejections:[{g:59,gpa:6.1}] },
+ finalOffer:{ offers:[{g:71,gpa:6.845},{g:62,gpa:7},{g:65,gpa:6.52},{g:60,gpa:6.4},{g:63,gpa:5.69},{g:54,gpa:5.6}], rejections:[{g:60,gpa:6.17}] },
+ note:'Uses unweighted GAMSAT. Large international intake. Ochsner pathway also available.' },
+ { id:'uwa', name:'University of Western Australia', degree:'MD', gamsatMode:'weighted',
+ interview:{ offers:[{g:77,gpa:7},{g:71,gpa:6.845},{g:66.5,gpa:6.856}], rejections:[{g:64,gpa:6.74},{g:63,gpa:6.47},{g:70,gpa:5.3},{g:63,gpa:5.753},{g:63,gpa:5.735}] },
+ finalOffer:{ offers:[{g:71,gpa:6.845},{g:61,gpa:6.88},{g:59,gpa:6.48}], rejections:[{g:66.5,gpa:6.88}] },
+ note:'Rejections observed at combo 1.60+ suggest tight international quota. High combo strongly recommended.' },
+ { id:'uow', name:'University of Wollongong', degree:'MD', gamsatMode:'weighted',
+ interview:{ offers:[{g:71,gpa:6.845}], rejections:[] },
+ finalOffer:{ offers:[{g:71,gpa:6.845}], rejections:[] },
+ note:'Very limited international data. UoW uses CASPer-based ranking once GPA/GAMSAT hurdles are met.' },
+ ],
+ MCAT: [
+ { id:'anu_m', name:'Australian National University', degree:'MD',
+ interview:{ offers:[{mcat:514,gpa:6.7}], rejections:[] },
+ finalOffer:{ offers:[{mcat:514,gpa:6.7}], rejections:[] },
+ note:'MCAT accepted for international applicants. Very limited data.' },
+ { id:'flinders_m', name:'Flinders University', degree:'MD',
+ interview:{ offers:[{mcat:517,gpa:6.86}], rejections:[] },
+ finalOffer:{ offers:[{mcat:517,gpa:6.86}], rejections:[] },
+ note:'MCAT accepted. Single data point at 517.' },
+ { id:'griffith_m', name:'Griffith University', degree:'MD',
+ interview:{ offers:[{mcat:513,gpa:6.9},{mcat:522,gpa:6.7},{mcat:509,gpa:6.5},{mcat:509,gpa:5}], rejections:[] },
+ finalOffer:{ offers:[{mcat:513,gpa:6.9},{mcat:522,gpa:6.7},{mcat:509,gpa:6.5}], rejections:[] },
+ note:'MCAT accepted. Offers from MCAT 509+. GPA still matters.' },
+ { id:'unds_m', name:'Notre Dame Sydney', degree:'MD',
+ interview:{ offers:[{mcat:501,gpa:6.5}], rejections:[] },
+ finalOffer:{ offers:[{mcat:0,gpa:6.5}], rejections:[] },
+ note:'MCAT accepted. CASPer also used in selection.' },
+ { id:'undf_m', name:'Notre Dame Fremantle', degree:'MD',
+ interview:{ offers:[{mcat:0,gpa:6.9}], rejections:[] },
+ finalOffer:{ offers:[], rejections:[] },
+ note:'MCAT accepted. Very limited data - one observation with exempt/zero score.' },
+ { id:'uq_m', name:'University of Queensland', degree:'MD',
+ interview:{ offers:[{mcat:513,gpa:6.9},{mcat:515,gpa:6.9},{mcat:512,gpa:6.9},{mcat:517,gpa:6.86},{mcat:508,gpa:6.8},{mcat:507,gpa:6.5},{mcat:508,gpa:6.2},{mcat:516,gpa:6.1},{mcat:515,gpa:5}], rejections:[] },
+ finalOffer:{ offers:[{mcat:513,gpa:6.9},{mcat:516,gpa:6.1}], rejections:[] },
+ note:'UQ accepts MCAT. MCAT 508+ with solid GPA appears competitive for interview.' },
+ { id:'uom_m', name:'University of Melbourne', degree:'MD',
+ interview:{ offers:[{mcat:513,gpa:6.9},{mcat:508,gpa:6.79},{mcat:516,gpa:6.1}], rejections:[{mcat:508,gpa:6.2}] },
+ finalOffer:{ offers:[], rejections:[] },
+ note:'UoM accepts MCAT. Rejection at 508/6.2 - both MCAT score and GPA matter.' },
+ { id:'uwa_m', name:'University of Western Australia', degree:'MD',
+ interview:{ offers:[{mcat:504,gpa:6.5}], rejections:[] },
+ finalOffer:{ offers:[], rejections:[] },
+ note:'UWA accepts MCAT. Single offer observed at 504.' },
+ { id:'usyd_m', name:'University of Sydney', degree:'MD',
+ interview:{ offers:[{mcat:518,gpa:null},{mcat:524,gpa:null}], rejections:[] },
+ finalOffer:{ offers:[{mcat:518,gpa:null}], rejections:[] },
+ note:'USyd accepts MCAT. Limited data - offers observed at MCAT 518+.' },
+ ],
+ GPA: [
+ { id:'monash_g', name:'Monash University', degree:'MD',
+ wam_interview_offers:[92,89.056,88.364,87.967,87.469,87,86.1,85.5,84.45,83.5,82.65,82.581,82.375,83.19,82.32,92,87.893,86.872,85.765,85.7,85.436,83.615,82.865,75],
+ wam_interview_rejections:[70.01],
+ wam_final_offers:[92.486,89.632,88.132,87.763,85.6,82],
+ wam_final_waitlists:[86.175,85.053,83.2],
+ wam_final_rejections:[85,84.8],
+ note:'Monash uses WAM (weighted average mark from your undergraduate degree) to apply for the graduate MD. Non-rural interview offers observed from WAM ~82+. Rural offer observed at 75. Final offers from ~82+; rejections cluster at WAM 84–85, suggesting a tight band near that threshold.' },
+ ],
+ DAT: [
+ { id:'usyd_d', name:'University of Sydney', degree:'DMD',
+ interview:{ offers:[{dat:24},{dat:23},{dat:22},{dat:22}], rejections:[] },
+ finalOffer:{ offers:[{dat:23},{dat:22}], rejections:[] },
+ note:'USyd DMD accepts DAT for international applicants. Offers observed from DAT 22+.' },
+ ],
+};
+
+let intlTestMode = 'GAMSAT';
+const intlChartInstances = {};
+
+// MCAT minimum requirements per school (total score min, section min)
+const INTL_MCAT_MINS = {
+  anu_m:   { total: 500, section: 125, note: 'Min 125 per section' },
+  flinders_m: { total: 500, section: null, note: 'Min score required; check Flinders directly' },
+  griffith_m: { total: 500, section: null, note: 'Standard MCAT minimum applies' },
+  unds_m:  { total: 500, section: null, note: 'Min 500 total or unweighted GAMSAT 50' },
+  undf_m:  { total: 500, section: null, note: 'Min 500 total or unweighted GAMSAT 50' },
+  uq_m:    { total: 500, section: null, note: 'UQ accepts MCAT - apply directly' },
+  uom_m:   { total: 492, section: null, note: 'Min 492 total. Overseas applicants only (not onshore).' },
+  uwa_m:   { total: 500, section: 124, note: 'Min 500 total, 124 per section' },
+  usyd_m:  { total: null, section: null, note: 'USyd uses MCAT section-based ranking; no published overall min' },
+};
+
+// GAMSAT mode per school: which score is used for international GAMSAT applicants
+const INTL_GAMSAT_MODE = {
+  uom:   'unweighted', // UoM uses unweighted average
+  uq:    'unweighted', // UQ uses unweighted average
+  unds:  'unweighted', // UNDS uses unweighted average
+  undf:  'unweighted', // UNDF uses unweighted average
+  // all others use ACER overall weighted score
+};
+
+let intlGamsatMode = 'overall'; // 'overall' | 'sections'
+let intlGamsatSections = { s1: null, s2: null, s3: null };
+
+function setIntlGamsatMode(mode) {
+  intlGamsatMode = mode;
+  document.getElementById('intlGamsatOverallBtn').classList.toggle('active', mode === 'overall');
+  document.getElementById('intlGamsatSectionsBtn').classList.toggle('active', mode === 'sections');
+  document.getElementById('intlGamsatOverallPanel').style.display = mode === 'overall' ? '' : 'none';
+  document.getElementById('intlGamsatSectionsPanel').style.display = mode === 'sections' ? '' : 'none';
+}
+
+function intlGetGamsatForSchool(school, overallScore) {
+  // If sections entered, compute the right score per school
+  const { s1, s2, s3 } = intlGamsatSections;
+  const hasAllSections = s1 !== null && s2 !== null && s3 !== null;
+  const mode = INTL_GAMSAT_MODE[school.id] || 'weighted';
+  if (hasAllSections && intlGamsatMode === 'sections') {
+    if (mode === 'unweighted') return { score: (s1 + s2 + s3) / 3, label: 'Unweighted avg', estimated: false };
+    // weighted: (S1 + S2 + 2*S3) / 4
+    return { score: (s1 + s2 + 2 * s3) / 4, label: 'ACER weighted', estimated: false };
+  }
+  // Overall mode: for unweighted schools, we have to use overall as approximation
+  const estimated = (mode === 'unweighted');
+  return { score: overallScore, label: estimated ? 'Overall (estimated)' : 'ACER overall', estimated };
+}
+
+// Wire section inputs to live preview
+function initIntlSectionListeners() {
+  ['intlS1Input','intlS2Input','intlS3Input'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      const s1 = parseFloat(document.getElementById('intlS1Input').value);
+      const s2 = parseFloat(document.getElementById('intlS2Input').value);
+      const s3 = parseFloat(document.getElementById('intlS3Input').value);
+      intlGamsatSections.s1 = Number.isFinite(s1) ? s1 : null;
+      intlGamsatSections.s2 = Number.isFinite(s2) ? s2 : null;
+      intlGamsatSections.s3 = Number.isFinite(s3) ? s3 : null;
+      const prev = document.getElementById('intlSectionPreview');
+      if (!prev) return;
+      if (intlGamsatSections.s1 !== null && intlGamsatSections.s2 !== null && intlGamsatSections.s3 !== null) {
+        const { s1, s2, s3 } = intlGamsatSections;
+        const weighted = ((s1 + s2 + 2 * s3) / 4).toFixed(1);
+        const unweighted = ((s1 + s2 + s3) / 3).toFixed(1);
+        prev.innerHTML = `ACER weighted: <strong>${weighted}</strong> &nbsp;|&nbsp; Unweighted avg: <strong>${unweighted}</strong> &nbsp;<span style="color:var(--gray400);font-size:0.68rem;">(UoM / UQ use unweighted)</span>`;
+      } else {
+        prev.textContent = 'Enter S1, S2 and S3 to calculate scores automatically.';
+      }
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', initIntlSectionListeners);
+
+function setIntlTest(mode) {
+ intlTestMode = mode;
+ ['GAMSAT','MCAT','GPA','DAT'].forEach(m => {
+ const btn = document.getElementById('intlTest' + m);
+ if (btn) {
+ btn.classList.toggle('active', m === mode);
+ btn.setAttribute('aria-selected', m === mode ? 'true' : 'false');
+ }
+ });
+ const gpaField = document.getElementById('intlGpaField');
+ const scoreField = document.getElementById('intlTestScoreField');
+ const wamField = document.getElementById('intlWamField');
+ const label = document.getElementById('intlTestScoreLabel');
+ const gamsatPanel = document.getElementById('intlGamsatPanel');
+ const mcatPanel   = document.getElementById('intlMcatPanel');
+ const datPanel    = document.getElementById('intlDatPanel');
+
+ // Reset all panels
+ if (gamsatPanel) gamsatPanel.style.display = 'none';
+ if (mcatPanel)   mcatPanel.style.display   = 'none';
+ if (datPanel)    datPanel.style.display    = 'none';
+
+ if (mode === 'GPA') {
+   if (gpaField)   gpaField.style.display   = 'none';
+   if (scoreField) scoreField.style.display  = 'none';
+   if (wamField)   wamField.style.display    = '';
+ } else if (mode === 'DAT') {
+   if (gpaField)   gpaField.style.display   = 'none';
+   if (scoreField) scoreField.style.display  = '';
+   if (wamField)   wamField.style.display    = 'none';
+   if (datPanel)   datPanel.style.display    = '';
+   if (label)      label.textContent         = 'DAT score';
+ } else if (mode === 'MCAT') {
+   if (gpaField)   gpaField.style.display   = '';
+   if (scoreField) scoreField.style.display  = '';
+   if (wamField)   wamField.style.display    = 'none';
+   if (mcatPanel)  mcatPanel.style.display   = '';
+   if (label)      label.textContent         = 'MCAT total (472–528)';
+ } else {
+   // GAMSAT
+   if (gpaField)    gpaField.style.display   = '';
+   if (scoreField)  scoreField.style.display  = '';
+   if (wamField)    wamField.style.display    = 'none';
+   if (gamsatPanel) gamsatPanel.style.display = '';
+   if (label)       label.textContent         = 'GAMSAT score';
+ }
+}
+
+function intlCalcCombo(gpa, gamsat) {
+ return (gpa / 7) + (gamsat / 100);
+}
+
+function intlGetDataPoints(school, mode) {
+ if (mode === 'GPA') {
+ return {
+ intOffers: (school.wam_interview_offers || []).slice(),
+ intRej: (school.wam_interview_rejections || []).slice(),
+ finOffers: (school.wam_final_offers || []).slice(),
+ finWait: (school.wam_final_waitlists || []).slice(),
+ finRej: (school.wam_final_rejections || []).slice(),
+ isWam: true,
+ };
+ }
+ const toCombo = (d) => {
+ if (mode === 'DAT') return (d.dat != null && d.dat > 0) ? d.dat : null;
+ if (mode === 'MCAT') {
+ if (d.mcat == null || d.mcat === 0) return null;
+ const norm = d.mcat * (100/528);
+ return d.gpa != null ? intlCalcCombo(d.gpa, norm) : norm;
+ }
+ return (d.g != null && d.gpa != null) ? intlCalcCombo(d.gpa, d.g) : null;
+ };
+ const iv = school.interview || { offers:[], rejections:[] };
+ const fo = school.finalOffer || { offers:[], rejections:[] };
+ return {
+ intOffers: iv.offers.map(toCombo).filter(v => v != null),
+ intRej: iv.rejections.map(toCombo).filter(v => v != null),
+ finOffers: fo.offers.map(toCombo).filter(v => v != null),
+ finWait: [],
+ finRej: fo.rejections.map(toCombo).filter(v => v != null),
+ isWam: false,
+ };
+}
+
+function intlGetStatus(userVal, pts) {
+ const allOffers = [...pts.intOffers, ...pts.finOffers];
+ if (!allOffers.length) return 'unknown';
+ const minOffer = Math.min(...allOffers);
+ const allRej = [...pts.intRej, ...pts.finRej];
+ if (userVal >= minOffer) return 'competitive';
+ if (userVal >= minOffer - 0.07) return 'borderline';
+ if (allRej.length && userVal >= Math.max(...allRej) - 0.02) return 'borderline';
+ return 'low';
+}
+
+function intlDrawChart(canvasId, pts, userVal) {
+ if (intlChartInstances[canvasId]) {
+ try { intlChartInstances[canvasId].destroy(); } catch(e) {}
+ delete intlChartInstances[canvasId];
+ }
+ const ctx = document.getElementById(canvasId);
+ if (!ctx) return;
+ if (typeof Chart === 'undefined') return;
+ const allVals = [...pts.intOffers, ...pts.intRej, ...pts.finOffers, ...pts.finWait, ...pts.finRej];
+ if (!allVals.length) return;
+ const isWam = pts.isWam;
+ const pad = isWam ? 3 : 0.04;
+ const minX = Math.min(...allVals) - pad;
+ const maxX = Math.max(...allVals) + pad;
+ const datasets = [
+ { label:'Interview offers', data:pts.intOffers.map(x=>({x,y:1})), backgroundColor:'#5DCAA5', borderColor:'#1D9E75', pointRadius:6, pointHoverRadius:8 },
+ { label:'Final offers', data:pts.finOffers.map(x=>({x,y:2})), backgroundColor:'#85B7EB', borderColor:'#378ADD', pointRadius:6, pointHoverRadius:8 },
+ { label:'Rejections/waitlists', data:[...pts.intRej,...pts.finRej,...pts.finWait].map(x=>({x,y:1.5})), backgroundColor:'#F09595', borderColor:'#E24B4A', pointRadius:6, pointHoverRadius:8 },
+ ];
+ if (isFinite(userVal)) {
+ datasets.push({ label:'Your score', data:[{x:userVal,y:1.5}], backgroundColor:'#185FA5', borderColor:'#185FA5', pointRadius:9, pointStyle:'triangle', pointHoverRadius:11 });
+ }
+ intlChartInstances[canvasId] = new Chart(ctx, {
+ type:'scatter',
+ data:{ datasets },
+ options:{
+ responsive:true, maintainAspectRatio:false,
+ plugins:{
+ legend:{display:false},
+ tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.x.toFixed(isWam?1:4)}}
+ },
+ scales:{
+ x:{min:minX,max:maxX,title:{display:true,text:isWam?'WAM':'Combo score',font:{size:11}},ticks:{font:{size:10},callback:v=>v.toFixed(isWam?0:2)}},
+ y:{display:false,min:0.5,max:2.5}
+ }
+ }
+ });
+}
+
+function calculateInternational() {
+ const errEl = document.getElementById('intlErr');
+ const gpaEl = document.getElementById('intlGpaInput');
+ const wamEl = document.getElementById('intlWamInput');
+ const gpa = gpaEl ? parseFloat(gpaEl.value) : NaN;
+ const wam = wamEl ? parseFloat(wamEl.value) : NaN;
+
+ // Resolve GAMSAT overall score (from overall input or derived from sections)
+ let overallGamsat = NaN;
+ if (intlTestMode === 'GAMSAT') {
+   if (intlGamsatMode === 'sections') {
+     const { s1, s2, s3 } = intlGamsatSections;
+     if (s1 !== null && s2 !== null && s3 !== null) {
+       overallGamsat = (s1 + s2 + 2 * s3) / 4; // ACER weighted (fallback for overall display)
+     }
+   } else {
+     const el = document.getElementById('intlTestScoreInput');
+     overallGamsat = el ? parseFloat(el.value) : NaN;
+   }
+ }
+
+ // Resolve MCAT score
+ const mcatEl = document.getElementById('intlMcatInput');
+ const mcatScore = mcatEl ? parseFloat(mcatEl.value) : NaN;
+
+ // Resolve DAT score
+ const datEl = document.getElementById('intlTestScoreInputDat');
+ const datScore = datEl ? parseFloat(datEl.value) : NaN;
+
+ let userVal = null;
+ let comboText = '';
+
+ if (intlTestMode === 'GPA') {
+   if (!wam || isNaN(wam)) { if(errEl){errEl.style.display='block';} return; }
+   userVal = wam;
+   comboText = 'WAM <strong>' + wam.toFixed(1) + '</strong> - Monash graduate MD entry';
+ } else if (intlTestMode === 'DAT') {
+   if (!datScore || isNaN(datScore)) { if(errEl){errEl.style.display='block';} return; }
+   userVal = datScore;
+   comboText = 'DAT <strong>' + datScore + '</strong> - USyd DMD international';
+ } else if (intlTestMode === 'MCAT') {
+   if (!gpa || isNaN(gpa) || !mcatScore || isNaN(mcatScore)) { if(errEl){errEl.style.display='block';} return; }
+   const normMcat = mcatScore * (100/528);
+   userVal = intlCalcCombo(gpa, normMcat);
+   comboText = 'GPA ' + gpa.toFixed(2) + ' + MCAT ' + Math.round(mcatScore) + ' → normalised combo <strong>' + userVal.toFixed(4) + '</strong>';
+ } else {
+   // GAMSAT
+   if (!gpa || isNaN(gpa) || isNaN(overallGamsat)) { if(errEl){errEl.style.display='block';} return; }
+   // userVal uses the ACER weighted score for the combo display figure; per-school uses intlGetGamsatForSchool
+   userVal = intlCalcCombo(gpa, overallGamsat);
+   const { s1, s2, s3 } = intlGamsatSections;
+   const hasSections = intlGamsatMode === 'sections' && s1 !== null && s2 !== null && s3 !== null;
+   if (hasSections) {
+     const uw = ((s1 + s2 + s3) / 3).toFixed(1);
+     comboText = 'GPA ' + gpa.toFixed(2) + ' + S1 ' + s1 + ' / S2 ' + s2 + ' / S3 ' + s3 +
+       ' → weighted GAMSAT <strong>' + overallGamsat.toFixed(1) + '</strong>, unweighted <strong>' + uw + '</strong>';
+   } else {
+     comboText = 'GPA ' + gpa.toFixed(2) + ' + GAMSAT ' + overallGamsat.toFixed(1) + ' → combo <strong>' + userVal.toFixed(4) + '</strong>';
+   }
+ }
+
+ if(errEl) errEl.style.display = 'none';
+ const schools = INTL_SCHOOLS[intlTestMode] || [];
+ const comboEl = document.getElementById('intlComboDisplay');
+ if (comboEl) comboEl.innerHTML = comboText;
+ const list = document.getElementById('intlUniList');
+ list.innerHTML = '';
+
+ schools.forEach((school, idx) => {
+   // For GAMSAT mode, get the school-specific score (weighted vs unweighted)
+   let schoolUserVal = userVal;
+   let scoreBadgeHtml = '';
+   if (intlTestMode === 'GAMSAT') {
+     const scoreInfo = intlGetGamsatForSchool(school, overallGamsat);
+     const schoolCombo = intlCalcCombo(gpa, scoreInfo.score);
+     schoolUserVal = schoolCombo;
+     const estNote = scoreInfo.estimated ? ' (estimated from overall)' : '';
+     scoreBadgeHtml = `<div class="intl-school-score-badge">GAMSAT used: ${scoreInfo.label} ${scoreInfo.score.toFixed(1)}${estNote} → combo ${schoolCombo.toFixed(4)}</div>`;
+   } else if (intlTestMode === 'MCAT') {
+     // Show MCAT hurdle check per school
+     const mins = INTL_MCAT_MINS[school.id];
+     if (mins) {
+       const passTotal = !mins.total || (!isNaN(mcatScore) && mcatScore >= mins.total);
+       const passSection = true; // we don't collect per-section MCAT
+       const cls = passTotal ? 'pass' : 'fail';
+       const icon = passTotal ? '✓' : '✗';
+       scoreBadgeHtml = `<div class="intl-mcat-hurdle ${cls}">${icon} ${mins.note}${mins.total ? ' (min ' + mins.total + ')' : ''}</div>`;
+     }
+   }
+
+   const pts = intlGetDataPoints(school, intlTestMode);
+   const allPts = [...pts.intOffers,...pts.intRej,...pts.finOffers,...pts.finRej,...pts.finWait];
+   const hasData = allPts.length > 0;
+   let status;
+   if (intlTestMode === 'GPA') {
+     status = wam >= 82 ? 'competitive' : wam >= 77 ? 'borderline' : 'low';
+   } else if (intlTestMode === 'DAT') {
+     status = datScore >= 22 ? 'competitive' : datScore >= 20 ? 'borderline' : 'low';
+   } else {
+     status = intlGetStatus(schoolUserVal, pts);
+   }
+   const pillMap = { competitive:'<span class="intl-pill intl-pill-green">Competitive</span>', borderline:'<span class="intl-pill intl-pill-amber">Borderline</span>', low:'<span class="intl-pill intl-pill-red">Below observed</span>', unknown:'<span class="intl-pill intl-pill-gray">Insufficient data</span>' };
+   const canvasId = 'intlchart_' + school.id + '_' + Date.now();
+   const card = document.createElement('div');
+   card.className = 'uni-card';
+   card.innerHTML = '<div class="uni-card-top"><div><div class="uni-name">' + escapeHtml(school.name) + ' <span style="font-weight:400;color:var(--gray500);font-size:0.82rem;">' + escapeHtml(school.degree) + '</span></div><div class="uni-n">International applicant data · 2025 cycle · self-reported</div></div><div class="uni-verdict ' + (status === 'competitive' ? 'green' : status === 'borderline' ? 'amber' : status === 'unknown' ? 'gray' : 'red') + '">' + (pillMap[status] || '').replace(/<[^>]+>/g,'') + '</div></div>' +
+   '<div class="uni-body" style="padding:' + (hasData ? '0' : '') + ';">' +
+   (hasData ? '<div style="position:relative;width:100%;height:110px;margin:8px 0;"><canvas id="' + canvasId + '" role="img" aria-label="Scatter chart of international outcomes for ' + escapeHtml(school.name) + '"></canvas></div>' : '<div class="uni-notes" style="margin:0;">Insufficient numeric data to plot. See note below.</div>') +
+   '</div>' +
+   scoreBadgeHtml +
+   '<div class="uni-notes" style="margin-top:8px;">' + escapeHtml(school.note) + '</div>' +
+   '<div class="intl-coaching-note">Interview performance matters significantly - applicants with similar combo scores get different final outcomes depending on how they perform. <a href="https://calendly.com/brittainmbbs/1-1-tutoring-1-hour" target="_blank" rel="noopener">Book interview coaching with Dan ($300)</a> to work on this before offers come out.</div>';
+   list.appendChild(card);
+   if (hasData) {
+     const chartUserVal = schoolUserVal;
+     setTimeout(() => intlDrawChart(canvasId, pts, chartUserVal), 80 * idx);
+   }
+ });
+ const wrap = document.getElementById('intlResultsWrap');
+ if (wrap) wrap.style.display = 'block';
+ document.getElementById('calcCard').classList.add('calc-hide-on-results');
+ setTimeout(() => {
+   const wrap2 = document.getElementById('intlResultsWrap');
+   if (wrap2) wrap2.scrollIntoView({behavior:'smooth',block:'start'});
+ }, 100);
+ trackCalculatorEvent('calculate_international', { test_mode: intlTestMode });
+}
+
+
+document.getElementById('emailForm').addEventListener('submit', (e) => {
+ e.preventDefault();
+ const input = document.getElementById('emailInput');
+ const email = (input.value || '').trim();
+ if (!email || !email.includes('@') || !email.includes('.')) {
+ input.style.borderColor = 'var(--red)';
+ input.focus();
+ return;
+ }
+ input.style.borderColor = '';
+ setResultStatus('Sending your plan...');
+ const payload = {
+ email,
+ source: 'chances-calculator',
+ plan: latestCalculatorPlan,
+ planText: formatLatestCalculatorPlan(),
+ };
+ fetch('https://key2md-api.brittainmbbs.workers.dev/api/calculator/plan', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify(payload),
+ }).then(res => {
+ if (!res.ok) throw new Error('plan_email_failed');
+ document.getElementById('emailForm').style.display = 'none';
+ document.getElementById('emailDone').classList.add('show');
+ setResultStatus('');
+ }).catch(() => {
+ return fetch('https://key2md-api.brittainmbbs.workers.dev/api/email/subscribe', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ email: email, source: 'chances-calculator-plan-fallback' }),
+ }).then(res => {
+ if (!res.ok) throw new Error('subscribe_failed');
+ document.getElementById('emailForm').style.display = 'none';
+ document.getElementById('emailDone').textContent = 'Done. You are on the Key2MD list; copy the plan above if you want to keep the exact result.';
+ document.getElementById('emailDone').classList.add('show');
+ setResultStatus('');
+ }).catch(() => {
+ setResultStatus('Email had trouble sending. Copy the result above and keep going.');
+ });
+ });
+ trackCalculatorEvent('calculator_plan_email', { event_label: latestCalculatorPlan?.mode || 'unknown' });
+});
+
+// Routes the correct GPA per school.
+// Priority: yearly breakdown data > explicit weighted/unweighted boxes > fallback
+function getGpaForSchool(schoolId, baseGpa) {
+  const yr = window._gpaYearly;
+  const res = window._gpaResolved;
+  if (yr && yr.hasData) {
+    switch ((schoolId || '').toLowerCase()) {
+      case 'griffith': return yr.unweighted !== null ? yr.unweighted : baseGpa;
+      case 'uom':      return yr.melbourne  !== null ? yr.melbourne  : baseGpa;
+      default:         return yr.weighted   !== null ? yr.weighted   : baseGpa;
+    }
+  }
+  if (!res) return baseGpa;
+  switch ((schoolId || '').toLowerCase()) {
+    case 'griffith': return res.unweighted;
+    case 'uom':      return res.weighted;
+    default:         return res.weighted;
+  }
+}
+
+// Best-guess fallback toggle
+(function () {
+  const btn = document.getElementById('gpaFallbackToggle');
+  const panel = document.getElementById('gpaFallbackPanel');
+  if (!btn || !panel) return;
+  btn.addEventListener('click', () => {
+    const open = panel.classList.toggle('open');
+    btn.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+  });
+})();
+
+// GPA yearly breakdown
+(function () {
+  'use strict';
+  const HON_GPA = { first: 7.0, '2a': 6.0, '2b': 5.0, third: 4.0 };
+  const yVals = { y2: null, y1: null, y0: null };
+  let degMode = 'standard', isHon = false, honCls = null;
+
+  window._gpaYearly = { hasData: false, weighted: null, unweighted: null, melbourne: null };
+
+  const panel     = document.getElementById('gpaYearlyPanel');
+  const toggleBtn = document.getElementById('gpaYearlyToggleBtn');
+  const applyBtn  = document.getElementById('gpaYearlyApply');
+  const rowsEl    = document.getElementById('gpaYearRows');
+  const gpaWInput = document.getElementById('gpaInput');
+  const gpaUInput = document.getElementById('gpaUnweightedInput');
+
+  if (!panel || !toggleBtn || !rowsEl) return;
+
+  toggleBtn.addEventListener('click', () => {
+    const open = panel.classList.toggle('open');
+    toggleBtn.classList.toggle('open', open);
+    toggleBtn.setAttribute('aria-expanded', String(open));
+    panel.setAttribute('aria-hidden', String(!open));
+    if (open && !rowsEl.children.length) buildRows();
+  });
+
+  document.getElementById('gpaDegStd').addEventListener('click', () => {
+    degMode = 'standard';
+    document.getElementById('gpaDegStd').classList.add('active');
+    document.getElementById('gpaDegHon').classList.remove('active');
+    buildRows();
+  });
+  document.getElementById('gpaDegHon').addEventListener('click', () => {
+    degMode = 'honours';
+    document.getElementById('gpaDegHon').classList.add('active');
+    document.getElementById('gpaDegStd').classList.remove('active');
+    buildRows();
+  });
+
+  function buildRows() {
+    rowsEl.innerHTML = '';
+    const rows = [
+      { key: 'y2', lbl: 'Final-2 year', sub: degMode === 'honours' ? 'Second-last bachelor year (x1)' : 'Oldest of 3 years (x1 weight)' },
+      { key: 'y1', lbl: 'Final-1 year', sub: degMode === 'honours' ? 'Last bachelor year, pre-honours (x2)' : 'Middle year (x2 weight)' },
+      { key: 'y0', lbl: 'Final year',   sub: degMode === 'honours' ? 'Honours year (x3 at most schools)' : 'Most recent year (x3 weight)' },
+    ];
+    rows.forEach((r, idx) => {
+      const isLast = idx === rows.length - 1;
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'gpa-year-row';
+      const lblBlock = document.createElement('div');
+      lblBlock.innerHTML = `<div class="gpa-year-lbl">${r.lbl}</div><div class="gpa-year-sub">${r.sub}</div>`;
+      const inp = document.createElement('input');
+      inp.type = 'number'; inp.className = 'gpa-year-inp'; inp.step = '0.01';
+      inp.min = '0'; inp.max = '7'; inp.placeholder = '0-7'; inp.inputMode = 'decimal'; inp.autocomplete = 'off';
+      if (yVals[r.key] !== null) inp.value = yVals[r.key];
+      inp.addEventListener('input', () => {
+        const v = parseFloat(inp.value);
+        yVals[r.key] = (Number.isFinite(v) && v >= 0 && v <= 7) ? v : null;
+        recalc();
+      });
+      rowDiv.appendChild(lblBlock); rowDiv.appendChild(inp); rowsEl.appendChild(rowDiv);
+
+      if (isLast && degMode === 'honours') {
+        const honRow = document.createElement('div');
+        honRow.className = 'gpa-hon-row show';
+        honRow.innerHTML =
+          `<label class="gpa-hon-chk-label"><input type="checkbox" id="gpaHonChk"${isHon ? ' checked' : ''}>Completed honours (classification known)</label>` +
+          `<div class="gpa-hon-cls${isHon ? ' show' : ''}" id="gpaHonClsWrap">` +
+            `<select id="gpaHonClsSel">` +
+              `<option value="">Select classification</option>` +
+              `<option value="first"${honCls==='first'?' selected':''}>First Class (H1) - GPA 7.0</option>` +
+              `<option value="2a"${honCls==='2a'?' selected':''}>Class 2A (H2A) - GPA 6.0</option>` +
+              `<option value="2b"${honCls==='2b'?' selected':''}>Class 2B (H2B) - GPA 5.0</option>` +
+              `<option value="third"${honCls==='third'?' selected':''}>Third Class (H3) - GPA 4.0</option>` +
+            `</select>` +
+            `<div class="gpa-hon-note">UQ and Griffith use the honours classification as your final-year GPA. At UQ, First Class = GPA 7.0, same as a completed PhD.</div>` +
+          `</div>`;
+        const chk = honRow.querySelector('#gpaHonChk');
+        const clsWrap = honRow.querySelector('#gpaHonClsWrap');
+        const sel = honRow.querySelector('#gpaHonClsSel');
+        chk.addEventListener('change', () => { isHon = chk.checked; clsWrap.classList.toggle('show', isHon); if (!isHon) { honCls = null; sel.value = ''; } recalc(); });
+        sel.addEventListener('change', () => { honCls = sel.value || null; recalc(); });
+        rowsEl.appendChild(honRow);
+      }
+    });
+    recalc();
+  }
+
+  function recalc() {
+    const { y2, y1, y0 } = yVals;
+    const allFilled = y2 !== null && y1 !== null && y0 !== null;
+    const hGpa = (isHon && honCls && HON_GPA[honCls] !== undefined) ? HON_GPA[honCls] : null;
+    const f0 = hGpa !== null ? hGpa : y0;
+    const weighted   = allFilled ? ((y2 + y1 * 2 + f0 * 3) / 6) : null;
+    const unweighted = allFilled ? ((y2 + y1 + f0) / 3) : null;
+    const melbourne  = allFilled ? ((y2 + y1 * 2 + f0 * 2) / 5) : null;
+    window._gpaYearly = { hasData: allFilled, weighted, unweighted, melbourne };
+    const wEl = document.getElementById('gpaCalcW');
+    const uEl = document.getElementById('gpaCalcU');
+    const mEl = document.getElementById('gpaCalcM');
+    if (wEl) wEl.textContent = weighted   !== null ? weighted.toFixed(2)   : '-';
+    if (uEl) uEl.textContent = unweighted !== null ? unweighted.toFixed(2) : '-';
+    if (mEl) mEl.textContent = melbourne  !== null ? melbourne.toFixed(2)  : '-';
+    if (applyBtn) {
+      applyBtn.disabled = !allFilled;
+      applyBtn.textContent = allFilled
+        ? `Fill GPA fields above (weighted ${weighted.toFixed(2)}, unweighted ${unweighted.toFixed(2)})`
+        : 'Fill GPA fields above';
+    }
+  }
+
+  function flash(el) {
+    el.style.transition = 'box-shadow 0.3s';
+    el.style.boxShadow = '0 0 0 4px rgba(14,165,233,0.28)';
+    setTimeout(() => { el.style.boxShadow = ''; }, 1100);
+  }
+
+  if (applyBtn) applyBtn.addEventListener('click', () => {
+    const yr = window._gpaYearly;
+    if (!yr || !yr.hasData) return;
+    if (gpaWInput && yr.weighted !== null) { gpaWInput.value = yr.weighted.toFixed(2); gpaWInput.dispatchEvent(new Event('input', { bubbles: true })); flash(gpaWInput); }
+    if (gpaUInput && yr.unweighted !== null) { gpaUInput.value = yr.unweighted.toFixed(2); gpaUInput.dispatchEvent(new Event('input', { bubbles: true })); flash(gpaUInput); }
+  });
+})();

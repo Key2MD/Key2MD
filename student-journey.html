@@ -421,6 +421,23 @@
  <main class="journey-shell">
  <div class="wrap journey-layout">
  <section>
+ <article class="journey-card" id="commandCard" style="border:1px solid rgba(14,165,233,0.35);background:linear-gradient(180deg,rgba(14,165,233,0.06),transparent);">
+ <div class="journey-kicker">Your command center</div>
+ <h2 id="commandCountdown" style="margin-bottom:6px;">When is your interview?</h2>
+ <p class="journey-muted" id="commandPhase">Set your interview date and I will build your focus for right now. Most Australian interviews land in September.</p>
+ <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 0;">
+ <input type="date" id="commandDate" aria-label="Interview date" style="padding:10px 12px;border:1px solid #dbe4ef;border-radius:10px;font-family:inherit;font-size:0.92rem;color:#0a1628;background:#fff;">
+ <button type="button" class="journey-btn primary" style="margin:0;" onclick="saveJourneyDate()">Set date</button>
+ <button type="button" class="journey-btn secondary" id="commandClearBtn" style="margin:0;display:none;" onclick="clearJourneyDate()">Change</button>
+ </div>
+ <div id="commandPlan" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid #e2e8f0;">
+ <div class="journey-kicker" id="commandPlanKicker">Do this now</div>
+ <h3 id="commandPlanTitle" style="margin:4px 0 6px;"></h3>
+ <p class="journey-muted" id="commandPlanCopy" style="margin-bottom:12px;"></p>
+ <div class="journey-actions" id="commandPlanActions" style="margin-top:0;"></div>
+ </div>
+ </article>
+
  <article class="journey-card" id="journeyReferralCard" style="display:none;border:1px solid rgba(14,165,233,0.3);">
  <div class="journey-kicker">Refer a friend</div>
  <h2 style="margin-bottom:6px;">You both win.</h2>
@@ -514,6 +531,16 @@
  <div class="journey-actions">
  <a class="journey-btn primary" id="nextStepLink" href="practice.html">Start practice</a>
  </div>
+ </article>
+ <article class="journey-card" id="outcomeCard">
+ <div class="journey-kicker">Your result</div>
+ <h3 id="outcomeTitle">Heard back from a school?</h3>
+ <p class="journey-muted">Tell Dan when you get an interview invite or an offer. It helps us track what genuinely works, and Dan loves the good news.</p>
+ <div class="journey-actions" id="outcomeButtons">
+ <button type="button" class="journey-btn primary" style="margin:0;" onclick="reportOutcome('interview')">I got an interview</button>
+ <button type="button" class="journey-btn secondary" style="margin:0;" onclick="reportOutcome('offer')">I got an offer</button>
+ </div>
+ <div class="journey-status" id="outcomeStatus" style="display:none;margin-top:10px;"></div>
  </article>
  </aside>
  </div>
@@ -1155,6 +1182,54 @@ renderAccount();
   }catch(e){}
  }
  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',loadJourneyReferral); else loadJourneyReferral();
+})();
+</script>
+<script>
+(function(){
+ var API='https://key2md-api.brittainmbbs.workers.dev';
+ var DATES_KEY='k2md_journey_dates_v1';
+ function getDates(){ try{ return JSON.parse(localStorage.getItem(DATES_KEY)||'{}')||{}; }catch(e){ return {}; } }
+ function setDates(d){ try{ localStorage.setItem(DATES_KEY, JSON.stringify(d||{})); }catch(e){} }
+ function daysTo(iso){ if(!iso) return null; var t=new Date(iso+'T00:00:00'); if(!isFinite(t.getTime())) return null; var now=new Date(); now.setHours(0,0,0,0); return Math.round((t-now)/86400000); }
+ function planFor(n){
+  if(n<0) return {tag:'Interview done',title:'How did it go?',copy:'Mark your result on the right so Dan can track what works. Keep practising in case you have more interviews coming up.',ctas:[['Open MMI practice','practice.html?lock_mode=mmi','primary']]};
+  if(n<=21) return {tag:'Peak phase',title:'Go intensive for the final stretch.',copy:'Daily spoken reps matter most now. Run a full mock this week, drill your weakest criterion, and consider a 1:1 with Dan or the Ultimate package for a final sharpening.',ctas:[['Run a baseline mock','practice.html?lock_mode=mmi&tab=baseline','primary'],['Book 1:1 with Dan','booking.html?type=paid','secondary'],['View packages','plans.html','secondary']]};
+  if(n<=60) return {tag:'Sharpen phase',title:'Pressure-test under real conditions.',copy:'Join the live MMI classes for coached group reps, run a mock to build stamina, and keep marking your own answers between sessions.',ctas:[['Register for MMI classes','mmi-class.html','primary'],['Run a mock','practice.html?lock_mode=mmi&tab=baseline','secondary'],['Unlimited AI marking','plans.html#mmi-section','secondary']]};
+  if(n<=120) return {tag:'Build phase',title:'Turn practice into real feedback.',copy:'Get unlimited AI marking on every answer and lock in your spot in the weekly MMI classes. Consistency now is what compounds by interview day.',ctas:[['Register for MMI classes','mmi-class.html','primary'],['Compare MMI Pro','plans.html#mmi-section','secondary'],['Open MMI practice','practice.html?lock_mode=mmi','secondary']]};
+  return {tag:'Foundation phase',title:'Build the fundamentals while you have time.',copy:'You have runway. Practise the free MMI and CASPer stations regularly, and clear any entrance exams first. Come back as your interview approaches and this plan sharpens automatically.',ctas:[['Open MMI practice','practice.html?lock_mode=mmi','primary'],['CASPer practice','casper-practice.html','secondary'],['Entrance exams','#entranceExamCard','secondary']]};
+ }
+ function render(){
+  var input=document.getElementById('commandDate'); if(!input) return;
+  var iso=(getDates().interview)||'';
+  var countdown=document.getElementById('commandCountdown'), phaseEl=document.getElementById('commandPhase'), planWrap=document.getElementById('commandPlan'), clearBtn=document.getElementById('commandClearBtn');
+  if(!iso){ if(!input.value) input.value='2026-09-15'; countdown.textContent='When is your interview?'; phaseEl.textContent='Set your interview date and I will build your focus for right now. Most Australian interviews land in September.'; planWrap.style.display='none'; if(clearBtn) clearBtn.style.display='none'; return; }
+  input.value=iso; if(clearBtn) clearBtn.style.display='';
+  var n=daysTo(iso);
+  countdown.textContent = n>0 ? ('Interview in '+n+' day'+(n===1?'':'s')) : (n===0 ? 'Your interview is today' : ('Interview was '+(-n)+' day'+(n===-1?'':'s')+' ago'));
+  var ph=planFor(n);
+  phaseEl.textContent=ph.tag;
+  document.getElementById('commandPlanKicker').textContent = n<0 ? 'Next' : 'Do this now';
+  document.getElementById('commandPlanTitle').textContent=ph.title;
+  document.getElementById('commandPlanCopy').textContent=ph.copy;
+  document.getElementById('commandPlanActions').innerHTML=ph.ctas.map(function(c){ return '<a class="journey-btn '+c[2]+'" href="'+c[1]+'">'+c[0]+'</a>'; }).join('');
+  planWrap.style.display='block';
+ }
+ window.saveJourneyDate=function(){ var input=document.getElementById('commandDate'); if(!input||!input.value) return; var d=getDates(); d.interview=input.value; setDates(d); render(); };
+ window.clearJourneyDate=function(){ var d=getDates(); delete d.interview; setDates(d); var input=document.getElementById('commandDate'); if(input) input.value=''; render(); };
+ window.reportOutcome=function(kind){
+  var wrap=document.getElementById('outcomeButtons'); if(!wrap) return;
+  wrap.innerHTML='<input type="email" id="outcomeEmail" placeholder="your email" style="padding:10px 12px;border:1px solid #dbe4ef;border-radius:10px;font-family:inherit;font-size:0.9rem;min-width:170px;"> <input type="text" id="outcomeSchool" placeholder="which school (optional)" style="padding:10px 12px;border:1px solid #dbe4ef;border-radius:10px;font-family:inherit;font-size:0.9rem;min-width:150px;"> <button type="button" class="journey-btn primary" style="margin:0;" onclick="submitOutcome(\''+(kind==='offer'?'offer':'interview')+'\')">Send to Dan</button>';
+ };
+ window.submitOutcome=function(kind){
+  var email=((document.getElementById('outcomeEmail')||{}).value||'').trim(), school=((document.getElementById('outcomeSchool')||{}).value||'').trim();
+  var status=document.getElementById('outcomeStatus');
+  if(!email||email.indexOf('@')<0){ if(status){status.style.display='block';status.style.color='#b91c1c';status.textContent='Please enter a valid email.';} return; }
+  var label= kind==='offer' ? 'offer' : 'interview invite';
+  try{ fetch(API+'/api/enquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Journey outcome',email:email,type:'Outcome report',universities:school,exam_date:'',notes:'Student reports: '+label+(school?(' at '+school):'')})}).catch(function(){}); }catch(e){}
+  var wrap=document.getElementById('outcomeButtons'); if(wrap) wrap.style.display='none';
+  if(status){ status.style.display='block'; status.style.color='#15803d'; status.textContent= kind==='offer' ? 'Amazing, congratulations. Dan has been notified.' : 'Great news, that is a real milestone. Dan has been notified.'; }
+ };
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',render); else render();
 })();
 </script>
 </body>
