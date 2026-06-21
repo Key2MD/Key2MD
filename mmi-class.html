@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>MMI Classes Australia | Weekly Live Interview Practice | Key2MD</title>
+ <meta name="description" content="Register your interest in Key2MD's weekly live MMI classes. Small-group practice with Dan covering stations relevant to every medical school. Register now to lock in launch pricing.">
+ <link rel="canonical" href="https://www.key2md.com/mmi-class.html">
+ <meta name="robots" content="index, follow">
+ <meta property="og:title" content="MMI Classes Australia | Key2MD">
+ <meta property="og:description" content="Weekly live MMI classes covering stations relevant to every medical school. Register your interest now.">
+ <meta property="og:type" content="website">
+ <meta property="og:url" content="https://www.key2md.com/mmi-class.html">
+ <meta property="og:image" content="https://www.key2md.com/key2md-og.png">
+ <script src="auth.js" defer></script>
+ <script src="/key2md-tracking.js" defer></script>
+ <link rel="stylesheet" href="admissions-pages.css">
+ <style>
+ .benefits-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 36px 0 0; }
+ .benefit { border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 20px; box-shadow: 0 4px 16px rgba(15,23,42,.04); }
+ .benefit strong { display: block; font-size: 0.96rem; color: var(--navy); margin-bottom: 6px; }
+ .benefit p { margin: 0; font-size: 0.86rem; color: var(--muted); line-height: 1.55; }
+ .class-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 36px; align-items: start; padding: 48px 0 80px; }
+ .steps { margin: 32px 0 0; display: grid; gap: 0; }
+ .step { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding-bottom: 24px; position: relative; }
+ .step:not(:last-child) .step-num::after { content: ''; position: absolute; left: 19px; top: 42px; bottom: 0; width: 2px; background: var(--line); }
+ .step-num { width: 40px; height: 40px; border-radius: 999px; background: var(--navy); color: #fff; font-size: 0.82rem; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 1; }
+ .step-body strong { display: block; font-size: 0.95rem; color: var(--navy); margin-bottom: 4px; }
+ .step-body span { font-size: 0.87rem; color: var(--muted); line-height: 1.55; }
+ .booking-card { border: 1px solid var(--line); border-radius: 16px; background: #fff; padding: 26px 24px; box-shadow: 0 8px 30px rgba(15,23,42,.06); position: sticky; top: 24px; }
+ .booking-card h2 { font-size: 1.12rem; margin: 0 0 4px; color: var(--navy); }
+ .booking-card .sub { font-size: 0.85rem; color: var(--muted); margin: 0 0 18px; line-height: 1.5; }
+ .price-row { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); }
+ .price-row:last-of-type { border-bottom: 0; }
+ .price-row .lbl { font-size: 0.9rem; color: var(--navy); font-weight: 700; }
+ .price-row .lbl small { display: block; font-weight: 500; color: var(--muted); font-size: 0.76rem; margin-top: 2px; }
+ .price-row .amt { font-size: 1.18rem; font-weight: 900; color: var(--navy); white-space: nowrap; }
+ .price-row .amt small { font-size: 0.72rem; font-weight: 600; color: var(--muted); }
+ .pkg-note { font-size: 0.8rem; color: var(--muted); line-height: 1.5; margin: 14px 0 0; padding: 12px 14px; background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; }
+ .pkg-note strong { color: var(--navy); }
+ .no-charge { font-size: 0.82rem; color: #075985; background: #eff6ff; border: 1px solid rgba(14,165,233,.24); border-radius: 10px; padding: 12px 14px; margin: 16px 0 0; line-height: 1.5; }
+ .form-card { border: 1px solid var(--line); border-radius: 16px; background: #fff; padding: 28px 26px; box-shadow: 0 8px 30px rgba(15,23,42,.06); margin: 8px 0 0; }
+ .form-card h2 { font-size: 1.2rem; margin: 0 0 4px; color: var(--navy); }
+ .form-card .sub { font-size: 0.9rem; color: var(--muted); margin: 0 0 20px; line-height: 1.55; }
+ .field { margin: 0 0 14px; }
+ .field label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--navy); margin: 0 0 5px; }
+ .field input, .field textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px; font-size: 0.92rem; font-family: inherit; color: var(--navy); background: #fff; }
+ .field textarea { min-height: 78px; resize: vertical; }
+ .field input:focus, .field textarea:focus { outline: none; border-color: var(--teal, #0ea5e9); box-shadow: 0 0 0 3px rgba(14,165,233,.12); }
+ .form-msg { display: none; border-radius: 10px; padding: 12px 14px; font-size: 0.88rem; line-height: 1.5; margin: 0 0 14px; }
+ .form-msg.err { display: block; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; }
+ .form-ok { display: none; text-align: center; padding: 16px 0; }
+ .form-ok strong { display: block; font-size: 1.05rem; color: var(--navy); margin: 0 0 6px; }
+ .form-ok span { font-size: 0.9rem; color: var(--muted); line-height: 1.55; }
+ .full-btn { width: 100%; }
+ @media (max-width: 860px) { .class-grid { grid-template-columns: 1fr; } .benefits-strip { grid-template-columns: 1fr; } .booking-card { position: static; } }
+ </style>
+</head>
+<body>
+
+
+ <nav class="simple-nav" aria-label="Primary navigation">
+ <div class="simple-nav-inner">
+ <a class="simple-logo" href="index.html">Key<span>2</span>MD</a>
+ <div class="simple-links">
+ <a class="simple-gold" href="mmi-class.html">MMI Classes</a>
+ <a href="testimonials.html">Results</a>
+ <a href="student-journey.html">My Journey</a>
+ <a href="plans.html">Plans</a>
+ <a class="simple-green" href="medical-school-chances.html">Chances</a>
+ <div class="simple-dropdown"><a class="simple-gold" href="practice.html">Practice</a>
+ <div class="simple-dropdown-menu" aria-label="Practice tools">
+ <a class="simple-gold" href="mmi-practice.html">MMI Practice</a>
+ <a class="simple-gold" href="casper-practice.html">CASPer Practice</a>
+ <a class="simple-purple" href="gamsat-s2-practice.html">GAMSAT S2 Essay Practice</a>
+ <a href="full-casper-mock-exam.html">Full CASPer Mock Exam</a>
+ </div>
+ </div>
+ <div class="simple-dropdown"><a href="guide.html">Resources</a>
+ <div class="simple-dropdown-menu" aria-label="Key2MD resources">
+ <a href="guide.html">Full Guide</a>
+ <a href="secure-booking.html">Secure Booking</a>
+ <a href="about.html">About Dan</a>
+ <a href="medicine-entry-requirements.html">Uni Entry Guides</a>
+ <a href="blog.html">Blog</a>
+ <a href="gemsas-gpa-calculator.html">GEMSAS GPA Calculator</a>
+ <a href="blog-casper-guide-australia.html">CASPer Guide</a>
+ <a href="blog-mmi-guide-australia.html">MMI Guide</a>
+ <a href="blog-gamsat-section-2-reading-list.html">GAMSAT S2 Reading List</a>
+ </div>
+ </div>
+ <a class="simple-cta" href="#register" data-track="mmi_class_interest_open">Register interest</a>
+ </div>
+</div>
+ </nav>
+
+
+ <header class="page-hero">
+ <div class="wrap">
+ <div class="eyebrow">Live MMI Classes</div>
+ <h1>Weekly MMI classes, built for every medical school.</h1>
+ <p class="hero-sub">Small-group live practice with Dan, working through MMI stations relevant to all universities. The MMI tests fundamental skills used in every interview format and every program: structured thinking, genuine empathy, ethical reasoning and clear communication. Whatever university you are sitting for, these classes sharpen the skills that decide the day.</p>
+ <p class="hero-sub"><strong>We are taking registrations of interest now.</strong> As soon as we reach the numbers to begin, classes run live every Friday at 6pm AEST. Register now to be in the first cohort and to lock in launch pricing.</p>
+ <div class="hero-actions">
+ <a href="#register" class="btn btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'});return false;">Register your interest -></a>
+ <a href="blog-mmi-guide-australia.html" class="btn btn-outline">MMI preparation guide</a>
+ </div>
+ </div>
+ </header>
+
+
+ <main class="wrap">
+
+ <div class="benefits-strip">
+ <div class="benefit">
+ <strong>Relevant to every university</strong>
+ <p>Stations are drawn to cover the formats and themes used across Australian and international medical schools, not one university's quirks. Wherever you are interviewing, the practice applies.</p>
+ </div>
+ <div class="benefit">
+ <strong>Fundamental, transferable skills</strong>
+ <p>Reasoning through ethical dilemmas, reading a person with empathy, structuring an answer under pressure: these are the skills every MMI, panel and CASPer rewards, and they carry into medical school itself.</p>
+ </div>
+ <div class="benefit">
+ <strong>Live feedback, in a group</strong>
+ <p>Not a lecture. Your answers are discussed, errors are named, and you learn from how the rest of the group handles the same station. Every student benefits, whatever their starting point.</p>
+ </div>
+ </div>
+
+ <div class="class-grid">
+ <section>
+ <h2 style="color:var(--navy);margin:8px 0 0;">How the classes will run</h2>
+ <div class="steps">
+ <div class="step">
+ <div class="step-num">1</div>
+ <div class="step-body"><strong>Register your interest now</strong><span>Tell us you want in. There is nothing to pay yet. We are gauging numbers so we can set a start date and confirm the first Friday.</span></div>
+ </div>
+ <div class="step">
+ <div class="step-num">2</div>
+ <div class="step-body"><strong>We confirm the start date</strong><span>Once we have the numbers to begin, everyone who registered is emailed first with the launch date, the joining details and the package options.</span></div>
+ </div>
+ <div class="step">
+ <div class="step-num">3</div>
+ <div class="step-body"><strong>Live every Friday, 6pm AEST</strong><span>Each week Dan runs realistic MMI stations, then marks and discusses answers live so you can see exactly where responses go right and wrong.</span></div>
+ </div>
+ <div class="step">
+ <div class="step-num">4</div>
+ <div class="step-body"><strong>Build week on week</strong><span>Come weekly to compound the gains, benchmark against the group, and walk into interview day having already performed under pressure many times over.</span></div>
+ </div>
+ </div>
+ </section>
+
+ <aside>
+ <div class="booking-card">
+ <h2>Pricing</h2>
+ <p class="sub">Launch pricing for the first cohort. Lock it in by registering now.</p>
+ <div class="price-row">
+ <div class="lbl">Weekly class<small>Pay-as-you-go, cancel anytime</small></div>
+ <div class="amt">$150 <small>AUD/week</small></div>
+ </div>
+ <div class="price-row">
+ <div class="lbl">Key2MD subscribers<small>Active subscription discount</small></div>
+ <div class="amt">$140 <small>AUD/week</small></div>
+ </div>
+ <div class="pkg-note"><strong>Package deals to come.</strong> Once a start date is decided we will release multi-week packages at a further saving. Registered students get first access.</div>
+ <div class="no-charge">You are not charged anything now. This is a registration of interest only. Payment opens when the start date is confirmed.</div>
+ <p class="pkg-note" style="margin-top:14px;">Classes are recorded by Dan solely to protect session integrity and resolve any misconduct concern. The stations and teaching are copyrighted; students may not record, screen-capture or share any part of a class. See the <a href="terms.html" style="color:var(--navy);font-weight:700;">Terms of Use</a>.</p>
+ </div>
+ </aside>
+ </div>
+
+ <section class="form-card" id="register">
+ <h2>Register your interest</h2>
+ <p class="sub">Spots in the first cohort are limited. Add your name now to be emailed first with the start date, joining details and launch pricing. No payment required today.</p>
+ <div id="interestForm">
+ <div class="form-msg err" id="interestErr"></div>
+ <div class="field"><label for="inName">Your name</label><input id="inName" type="text" autocomplete="name" placeholder="Jane Smith"></div>
+ <div class="field"><label for="inEmail">Email</label><input id="inEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
+ <div class="field"><label for="inUni">Which universities or interviews are you preparing for?</label><input id="inUni" type="text" placeholder="e.g. Monash, UNSW, or undecided"></div>
+ <div class="field"><label for="inNotes">Anything else? (your stage, availability for Friday 6pm AEST, questions)</label><textarea id="inNotes" placeholder="Optional"></textarea></div>
+ <button class="btn btn-primary full-btn" id="interestBtn" onclick="submitInterest()">Register my interest -></button>
+ </div>
+ <div class="form-ok" id="interestOk">
+ <strong>You're on the list.</strong>
+ <span>Thanks for registering. We'll email you first as soon as the start date is confirmed, with joining details and launch pricing.</span>
+ </div>
+ </section>
+
+ </main>
+
+
+ <footer>
+ <div class="wrap footer-row">
+ <span>(c) 2026 Key2MD</span>
+ <div class="footer-links">
+ <a href="privacy.html">Privacy</a>
+ <a href="racgp-casper-tutor.html">Tutoring</a>
+ <a href="practice.html">Practice</a>
+ <a href="plans.html">Plans</a>
+ </div>
+ </div>
+ </footer>
+
+ <script>
+ const API_BASE = 'https://key2md-api.brittainmbbs.workers.dev';
+ function submitInterest(){
+ var name = document.getElementById('inName').value.trim();
+ var email = document.getElementById('inEmail').value.trim();
+ var unis = document.getElementById('inUni').value.trim();
+ var notes = document.getElementById('inNotes').value.trim();
+ var err = document.getElementById('interestErr');
+ var btn = document.getElementById('interestBtn');
+ if(!name){ err.textContent = 'Please enter your name.'; err.style.display = 'block'; return; }
+ if(!email || email.indexOf('@') === -1){ err.textContent = 'Please enter a valid email address.'; err.style.display = 'block'; return; }
+ err.style.display = 'none'; btn.disabled = true; btn.textContent = 'Sending...';
+ var payload = { name: name, email: email, type: 'MMI Class interest', universities: unis, exam_date: '', notes: notes };
+ fetch(API_BASE + '/api/enquiry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+ .then(function(res){ return res.json(); })
+ .then(function(){
+ document.getElementById('interestForm').style.display = 'none';
+ document.getElementById('interestOk').style.display = 'block';
+ if(typeof gtag === 'function') gtag('event', 'mmi_class_interest_submit', { event_category: 'conversion', event_label: 'mmi_class' });
+ if(window.Key2MDTrack && window.Key2MDTrack.funnel) window.Key2MDTrack.funnel('mmi_class_interest_submit', { universities: unis });
+ })
+ .catch(function(){
+ var subject = encodeURIComponent('MMI Class interest - ' + name);
+ var body = encodeURIComponent('MMI Class registration of interest\n\nName: ' + name + '\nEmail: ' + email + '\nPreparing for: ' + (unis || 'N/A') + '\nNotes: ' + (notes || 'None'));
+ window.open('mailto:brittainmbbs@gmail.com?subject=' + subject + '&body=' + body);
+ document.getElementById('interestForm').style.display = 'none';
+ document.getElementById('interestOk').style.display = 'block';
+ });
+ }
+ </script>
+</body>
+</html>

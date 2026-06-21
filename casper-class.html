@@ -360,7 +360,7 @@
  <div class="simple-nav-inner">
  <a class="simple-logo" href="index.html">Key<span>2</span>MD</a>
  <div class="simple-links">
- <a class="simple-gold" href="casper-class.html">Friday Classes</a>
+ <a class="simple-gold" href="mmi-class.html">MMI Classes</a>
  <a href="testimonials.html">Results</a>
  <a href="student-journey.html">My Journey</a>
  <a href="plans.html">Plans</a>
@@ -392,20 +392,24 @@
  </nav>
 
 
+ <div style="background:#fffbeb;border-bottom:1px solid #fde68a;color:#92400e;padding:12px 16px;text-align:center;font-size:0.92rem;line-height:1.5;">
+ CASPer season has ended. The Friday classes are becoming weekly <strong>MMI Classes</strong>, relevant to every medical school. <a href="mmi-class.html" style="color:#b45309;font-weight:700;text-decoration:underline;">Register your interest -></a>
+ </div>
+
  <header class="page-hero">
  <div class="wrap">
- <div class="eyebrow">Live CASPer class</div>
- <h1>The class where answers actually get reviewed.</h1>
- <p class="hero-sub">Small-group practice with Dan every Friday at 6pm AEST. Not a lecture - a live session where your answers are discussed, errors are named, and the group context makes you sharper.</p>
+ <div class="eyebrow">Live classes</div>
+ <h1>Friday classes are moving to the MMI.</h1>
+ <p class="hero-sub">CASPer season has wrapped. The same live, small-group format with Dan continues as weekly MMI classes, with stations relevant to every medical school and skills that carry into every interview. Register your interest now; classes run Fridays at 6pm AEST once we reach the numbers to begin.</p>
  <div class="hero-actions">
- <a href="#booking" class="btn btn-primary" onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'});return false;">Register for this Friday -></a>
- <a href="blog-casper-guide-australia.html" class="btn btn-outline">CASPer preparation guide</a>
+ <a href="mmi-class.html" class="btn btn-primary">Register for MMI classes -></a>
+ <a href="blog-mmi-guide-australia.html" class="btn btn-outline">MMI preparation guide</a>
  </div>
  </div>
  </header>
  <div class="wrap">
  <div class="practice-context" id="practiceClassContext">
- <strong>Coming from the practice tool?</strong> The Friday class is not a repeat of the free practice bank. Dan uses separate, more realistic CASPer tutoring stations, then marks and discusses student answers so you can see where these kinds of responses go wrong.
+ <strong>Coming from the practice tool?</strong> The live class is not a repeat of the free practice bank. Dan uses separate, more realistic interview stations, then marks and discusses student answers live so you can see where these kinds of responses go wrong.
  </div>
  </div>
 
@@ -464,7 +468,7 @@
  <div class="step-num">2</div>
  <div class="step-body">
   <strong>Pay through Stripe</strong>
-  <span>$120 for the final Friday class, or $120/week if you want ongoing weekly access until you cancel.</span>
+  <span>The Friday classes are moving to the weekly MMI format. Register your interest to join the first cohort.</span>
  </div>
  </div>
  <div class="step">
@@ -499,7 +503,7 @@
  <button type="button" class="plan-option active" id="planOneOff" data-track="class_plan_select" data-plan="one_off" data-track-detail="casper_class_card" onclick="selectClassPlan('one_off')">
   <div class="plan-kicker">Final class</div>
   <strong>One-off class pass - $120 AUD</strong>
-  <span>Drop in for the final Friday class, no ongoing commitment.</span>
+  <span>Register your interest in the weekly MMI classes.</span>
   </button>
  <button type="button" class="plan-option" id="planOngoing" data-track="class_plan_select" data-plan="ongoing" data-track-detail="casper_class_card" onclick="selectClassPlan('ongoing')">
  <div class="plan-kicker">Weekly access</div>
@@ -522,7 +526,7 @@
  </div>
 
  <div class="actions">
- <button class="btn-primary" id="payBtn" onclick="startClassCheckout()">Pay $120 and unlock</button>
+ <button class="btn-primary" id="payBtn" onclick="location.href='mmi-class.html'">Register for MMI classes</button>
 	 <button class="btn-secondary" id="loginBtn" onclick="openClassAuth('login')">Log in</button>
 	 <button class="btn-secondary" id="signupBtn" onclick="openClassAuth('signup')">Create free account</button>
  <button class="btn-secondary" id="cancelBtn" onclick="cancelWeeklyAccess()" style="display:none;">Cancel weekly access</button>
@@ -555,12 +559,12 @@
 	 let classAuthReady = false;
 	 const CLASS_PLANS = {
  one_off: {
- priceHtml: '$120 <small>AUD</small>',
- buttonText: 'Pay $120 and unlock'
+ priceHtml: 'MMI classes',
+ buttonText: 'Register for MMI classes'
  },
  ongoing: {
- priceHtml: '$120 <small>AUD / week</small>',
- buttonText: 'Start weekly access'
+ priceHtml: 'MMI classes',
+ buttonText: 'Register for MMI classes'
   }
   };
 
@@ -698,6 +702,10 @@
 	 }
 
 	 async function startClassCheckout(){
+	 // CASPer season has ended; the Friday class is now the weekly MMI class. Redirect to register interest.
+	 location.href = 'mmi-class.html';
+	 return;
+	 // eslint-disable-next-line no-unreachable
 	 if (!token()) {
 	 setStatus('Log in or create a free Key2MD account before paying. This keeps the class link protected.');
 	 openClassAuth('signup');
