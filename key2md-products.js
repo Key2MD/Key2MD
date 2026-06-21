@@ -1,14 +1,14 @@
 (function () {
  var PRODUCTS = [
  {
- id: 'casper_class',
- area: 'CASPer',
- title: 'Live CASPer class',
- price: '$120',
- href: 'casper-class.html',
- cta: 'View live classes',
- bestFor: 'Students who want a live coached pass through realistic CASPer stations before their next sitting.',
- tags: ['casper', 'uow', 'notre dame', 'class', 'live']
+ id: 'mmi_class',
+ area: 'MMI',
+ title: 'Live MMI classes',
+ price: '$150/week',
+ href: 'mmi-class.html',
+ cta: 'Register your interest',
+ bestFor: 'Applicants who want coached, live group MMI practice with stations relevant to every medical school, timed to interview season.',
+ tags: ['mmi', 'interview', 'class', 'live', 'group']
  },
  {
  id: 'casper_masterclass',
@@ -150,12 +150,13 @@
  }
 
  if (/uow|notre|und|casper|q4/.test(text)) {
- addUnique(recs, 'casper_class', 'Your latest admissions read is CASPer-sensitive, so live review has high leverage.');
+ addUnique(recs, 'casper_masterclass', 'Your latest admissions read is CASPer-sensitive, so the full CASPer masterclass plus Pro practice have high leverage.');
  addUnique(recs, count >= 5 || avg < 7 ? 'casper_pro' : 'casper_credits', count >= 5 ? 'You are doing enough reps that the daily free cap will slow you down.' : 'Use paid checks only when a response needs scoring.');
  }
 
  if (/mmi|interview/.test(text)) {
- addUnique(recs, 'mmi_pro', 'Your written profile is less likely to be the bottleneck than interview conversion.');
+ addUnique(recs, 'mmi_class', 'Live MMI classes give coached, group interview reps with stations relevant to every school, the fastest way to convert.');
+ addUnique(recs, 'mmi_pro', 'Unlimited AI marking on your own answers between classes keeps the reps high.');
  }
 
  if (/gamsat|section ii|essay|s2/.test(text)) {
