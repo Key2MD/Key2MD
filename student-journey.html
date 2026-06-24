@@ -956,7 +956,7 @@
      category: review.station_category || 'MMI station',
      tier: review.tier || 'transcript',
      evidence: comments.find(Boolean) || '',
-     improve: feedback && feedback.overall && feedback.overall.biggest_improvement ? feedback.overall.biggest_improvement : ''
+     improve: feedback && feedback.overall ? (feedback.overall.biggest_change || feedback.overall.biggest_improvement || '') : ''
     };
     map[skill.key].points.push(point);
     map[skill.key].categories[point.category] = (map[skill.key].categories[point.category] || 0) + 1;
