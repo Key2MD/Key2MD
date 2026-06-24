@@ -919,7 +919,7 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  </div>
  <div style="margin-bottom:22px;padding:15px 18px;background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(14,165,233,0.1));border:1px solid rgba(196,181,253,0.34);border-radius:14px;">
  <div style="font-size:0.72rem;font-weight:800;color:#ddd6fe;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">MMI Founder pricing</div>
- <p style="font-size:0.88rem;color:rgba(255,255,255,0.78);line-height:1.65;margin:0 0 8px;"><strong style="color:#fff;">10% off Transcript Pro</strong> or <strong style="color:#fff;">25% off Premium Pro</strong> for early MMI users.</p>
+ <p style="font-size:0.88rem;color:rgba(255,255,255,0.78);line-height:1.65;margin:0 0 8px;"><strong style="color:#fff;">10% off Transcript Pro</strong> or <strong style="color:#fff;">25% off Premium Pro</strong> for early MMI users. Enter code <strong style="color:#fff;">FOUNDER</strong> in the discount field at checkout to apply it.</p>
  <p style="font-size:0.78rem;color:rgba(255,255,255,0.58);line-height:1.6;margin:0;">This is offered while Dan keeps polishing the early MMI system. Most bugs are already ironed out, but if anything odd happens, Dan is very responsive - as anyone who has messaged him knows :P</p>
  </div>
  <div class="pro-feats">
@@ -964,9 +964,8 @@ body[data-page="gamsat"] .k2-nav-links a[data-nav="practice"]{color:#c4b5fd;}
  <div style="font-size:0.68rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#c4b5fd;margin-bottom:5px;">Early-bird founder offer</div>
  <div id="mmiFounderTierText" style="font-size:0.86rem;font-weight:800;color:#fff;line-height:1.35;">Transcript Pro: 10% off</div>
  <p style="font-size:0.74rem;color:rgba(255,255,255,0.6);line-height:1.55;margin:6px 0 0;">Applies to MMI Pro only. Credit packs keep their normal bundle savings.</p>
- <div id="mmiFounderStatus" style="font-size:0.72rem;color:rgba(255,255,255,0.52);line-height:1.45;margin-top:7px;">Sign in and claim before checkout.</div>
+ <div id="mmiFounderStatus" style="font-size:0.72rem;color:rgba(255,255,255,0.52);line-height:1.45;margin-top:7px;">Enter code <strong style="color:#fff;">FOUNDER</strong> in the discount field at checkout to apply.</div>
  </div>
- <button id="mmiFounderClaimBtn" onclick="claimMMIFounderPricing(this)" style="flex:0 0 auto;border:none;border-radius:999px;background:#fff;color:#5b21b6;font-weight:800;font-family:inherit;font-size:0.75rem;padding:9px 12px;cursor:pointer;white-space:nowrap;">Claim</button>
  </div>
  </div>
 
@@ -1698,8 +1697,8 @@ function k2PkgPayClose(){ var o=document.getElementById('pkgPayOverlay'); if(o)o
 <div class="modal-sub" id="modalSub">You'll be redirected to Stripe's secure checkout.</div>
 <div class="modal-policy-note" id="modalPolicyNote"><strong>Subscription note:</strong> recurring plans renew until cancelled. Elapsed subscription days and forgotten renewals are not refunded; accidental purchases may be considered for a pro-rata refund of unused future days after cancellation.</div>
 <div id="modalReferralRow" style="display:none;text-align:left;margin-bottom:16px;">
- <label style="display:block;font-size:0.78rem;color:rgba(255,255,255,0.7);margin-bottom:6px;">Referral code (optional)</label>
- <input id="modalReferralCode" type="text" placeholder="Friend's code" autocomplete="off" oninput="onReferralCodeInput()" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.9rem;font-family:inherit;text-transform:uppercase;box-sizing:border-box;">
+ <label style="display:block;font-size:0.78rem;color:rgba(255,255,255,0.7);margin-bottom:6px;">Discount or referral code (optional)</label>
+ <input id="modalReferralCode" type="text" placeholder="e.g. FOUNDER" autocomplete="off" oninput="onReferralCodeInput()" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.9rem;font-family:inherit;text-transform:uppercase;box-sizing:border-box;">
  <div id="modalReferralStatus" style="font-size:0.75rem;margin-top:6px;color:rgba(255,255,255,0.5);min-height:1em;"></div>
 </div>
 <div class="modal-alert" id="modalAlert"></div>
@@ -2320,7 +2319,7 @@ function onReferralCodeInput(){
    const d = await res.json().catch(() => ({}));
    if (!status) return;
    if (d && d.valid) {
-    status.textContent = `${d.percent || 15}% off will be applied at checkout.`;
+    status.textContent = d.message || `${d.percent || 15}% off will be applied at checkout.`;
     status.style.color = '#4ade80';
    } else {
     const msg = { already_used: 'You have already used a referral discount.', not_first_purchase: 'Referral codes apply to your first purchase only.', unknown_code: 'That code was not recognised.', own_code: 'You cannot use your own code.' }[d && d.reason] || 'That code cannot be applied.';
@@ -2719,6 +2718,16 @@ function openMMIModal(title, sub, action) {
  document.getElementById('modalAlert').className = 'modal-alert';
  document.getElementById('modalConfirmBtn').disabled = false;
  document.getElementById('modalConfirmBtn').textContent = 'Continue to Payment ->';
+ const refRow = document.getElementById('modalReferralRow');
+ if (refRow) {
+  const showRef = (action === 'mmi_pro' || action === 'mmi_credits');
+  refRow.style.display = showRef ? 'block' : 'none';
+  if (showRef) {
+   const input = document.getElementById('modalReferralCode');
+   if (input && !input.value) { try { input.value = localStorage.getItem('k2md_ref') || ''; } catch (e) {} }
+   onReferralCodeInput();
+  }
+ }
 pendingAction = action;
 document.getElementById('checkoutModal').classList.add('open');
 }
