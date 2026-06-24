@@ -49,45 +49,178 @@
  <script src="auth.js" defer></script>
  <script src="/key2md-tracking.js" defer></script>
  <link rel="stylesheet" href="admissions-pages.css">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet">
  <style>
- .benefits-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 36px 0 0; }
- .benefit { border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 20px; box-shadow: 0 4px 16px rgba(15,23,42,.04); }
- .benefit strong { display: block; font-size: 0.96rem; color: var(--navy); margin-bottom: 6px; }
- .benefit p { margin: 0; font-size: 0.86rem; color: var(--muted); line-height: 1.55; }
- .class-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 36px; align-items: start; padding: 48px 0 80px; }
- .steps { margin: 32px 0 0; display: grid; gap: 0; }
- .step { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding-bottom: 24px; position: relative; }
- .step:not(:last-child) .step-num::after { content: ''; position: absolute; left: 19px; top: 42px; bottom: 0; width: 2px; background: var(--line); }
- .step-num { width: 40px; height: 40px; border-radius: 999px; background: var(--navy); color: #fff; font-size: 0.82rem; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 1; }
- .step-body strong { display: block; font-size: 0.95rem; color: var(--navy); margin-bottom: 4px; }
- .step-body span { font-size: 0.87rem; color: var(--muted); line-height: 1.55; }
- .booking-card { border: 1px solid var(--line); border-radius: 16px; background: #fff; padding: 26px 24px; box-shadow: 0 8px 30px rgba(15,23,42,.06); position: sticky; top: 24px; }
- .booking-card h2 { font-size: 1.12rem; margin: 0 0 4px; color: var(--navy); }
- .booking-card .sub { font-size: 0.85rem; color: var(--muted); margin: 0 0 18px; line-height: 1.5; }
- .price-row { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); }
- .price-row:last-of-type { border-bottom: 0; }
- .price-row .lbl { font-size: 0.9rem; color: var(--navy); font-weight: 700; }
- .price-row .lbl small { display: block; font-weight: 500; color: var(--muted); font-size: 0.76rem; margin-top: 2px; }
- .price-row .amt { font-size: 1.18rem; font-weight: 900; color: var(--navy); white-space: nowrap; }
- .price-row .amt small { font-size: 0.72rem; font-weight: 600; color: var(--muted); }
- .pkg-note { font-size: 0.8rem; color: var(--muted); line-height: 1.5; margin: 14px 0 0; padding: 12px 14px; background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; }
- .pkg-note strong { color: var(--navy); }
- .no-charge { font-size: 0.82rem; color: #075985; background: #eff6ff; border: 1px solid rgba(14,165,233,.24); border-radius: 10px; padding: 12px 14px; margin: 16px 0 0; line-height: 1.5; }
- .form-card { border: 1px solid var(--line); border-radius: 16px; background: #fff; padding: 28px 26px; box-shadow: 0 8px 30px rgba(15,23,42,.06); margin: 8px 0 0; }
- .form-card h2 { font-size: 1.2rem; margin: 0 0 4px; color: var(--navy); }
- .form-card .sub { font-size: 0.9rem; color: var(--muted); margin: 0 0 20px; line-height: 1.55; }
- .field { margin: 0 0 14px; }
- .field label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--navy); margin: 0 0 5px; }
- .field input, .field textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px; font-size: 0.92rem; font-family: inherit; color: var(--navy); background: #fff; }
- .field textarea { min-height: 78px; resize: vertical; }
- .field input:focus, .field textarea:focus { outline: none; border-color: var(--teal, #0ea5e9); box-shadow: 0 0 0 3px rgba(14,165,233,.12); }
- .form-msg { display: none; border-radius: 10px; padding: 12px 14px; font-size: 0.88rem; line-height: 1.5; margin: 0 0 14px; }
+ .mc-display { font-family: 'DM Serif Display', Georgia, 'Times New Roman', serif; font-weight: 400; letter-spacing: 0.2px; }
+
+ .mc-hero { position: relative; overflow: hidden; color: #fff; padding: 76px 0 104px; background: linear-gradient(160deg, #08111f 0%, #0a1628 44%, #0e2347 100%); }
+ .mc-hero-bg { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+ .mc-hero-bg::before { content: ""; position: absolute; top: -180px; left: -130px; width: 540px; height: 540px; border-radius: 50%; background: radial-gradient(circle, rgba(14,165,233,0.40), transparent 62%); filter: blur(14px); }
+ .mc-hero-bg::after { content: ""; position: absolute; right: -160px; bottom: -200px; width: 560px; height: 560px; border-radius: 50%; background: radial-gradient(circle, rgba(245,158,11,0.16), transparent 60%); filter: blur(18px); }
+ .mc-grid-overlay { position: absolute; inset: 0; z-index: 0; opacity: 0.6; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px); background-size: 26px 26px; -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.8), transparent 78%); mask-image: linear-gradient(180deg, rgba(0,0,0,0.8), transparent 78%); }
+ .mc-hero-grid { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr); gap: 52px; align-items: center; }
+ .mc-hero h1 { margin: 18px 0 16px; max-width: 620px; font-size: clamp(2.45rem, 5.2vw, 4rem); line-height: 1.04; }
+ .mc-accent { background: linear-gradient(120deg, #38bdf8 0%, #7dd3fc 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+ .mc-hero .hero-sub { color: rgba(255,255,255,0.78); }
+ .mc-points { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 11px; max-width: 560px; }
+ .mc-points li { display: flex; gap: 11px; align-items: flex-start; color: rgba(255,255,255,0.84); font-size: 0.97rem; line-height: 1.5; }
+ .mc-check { flex: 0 0 auto; width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(14,165,233,0.18); border: 1px solid rgba(56,189,248,0.4); color: #7dd3fc; }
+ .mc-check svg { width: 13px; height: 13px; }
+ .mc-hero .hero-actions { margin-top: 30px; }
+ .mc-trust { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+ .mc-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.06); font-size: 0.78rem; font-weight: 800; color: rgba(255,255,255,0.86); }
+ .mc-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 10px rgba(14,165,233,0.8); }
+
+ .mc-preview { position: relative; border-radius: 24px; padding: 22px; background: linear-gradient(165deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)); border: 1px solid rgba(255,255,255,0.16); box-shadow: 0 36px 80px rgba(0,0,0,0.46); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+ .mc-preview-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+ .mc-live { display: inline-flex; align-items: center; gap: 8px; padding: 5px 11px; border-radius: 999px; background: rgba(239,68,68,0.16); border: 1px solid rgba(248,113,113,0.42); color: #fecaca; font-size: 0.7rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+ .mc-live .pulse { width: 8px; height: 8px; border-radius: 50%; background: #f87171; }
+ .mc-preview-when { font-size: 0.8rem; font-weight: 800; color: rgba(255,255,255,0.82); }
+ .mc-station { margin-top: 16px; border-radius: 16px; padding: 18px; background: #ffffff; color: var(--navy); box-shadow: 0 16px 36px rgba(0,0,0,0.26); }
+ .mc-station-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; color: #0369a1; background: rgba(14,165,233,0.1); border: 1px solid rgba(14,165,233,0.24); border-radius: 999px; padding: 4px 10px; }
+ .mc-station h3 { margin: 11px 0 0; font-size: 1.04rem; line-height: 1.32; color: var(--navy); }
+ .mc-station-meta { margin: 12px 0 0; display: flex; align-items: center; gap: 8px; font-size: 0.76rem; color: var(--muted); font-weight: 700; }
+ .mc-station-meta .bar { flex: 1; height: 5px; border-radius: 999px; background: #e2e8f0; overflow: hidden; }
+ .mc-station-meta .bar i { display: block; width: 38%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--teal), var(--teal2)); }
+ .mc-crit { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 7px; }
+ .mc-crit span { font-size: 0.72rem; font-weight: 800; color: #0f2744; background: #eef5fb; border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; }
+ .mc-preview-foot { margin-top: 18px; display: flex; align-items: center; gap: 12px; }
+ .mc-roster { display: flex; align-items: center; }
+ .mc-ava { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #112a4f; margin-left: -9px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 900; color: #fff; }
+ .mc-ava:first-child { margin-left: 0; }
+ .mc-ava.a1 { background: linear-gradient(135deg, #0ea5e9, #38bdf8); }
+ .mc-ava.a2 { background: linear-gradient(135deg, #6366f1, #818cf8); }
+ .mc-ava.a3 { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+ .mc-ava.a4 { background: rgba(255,255,255,0.14); border-style: dashed; border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.85); }
+ .mc-preview-foot span { font-size: 0.82rem; color: rgba(255,255,255,0.78); line-height: 1.4; }
+
+ main { display: block; }
+ .mc-features { margin-top: -68px; position: relative; z-index: 5; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+ .mc-feature { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 26px 24px; box-shadow: 0 22px 54px rgba(15,23,42,0.10); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+ .mc-feature:hover { transform: translateY(-5px); box-shadow: 0 30px 64px rgba(15,23,42,0.15); }
+ .mc-ic { width: 48px; height: 48px; border-radius: 13px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; color: var(--teal); background: linear-gradient(135deg, rgba(14,165,233,0.16), rgba(56,189,248,0.08)); border: 1px solid rgba(14,165,233,0.18); }
+ .mc-ic svg { width: 24px; height: 24px; }
+ .mc-feature h3 { margin: 0 0 8px; font-size: 1.05rem; color: var(--navy); }
+ .mc-feature p { margin: 0; color: var(--muted); font-size: 0.91rem; line-height: 1.62; }
+
+ .mc-section { padding: 70px 0; }
+ .mc-section-soft { background: linear-gradient(180deg, #f6f9fc 0%, #eef4fb 100%); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+ .mc-kicker { display: inline-flex; align-items: center; min-height: 26px; padding: 0 11px; border-radius: 999px; background: rgba(14,165,233,0.1); color: #0369a1; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid rgba(14,165,233,0.2); }
+ .mc-h2 { margin: 14px 0 0; font-size: clamp(1.85rem, 3.4vw, 2.6rem); line-height: 1.1; color: var(--navy); }
+ .mc-lead { margin: 13px 0 0; max-width: 660px; color: var(--muted); font-size: 1.02rem; }
+
+ .mc-steps { margin-top: 38px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+ .mc-step { position: relative; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 24px 22px; box-shadow: 0 14px 34px rgba(15,23,42,0.06); }
+ .mc-step-num { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 900; color: #fff; margin-bottom: 15px; background: linear-gradient(135deg, var(--navy), var(--navy2)); }
+ .mc-step h3 { margin: 0 0 7px; font-size: 1.02rem; color: var(--navy); }
+ .mc-step p { margin: 0; color: var(--muted); font-size: 0.89rem; line-height: 1.58; }
+ .mc-step.is-now { border-color: rgba(14,165,233,0.45); box-shadow: 0 18px 44px rgba(14,165,233,0.16); }
+ .mc-step.is-now .mc-step-num { background: linear-gradient(135deg, var(--teal), var(--teal2)); }
+ .mc-step-flag { display: inline-block; margin-bottom: 12px; font-size: 0.68rem; font-weight: 900; letter-spacing: 0.07em; text-transform: uppercase; color: #0369a1; }
+
+ .mc-price-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 40px; align-items: start; margin-top: 40px; }
+ .mc-included { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 14px; }
+ .mc-included li { display: flex; gap: 12px; align-items: flex-start; color: var(--text); font-size: 0.98rem; line-height: 1.5; }
+ .mc-included .mc-check { background: rgba(14,165,233,0.1); border-color: rgba(14,165,233,0.28); color: var(--teal); }
+ .mc-finenote { margin: 26px 0 0; padding: 16px 18px; background: #f6f9fc; border: 1px solid var(--line); border-radius: 12px; font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+ .mc-finenote a { color: var(--navy); font-weight: 800; }
+
+ .mc-price-card { border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: #fff; box-shadow: 0 34px 74px rgba(15,23,42,0.14); position: sticky; top: 90px; }
+ .mc-price-head { position: relative; padding: 26px 26px 24px; color: #fff; background: radial-gradient(circle at 86% 8%, rgba(56,189,248,0.34), transparent 42%), linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%); }
+ .mc-price-head::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, var(--teal), var(--teal2), var(--gold)); }
+ .mc-badge-gold { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; background: rgba(245,158,11,0.18); border: 1px solid rgba(245,158,11,0.45); color: #fcd34d; font-size: 0.7rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
+ .mc-price-head h3 { margin: 14px 0 4px; font-size: 1.3rem; color: #fff; }
+ .mc-price-head p { margin: 0; font-size: 0.86rem; color: rgba(255,255,255,0.72); }
+ .mc-price-body { padding: 12px 26px 26px; }
+ .mc-price-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+ .mc-price-row:last-of-type { border-bottom: 0; }
+ .mc-price-lbl { font-size: 0.96rem; font-weight: 800; color: var(--navy); }
+ .mc-price-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+ .mc-price-amt { font-size: 1.5rem; font-weight: 900; color: var(--navy); white-space: nowrap; }
+ .mc-price-amt span { display: block; text-align: right; font-size: 0.7rem; font-weight: 700; color: var(--muted); margin-top: 1px; }
+ .mc-price-row.is-best { margin: 10px -14px; padding: 16px 14px; border: 1px solid rgba(14,165,233,0.32); border-radius: 14px; background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(56,189,248,0.03)); }
+ .mc-price-tag { display: inline-block; margin-bottom: 6px; font-size: 0.66rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; color: #0369a1; background: rgba(14,165,233,0.12); border-radius: 999px; padding: 3px 8px; }
+ .mc-pkg { margin: 16px 0 0; padding: 13px 15px; background: #f6f9fc; border: 1px solid var(--line); border-radius: 12px; font-size: 0.82rem; color: var(--muted); line-height: 1.55; }
+ .mc-pkg strong { color: var(--navy); }
+ .mc-nocharge { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0 0; padding: 13px 15px; background: #eff6ff; border: 1px solid rgba(14,165,233,0.24); border-radius: 12px; font-size: 0.82rem; color: #075985; line-height: 1.5; }
+ .mc-nocharge .mc-check { background: rgba(14,165,233,0.16); border-color: rgba(14,165,233,0.34); color: #0369a1; }
+ .mc-price-card .btn { width: 100%; margin-top: 18px; }
+
+ .mc-register { padding: 74px 0; background: radial-gradient(circle at 12% 0%, rgba(14,165,233,0.1), transparent 42%), linear-gradient(180deg, #eef4fb 0%, #f6f9fc 100%); border-top: 1px solid var(--line); scroll-margin-top: 84px; }
+ .mc-register-card { display: grid; grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr); background: #fff; border: 1px solid var(--line); border-radius: 24px; overflow: hidden; box-shadow: 0 36px 80px rgba(15,23,42,0.14); }
+ .mc-register-aside { position: relative; padding: 36px 32px; color: #fff; overflow: hidden; background: radial-gradient(circle at 88% 8%, rgba(56,189,248,0.28), transparent 44%), linear-gradient(155deg, var(--navy) 0%, #102c54 100%); }
+ .mc-register-aside::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, var(--teal), var(--teal2), var(--gold)); }
+ .mc-register-aside .mc-kicker { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #bae6fd; }
+ .mc-register-aside h2 { margin: 16px 0 10px; font-size: 1.7rem; line-height: 1.14; color: #fff; }
+ .mc-register-aside .lead { margin: 0; color: rgba(255,255,255,0.74); font-size: 0.94rem; line-height: 1.6; }
+ .mc-aside-list { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 13px; }
+ .mc-aside-list li { display: flex; gap: 11px; align-items: flex-start; font-size: 0.92rem; color: rgba(255,255,255,0.86); line-height: 1.45; }
+ .mc-aside-list .mc-check { background: rgba(14,165,233,0.2); border-color: rgba(56,189,248,0.4); color: #7dd3fc; }
+ .mc-aside-foot { margin-top: 26px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 12px; }
+ .mc-aside-foot .mc-ava { border-color: #14264a; }
+ .mc-aside-foot span { font-size: 0.82rem; color: rgba(255,255,255,0.74); }
+
+ .mc-register-form { padding: 38px 36px; }
+ .mc-register-form h2 { margin: 0 0 5px; font-size: 1.35rem; color: var(--navy); }
+ .mc-register-form .sub { margin: 0 0 22px; font-size: 0.9rem; color: var(--muted); line-height: 1.55; }
+ .mc-field { margin: 0 0 15px; }
+ .mc-field label { display: block; font-size: 0.82rem; font-weight: 800; color: var(--navy); margin: 0 0 6px; }
+ .mc-field input, .mc-field textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 11px; padding: 12px 14px; font-size: 0.93rem; font-family: inherit; color: var(--navy); background: #fcfdff; transition: border-color 0.16s ease, box-shadow 0.16s ease; }
+ .mc-field textarea { min-height: 84px; resize: vertical; }
+ .mc-field input:focus, .mc-field textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 4px rgba(14,165,233,0.13); background: #fff; }
+ .mc-field input::placeholder, .mc-field textarea::placeholder { color: #9aa7b8; }
+ .form-msg { display: none; border-radius: 11px; padding: 12px 14px; font-size: 0.88rem; line-height: 1.5; margin: 0 0 14px; }
  .form-msg.err { display: block; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; }
- .form-ok { display: none; text-align: center; padding: 16px 0; }
- .form-ok strong { display: block; font-size: 1.05rem; color: var(--navy); margin: 0 0 6px; }
- .form-ok span { font-size: 0.9rem; color: var(--muted); line-height: 1.55; }
- .full-btn { width: 100%; }
- @media (max-width: 860px) { .class-grid { grid-template-columns: 1fr; } .benefits-strip { grid-template-columns: 1fr; } .booking-card { position: static; } }
+ .mc-register-form .btn { width: 100%; margin-top: 6px; }
+ .mc-form-foot { margin: 14px 0 0; font-size: 0.78rem; color: var(--muted); text-align: center; line-height: 1.5; }
+ .form-ok { display: none; text-align: center; padding: 30px 10px; }
+ .form-ok .mc-ok-ic { width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; background: linear-gradient(135deg, var(--green), #22c55e); box-shadow: 0 14px 30px rgba(22,163,74,0.28); }
+ .form-ok .mc-ok-ic svg { width: 26px; height: 26px; }
+ .form-ok strong { display: block; font-size: 1.18rem; color: var(--navy); margin: 0 0 8px; }
+ .form-ok span { display: block; max-width: 380px; margin: 0 auto; font-size: 0.92rem; color: var(--muted); line-height: 1.6; }
+
+ .mc-faq { max-width: 820px; margin: 38px auto 0; }
+ .mc-faq details { border: 1px solid var(--line); border-radius: 14px; background: #fff; margin: 0 0 12px; box-shadow: 0 8px 22px rgba(15,23,42,0.04); transition: border-color 0.18s ease, box-shadow 0.18s ease; }
+ .mc-faq details[open] { border-color: rgba(14,165,233,0.4); box-shadow: 0 16px 36px rgba(14,165,233,0.1); }
+ .mc-faq summary { list-style: none; cursor: pointer; padding: 17px 20px; font-weight: 800; font-size: 0.98rem; color: var(--navy); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+ .mc-faq summary::-webkit-details-marker { display: none; }
+ .mc-faq summary::after { content: "+"; flex: 0 0 auto; width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; line-height: 1; color: var(--teal); background: rgba(14,165,233,0.1); transition: transform 0.2s ease; }
+ .mc-faq details[open] summary::after { content: "\00d7"; transform: rotate(0deg); }
+ .mc-faq p { margin: 0; padding: 0 20px 18px; color: var(--muted); font-size: 0.93rem; line-height: 1.65; }
+
+ .mc-cta-band { position: relative; overflow: hidden; margin: 0 0 4px; padding: 48px 40px; border-radius: 22px; color: #fff; background: radial-gradient(circle at 90% 12%, rgba(56,189,248,0.26), transparent 38%), linear-gradient(135deg, var(--navy) 0%, #12335f 100%); border: 1px solid rgba(56,189,248,0.2); box-shadow: 0 30px 66px rgba(15,23,42,0.2); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+ .mc-cta-band::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, var(--teal), var(--teal2), var(--gold)); }
+ .mc-cta-band > * { position: relative; z-index: 1; }
+ .mc-cta-band h2 { margin: 0 0 6px; font-size: clamp(1.5rem, 3vw, 2.1rem); color: #fff; }
+ .mc-cta-band p { margin: 0; color: rgba(255,255,255,0.76); max-width: 560px; }
+ .mc-cta-band .btn-primary { flex: 0 0 auto; background: #fff; color: var(--navy); box-shadow: 0 14px 30px rgba(0,0,0,0.2); }
+ .mc-cta-band .btn-primary:hover { color: var(--navy); }
+
+ @media (max-width: 960px) {
+  .mc-hero { padding: 60px 0 92px; }
+  .mc-hero-grid { grid-template-columns: 1fr; gap: 38px; }
+  .mc-preview { max-width: 460px; }
+  .mc-price-wrap { grid-template-columns: 1fr; gap: 28px; }
+  .mc-price-card { position: static; max-width: 460px; }
+  .mc-register-card { grid-template-columns: 1fr; }
+ }
+ @media (max-width: 820px) {
+  .mc-features { grid-template-columns: 1fr; margin-top: 28px; }
+  .mc-steps { grid-template-columns: 1fr; }
+ }
+ @media (max-width: 560px) {
+  .mc-section { padding: 54px 0; }
+  .mc-register-form, .mc-register-aside { padding: 28px 22px; }
+  .mc-cta-band { padding: 34px 24px; }
+ }
+ @media (prefers-reduced-motion: no-preference) {
+  .mc-preview { animation: mcfloat 6.5s ease-in-out infinite; }
+  .mc-live .pulse { animation: mcpulse 1.8s infinite; }
+  @keyframes mcfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @keyframes mcpulse { 0% { box-shadow: 0 0 0 0 rgba(248,113,113,0.6); } 70% { box-shadow: 0 0 0 8px rgba(248,113,113,0); } 100% { box-shadow: 0 0 0 0 rgba(248,113,113,0); } }
+ }
  </style>
 </head>
 <body>
@@ -129,102 +262,223 @@
  </nav>
 
 
- <header class="page-hero">
- <div class="wrap">
+ <header class="mc-hero">
+ <div class="mc-hero-bg" aria-hidden="true"></div>
+ <div class="mc-grid-overlay" aria-hidden="true"></div>
+ <div class="wrap mc-hero-grid">
+ <div class="mc-hero-copy">
  <div class="eyebrow">Live MMI Classes</div>
- <h1>Weekly MMI classes, built for every medical school.</h1>
- <p class="hero-sub">Small-group live practice with Dan, working through MMI stations relevant to all universities. The MMI tests fundamental skills used in every interview format and every program: structured thinking, genuine empathy, ethical reasoning and clear communication. Whatever university you are sitting for, these classes sharpen the skills that decide the day.</p>
- <p class="hero-sub"><strong>We are taking registrations of interest now.</strong> As soon as we reach the numbers to begin, classes run live every Friday at 6pm AEST. Register now to be in the first cohort and to lock in launch pricing.</p>
+ <h1 class="mc-display">Weekly MMI classes, built for <span class="mc-accent">every medical school.</span></h1>
+ <p class="hero-sub">Small-group live practice with Dan, working through MMI stations relevant to all universities. The MMI tests the fundamentals every interview rewards: structured thinking, genuine empathy, ethical reasoning and clear communication. Whatever university you sit for, these classes sharpen the skills that decide the day.</p>
+ <ul class="mc-points">
+ <li><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>Live every Friday at 6pm AEST, once the first cohort fills.</span></li>
+ <li><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>Stations relevant to every Australian and international medical school.</span></li>
+ <li><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>Answers marked and discussed live, not a lecture you watch.</span></li>
+ </ul>
  <div class="hero-actions">
  <a href="#register" class="btn btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'});return false;">Register your interest</a>
  <a href="blog-mmi-guide-australia.html" class="btn btn-outline">MMI preparation guide</a>
+ </div>
+ <div class="mc-trust">
+ <span class="mc-chip"><span class="dot"></span>Friday 6pm AEST</span>
+ <span class="mc-chip"><span class="dot"></span>Small-group</span>
+ <span class="mc-chip"><span class="dot"></span>Every university</span>
+ <span class="mc-chip"><span class="dot"></span>Marked live</span>
+ </div>
+ </div>
+ <div class="mc-preview" aria-hidden="true">
+ <div class="mc-preview-head">
+ <span class="mc-live"><span class="pulse"></span>Live class</span>
+ <span class="mc-preview-when">Friday 6:00pm AEST</span>
+ </div>
+ <div class="mc-station">
+ <span class="mc-station-tag">Station 4 &middot; Ethics</span>
+ <h3>A close friend asks you to keep a secret that could put them at real risk. What do you do?</h3>
+ <div class="mc-station-meta"><span>Reading 2:00</span><span class="bar"><i></i></span><span>Response 5:00</span></div>
+ <div class="mc-crit">
+ <span>Empathy</span>
+ <span>Reasoning</span>
+ <span>Communication</span>
+ <span>Judgement</span>
+ </div>
+ </div>
+ <div class="mc-preview-foot">
+ <div class="mc-roster">
+ <span class="mc-ava a1">JS</span>
+ <span class="mc-ava a2">AM</span>
+ <span class="mc-ava a3">KP</span>
+ <span class="mc-ava a4">+</span>
+ </div>
+ <span>Small group, marked and discussed live with Dan.</span>
+ </div>
  </div>
  </div>
  </header>
 
 
- <main class="wrap">
+ <main>
 
- <div class="benefits-strip">
- <div class="benefit">
- <strong>Relevant to every university</strong>
- <p>Stations are drawn to cover the formats and themes used across Australian and international medical schools, not one university's quirks. Wherever you are interviewing, the practice applies.</p>
+ <div class="wrap">
+ <div class="mc-features">
+ <div class="mc-feature">
+ <div class="mc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg></div>
+ <h3>Relevant to every university</h3>
+ <p>Stations cover the formats and themes used across Australian and international medical schools, not one university's quirks. Wherever you are interviewing, the practice applies.</p>
  </div>
- <div class="benefit">
- <strong>Fundamental, transferable skills</strong>
- <p>Reasoning through ethical dilemmas, reading a person with empathy, structuring an answer under pressure: these are the skills every MMI, panel and CASPer rewards, and they carry into medical school itself.</p>
+ <div class="mc-feature">
+ <div class="mc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4"/><path d="M12 17v4"/><path d="M3 12h4"/><path d="M17 12h4"/><path d="m6 6 2.6 2.6"/><path d="m15.4 15.4 2.6 2.6"/><path d="m18 6-2.6 2.6"/><path d="m8.6 15.4-2.6 2.6"/></svg></div>
+ <h3>Fundamental, transferable skills</h3>
+ <p>Reasoning through dilemmas, reading a person with empathy, structuring an answer under pressure: the skills every MMI, panel and CASPer rewards, and that carry into medical school itself.</p>
  </div>
- <div class="benefit">
- <strong>Live feedback, in a group</strong>
+ <div class="mc-feature">
+ <div class="mc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.1"/><path d="M3.6 19a5.4 5.4 0 0 1 10.8 0"/><path d="M16.2 5.6a3 3 0 0 1 0 5.5"/><path d="M17.6 19a5.4 5.4 0 0 0-2.7-4.7"/></svg></div>
+ <h3>Live feedback, in a group</h3>
  <p>Not a lecture. Your answers are discussed, errors are named, and you learn from how the rest of the group handles the same station. Every student benefits, whatever their starting point.</p>
  </div>
  </div>
+ </div>
 
- <div class="class-grid">
- <section>
- <h2 style="color:var(--navy);margin:8px 0 0;">How the classes will run</h2>
- <div class="steps">
- <div class="step">
- <div class="step-num">1</div>
- <div class="step-body"><strong>Register your interest now</strong><span>Tell us you want in. There is nothing to pay yet. We are gauging numbers so we can set a start date and confirm the first Friday.</span></div>
+ <section class="mc-section mc-section-soft">
+ <div class="wrap">
+ <div class="mc-kicker">How it works</div>
+ <h2 class="mc-h2 mc-display">From registration to interview-ready</h2>
+ <p class="mc-lead">Register now while we gauge numbers. The moment the first cohort fills, you are in and practising every week.</p>
+ <div class="mc-steps">
+ <div class="mc-step is-now">
+ <div class="mc-step-flag">Start here</div>
+ <div class="mc-step-num">1</div>
+ <h3>Register your interest</h3>
+ <p>Tell us you want in. There is nothing to pay yet. We are gauging numbers so we can set a start date and confirm the first Friday.</p>
  </div>
- <div class="step">
- <div class="step-num">2</div>
- <div class="step-body"><strong>We confirm the start date</strong><span>Once we have the numbers to begin, everyone who registered is emailed first with the launch date, the joining details and the package options.</span></div>
+ <div class="mc-step">
+ <div class="mc-step-num">2</div>
+ <h3>We confirm the start date</h3>
+ <p>Once we have the numbers to begin, everyone who registered is emailed first with the launch date, joining details and package options.</p>
  </div>
- <div class="step">
- <div class="step-num">3</div>
- <div class="step-body"><strong>Live every Friday, 6pm AEST</strong><span>Each week Dan runs realistic MMI stations, then marks and discusses answers live so you can see exactly where responses go right and wrong.</span></div>
+ <div class="mc-step">
+ <div class="mc-step-num">3</div>
+ <h3>Live every Friday, 6pm AEST</h3>
+ <p>Each week Dan runs realistic MMI stations, then marks and discusses answers live so you see exactly where responses go right and wrong.</p>
  </div>
- <div class="step">
- <div class="step-num">4</div>
- <div class="step-body"><strong>Build week on week</strong><span>Come weekly to compound the gains, benchmark against the group, and walk into interview day having already performed under pressure many times over.</span></div>
+ <div class="mc-step">
+ <div class="mc-step-num">4</div>
+ <h3>Build week on week</h3>
+ <p>Come weekly to compound the gains, benchmark against the group, and walk into interview day having already performed under pressure many times over.</p>
+ </div>
  </div>
  </div>
  </section>
 
- <aside>
- <div class="booking-card">
- <h2>Pricing</h2>
- <p class="sub">Launch pricing for the first cohort. Lock it in by registering now.</p>
- <div class="price-row">
- <div class="lbl">Weekly class<small>Pay-as-you-go, cancel anytime</small></div>
- <div class="amt">$150 <small>AUD/week</small></div>
+ <section class="mc-section">
+ <div class="wrap">
+ <div class="mc-price-wrap">
+ <div>
+ <div class="mc-kicker">Pricing</div>
+ <h2 class="mc-h2 mc-display">Launch pricing for the first cohort</h2>
+ <p class="mc-lead">Lock it in by registering now. You are not charged anything today, this is a registration of interest only.</p>
+ <ul class="mc-included">
+ <li><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>A live small-group class every Friday at 6pm AEST.</span></li>
+ <li><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>Realistic MMI stations, marked and discussed live with Dan.</span></li>
+ <li><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>Skills that transfer to every MMI, panel and CASPer.</span></li>
+ <li><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>First access to multi-week packages when they are released.</span></li>
+ </ul>
+ <p class="mc-finenote">Classes are recorded by Dan solely to protect session integrity and resolve any misconduct concern. The stations and teaching are copyrighted; students may not record, screen-capture or share any part of a class. See the <a href="terms.html">Terms of Use</a>.</p>
  </div>
- <div class="price-row">
- <div class="lbl">Key2MD subscribers<small>Active subscription discount</small></div>
- <div class="amt">$140 <small>AUD/week</small></div>
+ <aside class="mc-price-card">
+ <div class="mc-price-head">
+ <span class="mc-badge-gold">Launch pricing &middot; first cohort</span>
+ <h3>Live MMI Class</h3>
+ <p>Pay-as-you-go, cancel anytime.</p>
  </div>
- <div class="pkg-note"><strong>Package deals to come.</strong> Once a start date is decided we will release multi-week packages at a further saving. Registered students get first access.</div>
- <div class="no-charge">You are not charged anything now. This is a registration of interest only. Payment opens when the start date is confirmed.</div>
- <p class="pkg-note" style="margin-top:14px;">Classes are recorded by Dan solely to protect session integrity and resolve any misconduct concern. The stations and teaching are copyrighted; students may not record, screen-capture or share any part of a class. See the <a href="terms.html" style="color:var(--navy);font-weight:700;">Terms of Use</a>.</p>
+ <div class="mc-price-body">
+ <div class="mc-price-row">
+ <div>
+ <div class="mc-price-lbl">Weekly class</div>
+ <div class="mc-price-sub">Open to everyone</div>
+ </div>
+ <div class="mc-price-amt">$150<span>AUD / week</span></div>
+ </div>
+ <div class="mc-price-row is-best">
+ <div>
+ <span class="mc-price-tag">Best value</span>
+ <div class="mc-price-lbl">Key2MD subscribers</div>
+ <div class="mc-price-sub">Active subscription discount</div>
+ </div>
+ <div class="mc-price-amt">$140<span>AUD / week</span></div>
+ </div>
+ <div class="mc-pkg"><strong>Package deals to come.</strong> Once a start date is decided we will release multi-week packages at a further saving. Registered students get first access.</div>
+ <div class="mc-nocharge"><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>Nothing to pay now. Payment opens only when the start date is confirmed.</span></div>
+ <a href="#register" class="btn btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'});return false;">Register your interest</a>
  </div>
  </aside>
  </div>
-
- <section class="form-card" id="register">
- <h2>Register your interest</h2>
- <p class="sub">Spots in the first cohort are limited. Add your name now to be emailed first with the start date, joining details and launch pricing. No payment required today.</p>
- <div id="interestForm">
- <div class="form-msg err" id="interestErr"></div>
- <div class="field"><label for="inName">Your name</label><input id="inName" type="text" autocomplete="name" placeholder="Jane Smith"></div>
- <div class="field"><label for="inEmail">Email</label><input id="inEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
- <div class="field"><label for="inUni">Which universities or interviews are you preparing for?</label><input id="inUni" type="text" placeholder="e.g. Monash, UNSW, or undecided"></div>
- <div class="field"><label for="inNotes">Anything else? (your stage, availability for Friday 6pm AEST, questions)</label><textarea id="inNotes" placeholder="Optional"></textarea></div>
- <button class="btn btn-primary full-btn" id="interestBtn" onclick="submitInterest()">Register my interest</button>
- </div>
- <div class="form-ok" id="interestOk">
- <strong>You're on the list.</strong>
- <span>Thanks for registering. We'll email you first as soon as the start date is confirmed, with joining details and launch pricing.</span>
  </div>
  </section>
 
- <section style="max-width:760px; margin:8px auto 0;">
- <h2 style="font-size:1.3rem; color:var(--navy); margin:0 0 14px;">MMI classes: common questions</h2>
- <details style="border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 10px;"><summary style="font-weight:700; color:var(--navy); cursor:pointer;">When do the MMI classes start?</summary><p style="margin:10px 0 0; color:var(--muted); line-height:1.6; font-size:0.92rem;">Classes run live every Friday at 6pm AEST. We are taking registrations of interest now and will confirm the start date once we reach the numbers to begin. Registered students are emailed first.</p></details>
- <details style="border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 10px;"><summary style="font-weight:700; color:var(--navy); cursor:pointer;">How much do the MMI classes cost?</summary><p style="margin:10px 0 0; color:var(--muted); line-height:1.6; font-size:0.92rem;">$150 per week, or $140 per week for current Key2MD subscribers. Multi-week packages will follow once a start date is set. There is nothing to pay when you register your interest.</p></details>
- <details style="border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 10px;"><summary style="font-weight:700; color:var(--navy); cursor:pointer;">Who are the MMI classes for?</summary><p style="margin:10px 0 0; color:var(--muted); line-height:1.6; font-size:0.92rem;">Any student preparing for a medical school interview. Stations are drawn to be relevant to every university, and the fundamental skills they build transfer to every MMI, panel and CASPer.</p></details>
- <details style="border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 10px;"><summary style="font-weight:700; color:var(--navy); cursor:pointer;">Do I have to pay to register my interest?</summary><p style="margin:10px 0 0; color:var(--muted); line-height:1.6; font-size:0.92rem;">No. Registering is free and places you under no obligation. It adds you to the first cohort and locks in launch pricing, and you are emailed first when the start date is confirmed.</p></details>
+ <section class="mc-register" id="register">
+ <div class="wrap">
+ <div class="mc-register-card">
+ <div class="mc-register-aside">
+ <div class="mc-kicker">Be first in line</div>
+ <h2 class="mc-display">Join the first cohort</h2>
+ <p class="lead">Spots in the first cohort are limited. Add your name now to be emailed first with the start date, joining details and launch pricing.</p>
+ <ul class="mc-aside-list">
+ <li><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>Emailed first when the start date is confirmed.</span></li>
+ <li><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>Launch pricing locked in for your cohort.</span></li>
+ <li><span class="mc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>No payment today, and no obligation to continue.</span></li>
+ </ul>
+ <div class="mc-aside-foot">
+ <div class="mc-roster">
+ <span class="mc-ava a1">JS</span>
+ <span class="mc-ava a2">AM</span>
+ <span class="mc-ava a3">KP</span>
+ </div>
+ <span>Students are registering interest now.</span>
+ </div>
+ </div>
+ <div class="mc-register-form">
+ <div id="interestForm">
+ <h2>Register your interest</h2>
+ <p class="sub">It takes under a minute. No payment required today.</p>
+ <div class="form-msg err" id="interestErr"></div>
+ <div class="mc-field"><label for="inName">Your name</label><input id="inName" type="text" autocomplete="name" placeholder="Jane Smith"></div>
+ <div class="mc-field"><label for="inEmail">Email</label><input id="inEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
+ <div class="mc-field"><label for="inUni">Which universities or interviews are you preparing for?</label><input id="inUni" type="text" placeholder="e.g. Monash, UNSW, or undecided"></div>
+ <div class="mc-field"><label for="inNotes">Anything else? (your stage, availability for Friday 6pm AEST, questions)</label><textarea id="inNotes" placeholder="Optional"></textarea></div>
+ <button class="btn btn-primary" id="interestBtn" onclick="submitInterest()">Register my interest</button>
+ <p class="mc-form-foot">We will only email you about the MMI classes. No spam, unsubscribe anytime.</p>
+ </div>
+ <div class="form-ok" id="interestOk">
+ <div class="mc-ok-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+ <strong>You're on the list.</strong>
+ <span>Thanks for registering. We'll email you first as soon as the start date is confirmed, with joining details and launch pricing.</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <section class="mc-section">
+ <div class="wrap">
+ <div class="mc-kicker">FAQ</div>
+ <h2 class="mc-h2 mc-display">MMI classes: common questions</h2>
+ <div class="mc-faq">
+ <details><summary>When do the MMI classes start?</summary><p>Classes run live every Friday at 6pm AEST. We are taking registrations of interest now and will confirm the start date once we reach the numbers to begin. Registered students are emailed first.</p></details>
+ <details><summary>How much do the MMI classes cost?</summary><p>$150 per week, or $140 per week for current Key2MD subscribers. Multi-week packages will follow once a start date is set. There is nothing to pay when you register your interest.</p></details>
+ <details><summary>Who are the MMI classes for?</summary><p>Any student preparing for a medical school interview. Stations are drawn to be relevant to every university, and the fundamental skills they build transfer to every MMI, panel and CASPer.</p></details>
+ <details><summary>Do I have to pay to register my interest?</summary><p>No. Registering is free and places you under no obligation. It adds you to the first cohort and locks in launch pricing, and you are emailed first when the start date is confirmed.</p></details>
+ </div>
+ </div>
+ </section>
+
+ <section class="wrap" style="padding-bottom:24px;">
+ <div class="mc-cta-band">
+ <div>
+ <h2 class="mc-display">Be first into the first cohort.</h2>
+ <p>Register your interest now to lock in launch pricing and get the start date before anyone else. Nothing to pay today.</p>
+ </div>
+ <a href="#register" class="btn btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'});return false;">Register your interest</a>
+ </div>
  </section>
 
  </main>
