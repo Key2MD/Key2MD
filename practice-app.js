@@ -1714,6 +1714,7 @@ async function finishStation(){
  if(isMmi){ try{ localStorage.setItem('k2_mmi_attempts', String((parseInt(localStorage.getItem('k2_mmi_attempts')||'0',10)||0)+1)); }catch(e){} }
  const isStrict=document.getElementById('strictModeToggle')?.checked;
  if(isMmi){
+ if(typeof mmiEngineReset==='function') mmiEngineReset();
  if(mmiRoleplayMode){
   const rlw=$('mmiRoleplayWrap');if(rlw)rlw.style.display='';
   const s=pool[currentIdx];if(s&&typeof initRoleplayConversation==='function')initRoleplayConversation(s);
@@ -4247,7 +4248,9 @@ if(phase==='writing'&&currentMode===MODE_CASPER){
  clearTimer();saveAnswer();setPhaseUI('done');
  }
  if(phase==='writing'&&currentMode===MODE_MMI){
- clearTimer();stopRecording();setPhaseUI('done');
+ clearTimer();stopRecording();
+ if(typeof mmiEngineReset==='function') mmiEngineReset();
+ setPhaseUI('done');
  const _stopH = sessionHistory[currentIdx];
  if(_stopH && _stopH.station) recordStationSeen(_stopH.station, MODE_MMI, _stopH.score!=null?_stopH.score:null);
  updateBtns();return;
