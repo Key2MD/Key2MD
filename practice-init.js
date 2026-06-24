@@ -1,6 +1,7 @@
 
 window.STATIONS = STATIONS;
 window.MMI_STATIONS = MMI_STATIONS;
+if (typeof RACGP_STATIONS !== 'undefined') window.RACGP_STATIONS = RACGP_STATIONS;
 (function () {
   try {
     var total = (typeof STATIONS !== 'undefined' ? STATIONS.length : 0) + (typeof MMI_STATIONS !== 'undefined' ? MMI_STATIONS.length : 0);

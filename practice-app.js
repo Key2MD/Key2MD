@@ -69,6 +69,26 @@ function getStationHistoryId(station, mode = currentMode) {
  return '';
 }
 
+function interleavePriorityPool(priorityStations, baseStations, windowSize) {
+ const p = buildWeightedPool(priorityStations);
+ const b = buildWeightedPool(baseStations);
+ if (!p.length) return b;
+ const win = Math.min(windowSize, p.length + b.length);
+ const slots = new Array(win).fill(null);
+ const taken = new Set();
+ for (let k = 0; k < p.length; k++) {
+ let pos = Math.floor((k + 0.5) * win / p.length);
+ if (pos >= win) pos = win - 1;
+ while (pos < win && taken.has(pos)) pos++;
+ if (pos >= win) pos = slots.indexOf(null);
+ if (pos < 0) continue;
+ taken.add(pos);
+ slots[pos] = p[k];
+ }
+ let bi = 0;
+ for (let i = 0; i < win; i++) { if (slots[i] === null && bi < b.length) slots[i] = b[bi++]; }
+ return slots.filter(Boolean).concat(b.slice(bi));
+}
 function buildWeightedPool(stations) {
  const now = Date.now();
  const DAY = 86400000;
@@ -693,10 +713,14 @@ const trendWrap=$('trendWrap'),trendEmpty=$('trendEmpty'),trendCanvas=$('trendCa
 
 
 
+function activeCasperBank(){
+ return (typeof practiceAudience!=='undefined'&&practiceAudience==='racgp'&&typeof RACGP_STATIONS!=='undefined'&&RACGP_STATIONS.length)?RACGP_STATIONS.concat(STATIONS):STATIONS;
+}
 function updateCounts(){
  const c={Ethics:0,'Conflict Resolution':0,Personal:0,Professionalism:0,Communication:0};
- STATIONS.forEach(s=>{if(c[s.category]!==undefined)c[s.category]++;});
- $('cnt-all').textContent=STATIONS.length;
+ const bank=activeCasperBank();
+ bank.forEach(s=>{if(c[s.category]!==undefined)c[s.category]++;});
+ $('cnt-all').textContent=bank.length;
  $('cnt-ethics').textContent=c.Ethics;
  $('cnt-conflict').textContent=c['Conflict Resolution'];
  $('cnt-personal').textContent=c.Personal;
@@ -1464,16 +1488,19 @@ function startSession(){
  }
  _sessionRecordedIds = new Set();
  resetAutoSaveState();
+ const racgpMode=currentMode===MODE_CASPER&&practiceAudience==='racgp'&&typeof RACGP_STATIONS!=='undefined'&&RACGP_STATIONS.length;
  const stations=currentMode===MODE_CASPER?STATIONS:MMI_STATIONS;
- let filtered;
+ let filtered,priority=[];
  if(selectedCategory==='__starred'){
  const starred=new Set(StationHistory.getStarred());
- filtered=stations.filter(s=>starred.has(getStationHistoryId(s, currentMode)));
+ const starBase=racgpMode?RACGP_STATIONS.concat(stations):stations;
+ filtered=starBase.filter(s=>starred.has(getStationHistoryId(s, currentMode)));
  if(!filtered.length){showPracticeNotice('No starred stations yet. Star some stations first.', 'error');return;}
  } else {
  filtered=selectedCategory==='All'?stations:stations.filter(s=>s.category===selectedCategory);
+ if(racgpMode)priority=selectedCategory==='All'?RACGP_STATIONS.slice():RACGP_STATIONS.filter(s=>s.category===selectedCategory);
  }
- pool=buildWeightedPool(filtered);
+ pool=priority.length?interleavePriorityPool(priority,filtered,45):buildWeightedPool(filtered);
  sessionPool=[...pool];currentIdx=0;completed=0;sessionHistory=[];
  sessionActive=true;reviewPanel.classList.remove('show');scenarioCard.style.display='';
  setPracticeSessionRunning(true);
@@ -2169,7 +2196,7 @@ ${h.answer}
  <span style="font-size:0.82rem;color:#164e63;">${d.message||'RACGP-calibrated AI feedback requires an active RACGP CASPer Pro subscription.'}</span>
  <br><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
  <button onclick="buyRacgpPass(this)" style="background:#0ea5e9;color:#fff;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Start RACGP Pro - $80/week</button>
- <button onclick="practiceAudience='';updateLimitUI();refreshAiMarkButton();showPracticeNotice('Standard CASPer feedback mode is active.', 'info');" style="background:#fff;color:#075985;border:1px solid #bfdbfe;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Use standard mode</button>
+ <button onclick="practiceAudience='';updateCounts();updateLimitUI();refreshAiMarkButton();showPracticeNotice('Standard CASPer feedback mode is active.', 'info');" style="background:#fff;color:#075985;border:1px solid #bfdbfe;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;font-family:inherit;">Use standard mode</button>
  </div>
  </div>`;
  updateLimitUI(); return;
@@ -4818,6 +4845,7 @@ function referralPostPurchaseNudge(){
  } else if(params.get('racgp') === 'success'){
  clearPaymentParams(['racgp']);
  practiceAudience = 'racgp';
+ updateCounts();
  setTimeout(async function(){
  await Key2MDAuth.checkSession();
  updateLimitUI();
