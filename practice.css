@@ -440,14 +440,14 @@
 /* All three pills share a fixed height so the grid NEVER reflows */
 .mode-pill {
  display:flex; align-items:center; justify-content:center;
- height:42px; min-height:42px; max-height:42px; /* locked — no reflow */
+ height:42px; min-height:42px; max-height:42px; /* locked - no reflow */
  padding:0 7px; border-radius:8px;
- border:1px solid #cbd5e1; /* slightly stronger than gray200 — reads as pressable */
+ border:1px solid #cbd5e1; /* slightly stronger than gray200 - reads as pressable */
  background:var(--white); color:var(--gray600);
  font-size:0.8rem; font-weight:800; cursor:pointer;
  transition:background 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s;
  font-family:inherit; text-align:center; white-space:nowrap; letter-spacing:0;
- overflow:hidden; /* belt-and-braces — nothing can push height */
+ overflow:hidden; /* belt-and-braces - nothing can push height */
 }
 .mode-pill:hover { border-color:var(--teal); color:var(--teal3); background:rgba(14,165,233,0.04); }
 .mode-pill.active-casper { background:var(--navy); color:var(--white); border-color:var(--navy); box-shadow:0 4px 14px rgba(10,22,40,0.22); }
@@ -462,7 +462,7 @@
  background:linear-gradient(160deg,rgba(14,165,233,0.1),rgba(14,165,233,0.02) 60%,#fff);
  box-shadow:0 4px 14px rgba(14,165,233,0.14);
 }
-/* Kicker absolutely positioned — cannot affect pill height */
+/* Kicker absolutely positioned - cannot affect pill height */
 .mock-pill-kicker {
  position:absolute;
  top:6px; left:50%; transform:translateX(-50%);
@@ -478,10 +478,10 @@
 .mode-pill.active-mock {
  background:linear-gradient(135deg,var(--navy),#0f2a44);
  box-shadow:0 8px 20px rgba(10,22,40,0.28), inset 0 -3px 0 var(--teal);
- color:#ffffff !important; /* explicit — overrides gray600 base */
+ color:#ffffff !important; /* explicit - overrides gray600 base */
  border-color:var(--navy);
 }
-/* Both children must be white — explicit overrides prevent invisible-text bug */
+/* Both children must be white - explicit overrides prevent invisible-text bug */
 .mode-pill.active-mock .mock-pill-kicker { color:#7dd3fc !important; }
 .mode-pill.active-mock > span:last-child { color:#ffffff !important; }
 .mode-pill.active-mock:hover { border-color:var(--navy); color:#ffffff !important; }

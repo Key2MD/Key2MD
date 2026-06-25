@@ -1,9 +1,9 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   KEY2MD MOCK REPORT — DESIGN TOKENS
+   KEY2MD MOCK REPORT - DESIGN TOKENS
    These vars exist on :root so the same CSS works inside practice.html
    (light parent) and as a standalone dark page (mock-report.html).
    ─────────────────────────────────────────────────────────────────────── */
-/* box-sizing reset intentionally removed — practice.css handles this globally */
+/* box-sizing reset intentionally removed - practice.css handles this globally */
 /* body/a rules below are ONLY for mock-report.html standalone page */
 :root{
  --navy:#0a1628;--navy2:#0d1f3c;--navy3:#112347;
@@ -23,14 +23,14 @@
 
 /* These body/a rules apply ONLY when mock-report-redesign.css is loaded
    as the primary stylesheet (i.e. mock-report.html standalone).
-   When injected into practice.html they must NOT fire — so we scope them
+   When injected into practice.html they must NOT fire - so we scope them
    to .k2-mock-report which is the actual container used on practice.html.
    On mock-report.html the <body> itself carries .k2-mock-report class. */
 .k2-mock-report{font-family:var(--body);-webkit-font-smoothing:antialiased}
 .k2-mock-report a{color:inherit;text-decoration:none}
 
 /* ─────────────────────────────────────────────────────────────────────────
-   .k2-mock-report — the shell. Everything below scopes under this so it
+   .k2-mock-report - the shell. Everything below scopes under this so it
    doesn't fight with light styles when rendered inside practice.html.
    ─────────────────────────────────────────────────────────────────────── */
 .k2-mock-report{
@@ -277,7 +277,7 @@
 .k2mr-fbsummary-cat{font-size:0.85rem;font-weight:800;color:#fff}
 .k2mr-fbsummary-score{font-family:var(--serif);font-size:1.5rem;line-height:1}
 
-/* Feedback tiles — left-border colour-coded */
+/* Feedback tiles - left-border colour-coded */
 .k2mr-fb-tile{padding:12px 14px;border-radius:8px;background:rgba(0,0,0,0.2);margin-bottom:8px;border-left:3px solid var(--teal)}
 .k2mr-fb-tile.strength{border-left-color:var(--green)}
 .k2mr-fb-tile.improve{border-left-color:var(--gold3)}
@@ -375,7 +375,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   HISTORY PAGE REDESIGN — separate page, also dark
+   HISTORY PAGE REDESIGN - separate page, also dark
    ─────────────────────────────────────────────────────────────────────── */
 .k2hist{
  background:
