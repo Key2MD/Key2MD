@@ -438,6 +438,14 @@
  </div>
  </article>
 
+ <section class="k2c-card" id="coachDiagnostic">
+ <p class="journey-muted" style="margin:0;">Reading your marked answers. <a href="practice.html?lock_mode=mmi" style="color:#0284c7;font-weight:700;">Open MMI practice</a></p>
+ </section>
+
+ <section class="k2c-card k2c-coach" id="coachPanel">
+ <p class="journey-muted" style="margin:0;">Your coach is loading.</p>
+ </section>
+
  <article class="journey-card" id="journeyReferralCard" style="display:none;border:1px solid rgba(14,165,233,0.3);">
  <div class="journey-kicker">Refer a friend</div>
  <h2 style="margin-bottom:6px;">You both win.</h2>
@@ -1230,6 +1238,21 @@ renderAccount();
   if(status){ status.style.display='block'; status.style.color='#15803d'; status.textContent= kind==='offer' ? 'Amazing, congratulations. Dan has been notified.' : 'Great news, that is a real milestone. Dan has been notified.'; }
  };
  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',render); else render();
+})();
+</script>
+<script src="/key2md-coach.js" defer></script>
+<script>
+(function(){
+ function mountCoach(){
+  if(!window.Key2MDCoach){ setTimeout(mountCoach,200); return; }
+  Key2MDCoach.mount({
+   apiBase:'https://key2md-api.brittainmbbs.workers.dev',
+   diagnosticEl:document.getElementById('coachDiagnostic'),
+   coachEl:document.getElementById('coachPanel'),
+   getToken:function(){ return (window.Key2MDAuth&&window.Key2MDAuth.getToken&&window.Key2MDAuth.getToken())||localStorage.getItem('key2md_token')||''; }
+  });
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mountCoach); else mountCoach();
 })();
 </script>
 </body>

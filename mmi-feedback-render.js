@@ -753,11 +753,17 @@ const MMIFeedbackRender = (() => {
  const critAvgs = computeCriterionAverages(feedback);
  const critStrip = CRITERIA_KEYS.map(k => {
  const v = critAvgs[k];
- if (!Number.isFinite(v)) return '';
+ if (!Number.isFinite(v)) {
+ return `<div class="mmi-crit-chip mmi-crit-chip-na"><div class="mmi-crit-chip-top"><span>${esc(CRITERIA_LABELS[k])}</span><strong style="color:#94a3b8;font-weight:600;">n/a</strong></div><div class="mmi-crit-bar"><span style="width:0%"></span></div></div>`;
+ }
  const pct = Math.max(0, Math.min(100, (v / 5) * 100));
  const cls = v >= 4 ? 'good' : v >= 3 ? 'mid' : 'low';
  return `<div class="mmi-crit-chip"><div class="mmi-crit-chip-top"><span>${esc(CRITERIA_LABELS[k])}</span><strong>${v.toFixed(1)}</strong></div><div class="mmi-crit-bar"><span class="rate-${cls}" style="width:${pct}%"></span></div></div>`;
- }).filter(Boolean).join('');
+ }).join('');
+ const naCrits = CRITERIA_KEYS.filter(k => !Number.isFinite(critAvgs[k]));
+ const naNote = naCrits.length
+ ? `<div class="mmi-crit-na-note" style="font-size:0.72rem;color:#64748b;margin-top:7px;line-height:1.45;">${naCrits.map(k => esc(CRITERIA_LABELS[k])).join(' and ')} ${naCrits.length > 1 ? 'were' : 'was'} not assessed on this station: the prompts here gave ${naCrits.length > 1 ? 'them' : 'it'} no clear opening to show. ${naCrits.length > 1 ? 'They' : 'It'} will be scored on a station that calls for ${naCrits.length > 1 ? 'them' : 'it'}.</div>`
+ : '';
  const leadHtml = `
  <div class="mmi-lead">
  <div class="mmi-lead-focus">
@@ -765,7 +771,7 @@ const MMIFeedbackRender = (() => {
  <div class="mmi-lead-text">${esc(overall.biggest_change || overall.biggest_improvement || 'Name the real tension and land a clear, reasoned decision.')}</div>
  </div>
  ${overall.biggest_strength ? `<div class="mmi-lead-strength"><strong>What landed:</strong> ${esc(overall.biggest_strength)}</div>` : ''}
- ${critStrip ? `<div class="mmi-crit-strip">${critStrip}</div>` : ''}
+ ${critStrip ? `<div class="mmi-crit-strip">${critStrip}</div>${naNote}` : ''}
  </div>`;
 
  const moveItems = [];
