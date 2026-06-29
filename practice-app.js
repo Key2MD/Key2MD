@@ -1121,6 +1121,8 @@ function applyModeUI(mode) {
  if (mbh) mbh.style.display = isMMI ? '' : 'none';
  const mcc = $('mmiCircuitCard');
  if (mcc) mcc.style.display = isMMI ? '' : 'none';
+ const lbc = $('leaderboardCard');
+ if (lbc) lbc.style.display = isMMI ? 'none' : '';
  const cmk = $('casperMockCard');
  if (cmk) cmk.style.display = isCasper ? '' : 'none';
  if (sq) sq.style.display = isCasper ? '' : 'none';
@@ -3132,6 +3134,7 @@ async function loadLeaderboardSettings(){
 
 async function refreshLeaderboardData(opts){
  const silent=opts&&opts.silent;
+ if(currentLbTool()==='mmi'){ leaderboardRows=[]; leaderboardLoaded=false; updateLeaderboard(); return; }
  try{
  const data=await leaderboardFetch('/api/leaderboard?tool='+encodeURIComponent(currentLbTool()));
  leaderboardRows=Array.isArray(data.rows)?data.rows:[];
