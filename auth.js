@@ -230,6 +230,7 @@ const Key2MDAuth = (() => {
  messages,
  question_context: extraContext.question || '',
  user_response: extraContext.response || '',
+ focus_mistakes: (() => { try { const f = window.Key2MDFocus && Key2MDFocus.getIds(_config.tool); return (f && f.length) ? f : undefined; } catch (e) { return undefined; } })(),
  }),
  });
 

@@ -2,6 +2,7 @@
  var API_DEFAULT = 'https://key2md-api.brittainmbbs.workers.dev';
  var OPTIN_KEY = 'k2md_coach_optin_v1';
  var DATES_KEY = 'k2md_journey_dates_v1';
+ var FOCUS_KEY = 'k2md_focus_v1';
 
  var CRITERIA = [
   { key: 'empathy', name: 'Empathy', focus: 'Make the person and the emotional stakes visible before you solve the case.', drill: 'Open your next station by naming the person, what they may be feeling, and why that feeling matters, before you move to a solution.' },
@@ -19,6 +20,7 @@
   diagnosticEl: null,
   coachEl: null,
   analysis: null,
+  profile: null,
   loadedToken: null,
   loading: false,
   retries: 0
@@ -41,6 +43,21 @@
  }
 
  function isOptedIn() { return lsGet(OPTIN_KEY) === '1'; }
+
+ // Share the student's top tracked mistake with the practice tool (cross-page pre-answer reminder
+ // and marker focus). Only while the coach is on, so it stays opt-in and privacy-respecting.
+ function persistFocus(profile) {
+  try {
+   if (!isOptedIn() || !profile || !profile.top || !profile.top.length) { localStorage.removeItem(FOCUS_KEY); return; }
+   localStorage.setItem(FOCUS_KEY, JSON.stringify({
+    tool: profile.tool || 'mmi',
+    ids: (typeof Key2MDMistakes !== 'undefined') ? Key2MDMistakes.focusIds(profile) : [],
+    watch: profile.watchLine || '',
+    label: profile.watchLabel || '',
+    at: Date.now()
+   }));
+  } catch (e) {}
+ }
 
  function interviewDateIso() {
   try { var d = JSON.parse(lsGet(DATES_KEY) || '{}'); return (d && d.interview) || ''; } catch (e) { return ''; }
@@ -104,18 +121,19 @@
   return Object.keys(out).length ? out : null;
  }
 
+ // MMI is marked out of 5 (1 Poor, 2 Unsatisfactory, 3 Satisfactory, 4 Good, 5 Excellent).
  function band(avg) {
   if (avg == null) return null;
-  if (avg >= 8) return { key: 'exceptional', label: 'Exceptional', color: '#7c3aed' };
-  if (avg >= 6.5) return { key: 'strong', label: 'Strong', color: '#0ea5e9' };
-  if (avg >= 5) return { key: 'developing', label: 'Developing', color: '#0284c7' };
+  if (avg >= 4.4) return { key: 'exceptional', label: 'Exceptional', color: '#7c3aed' };
+  if (avg >= 3.5) return { key: 'strong', label: 'Strong', color: '#0ea5e9' };
+  if (avg >= 2.6) return { key: 'developing', label: 'Developing', color: '#0284c7' };
   return { key: 'building', label: 'Building', color: '#64748b' };
  }
  function nextBand(avg) {
   if (avg == null) return null;
-  if (avg < 5) return 'Developing';
-  if (avg < 6.5) return 'Strong';
-  if (avg < 8) return 'Exceptional';
+  if (avg < 2.6) return 'Developing';
+  if (avg < 3.5) return 'Strong';
+  if (avg < 4.4) return 'Exceptional';
   return null;
  }
 
@@ -181,7 +199,17 @@
    + '.k2c-fine{font-size:0.74rem;color:#94a3b8;line-height:1.5;margin-top:14px;}'
    + '.k2c-coach{border:1px solid rgba(124,58,237,0.35);background:linear-gradient(180deg,rgba(124,58,237,0.05),transparent);}'
    + '.k2c-toggle{margin-left:auto;font-size:0.78rem;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit;}'
-   + '.k2c-head{display:flex;align-items:flex-start;gap:10px;}';
+   + '.k2c-head{display:flex;align-items:flex-start;gap:10px;}'
+   + '.k2c-pat{margin-top:16px;border:1px solid rgba(124,58,237,0.22);border-radius:14px;padding:15px 16px 6px;background:linear-gradient(180deg,rgba(124,58,237,0.05),transparent);}'
+   + '.k2c-pat-lab{font-size:0.72rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#7c3aed;display:flex;align-items:center;gap:7px;}'
+   + '.k2c-pat-sub{font-size:0.82rem;color:#64748b;margin:4px 0 10px;line-height:1.5;}'
+   + '.k2c-pat-item{padding:11px 0;border-top:1px solid rgba(124,58,237,0.12);}'
+   + '.k2c-pat-item:first-of-type{border-top:none;}'
+   + '.k2c-pat-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}'
+   + '.k2c-pat-name{font-weight:800;color:#0a1628;font-size:0.95rem;}'
+   + '.k2c-pat-freq{font-size:0.72rem;font-weight:800;color:#7c3aed;background:rgba(124,58,237,0.10);border-radius:999px;padding:3px 10px;white-space:nowrap;}'
+   + '.k2c-pat-drill{font-size:0.84rem;color:#334155;line-height:1.55;margin-top:5px;}'
+   + '.k2c-pat-drill b{color:#0a1628;}';
   var st = document.createElement('style');
   st.id = 'k2cStyles';
   st.textContent = css;
@@ -194,8 +222,8 @@
 
  function trendLine(a) {
   if (a.gain == null) return 'One answer marked so far. Do a couple more and I can show your trend.';
-  if (a.gain >= 0.6) return 'Up ' + a.gain.toFixed(1) + ' since your first marked answer. Keep the same habits going.';
-  if (a.gain <= -0.6) return 'Down ' + Math.abs(a.gain).toFixed(1) + ' from your first answer. That is usually a focus or fatigue dip, not a real drop in ability.';
+  if (a.gain >= 0.4) return 'Up ' + a.gain.toFixed(1) + ' since your first marked answer. Keep the same habits going.';
+  if (a.gain <= -0.4) return 'Down ' + Math.abs(a.gain).toFixed(1) + ' from your first answer. That is usually a focus or fatigue dip, not a real drop in ability.';
   return 'Holding steady across your marked answers. A targeted change to one criterion is the fastest way to move it.';
  }
 
@@ -247,7 +275,7 @@
    + '<span class="k2c-chip" style="background:' + b.color + ';">' + esc(b.label) + '</span></div>'
    + '<p class="k2c-muted">' + esc(trendLine(a)) + '</p>'
    + '<div class="k2c-row">'
-   + '<div class="k2c-stat"><b>' + a.avg.toFixed(1) + '</b><span>Recent average out of 10</span></div>'
+   + '<div class="k2c-stat"><b>' + a.avg.toFixed(1) + '</b><span>Recent average out of 5</span></div>'
    + '<div class="k2c-stat"><b>' + a.count + '</b><span>Answers marked</span></div>'
    + (a.gain != null ? '<div class="k2c-stat"><b>' + (a.gain >= 0 ? '+' : '') + a.gain.toFixed(1) + '</b><span>Change since your first</span></div>' : '')
    + '</div>'
@@ -259,6 +287,27 @@
    + disclaimer();
  }
 
+ function patternsHtml(profile) {
+  if (!profile || !profile.top || !profile.top.length || profile.considered < 2) return '';
+  var items = profile.top.map(function (m) {
+   var freq = m.count >= profile.considered
+    ? 'every recent answer'
+    : (m.count + ' of your last ' + profile.considered);
+   return ''
+    + '<div class="k2c-pat-item">'
+    + '<div class="k2c-pat-top"><span class="k2c-pat-name">' + esc(m.label) + '</span>'
+    + '<span class="k2c-pat-freq">' + esc(freq) + '</span></div>'
+    + '<div class="k2c-pat-drill"><b>Fix:</b> ' + esc(m.drill) + '</div>'
+    + '</div>';
+  }).join('');
+  return ''
+   + '<div class="k2c-pat">'
+   + '<div class="k2c-pat-lab">Patterns I am tracking for you</div>'
+   + '<div class="k2c-pat-sub">These are the mistakes that keep showing up in your own marked answers. I steer your drills and your pre-answer reminders here until they stop.</div>'
+   + items
+   + '</div>';
+ }
+
  function renderCoach() {
   var el = state.coachEl;
   if (!el) return;
@@ -267,7 +316,7 @@
    el.innerHTML = ''
     + '<div class="k2c-kicker">Your coach</div>'
     + '<h2 class="k2c-h">Turn on your AI coach.</h2>'
-    + '<p class="k2c-muted">Your coach remembers your history, greets you with the one thing to work on next, and rewrites your plan every time you practise. It reads only your own marked answers. Off by default.</p>'
+    + '<p class="k2c-muted">Your coach learns the mistakes you keep repeating, reminds you of them right before your next answer, and tells the marker to check them harder - so every session targets exactly where you go wrong. It reads only your own marked answers. Off by default.</p>'
     + '<div class="k2c-actions">'
     + '<button type="button" class="k2c-btn primary" onclick="Key2MDCoach.enable()">Turn on my coach</button>'
     + '</div>';
@@ -300,7 +349,8 @@
 
   var weak = a.weakest ? CRIT_BY_KEY[a.weakest] : null;
   var b = band(a.avg);
-  var memory = 'Your last marked answer scored ' + a.latest.toFixed(0) + ' out of 10'
+  var pats = patternsHtml(state.profile);
+  var memory = 'Your last marked answer scored ' + a.latest.toFixed(0) + ' out of 5'
    + (a.lastCat ? ' in the ' + esc(a.lastCat) + ' theme' : '') + '.';
 
   var todo = [];
@@ -318,7 +368,7 @@
    + '<h2 class="k2c-h">Welcome back.</h2></div>'
    + '<button type="button" class="k2c-toggle" onclick="Key2MDCoach.disable()">Turn off</button></div>'
    + '<p class="k2c-muted">' + memory + ' You are in the ' + esc(b.label) + ' range right now.' + (phase.line ? ' ' + esc(phase.line) : '') + '</p>'
-   + (weak ? '<div class="k2c-focus"><div class="lab">Work on this next</div><div class="ti">' + esc(weak.name) + '</div><div class="k2c-muted" style="margin:0;">' + esc(weak.focus) + '</div></div>' : '')
+   + (pats || (weak ? '<div class="k2c-focus"><div class="lab">Work on this next</div><div class="ti">' + esc(weak.name) + '</div><div class="k2c-muted" style="margin:0;">' + esc(weak.focus) + '</div></div>' : ''))
    + '<ul class="k2c-list">' + todo.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>'
    + '<div class="k2c-actions">' + ctas + '</div>'
    + disclaimer();
@@ -345,6 +395,8 @@
    .then(function (data) {
     var reviews = data && Array.isArray(data.reviews) ? data.reviews : [];
     state.analysis = analyse(reviews);
+    state.profile = (typeof Key2MDMistakes !== 'undefined') ? Key2MDMistakes.buildProfile(reviews, 'mmi') : null;
+    persistFocus(state.profile);
     state.loadedToken = token;
    })
    .catch(function () {})
@@ -361,8 +413,8 @@
    loadData();
   },
   refresh: function () { state.loadedToken = null; loadData(); },
-  enable: function () { lsSet(OPTIN_KEY, '1'); renderAll(); },
-  disable: function () { lsSet(OPTIN_KEY, '0'); renderAll(); },
+  enable: function () { lsSet(OPTIN_KEY, '1'); persistFocus(state.profile); renderAll(); },
+  disable: function () { lsSet(OPTIN_KEY, '0'); persistFocus(state.profile); renderAll(); },
   isOptedIn: isOptedIn
  };
 

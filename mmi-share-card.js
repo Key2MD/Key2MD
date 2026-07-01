@@ -53,9 +53,9 @@
       sx+=arrowW+gap;
       ctx.fillStyle=TEAL2; ctx.fillText(String(to),sx,640);
       ctx.textAlign='center'; ctx.font='800 38px '+FONT; ctx.fillStyle='rgba(255,255,255,0.55)';
-      ctx.fillText('out of 10', cx, 712);
+      ctx.fillText('out of '+(o.outOf||5), cx, 712);
     } else {
-      const sc=clampScore(o.score); const out=o.outOf||10;
+      const sc=clampScore(o.score); const out=o.outOf||5;
       // ring
       const ringX=cx, ringY=560, R=200; const pct=sc!=null?(sc/out):0;
       ctx.lineWidth=34; ctx.lineCap='round';
