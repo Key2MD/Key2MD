@@ -600,6 +600,11 @@ const Key2MDAuth = (() => {
  const bar = document.getElementById('k2mdAuthBar');
  if (!bar) return;
 
+ if (_user && _config.tool === 'gamsat') {
+ updateGamsatAuthBar(bar);
+ return;
+ }
+
  if (_user) {
  const proEndsAt = formatPeriodEnd(_user.pro_period_end);
  const accountLabel = _user.impersonation
@@ -640,6 +645,31 @@ const Key2MDAuth = (() => {
  </div>
  `;
  }
+ }
+
+ function updateGamsatAuthBar(bar) {
+ const displayName = htmlEscape(_user.name || _user.email.split('@')[0]);
+ const initial = htmlEscape((_user.name || _user.email || '?').trim().charAt(0).toUpperCase() || '?');
+ const accountLabel = _user.impersonation ? 'Admin view as student' : 'Key2MD account';
+ const actions = _user.impersonation ? '' : `
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+ <button onclick="window.location.href='billing.html'" style="padding:9px 10px;border-radius:9px;border:1px solid rgba(19,26,38,0.12);background:#fff;color:#131a26;font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;transition:background 0.15s,border-color 0.15s;" onmouseover="this.style.background='#f7f5f0';this.style.borderColor='rgba(19,26,38,0.2)'" onmouseout="this.style.background='#fff';this.style.borderColor='rgba(19,26,38,0.12)'">Billing</button>
+ <button onclick="window.location.href='gamsat-section-2-tutor.html'" style="padding:9px 10px;border-radius:9px;border:1px solid rgba(193,154,62,0.4);background:rgba(193,154,62,0.09);color:#8a6a1e;font:inherit;font-size:0.72rem;font-weight:800;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(193,154,62,0.16)'" onmouseout="this.style.background='rgba(193,154,62,0.09)'">Get essay marked</button>
+ <button onclick="window.location.href='plans.html#s2-pro-section'" style="grid-column:1/-1;padding:10px;border-radius:9px;border:none;background:linear-gradient(180deg,#8b5cf6,#7c3aed);color:#fff;font:inherit;font-size:0.74rem;font-weight:800;cursor:pointer;box-shadow:0 8px 20px -10px rgba(124,58,237,0.7);transition:transform 0.15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">Explore GAMSAT S2 Pro &rarr;</button>
+ </div>`;
+ bar.innerHTML = `
+ <div style="padding:14px 16px;background:linear-gradient(180deg,#ffffff,#faf8f3);border:1px solid rgba(19,26,38,0.10);border-radius:14px;box-shadow:0 2px 6px rgba(16,24,40,0.05),0 12px 28px -14px rgba(16,24,40,0.18);">
+ <div style="display:flex;align-items:center;gap:11px;">
+ <div style="width:38px;height:38px;flex-shrink:0;border-radius:50%;background:linear-gradient(180deg,#12203a,#0a1628);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.98rem;font-family:'DM Sans',sans-serif;box-shadow:0 6px 14px -8px rgba(10,22,40,0.7);">${initial}</div>
+ <div style="min-width:0;flex:1;">
+ <div style="font-size:0.86rem;font-weight:800;color:#131a26;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${displayName}</div>
+ <div style="font-size:0.7rem;color:#8a6a1e;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">${htmlEscape(accountLabel)}</div>
+ </div>
+ <button onclick="Key2MDAuth.logout()" style="background:none;border:1px solid rgba(19,26,38,0.12);border-radius:7px;padding:6px 11px;font-size:0.72rem;font-weight:700;color:#5b6472;cursor:pointer;font-family:inherit;white-space:nowrap;">${_user.impersonation ? 'Exit' : 'Log out'}</button>
+ </div>
+ ${actions}
+ </div>
+ `;
  }
 
  function formatPeriodEnd(value) {
