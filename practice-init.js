@@ -857,7 +857,7 @@ async function submitMMIForFeedback() {
    clearTimeout(stillWorkingTimer);
    const data = evt.result || {};
    if(data.used_free_review) { try { window.Key2MDTrack?.funnel?.('free_review_used', { product: 'mmi', tier }); } catch(e) {} }
-   recordStationSeen(s, MODE_MMI, data?.score ?? data?.feedback?.score ?? null);
+   recordStationSeen(s, MODE_MMI, data?.feedback?.overall?.score ?? data?.overall?.score ?? data?.score ?? null);
    if(window._circuitCapture) { mmiFeedbackUploadInFlight = false; try { updateMMILimitsUI(); } catch(e) {} try { resetMMISubmitState(); } catch(e) {} window._circuitCapture(data); return; }
    showMMIPrediction(feedbackWrap, data, { tier, specialistMode: mmiSpecialistMode, stationCategory: s.category || '', durationSec: mmiRecordingDurationSec, visualDegraded });
    return;
@@ -951,7 +951,7 @@ function saveMMIPrediction(predictions, data) {
   const criteria = ['empathy','communication','reasoning','reflection','real_world_awareness'];
   const actual = {};
   for (const key of criteria) {
-   const scores = (feedback.per_prompt || []).map(pp => pp?.criteria?.[key]?.score).filter(s => typeof s === 'number');
+   const scores = (feedback.per_prompt || []).map(pp => pp?.scores?.[key]?.score).filter(s => typeof s === 'number');
    if (scores.length) actual[key] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
   }
   const saved = JSON.parse(localStorage.getItem('mmi_predictions') || '[]');

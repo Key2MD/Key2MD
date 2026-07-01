@@ -103,7 +103,7 @@ function buildWeightedPool(stations) {
  if (daysSince >= 7) w = 6;
  else if (daysSince >= 3) w = 3;
  else w = 1;
- if (h.lastScore != null && h.lastScore < 6) w += 2;
+ if (h.lastScore != null && h.lastScore < (String(id).startsWith('mmi_') ? 3 : 6)) w += 2;
  }
  return { station: s, weight: w };
  });
@@ -2501,7 +2501,7 @@ function updateSeenPill(station) {
  pill.innerHTML = '<span class="pill-new">* New</span>';
  } else {
  const daysAgo = h.lastSeenAt ? Math.floor((Date.now() - h.lastSeenAt) / 86400000) : null;
- const qStr = h.lastScore != null ? ' | ' + getQuartile(h.lastScore).q : '';
+ const qStr = h.lastScore != null ? ' | ' + (currentMode === MODE_MMI ? (Math.round(h.lastScore * 10) / 10) + '/5' : getQuartile(h.lastScore).q) : '';
  const whenStr = daysAgo === 0 ? 'Today' : daysAgo === 1 ? '1d ago' : (daysAgo + 'd ago');
  pill.innerHTML = `<span class="pill-reviewed"> ${daysAgo === 0 ? 'Today' : 'Reviewed | ' + whenStr}${qStr}</span>`;
  }
