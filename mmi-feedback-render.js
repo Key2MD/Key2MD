@@ -38,6 +38,8 @@ const MMIFeedbackRender = (() => {
  }
 
  function finiteScore(value) {
+ if (value === null || value === undefined) return null;
+ if (typeof value === 'string' && value.trim() === '') return null;
  const n = Number(value);
  return Number.isFinite(n) ? Math.max(1, Math.min(5, Math.round(n * 10) / 10)) : null;
  }

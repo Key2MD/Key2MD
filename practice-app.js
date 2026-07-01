@@ -1150,6 +1150,20 @@ function applyModeUI(mode) {
  const vmr = $('verbalModeRow');
  if (vmr) vmr.style.display = isMMI ? '' : 'none';
 
+ const benchNum=$('statBenchNum'), benchLabel=$('statBenchLabel'), strongNum=$('statStrongNum'), strongLabel=$('statStrongLabel');
+ if(benchNum) benchNum.textContent = isMMI ? '3.5+' : '7+';
+ if(benchLabel) benchLabel.textContent = isMMI ? 'Solid band' : 'Likely Q4 calibration';
+ if(strongNum) strongNum.textContent = isMMI ? '4+' : '8+';
+ if(strongLabel) strongLabel.textContent = isMMI ? 'Competitive position' : 'Strong position';
+ const heatEmpty=$('heatmapEmptyState'), compEmpty=$('competencyProgressEmptyState');
+ if(heatEmpty) heatEmpty.textContent = isMMI
+ ? 'Complete an AI-marked MMI station and this area turns into your criterion heatmap. It will show which of the five criteria are dragging your score down instead of making you guess.'
+ : 'Complete an AI-marked CASPer station and this area turns into your competency heatmap. It will show which habits are dragging your score down instead of making you guess.';
+ if(compEmpty) compEmpty.textContent = isMMI
+ ? 'After a few AI-marked MMI stations, this becomes your longer-term trend. Until then, use the session score and feedback text rather than over-reading one mark.'
+ : 'After a few AI-marked responses, this becomes your longer-term trend. Until then, use the session score and feedback text rather than over-reading one mark.';
+ updateAvgStat();
+
  syncIdleTimerPickers();
  updateCasperReflectionUI();
 }
@@ -2445,7 +2459,7 @@ function updateTrend(){
  const avg=sc.reduce((a,b)=>a+b,0)/sc.length;
  if(trendAvgLine)trendAvgLine.style.display='flex';if(trendAvgNum)trendAvgNum.textContent=(Math.round(avg*10)/10)+'/10';
 }
-function updateAvgStat(){const avg=avgScores();if(avg!==null){statAvg.textContent=avg+'/10';statAvg.style.color=avg>=7?'var(--green)':avg>=5?'var(--gold)':'var(--red)';} updateLeaderboard(); updateCategoryHeatmap();}
+function updateAvgStat(){const avg=avgScores();const mmi=currentMode===MODE_MMI;const outOf=mmi?5:10;const strong=mmi?3.5:7,ok=mmi?2.6:5;if(avg!==null){statAvg.textContent=avg+'/'+outOf;statAvg.style.color=avg>=strong?'var(--green)':avg>=ok?'var(--gold)':'var(--red)';}else{statAvg.textContent='-';statAvg.style.color='var(--gray400)';} updateLeaderboard(); updateCategoryHeatmap();}
 
 function updateLibraryCoverage() {
  if(typeof STATIONS !== 'undefined') {
